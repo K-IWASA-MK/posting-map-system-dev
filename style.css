@@ -95,6 +95,15 @@ input::placeholder { text-align: center; }
   font-family: "Inter", "Noto Sans JP", sans-serif !important;
 }
 
+#screen-gateway .gateway-header-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 1.5rem !important;
+  margin-top: 0 !important;
+}
+
 #screen-gateway .gateway-icon-container {
   width: 11rem !important;
   height: 11rem !important;
@@ -113,8 +122,68 @@ input::placeholder { text-align: center; }
   box-sizing: border-box !important;
 }
 
+#screen-gateway .gateway-icon-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 3.5rem !important;
+  z-index: 10 !important;
+}
+
+#screen-gateway .gateway-header-wrap h2 {
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
+  color: rgba(255,255,255,0.72) !important;
+  margin: 0 !important;
+}
+
+#screen-gateway .gateway-header-wrap p {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: rgba(255,255,255,0.4) !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0 !important;
+}
+
+#screen-gateway .gateway-content-wrap {
+  width: 100% !important;
+  max-width: 24rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+}
+
+#screen-gateway .gateway-btn-card {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 2.5rem !important;
+  padding: 2rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5) !important;
+  box-sizing: border-box !important;
+}
+
+#screen-gateway .btn-neu {
+  width: 100% !important;
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border-radius: 1rem !important;
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+  font-size: 1.125rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: -0.05em !important;
+  border: none !important;
+  box-shadow: 0 20px 25px -5px rgba(37,99,235,0.3) !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
 #screen-gateway .gateway-footer {
-  margin-top: 1.5rem !important;
+  margin-top: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 0.25rem !important;
