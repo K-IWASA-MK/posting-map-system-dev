@@ -327,22 +327,20 @@
       const container = $('settings-content');
       
       if (!userInfo) {
-        // Card 1: Registration (Absolute alignment with Splash Model)
         container.innerHTML = `
           <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
             <div class="mb-10 text-center">
               <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                 <span class="font-black">お名前を登録して</span><br>
-                <span class="font-medium">ください</span>
+                <span class="font-medium">業務を開始しましょう</span>
               </p>
             </div>
-            <div class="w-full space-y-8 text-left">
-              <div>
-                <label style="color: rgba(255,255,255,0.72);" class="text-[11px] font-black uppercase tracking-[0.2em] mb-4 block text-center">苗字</label>
-                <input type="text" id="user-last" class="w-full bg-white rounded-2xl py-6 px-7 text-lg font-black text-black text-left outline-none shadow-xl" placeholder="例：鈴木">
-              </div>
-              <div>
-                <label style="color: rgba(255,255,255,0.72);" class="text-[11px] font-black uppercase tracking-[0.2em] mb-4 block text-center">名前</label>
+            
+            <div class="w-full max-w-sm space-y-10 relative z-10">
+              <!-- 二重構造の入力フレーム: より強固な高級感 -->
+              <div class="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl relative">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent rounded-[2.5rem] pointer-events-none"></div>
+                <input type="text" id="user-last" class="w-full bg-white rounded-2xl py-6 px-7 text-lg font-black text-black text-left outline-none shadow-xl mb-4" placeholder="例：岩佐">
                 <input type="text" id="user-first" class="w-full bg-white rounded-2xl py-6 px-7 text-lg font-black text-black text-left outline-none shadow-xl" placeholder="例：一郎">
               </div>
               
@@ -356,7 +354,7 @@
       } else {
         // Card 2: Distributor ID Card (Standardized to Splash Model)
         container.innerHTML = `
-          <div class="-mt-40 py-10 px-4 flex flex-col items-center">
+          <div class="py-10 px-4 flex flex-col items-center">
             <div class="mb-16 text-center">
               <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
                 <span class="font-black">配布員証</span><br>
@@ -384,6 +382,7 @@
             </div>
           </div>
         `;
+        setTimeout(() => { $('content').scrollTop = 120; }, 10);
       }
     }
 
