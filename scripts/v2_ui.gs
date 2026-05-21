@@ -211,6 +211,9 @@ function applyProDesign(sheet) {
   sheet.setColumnWidth(6, 120); // 枚数 (F) - 拡大
   sheet.setColumnWidth(7, 220); // 担当 (G) - 拡大
 
+  // F列（枚数）のプルダウン（データの入力規則）をクリアして、自由な数字入力に対応させる
+  sheet.getRange("F2:F11").clearDataValidation();
+
   // 行の高さ調整（85pxのゆったりサイズ）
   sheet.setRowHeight(1, 50); // ヘッダー
   const dataRowHeight = 85; // データ行
