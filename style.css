@@ -74,3 +74,59 @@ button, .btn-neu, .nav-btn, .clickable-card {
 
 .description { line-height: 160%; }
 input::placeholder { text-align: center; }
+
+/* Gateway/Splash Screen instant layout to prevent CDN load shift */
+#screen-gateway {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 1000 !important;
+  background-color: #000000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.5rem !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  font-family: "Inter", "Noto Sans JP", sans-serif !important;
+}
+
+#screen-gateway .gateway-icon-container {
+  width: 11rem !important;
+  height: 11rem !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 3.8rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  margin-bottom: 1.5rem !important;
+  padding: 0.25rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5) !important;
+  box-sizing: border-box !important;
+}
+
+#screen-gateway .gateway-footer {
+  margin-top: 1.5rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem !important;
+}
+
+#screen-gateway .gateway-footer p {
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  color: #4b5563 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.4em !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
