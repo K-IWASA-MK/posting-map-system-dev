@@ -83,6 +83,22 @@ function doPost(e) {
       case 'registerStaff':
         response = registerStaff(postData.lastName, postData.firstName);
         break;
+      case 'forceStartBatch':
+        forceStartBatch();
+        response = { success: true, message: 'Batch run initiated successfully' };
+        break;
+      case 'refreshCache':
+        const cacheResult = refreshAreaSummaryCache();
+        response = { success: true, message: 'Cache sync completed successfully', data: cacheResult };
+        break;
+      case 'aggregateStats':
+        aggregateTotalVolumes();
+        response = { success: true, message: 'Aggregation completed successfully' };
+        break;
+      case 'resetAllSheets':
+        deleteAllAreaSheets();
+        response = { success: true, message: 'All area sheets reset successfully' };
+        break;
       default:
         response = { success: false, message: 'Invalid POST action' };
     }
@@ -114,12 +130,29 @@ function getAppData() {
     CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL, CONFIG.SHEET_SYSTEM_CACHE
   ];
 
+  let dashboardData;
+  try {
+    dashboardData = getDashboardData();
+  } catch (e) {
+    dashboardData = { summary: [] };
+  }
+
+  const progressMap = {};
+  if (dashboardData && dashboardData.summary) {
+    dashboardData.summary.forEach(item => {
+      progressMap[item.name] = item.total > 0 ? Math.round((item.done / item.total) * 100) : 0;
+    });
+  }
+
   const areas = sheets
     .filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden())
-    .map(s => ({
-      name: s.getName(),
-      progress: 0 // 高速化のため進捗計算は一旦スキップ
-    }));
+    .map(s => {
+      const name = s.getName();
+      return {
+        name: name,
+        progress: progressMap[name] !== undefined ? progressMap[name] : 0
+      };
+    });
 
   return {
     success: true,
@@ -161,8 +194,31 @@ function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) 
   const s = ss.getSheetByName(areaName);
   if (!s) return { success: false, message: "Sheet not found" };
 
+  // 1. キャッシュ更新のための値の変化を検知
+  const prevVal = s.getRange(rowId, 4).getValue();
+  const wasDone = prevVal === true || prevVal === "TRUE";
+  const nowDone = isDone === true || isDone === "TRUE";
+  
+  let isDoneChange = 0;
+  if (!wasDone && nowDone) {
+    isDoneChange = 1;
+  } else if (wasDone && !nowDone) {
+    isDoneChange = -1;
+  }
+
+  // 2. セルの更新
   const now = new Date();
   s.getRange(rowId, 4, 1, 3).setValues([[isDone, staffName, now]]);
+
+  // 3. キャッシュの更新
+  if (isDoneChange !== 0) {
+    try {
+      updateAreaCache(areaName, isDoneChange);
+    } catch (e) {
+      // キャッシュ更新エラーは無視
+    }
+  }
+
   return { success: true };
 }
 

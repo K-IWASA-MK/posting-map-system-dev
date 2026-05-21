@@ -77,7 +77,7 @@
       <!-- DETAIL PAGE -->
       <section id="page-detail" class="page hidden space-y-8">
         <div class="flex items-center gap-4 mb-4">
-          <button onclick="switchPage('areas')" class="w-12 h-12 neu-flat rounded-2xl flex items-center justify-center text-xl">‹</button>
+          <button onclick="switchPage('areas')" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
           <h2 id="detail-title" class="text-2xl font-black text-navy dark:text-white tracking-tighter truncate">Area Detail</h2>
         </div>
         <div id="detail-list" class="space-y-8 pb-20"></div>
@@ -92,8 +92,8 @@
     </main>
 
     <!-- 下ナビ：iOSライクなガラス感に調整 -->
-    <nav id="bottom-nav" class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
-      <div style="background: rgba(20,20,20,0.72); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border-top: 1px solid rgba(255,255,255,0.04);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
+    <nav id="bottom-nav" style="bottom: calc(env(safe-area-inset-bottom) + 1rem);" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
+      <div style="background: rgba(20,20,20,0.72); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.02);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
         <button onclick="switchPage('areas')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">📍</div><span class="text-[10px] font-black uppercase tracking-widest text-gray-500">地区</span></button>
         <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-gray-500">設定</span></button>
       </div>
