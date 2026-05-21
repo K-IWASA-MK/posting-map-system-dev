@@ -208,3 +208,30 @@ input::placeholder { text-align: center; }
   line-height: 1 !important;
 }
 
+/* Custom Numpad Modal Styles */
+#numpad-modal .numpad-key {
+  height: 72px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s cubic-bezier(0.25, 0.8, 0.25, 1);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#numpad-modal .numpad-key:active {
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(0.94);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Glassmorphism adjustments for numpad */
+#numpad-modal > div {
+  box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}

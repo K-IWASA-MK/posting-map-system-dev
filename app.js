@@ -153,22 +153,107 @@ async function loadData(skipSync = false) {
   }
 }
 
-async function updateRecord(areaName, rowId, field, val) {
+let numpadContext = null;
+
+function openNumpad(areaName, rowId, initialCount, isDoneToggle = false, checkbox = null) {
+  numpadContext = {
+    areaName,
+    rowId,
+    isDoneToggle,
+    checkbox,
+    currentVal: initialCount ? String(initialCount) : '0'
+  };
+  
+  $('numpad-display').textContent = numpadContext.currentVal;
+  
+  const modal = $('numpad-modal');
+  modal.classList.remove('pointer-events-none', 'opacity-0');
+  const content = modal.firstElementChild;
+  content.classList.remove('translate-y-full');
+}
+
+function closeNumpad() {
+  if (!numpadContext) return;
+  
+  if (numpadContext.isDoneToggle && numpadContext.checkbox) {
+    numpadContext.checkbox.checked = false;
+  }
+  
+  const modal = $('numpad-modal');
+  modal.classList.add('opacity-0', 'pointer-events-none');
+  const content = modal.firstElementChild;
+  content.classList.add('translate-y-full');
+  
+  numpadContext = null;
+}
+
+function pressNum(key) {
+  if (!numpadContext) return;
+  
+  if (key === 'C') {
+    numpadContext.currentVal = '0';
+  } else if (key === 'OK') {
+    const valNum = parseFloat(numpadContext.currentVal) || 0;
+    const { areaName, rowId } = numpadContext;
+    
+    // Update local state instantly
+    const p = allPoints.find(point => point.rowId === rowId);
+    if (p) {
+      p.isDone = true;
+      p.count = valNum;
+      
+      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+      p.staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+      
+      const now = new Date();
+      p.completedAt = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      const card = $(`point-card-${rowId}`);
+      if (card) {
+        card.innerHTML = renderPointCardHtml(areaName, p);
+      }
+    }
+    
+    // De-couple toggle so closeNumpad doesn't reset checkbox
+    numpadContext.isDoneToggle = false;
+    closeNumpad();
+    
+    // Update server
+    updateRecord(areaName, rowId, true, valNum);
+    return;
+  } else {
+    // Digit key pressed
+    if (numpadContext.currentVal === '0') {
+      numpadContext.currentVal = String(key);
+    } else {
+      if (numpadContext.currentVal.length < 5) {
+        numpadContext.currentVal += String(key);
+      }
+    }
+  }
+  
+  $('numpad-display').textContent = numpadContext.currentVal;
+}
+
+async function updateRecord(areaName, rowId, isDone, count) {
   const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
   const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+  const staffId = userInfo.id || '';
   
   const payload = {
     areaName: areaName,
     rowId: rowId,
     staffName: staffName,
-    isDone: val,
+    staffId: staffId,
+    isDone: isDone,
+    count: count,
     action: 'submitDistribution'
   };
 
   // Optimistic UI updates if offline or connection fails
   if (!navigator.onLine) {
     saveToOfflineQueue(payload);
-    applyOptimisticCheck(areaName, rowId, val);
+    applyOptimisticCheck(areaName, rowId, isDone, count);
     return;
   }
   
@@ -180,7 +265,7 @@ async function updateRecord(areaName, rowId, field, val) {
   } catch (e) {
     console.warn("API write failed. Storing report to offline queue.");
     saveToOfflineQueue(payload);
-    applyOptimisticCheck(areaName, rowId, val);
+    applyOptimisticCheck(areaName, rowId, isDone, count);
   }
 }
 
@@ -192,30 +277,29 @@ function saveToOfflineQueue(payload) {
   setSyncStatus('offline');
 }
 
-function applyOptimisticCheck(areaName, rowId, val) {
-  const label = document.querySelector(`input[onchange*="${areaName}"][onchange*="${rowId}"]`)?.closest('label');
-  if (label) {
-    const checkbox = label.querySelector('div');
-    const statusText = label.querySelector('span');
-    if (val) {
-      label.style.cssText = 'background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);';
-      if (checkbox) {
-        checkbox.style.cssText = 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);';
-        checkbox.innerHTML = '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
-      }
-      if (statusText) {
-        statusText.className = 'text-[10px] font-black uppercase tracking-widest text-[#10b981]';
-        statusText.textContent = 'MISSION COMPLETED (OFFLINE)';
-      }
+function applyOptimisticCheck(areaName, rowId, isDone, count) {
+  const p = allPoints.find(point => point.rowId === rowId);
+  if (p) {
+    p.isDone = isDone;
+    p.count = count;
+    if (isDone) {
+      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+      p.staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+      const now = new Date();
+      p.completedAt = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     } else {
-      label.style.cssText = 'background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05);';
-      if (checkbox) {
-        checkbox.style.cssText = 'border-color: rgba(255,255,255,0.2); background-color: transparent;';
-        checkbox.innerHTML = '';
-      }
-      if (statusText) {
-        statusText.className = 'text-[10px] font-black uppercase tracking-widest text-white/60';
-        statusText.textContent = 'READY TO DEPLOY';
+      p.completedAt = '';
+      p.staffName = '';
+    }
+    
+    const card = $(`point-card-${rowId}`);
+    if (card) {
+      card.innerHTML = renderPointCardHtml(areaName, p);
+      if (!navigator.onLine) {
+        const statusText = card.querySelector('label span');
+        if (statusText) {
+          statusText.textContent = isDone ? 'MISSION COMPLETED (OFFLINE)' : 'READY TO DEPLOY (OFFLINE)';
+        }
       }
     }
   }

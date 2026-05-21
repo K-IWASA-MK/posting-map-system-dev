@@ -24,6 +24,52 @@ function renderAreas() {
   }).join('');
 }
 
+// Render single card contents
+function renderPointCardHtml(areaName, p) {
+  return `
+    <div class="flex justify-between items-start gap-4">
+      <div class="flex-1 space-y-2">
+        <div class="text-lg font-black text-white tracking-tight leading-tight">${p.address}</div>
+        ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5">${p.memo}</div>` : ''}
+      </div>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
+    </div>
+    
+    <div class="flex flex-col gap-4">
+      <label style="${p.isDone ? 'background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);' : 'background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05);'}" class="rounded-3xl p-5 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all">
+        <input type="checkbox" class="hidden" ${p.isDone?'checked':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
+        <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(255,255,255,0.2); background-color: transparent;'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0">
+          ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
+        </div>
+        <div class="flex-1 min-w-0">
+          <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">${p.isDone?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
+          ${p.isDone && p.completedAt ? `
+            <div class="text-[10px] text-white/40 font-bold mt-0.5 tracking-wider uppercase">${p.completedAt} ${p.staffName ? `· ${p.staffName}` : ''}</div>
+          ` : ''}
+        </div>
+      </label>
+
+      ${p.isDone ? `
+        <div class="flex justify-between items-center bg-white/5 border border-white/5 rounded-2xl p-5">
+          <div class="flex items-baseline">
+            <span class="text-3xl font-black text-white tracking-tight">${p.count || 0}</span>
+            <span class="text-xs font-bold text-white/60 ml-1">枚</span>
+          </div>
+          <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all">枚数変更</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+// Render the entire details list using global allPoints
+function renderDetailList(areaName) {
+  $('detail-list').innerHTML = allPoints.map((p, i) => `
+    <div id="point-card-${p.rowId}" class="premium-glass p-8 space-y-6">
+      ${renderPointCardHtml(areaName, p)}
+    </div>`).join('');
+}
+
 async function openDetail(name) {
   $('loading').classList.remove('hidden');
   $('loading').classList.remove('opacity-0');
@@ -34,22 +80,8 @@ async function openDetail(name) {
     const data = await callApi('getAreaDetails', { name: name });
     if (data && data.points) {
       $('detail-title').textContent = name;
-      $('detail-list').innerHTML = data.points.map((p, i) => `
-        <div class="premium-glass p-8 space-y-6">
-          <div class="flex justify-between items-start gap-4">
-            <div class="text-lg font-black text-white tracking-tight leading-tight">${p.address}</div>
-            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl">📍</a>
-          </div>
-          <div class="flex flex-col gap-6">
-            <label style="${p.isDone ? 'background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);' : 'background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05);'}" class="rounded-3xl p-5 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all">
-              <input type="checkbox" class="hidden" ${p.isDone?'checked':''} onchange="updateRecord('${name}',${p.rowId},'done',this.checked)">
-              <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(255,255,255,0.2); background-color: transparent;'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all">
-                ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
-              </div>
-              <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">${p.isDone?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
-            </label>
-          </div>
-        </div>`).join('');
+      allPoints = data.points;
+      renderDetailList(name);
       switchPage('detail');
     }
   } catch (e) {
@@ -58,6 +90,31 @@ async function openDetail(name) {
   
   $('loading').classList.add('opacity-0');
   setTimeout(() => $('loading').classList.add('hidden'), 700);
+}
+
+function toggleDone(areaName, rowId, checkbox) {
+  const p = allPoints.find(point => point.rowId === rowId);
+  if (!p) return;
+  
+  if (checkbox.checked) {
+    // Open numpad modal
+    openNumpad(areaName, rowId, p.count || 0, true, checkbox);
+  } else {
+    // Directly clear completion and count
+    p.isDone = false;
+    p.count = 0;
+    p.completedAt = '';
+    p.staffName = '';
+    
+    // Update local card
+    const card = $(`point-card-${rowId}`);
+    if (card) {
+      card.innerHTML = renderPointCardHtml(areaName, p);
+    }
+    
+    // Send update to server
+    updateRecord(areaName, rowId, false, 0);
+  }
 }
 
 function renderSettings() {

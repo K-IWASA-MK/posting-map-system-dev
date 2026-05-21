@@ -169,13 +169,15 @@ function getAreaDetails(areaName) {
   const lastRow = s.getLastRow();
   if (lastRow < 2) return { success: true, points: [] };
 
-  const values = s.getRange(2, 1, lastRow - 1, 6).getValues();
+  const values = s.getRange(2, 1, lastRow - 1, 8).getValues();
   const points = values.map((r, i) => ({
     rowId: i + 2,
     address: r[0],
     memo: r[2],
     isDone: r[3] === true || r[3] === "TRUE",
-    staffName: r[4]
+    completedAt: r[4] ? String(r[4]).trim() : "",
+    count: parseFloat(r[5]) || 0,
+    staffName: r[6]
   }));
 
   return { success: true, points: points };
@@ -228,9 +230,16 @@ function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) 
       isDoneChange = -1;
     }
 
-    // 2. セルの更新
+    // 2. セルの更新 (F列の枚数は count を書き込む。isDone が false の場合はクリア)
     const now = new Date();
-    s.getRange(rowId, 4, 1, 3).setValues([[isDone, staffName, now]]);
+    const completedAt = Utilities.formatDate(now, "JST", "MM/dd HH:mm");
+    
+    // D, E列の更新 (完了、日付)
+    s.getRange(rowId, 4, 1, 2).setValues([[isDone, isDone ? completedAt : ""]]);
+    // F列（枚数）の更新
+    s.getRange(rowId, 6).setValue(isDone ? (parseFloat(count) || 0) : "");
+    // G, H列の更新 (担当、スタッフID)
+    s.getRange(rowId, 7, 1, 2).setValues([[isDone ? staffName : "", isDone ? (staffId || "") : ""]]);
 
     // 3. キャッシュの更新
     if (isDoneChange !== 0) {

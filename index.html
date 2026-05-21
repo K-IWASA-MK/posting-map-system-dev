@@ -100,6 +100,34 @@
     </nav>
   </div>
 
+  <!-- 4. CUSTOM NUMPAD MODAL -->
+  <div id="numpad-modal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none">
+    <div class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 pb-12 transform translate-y-full transition-transform duration-300 space-y-6">
+      <div class="flex justify-between items-center">
+        <span class="text-[10px] font-black uppercase tracking-widest text-white/40">配布枚数入力</span>
+        <button id="numpad-close" onclick="closeNumpad()" class="text-sm font-bold text-[#2563eb]">キャンセル</button>
+      </div>
+      <div class="flex justify-center items-baseline py-4 border-b border-white/5">
+        <div id="numpad-display" class="text-5xl font-black text-white tracking-tighter">0</div>
+        <span class="text-sm font-bold text-white/60 ml-2">枚</span>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <button onclick="pressNum(1)" class="numpad-key">1</button>
+        <button onclick="pressNum(2)" class="numpad-key">2</button>
+        <button onclick="pressNum(3)" class="numpad-key">3</button>
+        <button onclick="pressNum(4)" class="numpad-key">4</button>
+        <button onclick="pressNum(5)" class="numpad-key">5</button>
+        <button onclick="pressNum(6)" class="numpad-key">6</button>
+        <button onclick="pressNum(7)" class="numpad-key">7</button>
+        <button onclick="pressNum(8)" class="numpad-key">8</button>
+        <button onclick="pressNum(9)" class="numpad-key">9</button>
+        <button onclick="pressNum('C')" class="numpad-key text-red-500 font-bold">C</button>
+        <button onclick="pressNum(0)" class="numpad-key">0</button>
+        <button onclick="pressNum('OK')" class="numpad-key bg-[#2563eb] text-white font-black shadow-[0_0_15px_rgba(37,99,235,0.4)]">OK</button>
+      </div>
+    </div>
+  </div>
+
   <script src="./app.js?v=202"></script>
   <script src="./render.js?v=202"></script>
 </body>
