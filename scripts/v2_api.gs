@@ -186,7 +186,21 @@ function getRoster() {
   if (!s) return [];
   const lastRow = s.getLastRow();
   if (lastRow < 2) return [];
-  return s.getRange(2, 1, lastRow - 1, 2).getValues().map(r => ({ id: r[0], name: r[1] }));
+  
+  const values = s.getRange(2, 1, lastRow - 1, 3).getValues();
+  const roster = [];
+  
+  for (let i = 0; i < values.length; i++) {
+    const id = String(values[i][0] || "").trim();
+    const lastName = String(values[i][1] || "").trim();
+    const firstName = String(values[i][2] || "").trim();
+    
+    if (id !== "" && lastName !== "") {
+      const fullName = (lastName + " " + firstName).trim();
+      roster.push({ id: id, name: fullName });
+    }
+  }
+  return roster;
 }
 
 function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) {
@@ -244,14 +258,89 @@ function registerStaff(lastName, firstName) {
   try {
     const ss = getSS();
     const s = ss.getSheetByName(CONFIG.SHEET_ROSTER);
-    if (!s) return { success: false };
+    if (!s) return { success: false, message: "Roster sheet not found" };
 
-    const name = lastName + " " + firstName;
+    const cleanLast = String(lastName || "").trim();
+    const cleanFirst = String(firstName || "").trim();
+    if (!cleanLast || !cleanFirst) {
+      return { success: false, message: "姓と名を入力してください。" };
+    }
+
+    const name = cleanLast + " " + cleanFirst;
+
+    // A列からC列のデータをすべて取得してチェック
     const lastRow = s.getLastRow();
-    const newId = "S" + Utilities.formatDate(new Date(), "JST", "yyyyMMddHHmmss");
-    s.appendRow([newId, name, new Date()]);
-    
-    return { success: true, id: newId, name: name };
+    let values = [];
+    if (lastRow >= 1) {
+      values = s.getRange(1, 1, lastRow, 3).getValues();
+    }
+
+    // 1. 既存の同姓同名スタッフがいないかチェック
+    for (let i = 1; i < values.length; i++) {
+      const rowId = String(values[i][0] || "").trim();
+      const rowLast = String(values[i][1] || "").trim();
+      const rowFirst = String(values[i][2] || "").trim();
+
+      if (rowLast === cleanLast && rowFirst === cleanFirst && rowId !== "") {
+        // 既に存在する場合はそのIDを返す (重複防止・ID復元)
+        return { success: true, id: rowId, name: name, message: "existing" };
+      }
+    }
+
+    // 2. 新規採番 (A列の最大値 + 1) と書き込み先の決定
+    let maxIdNum = 0;
+    let prefix = "S"; // デフォルトプレフィックス
+    let paddingWidth = 3; // デフォルトパディング幅 (S001 -> 3桁)
+    let targetRow = values.length + 1;
+    let foundEmptyRow = false;
+
+    for (let i = 1; i < values.length; i++) {
+      const rowId = String(values[i][0] || "").trim();
+      const rowLast = String(values[i][1] || "").trim();
+
+      if (rowId !== "") {
+        // 例: "S001" -> prefix: "S", numPart: "001"
+        const match = rowId.match(/^([A-Za-z]*)(0*)(\d+)$/);
+        if (match) {
+          const currentPrefix = match[1];
+          const zeros = match[2];
+          const numStr = match[3];
+          const idNum = parseInt(numStr, 10);
+          
+          if (!isNaN(idNum) && idNum > maxIdNum) {
+            maxIdNum = idNum;
+            prefix = currentPrefix;
+            paddingWidth = (zeros + numStr).length;
+          }
+        } else {
+          const idNum = parseInt(rowId, 10);
+          if (!isNaN(idNum) && idNum > maxIdNum) {
+            maxIdNum = idNum;
+            prefix = "";
+            paddingWidth = 0;
+          }
+        }
+      }
+
+      // データ書き込み先として、ヘッダーより下で「IDが空かつ苗字が空」の最初の行を再利用する
+      if (!foundEmptyRow && rowId === "" && rowLast === "") {
+        targetRow = i + 1;
+        foundEmptyRow = true;
+      }
+    }
+
+    const nextIdNum = maxIdNum + 1;
+    let newId = "";
+    if (paddingWidth > 0) {
+      newId = prefix + String(nextIdNum).padStart(paddingWidth, '0');
+    } else {
+      newId = prefix + nextIdNum;
+    }
+
+    // 指定の行に書き込む (A: ID, B: 苗字, C: 名前)
+    s.getRange(targetRow, 1, 1, 3).setValues([[newId, cleanLast, cleanFirst]]);
+
+    return { success: true, id: newId, name: name, message: "new" };
   } finally {
     lock.releaseLock();
   }

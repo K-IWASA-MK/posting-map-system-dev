@@ -135,8 +135,7 @@ async function loadData(skipSync = false) {
       renderAreas();
       updateStats();
       
-      const saved = localStorage.getItem('user_info');
-      switchPage(saved ? 'areas' : 'settings');
+      switchPage('settings');
       
       $('app').classList.remove('hidden');
       setTimeout(() => {
