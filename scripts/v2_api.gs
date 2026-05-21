@@ -190,47 +190,69 @@ function getRoster() {
 }
 
 function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) {
-  const ss = getSS();
-  const s = ss.getSheetByName(areaName);
-  if (!s) return { success: false, message: "Sheet not found" };
-
-  // 1. キャッシュ更新のための値の変化を検知
-  const prevVal = s.getRange(rowId, 4).getValue();
-  const wasDone = prevVal === true || prevVal === "TRUE";
-  const nowDone = isDone === true || isDone === "TRUE";
-  
-  let isDoneChange = 0;
-  if (!wasDone && nowDone) {
-    isDoneChange = 1;
-  } else if (wasDone && !nowDone) {
-    isDoneChange = -1;
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(15000); // 15 seconds maximum wait
+  } catch (e) {
+    throw new Error("サーバーが混雑しています。時間をおいて再度お試しください。");
   }
 
-  // 2. セルの更新
-  const now = new Date();
-  s.getRange(rowId, 4, 1, 3).setValues([[isDone, staffName, now]]);
+  try {
+    const ss = getSS();
+    const s = ss.getSheetByName(areaName);
+    if (!s) return { success: false, message: "Sheet not found" };
 
-  // 3. キャッシュの更新
-  if (isDoneChange !== 0) {
-    try {
-      updateAreaCache(areaName, isDoneChange);
-    } catch (e) {
-      // キャッシュ更新エラーは無視
+    // 1. キャッシュ更新のための値の変化を検知
+    const prevVal = s.getRange(rowId, 4).getValue();
+    const wasDone = prevVal === true || prevVal === "TRUE";
+    const nowDone = isDone === true || isDone === "TRUE";
+    
+    let isDoneChange = 0;
+    if (!wasDone && nowDone) {
+      isDoneChange = 1;
+    } else if (wasDone && !nowDone) {
+      isDoneChange = -1;
     }
-  }
 
-  return { success: true };
+    // 2. セルの更新
+    const now = new Date();
+    s.getRange(rowId, 4, 1, 3).setValues([[isDone, staffName, now]]);
+
+    // 3. キャッシュの更新
+    if (isDoneChange !== 0) {
+      try {
+        updateAreaCache(areaName, isDoneChange);
+      } catch (e) {
+        // キャッシュ更新エラーは無視
+      }
+    }
+
+    return { success: true };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function registerStaff(lastName, firstName) {
-  const ss = getSS();
-  const s = ss.getSheetByName(CONFIG.SHEET_ROSTER);
-  if (!s) return { success: false };
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(15000);
+  } catch (e) {
+    throw new Error("サーバーが混雑しています。時間をおいて再度お試しください。");
+  }
 
-  const name = lastName + " " + firstName;
-  const lastRow = s.getLastRow();
-  const newId = "S" + Utilities.formatDate(new Date(), "JST", "yyyyMMddHHmmss");
-  s.appendRow([newId, name, new Date()]);
-  
-  return { success: true, id: newId, name: name };
+  try {
+    const ss = getSS();
+    const s = ss.getSheetByName(CONFIG.SHEET_ROSTER);
+    if (!s) return { success: false };
+
+    const name = lastName + " " + firstName;
+    const lastRow = s.getLastRow();
+    const newId = "S" + Utilities.formatDate(new Date(), "JST", "yyyyMMddHHmmss");
+    s.appendRow([newId, name, new Date()]);
+    
+    return { success: true, id: newId, name: name };
+  } finally {
+    lock.releaseLock();
+  }
 }
