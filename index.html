@@ -323,8 +323,16 @@
     }
 
     function renderSettings() {
+      const content = document.getElementById('content');
       const userInfo = JSON.parse(localStorage.getItem('user_info'));
-      const container = $('settings-content');
+      
+      if (!userInfo) {
+        content.classList.remove('pb-64');
+      } else {
+        content.classList.add('pb-64');
+      }
+      
+      const container = document.createElement('div');
       
       if (!userInfo) {
         // Card 1: Registration (Absolute alignment with Splash Model)
@@ -356,7 +364,7 @@
       } else {
         // Card 2: Distributor ID Card (Standardized to Splash Model)
         container.innerHTML = `
-          <div class="-mt-40 py-10 px-4 flex flex-col items-center">
+          <div class="py-10 px-4 flex flex-col items-center">
             <div class="mb-16 text-center">
               <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
                 <span class="font-black">配布員証</span><br>
@@ -384,6 +392,15 @@
             </div>
           </div>
         `;
+      }
+      
+      content.appendChild(container);
+      
+      // Card 2の場合のみ、アニメーションなしで即座に初期スクロール位置を設定
+      if (userInfo) {
+        requestAnimationFrame(() => {
+          content.scrollTop = 120;
+        });
       }
     }
 
