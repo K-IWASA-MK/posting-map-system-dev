@@ -247,6 +247,12 @@ function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) 
   }
 }
 
+function normalizeName(str) {
+  if (!str) return "";
+  // 全角スペース・半角スペース・タブ・改行を完全に除去
+  return String(str).replace(/[\s\u3000]/g, "");
+}
+
 function registerStaff(lastName, firstName) {
   const lock = LockService.getScriptLock();
   try {
@@ -262,6 +268,9 @@ function registerStaff(lastName, firstName) {
 
     const cleanLast = String(lastName || "").trim();
     const cleanFirst = String(firstName || "").trim();
+    const normLast = normalizeName(lastName);
+    const normFirst = normalizeName(firstName);
+    
     if (!cleanLast || !cleanFirst) {
       return { success: false, message: "姓と名を入力してください。" };
     }
@@ -275,13 +284,13 @@ function registerStaff(lastName, firstName) {
       values = s.getRange(1, 1, lastRow, 3).getValues();
     }
 
-    // 1. 既存の同姓同名スタッフがいないかチェック
+    // 1. 既存の同姓同名スタッフがいないかチェック (スペース無視で比較)
     for (let i = 1; i < values.length; i++) {
       const rowId = String(values[i][0] || "").trim();
-      const rowLast = String(values[i][1] || "").trim();
-      const rowFirst = String(values[i][2] || "").trim();
+      const rowLast = normalizeName(values[i][1]);
+      const rowFirst = normalizeName(values[i][2]);
 
-      if (rowLast === cleanLast && rowFirst === cleanFirst && rowId !== "") {
+      if (rowLast === normLast && rowFirst === normFirst && rowId !== "") {
         // 既に存在する場合はそのIDを返す (重複防止・ID復元)
         return { success: true, id: rowId, name: name, message: "existing" };
       }
