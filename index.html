@@ -86,7 +86,12 @@
   </div>
 
   <div id="loading" class="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
-    <div class="w-12 h-12 border-[3px] border-white/10 border-t-[#2563eb] rounded-full animate-spin"></div>
+    <svg class="w-12 h-12" viewBox="0 0 50 50" fill="none" stroke-width="4">
+      <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
+      <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite" />
+      </path>
+    </svg>
     <p class="mt-6 text-[10px] font-black text-white/40 uppercase tracking-[0.3em] animate-pulse">Syncing Data...</p>
   </div>
 
