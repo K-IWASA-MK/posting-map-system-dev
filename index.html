@@ -410,7 +410,9 @@
         const res = await callApi('registerStaff', { lastName: last, firstName: first });
         if (res && res.success) {
           localStorage.setItem('user_info', JSON.stringify({last, first, id: res.id}));
-          loadData();
+          switchPage('settings');
+          $('loading').classList.add('opacity-0');
+          setTimeout(() => $('loading').classList.add('hidden'), 700);
         } else {
           throw new Error('Failed');
         }
