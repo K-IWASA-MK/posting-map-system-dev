@@ -101,7 +101,7 @@ function renderSettings() {
             <span class="font-black">配布員証</span><br>
             <span class="font-medium">公式配布員 IDカード</span>
           </p>
-          \${userInfo.id ? \`<div class="text-xl font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">\${userInfo.id}</div>\` : ''}
+          ${userInfo.id ? `<div class="text-xl font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">${userInfo.id}</div>` : ''}
         </div>
         
         <div class="w-full h-[220px] premium-glass flex flex-col items-center justify-center">
@@ -111,8 +111,8 @@ function renderSettings() {
           </div>
           
           <div style="font-size: 44px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center mb-4">
-            <div>\${userInfo.last}</div>
-            <div>\${userInfo.first}</div>
+            <div>${userInfo.last}</div>
+            <div>${userInfo.first}</div>
           </div>
           
           <p class="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em]">Field Operations</p>
