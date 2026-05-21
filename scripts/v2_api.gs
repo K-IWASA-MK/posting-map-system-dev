@@ -249,8 +249,13 @@ function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) 
 
 function normalizeName(str) {
   if (!str) return "";
-  // 全角スペース・半角スペース・タブ・改行を完全に除去
-  return String(str).replace(/[\s\u3000]/g, "");
+  let s = String(str);
+  // 1. Unicode正規化 (NFC) - Macの濁点結合文字対策など
+  if (typeof s.normalize === 'function') {
+    s = s.normalize('NFC');
+  }
+  // 2. 全角・半角スペース、改行、ゼロ幅スペース(\u200B,\u200C,\u200D)、BOM(\uFEFF)等のすべての不可視文字を除去
+  return s.replace(/[\s\u3000\u200b\u200c\u200d\uFEFF]/g, "");
 }
 
 function registerStaff(lastName, firstName) {
@@ -284,9 +289,9 @@ function registerStaff(lastName, firstName) {
       values = s.getRange(1, 1, lastRow, 3).getValues();
     }
 
-    // 1. 既存の同姓同名スタッフがいないかチェック (スペース無視で比較)
+    // 1. 既存の同姓同名スタッフがいないかチェック (表記揺れ吸収の上で比較)
     for (let i = 1; i < values.length; i++) {
-      const rowId = String(values[i][0] || "").trim();
+      const rowId = normalizeName(values[i][0]);
       const rowLast = normalizeName(values[i][1]);
       const rowFirst = normalizeName(values[i][2]);
 
@@ -300,16 +305,17 @@ function registerStaff(lastName, firstName) {
     let maxIdNum = 0;
     let prefix = "S"; // デフォルトプレフィックス
     let paddingWidth = 3; // デフォルトパディング幅 (S001 -> 3桁)
-    let targetRow = values.length + 1;
+    let targetRow = 0;
     let foundEmptyRow = false;
 
     for (let i = 1; i < values.length; i++) {
-      const rowId = String(values[i][0] || "").trim();
-      const rowLast = String(values[i][1] || "").trim();
+      const valId = normalizeName(values[i][0]);
+      const valLast = normalizeName(values[i][1]);
+      const valFirst = normalizeName(values[i][2]);
 
-      if (rowId !== "") {
+      if (valId !== "") {
         // 例: "S001" -> prefix: "S", numPart: "001"
-        const match = rowId.match(/^([A-Za-z]*)(0*)(\d+)$/);
+        const match = valId.match(/^([A-Za-z]*)(0*)(\d+)$/);
         if (match) {
           const currentPrefix = match[1];
           const zeros = match[2];
@@ -322,7 +328,7 @@ function registerStaff(lastName, firstName) {
             paddingWidth = (zeros + numStr).length;
           }
         } else {
-          const idNum = parseInt(rowId, 10);
+          const idNum = parseInt(valId, 10);
           if (!isNaN(idNum) && idNum > maxIdNum) {
             maxIdNum = idNum;
             prefix = "";
@@ -331,11 +337,15 @@ function registerStaff(lastName, firstName) {
         }
       }
 
-      // データ書き込み先として、ヘッダーより下で「IDが空かつ苗字が空」の最初の行を再利用する
-      if (!foundEmptyRow && rowId === "" && rowLast === "") {
+      // データ書き込み先として、ヘッダーより下で「ID、苗字、名前がすべて実質空白」の最初の行を再利用する
+      if (!foundEmptyRow && valId === "" && valLast === "" && valFirst === "") {
         targetRow = i + 1;
         foundEmptyRow = true;
       }
+    }
+
+    if (!foundEmptyRow) {
+      targetRow = values.length + 1;
     }
 
     const nextIdNum = maxIdNum + 1;
