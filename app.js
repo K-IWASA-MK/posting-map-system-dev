@@ -609,8 +609,23 @@ async function safeInitApp() {
           if (subtitle) subtitle.textContent = "自動ログインに失敗しました。手動で起動してください。";
         }
       } else {
-        logDebug("Not logged in. Redirecting to LINE Login...");
-        liff.login();
+        logDebug("Not logged in.");
+        if (liff.isInClient()) {
+          logDebug("In LINE client. Redirecting to LINE Login automatically...");
+          liff.login();
+        } else {
+          logDebug("In external browser. Showing manual login button.");
+          if (btn) {
+            btn.textContent = "LINEでログイン";
+            btn.onclick = () => {
+              logDebug("Manual login button clicked. Redirecting...");
+              liff.login();
+            };
+            btn.classList.remove('hidden');
+          }
+          if (spinner) spinner.classList.add('hidden');
+          if (subtitle) subtitle.textContent = "ブラウザ環境です。「LINEでログイン」ボタンを押してください。";
+        }
       }
     } catch (err) {
       console.error("LIFF Init Error:", err);
