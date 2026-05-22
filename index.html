@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP PRO v2.0-API</title>
+  <script>
+    // キャッシュによる動作不良を防ぐため、一時的にService Workerを強制解除
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let r of registrations) {
+          r.unregister();
+          console.log('SW unregistered successfully');
+        }
+      });
+    }
+  </script>
   <!-- Force Refresh: v200 (2026-05-15T09:14:40) -->
   <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=200">
@@ -30,7 +41,7 @@
       e.preventDefault();
     }, { passive: false });
   </script>
-  <link rel="stylesheet" href="./style.css?v=217">
+  <link rel="stylesheet" href="./style.css?v=218">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -145,7 +156,7 @@
     </div>
   </div>
 
-  <script src="./app.js?v=217"></script>
-  <script src="./render.js?v=217"></script>
+  <script src="./app.js?v=218"></script>
+  <script src="./render.js?v=218"></script>
 </body>
 </html>
