@@ -55,8 +55,8 @@ async function callApi(action, params = {}) {
     method: 'GET',
     mode: 'cors',
     credentials: 'omit',
-    redirect: 'follow',
-    cache: 'no-cache'
+    cache: 'no-cache',
+    redirect: 'follow'
   };
 
   for (let key in params) {
