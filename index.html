@@ -5,19 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP PRO v2.0-API</title>
   <script>
-    // 早期エラーハンドラとデバッグログ定義
+    // 早期エラーハンドラとデバッグログ定義 (本番用: コンソールのみ出力)
     window.logDebug = function(msg) {
       console.log("[DEBUG]", msg);
-      const logEl = document.getElementById('debug-log');
-      const contentEl = document.getElementById('debug-log-content');
-      if (logEl && contentEl) {
-        logEl.classList.remove('hidden');
-        const item = document.createElement('div');
-        item.className = 'border-b border-red-900/30 pb-0.5';
-        item.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-        contentEl.appendChild(item);
-        logEl.scrollTop = logEl.scrollHeight;
-      }
     };
     window.onerror = function(message, source, lineno, colno, error) {
       if (message === "Script error.") return false;

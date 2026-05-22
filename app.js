@@ -1,18 +1,8 @@
 const $ = id => document.getElementById(id);
 
-// デバッグログ出力関数
+// デバッグログ出力関数 (本番用: コンソールのみ出力)
 window.logDebug = function(msg) {
   console.log("[DEBUG]", msg);
-  const logEl = $('debug-log');
-  const contentEl = $('debug-log-content');
-  if (logEl && contentEl) {
-    logEl.classList.remove('hidden');
-    const item = document.createElement('div');
-    item.className = 'border-b border-red-900/30 pb-0.5';
-    item.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-    contentEl.appendChild(item);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
 };
 window.onerror = function(message, source, lineno, colno, error) {
   if (message === "Script error.") return false;
