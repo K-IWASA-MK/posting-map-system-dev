@@ -22,7 +22,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="./style.css?v=202">
+  <link rel="stylesheet" href="./style.css?v=206">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -224,6 +224,16 @@
     }
 
     window.onload = () => {
+      // ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止
+      const gateway = $('screen-gateway');
+      if (gateway) {
+        gateway.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+      }
+      const loading = $('loading');
+      if (loading) {
+        loading.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+      }
+
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js')
           .then(reg => console.log('Service Worker registered for Admin. Scope:', reg.scope))

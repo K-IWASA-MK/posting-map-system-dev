@@ -18,6 +18,22 @@ function removePressed() {
   });
 }
 
+// ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止
+document.addEventListener('DOMContentLoaded', () => {
+  const gateway = $('screen-gateway');
+  if (gateway) {
+    gateway.addEventListener('touchmove', e => {
+      e.preventDefault();
+    }, { passive: false });
+  }
+  const loading = $('loading');
+  if (loading) {
+    loading.addEventListener('touchmove', e => {
+      e.preventDefault();
+    }, { passive: false });
+  }
+});
+
 // GAS API CONFIG (JSON ONLY)
 const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
 
