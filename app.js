@@ -315,18 +315,48 @@ window.addEventListener('offline', () => {
   setSyncStatus('offline');
 });
 
-function switchPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+async function switchPage(id) {
+  const pages = document.querySelectorAll('.page');
+  const targetId = id === 'detail' ? 'page-detail' : (id === 'settings' ? 'page-settings' : 'page-areas');
+  const target = $(targetId);
+  if (!target) return;
+
+  // すでにアクティブなら多重遷移を防ぐためスキップ
+  if (!target.classList.contains('hidden') && target.style.opacity === '1') return;
+
+  // 1. 現在表示されているページを上にスライドさせながらフェードアウト
+  const activePage = Array.from(pages).find(p => !p.classList.contains('hidden'));
+  if (activePage) {
+    activePage.style.opacity = '0';
+    activePage.style.transform = 'translateY(-12px)';
+    await new Promise(r => setTimeout(r, 200)); // アニメーション時間分待つ
+    activePage.classList.add('hidden');
+  } else {
+    pages.forEach(p => {
+      p.classList.add('hidden');
+      p.style.opacity = '0';
+    });
+  }
+
+  // 2. 設定画面の場合はレンダリングを行う
   if (id === 'settings') renderSettings();
   
-  // 全画面共通：登録済みなら下ナビを表示、未登録なら隠す
+  // 3. ナビゲーションの表示制御
   const nav = $('bottom-nav');
   if (nav) nav.style.display = localStorage.getItem('user_info') ? '' : 'none';
 
-  const target = $(id === 'detail' ? 'page-detail' : (id === 'settings' ? 'page-settings' : 'page-areas'));
-  if(target) target.classList.remove('hidden');
+  // 4. 次のページを少し下から準備してフェードイン
+  target.style.opacity = '0';
+  target.style.transform = 'translateY(12px)';
+  target.classList.remove('hidden');
   
-  // pb-64の制御：設定画面かつ未登録(Card 1)のときのみpb-64を除外。それ以外はpb-64を追加してスクロール領域を確保。
+  // リフローを強制してアニメーションを適用
+  target.offsetHeight; 
+  
+  target.style.opacity = '1';
+  target.style.transform = 'translateY(0)';
+  
+  // pb-64の制御（入力欄のスクロール領域確保）
   const userInfo = JSON.parse(localStorage.getItem('user_info'));
   if (id === 'settings' && !userInfo) {
     $('content').classList.remove('pb-64');
@@ -334,9 +364,12 @@ function switchPage(id) {
     $('content').classList.add('pb-64');
   }
 
-  document.querySelectorAll('.nav-btn').forEach((b, i) => { b.style.opacity = (id === 'areas' && i === 0) || (id === 'settings' && i === 1) ? '1' : '0.3'; });
+  // 下ナビのタブのアクティブ状態の不透明度を調整
+  document.querySelectorAll('.nav-btn').forEach((b, i) => { 
+    b.style.opacity = (id === 'areas' && i === 0) || (id === 'settings' && i === 1) ? '1' : '0.3'; 
+  });
 
-  // スクロール位置の設定：設定画面かつ登録済みの場合は初期位置120にスクロール、それ以外は0にリセット
+  // スクロール位置のリセット
   if (id === 'settings' && userInfo) {
     $('content').scrollTo(0, 120);
   } else {
