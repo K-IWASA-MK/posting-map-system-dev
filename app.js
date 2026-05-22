@@ -530,32 +530,35 @@ async function safeInitApp() {
   
   if (typeof liff !== 'undefined') {
     try {
-      logDebug("LIFF SDK detected. Initializing...");
+      logDebug("LIFF INIT START"); // ① LIFF初期化開始
       // LINE JS Bridge の接続確立を待つ安全ディレイ
       await new Promise(r => setTimeout(r, 200));
 
       await liff.init({ liffId: liffId });
-      logDebug("LIFF initialization successful.");
+      logDebug("LIFF INIT OK"); // ② LIFF初期化成功
       
+      logDebug("LOGIN CHECK"); // ③ login判定
       if (liff.isLoggedIn()) {
-        logDebug("User is logged in to LINE.");
+        logDebug("LOGIN OK"); // ④ login成功
         try {
           // 初期化完了後のLINE内部トークン処理を安定させるディレイ
           await new Promise(r => setTimeout(r, 300));
 
+          logDebug("PROFILE START"); // ⑤ profile取得開始
           const profile = await liff.getProfile();
-          logDebug("LINE profile fetched");
+          logDebug("PROFILE OK"); // ⑥ profile取得成功
           console.log(profile);
 
           let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
           
           // LINE IDが変わっている、または未登録の場合のみGASへ同期登録する
           if (!userInfo.id || userInfo.lineUserId !== profile.userId) {
-            logDebug("Registering staff on GAS with LINE account...");
+            logDebug("API START"); // ⑦ API開始
             const res = await callApi('registerStaff', { 
               lastName: profile.displayName, 
               firstName: "(LINE)" 
             });
+            logDebug("API OK"); // ⑧ APIレスポンス成功
             if (res && res.success) {
               userInfo = {
                 last: profile.displayName,
@@ -578,6 +581,7 @@ async function safeInitApp() {
           // LINE WebViewのタイミング問題対策（800ms delay）
           await new Promise(r => setTimeout(r, 800));
           
+          logDebug("START APP"); // ⑨ startApp開始
           startApp(profile);
         } catch (err) {
           console.error("LIFF PROFILE ERROR", err);
