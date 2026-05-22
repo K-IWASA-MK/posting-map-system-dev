@@ -1,3 +1,4 @@
+alert("APP JS START");
 const $ = id => document.getElementById(id);
 
 // デバッグログ出力関数
