@@ -502,8 +502,8 @@ async function saveProfile() {
   }
 }
 
-window.onload = async () => {
-  console.log("POSTING MAP PRO initialized.");
+async function safeInitApp() {
+  console.log("POSTING MAP PRO safeInitApp started.");
   
   const liffId = "2010168705-kVxE2jve";
   const btn = $('btn-login-manual');
@@ -568,4 +568,11 @@ window.onload = async () => {
     if (spinner) spinner.classList.add('hidden');
     if (subtitle) subtitle.textContent = "ブラウザ環境です。手動で起動します。";
   }
-};
+}
+
+// 画面の準備ができ次第、即座に起動処理を走らせる
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', safeInitApp);
+} else {
+  safeInitApp();
+}

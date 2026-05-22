@@ -57,19 +57,19 @@
 
   <!-- 1. GATEWAY / SPLASH (LINE LOGIN SYSTEM) -->
   <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center">
-    <div class="gateway-header-wrap flex flex-col items-center justify-center mb-6 mt-0">
-      <div class="gateway-icon-container w-44 h-44 bg-white/5 backdrop-blur-2xl rounded-[3.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
-        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=200" class="w-full h-full object-cover rounded-[3.5rem] z-10">
+    <div class="gateway-header-wrap flex flex-col items-center justify-center mb-4 mt-0">
+      <div class="gateway-icon-container w-32 h-32 bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-4 p-1 relative shadow-2xl">
+        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=200" class="w-full h-full object-cover rounded-[2.2rem] z-10">
       </div>
       <div class="text-center">
         <h2 id="gateway-title" style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">LINEから直接ログインします</h2>
         <p id="gateway-subtitle" style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2">自動ログイン処理中...</p>
       </div>
     </div>
-    <div class="gateway-content-wrap w-full max-w-sm space-y-6">
-      <div class="gateway-btn-card bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl">
-        <button id="btn-login-manual" onclick="startApp()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter hidden">ログインして起動</button>
-        <div id="login-spinner" class="flex justify-center py-4">
+    <div class="gateway-content-wrap w-full max-w-sm space-y-4">
+      <div class="gateway-btn-card bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl">
+        <button id="btn-login-manual" onclick="startApp()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-5 text-lg font-black shadow-xl uppercase tracking-tighter hidden">ログインして起動</button>
+        <div id="login-spinner" class="flex justify-center py-2">
           <svg class="w-8 h-8 animate-spin" viewBox="0 0 50 50" fill="none" stroke-width="4">
             <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
             <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round"></path>
