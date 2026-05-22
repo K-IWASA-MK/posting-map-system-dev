@@ -5,6 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP PRO v2.0-API</title>
   <script>
+    // 早期エラーハンドラとデバッグログ定義
+    window.logDebug = function(msg) {
+      console.log("[DEBUG]", msg);
+      const logEl = document.getElementById('debug-log');
+      const contentEl = document.getElementById('debug-log-content');
+      if (logEl && contentEl) {
+        logEl.classList.remove('hidden');
+        const item = document.createElement('div');
+        item.className = 'border-b border-red-900/30 pb-0.5';
+        item.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        contentEl.appendChild(item);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+    };
+    window.onerror = function(message, source, lineno, colno, error) {
+      if (message === "Script error.") return false;
+      window.logDebug(`ERROR: ${message} at ${source}:${lineno}:${colno}`);
+      return false;
+    };
+    window.onunhandledrejection = function(event) {
+      window.logDebug(`UNHANDLED PROMISE: ${event.reason}`);
+    };
+
     // キャッシュによる動作不良を防ぐため、一時的にService Workerを強制解除
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(registrations => {
@@ -15,22 +38,26 @@
       });
     }
   </script>
-  <!-- Force Refresh: v230 (2026-05-23T07:11:00) -->
-  <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
-  <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=230">
+  <!-- Force Refresh: v231 (2026-05-23T07:30:00) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=231">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
   <script>
-    tailwind.config = {
-      darkMode: 'media',
-      theme: {
-        extend: {
-          colors: {
-            navy: { DEFAULT: '#1a237e', light: '#283593', dark: '#0d1642' },
-            apple: { light: '#f5f5f7', dark: '#000000' }
-          },
-          fontFamily: { sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'] }
+    try {
+      tailwind.config = {
+        darkMode: 'media',
+        theme: {
+          extend: {
+            colors: {
+              navy: { DEFAULT: '#1a237e', light: '#283593', dark: '#0d1642' },
+              apple: { light: '#f5f5f7', dark: '#000000' }
+            },
+            fontFamily: { sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'] }
+          }
         }
-      }
+      };
+    } catch (e) {
+      console.error("Tailwind config error:", e);
     }
   </script>
   <script>
@@ -42,7 +69,7 @@
     }, { passive: false });
   </script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="https://area-management.github.io/posting-map-system/style.css?v=230">
+  <link rel="stylesheet" href="https://area-management.github.io/posting-map-system/style.css?v=231">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -59,7 +86,7 @@
   <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center">
     <div class="gateway-header-wrap flex flex-col items-center justify-center mb-4 mt-0">
       <div class="gateway-icon-container w-32 h-32 bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-4 p-1 relative shadow-2xl">
-        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=230" class="w-full h-full object-cover rounded-[2.2rem] z-10">
+        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=231" class="w-full h-full object-cover rounded-[2.2rem] z-10">
       </div>
       <div class="text-center">
         <h2 id="gateway-title" style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">LINEから直接ログインします</h2>
@@ -163,7 +190,7 @@
     </div>
   </div>
 
-  <script src="https://area-management.github.io/posting-map-system/app.js?v=230"></script>
-  <script src="https://area-management.github.io/posting-map-system/render.js?v=230"></script>
+  <script src="https://area-management.github.io/posting-map-system/app.js?v=231"></script>
+  <script src="https://area-management.github.io/posting-map-system/render.js?v=231"></script>
 </body>
 </html>
