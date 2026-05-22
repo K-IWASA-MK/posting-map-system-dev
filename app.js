@@ -64,30 +64,41 @@ async function callApi(action, params = {}) {
   };
   
   try {
-    logDebug(`callApi GET: action=${action}, params=${JSON.stringify(params)}`);
+    logDebug(`[callApi] START: action=${action}`);
+    logDebug(`[callApi] URL: ${url.substring(0, 80)}...`);
+    
     const response = await fetch(url, options);
-    logDebug(`callApi response status: ${response.status} (${response.statusText})`);
+    
+    logDebug(`[callApi] FETCH OK. status=${response.status}, type=${response.type}`);
     
     if (!response.ok) {
+      logDebug(`[callApi] HTTP ERROR: status=${response.status}`);
       throw new Error(`HTTP Error: ${response.status}`);
     }
     
+    logDebug(`[callApi] Calling response.text()...`);
     const text = await response.text();
-    logDebug(`callApi response text length: ${text.length}`);
+    logDebug(`[callApi] TEXT RECEIVED (length=${text.length})`);
+    logDebug(`[callApi] TEXT PREVIEW: ${text.substring(0, 150)}`);
+    
+    logDebug(`[callApi] Parsing JSON...`);
     let data;
     try {
       data = JSON.parse(text);
+      logDebug(`[callApi] JSON PARSE SUCCESS. success=${data.success}`);
     } catch (parseErr) {
-      logDebug(`callApi JSON parse failed: ${text.substring(0, 100)}`);
-      throw new Error("JSON形式ではない応答を受け取りました");
+      logDebug(`[callApi] JSON parse failed. Error=${parseErr.message}`);
+      logDebug(`[callApi] Failed Text snippet: ${text.substring(0, 200)}`);
+      throw new Error("JSON形式ではない応答を受け取りました: " + parseErr.message);
     }
     
     if (data.success === false) {
+      logDebug(`[callApi] API returned success=false. msg=${data.message}`);
       throw new Error(data.message || "API Error");
     }
     return data;
   } catch (err) {
-    logDebug(`callApi error: ${err.message}`);
+    logDebug(`[callApi] CRITICAL ERROR: ${err.message}`);
     console.error("API Connection Error:", err);
     alert("通信エラーが発生しました。\n内容: " + err.message);
     throw err;
@@ -158,21 +169,31 @@ async function syncOfflineQueue() {
 }
 
 async function loadData(skipSync = false) {
+  logDebug("[loadData] START");
   if (!skipSync && navigator.onLine) {
+    logDebug("[loadData] Syncing offline queue...");
     await syncOfflineQueue();
   } else if (!navigator.onLine) {
+    logDebug("[loadData] Offline. Setting status...");
     setSyncStatus('offline');
   }
 
   try {
+    logDebug("[loadData] Fetching getAppData...");
     const data = await callApi('getAppData');
+    logDebug("[loadData] getAppData fetched successfully.");
     if (data && data.success) {
       areaSummary = data.areas;
+      
+      logDebug("[loadData] Rendering areas...");
       renderAreas();
+      logDebug("[loadData] Rendering areas OK. Updating stats...");
       updateStats();
+      logDebug("[loadData] Stats updated. Switching page to settings...");
       
       switchPage('settings');
       
+      logDebug("[loadData] Showing main app div...");
       $('app').classList.remove('hidden');
       setTimeout(() => {
         $('app').classList.remove('opacity-0');
@@ -184,7 +205,7 @@ async function loadData(skipSync = false) {
     }
   } catch (err) {
     console.error("Startup Error:", err);
-    logDebug(`Startup Error: ${err.message}`);
+    logDebug(`[loadData] ERROR: ${err.message}`);
     $('loading').classList.add('hidden');
     $('screen-gateway').classList.remove('hidden');
   }
