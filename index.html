@@ -18,12 +18,16 @@
       window.logDebug(`UNHANDLED PROMISE: ${event.reason}`);
     };
 
-    // キャッシュによる動作不良を防ぐため、一時的にService Workerを強制解除
+    // キャッシュによる動作不良を防ぐため、Service Workerを強制解除して一度だけ自動リロード
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(registrations => {
-        for (let r of registrations) {
-          r.unregister();
-          console.log('SW unregistered successfully');
+        if (registrations.length > 0) {
+          for (let r of registrations) {
+            r.unregister();
+          }
+          // 解除されたら、キャッシュを破棄して最新版をサーバーから直接ロードするために自動リロード
+          console.log('SW unregistered. Reloading to apply clean state...');
+          window.location.reload();
         }
       });
     }
