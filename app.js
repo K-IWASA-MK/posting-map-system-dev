@@ -95,7 +95,7 @@ async function callApi(action, params = {}) {
   }
 }
 
-function startApp() {
+function startApp(profile = null) {
   $('screen-gateway').classList.add('hidden');
   $('loading').classList.remove('hidden');
   loadData();
@@ -515,40 +515,51 @@ async function safeInitApp() {
       logDebug("LIFF initialization successful.");
       
       if (liff.isLoggedIn()) {
-        logDebug("User is logged in to LINE. Fetching profile...");
-        const profile = await liff.getProfile();
-        logDebug(`LINE Profile: ${profile.displayName} (${profile.userId})`);
-        
-        let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-        
-        // LINE IDが変わっている、または未登録の場合のみGASへ同期登録する
-        if (!userInfo.id || userInfo.lineUserId !== profile.userId) {
-          logDebug("Registering staff on GAS with LINE account...");
-          const res = await callApi('registerStaff', { 
-            lastName: profile.displayName, 
-            firstName: "(LINE)" 
-          });
-          if (res && res.success) {
-            userInfo = {
-              last: profile.displayName,
-              first: "",
-              id: res.id,
-              lineUserId: profile.userId,
-              picture: profile.pictureUrl
-            };
-            localStorage.setItem('user_info', JSON.stringify(userInfo));
-            logDebug("Registered! Staff ID: " + res.id);
+        logDebug("User is logged in to LINE.");
+        try {
+          const profile = await liff.getProfile();
+          logDebug("LINE profile fetched");
+          console.log(profile);
+
+          let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+          
+          // LINE IDが変わっている、または未登録の場合のみGASへ同期登録する
+          if (!userInfo.id || userInfo.lineUserId !== profile.userId) {
+            logDebug("Registering staff on GAS with LINE account...");
+            const res = await callApi('registerStaff', { 
+              lastName: profile.displayName, 
+              firstName: "(LINE)" 
+            });
+            if (res && res.success) {
+              userInfo = {
+                last: profile.displayName,
+                first: "",
+                id: res.id,
+                lineUserId: profile.userId,
+                picture: profile.pictureUrl
+              };
+              localStorage.setItem('user_info', JSON.stringify(userInfo));
+              logDebug("Registered! Staff ID: " + res.id);
+            } else {
+              throw new Error("GAS registration failed");
+            }
           } else {
-            throw new Error("GAS registration failed");
+            // すでに登録済みでLINE画像などが最新でない場合はローカルキャッシュのみ更新
+            userInfo.picture = profile.pictureUrl;
+            localStorage.setItem('user_info', JSON.stringify(userInfo));
           }
-        } else {
-          // すでに登録済みでLINE画像などが最新でない場合はローカルキャッシュのみ更新
-          userInfo.picture = profile.pictureUrl;
-          localStorage.setItem('user_info', JSON.stringify(userInfo));
+
+          // LINE WebViewのタイミング問題対策（800ms delay）
+          await new Promise(r => setTimeout(r, 800));
+          
+          startApp(profile);
+        } catch (err) {
+          console.error("LIFF PROFILE ERROR", err);
+          logDebug("LIFF PROFILE ERROR: " + err.message);
+          if (btn) btn.classList.remove('hidden');
+          if (spinner) spinner.classList.add('hidden');
+          if (subtitle) subtitle.textContent = "自動ログインに失敗しました。手動で起動してください。";
         }
-        
-        // ログイン成功したら自動起動
-        startApp();
       } else {
         logDebug("Not logged in. Redirecting to LINE Login...");
         liff.login();
