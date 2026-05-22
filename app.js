@@ -45,7 +45,7 @@ function removePressed() {
 
 
 // GAS API CONFIG (JSON ONLY)
-const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQWPGRXThLyaavkl1TYrTgEbswgnuR68U2Nuxa50xF4h-lpY-legMDr4mGIktIyMXyxsFaufiC9XRROJKD-YmWtuKzPTMrANmtPCgvBdLP9eIS6Ofr9-R42gIci-lK9PcHHrLojhwj4NkTCTL6mBXUGkp8xQpHz48jLFqyjyv40f9tXhUAzkItNQqIiuewG1lhGAovobx4mBucLoUXIde5UjyHY1ZzP5-7n8xZFTLtwZc--L0_KJUF-kjT3zFkTMZBl7xpmTnBEFpNigwLRmS-P64DhKUUo68rAhE7G8NegT-qdc7Y&lib=MvOczfNWV8d0ykcJwRLtNDYhSORrKAex6";
+const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
 
 async function callApi(action, params = {}) {
   // 長いGET URLがLINE WebViewで制限されるのを防ぐため、すべてのパラメータをBodyに乗せるPOSTへ統一
