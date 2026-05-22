@@ -36,12 +36,12 @@
   <script>
     // 画面の意図しないスクロールやバウンスを物理的に防止（スクロール可能なメインコンテンツ領域等のみ許可）
     document.addEventListener('touchmove', function(e) {
-      const scrollable = e.target.closest('#content, .scrollable');
-      if (scrollable) return;
-      e.preventDefault();
+      if (e.target.closest('#screen-gateway') || e.target.closest('#loading')) {
+        e.preventDefault();
+      }
     }, { passive: false });
   </script>
-  <link rel="stylesheet" href="./style.css?v=218">
+  <link rel="stylesheet" href="./style.css?v=219">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -156,7 +156,11 @@
     </div>
   </div>
 
-  <script src="./app.js?v=218"></script>
-  <script src="./render.js?v=218"></script>
+  <script src="./app.js?v=219"></script>
+  <script src="./render.js?v=219"></script>
+  <script>
+    // ロード検証用アラート
+    alert("Script loaded! startApp type: " + typeof startApp);
+  </script>
 </body>
 </html>
