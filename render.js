@@ -151,31 +151,45 @@ function renderSettings() {
     `;
   } else {
     // Card 2: Distributor ID Card (Standardized to Splash Model)
+    const avatarHtml = userInfo.picture ? `
+      <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl mb-4 relative z-10">
+        <img src="${userInfo.picture}" class="w-full h-full object-cover">
+      </div>
+    ` : `
+      <div class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4 relative z-10">
+        <span class="text-3xl text-white/40">👤</span>
+      </div>
+    `;
+
     container.innerHTML = `
       <div class="py-10 px-4 flex flex-col items-center">
-        <div class="mb-16 text-center">
-          <p class="text-sm text-white/70 leading-relaxed mb-4">
+        <div class="mb-10 text-center">
+          <p class="text-sm text-white/70 leading-relaxed mb-3">
             <span class="font-black">配布員証</span><br>
             <span class="font-medium">公式配布員 IDカード</span>
           </p>
           ${userInfo.id ? `<div class="text-xl font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">${userInfo.id}</div>` : ''}
         </div>
         
-        <div class="w-full h-[220px] premium-glass flex flex-col items-center justify-center">
-          <div class="inline-flex items-center gap-2 mb-4">
+        <div class="w-full h-[320px] premium-glass flex flex-col items-center justify-center p-6 relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-white/0 pointer-events-none rounded-[28px]"></div>
+          
+          <div class="inline-flex items-center gap-2 mb-6">
             <span class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]"></span>
             <span class="text-[8px] font-black text-[#22c55e] uppercase tracking-[0.3em]">Authorized Staff</span>
           </div>
           
-          <div style="font-size: 44px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center mb-4">
+          ${avatarHtml}
+          
+          <div style="font-size: 32px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center mb-4 z-10">
             <div>${userInfo.last}</div>
-            <div>${userInfo.first}</div>
+            <div class="text-sm text-white/40 font-medium mt-1">${userInfo.first || ''}</div>
           </div>
           
-          <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">Field Operations</p>
+          <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] z-10">Field Operations</p>
         </div>
         
-        <div class="w-full mt-20 pb-8">
+        <div class="w-full mt-12 pb-8">
           <button onclick="switchPage('areas')" class="btn-neu w-full bg-[#2563eb] text-white rounded-[1.8rem] py-7 text-xl font-black shadow-xl">業務を開始する</button>
         </div>
       </div>

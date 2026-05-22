@@ -502,14 +502,70 @@ async function saveProfile() {
   }
 }
 
-window.onload = () => {
+window.onload = async () => {
   console.log("POSTING MAP PRO initialized.");
-  // キャッシュ問題を回避するため一時的に無効化
-  /*
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(reg => console.log('Service Worker registered. Scope:', reg.scope))
-      .catch(err => console.error('Service Worker registration failed:', err));
+  
+  const liffId = "2010168705-kVxE2jve";
+  const btn = $('btn-login-manual');
+  const spinner = $('login-spinner');
+  const subtitle = $('gateway-subtitle');
+  
+  if (typeof liff !== 'undefined') {
+    try {
+      logDebug("LIFF SDK detected. Initializing...");
+      await liff.init({ liffId: liffId });
+      logDebug("LIFF initialization successful.");
+      
+      if (liff.isLoggedIn()) {
+        logDebug("User is logged in to LINE. Fetching profile...");
+        const profile = await liff.getProfile();
+        logDebug(`LINE Profile: ${profile.displayName} (${profile.userId})`);
+        
+        let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+        
+        // LINE IDが変わっている、または未登録の場合のみGASへ同期登録する
+        if (!userInfo.id || userInfo.lineUserId !== profile.userId) {
+          logDebug("Registering staff on GAS with LINE account...");
+          const res = await callApi('registerStaff', { 
+            lastName: profile.displayName, 
+            firstName: "(LINE)" 
+          });
+          if (res && res.success) {
+            userInfo = {
+              last: profile.displayName,
+              first: "",
+              id: res.id,
+              lineUserId: profile.userId,
+              picture: profile.pictureUrl
+            };
+            localStorage.setItem('user_info', JSON.stringify(userInfo));
+            logDebug("Registered! Staff ID: " + res.id);
+          } else {
+            throw new Error("GAS registration failed");
+          }
+        } else {
+          // すでに登録済みでLINE画像などが最新でない場合はローカルキャッシュのみ更新
+          userInfo.picture = profile.pictureUrl;
+          localStorage.setItem('user_info', JSON.stringify(userInfo));
+        }
+        
+        // ログイン成功したら自動起動
+        startApp();
+      } else {
+        logDebug("Not logged in. Redirecting to LINE Login...");
+        liff.login();
+      }
+    } catch (err) {
+      console.error("LIFF Init Error:", err);
+      logDebug("LIFF Error: " + err.message);
+      if (btn) btn.classList.remove('hidden');
+      if (spinner) spinner.classList.add('hidden');
+      if (subtitle) subtitle.textContent = "自動ログインに失敗しました。手動で起動してください。";
+    }
+  } else {
+    logDebug("Running in standalone web browser. Showing manual launch button.");
+    if (btn) btn.classList.remove('hidden');
+    if (spinner) spinner.classList.add('hidden');
+    if (subtitle) subtitle.textContent = "ブラウザ環境です。手動で起動します。";
   }
-  */
 };
