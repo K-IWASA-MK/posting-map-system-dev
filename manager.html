@@ -22,7 +22,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="./style.css?v=206">
+  <link rel="stylesheet" href="./style.css?v=208">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -223,8 +223,8 @@
       });
     }
 
-    window.onload = () => {
-      // ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止
+    // ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止（即時実行してタイムラグを排除）
+    function initScrollLock() {
       const gateway = $('screen-gateway');
       if (gateway) {
         gateway.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
@@ -233,7 +233,10 @@
       if (loading) {
         loading.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
       }
+    }
+    initScrollLock();
 
+    window.onload = () => {
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js')
           .then(reg => console.log('Service Worker registered for Admin. Scope:', reg.scope))

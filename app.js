@@ -18,8 +18,8 @@ function removePressed() {
   });
 }
 
-// ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止
-document.addEventListener('DOMContentLoaded', () => {
+// ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止（即時実行してタイムラグを排除）
+function initScrollLock() {
   const gateway = $('screen-gateway');
   if (gateway) {
     gateway.addEventListener('touchmove', e => {
@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
     }, { passive: false });
   }
-});
+}
+initScrollLock();
+
 
 // GAS API CONFIG (JSON ONLY)
 const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
