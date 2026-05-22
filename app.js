@@ -1,4 +1,27 @@
 const $ = id => document.getElementById(id);
+
+// デバッグログ出力関数
+window.logDebug = function(msg) {
+  console.log("[DEBUG]", msg);
+  const logEl = $('debug-log');
+  const contentEl = $('debug-log-content');
+  if (logEl && contentEl) {
+    logEl.classList.remove('hidden');
+    const item = document.createElement('div');
+    item.className = 'border-b border-red-900/30 pb-0.5';
+    item.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    contentEl.appendChild(item);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+};
+window.onerror = function(message, source, lineno, colno, error) {
+  logDebug(`ERROR: ${message} at ${source}:${lineno}:${colno}`);
+  return false;
+};
+window.onunhandledrejection = function(event) {
+  logDebug(`UNHANDLED PROMISE: ${event.reason}`);
+};
+
 let allPoints = [], areaSummary = [], roster = [];
 
 // プレミアム・インタラクション・スキル (JS Touch Handler)
@@ -42,18 +65,31 @@ async function callApi(action, params = {}) {
   }
   
   try {
+    logDebug(`callApi: action=${action}, params=${JSON.stringify(params)}`);
+    logDebug(`callApi fetching: url=${url}`);
     const response = await fetch(url, options);
+    logDebug(`callApi response status: ${response.status} (${response.statusText})`);
     
     if (!response.ok) {
       throw new Error(`HTTP Error: ${response.status}`);
     }
     
-    const data = await response.json();
+    const text = await response.text();
+    logDebug(`callApi response text length: ${text.length}`);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (parseErr) {
+      logDebug(`callApi JSON parse failed: ${text.substring(0, 100)}`);
+      throw new Error("JSON形式ではない応答を受け取りました");
+    }
+    
     if (data.success === false) {
       throw new Error(data.message || "API Error");
     }
     return data;
   } catch (err) {
+    logDebug(`callApi error: ${err.message}`);
     console.error("API Connection Error:", err);
     alert("通信エラーが発生しました。\n内容: " + err.message);
     throw err;
@@ -317,14 +353,14 @@ window.addEventListener('offline', () => {
   setSyncStatus('offline');
 });
 
-async function switchPage(id) {
+async function switchPage(id, force = false) {
   const pages = document.querySelectorAll('.page');
   const targetId = id === 'detail' ? 'page-detail' : (id === 'settings' ? 'page-settings' : 'page-areas');
   const target = $(targetId);
   if (!target) return;
 
   // すでにアクティブなら多重遷移を防ぐためスキップ
-  if (!target.classList.contains('hidden') && target.style.opacity === '1') return;
+  if (!force && !target.classList.contains('hidden') && target.style.opacity === '1') return;
 
   // 1. 現在表示されているページを上にスライドさせながらフェードアウト
   const activePage = Array.from(pages).find(p => !p.classList.contains('hidden'));
@@ -359,8 +395,7 @@ async function switchPage(id) {
   target.style.transform = 'translateY(0)';
   
   // pb-64の制御（入力欄のスクロール領域確保）
-  const userInfo = JSON.parse(localStorage.getItem('user_info'));
-  if (id === 'settings' && !userInfo) {
+  if (id === 'settings') {
     $('content').classList.remove('pb-64');
   } else {
     $('content').classList.add('pb-64');
@@ -372,7 +407,7 @@ async function switchPage(id) {
   });
 
   // スクロール位置のリセット
-  if (id === 'settings' && userInfo) {
+  if (id === 'settings' && localStorage.getItem('user_info')) {
     $('content').scrollTo(0, 120);
   } else {
     $('content').scrollTo(0, 0);
@@ -424,28 +459,41 @@ function cleanNameInput(str) {
 }
 
 async function saveProfile() {
+  logDebug("saveProfile: click triggered");
   const rawLast = $('user-last').value, rawFirst = $('user-first').value;
+  logDebug(`saveProfile: inputs: last='${rawLast}', first='${rawFirst}'`);
   const last = cleanNameInput(rawLast);
   const first = cleanNameInput(rawFirst);
+  logDebug(`saveProfile: cleaned: last='${last}', first='${first}'`);
   
-  if (!last || !first) { alert('姓名を入力してください'); return; }
+  if (!last || !first) {
+    logDebug("saveProfile: validation failed (empty last/first name)");
+    alert('姓名を入力してください');
+    return;
+  }
   
+  logDebug("saveProfile: showing loading indicator");
   $('loading').classList.remove('hidden');
   $('loading').classList.remove('opacity-0');
   
   await new Promise(r => setTimeout(r, 50));
   
   try {
+    logDebug("saveProfile: invoking callApi('registerStaff')");
     const res = await callApi('registerStaff', { lastName: last, firstName: first });
+    logDebug(`saveProfile: API result: ${JSON.stringify(res)}`);
     if (res && res.success) {
+      logDebug("saveProfile: success! storing user_info to localStorage");
       localStorage.setItem('user_info', JSON.stringify({last, first, id: res.id}));
-      switchPage('settings');
+      logDebug("saveProfile: switching to settings page");
+      switchPage('settings', true);
       $('loading').classList.add('opacity-0');
       setTimeout(() => $('loading').classList.add('hidden'), 700);
     } else {
       throw new Error('Failed');
     }
   } catch (err) {
+    logDebug(`saveProfile: caught exception: ${err.message}`);
     alert('通信エラーが発生しました。');
     $('loading').classList.add('opacity-0');
     setTimeout(() => $('loading').classList.add('hidden'), 700);

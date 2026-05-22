@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP PRO v2.0-API</title>
   <!-- Force Refresh: v200 (2026-05-15T09:14:40) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=200">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
   <script>
@@ -23,16 +23,25 @@
     }
   </script>
   <script>
-    // ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止（初期ダウンロード中の遅延対策）
+    // 画面の意図しないスクロールやバウンスを物理的に防止（スクロール可能なメインコンテンツ領域等のみ許可）
     document.addEventListener('touchmove', function(e) {
-      if (e.target.closest('#screen-gateway') || e.target.closest('#loading')) {
-        e.preventDefault();
-      }
+      const scrollable = e.target.closest('#content, .scrollable');
+      if (scrollable) return;
+      e.preventDefault();
     }, { passive: false });
   </script>
-  <link rel="stylesheet" href="./style.css?v=210">
+  <link rel="stylesheet" href="./style.css?v=214">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
+
+  <!-- デバッグ用ログ領域 (原因特定後に削除します) -->
+  <div id="debug-log" class="fixed top-0 left-0 w-full max-h-[35dvh] overflow-y-auto bg-red-950/95 text-red-200 text-[10px] p-4 font-mono z-[9999] hidden border-b border-red-500">
+    <div class="flex justify-between items-center mb-2 pb-1 border-b border-red-800">
+      <span class="font-bold text-red-400">DEBUG LOG</span>
+      <button onclick="document.getElementById('debug-log').classList.add('hidden')" class="bg-red-800 text-white px-2 py-0.5 rounded text-[9px]">閉じる</button>
+    </div>
+    <div id="debug-log-content" class="space-y-1"></div>
+  </div>
 
   <!-- 1. GATEWAY / SPLASH (SYNCED WITH MANAGER BALANCE) -->
   <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center">
@@ -50,13 +59,13 @@
         <button onclick="startApp()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">アプリを起動する</button>
       </div>
       <div class="gateway-footer space-y-1">
-        <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">Operational</p>
-        <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">Environment</p>
+        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Operational</p>
+        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Environment</p>
       </div>
     </div>
   </div>
 
-  <div id="loading" class="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
+  <div id="loading" class="fixed top-0 left-0 w-full h-[100dvh] z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
     <svg class="w-12 h-12" viewBox="0 0 50 50" fill="none" stroke-width="4">
       <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
       <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
@@ -67,7 +76,7 @@
   </div>
 
   <!-- 3. MAIN APP -->
-  <div id="app" class="fixed inset-0 z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-1000 hidden">
+  <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-1000 hidden">
     <header class="safe-top px-8 py-8 flex justify-between items-center">
       <h1 class="text-2xl font-black tracking-tighter text-white leading-none">POSTING MAP</h1>
       <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
@@ -102,15 +111,15 @@
     <!-- 下ナビ：iOSライクなガラス感に調整 -->
     <nav id="bottom-nav" style="bottom: calc(env(safe-area-inset-bottom) + 1rem);" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
       <div style="background: rgba(20,20,20,0.72); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.02);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
-        <button onclick="switchPage('areas')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">📍</div><span class="text-[10px] font-black uppercase tracking-widest text-gray-500">地区</span></button>
-        <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-gray-500">設定</span></button>
+        <button onclick="switchPage('areas')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">📍</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">地区</span></button>
+        <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">設定</span></button>
       </div>
     </nav>
   </div>
 
   <!-- 4. CUSTOM NUMPAD MODAL -->
   <div id="numpad-modal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none">
-    <div class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 pb-12 transform translate-y-full transition-transform duration-300 space-y-6">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 space-y-6">
       <div class="flex justify-between items-center">
         <span class="text-[10px] font-black uppercase tracking-widest text-white/40">配布枚数入力</span>
         <button id="numpad-close" onclick="closeNumpad()" class="text-sm font-bold text-[#2563eb]">キャンセル</button>
@@ -136,7 +145,7 @@
     </div>
   </div>
 
-  <script src="./app.js?v=210"></script>
-  <script src="./render.js?v=210"></script>
+  <script src="./app.js?v=214" crossorigin="anonymous"></script>
+  <script src="./render.js?v=214" crossorigin="anonymous"></script>
 </body>
 </html>
