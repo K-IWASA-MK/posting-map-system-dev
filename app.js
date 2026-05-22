@@ -187,6 +187,7 @@ async function loadData(skipSync = false) {
     }
   } catch (err) {
     console.error("Startup Error:", err);
+    logDebug(`Startup Error: ${err.message}`);
     $('loading').classList.add('hidden');
     $('screen-gateway').classList.remove('hidden');
   }
