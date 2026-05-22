@@ -1,6 +1,6 @@
 function renderAreas() {
   if (!areaSummary || areaSummary.length === 0) {
-    $('area-list').innerHTML = '<p class="text-center text-gray-500 py-20 font-bold">データがありません。<br>一括作成を実行してください。</p>';
+    $('area-list').innerHTML = '<p class="text-center text-white/40 py-20 font-bold">データがありません。<br>一括作成を実行してください。</p>';
     return;
   }
   $('area-list').innerHTML = areaSummary.map(s => {
@@ -17,9 +17,9 @@ function renderAreas() {
       <div style="${dotStyle}" class="w-3 h-3 rounded-full mr-6"></div>
       <div class="flex-1">
         <div class="text-lg font-black text-white tracking-tighter">${s.name}</div>
-        <div class="text-[9px] font-bold text-gray-500 mt-1 uppercase tracking-widest">${s.progress}% Completed</div>
+        <div class="text-[9px] font-bold text-white/40 mt-1 uppercase tracking-widest">${s.progress}% Completed</div>
       </div>
-      <span class="text-gray-600 text-xl font-light">›</span>
+      <span class="text-white/40 text-xl font-light">›</span>
     </div>`;
   }).join('');
 }
@@ -126,7 +126,7 @@ function renderSettings() {
     container.innerHTML = `
       <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
         <div class="mb-8 text-center">
-          <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+          <p class="text-sm text-white/70 leading-relaxed">
             <span class="font-black">お名前を登録して</span><br>
             <span class="font-medium">ください</span>
           </p>
@@ -154,7 +154,7 @@ function renderSettings() {
     container.innerHTML = `
       <div class="py-10 px-4 flex flex-col items-center">
         <div class="mb-16 text-center">
-          <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
+          <p class="text-sm text-white/70 leading-relaxed mb-4">
             <span class="font-black">配布員証</span><br>
             <span class="font-medium">公式配布員 IDカード</span>
           </p>
@@ -172,7 +172,7 @@ function renderSettings() {
             <div>${userInfo.first}</div>
           </div>
           
-          <p class="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em]">Field Operations</p>
+          <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">Field Operations</p>
         </div>
         
         <div class="w-full mt-20 pb-8">

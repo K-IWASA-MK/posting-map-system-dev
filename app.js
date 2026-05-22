@@ -15,6 +15,7 @@ window.logDebug = function(msg) {
   }
 };
 window.onerror = function(message, source, lineno, colno, error) {
+  if (message === "Script error.") return false;
   logDebug(`ERROR: ${message} at ${source}:${lineno}:${colno}`);
   return false;
 };

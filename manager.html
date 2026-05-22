@@ -23,11 +23,11 @@
     }
   </script>
   <script>
-    // ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止（初期ダウンロード中の遅延対策）
+    // 画面の意図しないスクロールやバウンスを物理的に防止（スクロール可能なメインコンテンツ領域等のみ許可）
     document.addEventListener('touchmove', function(e) {
-      if (e.target.closest('#screen-gateway') || e.target.closest('#loading')) {
-        e.preventDefault();
-      }
+      const scrollable = e.target.closest('#content, .scrollable');
+      if (scrollable) return;
+      e.preventDefault();
     }, { passive: false });
   </script>
   <link rel="stylesheet" href="./style.css?v=210">
@@ -50,14 +50,14 @@
         <button onclick="startAdmin()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">管理画面を起動する</button>
       </div>
       <div class="gateway-footer space-y-1 pt-0">
-        <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">Administrator</p>
-        <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">Command Mode</p>
+        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Administrator</p>
+        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Command Mode</p>
       </div>
     </div>
   </div>
 
   <!-- 2. LOADING -->
-  <div id="loading" class="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
+  <div id="loading" class="fixed top-0 left-0 w-full h-[100dvh] z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
     <svg class="w-12 h-12" viewBox="0 0 50 50" fill="none" stroke-width="4">
       <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
       <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
@@ -68,7 +68,7 @@
   </div>
 
   <!-- 3. MAIN ADMIN APP -->
-  <div id="app" class="fixed inset-0 z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-1000 hidden">
+  <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-1000 hidden">
     <header class="safe-top px-8 py-8 flex justify-between items-center">
       <h1 class="text-2xl font-black tracking-tighter text-white leading-none">ADMIN PANEL</h1>
       <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
@@ -77,18 +77,18 @@
       </div>
     </header>
 
-    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 pb-12">
+    <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10">
       <!-- 1. KPI Panel -->
       <section class="grid grid-cols-2 gap-4">
         <div class="premium-glass p-6 flex flex-col justify-between h-36">
-          <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Overall Coverage</span>
+          <span class="text-[9px] font-black text-white/40 uppercase tracking-widest">Overall Coverage</span>
           <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
           <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
             <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
           </div>
         </div>
         <div class="premium-glass p-6 flex flex-col justify-between h-36">
-          <span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Active Staff</span>
+          <span class="text-[9px] font-black text-white/40 uppercase tracking-widest">Active Staff</span>
           <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
           <span class="text-[8px] font-black text-[#10b981] tracking-wider uppercase">● Online Roster</span>
         </div>
@@ -96,7 +96,7 @@
 
       <!-- 2. Command Operations -->
       <section class="space-y-4">
-        <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] px-2">Tactical Command Center</h3>
+        <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2">Tactical Command Center</h3>
         <div class="grid grid-cols-2 gap-4">
           <button onclick="runCommand('forceStartBatch')" class="clickable-card premium-glass p-6 flex flex-col items-center justify-center gap-3 active:scale-95">
             <span class="text-2xl">🚀</span>
@@ -110,7 +110,7 @@
             <span class="text-2xl">📊</span>
             <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-widest">Aggregate</span>
           </button>
-          <button onclick="runCommand('resetAllSheets')" class="clickable-card premium-glass p-6 flex flex-col items-center justify-center gap-3 border-rose-500/20 active:scale-95">
+          <button onclick="runCommand('resetAllSheets')" style="border-color: rgba(244, 63, 94, 0.2);" class="clickable-card premium-glass p-6 flex flex-col items-center justify-center gap-3 active:scale-95">
             <span class="text-2xl">⚠️</span>
             <span class="text-[10px] font-black text-rose-500 uppercase tracking-widest">System Reset</span>
           </button>
@@ -119,7 +119,7 @@
 
       <!-- 3. Intel Live Stream Console -->
       <section class="space-y-4">
-        <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] px-2">📡 Intel Live Stream</h3>
+        <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2">📡 Intel Live Stream</h3>
         <div class="premium-glass p-6">
           <div id="log-console" class="h-40 overflow-y-auto font-mono text-[10px] space-y-2 text-white/50 hide-scrollbar selection:bg-[#2563eb]">
             <div class="text-white/30">&gt; Command console initialized. Ready.</div>
