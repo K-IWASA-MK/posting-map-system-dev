@@ -48,21 +48,16 @@ function removePressed() {
 const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
 
 async function callApi(action, params = {}) {
-  const isPost = (action === 'submitDistribution' || action === 'registerStaff');
+  // LINEインアプリブラウザのPOSTリダイレクト制限(Load failed)を回避するため、すべてGETで送信する
   let url = API_URL + "?action=" + action;
   
   let options = {
-    method: isPost ? 'POST' : 'GET',
+    method: 'GET',
     redirect: 'follow'
   };
 
-  if (isPost) {
-    options.body = JSON.stringify({ action: action, ...params });
-    options.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
-  } else {
-    for (let key in params) {
-      url += "&" + key + "=" + encodeURIComponent(params[key]);
-    }
+  for (let key in params) {
+    url += "&" + key + "=" + encodeURIComponent(params[key]);
   }
   
   try {

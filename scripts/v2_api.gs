@@ -40,6 +40,19 @@ function doGet(e) {
       case 'getAreaDetails':
         response = getAreaDetails(e.parameter.name);
         break;
+      case 'submitDistribution':
+        response = submitDistribution(
+          e.parameter.areaName,
+          parseInt(e.parameter.rowId, 10),
+          e.parameter.staffName,
+          parseFloat(e.parameter.count) || 0,
+          e.parameter.isDone === 'true' || e.parameter.isDone === true,
+          e.parameter.staffId
+        );
+        break;
+      case 'registerStaff':
+        response = registerStaff(e.parameter.lastName, e.parameter.firstName);
+        break;
       default:
         response = { success: true, message: 'POSTING MAP API is online.' };
     }
