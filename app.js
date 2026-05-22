@@ -512,12 +512,18 @@ async function safeInitApp() {
   if (typeof liff !== 'undefined') {
     try {
       logDebug("LIFF SDK detected. Initializing...");
+      // LINE JS Bridge の接続確立を待つ安全ディレイ
+      await new Promise(r => setTimeout(r, 200));
+
       await liff.init({ liffId: liffId });
       logDebug("LIFF initialization successful.");
       
       if (liff.isLoggedIn()) {
         logDebug("User is logged in to LINE.");
         try {
+          // 初期化完了後のLINE内部トークン処理を安定させるディレイ
+          await new Promise(r => setTimeout(r, 300));
+
           const profile = await liff.getProfile();
           logDebug("LINE profile fetched");
           console.log(profile);
@@ -580,9 +586,5 @@ async function safeInitApp() {
   }
 }
 
-// 画面の準備ができ次第、即座に起動処理を走らせる
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', safeInitApp);
-} else {
-  safeInitApp();
-}
+// スクリプトがHTML最下部にあるため、イベントを待たず即時実行してタイミング問題を回避
+safeInitApp();
