@@ -45,11 +45,12 @@ function removePressed() {
 
 
 // GAS API CONFIG (JSON ONLY)
-const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
+const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQWPGRXThLyaavkl1TYrTgEbswgnuR68U2Nuxa50xF4h-lpY-legMDr4mGIktIyMXyxsFaufiC9XRROJKD-YmWtuKzPTMrANmtPCgvBdLP9eIS6Ofr9-R42gIci-lK9PcHHrLojhwj4NkTCTL6mBXUGkp8xQpHz48jLFqyjyv40f9tXhUAzkItNQqIiuewG1lhGAovobx4mBucLoUXIde5UjyHY1ZzP5-7n8xZFTLtwZc--L0_KJUF-kjT3zFkTMZBl7xpmTnBEFpNigwLRmS-P64DhKUUo68rAhE7G8NegT-qdc7Y&lib=MvOczfNWV8d0ykcJwRLtNDYhSORrKAex6";
 
 async function callApi(action, params = {}) {
   // LINEインアプリブラウザのPOSTリダイレクト制限(Load failed)を回避するため、すべてGETで送信する
-  let url = API_URL + "?action=" + action;
+  // 既にAPI_URLに?（クエリ）が含まれている場合は&で安全に結合する
+  let url = API_URL + (API_URL.includes('?') ? '&' : '?') + "action=" + action;
   
   let options = {
     method: 'GET',
