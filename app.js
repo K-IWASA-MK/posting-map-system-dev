@@ -522,6 +522,7 @@ async function saveProfile() {
 }
 
 async function safeInitApp() {
+  alert("INSIDE safeInitApp");
   console.log("POSTING MAP PRO safeInitApp started.");
   
   const liffId = "2010168705-kVxE2jve";
@@ -611,4 +612,5 @@ async function safeInitApp() {
 }
 
 // スクリプトがHTML最下部にあるため、イベントを待たず即時実行してタイミング問題を回避
+alert("CALLING safeInitApp");
 safeInitApp();
