@@ -18,22 +18,6 @@ function removePressed() {
   });
 }
 
-// ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止（即時実行してタイムラグを排除）
-function initScrollLock() {
-  const gateway = $('screen-gateway');
-  if (gateway) {
-    gateway.addEventListener('touchmove', e => {
-      e.preventDefault();
-    }, { passive: false });
-  }
-  const loading = $('loading');
-  if (loading) {
-    loading.addEventListener('touchmove', e => {
-      e.preventDefault();
-    }, { passive: false });
-  }
-}
-initScrollLock();
 
 
 // GAS API CONFIG (JSON ONLY)

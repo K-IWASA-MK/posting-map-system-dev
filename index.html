@@ -22,7 +22,15 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="./style.css?v=208">
+  <script>
+    // ゲートウェイ画面とローディング画面でのスクロール/バウンスを物理的に防止（初期ダウンロード中の遅延対策）
+    document.addEventListener('touchmove', function(e) {
+      if (e.target.closest('#screen-gateway') || e.target.closest('#loading')) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  </script>
+  <link rel="stylesheet" href="./style.css?v=210">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -128,7 +136,7 @@
     </div>
   </div>
 
-  <script src="./app.js?v=208"></script>
-  <script src="./render.js?v=208"></script>
+  <script src="./app.js?v=210"></script>
+  <script src="./render.js?v=210"></script>
 </body>
 </html>
