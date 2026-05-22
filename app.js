@@ -1,4 +1,3 @@
-alert("APP JS START");
 const $ = id => document.getElementById(id);
 
 // デバッグログ出力関数
@@ -49,60 +48,71 @@ function removePressed() {
 const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
 
 async function callApi(action, params = {}) {
-  const queryParams = new URLSearchParams({
-    action: action,
-    ...params
-  });
+  const MAX_RETRIES = 3;
+  let delay = 1000;
   
-  const url = `${API_URL}?${queryParams.toString()}`;
-
-  const options = {
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'omit',
-    cache: 'no-cache',
-    redirect: 'follow'
-  };
-  
-  try {
-    logDebug(`[callApi] START: action=${action}`);
-    logDebug(`[callApi] URL: ${url.substring(0, 80)}...`);
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const queryParams = new URLSearchParams({
+      action: action,
+      _t: Date.now().toString(), // キャッシュバスター：iOS WebKitの302キャッシュ回避
+      ...params
+    });
     
-    const response = await fetch(url, options);
+    const url = `${API_URL}?${queryParams.toString()}`;
+    const options = {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'omit',
+      cache: 'no-store', // キャッシュを利用しない
+      redirect: 'follow'
+    };
     
-    logDebug(`[callApi] FETCH OK. status=${response.status}, type=${response.type}`);
-    
-    if (!response.ok) {
-      logDebug(`[callApi] HTTP ERROR: status=${response.status}`);
-      throw new Error(`HTTP Error: ${response.status}`);
-    }
-    
-    logDebug(`[callApi] Calling response.text()...`);
-    const text = await response.text();
-    logDebug(`[callApi] TEXT RECEIVED (length=${text.length})`);
-    logDebug(`[callApi] TEXT PREVIEW: ${text.substring(0, 150)}`);
-    
-    logDebug(`[callApi] Parsing JSON...`);
-    let data;
     try {
-      data = JSON.parse(text);
-      logDebug(`[callApi] JSON PARSE SUCCESS. success=${data.success}`);
-    } catch (parseErr) {
-      logDebug(`[callApi] JSON parse failed. Error=${parseErr.message}`);
-      logDebug(`[callApi] Failed Text snippet: ${text.substring(0, 200)}`);
-      throw new Error("JSON形式ではない応答を受け取りました: " + parseErr.message);
+      logDebug(`[callApi] START (Attempt ${attempt}/${MAX_RETRIES}): action=${action}`);
+      logDebug(`[callApi] URL: ${url.substring(0, 80)}...`);
+      
+      const response = await fetch(url, options);
+      
+      logDebug(`[callApi] FETCH OK. status=${response.status}, type=${response.type}`);
+      
+      if (!response.ok) {
+        logDebug(`[callApi] HTTP ERROR: status=${response.status}`);
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+      
+      logDebug(`[callApi] Calling response.text()...`);
+      const text = await response.text();
+      logDebug(`[callApi] TEXT RECEIVED (length=${text.length})`);
+      logDebug(`[callApi] TEXT PREVIEW: ${text.substring(0, 150)}`);
+      
+      logDebug(`[callApi] Parsing JSON...`);
+      let data;
+      try {
+        data = JSON.parse(text);
+        logDebug(`[callApi] JSON PARSE SUCCESS. success=${data.success}`);
+      } catch (parseErr) {
+        logDebug(`[callApi] JSON parse failed. Error=${parseErr.message}`);
+        logDebug(`[callApi] Failed Text snippet: ${text.substring(0, 200)}`);
+        throw new Error("JSON形式ではない応答を受け取りました: " + parseErr.message);
+      }
+      
+      if (data.success === false) {
+        logDebug(`[callApi] API returned success=false. msg=${data.message}`);
+        throw new Error(data.message || "API Error");
+      }
+      return data;
+    } catch (err) {
+      logDebug(`[callApi] Attempt ${attempt} failed: ${err.message}`);
+      if (attempt === MAX_RETRIES) {
+        logDebug(`[callApi] ALL ATTEMPTS FAILED.`);
+        console.error("API Connection Error:", err);
+        alert("通信エラーが発生しました。\n内容: " + err.message);
+        throw err;
+      }
+      logDebug(`[callApi] Waiting ${delay}ms before retry...`);
+      await new Promise(r => setTimeout(r, delay));
+      delay *= 2;
     }
-    
-    if (data.success === false) {
-      logDebug(`[callApi] API returned success=false. msg=${data.message}`);
-      throw new Error(data.message || "API Error");
-    }
-    return data;
-  } catch (err) {
-    logDebug(`[callApi] CRITICAL ERROR: ${err.message}`);
-    console.error("API Connection Error:", err);
-    alert("通信エラーが発生しました。\n内容: " + err.message);
-    throw err;
   }
 }
 
@@ -522,7 +532,7 @@ async function saveProfile() {
 }
 
 async function safeInitApp() {
-  alert("INSIDE safeInitApp");
+  logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
   
   const liffId = "2010168705-kVxE2jve";
@@ -536,7 +546,13 @@ async function safeInitApp() {
       // LINE JS Bridge の接続確立を待つ安全ディレイ
       await new Promise(r => setTimeout(r, 200));
 
-      await liff.init({ liffId: liffId });
+      // ⏳ 5秒でタイムアウトする安全装置
+      const liffInitPromise = liff.init({ liffId: liffId });
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("LINEログインの応答がタイムアウトしました(5秒)")), 5000)
+      );
+
+      await Promise.race([liffInitPromise, timeoutPromise]);
       logDebug("LIFF INIT OK"); // ② LIFF初期化成功
       
       logDebug("LOGIN CHECK"); // ③ login判定
@@ -612,5 +628,4 @@ async function safeInitApp() {
 }
 
 // スクリプトがHTML最下部にあるため、イベントを待たず即時実行してタイミング問題を回避
-alert("CALLING safeInitApp");
 safeInitApp();
