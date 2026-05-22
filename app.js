@@ -53,7 +53,10 @@ async function callApi(action, params = {}) {
   
   let options = {
     method: 'GET',
-    redirect: 'follow'
+    mode: 'cors',
+    credentials: 'omit',
+    redirect: 'follow',
+    cache: 'no-cache'
   };
 
   for (let key in params) {
