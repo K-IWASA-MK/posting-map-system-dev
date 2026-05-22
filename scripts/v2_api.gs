@@ -69,7 +69,8 @@ function doGet(e) {
 function doPost(e) {
   let postData;
   try {
-    if (e.postData && e.postData.contents) {
+    // JSONとフォーム送信(urlencoded)でパース方法を安全に切り分け
+    if (e.postData && e.postData.contents && e.postData.type === 'application/json') {
       postData = JSON.parse(e.postData.contents);
     } else {
       postData = e.parameter;
@@ -83,13 +84,22 @@ function doPost(e) {
 
   try {
     switch (action) {
+      case 'getAppData':
+        response = getAppData();
+        break;
+      case 'getRoster':
+        response = getRoster();
+        break;
+      case 'getAreaDetails':
+        response = getAreaDetails(postData.name || e.parameter.name);
+        break;
       case 'submitDistribution':
         response = submitDistribution(
           postData.areaName,
-          postData.rowId,
+          parseInt(postData.rowId, 10),
           postData.staffName,
-          postData.count,
-          postData.isDone,
+          parseFloat(postData.count) || 0,
+          postData.isDone === 'true' || postData.isDone === true,
           postData.staffId
         );
         break;

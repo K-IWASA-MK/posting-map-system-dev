@@ -48,27 +48,24 @@ function removePressed() {
 const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
 
 async function callApi(action, params = {}) {
-  // 長いGET URLがLINE WebViewで制限されるのを防ぐため、すべてのパラメータをBodyに乗せるPOSTへ統一
-  const bodyParams = new URLSearchParams({
+  const queryParams = new URLSearchParams({
     action: action,
     ...params
   });
+  
+  const url = `${API_URL}?${queryParams.toString()}`;
 
   const options = {
-    method: 'POST',
+    method: 'GET',
     mode: 'cors',
     credentials: 'omit',
     cache: 'no-cache',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: bodyParams.toString(),
     redirect: 'follow'
   };
   
   try {
-    logDebug(`callApi POST: action=${action}, params=${JSON.stringify(params)}`);
-    const response = await fetch(API_URL, options);
+    logDebug(`callApi GET: action=${action}, params=${JSON.stringify(params)}`);
+    const response = await fetch(url, options);
     logDebug(`callApi response status: ${response.status} (${response.statusText})`);
     
     if (!response.ok) {
