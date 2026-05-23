@@ -32,9 +32,9 @@
       });
     }
   </script>
-  <!-- Force Refresh: v231 (2026-05-23T07:30:00) -->
+  <!-- Force Refresh: v240 (2026-05-24T06:07:00) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=231">
+  <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=240">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
   <script>
     try {
@@ -57,13 +57,13 @@
   <script>
     // 画面の意図しないスクロールやバウンスを物理的に防止（スクロール可能なメインコンテンツ領域等のみ許可）
     document.addEventListener('touchmove', function(e) {
-      if (e.target.closest('#screen-gateway') || e.target.closest('#loading')) {
-        e.preventDefault();
-      }
+      const scrollable = e.target.closest('#content, #debug-log, #debug-log-content');
+      if (scrollable) return;
+      e.preventDefault();
     }, { passive: false });
   </script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="https://area-management.github.io/posting-map-system/style.css?v=231">
+  <link rel="stylesheet" href="https://area-management.github.io/posting-map-system/style.css?v=240">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -80,7 +80,7 @@
   <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center">
     <div class="gateway-header-wrap flex flex-col items-center justify-center mb-4 mt-0">
       <div class="gateway-icon-container w-32 h-32 bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-4 p-1 relative shadow-2xl">
-        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=231" class="w-full h-full object-cover rounded-[2.2rem] z-10">
+        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=240" class="w-full h-full object-cover rounded-[2.2rem] z-10">
       </div>
       <div class="text-center">
         <h2 id="gateway-title" style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">LINEから直接ログインします</h2>
@@ -124,7 +124,7 @@
       </div>
     </header>
 
-    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 pb-64">
+    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
       <!-- AREAS PAGE -->
       <section id="page-areas" class="page space-y-8">
         <div id="area-list" class="space-y-6"></div>
@@ -184,7 +184,7 @@
     </div>
   </div>
 
-  <script src="https://area-management.github.io/posting-map-system/app.js?v=231"></script>
-  <script src="https://area-management.github.io/posting-map-system/render.js?v=231"></script>
+  <script src="https://area-management.github.io/posting-map-system/app.js?v=240"></script>
+  <script src="https://area-management.github.io/posting-map-system/render.js?v=240"></script>
 </body>
 </html>

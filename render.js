@@ -162,35 +162,35 @@ function renderSettings() {
     `;
 
     container.innerHTML = `
-      <div class="py-10 px-4 flex flex-col items-center">
-        <div class="mb-10 text-center">
-          <p class="text-sm text-white/70 leading-relaxed mb-3">
+      <div class="py-6 px-4 flex flex-col items-center">
+        <div class="mb-6 text-center">
+          <p class="text-sm text-white/70 leading-relaxed mb-2">
             <span class="font-black">配布員証</span><br>
             <span class="font-medium">公式配布員 IDカード</span>
           </p>
-          ${userInfo.id ? `<div class="text-xl font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">${userInfo.id}</div>` : ''}
+          ${userInfo.id ? `<div class="text-lg font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">${userInfo.id}</div>` : ''}
         </div>
         
-        <div class="w-full h-[320px] premium-glass flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div class="w-full h-[300px] premium-glass flex flex-col items-center justify-center p-6 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-white/0 pointer-events-none rounded-[28px]"></div>
           
-          <div class="inline-flex items-center gap-2 mb-6">
+          <div class="inline-flex items-center gap-2 mb-4">
             <span class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]"></span>
             <span class="text-[8px] font-black text-[#22c55e] uppercase tracking-[0.3em]">Authorized Staff</span>
           </div>
           
           ${avatarHtml}
           
-          <div style="font-size: 32px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center mb-4 z-10">
+          <div style="font-size: 28px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center mb-3 z-10">
             <div>${userInfo.last}</div>
-            <div class="text-sm text-white/40 font-medium mt-1">${userInfo.first || ''}</div>
+            <div class="text-xs text-white/40 font-medium mt-1">${userInfo.first || ''}</div>
           </div>
           
           <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] z-10">Field Operations</p>
         </div>
         
-        <div class="w-full mt-12 pb-8">
-          <button onclick="switchPage('areas')" class="btn-neu w-full bg-[#2563eb] text-white rounded-[1.8rem] py-7 text-xl font-black shadow-xl">業務を開始する</button>
+        <div class="w-full mt-8 pb-4">
+          <button onclick="switchPage('areas')" class="btn-neu w-full bg-[#2563eb] text-white rounded-[1.8rem] py-5 text-lg font-black shadow-xl">業務を開始する</button>
         </div>
       </div>
     `;

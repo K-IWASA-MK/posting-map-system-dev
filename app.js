@@ -415,12 +415,6 @@ async function switchPage(id, force = false) {
   target.style.opacity = '1';
   target.style.transform = 'translateY(0)';
   
-  // pb-64の制御（入力欄のスクロール領域確保）
-  if (id === 'settings') {
-    $('content').classList.remove('pb-64');
-  } else {
-    $('content').classList.add('pb-64');
-  }
 
   // 下ナビのタブのアクティブ状態の不透明度を調整
   document.querySelectorAll('.nav-btn').forEach((b, i) => { 
@@ -428,11 +422,7 @@ async function switchPage(id, force = false) {
   });
 
   // スクロール位置のリセット
-  if (id === 'settings' && localStorage.getItem('user_info')) {
-    $('content').scrollTo(0, 120);
-  } else {
-    $('content').scrollTo(0, 0);
-  }
+  $('content').scrollTo(0, 0);
 }
 
 function updateStats() {

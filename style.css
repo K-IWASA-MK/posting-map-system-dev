@@ -248,3 +248,14 @@ input::placeholder { text-align: center; }
 #numpad-modal > div {
   box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
+
+/* 各ページ専用の下部パディング（フローティング下部ナビゲーションとの重なりを回避） */
+#page-areas {
+  padding-bottom: 160px;
+}
+#page-detail {
+  padding-bottom: 160px;
+}
+#page-settings {
+  padding-bottom: 160px;
+}
