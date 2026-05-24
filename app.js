@@ -456,13 +456,18 @@ function updateStats() {
     totalPoints += area.total || 0;
   });
 
+  const countEl = $('header-count');
+  const pctEl = $('header-pct');
+
   if (totalPoints === 0) {
-    $('header-pct').innerHTML = '0% <span class="text-white/40 text-[10px] font-bold ml-1.5">(0/0)</span>';
+    if (countEl) countEl.textContent = '(0/0)';
+    if (pctEl) pctEl.textContent = '0%';
     return;
   }
 
   const pct = Math.round((totalDone / totalPoints) * 100);
-  $('header-pct').innerHTML = `${pct}% <span class="text-white/40 text-[10px] font-bold ml-1.5">(${totalDone}/${totalPoints})</span>`;
+  if (countEl) countEl.textContent = `(${totalDone}/${totalPoints})`;
+  if (pctEl) pctEl.textContent = `${pct}%`;
 }
 
 function cleanNameInput(str) {
