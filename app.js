@@ -442,13 +442,20 @@ async function switchPage(id, force = false) {
 }
 
 function updateStats() {
-  const total = areaSummary.length;
-  if (total === 0) {
-    $('header-pct').textContent = '0%';
+  let totalDone = 0;
+  let totalPoints = 0;
+  areaSummary.forEach(area => {
+    totalDone += area.done || 0;
+    totalPoints += area.total || 0;
+  });
+
+  if (totalPoints === 0) {
+    $('header-pct').innerHTML = '0% <span class="text-white/40 text-[10px] font-bold ml-1.5">(0/0)</span>';
     return;
   }
-  const avg = areaSummary.reduce((acc, cur) => acc + (cur.progress || 0), 0) / total;
-  $('header-pct').textContent = Math.round(avg) + '%';
+
+  const pct = Math.round((totalDone / totalPoints) * 100);
+  $('header-pct').innerHTML = `${pct}% <span class="text-white/40 text-[10px] font-bold ml-1.5">(${totalDone}/${totalPoints})</span>`;
 }
 
 function cleanNameInput(str) {

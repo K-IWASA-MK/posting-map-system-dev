@@ -17,7 +17,7 @@ function renderAreas() {
       <div style="${dotStyle}" class="w-3 h-3 rounded-full mr-6"></div>
       <div class="flex-1">
         <div class="text-lg font-black text-white tracking-tighter">${s.name}</div>
-        <div class="text-[9px] font-bold text-white/40 mt-1 uppercase tracking-widest">${s.progress}% Completed</div>
+        <div class="text-[9px] font-bold text-white/40 mt-1 uppercase tracking-widest">${s.progress}% Completed <span class="text-white/20 font-medium">(${s.done || 0}/${s.total || 0})</span></div>
       </div>
       <span class="text-white/40 text-xl font-light">›</span>
     </div>`;
