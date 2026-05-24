@@ -167,16 +167,28 @@ function getAppData() {
     });
   }
 
+  let statsDone = 0;
+  let statsTotal = 0;
+
   const areas = sheets
     .filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden())
     .map(s => {
       const name = s.getName();
       const summaryItem = dashboardData.summary ? dashboardData.summary.find(item => item.name === name) : null;
+      const lastRow = s.getLastRow();
+      const actualTotal = lastRow >= 2 ? (lastRow - 1) : 0;
+      
+      const doneVal = summaryItem ? summaryItem.done : 0;
+      const totalVal = (summaryItem && summaryItem.total > 0) ? summaryItem.total : actualTotal;
+      
+      statsDone += doneVal;
+      statsTotal += totalVal;
+
       return {
         name: name,
-        progress: progressMap[name] !== undefined ? progressMap[name] : 0,
-        done: summaryItem ? summaryItem.done : 0,
-        total: summaryItem ? summaryItem.total : 0
+        progress: totalVal > 0 ? Math.round((doneVal / totalVal) * 100) : 0,
+        done: doneVal,
+        total: totalVal
       };
     });
 
@@ -184,7 +196,7 @@ function getAppData() {
     success: true,
     branchName: ss.getName().split(/[ 　]/)[0] || "支部",
     areas: areas,
-    stats: dashboardData.stats || { done: 0, total: 0 }
+    stats: { done: statsDone, total: statsTotal }
   };
 }
 
