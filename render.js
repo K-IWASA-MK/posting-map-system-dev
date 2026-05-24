@@ -171,7 +171,6 @@ function renderSettings() {
       <div class="py-6 px-4 flex flex-col items-center">
         <div class="mb-6 text-center">
           <p class="text-sm text-white/70 leading-relaxed mb-2">
-            <span class="font-black">配布員証</span><br>
             <span class="font-medium">公式配布員 IDカード</span>
           </p>
           ${userInfo.id ? `<div class="text-lg font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">${userInfo.id}</div>` : ''}
