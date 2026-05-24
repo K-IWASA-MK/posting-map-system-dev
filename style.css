@@ -11,7 +11,7 @@ body {
   margin: 0 !important;
   padding: 0 !important;
 }
-.safe-top { padding-top: calc(env(safe-area-inset-top) + 1.5rem) !important; }
+.safe-top { padding-top: calc(env(safe-area-inset-top) + 2.2rem) !important; }
 .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem) !important; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .page {
