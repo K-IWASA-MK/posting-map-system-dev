@@ -598,6 +598,8 @@ async function safeInitApp() {
           if (btn) btn.classList.remove('hidden');
           if (spinner) spinner.classList.add('hidden');
           if (subtitle) subtitle.textContent = "自動ログインに失敗しました。手動で起動してください。";
+          $('screen-gateway').classList.remove('hidden');
+          $('loading').classList.add('hidden');
         }
       } else {
         logDebug("Not logged in.");
@@ -616,6 +618,8 @@ async function safeInitApp() {
           }
           if (spinner) spinner.classList.add('hidden');
           if (subtitle) subtitle.textContent = "ブラウザ環境です。「LINEでログイン」ボタンを押してください。";
+          $('screen-gateway').classList.remove('hidden');
+          $('loading').classList.add('hidden');
         }
       }
     } catch (err) {
@@ -624,12 +628,16 @@ async function safeInitApp() {
       if (btn) btn.classList.remove('hidden');
       if (spinner) spinner.classList.add('hidden');
       if (subtitle) subtitle.textContent = "自動ログインに失敗しました。手動で起動してください。";
+      $('screen-gateway').classList.remove('hidden');
+      $('loading').classList.add('hidden');
     }
   } else {
     logDebug("Running in standalone web browser. Showing manual launch button.");
     if (btn) btn.classList.remove('hidden');
     if (spinner) spinner.classList.add('hidden');
     if (subtitle) subtitle.textContent = "ブラウザ環境です。手動で起動します。";
+    $('screen-gateway').classList.remove('hidden');
+    $('loading').classList.add('hidden');
   }
 }
 
