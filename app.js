@@ -402,7 +402,18 @@ async function switchPage(id, force = false) {
   
   // 3. ナビゲーションの表示制御
   const nav = $('bottom-nav');
-  if (nav) nav.style.display = localStorage.getItem('user_info') ? '' : 'none';
+  const hasUser = !!localStorage.getItem('user_info');
+  if (nav) nav.style.display = hasUser ? '' : 'none';
+
+  // 設定画面（登録・IDカード）では無駄なスクロールを徹底排除して1画面固定
+  const contentEl = $('content');
+  const settingsPage = document.getElementById('page-settings');
+  if (id === 'settings') {
+    if (settingsPage) settingsPage.style.paddingBottom = '0px';
+    contentEl.style.overflowY = 'hidden';
+  } else {
+    contentEl.style.overflowY = 'auto';
+  }
 
   // 4. 次のページを少し下から準備してフェードイン
   target.style.opacity = '0';

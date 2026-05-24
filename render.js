@@ -188,10 +188,6 @@ function renderSettings() {
           
           <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] z-10">Field Operations</p>
         </div>
-        
-        <div class="w-full mt-8 pb-4">
-          <button onclick="switchPage('areas')" class="btn-neu w-full bg-[#2563eb] text-white rounded-[1.8rem] py-5 text-lg font-black shadow-xl">業務を開始する</button>
-        </div>
       </div>
     `;
   }
