@@ -466,7 +466,13 @@ function updateStats() {
   }
 
   const pct = Math.round((totalDone / totalPoints) * 100);
-  if (countEl) countEl.textContent = `(${totalDone}/${totalPoints})`;
+  
+  // 全体数の桁数に合わせて、完了数の左側を半角スペースでパディングする
+  const doneStr = String(totalDone);
+  const totalStr = String(totalPoints);
+  const paddedDone = doneStr.padStart(totalStr.length, ' ');
+
+  if (countEl) countEl.textContent = `(${paddedDone}/${totalPoints})`;
   if (pctEl) pctEl.textContent = `${pct}%`;
 }
 
