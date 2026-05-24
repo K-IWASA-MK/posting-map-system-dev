@@ -41,7 +41,7 @@ function removePressed() {
 
 
 // GAS API CONFIG (JSON ONLY)
-const API_URL = "https://script.google.com/macros/s/AKfycbzcBYbMezMKKQH5nG1HaZ_8Alg9rVgFwZCC3Jxs0e15TTnaakkYh1wamuymnwQJcAls/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
 
 async function callApi(action, params = {}) {
   const MAX_RETRIES = 3;
