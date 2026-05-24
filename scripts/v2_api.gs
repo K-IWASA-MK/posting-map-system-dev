@@ -13,7 +13,7 @@ function getSS() {
   } catch (e) {
     // Fallback if not container-bound
   }
-  const SPREADSHEET_ID = '1KuA5pN0ItODhwSJph-fwgj_U_ZyHrn9Osew92D99xBs';
+  const SPREADSHEET_ID = '1whCYOf3QdEO88Kcmj99-Nzvhi1zJnRJktEF57Q_rDM';
   if (!SPREADSHEET_ID) throw new Error("SPREADSHEET_ID is not defined.");
   return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
