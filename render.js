@@ -82,6 +82,12 @@ async function openDetail(name) {
       $('detail-title').textContent = name;
       allPoints = data.points;
       renderDetailList(name);
+      
+      // 新しい地区を開くため、詳細画面のスクロール位置をキャッシュからクリア
+      if (typeof scrollPositions !== 'undefined') {
+        scrollPositions['detail'] = 0;
+      }
+      
       switchPage('detail');
     }
   } catch (e) {

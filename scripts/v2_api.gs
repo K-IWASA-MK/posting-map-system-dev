@@ -171,16 +171,20 @@ function getAppData() {
     .filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden())
     .map(s => {
       const name = s.getName();
+      const summaryItem = dashboardData.summary ? dashboardData.summary.find(item => item.name === name) : null;
       return {
         name: name,
-        progress: progressMap[name] !== undefined ? progressMap[name] : 0
+        progress: progressMap[name] !== undefined ? progressMap[name] : 0,
+        done: summaryItem ? summaryItem.done : 0,
+        total: summaryItem ? summaryItem.total : 0
       };
     });
 
   return {
     success: true,
     branchName: ss.getName().split(/[ 　]/)[0] || "支部",
-    areas: areas
+    areas: areas,
+    stats: dashboardData.stats || { done: 0, total: 0 }
   };
 }
 

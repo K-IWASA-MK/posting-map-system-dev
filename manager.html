@@ -198,12 +198,17 @@
         if (appData && appData.success) {
           const areas = appData.areas || [];
           const total = areas.length;
-          const progressSum = areas.reduce((sum, item) => sum + (item.progress || 0), 0);
-          const coverage = total > 0 ? Math.round(progressSum / total) : 0;
+          let totalDone = 0;
+          let totalPoints = 0;
+          areas.forEach(area => {
+            totalDone += area.done || 0;
+            totalPoints += area.total || 0;
+          });
+          const coverage = totalPoints > 0 ? Math.round((totalDone / totalPoints) * 100) : 0;
           
           $('stat-coverage').textContent = `${coverage}%`;
           $('stat-progress-bar').style.width = `${coverage}%`;
-          addLog(`Stats updated: overall coverage is ${coverage}% across ${total} districts.`);
+          addLog(`Stats updated: overall coverage is ${coverage}% across ${total} districts (Total: ${totalDone}/${totalPoints} points).`);
         }
         
         const rosterData = await (await fetch(API_URL + "?action=getRoster")).json();

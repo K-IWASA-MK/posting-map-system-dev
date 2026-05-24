@@ -14,6 +14,12 @@ window.onunhandledrejection = function(event) {
 };
 
 let allPoints = [], areaSummary = [], roster = [];
+let scrollPositions = { areas: 0, detail: 0, settings: 0 };
+const pageIdMap = {
+  'page-areas': 'areas',
+  'page-detail': 'detail',
+  'page-settings': 'settings'
+};
 
 // プレミアム・インタラクション・スキル (JS Touch Handler)
 document.addEventListener('touchstart', e => {
@@ -386,6 +392,10 @@ async function switchPage(id, force = false) {
   // 1. 現在表示されているページを上にスライドさせながらフェードアウト
   const activePage = Array.from(pages).find(p => !p.classList.contains('hidden'));
   if (activePage) {
+    const activeId = pageIdMap[activePage.id];
+    if (activeId) {
+      scrollPositions[activeId] = $('content').scrollTop;
+    }
     activePage.style.opacity = '0';
     activePage.style.transform = 'translateY(-12px)';
     await new Promise(r => setTimeout(r, 200)); // アニメーション時間分待つ
@@ -405,20 +415,17 @@ async function switchPage(id, force = false) {
   const hasUser = !!localStorage.getItem('user_info');
   if (nav) nav.style.display = hasUser ? '' : 'none';
 
-  // 設定画面（登録・IDカード）では無駄なスクロールを徹底排除して1画面固定
+  // 設定画面（登録・IDカード）では無駄なスクロールを避けるが、画面サイズが小さい場合はスクロール可能にする
   const contentEl = $('content');
   const settingsPage = document.getElementById('page-settings');
   if (id === 'settings') {
     if (!hasUser) {
       if (settingsPage) settingsPage.style.paddingBottom = '0px';
-      contentEl.style.overflowY = 'hidden';
     } else {
       if (settingsPage) settingsPage.style.paddingBottom = '140px';
-      contentEl.style.overflowY = 'hidden';
     }
-  } else {
-    contentEl.style.overflowY = 'auto';
   }
+  contentEl.style.overflowY = 'auto';
 
   // 4. 次のページを少し下から準備してフェードイン
   target.style.opacity = '0';
@@ -437,8 +444,8 @@ async function switchPage(id, force = false) {
     b.style.opacity = (id === 'areas' && i === 0) || (id === 'settings' && i === 1) ? '1' : '0.3'; 
   });
 
-  // スクロール位置のリセット
-  $('content').scrollTo(0, 0);
+  // スクロール位置の復元
+  $('content').scrollTo(0, scrollPositions[id] || 0);
 }
 
 function updateStats() {
