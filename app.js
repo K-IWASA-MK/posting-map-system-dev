@@ -424,8 +424,10 @@ async function switchPage(id, force = false) {
     } else {
       if (settingsPage) settingsPage.style.paddingBottom = '140px';
     }
+    contentEl.style.overflowY = 'hidden';
+  } else {
+    contentEl.style.overflowY = 'auto';
   }
-  contentEl.style.overflowY = 'auto';
 
   // 4. 次のページを少し下から準備してフェードイン
   target.style.opacity = '0';
