@@ -184,6 +184,10 @@ Avoid:
 
 Less information = stronger design.
 
+## UI Layout Fixed Rules (レイアウト固定ルール)
+* **上部ヘッダーの完全保護**: 全体進捗バッジを含む上部ヘッダー（`index.html` の `<header>`）は完成済みです。今後、パディングや構成要素は一切変更しないでください。
+* **設定画面のIDカード垂直バランス**: 設定画面（`page-settings`）はスクロール不可の固定レイアウトです。下部ナビゲーションバーとの干渉を防ぐため、写真付きIDカード本体（`premium-glass` を持つ `div`）のみを `-translate-y-6`（24px上へシフト）で持ち上げて固定し、他のコンテナ余白やテキスト位置は一切触らないでください。
+
 ## Cross-Device Layout & Compatibility (Progressive Enhancement)
 * Base Layout: 常に `w-full` や Flexbox、均等な余白 (`px-` 等) を駆使し、どんな画面幅でも絶対にレイアウトが崩れない、または非対称にならない「流動的で強牢な構造」をベースとすること。固定幅(px指定)でレイアウトを制限してはならない。
 * Device Agnosticism: iOS/Android問わず、横スクロールが発生したり、要素が見切れたりすることは絶対に許されない。
