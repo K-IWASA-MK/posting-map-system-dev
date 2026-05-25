@@ -172,7 +172,7 @@ function renderSettings() {
     const displayBranch = rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`;
 
     container.innerHTML = `
-      <div class="h-[calc(100dvh-220px)] flex flex-col items-center justify-center px-4 pb-16">
+      <div class="h-[calc(100dvh-220px)] flex flex-col items-center justify-center px-4 pb-6">
         <div class="mb-6 flex items-center justify-center gap-3">
           <span class="text-xs font-bold text-white/50 tracking-wider">公式配布員 IDカード</span>
           ${formattedId ? `<span style="letter-spacing: 0.15em; text-indent: 0.15em;" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono bg-[#2563eb]/10 rounded-full border border-[#2563eb]/20">${formattedId}</span>` : ''}
