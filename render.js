@@ -178,7 +178,7 @@ function renderSettings() {
           ${formattedId ? `<span style="letter-spacing: 0.15em; text-indent: 0.15em;" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono bg-[#2563eb]/10 rounded-full border border-[#2563eb]/20">${formattedId}</span>` : ''}
         </div>
         
-        <div class="w-full max-w-sm h-[300px] premium-glass flex flex-col items-center justify-between p-6 relative overflow-hidden">
+        <div class="w-full max-w-sm h-[300px] premium-glass flex flex-col items-center justify-between p-6 relative overflow-hidden -translate-y-6">
           <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-white/0 pointer-events-none rounded-[28px]"></div>
           
           <div class="inline-flex items-center gap-2 z-10 mt-3">
