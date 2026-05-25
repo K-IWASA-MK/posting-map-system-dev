@@ -167,29 +167,37 @@ function renderSettings() {
       </div>
     `;
 
+    const formattedId = userInfo.id ? userInfo.id.replace(/^([A-Za-z]+)(\d+)$/, '$1 $2') : '';
+    const rawBranch = localStorage.getItem('branch_name') || '';
+    const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : '';
+
     container.innerHTML = `
       <div class="pt-2 pb-0 px-4 flex flex-col items-center">
-        <div class="mb-6 text-center flex flex-col items-center gap-1">
-          <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">公式配布員 IDカード</p>
-          ${userInfo.id ? `<div class="text-base font-black text-[#2563eb] tracking-[0.4em] font-mono">${userInfo.id}</div>` : ''}
+        <div class="mb-6 flex items-center justify-center gap-3">
+          <span class="text-xs font-bold text-white/50 tracking-wider">公式配布員 IDカード</span>
+          ${formattedId ? `<span style="letter-spacing: 0.15em; text-indent: 0.15em;" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono bg-[#2563eb]/10 rounded-full border border-[#2563eb]/20">${formattedId}</span>` : ''}
         </div>
         
-        <div class="w-full h-[300px] premium-glass flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div class="w-full max-w-sm h-[300px] premium-glass flex flex-col items-center justify-between p-6 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-white/0 pointer-events-none rounded-[28px]"></div>
           
-          <div class="inline-flex items-center gap-2 mb-4">
+          <div class="inline-flex items-center gap-2 z-10">
             <span class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]"></span>
             <span class="text-[8px] font-black text-[#22c55e] uppercase tracking-[0.3em]">Authorized Staff</span>
           </div>
           
-          ${avatarHtml}
-          
-          <div style="font-size: 28px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center mb-3 z-10">
-            <div>${userInfo.last}</div>
-            <div class="text-xs text-white/40 font-medium mt-1">${userInfo.first || ''}</div>
+          <div class="flex flex-col items-center z-10 my-auto w-full max-w-[280px]">
+            ${avatarHtml}
+            <div style="font-size: 28px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center w-full">
+              <div class="truncate w-full">${userInfo.last}</div>
+              <div class="text-xs text-white/40 font-medium mt-1 truncate w-full">${userInfo.first || ''}</div>
+            </div>
           </div>
           
-          <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] z-10">Field Operations</p>
+          <div class="flex flex-col items-center gap-1 z-10">
+            ${displayBranch ? `<p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">${displayBranch}</p>` : ''}
+            <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">Field Operations</p>
+          </div>
         </div>
       </div>
     `;
