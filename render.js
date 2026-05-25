@@ -169,11 +169,9 @@ function renderSettings() {
 
     container.innerHTML = `
       <div class="py-6 px-4 flex flex-col items-center">
-        <div class="mb-6 text-center">
-          <p class="text-sm text-white/70 leading-relaxed mb-2">
-            <span class="font-medium">公式配布員 IDカード</span>
-          </p>
-          ${userInfo.id ? `<div class="text-lg font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">${userInfo.id}</div>` : ''}
+        <div class="mb-6 text-center flex flex-col items-center gap-1">
+          <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">公式配布員 IDカード</p>
+          ${userInfo.id ? `<div class="text-base font-black text-[#2563eb] tracking-[0.4em] font-mono">${userInfo.id}</div>` : ''}
         </div>
         
         <div class="w-full h-[300px] premium-glass flex flex-col items-center justify-center p-6 relative overflow-hidden">
