@@ -1,8 +1,8 @@
-Created At: 2026-05-26T08:19:00Z
-Completed At: 2026-05-26T08:19:00Z
+Created At: 2026-05-26T08:33:00Z
+Completed At: 2026-05-26T08:33:00Z
 File Path: `file:///Volumes/SSD_DATA/posting-map-system/HANDOVER_TO_FLASH.md`
 
-# 開発引き継ぎ事項 (更新: 2026-05-26 v260)
+# 開発引き継ぎ事項 (更新: 2026-05-26 v261)
 
 次回の担当AIへ。以下のコンテキストを読み込み、前回のタスク範囲の変更点のみを確認して作業を再開してください。
 
@@ -14,14 +14,18 @@ File Path: `file:///Volumes/SSD_DATA/posting-map-system/HANDOVER_TO_FLASH.md`
 
 ## 1. 今回完了したタスクと変更点
 
-フロントエンド（GitHub Pages）へ適用・デプロイ準備済みです。キャッシュバスターは **v260** です。
+フロントエンド（GitHub Pages）へ適用・デプロイ準備済みです。キャッシュバスターは **v261** です。
 
-### ① 設定画面のスクロール位置固定とスクロール不可の適用 (`app.js`)
+### ① IDカード内「AUTHORIZED STAFF」の縦位置微調整 (`render.js`)
+- 「AUTHORIZED STAFF」要素に `mt-2` (上部マージン 8px) を追加しました。
+- これにより、IDカード上端からの隙間が程よく広がり、アバター画像との間の余白と綺麗に調和するようになりました。
+
+### ② 設定画面のスクロール位置固定とスクロール不可の適用 (`app.js`)
 - 設定画面（`settings`）に遷移した際、`contentEl.scrollTop = 0` でスクロール位置を一番上に強制する処理を追加しました。
 - また、設定画面表示時のみ `contentEl.style.overflowY = 'hidden'` にし、指で引っ張っても上下スクロール（バウンス）しないように固定しました。
 - 他の画面（`areas`, `detail`）に切り替わった際は、再び `overflowY = 'auto'` に戻り、通常通りスクロール可能です。
 
-### ② タイトル上下の余白（パディング）を24pxでシンメトリー化 (`index.html`)
+### ③ タイトル上下の余白（パディング）を24pxでシンメトリー化 (`index.html`)
 - `main#content` に設定されていた不要な Tailwind クラス `space-y-10` を削除しました。
 - これにより、非表示のセクション経由で適用されていた余分な `margin-top: 40px` が消去されました。
 - **結果としての余白バランス（完全対称）**:
@@ -36,4 +40,4 @@ File Path: `file:///Volumes/SSD_DATA/posting-map-system/HANDOVER_TO_FLASH.md`
 - **IDカード外側ラッパー**: `pt-2 pb-0 px-4 flex flex-col items-center` が確定版です。
 - **タイトル〜IDカード間の余白**: `mb-6` (24px) が確定版です。
 - **スクロール固定挙動**: 設定画面はスクロール不可の固定レイアウト（一番上でロック）です。
-- **キャッシュバスター**: 現在 `v260`。フロントエンドファイルを変更する際は必ず `index.html` のバージョン番号を上げてください。
+- **キャッシュバスター**: 現在 `v261`。フロントエンドファイルを変更する際は必ず `index.html` のバージョン番号を上げてください。
