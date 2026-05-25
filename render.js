@@ -181,7 +181,7 @@ function renderSettings() {
         <div class="w-full max-w-sm h-[300px] premium-glass flex flex-col items-center justify-between p-6 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-white/0 pointer-events-none rounded-[28px]"></div>
           
-          <div class="inline-flex items-center gap-2 z-10">
+          <div class="inline-flex items-center gap-2 z-10 mt-3">
             <span class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]"></span>
             <span class="text-[8px] font-black text-[#22c55e] uppercase tracking-[0.3em]">Authorized Staff</span>
           </div>
