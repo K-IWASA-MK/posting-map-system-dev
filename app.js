@@ -191,9 +191,6 @@ async function loadData(skipSync = false) {
     logDebug("[loadData] getAppData fetched successfully.");
     if (data && data.success) {
       areaSummary = data.areas;
-      if (data.branchName) {
-        localStorage.setItem('branch_name', data.branchName);
-      }
       
       logDebug("[loadData] Rendering areas...");
       renderAreas();
@@ -427,10 +424,8 @@ async function switchPage(id, force = false) {
     } else {
       if (settingsPage) settingsPage.style.paddingBottom = '140px';
     }
-    contentEl.style.overflowY = 'hidden';
-  } else {
-    contentEl.style.overflowY = 'auto';
   }
+  contentEl.style.overflowY = 'auto';
 
   // 4. 次のページを少し下から準備してフェードイン
   target.style.opacity = '0';
