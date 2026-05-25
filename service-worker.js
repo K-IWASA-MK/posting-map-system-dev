@@ -1,19 +1,19 @@
-const CACHE_NAME = 'posting-map-cache-v255';
+const CACHE_NAME = 'posting-map-cache-v256';
 const ASSETS = [
   './',
   './index.html',
   './manager.html',
   './style.css',
-  './style.css?v=255',
+  './style.css?v=256',
   './app.js',
-  './app.js?v=255',
+  './app.js?v=256',
   './render.js',
-  './render.js?v=255',
+  './render.js?v=256',
   './manifest.json',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap',
-  './assets/icon180-v2.png?v=255',
-  './assets/icon-admin-panel-180.png?v=255'
+  './assets/icon180-v2.png?v=256',
+  './assets/icon-admin-panel-180.png?v=256'
 ];
 
 // インストール時にアセットをプリキャッシュ
