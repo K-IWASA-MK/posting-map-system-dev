@@ -422,11 +422,7 @@ async function switchPage(id, force = false) {
   const contentEl = $('content');
   const settingsPage = document.getElementById('page-settings');
   if (id === 'settings') {
-    if (!hasUser) {
-      if (settingsPage) settingsPage.style.paddingBottom = '0px';
-    } else {
-      if (settingsPage) settingsPage.style.paddingBottom = '140px';
-    }
+    if (settingsPage) settingsPage.style.paddingBottom = '0px';
     contentEl.style.overflowY = 'hidden';
   } else {
     contentEl.style.overflowY = 'auto';
