@@ -167,16 +167,16 @@ function renderSettings() {
       </div>
     `;
 
+    const formattedId = userInfo.id ? userInfo.id.replace(/^([A-Za-z]+)(\d+)$/, '$1 $2') : '';
+
     container.innerHTML = `
-      <div class="py-6 px-4 flex flex-col items-center">
-        <div class="mb-6 text-center">
-          <p class="text-sm text-white/70 leading-relaxed mb-2">
-            <span class="font-medium">公式配布員 IDカード</span>
-          </p>
-          ${userInfo.id ? `<div class="text-lg font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">${userInfo.id}</div>` : ''}
+      <div class="min-h-[calc(100dvh-220px)] flex flex-col items-center justify-center px-4 pb-24">
+        <div class="mb-6 flex items-center justify-center gap-3">
+          <span class="text-xs font-bold text-white/50 tracking-wider">公式配布員 IDカード</span>
+          ${formattedId ? `<span class="text-xs font-black text-[#2563eb] tracking-[0.1em] font-mono bg-[#2563eb]/10 px-3 py-1 rounded-full border border-[#2563eb]/20 pl-1">${formattedId}</span>` : ''}
         </div>
         
-        <div class="w-full h-[300px] premium-glass flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div class="w-full max-w-sm h-[300px] premium-glass flex flex-col items-center justify-center p-6 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-white/0 pointer-events-none rounded-[28px]"></div>
           
           <div class="inline-flex items-center gap-2 mb-4">
