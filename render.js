@@ -168,6 +168,8 @@ function renderSettings() {
     `;
 
     const formattedId = userInfo.id ? userInfo.id.replace(/^([A-Za-z]+)(\d+)$/, '$1 $2') : '';
+    const rawBranch = localStorage.getItem('branch_name') || 'MIE-02';
+    const displayBranch = rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`;
 
     container.innerHTML = `
       <div class="min-h-[calc(100dvh-220px)] flex flex-col items-center justify-center px-4 pb-24">
@@ -192,7 +194,10 @@ function renderSettings() {
             </div>
           </div>
           
-          <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] z-10">Field Operations</p>
+          <div class="flex flex-col items-center gap-1 z-10">
+            <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">${displayBranch}</p>
+            <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">Field Operations</p>
+          </div>
         </div>
       </div>
     `;
