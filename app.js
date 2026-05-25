@@ -631,7 +631,8 @@ async function safeInitApp() {
           logDebug("LIFF PROFILE ERROR: " + err.message);
           if (btn) btn.classList.remove('hidden');
           if (spinner) spinner.classList.add('hidden');
-          if (subtitle) subtitle.textContent = "自動ログインに失敗しました。手動で起動してください。";
+          $('gateway-title').textContent = "自動ログインに失敗しました";
+          if (subtitle) subtitle.textContent = "手動で起動してください。";
           $('screen-gateway').classList.remove('hidden');
           $('loading').classList.add('hidden');
         }
@@ -661,7 +662,8 @@ async function safeInitApp() {
       logDebug("LIFF Error: " + err.message);
       if (btn) btn.classList.remove('hidden');
       if (spinner) spinner.classList.add('hidden');
-      if (subtitle) subtitle.textContent = "自動ログインに失敗しました。手動で起動してください。";
+      $('gateway-title').textContent = "自動ログインに失敗しました";
+      if (subtitle) subtitle.textContent = "手動で起動してください。";
       $('screen-gateway').classList.remove('hidden');
       $('loading').classList.add('hidden');
     }
@@ -669,7 +671,8 @@ async function safeInitApp() {
     logDebug("Running in standalone web browser. Showing manual launch button.");
     if (btn) btn.classList.remove('hidden');
     if (spinner) spinner.classList.add('hidden');
-    if (subtitle) subtitle.textContent = "ブラウザ環境です。手動で起動します。";
+    $('gateway-title').textContent = "ブラウザ起動";
+    if (subtitle) subtitle.textContent = "手動で起動します。";
     $('screen-gateway').classList.remove('hidden');
     $('loading').classList.add('hidden');
   }
