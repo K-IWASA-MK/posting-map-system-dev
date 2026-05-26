@@ -288,7 +288,7 @@ function formatRosterSheet() {
   sheet.showColumns(1, maxCols);
   sheet.setHiddenGridlines(true);
 
-  // 列幅設定 (ID: 100, 苗字: 250, 名前: 250)
+  // 列幅設定 (ID: 100, 名前: 250, アプリ名: 250)
   sheet.setColumnWidth(1, 100);
   sheet.setColumnWidth(2, 250);
   sheet.setColumnWidth(3, 250);
@@ -336,7 +336,7 @@ function setupRosterSheet() {
 
   // ★ 修正: 一旦全データをクリアして真っ新にする
   sheet.clear();
-  sheet.getRange(1, 1, 1, 3).setValues([["ID", "苗字", "名前"]]);
+  sheet.getRange(1, 1, 1, 3).setValues([["ID", "名前", "アプリ名"]]);
   sheet.setFrozenRows(1); // 1行目を固定
   
   formatRosterSheet(); // 整形も同時に行う

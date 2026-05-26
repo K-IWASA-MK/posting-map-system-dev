@@ -210,12 +210,10 @@ function getRoster() {
   
   for (let i = 0; i < values.length; i++) {
     const id = String(values[i][0] || "").trim();
-    const lastName = String(values[i][1] || "").trim();
-    const firstName = String(values[i][2] || "").trim();
+    const name = String(values[i][1] || "").trim();
     
-    if (id !== "" && lastName !== "") {
-      const fullName = (lastName + " " + firstName).trim();
-      roster.push({ id: id, name: fullName });
+    if (id !== "" && name !== "") {
+      roster.push({ id: id, name: name });
     }
   }
   return roster;
@@ -301,16 +299,16 @@ function registerStaff(lastName, firstName) {
     const s = ss.getSheetByName(CONFIG.SHEET_ROSTER);
     if (!s) return { success: false, message: "Roster sheet not found" };
 
-    const cleanLast = String(lastName || "").trim();
-    const cleanFirst = String(firstName || "").trim();
-    const normLast = normalizeName(lastName);
-    const normFirst = normalizeName(firstName);
+    const cleanName = String(lastName || "").trim();
+    const cleanAppName = String(firstName || "").trim();
+    const normName = normalizeName(lastName);
+    const normAppName = normalizeName(firstName);
     
-    if (!cleanLast || !cleanFirst) {
-      return { success: false, message: "姓と名を入力してください。" };
+    if (!cleanName || !cleanAppName) {
+      return { success: false, message: "名前とアプリ名を入力してください。" };
     }
 
-    const name = cleanLast + " " + cleanFirst;
+    const fullName = cleanName;
 
     // A列からC列のデータをすべて取得してチェック
     const lastRow = s.getLastRow();
@@ -319,15 +317,15 @@ function registerStaff(lastName, firstName) {
       values = s.getRange(1, 1, lastRow, 3).getValues();
     }
 
-    // 1. 既存の同姓同名スタッフがいないかチェック (表記揺れ吸収の上で比較)
+    // 1. 既存の同名スタッフがいないかチェック (表記揺れ吸収の上で比較)
     for (let i = 1; i < values.length; i++) {
       const rowId = normalizeName(values[i][0]);
-      const rowLast = normalizeName(values[i][1]);
-      const rowFirst = normalizeName(values[i][2]);
+      const rowName = normalizeName(values[i][1]);
+      const rowAppName = normalizeName(values[i][2]);
 
-      if (rowLast === normLast && rowFirst === normFirst && rowId !== "") {
+      if (rowName === normName && rowAppName === normAppName && rowId !== "") {
         // 既に存在する場合はそのIDを返す (重複防止・ID復元)
-        return { success: true, id: rowId, name: name, message: "existing" };
+        return { success: true, id: rowId, name: values[i][1], message: "existing" };
       }
     }
 
@@ -340,8 +338,8 @@ function registerStaff(lastName, firstName) {
 
     for (let i = 1; i < values.length; i++) {
       const valId = normalizeName(values[i][0]);
-      const valLast = normalizeName(values[i][1]);
-      const valFirst = normalizeName(values[i][2]);
+      const valName = normalizeName(values[i][1]);
+      const valAppName = normalizeName(values[i][2]);
 
       if (valId !== "") {
         // 例: "S001" -> prefix: "S", numPart: "001"
@@ -367,8 +365,8 @@ function registerStaff(lastName, firstName) {
         }
       }
 
-      // データ書き込み先として、ヘッダーより下で「ID、苗字、名前がすべて実質空白」の最初の行を再利用する
-      if (!foundEmptyRow && valId === "" && valLast === "" && valFirst === "") {
+      // データ書き込み先として、ヘッダーより下で「ID、名前、アプリ名がすべて実質空白」の最初の行を再利用する
+      if (!foundEmptyRow && valId === "" && valName === "" && valAppName === "") {
         targetRow = i + 1;
         foundEmptyRow = true;
       }
@@ -386,10 +384,10 @@ function registerStaff(lastName, firstName) {
       newId = prefix + nextIdNum;
     }
 
-    // 指定の行に書き込む (A: ID, B: 苗字, C: 名前)
-    s.getRange(targetRow, 1, 1, 3).setValues([[newId, cleanLast, cleanFirst]]);
+    // 指定の行に書き込む (A: ID, B: 名前, C: アプリ名)
+    s.getRange(targetRow, 1, 1, 3).setValues([[newId, cleanName, cleanAppName]]);
 
-    return { success: true, id: newId, name: name, message: "new" };
+    return { success: true, id: newId, name: fullName, message: "new" };
   } finally {
     lock.releaseLock();
   }
