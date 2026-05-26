@@ -725,5 +725,5 @@ async function safeInitApp() {
   }
 }
 
-// スクリプトがHTML最下部にあるため、イベントを待たず即時実行してタイミング問題を回避
+// defer属性によりDOM解析完了後・LIFF SDK読み込み後に実行される（DOMContentLoaded待ち不要）
 safeInitApp();
