@@ -15,6 +15,7 @@ window.onunhandledrejection = function(event) {
 
 let allPoints = [], areaSummary = [], roster = [], rankingData = [];
 let currentCity = null;
+let lastAreaSubPage = 'areas'; // 直前のエリアサブページ ('areas' または 'detail') を記憶
 let scrollPositions = { areas: 0, detail: 0, settings: 0, ranking: 0 };
 const pageIdMap = {
   'page-areas': 'areas',
@@ -412,6 +413,11 @@ async function switchPage(id, force = false) {
   // すでにアクティブなら多重遷移を防ぐためスキップ
   if (!force && !target.classList.contains('hidden') && target.style.opacity === '1') return;
 
+  // エリア関連のページ切り替えであれば直前のページタイプを記憶
+  if (id === 'areas' || id === 'detail') {
+    lastAreaSubPage = id;
+  }
+
   // 1. 現在表示されているページを上にスライドさせながらフェードアウト
   const activePage = Array.from(pages).find(p => !p.classList.contains('hidden'));
   if (activePage) {
@@ -470,7 +476,7 @@ async function switchPage(id, force = false) {
 
   // 下ナビのタブのアクティブ状態の不透明度を調整
   document.querySelectorAll('.nav-btn').forEach((b, i) => { 
-    const isActive = (id === 'areas' && i === 0) || 
+    const isActive = ((id === 'areas' || id === 'detail') && i === 0) || 
                      (id === 'ranking' && i === 1) || 
                      (id === 'settings' && i === 2);
     b.style.opacity = isActive ? '1' : '0.3'; 
@@ -478,6 +484,11 @@ async function switchPage(id, force = false) {
 
   // スクロール位置の復元
   $('content').scrollTo(0, scrollPositions[id] || 0);
+}
+
+// 下ナビの「エリア」ボタンタップ時に直前のサブページへ戻る
+function navigateToAreaTab() {
+  switchPage(lastAreaSubPage);
 }
 
 function updateStats() {
