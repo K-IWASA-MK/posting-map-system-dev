@@ -50,9 +50,9 @@ function renderAreas() {
     const filteredAreas = areaSummary.filter(s => getCityName(s.name) === currentCity);
 
     const backButtonHtml = `
-      <div class="flex items-center gap-4 mb-6">
-        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
-        <span class="text-sm font-black text-white/60 tracking-wider">${currentCity} エリアシート</span>
+      <div class="relative flex items-center justify-center mb-6 h-12">
+        <button onclick="backToCityList()" class="absolute left-0 w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+        <span class="text-sm font-black text-white/60 tracking-wider px-14 truncate">${currentCity} エリアシート</span>
       </div>
     `;
 

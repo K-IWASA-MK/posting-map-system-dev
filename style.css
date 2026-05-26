@@ -93,6 +93,10 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
+.premium-glass-btn:active {
+  transform: scale(0.92);
+  opacity: 0.8;
+}
 
 /* Breathing Green Pulse Animation for ONLINE state */
 @keyframes soft-pulse {
