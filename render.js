@@ -167,14 +167,14 @@ function renderSettings() {
       </div>
     `;
 
-    const formattedId = userInfo.id ? userInfo.id.replace(/^([A-Za-z]+)(\d+)$/, '$1 $2') : '';
+    const formattedId = userInfo.id ? userInfo.id.replace(/^[A-Za-z]+/, 'STAFF ID ') : '';
     const rawBranch = localStorage.getItem('branch_name') || '';
     const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : '';
 
     container.innerHTML = `
       <div class="pt-2 pb-0 px-4 flex flex-col items-center">
         <div class="mb-6 flex items-center justify-center gap-3">
-          <span class="text-xs font-bold text-white/50 tracking-wider">公式配布員 IDカード</span>
+          <span class="text-xs font-bold text-white/50 tracking-wider">公式配布員</span>
           ${formattedId ? `<span style="letter-spacing: 0.15em; text-indent: 0.15em;" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono bg-[#2563eb]/10 rounded-full border border-[#2563eb]/20">${formattedId}</span>` : ''}
         </div>
         
