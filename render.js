@@ -42,13 +42,10 @@ function renderAreas() {
         dotStyle = 'background-color: rgba(255, 255, 255, 0.2);';
       }
       return `
-      <div class="clickable-card premium-glass p-8 flex items-center" onclick="selectCity('${c.name}')">
-        <div style="${dotStyle}" class="w-3 h-3 rounded-full mr-6"></div>
-        <div class="flex-1">
-          <div class="text-lg font-black text-white tracking-tighter">${c.name}</div>
-          <div class="text-[9px] font-bold text-white/40 mt-1 uppercase tracking-widest">${c.progress}% Completed <span class="text-white/20 font-medium">(${c.done}/${c.total})</span></div>
-        </div>
-        <span class="text-white/40 text-xl font-light">›</span>
+      <div class="clickable-card premium-glass p-6 flex flex-col items-center justify-center text-center gap-2" onclick="selectCity('${c.name}')">
+        <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full mb-1"></div>
+        <div class="text-lg font-black text-white tracking-tight">${c.name}</div>
+        <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest">${c.progress}% Completed <span class="text-white/20 font-medium">(${c.done}/${c.total})</span></div>
       </div>`;
     }).join('');
   } else {
@@ -72,13 +69,10 @@ function renderAreas() {
         dotStyle = 'background-color: rgba(255, 255, 255, 0.2);';
       }
       return `
-      <div class="clickable-card premium-glass p-8 flex items-center" onclick="openDetail('${s.name}')">
-        <div style="${dotStyle}" class="w-3 h-3 rounded-full mr-6"></div>
-        <div class="flex-1">
-          <div class="text-lg font-black text-white tracking-tighter">${s.name}</div>
-          <div class="text-[9px] font-bold text-white/40 mt-1 uppercase tracking-widest">${s.progress}% Completed <span class="text-white/20 font-medium">(${s.done || 0}/${s.total || 0})</span></div>
-        </div>
-        <span class="text-white/40 text-xl font-light">›</span>
+      <div class="clickable-card premium-glass p-6 flex flex-col items-center justify-center text-center gap-2" onclick="openDetail('${s.name}')">
+        <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full mb-1"></div>
+        <div class="text-lg font-black text-white tracking-tight">${s.name}</div>
+        <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest">${s.progress}% Completed <span class="text-white/20 font-medium">(${s.done || 0}/${s.total || 0})</span></div>
       </div>`;
     }).join('');
 
