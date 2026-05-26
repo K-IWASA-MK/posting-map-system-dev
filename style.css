@@ -53,10 +53,17 @@ body {
 .premium-glass {
   border-radius: 28px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.008));
-  box-shadow: inset 0 0 0 1px rgba(120, 140, 255, 0.08), 0 0 30px rgba(37, 99, 235, 0.05);
+  box-shadow: 
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12), 
+    0 0 30px rgba(37, 99, 235, 0.03);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  background-image: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.008)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 255, 255, 0.18) 100%);
 }
 
 /* Gyro Hologram Glow Card Style (ID Card Edge & Shadow Glow) */
