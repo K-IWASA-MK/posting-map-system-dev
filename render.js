@@ -33,14 +33,8 @@ function renderAreas() {
     });
 
     $('area-list').innerHTML = cities.map(c => {
-      let dotStyle = '';
-      let pctColorClass = 'text-white/40';
-      if (c.progress > 0) {
-        dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
-        pctColorClass = 'text-[#2563eb]';
-      } else {
-        dotStyle = 'background-color: rgba(255, 255, 255, 0.2);';
-      }
+      const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
+      const pctColorClass = 'text-[#2563eb]';
       const doneStr = String(c.done);
       const totalStr = String(c.total);
       const paddedDone = doneStr.padStart(totalStr.length, ' ');
@@ -63,14 +57,8 @@ function renderAreas() {
     `;
 
     const areaCardsHtml = filteredAreas.map(s => {
-      let dotStyle = '';
-      let pctColorClass = 'text-white/40';
-      if (s.progress > 0) {
-        dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
-        pctColorClass = 'text-[#2563eb]';
-      } else {
-        dotStyle = 'background-color: rgba(255, 255, 255, 0.2);';
-      }
+      const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
+      const pctColorClass = 'text-[#2563eb]';
       const doneStr = String(s.done || 0);
       const totalStr = String(s.total || 0);
       const paddedDone = doneStr.padStart(totalStr.length, ' ');
