@@ -50,9 +50,8 @@ function renderAreas() {
     const filteredAreas = areaSummary.filter(s => getCityName(s.name) === currentCity);
 
     const backButtonHtml = `
-      <div class="relative flex items-center justify-center mb-6 h-12">
-        <button onclick="backToCityList()" class="absolute left-0 w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
-        <span class="text-sm font-black text-white/60 tracking-wider px-14 truncate">${currentCity} エリアシート</span>
+      <div class="flex items-center mb-6 h-12">
+        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
       </div>
     `;
 
@@ -70,7 +69,13 @@ function renderAreas() {
       </div>`;
     }).join('');
 
-    $('area-list').innerHTML = backButtonHtml + `<div class="space-y-6">${areaCardsHtml}</div>`;
+    const bottomBackButtonHtml = `
+      <div class="flex items-center mt-8 pb-32">
+        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+      </div>
+    `;
+
+    $('area-list').innerHTML = backButtonHtml + `<div class="space-y-6">${areaCardsHtml}</div>` + bottomBackButtonHtml;
   }
 }
 
