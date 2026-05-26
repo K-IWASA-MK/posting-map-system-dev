@@ -13,12 +13,14 @@ window.onunhandledrejection = function(event) {
   logDebug(`UNHANDLED PROMISE: ${event.reason}`);
 };
 
-let allPoints = [], areaSummary = [], roster = [];
-let scrollPositions = { areas: 0, detail: 0, settings: 0 };
+let allPoints = [], areaSummary = [], roster = [], rankingData = [];
+let currentCity = null;
+let scrollPositions = { areas: 0, detail: 0, settings: 0, ranking: 0 };
 const pageIdMap = {
   'page-areas': 'areas',
   'page-detail': 'detail',
-  'page-settings': 'settings'
+  'page-settings': 'settings',
+  'page-ranking': 'ranking'
 };
 
 // プレミアム・インタラクション・スキル (JS Touch Handler)
