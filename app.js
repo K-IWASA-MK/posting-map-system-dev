@@ -222,10 +222,17 @@ async function loadData(skipSync = false) {
       switchPage('settings');
       
       logDebug("[loadData] Showing main app div...");
+      // ボトムナビを事前に透明にして映り込みを防止
+      const nav = $('bottom-nav');
+      if (nav) nav.style.opacity = '0';
       $('app').classList.remove('hidden');
       setTimeout(() => {
         $('app').classList.remove('opacity-0');
         $('loading').classList.add('opacity-0');
+        // アプリフェードイン完了後にnavをフェードイン
+        setTimeout(() => {
+          if (nav) nav.style.opacity = '1';
+        }, 300);
         setTimeout(() => $('loading').classList.add('hidden'), 400);
       }, 100);
     } else {
