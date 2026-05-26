@@ -637,6 +637,14 @@ async function safeInitApp() {
           $('loading').classList.add('hidden');
         }
       } else {
+        // LINEログイン処理中（OAuthコールバックのパラメータがある）なら、手動ログイン画面を出さずに待機する
+        const urlParams = new URLSearchParams(window.location.search);
+        const isProcessing = urlParams.has('code') || urlParams.has('liff.state');
+        if (isProcessing) {
+          logDebug("LINE login is processing in background, skip showing manual gateway.");
+          return;
+        }
+
         logDebug("Not logged in.");
         if (liff.isInClient()) {
           logDebug("In LINE client. Redirecting to LINE Login automatically...");
