@@ -143,60 +143,28 @@ function createJsonResponse(data) {
 // =============================
 
 function getAppData() {
-  const ss = getSS();
-  const sheets = ss.getSheets();
-  
-  // 除外するシステムシートのリスト
-  const exclude = [
-    CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL, CONFIG.SHEET_DISTRICT, CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL, CONFIG.SHEET_SYSTEM_CACHE
-  ];
-
   let dashboardData;
   try {
     dashboardData = getDashboardData();
   } catch (e) {
-    dashboardData = { summary: [] };
+    dashboardData = { summary: [], stats: { done: 0, total: 0 } };
   }
 
-  const progressMap = {};
-  if (dashboardData && dashboardData.summary) {
-    dashboardData.summary.forEach(item => {
-      progressMap[item.name] = item.total > 0 ? Math.round((item.done / item.total) * 100) : 0;
-    });
-  }
+  // キャッシュデータをそのままマップして返却（シートへのアクセスを完全にゼロにする）
+  const areas = (dashboardData && dashboardData.summary) ? dashboardData.summary.map(item => ({
+    name: item.name,
+    progress: item.total > 0 ? Math.round((item.done / item.total) * 100) : 0,
+    done: item.done || 0,
+    total: item.total || 0
+  })) : [];
 
-  let statsDone = 0;
-  let statsTotal = 0;
-
-  const areas = sheets
-    .filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden())
-    .map(s => {
-      const name = s.getName();
-      const summaryItem = dashboardData.summary ? dashboardData.summary.find(item => item.name === name) : null;
-      const lastRow = s.getLastRow();
-      const actualTotal = lastRow >= 2 ? (lastRow - 1) : 0;
-      
-      const doneVal = summaryItem ? summaryItem.done : 0;
-      const totalVal = (summaryItem && summaryItem.total > 0) ? summaryItem.total : actualTotal;
-      
-      statsDone += doneVal;
-      statsTotal += totalVal;
-
-      return {
-        name: name,
-        progress: totalVal > 0 ? Math.round((doneVal / totalVal) * 100) : 0,
-        done: doneVal,
-        total: totalVal
-      };
-    });
+  const stats = (dashboardData && dashboardData.stats) ? dashboardData.stats : { done: 0, total: 0 };
 
   return {
     success: true,
-    branchName: ss.getName().split(/[ 　]/)[0] || "支部",
+    branchName: getSS().getName().split(/[ 　]/)[0] || "支部",
     areas: areas,
-    stats: { done: statsDone, total: statsTotal }
+    stats: stats
   };
 }
 
