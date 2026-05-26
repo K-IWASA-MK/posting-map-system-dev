@@ -222,12 +222,14 @@ async function loadData(skipSync = false) {
       switchPage('settings');
       
       logDebug("[loadData] Showing main app div...");
+      // フェードイン前に背後を確実にブラック化（アイコン透過防止）
+      $('screen-gateway').classList.add('hidden');
       $('app').classList.remove('hidden');
       setTimeout(() => {
         $('app').classList.remove('opacity-0');
         $('loading').classList.add('opacity-0');
         setTimeout(() => $('loading').classList.add('hidden'), 400);
-      }, 100);
+      }, 50);
     } else {
       throw new Error(data ? data.message : "データが空です");
     }
