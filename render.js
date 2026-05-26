@@ -69,11 +69,11 @@ function renderAreas() {
       </div>`;
     }).join('');
 
-    const bottomBackButtonHtml = `
-      <div class="flex items-center mt-8 pb-32">
+    const bottomBackButtonHtml = filteredAreas.length > 3 ? `
+      <div class="flex items-center mt-8">
         <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
       </div>
-    `;
+    ` : '';
 
     $('area-list').innerHTML = backButtonHtml + `<div class="space-y-6">${areaCardsHtml}</div>` + bottomBackButtonHtml;
   }
