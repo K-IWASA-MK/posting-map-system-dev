@@ -160,11 +160,20 @@ function getAppData() {
 
   const stats = (dashboardData && dashboardData.stats) ? dashboardData.stats : { done: 0, total: 0 };
 
+  // 個人ランキングデータの取得
+  let ranking = [];
+  try {
+    ranking = getRankingData();
+  } catch (e) {
+    // 集計エラー時は空
+  }
+
   return {
     success: true,
     branchName: getSS().getName().split(/[ 　]/)[0] || "支部",
     areas: areas,
-    stats: stats
+    stats: stats,
+    ranking: ranking
   };
 }
 
@@ -252,6 +261,11 @@ function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) 
     if (isDoneChange !== 0) {
       try {
         updateAreaCache(areaName, isDoneChange);
+        
+        // ランキングキャッシュをフラッシュ（次回取得時に再集計）
+        const cache = CacheService.getScriptCache();
+        cache.remove("RANKING_FAST_CACHE");
+        PropertiesService.getScriptProperties().deleteProperty("RANKING_CACHE");
       } catch (e) {
         // キャッシュ更新エラーは無視
       }
@@ -379,4 +393,24 @@ function registerStaff(lastName, firstName) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/**
+ * 個人別配布ランキングのキャッシュデータを取得する（なければ再集計）
+ */
+function getRankingData() {
+  const cache = CacheService.getScriptCache();
+  const fastCached = cache.get("RANKING_FAST_CACHE");
+  if (fastCached) return JSON.parse(fastCached);
+
+  const props = PropertiesService.getScriptProperties();
+  const cached = props.getProperty("RANKING_CACHE");
+  if (cached) {
+    try {
+      const data = JSON.parse(cached);
+      cache.put("RANKING_FAST_CACHE", cached, 600);
+      return data;
+    } catch (e) {}
+  }
+  return refreshRankingCache();
 }

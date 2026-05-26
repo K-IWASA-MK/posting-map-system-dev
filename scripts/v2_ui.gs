@@ -137,6 +137,13 @@ function diagnoseDriveFiles() {
 
 function deleteAllAreaSheets() {
   if (isNotAdmin()) return;
+
+  // 1. バックグラウンドで実行中のバッチ処理タイマーとステータスを完全停止・削除
+  deleteTriggers("generateAreaSheetsBatch");
+  const props = PropertiesService.getScriptProperties();
+  props.deleteProperty("BATCH_STATUS");
+  props.deleteProperty("BATCH_INDEX");
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const exclude = [
     CONFIG.SHEET_GUIDE,

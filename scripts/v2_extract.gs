@@ -138,5 +138,6 @@ function toHalfWidth(str) {
 }
 
 function extractCityName(addr) {
+  if (addr.indexOf("四日市市") === 0) return "四日市市";
   return addr.match(/^(.+?[市郡])/) ? addr.match(/^(.+?[市郡])/)[1] : "エリア";
 }

@@ -212,6 +212,7 @@ async function loadData(skipSync = false) {
     logDebug("[loadData] getAppData fetched successfully.");
     if (data && data.success) {
       areaSummary = data.areas;
+      rankingData = data.ranking || [];
       if (data.branchName) localStorage.setItem('branch_name', data.branchName);
       
       logDebug("[loadData] Rendering areas...");

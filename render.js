@@ -280,30 +280,57 @@ function renderRanking() {
   const userInfo = JSON.parse(localStorage.getItem('user_info'));
   const myName = userInfo ? (userInfo.last + " " + (userInfo.first || "")).trim() : "";
 
-  // 実データが無い場合の超美麗モックデータ
-  const defaultRanking = [
-    { name: "岩佐 健二", count: 5450 },
-    { name: "鈴木 一郎", count: 4200 },
-    { name: "佐藤 太一", count: 3900 },
-    { name: "田中 実", count: 2100 },
-    { name: "渡辺 花子", count: 1850 },
-    { name: "高橋 茂", count: 1500 },
-    { name: "中村 順子", count: 1200 }
-  ];
-
-  if (myName && !defaultRanking.some(r => r.name === myName)) {
-    defaultRanking.push({ name: myName, count: 650 });
-  }
-
-  const displayRanking = (typeof rankingData !== 'undefined' && rankingData && rankingData.length > 0)
-    ? rankingData
-    : defaultRanking.sort((a, b) => b.count - a.count);
+  // APIから取得した実データを優先的に使用
+  const displayRanking = (typeof rankingData !== 'undefined' && rankingData) ? rankingData : [];
 
   let myRank = -1;
+  let myCount = 0;
   if (myName) {
-    myRank = displayRanking.findIndex(r => r.name === myName) + 1;
+    const idx = displayRanking.findIndex(r => r.name === myName);
+    if (idx !== -1) {
+      myRank = idx + 1;
+      myCount = displayRanking[idx].count;
+    } else {
+      myRank = "圏外";
+      myCount = 0;
+    }
   }
 
+  // 1. 本人のステータスカード（ID登録されている場合のみ表示）
+  const myStatusCardHtml = myName ? `
+    <div style="border: 1px solid rgba(37, 99, 235, 0.25); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.05), 0 0 25px rgba(37, 99, 235, 0.08);" class="premium-glass p-6 flex items-center justify-between mb-6">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center text-xl shadow-lg shadow-[#2563eb]/10">🏆</div>
+        <div>
+          <p class="text-[9px] font-black text-[#2563eb] uppercase tracking-widest">My Performance</p>
+          <h4 class="text-sm font-black text-white tracking-tight mt-0.5">${myName}</h4>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="text-[9px] font-black text-white/40 uppercase tracking-widest">現在の順位</p>
+        <p class="text-2xl font-mono font-black text-white tracking-tighter mt-0.5">
+          ${myRank === "圏外" ? '<span class="text-base font-black text-white/40">圏外</span>' : `${myRank}<span class="text-xs text-white/50 font-bold ml-1">位</span>`}
+        </p>
+      </div>
+    </div>
+  ` : '';
+
+  // 2. ランキングリストが空の場合の美麗プレースホルダー
+  if (displayRanking.length === 0) {
+    container.innerHTML = myStatusCardHtml + `
+      <div style="border: 1px solid rgba(255, 255, 255, 0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+        <span class="text-3xl">🏆</span>
+        <div class="text-sm font-black text-white/80">まだ配布ランキングがありません</div>
+        <p class="text-[10px] text-white/40 font-bold leading-relaxed uppercase tracking-wider">
+          ポスティング完了が記録されると<br>
+          ここにランキングが表示されます
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  // 3. ランキング項目のレンダリング
   const itemsHtml = displayRanking.map((r, index) => {
     const rank = index + 1;
     const isMe = myName && r.name === myName;
@@ -354,22 +381,6 @@ function renderRanking() {
       </div>
     `;
   }).join('');
-
-  const myStatusCardHtml = myRank > 0 ? `
-    <div style="border: 1px solid rgba(37, 99, 235, 0.25); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.05), 0 0 25px rgba(37, 99, 235, 0.08);" class="premium-glass p-6 flex items-center justify-between mb-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center text-xl shadow-lg shadow-[#2563eb]/10">🏆</div>
-        <div>
-          <p class="text-[9px] font-black text-[#2563eb] uppercase tracking-widest">My Performance</p>
-          <h4 class="text-sm font-black text-white tracking-tight mt-0.5">${myName}</h4>
-        </div>
-      </div>
-      <div class="text-right">
-        <p class="text-[9px] font-black text-white/40 uppercase tracking-widest">現在の順位</p>
-        <p class="text-2xl font-mono font-black text-white tracking-tighter mt-0.5">${myRank}<span class="text-xs text-white/50 font-bold ml-1">位</span></p>
-      </div>
-    </div>
-  ` : '';
 
   container.innerHTML = myStatusCardHtml + `<div class="space-y-4">${itemsHtml}</div>`;
 }

@@ -62,6 +62,13 @@ function aggregateTotalVolumes() {
   // 進捗率の計算 (母数 651)
   const progressPercent = (totalUnitsDone / CONFIG.DENOMINATOR_UNITS) * 100;
 
+  // ランキングキャッシュの再構築
+  try {
+    refreshRankingCache();
+  } catch (e) {
+    // キャッシュ再構築のエラーは単に無視
+  }
+
   if (guideSheet) {
     // 1. 全体進捗表示 (H5セル) - パーセントのみ
     guideSheet
@@ -126,4 +133,58 @@ function exportAllDataToMasterSheet() {
     ss.insertSheet(CONFIG.SHEET_MASTER_EXPORT);
   master.clear();
   ss.toast("マスター抽出完了。");
+}
+
+/**
+ * 全エリアのシートをスキャンして個人ランキングを集計し、キャッシュに保存する
+ */
+function refreshRankingCache() {
+  const ss = getSS();
+  const exclude = [
+    CONFIG.SHEET_GUIDE,
+    CONFIG.SHEET_ROSTER,
+    CONFIG.SHEET_TEMPLATE,
+    CONFIG.SHEET_POSTAL,
+    CONFIG.SHEET_DISTRICT,
+    CONFIG.SHEET_MASTER_EXPORT,
+    CONFIG.SHEET_REPORT,
+    CONFIG.SHEET_MANUAL,
+    CONFIG.SHEET_SYSTEM_CACHE
+  ];
+
+  let staffRanking = {}; // { 名前: 合計枚数 }
+
+  const sheets = ss.getSheets();
+  sheets.forEach((sheet) => {
+    const name = sheet.getName();
+    if (!exclude.includes(name) && !sheet.isSheetHidden()) {
+      const lastRow = sheet.getLastRow();
+      if (lastRow >= 2) {
+        // D:完了, E:日時, F:枚数, G:スタッフ
+        const data = sheet.getRange(2, 4, lastRow - 1, 4).getValues();
+
+        data.forEach((row) => {
+          const isDone = row[0] === true || row[0] === "TRUE";
+          const count = parseFloat(row[2]) || 0;
+          const staffName = String(row[3] || "").trim();
+
+          if (isDone && staffName) {
+            staffRanking[staffName] = (staffRanking[staffName] || 0) + count;
+          }
+        });
+      }
+    }
+  });
+
+  // ランキング順（枚数降順）にソートしてオブジェクト配列に変換
+  const rankingList = Object.entries(staffRanking)
+    .map(([name, count]) => ({ name: name, count: count }))
+    .sort((a, b) => b.count - a.count);
+
+  const jsonResult = JSON.stringify(rankingList);
+  const cache = CacheService.getScriptCache();
+  cache.put("RANKING_FAST_CACHE", jsonResult, 600);
+  PropertiesService.getScriptProperties().setProperty("RANKING_CACHE", jsonResult);
+
+  return rankingList;
 }
