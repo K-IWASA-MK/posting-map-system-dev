@@ -217,19 +217,19 @@ async function loadData(skipSync = false) {
       renderAreas();
       logDebug("[loadData] Rendering areas OK. Updating stats...");
       updateStats();
-      logDebug("[loadData] Stats updated. Switching page to settings...");
       
-      switchPage('settings');
-      
-      logDebug("[loadData] Showing main app div...");
-      // フェードイン前に背後を確実にブラック化（アイコン透過防止）
-      $('screen-gateway').classList.add('hidden');
-      $('app').classList.remove('hidden');
-      setTimeout(() => {
-        $('app').classList.remove('opacity-0');
-        $('loading').classList.add('opacity-0');
-        setTimeout(() => $('loading').classList.add('hidden'), 400);
-      }, 50);
+      if (!skipSync) {
+        logDebug("[loadData] Initial load. Switching page to settings and animating app entry...");
+        switchPage('settings');
+        logDebug("[loadData] Showing main app div...");
+        $('screen-gateway').classList.add('hidden');
+        $('app').classList.remove('hidden');
+        setTimeout(() => {
+          $('app').classList.remove('opacity-0');
+          $('loading').classList.add('opacity-0');
+          setTimeout(() => $('loading').classList.add('hidden'), 400);
+        }, 50);
+      }
     } else {
       throw new Error(data ? data.message : "データが空です");
     }
