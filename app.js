@@ -798,25 +798,9 @@ function setupGyroEffect() {
     window.removeEventListener('deviceorientation', window.handleGyroOrientation, true);
     window.addEventListener('deviceorientation', window.handleGyroOrientation, true);
     gyroListenerActive = true;
-  } else if (typeof DeviceOrientationEvent !== 'undefined' &&
-             typeof DeviceOrientationEvent.requestPermission === 'function') {
-    // iOS 13+ は明示的許可が必要（初回レンダリング時は非同期で自動トライしてみるが、
-    // ジェスチャー以外での呼び出しは通常拒否されるため、catchされて自動揺らぎが継続する）
-    DeviceOrientationEvent.requestPermission()
-      .then(permissionState => {
-        if (permissionState === 'granted') {
-          if (gyroAutoInterval) {
-            clearInterval(gyroAutoInterval);
-            gyroAutoInterval = null;
-          }
-          window.removeEventListener('deviceorientation', window.handleGyroOrientation, true);
-          window.addEventListener('deviceorientation', window.handleGyroOrientation, true);
-          gyroListenerActive = true;
-        }
-      }).catch(() => {
-        // 拒否された場合やジェスチャーエラーの場合は自動揺らぎがそのまま継続
-      });
   }
+  // iOS 13+ などの許可が必要な環境は、ここでは自動ダイアログ要求を行わず、自動揺らぎのまま待機します。
+  // （カードタップ時の requestGyroPermission() でのみ明示的に許可を要求します）
 }
 
 // ユーザーがカードをタップした際に明示的にパーミッションを要求する関数
