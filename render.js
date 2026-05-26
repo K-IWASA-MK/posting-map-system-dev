@@ -41,11 +41,14 @@ function renderAreas() {
       } else {
         dotStyle = 'background-color: rgba(255, 255, 255, 0.2);';
       }
+      const doneStr = String(c.done);
+      const totalStr = String(c.total);
+      const paddedDone = doneStr.padStart(totalStr.length, ' ');
       return `
       <div class="clickable-card premium-glass p-6 flex flex-col items-center justify-center text-center gap-2" onclick="selectCity('${c.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full mb-1"></div>
         <div class="text-lg font-black text-white tracking-tight">${c.name}</div>
-        <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest">${c.progress}% Completed <span class="text-white/20 font-medium">(${c.done}/${c.total})</span></div>
+        <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest flex items-center justify-center gap-1">${c.progress}% Completed <span class="text-white/20 font-medium font-mono whitespace-pre">(${paddedDone}/${c.total})</span></div>
       </div>`;
     }).join('');
   } else {
@@ -68,11 +71,14 @@ function renderAreas() {
       } else {
         dotStyle = 'background-color: rgba(255, 255, 255, 0.2);';
       }
+      const doneStr = String(s.done || 0);
+      const totalStr = String(s.total || 0);
+      const paddedDone = doneStr.padStart(totalStr.length, ' ');
       return `
       <div class="clickable-card premium-glass p-6 flex flex-col items-center justify-center text-center gap-2" onclick="openDetail('${s.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full mb-1"></div>
         <div class="text-lg font-black text-white tracking-tight">${s.name}</div>
-        <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest">${s.progress}% Completed <span class="text-white/20 font-medium">(${s.done || 0}/${s.total || 0})</span></div>
+        <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest flex items-center justify-center gap-1">${s.progress}% Completed <span class="text-white/20 font-medium font-mono whitespace-pre">(${paddedDone}/${s.total || 0})</span></div>
       </div>`;
     }).join('');
 
