@@ -401,7 +401,7 @@ window.addEventListener('offline', () => {
 
 async function switchPage(id, force = false) {
   const pages = document.querySelectorAll('.page');
-  const targetId = id === 'detail' ? 'page-detail' : (id === 'settings' ? 'page-settings' : 'page-areas');
+  const targetId = id === 'detail' ? 'page-detail' : (id === 'settings' ? 'page-settings' : (id === 'ranking' ? 'page-ranking' : 'page-areas'));
   const target = $(targetId);
   if (!target) return;
 
@@ -428,6 +428,9 @@ async function switchPage(id, force = false) {
 
   // 2. 設定画面の場合はレンダリングを行う
   if (id === 'settings') renderSettings();
+  if (id === 'ranking') {
+    if (typeof renderRanking === 'function') renderRanking();
+  }
   
   // 3. ナビゲーションの表示制御
   const nav = $('bottom-nav');
@@ -463,7 +466,10 @@ async function switchPage(id, force = false) {
 
   // 下ナビのタブのアクティブ状態の不透明度を調整
   document.querySelectorAll('.nav-btn').forEach((b, i) => { 
-    b.style.opacity = (id === 'areas' && i === 0) || (id === 'settings' && i === 1) ? '1' : '0.3'; 
+    const isActive = (id === 'areas' && i === 0) || 
+                     (id === 'ranking' && i === 1) || 
+                     (id === 'settings' && i === 2);
+    b.style.opacity = isActive ? '1' : '0.3'; 
   });
 
   // スクロール位置の復元

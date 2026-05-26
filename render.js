@@ -203,3 +203,14 @@ function renderSettings() {
     `;
   }
 }
+
+function renderRanking() {
+  const container = $('ranking-list');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="premium-glass p-8 text-center space-y-4">
+      <div class="text-4xl">🏆</div>
+      <p class="text-sm text-white/70 font-black">ランキング集計中...</p>
+    </div>
+  `;
+}
