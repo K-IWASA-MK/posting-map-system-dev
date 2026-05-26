@@ -129,7 +129,7 @@ function setSyncStatus(state) {
   }
 
   if (state === 'online') {
-    statusEl.classList.add('bg-[#22c55e]', 'shadow-[0_0_8px_#22c55e]');
+    statusEl.classList.add('bg-[#22c55e]', 'shadow-[0_0_8px_#22c55e]', 'animate-soft-pulse');
     if (textEl) {
       textEl.textContent = 'ONLINE';
       textEl.classList.add('text-[#22c55e]');
