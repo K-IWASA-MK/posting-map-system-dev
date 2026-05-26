@@ -35,6 +35,8 @@ function onOpen() {
       "refreshAreaSummaryCache",
     )
     .addItem("⏰ 自動集計（1時間ごと）を有効化", "setupHourlyRefreshTrigger")
+    .addItem("⏰ 毎月末の自動更新を有効化", "setupMonthlyResetTrigger")
+    .addItem("🛑 契約終了を予約（今月末で停止）", "toggleContractEndReservation")
     .addSeparator()
     .addItem("🎨 全シートを「プロ仕様」に一斉整形", "formatAllSheets")
     .addItem("🔧 名簿シートを初期化・復旧する", "setupRosterSheet")
@@ -348,4 +350,54 @@ function setupRosterSheet() {
 function isNotAdmin() {
   // 現時点では全員を管理者として扱う（将来的にメールアドレス制限などを入れる場合はここを修正）
   return false;
+}
+
+/**
+ * 契約終了の月末自動停止の予約・解除を切り替える
+ */
+function toggleContractEndReservation() {
+  const ui = SpreadsheetApp.getUi();
+  const props = PropertiesService.getScriptProperties();
+  const isScheduled = props.getProperty("DISABLE_ROLLOVER") === "true";
+
+  if (!isScheduled) {
+    // 予約されていない場合 ➔ 予約する
+    const confirm = ui.alert(
+      "🛑 契約終了の予約 (今月末で停止)",
+      "今月末（翌月1日の深夜）をもって本システムのご契約を終了し、自動停止しますか？\n\n※今月末までは通常通りエリア地図・リストを利用可能です。月末の自動更新のタイミングでデータが完全削除され、システムが停止します。",
+      ui.ButtonSet.YES_NO
+    );
+    if (confirm === ui.Button.YES) {
+      props.setProperty("DISABLE_ROLLOVER", "true");
+      ui.alert("契約終了の予約を完了しました。\n今月末まで通常通りご利用いただけます。");
+    }
+  } else {
+    // すでに予約されている場合 ➔ キャンセルする
+    const confirm = ui.alert(
+      "🔄 契約終了予約のキャンセル (サブスク継続)",
+      "すでに今月末での契約終了（自動停止）が予約されています。\n\nこの予約をキャンセルし、来月以降も自動ローテーション（契約継続）しますか？",
+      ui.ButtonSet.YES_NO
+    );
+    if (confirm === ui.Button.YES) {
+      props.deleteProperty("DISABLE_ROLLOVER");
+      ui.alert("契約終了予約をキャンセルしました。\n来月以降も自動的に今月データがリセットされ、新規シートが作成されます。");
+    }
+  }
+}
+
+/**
+ * 毎月末の自動更新トリガーを設定する
+ */
+function setupMonthlyResetTrigger() {
+  // 既存の同名トリガーを掃除
+  deleteTriggers("checkEndOfMonthAndReset");
+
+  // 毎日午前0時〜1時の間に実行する日次トリガーを作成
+  ScriptApp.newTrigger("checkEndOfMonthAndReset")
+    .timeBased()
+    .everyDays(1)
+    .atHour(0)
+    .create();
+
+  SpreadsheetApp.getUi().alert("⏰ 毎月末（翌月1日深夜）の自動データ更新トリガーを設定しました。\n毎日深夜に自動判定を行い、1日のタイミングでデータのリセットと再展開を行います。");
 }

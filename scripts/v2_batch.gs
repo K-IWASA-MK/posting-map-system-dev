@@ -152,3 +152,41 @@ function deleteTriggers(name) {
     if (t.getHandlerFunction() === name) ScriptApp.deleteTrigger(t);
   });
 }
+
+/**
+ * 毎月末（翌月1日の深夜）に自動的に前月のデータを自動消去し、自動ローテーションまたは契約終了を行う
+ */
+function checkEndOfMonthAndReset() {
+  const now = new Date();
+  
+  // 1日になった日付（午前0時〜1時頃）に実行された場合のみ処理
+  if (now.getDate() === 1) {
+    // 1. 前月データをすべてクリア（リセット）
+    deleteAllAreaSheets();
+    
+    // 2. 契約終了予約の有無を確認
+    const props = PropertiesService.getScriptProperties();
+    const disableRollover = props.getProperty("DISABLE_ROLLOVER") === "true";
+    
+    if (disableRollover) {
+      // 【契約終了予約がある場合】 ➔ 再作成は行わずシステムを完全停止
+      // 自動更新トリガーを全削除
+      deleteTriggers("checkEndOfMonthAndReset");
+      // 各種管理用プロパティをクリア
+      props.deleteProperty("DISABLE_ROLLOVER");
+      props.deleteProperty("BATCH_STATUS");
+      props.deleteProperty("BATCH_INDEX");
+      
+      console.warn("ご契約終了に伴い、データを完全消去し、システムを自動停止しました。");
+    } else {
+      // 【契約継続（通常）の場合】 ➔ 翌月分のエリアシートを自動で一括再展開
+      props.setProperty("BATCH_STATUS", "running");
+      props.setProperty("BATCH_INDEX", "0");
+      props.setProperty("BATCH_CITY_COUNTS", JSON.stringify({}));
+      
+      generateAreaSheetsBatch();
+      
+      console.warn("毎月の自動データ切り替えを実行しました。旧データ消去＆翌月シート自動展開開始。");
+    }
+  }
+}
