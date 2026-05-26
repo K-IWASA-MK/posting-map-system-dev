@@ -247,7 +247,7 @@ function renderSettings() {
           ${formattedId ? `<span style="letter-spacing: 0.15em; text-indent: 0.15em; background: linear-gradient(180deg, rgba(37,99,235,0.16), rgba(37,99,235,0.06)); border: 1px solid rgba(37,99,235,0.3); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 0 6px rgba(37,99,235,0.35), 0 0 12px rgba(37,99,235,0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono rounded-full">${formattedId}</span>` : ''}
         </div>
         
-        <div id="id-gyro-card" style="--glow-x: 0px; --glow-y: 0px; --glow-opacity: 0.08; --edge-opacity: 0.08; --edge-angle: 180deg;" class="w-full max-w-sm h-[300px] gyro-card flex flex-col items-center justify-between p-6 relative overflow-hidden">
+        <div id="id-gyro-card" onclick="requestGyroPermission()" style="--glow-x: 0px; --glow-y: 0px; --glow-opacity: 0.08; --edge-opacity: 0.08; --edge-angle: 180deg; cursor: pointer;" class="w-full max-w-sm h-[300px] gyro-card flex flex-col items-center justify-between p-6 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-white/0 pointer-events-none rounded-[28px]"></div>
           
           <div class="inline-flex items-center gap-2 z-10 mt-2">
@@ -270,6 +270,7 @@ function renderSettings() {
         </div>
       </div>
     `;
+    setTimeout(() => setupGyroEffect(), 100);
   }
 }
 

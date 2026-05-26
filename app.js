@@ -725,5 +725,125 @@ async function safeInitApp() {
   }
 }
 
+// -------------------------------------------------------------
+// ジャイロセンサー連動 IDカード外枠エフェクト & フォールバック
+// -------------------------------------------------------------
+let gyroAutoInterval = null;
+let gyroListenerActive = false;
+
+function setupGyroEffect() {
+  const card = document.getElementById('id-gyro-card');
+  if (!card) return;
+
+  // 既存のインターバルがあればクリア
+  if (gyroAutoInterval) {
+    clearInterval(gyroAutoInterval);
+    gyroAutoInterval = null;
+  }
+
+  // 自動揺らぎ（ジャイロなし環境用フォールバック）
+  let autoAngle = 0;
+  gyroAutoInterval = setInterval(() => {
+    const activeCard = document.getElementById('id-gyro-card');
+    if (!activeCard) {
+      clearInterval(gyroAutoInterval);
+      gyroAutoInterval = null;
+      return;
+    }
+    autoAngle += 0.5;
+    const x = Math.sin(autoAngle * Math.PI / 180) * 8;
+    const y = Math.cos(autoAngle * Math.PI / 180) * 4;
+    activeCard.style.setProperty('--glow-x', `${x}px`);
+    activeCard.style.setProperty('--glow-y', `${y}px`);
+    activeCard.style.setProperty('--edge-angle', `${(autoAngle % 360) + 90}deg`);
+    activeCard.style.setProperty('--glow-opacity', '0.1');
+    activeCard.style.setProperty('--edge-opacity', '0.1');
+  }, 30);
+
+  // iOS/Android ジャイロセンサー連動用のハンドラー
+  window.handleGyroOrientation = (event) => {
+    const gyroCard = document.getElementById('id-gyro-card');
+    if (!gyroCard) return;
+    const gamma = Math.max(-30, Math.min(30, event.gamma || 0)); // 左右傾き -30~30
+    const beta  = Math.max(-20, Math.min(20, (event.beta || 0) - 45)); // 前後傾き
+    const glowX = (gamma / 30) * 16;
+    const glowY = (beta  / 20) * 10;
+    const edgeAngle = 180 + (gamma / 30) * 60;
+    const glowOpacity = 0.06 + Math.abs(gamma / 30) * 0.18;
+    const edgeOpacity = 0.08 + Math.abs(gamma / 30) * 0.22;
+
+    gyroCard.style.setProperty('--glow-x', `${glowX}px`);
+    gyroCard.style.setProperty('--glow-y', `${glowY}px`);
+    gyroCard.style.setProperty('--edge-angle', `${edgeAngle}deg`);
+    gyroCard.style.setProperty('--glow-opacity', glowOpacity.toFixed(3));
+    gyroCard.style.setProperty('--edge-opacity', edgeOpacity.toFixed(3));
+  };
+
+  // すでに登録されている場合は二重登録しない
+  if (gyroListenerActive) {
+    if (typeof DeviceOrientationEvent !== 'undefined') {
+      if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
+        clearInterval(gyroAutoInterval);
+        gyroAutoInterval = null;
+      }
+    }
+  }
+
+  // 許可不要デバイス（Android等）または既に許可済みのiOSでイベントが取れるか確認
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission !== 'function') {
+    // Android等は許可不要で即登録可能
+    clearInterval(gyroAutoInterval);
+    gyroAutoInterval = null;
+    window.removeEventListener('deviceorientation', window.handleGyroOrientation, true);
+    window.addEventListener('deviceorientation', window.handleGyroOrientation, true);
+    gyroListenerActive = true;
+  } else if (typeof DeviceOrientationEvent !== 'undefined' &&
+             typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // iOS 13+ は明示的許可が必要（初回レンダリング時は非同期で自動トライしてみるが、
+    // ジェスチャー以外での呼び出しは通常拒否されるため、catchされて自動揺らぎが継続する）
+    DeviceOrientationEvent.requestPermission()
+      .then(permissionState => {
+        if (permissionState === 'granted') {
+          if (gyroAutoInterval) {
+            clearInterval(gyroAutoInterval);
+            gyroAutoInterval = null;
+          }
+          window.removeEventListener('deviceorientation', window.handleGyroOrientation, true);
+          window.addEventListener('deviceorientation', window.handleGyroOrientation, true);
+          gyroListenerActive = true;
+        }
+      }).catch(() => {
+        // 拒否された場合やジェスチャーエラーの場合は自動揺らぎがそのまま継続
+      });
+  }
+}
+
+// ユーザーがカードをタップした際に明示的にパーミッションを要求する関数
+function requestGyroPermission() {
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission()
+      .then(permissionState => {
+        if (permissionState === 'granted') {
+          if (gyroAutoInterval) {
+            clearInterval(gyroAutoInterval);
+            gyroAutoInterval = null;
+          }
+          window.removeEventListener('deviceorientation', window.handleGyroOrientation, true);
+          window.addEventListener('deviceorientation', window.handleGyroOrientation, true);
+          gyroListenerActive = true;
+          logDebug("Gyro permission granted by user tap.");
+        } else {
+          logDebug("Gyro permission denied by user tap.");
+        }
+      })
+      .catch(err => {
+        logDebug("Gyro permission request failed: " + err);
+      });
+  }
+}
+
 // スクリプトがHTML最下部にあるため、イベントを待たず即時実行してタイミング問題を回避
 safeInitApp();
+
