@@ -21,21 +21,9 @@
       window.logDebug(`UNHANDLED PROMISE: ${event.reason}`);
     };
 
-    // キャッシュによる動作不良を防ぐため、Service Workerを強制解除して一度だけ自動リロード
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        if (registrations.length > 0) {
-          for (let r of registrations) {
-            r.unregister();
-          }
-          // 解除されたら、キャッシュを破棄して最新版をサーバーから直接ロードするために自動リロード
-          console.log('SW unregistered. Reloading to apply clean state...');
-          window.location.reload();
-        }
-      });
-    }
+
   </script>
-  <!-- Force Refresh: v264 (2026-05-26T09:08:00) -->
+  <!-- Force Refresh: v265 (2026-05-26T09:33:00) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="apple-touch-icon" href="./assets/icon180-v2.png?v=258">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
@@ -66,7 +54,7 @@
     }, { passive: false });
   </script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="./style.css?v=264">
+  <link rel="stylesheet" href="./style.css?v=265">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -192,7 +180,7 @@
     </div>
   </div>
 
-  <script src="./app.js?v=264"></script>
-  <script src="./render.js?v=264"></script>
+  <script src="./app.js?v=265"></script>
+  <script src="./render.js?v=265"></script>
 </body>
 </html>
