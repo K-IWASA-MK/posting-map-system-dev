@@ -12,7 +12,32 @@ function forceStartBatch() {
   const props = PropertiesService.getScriptProperties();
   props.setProperty("BATCH_STATUS", "running");
   props.setProperty("BATCH_INDEX", "0");
-  props.setProperty("BATCH_CITY_COUNTS", JSON.stringify({}));
+  
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // 1. 最初に巨大CSVから住所を一括展開・ソートして一時シートへ保存
+  ss.toast("住所データを抽出・ソート中...", "準備中", 5);
+  const addresses = extractDistrictAddresses();
+  addresses.sort((a, b) => {
+    const cityA = extractCityName(a.address);
+    const cityB = extractCityName(b.address);
+    return cityA.localeCompare(cityB, 'ja');
+  });
+
+  let tempSheet = ss.getSheetByName("__TEMP_ADDRESSES__");
+  if (!tempSheet) {
+    tempSheet = ss.insertSheet("__TEMP_ADDRESSES__");
+    tempSheet.hideSheet();
+  }
+  tempSheet.clear();
+  tempSheet.getRange(1, 1, 1, 2).setValues([["郵便番号", "住所"]]);
+  
+  if (addresses.length > 0) {
+    const rows = addresses.map(addr => [addr.postalCode || "", addr.address]);
+    tempSheet.getRange(2, 1, rows.length, 2).setValues(rows);
+  }
+  SpreadsheetApp.flush();
+  
   generateAreaSheetsBatch();
 }
 
@@ -23,11 +48,22 @@ function generateAreaSheetsBatch() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const baseSheet = ss.getSheetByName(CONFIG.SHEET_TEMPLATE);
 
-  const addresses = extractDistrictAddresses();
+  // 2. CSV読み込みの代わりに一時シートから高速ロード
+  const tempSheet = ss.getSheetByName("__TEMP_ADDRESSES__");
+  if (!tempSheet) {
+    ss.toast("一時データが見つかりません。一括作成を最初からやり直してください。", "エラー", 5);
+    return;
+  }
+  const lastRow = tempSheet.getLastRow();
+  if (lastRow < 2) return;
+  
+  const tempValues = tempSheet.getRange(2, 1, lastRow - 1, 2).getValues();
+  const addresses = tempValues.map(r => ({ postalCode: r[0], address: r[1] }));
+  
   const startIndex = parseInt(props.getProperty("BATCH_INDEX")) || 0;
   const chunkSize = CONFIG.CHUNK_SIZE;
 
-  // 1. 再開時の状態シミュレーション
+  // 3. 再開時の状態シミュレーション
   let cityCounts = {};
   let lastCity = "";
   let itemsInBlock = 0; // 1シート内の何件目か (0-9)
@@ -42,17 +78,16 @@ function generateAreaSheetsBatch() {
     itemsInBlock++;
   }
 
-  // 2. メインループ
+  // 4. メインループ
   for (
     let currentIndex = startIndex;
     currentIndex < addresses.length;
     currentIndex++
   ) {
     const now = new Date().getTime();
-    if (now - startTime > 300 * 1000) {
+    if (now - startTime > 260 * 1000) { // 安全のため4.3分で中断
       // 5分制限
       props.setProperty("BATCH_INDEX", currentIndex.toString());
-      // プロパティへの保存はBATCH_INDEXのみでOK（シミュレーションでcityCountsは復元可能）
       ScriptApp.newTrigger("generateAreaSheetsBatch")
         .timeBased()
         .after(1000 * 60)
@@ -81,12 +116,14 @@ function generateAreaSheetsBatch() {
     if (!sheet) {
       try {
         sheet = baseSheet.copyTo(ss).setName(sheetName);
+        SpreadsheetApp.flush(); // コピーと名前設定を強制同期
       } catch (e) {
         // 重複エラーが発生した場合のリカバリ
         sheet = ss.getSheetByName(sheetName);
         if (!sheet) {
           // それでも取得できない場合は名前を少し変えて作成
           sheet = baseSheet.copyTo(ss).setName(sheetName + " ");
+          SpreadsheetApp.flush();
         }
       }
     }
@@ -96,6 +133,7 @@ function generateAreaSheetsBatch() {
     if (itemsInBlock === 0) {
       sheet.getRange("A2:L11").clearContent(); // L列（通し番号）まで確実にクリア
       applyProDesign(sheet);
+      SpreadsheetApp.flush(); // 初期化を確定
     }
 
     // 書き込み（絶対に行番号を指定：2〜11行目）
@@ -118,8 +156,20 @@ function generateAreaSheetsBatch() {
   props.deleteProperty("BATCH_STATUS");
   props.deleteProperty("BATCH_INDEX");
   
+  // 一時シートの削除
+  const tempSheetToDelete = ss.getSheetByName("__TEMP_ADDRESSES__");
+  if (tempSheetToDelete) {
+    try {
+      ss.deleteSheet(tempSheetToDelete);
+      SpreadsheetApp.flush();
+    } catch (e) {
+      // 削除エラーは無視
+    }
+  }
+  
   // シャドウシートを最新のリストで更新
   createSystemCacheSheet();
+  SpreadsheetApp.flush();
   
   ss.toast(
     "すべてのエリアシートの展開（市町村境界考慮・10件分割版）が完了しました！",

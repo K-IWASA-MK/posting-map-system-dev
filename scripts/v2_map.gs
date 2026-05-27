@@ -97,7 +97,10 @@ function createSystemCacheSheet() {
 
   const areaSheets = ss.getSheets().filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden());
   
-  if (areaSheets.length === 0) return;
+  if (areaSheets.length === 0) {
+    SpreadsheetApp.flush();
+    return;
+  }
 
   const areaNames = areaSheets.map(s => [s.getName()]);
   const formulas = areaSheets.map(s => {
