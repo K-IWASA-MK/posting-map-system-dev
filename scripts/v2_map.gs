@@ -39,25 +39,25 @@ function refreshAreaSummaryCache() {
   }
 
   const lastRow = shadowSheet.getLastRow();
-  if (lastRow < 2) return { summary: [], stats: { done: 0, total: 0 } };
-
-  // 1回のAPI通信で全エリアの集計結果を取得 (A:エリア名, B:完了数, C:合計数)
-  const data = shadowSheet.getRange(2, 1, lastRow - 1, 3).getValues();
-  const summary = [];
+  let summary = [];
   let totalDone = 0;
   let totalPoints = 0;
 
-  data.forEach((row) => {
-    const name = row[0];
-    const done = Number(row[1]) || 0;
-    const total = Number(row[2]) || 0;
+  if (lastRow >= 2) {
+    // 1回のAPI通信で全エリアの集計結果を取得 (A:エリア名, B:完了数, C:合計数)
+    const data = shadowSheet.getRange(2, 1, lastRow - 1, 3).getValues();
+    data.forEach((row) => {
+      const name = row[0];
+      const done = Number(row[1]) || 0;
+      const total = Number(row[2]) || 0;
 
-    if (name) {
-      summary.push({ name: name, done: done, total: total });
-      totalDone += done;
-      totalPoints += total;
-    }
-  });
+      if (name) {
+        summary.push({ name: name, done: done, total: total });
+        totalDone += done;
+        totalPoints += total;
+      }
+    });
+  }
 
   const result = {
     summary: summary,
