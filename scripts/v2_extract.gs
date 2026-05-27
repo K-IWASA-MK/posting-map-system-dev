@@ -83,10 +83,27 @@ function extractDistrictAddresses(
       });
     }
   });
-  return Array.from(addressMap, ([address, postalCode]) => ({
-    postalCode,
-    address,
-  }));
+  // 郵便番号データから「漢字の市町村名 ➔ カタカナの読み仮名」のマップを構築
+  const cityKanaMap = {};
+  postalData.forEach(row => {
+    if (row && row[7] && row[4]) {
+      const cityKanji = row[7].toString().trim();
+      const cityKana = row[4].toString().trim();
+      if (cityKanji && cityKana && !cityKanaMap[cityKanji]) {
+        cityKanaMap[cityKanji] = toFullWidthKana(cityKana);
+      }
+    }
+  });
+
+  return Array.from(addressMap, ([address, postalCode]) => {
+    const city = extractCityName(address);
+    return {
+      postalCode,
+      address,
+      city,
+      cityKana: cityKanaMap[city] || ""
+    };
+  });
 }
 
 function getCsvOrSheetData(filename) {
@@ -140,4 +157,31 @@ function toHalfWidth(str) {
 function extractCityName(addr) {
   if (addr.indexOf("四日市市") === 0) return "四日市市";
   return addr.match(/^(.+?[市郡])/) ? addr.match(/^(.+?[市郡])/)[1] : "エリア";
+}
+
+// 半角カタカナを全角カタカナに変換して濁点を結合するユーティリティ
+function toFullWidthKana(str) {
+  if (!str) return "";
+  const kanaMap = {
+    'ｱ': 'ア', 'ｲ': 'イ', 'ｳ': 'ウ', 'ｴ': 'エ', 'ｵ': 'オ',
+    'ｶ': 'カ', 'ｷ': 'キ', 'ｸ': 'ク', 'ｹ': 'ケ', 'ｺ': 'コ',
+    'ｻ': 'サ', 'ｼ': 'ジ', 'ｽ': 'ス', 'ｾ': 'セ', 'ｿ': 'ソ',
+    'ﾀ': 'タ', 'ﾁ': 'チ', 'ﾂ': 'ツ', 'ﾃ': 'テ', 'ﾄ': 'ト',
+    'ﾅ': 'ナ', 'ﾆ': 'ニ', 'ﾇ': 'ヌ', 'ﾈ': 'ネ', 'ﾉ': 'ノ',
+    'ﾊ': 'ハ', 'ﾋ': 'ヒ', 'ﾌ': 'フ', 'ﾍ': 'ヘ', 'ﾎ': 'ホ',
+    'ﾏ': 'マ', 'ﾐ': 'ミ', 'ﾑ': 'ム', 'ﾒ': 'メ', 'ﾓ': 'モ',
+    'ﾔ': 'ヤ', 'ﾕ': 'ユ', 'ﾖ': 'ヨ',
+    'ﾗ': 'ラ', 'ﾘ': 'リ', 'ﾙ': 'ル', 'ﾚ': 'レ', 'ﾛ': 'ロ',
+    'ﾜ': 'ワ', 'ｦ': 'ヲ', 'ﾝ': 'ン',
+    'ｧ': 'ァ', 'ｨ': 'ィ', 'ｩ': 'ゥ', 'ｪ': 'ェ', 'ｫ': 'ォ',
+    'ｬ': 'ャ', 'ｭ': 'ュ', 'ｮ': 'ョ', 'ｯ': 'ッ',
+    'ｰ': 'ー', 'ﾞ': '゛', 'ﾟ': '゜'
+  };
+  let s = str.replace(/[ｱ-ﾝｧ-ｫｬ-ｮｯｰﾞﾟ]/g, m => kanaMap[m] || m);
+  s = s.replace(/カ゛/g, 'ガ').replace(/キ゛/g, 'ギ').replace(/ク゛/g, 'グ').replace(/ケ゛/g, 'ゲ').replace(/コ゛/g, 'ゴ')
+       .replace(/サ゛/g, 'ザ').replace(/シ゛/g, 'ジ').replace(/ス゛/g, 'ズ').replace(/セ゛/g, 'ゼ').replace(/ソ゛/g, 'ゾ')
+       .replace(/タ゛/g, 'ダ').replace(/チ゛/g, 'ヂ').replace(/ツ゛/g, 'ヅ').replace(/テ゛/g, 'デ').replace(/ト゛/g, 'ド')
+       .replace(/ハ゛/g, 'バ').replace(/ヒ゛/g, 'ビ').replace(/フ゛/g, 'ブ').replace(/ヘ゛/g, 'ベ').replace(/ホ゛/g, 'ボ')
+       .replace(/ハ゜/g, 'パ').replace(/ヒ゜/g, 'ピ').replace(/フ゜/g, 'プ').replace(/ヘ゜/g, 'ペ').replace(/ホ゜/g, 'ポ');
+  return s;
 }

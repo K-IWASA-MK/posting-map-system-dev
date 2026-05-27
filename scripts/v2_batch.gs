@@ -19,9 +19,9 @@ function forceStartBatch() {
   ss.toast("住所データを抽出・ソート中...", "準備中", 5);
   const addresses = extractDistrictAddresses();
   addresses.sort((a, b) => {
-    const cityA = extractCityName(a.address);
-    const cityB = extractCityName(b.address);
-    return cityA.localeCompare(cityB, 'ja');
+    const comp = (a.cityKana || "").localeCompare(b.cityKana || "", 'ja');
+    if (comp !== 0) return comp;
+    return a.address.localeCompare(b.address, 'ja');
   });
 
   let tempSheet = ss.getSheetByName("__TEMP_ADDRESSES__");
