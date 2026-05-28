@@ -731,3 +731,26 @@ async function safeInitApp() {
 
 // defer属性によりDOM解析完了後・LIFF SDK読み込み後に実行される（DOMContentLoaded待ち不要）
 safeInitApp();
+
+// ID情報モーダルの制御
+function openIdInfoModal() {
+  const modal = $('id-info-modal');
+  if (!modal) return;
+  
+  const rawBranch = localStorage.getItem('branch_name') || '';
+  const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : 'MIE-02 支部';
+  const branchEl = $('id-info-branch');
+  if (branchEl) {
+    branchEl.textContent = displayBranch;
+  }
+  
+  modal.classList.remove('pointer-events-none', 'opacity-0');
+  modal.firstElementChild.classList.remove('translate-y-full');
+}
+
+function closeIdInfoModal() {
+  const modal = $('id-info-modal');
+  if (!modal) return;
+  modal.classList.add('opacity-0', 'pointer-events-none');
+  modal.firstElementChild.classList.add('translate-y-full');
+}
