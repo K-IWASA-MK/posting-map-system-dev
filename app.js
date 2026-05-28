@@ -505,9 +505,7 @@ function pressNum(key) {
       }
       
       let imageBlob = null;
-      if (confirm("投函証明写真を追加しますか？")) {
-        imageBlob = await capturePhoto();
-      }
+      imageBlob = await capturePhoto(); // confirm()を廃止 → カメラ自動起動（LINE LIFF対応・端末側でキャンセル可）
       
       // 撮影直後にローカルBlobプレビューを反映
       if (imageBlob && p) {
