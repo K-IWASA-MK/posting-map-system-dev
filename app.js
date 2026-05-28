@@ -496,6 +496,12 @@ async function addPhotoToDetail(rowId) {
     }
     
     const gps = p.gps ? { latitude: p.gps.split(',')[0], longitude: p.gps.split(',')[1] } : { latitude: '', longitude: '' };
+
+    // BlobはSafari/LINE WebViewのIndexedDBで失われるため送信前にbase64変換
+    let photoBase64 = '';
+    if (imageBlob && typeof blobToBase64 === 'function') {
+      photoBase64 = await blobToBase64(imageBlob);
+    }
     
     await enqueueSync({
       areaName,
@@ -504,7 +510,7 @@ async function addPhotoToDetail(rowId) {
       count: p.count || 0,
       latitude: gps.latitude,
       longitude: gps.longitude,
-      imageBlob,
+      photoBase64, // BlobではなくBase64文字列で保存
       staffName,
       staffId
     });
@@ -569,6 +575,12 @@ function pressNum(key) {
           modalContent.innerHTML = renderDetailModalContent(p);
         }
       }
+
+      // BlobはSafari/LINE WebViewのIndexedDBで失われるため送信前にbase64変換
+      let photoBase64 = '';
+      if (imageBlob && typeof blobToBase64 === 'function') {
+        photoBase64 = await blobToBase64(imageBlob);
+      }
       
       if (typeof enqueueSync === 'function') {
         await enqueueSync({
@@ -578,7 +590,7 @@ function pressNum(key) {
           count: valNum,
           latitude: gps.latitude,
           longitude: gps.longitude,
-          imageBlob,
+          photoBase64, // BlobではなくBase64文字列で保存
           staffName,
           staffId
         });

@@ -114,10 +114,8 @@ async function processQueue() {
       updateUISyncStatus();
 
       try {
-        let photoData = '';
-        if (item.imageBlob) {
-          photoData = await blobToBase64(item.imageBlob);
-        }
+        // photoBase64はenqueueSync時点でBase64変換済み（BlobはSafariのIndexedDBで失われるため）
+        const photoData = item.photoBase64 || '';
 
         const payload = {
           areaName: item.areaName,
