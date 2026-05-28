@@ -32,7 +32,23 @@ function renderAreas() {
       return c;
     });
 
-    $('area-list').innerHTML = cities.map(c => {
+    const headerCardHtml = `
+      <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass p-6 flex items-center justify-between mb-6">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10">
+            <svg class="w-6 h-6 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">Field Operations</p>
+            <h4 class="text-sm font-black text-white tracking-tight mt-0.5">全体エリア</h4>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const cityCardsHtml = cities.map(c => {
       const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
       const pctColorClass = 'text-[#2563eb]';
       const doneStr = String(c.done);
@@ -45,6 +61,8 @@ function renderAreas() {
         <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest flex items-center justify-center gap-1"><span class="${pctColorClass}">${c.progress}%</span> Completed <span class="text-white/20 font-medium font-mono whitespace-pre">(${paddedDone}/${c.total})</span></div>
       </div>`;
     }).join('');
+
+    $('area-list').innerHTML = headerCardHtml + `<div class="space-y-6">${cityCardsHtml}</div>`;
   } else {
     // 【第2層：選択された市のエリアシート一覧画面】
     const filteredAreas = areaSummary.filter(s => getCityName(s.name) === currentCity);
