@@ -14,6 +14,7 @@ window.onunhandledrejection = function(event) {
 };
 
 let allPoints = [], areaSummary = [], roster = [], rankingData = [];
+let _appDataPromise = null; // ⑤ getAppData並列プリフェッチ用
 let currentCity = null;
 let lastAreaSubPage = 'areas'; // 直前のエリアサブページ ('areas' または 'detail') を記憶
 let scrollPositions = { areas: 0, detail: 0, settings: 0, ranking: 0 };
@@ -208,7 +209,8 @@ async function loadData(skipSync = false) {
 
   try {
     logDebug("[loadData] Fetching getAppData...");
-    const data = await callApi('getAppData');
+    const data = await (_appDataPromise || callApi('getAppData')); // ⑤ プリフェッチがあれば再利用
+    _appDataPromise = null;
     logDebug("[loadData] getAppData fetched successfully.");
     if (data && data.success) {
       areaSummary = data.areas;
@@ -608,8 +610,8 @@ async function safeInitApp() {
   if (typeof liff !== 'undefined') {
     try {
       logDebug("LIFF INIT START"); // ① LIFF初期化開始
-      // LINE JS Bridge の接続確立を待つ安全ディレイ
-      await new Promise(r => setTimeout(r, 200));
+      // ① LINE JS Bridge 接続待ち（最適化済み）
+      await new Promise(r => setTimeout(r, 50));
 
       // ⏳ 5秒でタイムアウトする安全装置
       const liffInitPromise = liff.init({ liffId: liffId });
@@ -622,10 +624,12 @@ async function safeInitApp() {
       
       logDebug("LOGIN CHECK"); // ③ login判定
       if (liff.isLoggedIn()) {
-        logDebug("LOGIN OK"); // ④ login成功
+        logDebug("LOGIN OK");
+        // ⑤ getAppDataを並列プリフェッチ開始（profile取得・登録処理と並行）
+        _appDataPromise = callApi('getAppData');
         try {
-          // 初期化完了後のLINE内部トークン処理を安定させるディレイ
-          await new Promise(r => setTimeout(r, 300));
+          // ② LINE内部トークン処理安定ディレイ（最適化済み）
+          await new Promise(r => setTimeout(r, 100));
 
           logDebug("PROFILE START"); // ⑤ profile取得開始
           const profile = await liff.getProfile();
@@ -634,14 +638,14 @@ async function safeInitApp() {
 
           let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
           
-          // LINE IDが変わっている、または未登録の場合のみGASへ同期登録する
-          if (!userInfo.id || userInfo.lineUserId !== profile.userId) {
-            logDebug("API START"); // ⑦ API開始
+          // ④ 未登録の場合のみGASへ登録（登録済みはAPIコールをスキップ）
+          if (!userInfo.id) {
+            logDebug("API START (初回登録)");
             const res = await callApi('registerStaff', { 
               lastName: profile.displayName, 
               firstName: "(LINE)" 
             });
-            logDebug("API OK"); // ⑧ APIレスポンス成功
+            logDebug("API OK");
             if (res && res.success) {
               userInfo = {
                 last: profile.displayName,
@@ -656,15 +660,14 @@ async function safeInitApp() {
               throw new Error("GAS registration failed");
             }
           } else {
-            // すでに登録済みでLINE画像などが最新でない場合はローカルキャッシュのみ更新
+            // 登録済み：LINE情報をローカルキャッシュのみ更新（API不要）
+            userInfo.lineUserId = profile.userId;
             userInfo.picture = profile.pictureUrl;
             localStorage.setItem('user_info', JSON.stringify(userInfo));
           }
 
-          // LINE WebViewのタイミング問題対策（800ms delay）
-          await new Promise(r => setTimeout(r, 800));
-          
-          logDebug("START APP"); // ⑨ startApp開始
+          // ③ 800msディレイ削除
+          logDebug("START APP");
           startApp(profile);
         } catch (err) {
           console.error("LIFF PROFILE ERROR", err);
