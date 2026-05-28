@@ -771,7 +771,33 @@ const ID_INFO_DATA = {
     title: 'Privacy Policy',
     body: `
       <div class="space-y-4 text-[11px] leading-relaxed text-white/50 select-none">
-        <p>プライバシーポリシーは準備中です。位置情報および配布データは保護され、運用目的以外には使用されません。</p>
+        <p>POSTING MAP は、<br>FIELD OPERATIONS SYSTEM として、<br>以下の情報を取得・管理します。</p>
+        
+        <div class="space-y-1">
+          <p class="text-white/70 font-black">【取得・管理する情報】</p>
+          <div class="pl-3 text-white/40 space-y-0.5">
+            <div>・LINE認証情報</div>
+            <div>・配布員ID</div>
+            <div>・エリア進捗</div>
+            <div>・配布ログ</div>
+            <div>・GPS位置情報</div>
+            <div>・写真エビデンス</div>
+            <div>・デバイス情報</div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <p class="text-white/70 font-black">【取得データの利用目的】</p>
+          <div class="pl-3 text-white/40 space-y-0.5">
+            <div>・配布進捗管理</div>
+            <div>・エリア統制</div>
+            <div>・FIELD OPERATIONS分析</div>
+            <div>・不正防止</div>
+            <div>・リアルタイム同期</div>
+          </div>
+        </div>
+
+        <p class="text-white/40 pt-2 border-t border-white/5">GPSおよび写真情報は、<br>FIELD OPERATIONS の活動証跡として利用されます。</p>
       </div>
     `
   },
