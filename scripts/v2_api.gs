@@ -7,15 +7,26 @@
 // ⓪ 基本設定
 // =============================
 function getSS() {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    if (ss && ss.getId()) return ss;
-  } catch (e) {
-    // Fallback if not container-bound
+  const props = PropertiesService.getScriptProperties();
+  let id = props.getProperty("SPREADSHEET_ID");
+  
+  if (!id) {
+    try {
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      if (ss && ss.getId()) {
+        id = ss.getId();
+        props.setProperty("SPREADSHEET_ID", id);
+      }
+    } catch (e) {
+      // ignore
+    }
   }
-  const SPREADSHEET_ID = '1whCYOf3QdEO88Kcmj99-Nzvhi1zJnRJktEF57Q_rDM';
-  if (!SPREADSHEET_ID) throw new Error("SPREADSHEET_ID is not defined.");
-  return SpreadsheetApp.openById(SPREADSHEET_ID);
+  
+  if (!id) {
+    // 現在のマスターのSpreadsheet ID（フォールバック）
+    id = '1KuA5pN0ltODhwSJph-fwgj_U_ZyHrn9Osew92D99xBs';
+  }
+  return SpreadsheetApp.openById(id);
 }
 
 // =============================

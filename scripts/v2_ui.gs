@@ -11,6 +11,16 @@
 // =============================
 
 function onOpen() {
+  // スプレッドシートIDをスクリプトプロパティに自動保存（Webアプリからの動的書き込みに必要）
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss) {
+      PropertiesService.getScriptProperties().setProperty("SPREADSHEET_ID", ss.getId());
+    }
+  } catch (e) {
+    // エラーは無視
+  }
+
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("⚙️ ポスティング管理")
     .addItem("🚀 エリアシート一括作成", "forceStartBatch")
