@@ -70,7 +70,7 @@ function renderAreas() {
     }).join('');
 
     const bottomBackButtonHtml = filteredAreas.length > 3 ? `
-      <div class="flex items-center mt-8">
+      <div class="flex items-center justify-start mt-8 pb-10">
         <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
       </div>
     ` : '';
