@@ -30,8 +30,25 @@ function getSS() {
 }
 
 // =============================
-// ① APIエントリポイント
+// Drive 認証テスト用（認証後は削除可）
 // =============================
+function authorizeAndTestDriveWrite() {
+  try {
+    const folderId = CONFIG.STORAGE_PARENT_ID;
+    const folder = DriveApp.getFolderById(folderId);
+    const blob = Utilities.newBlob("DRIVE_AUTH_TEST", "text/plain", "_auth_test.txt");
+    const file = folder.createFile(blob);
+    file.setTrashed(true);
+    Logger.log("✅ Drive write: SUCCESS. Folder: " + folder.getName());
+  } catch (e) {
+    Logger.log("❌ Drive write FAILED: " + e.toString());
+  }
+}
+
+// =============================
+// ⓪ 基本設定
+// =============================
+
 
 /**
  * GETリクエスト：JSONデータの取得
