@@ -23,7 +23,7 @@
 
 
   </script>
-  <!-- Force Refresh: v294 (2026-05-28T12:14:00) -->
+  <!-- Force Refresh: v296 (2026-05-28T12:50:00) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="apple-touch-icon" href="./assets/icon180-v2.png?v=258">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
     }, { passive: false });
   </script>
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="./style.css?v=294">
+  <link rel="stylesheet" href="./style.css?v=296">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -196,35 +196,18 @@
 
   <!-- 5. ID INFO MODAL -->
   <div id="id-info-modal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="closeIdInfoModal()">
-    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2.5rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 flex flex-col items-center text-center space-y-6" onclick="event.stopPropagation()">
-      <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 flex flex-col items-center text-center space-y-6" onclick="event.stopPropagation()">
+      <div class="w-12 h-1 bg-white/10 rounded-full mb-2"></div>
       
-      <div class="space-y-1 py-2">
-        <h3 id="id-info-branch" class="text-sm font-black text-white/60 tracking-wide">MIE-02 支部</h3>
-        <p class="text-[9px] font-black text-white/30 uppercase tracking-[0.3em]">Field Operations</p>
-      </div>
-      
-      <div class="w-full border-t border-white/5"></div>
-      
-      <!-- 準備中の規約内容をシンプルに明記 -->
-      <div class="w-full text-left space-y-5 text-xs text-white/60 max-h-[30dvh] overflow-y-auto pr-2 hide-scrollbar">
-        <div>
-          <h4 class="font-black text-white text-[10px] uppercase tracking-wider mb-1">Terms of Service</h4>
-          <p class="leading-relaxed text-white/40">利用規約は準備中です。本プラットフォームの利用における標準運用規約が適用されます。</p>
-        </div>
-        <div>
-          <h4 class="font-black text-white text-[10px] uppercase tracking-wider mb-1">Privacy Policy</h4>
-          <p class="leading-relaxed text-white/40">プライバシーポリシーは準備中です。位置情報および配布データは保護され、運用目的以外には使用されません。</p>
-        </div>
-        <div>
-          <h4 class="font-black text-white text-[10px] uppercase tracking-wider mb-1">License</h4>
-          <p class="leading-relaxed text-white/40">MIE-02 LICENSE<br>© FIELD OPERATIONS All Rights Reserved.</p>
-        </div>
+      <!-- タイトルと本文のみを表示する領域 -->
+      <div class="w-full text-left space-y-3">
+        <h4 id="id-info-title" class="font-black text-white text-[12px] uppercase tracking-wider mb-2"></h4>
+        <p id="id-info-body" class="leading-relaxed text-xs text-white/40"></p>
       </div>
     </div>
   </div>
 
-  <script defer src="./app.js?v=294"></script>
-  <script defer src="./render.js?v=294"></script>
+  <script defer src="./app.js?v=296"></script>
+  <script defer src="./render.js?v=296"></script>
 </body>
 </html>

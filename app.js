@@ -732,16 +732,39 @@ async function safeInitApp() {
 // defer属性によりDOM解析完了後・LIFF SDK読み込み後に実行される（DOMContentLoaded待ち不要）
 safeInitApp();
 
+// 規約・ライセンスデータ
+const ID_INFO_DATA = {
+  terms: {
+    title: 'Terms of Service',
+    body: '利用規約は準備中です。本プラットフォームの利用における標準運用規約が適用されます。'
+  },
+  privacy: {
+    title: 'Privacy Policy',
+    body: 'プライバシーポリシーは準備中です。位置情報および配布データは保護され、運用目的以外には使用されません。'
+  },
+  license: {
+    title: 'License',
+    body: 'STANDARD LICENSE\n© FIELD OPERATIONS All Rights Reserved.'
+  }
+};
+
 // ID情報モーダルの制御
-function openIdInfoModal() {
+function openIdInfoModal(type, event) {
+  if (event) event.stopPropagation(); // イベントのバブリング防止
+  
   const modal = $('id-info-modal');
   if (!modal) return;
   
-  const rawBranch = localStorage.getItem('branch_name') || '';
-  const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : 'MIE-02 支部';
-  const branchEl = $('id-info-branch');
-  if (branchEl) {
-    branchEl.textContent = displayBranch;
+  const data = ID_INFO_DATA[type];
+  if (!data) return;
+  
+  const titleEl = $('id-info-title');
+  const bodyEl = $('id-info-body');
+  
+  if (titleEl) titleEl.textContent = data.title;
+  if (bodyEl) {
+    // 改行コードを <br> に変換して反映
+    bodyEl.innerHTML = data.body.replace(/\n/g, '<br>');
   }
   
   modal.classList.remove('pointer-events-none', 'opacity-0');
