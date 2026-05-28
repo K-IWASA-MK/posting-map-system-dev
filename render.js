@@ -266,6 +266,7 @@ function renderSettings() {
           <div class="flex flex-col items-center gap-1 z-10">
             ${displayBranch ? `<p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">${displayBranch}</p>` : ''}
             <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">Field Operations</p>
+            <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] mt-2">Terms &nbsp;&nbsp; Privacy &nbsp;&nbsp; License</p>
           </div>
         </div>
       </div>
