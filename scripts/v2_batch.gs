@@ -18,6 +18,10 @@ function forceStartBatch() {
   // 1. 最初に巨大CSVから住所を一括展開・ソートして一時シートへ保存
   ss.toast("住所データを抽出・ソート中...", "準備中", 5);
   const addresses = extractDistrictAddresses();
+  
+  // デバッグ用トースト：抽出件数を画面に表示
+  ss.toast(`【デバッグ】住所データを ${addresses.length} 件抽出しました。ソート中...`, "デバッグ", 10);
+  
   addresses.sort((a, b) => {
     const comp = (a.cityKana || "").localeCompare(b.cityKana || "", 'ja');
     if (comp !== 0) return comp;
