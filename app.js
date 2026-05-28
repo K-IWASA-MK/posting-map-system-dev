@@ -279,6 +279,132 @@ function closeNumpad() {
   numpadContext = null;
 }
 
+// GPS現在地取得ヘルパー (3秒タイムアウト)
+function getGPSLocation() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve({ latitude: '', longitude: '' });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        resolve({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude
+        });
+      },
+      (err) => {
+        console.warn("GPS Error:", err);
+        resolve({ latitude: '', longitude: '' });
+      },
+      { enableHighAccuracy: true, timeout: 3000, maximumAge: 10000 }
+    );
+  });
+}
+
+// カメラを起動して写真Blobを返す
+function capturePhoto() {
+  return new Promise((resolve) => {
+    const input = document.getElementById('camera-input');
+    if (!input) {
+      resolve(null);
+      return;
+    }
+    
+    const onFileChange = async (e) => {
+      input.removeEventListener('change', onFileChange);
+      const file = e.target.files[0];
+      if (!file) {
+        resolve(null);
+        return;
+      }
+      try {
+        const compressedBlob = await compressImage(file);
+        resolve(compressedBlob);
+      } catch (err) {
+        console.error("Compression failed, uploading original:", err);
+        resolve(file);
+      } finally {
+        input.value = '';
+      }
+    };
+    
+    input.addEventListener('change', onFileChange);
+    input.click();
+  });
+}
+
+// Canvasを使った画像圧縮 (150KB〜300KB)
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const MAX_LEN = 1024;
+        
+        if (width > height) {
+          if (width > MAX_LEN) {
+            height = Math.round((height * MAX_LEN) / width);
+            width = MAX_LEN;
+          }
+        } else {
+          if (height > MAX_LEN) {
+            width = Math.round((width * MAX_LEN) / height);
+            height = MAX_LEN;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            console.log(`Compressed image: ${(blob.size / 1024).toFixed(1)} KB`);
+            resolve(blob);
+          } else {
+            reject(new Error("Canvas toBlob returned null"));
+          }
+        }, "image/jpeg", 0.6);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// UI上の同期状態を全カードへ伝搬・再描画する
+window.triggerUISyncRefresh = async function() {
+  if (!window.allPoints) return;
+  if (typeof getQueue !== 'function') return;
+  
+  try {
+    const queue = await getQueue();
+    window.allPoints.forEach(p => {
+      const found = queue.find(q => q.rowId === p.rowId);
+      if (found) {
+        p.syncStatus = found.status; // 'pending' | 'sending' | 'failed'
+      } else {
+        delete p.syncStatus;
+      }
+      
+      const card = document.getElementById(`point-card-${p.rowId}`);
+      if (card && typeof renderPointCardHtml === 'function') {
+        card.innerHTML = renderPointCardHtml(window.currentCityDetailAreaName || '', p);
+      }
+    });
+  } catch (err) {
+    console.error("triggerUISyncRefresh error:", err);
+  }
+};
+
 function pressNum(key) {
   if (!numpadContext) return;
   
@@ -288,17 +414,20 @@ function pressNum(key) {
     const valNum = parseFloat(numpadContext.currentVal) || 0;
     const { areaName, rowId } = numpadContext;
     
-    // Update local state instantly
     const p = allPoints.find(point => point.rowId === rowId);
+    const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+    const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+    const staffId = userInfo.id || '';
+    const now = new Date();
+    const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    // 1. UIを即座に「完了」へ更新 (待ち時間ゼロUX)
     if (p) {
       p.isDone = true;
       p.count = valNum;
-      
-      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-      p.staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
-      
-      const now = new Date();
-      p.completedAt = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      p.staffName = staffName;
+      p.completedAt = timeStr;
+      p.syncStatus = 'pending';
       
       const card = $(`point-card-${rowId}`);
       if (card) {
@@ -306,15 +435,37 @@ function pressNum(key) {
       }
     }
     
-    // De-couple toggle so closeNumpad doesn't reset checkbox
     numpadContext.isDoneToggle = false;
     closeNumpad();
     
-    // Update server
-    updateRecord(areaName, rowId, true, valNum);
+    // 2. バックグラウンドで非同期にGPS取得と写真撮影・キューイングを行う
+    (async () => {
+      const gps = await getGPSLocation();
+      let imageBlob = null;
+      
+      if (confirm("投函証明写真を追加しますか？")) {
+        imageBlob = await capturePhoto();
+      }
+      
+      if (typeof enqueueSync === 'function') {
+        await enqueueSync({
+          areaName,
+          rowId,
+          isDone: true,
+          count: valNum,
+          latitude: gps.latitude,
+          longitude: gps.longitude,
+          imageBlob,
+          staffName,
+          staffId
+        });
+      }
+    })().catch(err => {
+      console.error("Async sync background task failed:", err);
+    });
+    
     return;
   } else {
-    // Digit key pressed
     if (numpadContext.currentVal === '0') {
       numpadContext.currentVal = String(key);
     } else {

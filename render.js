@@ -125,23 +125,72 @@ function backToCityList() {
 
 // Render single card contents
 function renderPointCardHtml(areaName, p) {
+  const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+  const myId = userInfo.id || '';
+  const myName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+  
+  // 他人の完了実績か判定
+  const isOtherStaff = p.isDone && (
+    (p.staffId && p.staffId !== myId) ||
+    (!p.staffId && p.staffName && p.staffName !== myName)
+  );
+
+  // 非同期送信ステータスバッジの設計
+  let syncLabelHtml = '';
+  if (p.isDone) {
+    if (p.syncStatus === 'sending') {
+      syncLabelHtml = `<span class="text-[8px] font-black text-[#2563eb] animate-pulse ml-2 tracking-widest bg-[#2563eb]/10 px-2 py-0.5 rounded-full">FIELD DATA SYNCING...</span>`;
+    } else if (p.syncStatus === 'failed') {
+      syncLabelHtml = `<span class="text-[8px] font-black text-red-500 animate-pulse ml-2 tracking-widest bg-red-500/10 px-2 py-0.5 rounded-full">UPLOAD RETRYING...</span>`;
+    } else if (p.syncStatus === 'pending') {
+      syncLabelHtml = `<span class="text-[8px] font-black text-white/40 animate-pulse ml-2 tracking-widest bg-white/5 px-2 py-0.5 rounded-full">SYNC PENDING...</span>`;
+    }
+  }
+
+  // 🔒アイコン
+  const lockIconHtml = isOtherStaff ? `<span class="text-xs mr-1">🔒</span>` : '';
+
+  // テンポラリ表示用または公開済みの写真URLの取得
+  let photoUrl = p.photoUrl || p.tempPhotoUrl || '';
+  const photoThumbnailHtml = photoUrl ? `
+    <div class="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center my-3">
+      <img src="${photoUrl}" class="w-full h-full object-cover">
+    </div>
+  ` : '';
+
+  // ロック状態によるスタイル分岐
+  const labelClasses = isOtherStaff
+    ? "rounded-3xl p-5 flex items-center gap-5 cursor-default bg-white/[0.01] border border-white/[0.03]"
+    : `rounded-3xl p-5 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all`;
+  
+  const labelStyle = !isOtherStaff && p.isDone
+    ? 'background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);'
+    : '';
+
   return `
     <div class="flex justify-between items-start gap-4">
       <div class="flex-1 space-y-2">
         <div class="text-lg font-black text-white tracking-tight leading-tight">${p.address}</div>
         ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5">${p.memo}</div>` : ''}
+        ${photoThumbnailHtml}
       </div>
       <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
     </div>
     
     <div class="flex flex-col gap-4">
-      <label style="${p.isDone ? 'background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);' : 'background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05);'}" class="rounded-3xl p-5 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all">
-        <input type="checkbox" class="hidden" ${p.isDone?'checked':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
+      <label ${labelStyle ? `style="${labelStyle}"` : ''} class="${labelClasses}">
+        <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isOtherStaff?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
         <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(255,255,255,0.2); background-color: transparent;'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0">
           ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
         </div>
         <div class="flex-1 min-w-0">
-          <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">${p.isDone?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
+          <div class="flex items-center flex-wrap gap-1">
+            ${lockIconHtml}
+            <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">
+              ${p.isDone ? 'MISSION COMPLETED' : 'READY TO DEPLOY'}
+            </span>
+            ${syncLabelHtml}
+          </div>
           ${p.isDone && p.completedAt ? `
             <div class="text-[10px] text-white/40 font-bold mt-0.5 tracking-wider uppercase">${formatCompletedAt(p.completedAt)} ${p.staffName ? `· ${p.staffName}` : ''}</div>
           ` : ''}
@@ -154,7 +203,9 @@ function renderPointCardHtml(areaName, p) {
             <span class="text-3xl font-black text-white tracking-tight">${p.count || 0}</span>
             <span class="text-xs font-bold text-white/60 ml-1">枚</span>
           </div>
-          <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all">枚数変更</button>
+          ${!isOtherStaff ? `
+            <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all">枚数変更</button>
+          ` : ''}
         </div>
       ` : ''}
     </div>
@@ -187,6 +238,7 @@ async function openDetail(name) {
   try {
     const data = await callApi('getAreaDetails', { name: name });
     if (data && data.points) {
+      window.currentCityDetailAreaName = name;
       allPoints = data.points;
       renderDetailList(name);
       
@@ -213,11 +265,19 @@ function toggleDone(areaName, rowId, checkbox) {
     // Open numpad modal
     openNumpad(areaName, rowId, p.count || 0, true, checkbox);
   } else {
+    // 誤操作防止の削除確認ダイアログ
+    if (!confirm("完了実績をキャンセルしますか？\n入力された配布枚数もクリアされます。")) {
+      checkbox.checked = true; // キャンセルされたらチェック状態を元に戻す
+      return;
+    }
+    
     // Directly clear completion and count
     p.isDone = false;
     p.count = 0;
     p.completedAt = '';
     p.staffName = '';
+    delete p.syncStatus;
+    delete p.tempPhotoUrl;
     
     // Update local card
     const card = $(`point-card-${rowId}`);

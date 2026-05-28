@@ -114,6 +114,19 @@ function doPost(e) {
           postData.staffId
         );
         break;
+      case 'updateRecordWithGPSPhoto':
+        response = updateRecordWithGPSPhoto(
+          postData.areaName,
+          parseInt(postData.rowId, 10),
+          postData.isDone === 'true' || postData.isDone === true,
+          parseFloat(postData.count) || 0,
+          postData.latitude,
+          postData.longitude,
+          postData.photoData,
+          postData.staffName,
+          postData.staffId
+        );
+        break;
       case 'registerStaff':
         response = registerStaff(postData.lastName, postData.firstName);
         break;
@@ -196,7 +209,7 @@ function getAreaDetails(areaName) {
   const lastRow = s.getLastRow();
   if (lastRow < 2) return { success: true, points: [] };
 
-  const values = s.getRange(2, 1, lastRow - 1, 8).getValues();
+  const values = s.getRange(2, 1, lastRow - 1, 10).getValues();
   const points = values.map((r, i) => ({
     rowId: i + 2,
     address: r[0],
@@ -204,7 +217,10 @@ function getAreaDetails(areaName) {
     isDone: r[3] === true || r[3] === "TRUE",
     completedAt: r[4] ? String(r[4]).trim() : "",
     count: parseFloat(r[5]) || 0,
-    staffName: r[6]
+    staffName: r[6],
+    staffId: r[7] ? String(r[7]).trim() : "",
+    gps: r[8] ? String(r[8]).trim() : "",
+    photoUrl: r[9] ? String(r[9]).trim() : ""
   }));
 
   return { success: true, points: points };
@@ -422,4 +438,100 @@ function getRankingData() {
     } catch (e) {}
   }
   return refreshRankingCache();
+}
+
+/**
+ * GPS座標と写真データを伴う実績の登録・更新。
+ * 送信された写真Base64データをGoogleドライブに「自己記述型ファイル名」で保存し、共有リンクをスプレッドシートに記録する。
+ */
+function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, longitude, photoData, staffName, staffId) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(15000);
+  } catch (e) {
+    throw new Error("サーバーが混雑しています。時間をおいて再度お試しください。");
+  }
+
+  try {
+    const ss = getSS();
+    const s = ss.getSheetByName(areaName);
+    if (!s) return { success: false, message: "Sheet not found" };
+
+    const prevVal = s.getRange(rowId, 4).getValue();
+    const wasDone = prevVal === true || prevVal === "TRUE";
+    const nowDone = isDone === true || isDone === "TRUE";
+    
+    let isDoneChange = 0;
+    if (!wasDone && nowDone) {
+      isDoneChange = 1;
+    } else if (wasDone && !nowDone) {
+      isDoneChange = -1;
+    }
+
+    const now = new Date();
+    const completedAt = Utilities.formatDate(now, "JST", "MM/dd HH:mm");
+    
+    // D, E列の更新 (完了、日付)
+    s.getRange(rowId, 4, 1, 2).setValues([[isDone, isDone ? completedAt : ""]]);
+    // F列（枚数）の更新
+    s.getRange(rowId, 6).setValue(isDone ? (parseFloat(count) || 0) : "");
+    // G, H列の更新 (担当、スタッフID)
+    s.getRange(rowId, 7, 1, 2).setValues([[isDone ? staffName : "", isDone ? (staffId || "") : ""]]);
+
+    let photoUrl = "";
+    
+    if (isDone) {
+      // 1. GPSの書き込み (I列: 9列目)
+      const gpsStr = (latitude && longitude) ? `${latitude},${longitude}` : "";
+      s.getRange(rowId, 9).setValue(gpsStr);
+      
+      // 2. 写真のGoogleドライブ保存 (J列: 10列目)
+      if (photoData && photoData.indexOf("data:image") === 0) {
+        try {
+          const folderName = "PostingMapPhotos";
+          let folder;
+          const folders = DriveApp.getFoldersByName(folderName);
+          if (folders.hasNext()) {
+            folder = folders.next();
+          } else {
+            folder = DriveApp.createFolder(folderName);
+          }
+          
+          // 自己記述型ファイル名の作成: [地区名]_配布員名_時刻.jpg
+          const timeStr = Utilities.formatDate(now, "JST", "HHmm");
+          const safeStaffName = staffName ? staffName.replace(/[\s　]/g, "") : "Unknown";
+          const fileName = `[${areaName}]_${safeStaffName}_${timeStr}.jpg`;
+          
+          // Base64デコード
+          const base64Data = photoData.split(",")[1];
+          const decoded = Utilities.base64Decode(base64Data);
+          const blob = Utilities.newBlob(decoded, "image/jpeg", fileName);
+          
+          const file = folder.createFile(blob);
+          file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          photoUrl = file.getUrl();
+          s.getRange(rowId, 10).setValue(photoUrl);
+        } catch (driveErr) {
+          console.error("Google Drive Save Error:", driveErr);
+        }
+      }
+    } else {
+      // 解除時はGPSと写真URLもクリア
+      s.getRange(rowId, 9, 1, 2).setValues([["", ""]]);
+    }
+
+    // キャッシュ更新
+    if (isDoneChange !== 0) {
+      try {
+        updateAreaCache(areaName, isDoneChange);
+        const cache = CacheService.getScriptCache();
+        cache.remove("RANKING_FAST_CACHE");
+        PropertiesService.getScriptProperties().deleteProperty("RANKING_CACHE");
+      } catch (e) {}
+    }
+
+    return { success: true, photoUrl: photoUrl };
+  } finally {
+    lock.releaseLock();
+  }
 }
