@@ -1,3 +1,19 @@
+function formatCompletedAt(dateStr) {
+  if (!dateStr) return '';
+  if (/^\d{2}\/\d{2} \d{2}:\d{2}$/.test(dateStr)) {
+    return dateStr;
+  }
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) {
+    return dateStr;
+  }
+  const MM = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const HH = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${MM}/${dd} ${HH}:${mm}`;
+}
+
 function getCityName(areaName) {
   if (!areaName) return 'その他';
   if (areaName.startsWith('四日市')) return '四日市市';
@@ -127,7 +143,7 @@ function renderPointCardHtml(areaName, p) {
         <div class="flex-1 min-w-0">
           <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">${p.isDone?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
           ${p.isDone && p.completedAt ? `
-            <div class="text-[10px] text-white/40 font-bold mt-0.5 tracking-wider uppercase">${p.completedAt} ${p.staffName ? `· ${p.staffName}` : ''}</div>
+            <div class="text-[10px] text-white/40 font-bold mt-0.5 tracking-wider uppercase">${formatCompletedAt(p.completedAt)} ${p.staffName ? `· ${p.staffName}` : ''}</div>
           ` : ''}
         </div>
       </label>
