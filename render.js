@@ -340,13 +340,10 @@ function renderRanking() {
 
   // 1. 本人のステータスカード（ID登録されている場合のみ表示）
   const myStatusCardHtml = myName ? `
-    <div style="border: 1px solid rgba(37, 99, 235, 0.25); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.05), 0 0 25px rgba(37, 99, 235, 0.08);" class="premium-glass p-6 flex items-center justify-between mb-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center text-xl shadow-lg shadow-[#2563eb]/10">🏆</div>
-        <div>
-          <p class="text-[9px] font-black text-[#2563eb] uppercase tracking-widest">My Performance</p>
-          <h4 class="text-sm font-black text-white tracking-tight mt-0.5">${myName}</h4>
-        </div>
+    <div style="border: 1px solid rgba(255, 255, 255, 0.04);" class="premium-glass p-6 flex items-center justify-between mb-6">
+      <div>
+        <p class="text-[9px] font-black text-[#22c55e] uppercase tracking-widest">My Performance</p>
+        <h4 class="text-sm font-black text-white tracking-tight mt-0.5">${myName}</h4>
       </div>
       <div class="text-right">
         <p class="text-[9px] font-black text-white/40 uppercase tracking-widest">現在の順位</p>
