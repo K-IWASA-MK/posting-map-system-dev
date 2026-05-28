@@ -137,8 +137,8 @@ async function processQueue() {
           await dequeueSync(item.id);
           
           // メモリ上のローカルキャッシュ(allPoints)を同期
-          if (window.allPoints) {
-            const p = window.allPoints.find(point => point.rowId === item.rowId);
+          if (typeof allPoints !== 'undefined' && allPoints) {
+            const p = allPoints.find(point => point.rowId === item.rowId); // let変数は window に付かないため直接参照
             if (p) {
               // GASから返却されるのはfileId（非公開）なのでphotoUrlとして保持
               p.photoUrl = res.photoUrl || '';

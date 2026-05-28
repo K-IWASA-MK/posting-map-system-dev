@@ -381,12 +381,12 @@ function compressImage(file) {
 }
 
 window.triggerUISyncRefresh = async function() {
-  if (!window.allPoints) return;
+  if (!allPoints || allPoints.length === 0) return; // let変数は window に付かないため直接参照
   if (typeof getQueue !== 'function') return;
   
   try {
     const queue = await getQueue();
-    window.allPoints.forEach(p => {
+    allPoints.forEach(p => {
       const found = queue.find(q => q.rowId === p.rowId);
       if (found) {
         p.syncStatus = found.status; // 'pending' | 'sending' | 'failed'
@@ -403,7 +403,7 @@ window.triggerUISyncRefresh = async function() {
 
     // 開いている詳細モーダルの再描画
     if (window.currentPointDetailRowId) {
-      const p = window.allPoints.find(point => point.rowId === window.currentPointDetailRowId);
+      const p = allPoints.find(point => point.rowId === window.currentPointDetailRowId);
       const modalContent = $('detail-modal-content');
       if (p && modalContent && typeof renderDetailModalContent === 'function') {
         modalContent.innerHTML = renderDetailModalContent(p);
@@ -416,7 +416,7 @@ window.triggerUISyncRefresh = async function() {
 
 // 後から写真を追加・変更する処理
 async function addPhotoToDetail(rowId) {
-  const p = window.allPoints.find(point => point.rowId === rowId);
+  const p = allPoints.find(point => point.rowId === rowId); // let変数は window に付かないため直接参照
   if (!p) return;
   const areaName = window.currentCityDetailAreaName || '';
   
@@ -715,6 +715,14 @@ async function switchPage(id, force = false) {
 // 下ナビの「エリア」ボタンタップ時に直前のサブページへ戻る
 function navigateToAreaTab() {
   switchPage(lastAreaSubPage);
+}
+
+// 2層目（エリア一覧）から1層目（市区町村一覧）へ戻る
+function backToCityList() {
+  currentCity = null;
+  renderAreas();
+  const contentEl = $('content');
+  if (contentEl) contentEl.scrollTop = 0;
 }
 
 function updateStats() {
