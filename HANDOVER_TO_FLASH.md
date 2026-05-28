@@ -1,8 +1,57 @@
-# 開発引き継ぎ事項 (更新: 2026-05-28 v313)
+# 開発引き継ぎ事項 (更新: 2026-05-29 v316)
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
 ---
+
+## ⚠️ 最重要：GAS Drive権限の教訓（2026-05-29 発生・解決済み）
+
+### 何が起きたか
+写真をGoogle Driveに保存する機能を実装したが、**何日経っても写真がDriveに届かなかった**。
+
+### 根本原因
+**GAS の OAuth スコープ固着問題**
+
+```
+① 最初のGASセットアップ時（Flash担当）
+   → DriveApp を使うコードなし
+   → 認証スコープ = Spreadsheets + Script のみ
+   → appsscript.json にスコープ明示なし
+
+② 後から DriveApp.createFile() を追加（写真機能）
+   → clasp push + clasp deploy は成功
+   → しかし既存の認証トークンがそのまま使われ続けた
+   → Driveスコープが追加されたのに認証ダイアログが出なかった
+
+③ 結果
+   → DriveApp.Folder.createFile() を呼び出す権限がありません
+   → 写真はIndexedDBに保存されるがDriveに届かない
+```
+
+### 解決手順
+1. `appsscript.json` に `oauthScopes` を明示的に追加（**現在適用済み**）：
+   ```json
+   "oauthScopes": [
+     "https://www.googleapis.com/auth/spreadsheets",
+     "https://www.googleapis.com/auth/drive",
+     "https://www.googleapis.com/auth/script.external_request",
+     "https://www.googleapis.com/auth/userinfo.email"
+   ]
+   ```
+2. `https://myaccount.google.com/permissions` で「ポスティングコード」の権限を全削除（リセット）
+3. GASエディタで `authorizeAndTestDriveWrite()` を実行 → 全スコープ認証ダイアログ → 許可
+4. `testDriveWrite` エンドポイントで確認 → `"Write OK"` ✅
+
+### 今後の鉄則
+**新しいGoogleサービスをGASに追加したとき（DriveApp, GmailApp, CalendarApp等）は必ず：**
+1. `appsscript.json` の `oauthScopes` に追加
+2. `myaccount.google.com/permissions` で古い認証を削除
+3. GASエディタで再実行して再認証
+
+**これを怠ると、コードは正しくてもAPIが黙って失敗し続ける。**
+
+---
+
 
 ## 1. プロジェクト概要
 
