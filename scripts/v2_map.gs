@@ -92,7 +92,8 @@ function createSystemCacheSheet() {
   const exclude = [
     CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE,
     CONFIG.SHEET_POSTAL, CONFIG.SHEET_DISTRICT, CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL, CONFIG.SHEET_SYSTEM_CACHE
+    CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL, CONFIG.SHEET_SYSTEM_CACHE,
+    \"__TEMP_ADDRESSES__\" // バッチ一時シート（完了前に残った場合も除外）
   ];
 
   const areaSheets = ss.getSheets().filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden());

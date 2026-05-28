@@ -149,7 +149,8 @@ function refreshRankingCache() {
     CONFIG.SHEET_MASTER_EXPORT,
     CONFIG.SHEET_REPORT,
     CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_SYSTEM_CACHE
+    CONFIG.SHEET_SYSTEM_CACHE,
+    \"__TEMP_ADDRESSES__\" // バッチ一時シート（完了前に残った場合も除外）
   ];
 
   let staffRanking = {}; // { 名前: 合計枚数 }

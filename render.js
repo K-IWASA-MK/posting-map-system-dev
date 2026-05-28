@@ -112,7 +112,11 @@ function renderAreas() {
 function selectCity(cityName) {
   currentCity = cityName;
   renderAreas();
-  const contentEl = $('content'// Open point detail modal
+  const contentEl = $('content');
+  if (contentEl) contentEl.scrollTop = 0;
+}
+
+// Open point detail modal
 function openPointDetailModal(rowId) {
   const p = allPoints.find(point => point.rowId === rowId);
   if (!p) return;
