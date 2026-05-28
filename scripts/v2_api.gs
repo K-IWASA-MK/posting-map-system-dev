@@ -64,6 +64,22 @@ function doGet(e) {
       case 'registerStaff':
         response = registerStaff(e.parameter.lastName, e.parameter.firstName);
         break;
+      case 'testDriveAccess':
+        // Driveフォルダアクセステスト（診断用）
+        try {
+          const testFolderId = CONFIG.STORAGE_PARENT_ID;
+          const testFolder = DriveApp.getFolderById(testFolderId);
+          response = {
+            success: true,
+            message: 'Drive access OK',
+            folderId: testFolderId,
+            folderName: testFolder.getName(),
+            folderUrl: testFolder.getUrl()
+          };
+        } catch (driveErr) {
+          response = { success: false, message: 'Drive access FAILED: ' + driveErr.toString(), folderId: CONFIG.STORAGE_PARENT_ID };
+        }
+        break;
       default:
         response = { success: true, message: 'POSTING MAP API is online.' };
     }
