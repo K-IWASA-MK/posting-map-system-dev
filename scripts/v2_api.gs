@@ -80,6 +80,19 @@ function doGet(e) {
           response = { success: false, message: 'Drive access FAILED: ' + driveErr.toString(), folderId: CONFIG.STORAGE_PARENT_ID };
         }
         break;
+      case 'testDriveWrite':
+        // Driveファイル書き込みテスト（診断用）
+        try {
+          const wFolder = DriveApp.getFolderById(CONFIG.STORAGE_PARENT_ID);
+          const testBlob = Utilities.newBlob("POSTING_MAP_TEST_" + Date.now(), "text/plain", "test_write.txt");
+          const file = wFolder.createFile(testBlob);
+          response = { success: true, message: 'Write OK', fileId: file.getId(), fileName: file.getName() };
+          // テストファイルはすぐ削除
+          file.setTrashed(true);
+        } catch (writeErr) {
+          response = { success: false, message: 'Write FAILED: ' + writeErr.toString() };
+        }
+        break;
       default:
         response = { success: true, message: 'POSTING MAP API is online.' };
     }
