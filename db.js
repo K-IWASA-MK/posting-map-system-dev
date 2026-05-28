@@ -144,10 +144,15 @@ async function processQueue() {
               p.photoUrl = res.photoUrl || '';
               // ローカルBlobプレビューは送信完了後にクリア
               delete p.tempPhotoUrl;
-              // UI再描画: 📸 PHOTO SENT バッジが表示される
-              const card = document.getElementById(`point-card-${item.rowId}`);
-              if (card && typeof renderPointCardHtml === 'function') {
-                card.innerHTML = renderPointCardHtml(item.areaName, p);
+              // UI再描画: リスト全体と、開いている詳細モーダルを更新
+              if (typeof renderDetailList === 'function') {
+                renderDetailList(item.areaName);
+              }
+              if (window.currentPointDetailRowId === item.rowId) {
+                const modalContent = document.getElementById('detail-modal-content');
+                if (modalContent && typeof renderDetailModalContent === 'function') {
+                  modalContent.innerHTML = renderDetailModalContent(p);
+                }
               }
             }
           }

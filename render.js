@@ -112,19 +112,33 @@ function renderAreas() {
 function selectCity(cityName) {
   currentCity = cityName;
   renderAreas();
-  const contentEl = $('content');
-  if (contentEl) contentEl.scrollTop = 0;
+  const contentEl = $('content'// Open point detail modal
+function openPointDetailModal(rowId) {
+  const p = allPoints.find(point => point.rowId === rowId);
+  if (!p) return;
+
+  window.currentPointDetailRowId = rowId;
+  const modalContent = $('detail-modal-content');
+  if (modalContent) {
+    modalContent.innerHTML = renderDetailModalContent(p);
+  }
+
+  const modal = $('detail-modal');
+  modal.classList.remove('pointer-events-none', 'opacity-0');
+  modal.firstElementChild.classList.remove('translate-y-full');
 }
 
-function backToCityList() {
-  currentCity = null;
-  renderAreas();
-  const contentEl = $('content');
-  if (contentEl) contentEl.scrollTop = 0;
+// Close point detail modal
+function closeDetailModal() {
+  const modal = $('detail-modal');
+  if (!modal) return;
+  modal.classList.add('opacity-0', 'pointer-events-none');
+  modal.firstElementChild.classList.add('translate-y-full');
+  window.currentPointDetailRowId = null;
 }
 
-// Render single card contents
-function renderPointCardHtml(areaName, p) {
+// Render single point detail modal contents
+function renderDetailModalContent(p) {
   const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
   const myId = userInfo.id || '';
   const myName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
@@ -135,59 +149,94 @@ function renderPointCardHtml(areaName, p) {
     (!p.staffId && p.staffName && p.staffName !== myName)
   );
 
-  // 非同期送信ステータスバッジの設計
+  // GPS接続バッジ
+  let gpsBadgeHtml = '';
+  if (p.isDone) {
+    if (p.gps) {
+      gpsBadgeHtml = `
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[9px] font-black text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-full tracking-wider">
+          <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse shadow-[0_0_6px_#22c55e]"></span>
+          GPS SECURED
+        </span>
+      `;
+    } else {
+      gpsBadgeHtml = `
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[9px] font-black text-white/30 bg-white/5 border border-white/10 rounded-full tracking-wider">
+          NO GPS DATA
+        </span>
+      `;
+    }
+  }
+
+  // 非同期送信ステータスバッジ
   let syncLabelHtml = '';
   if (p.isDone) {
     if (p.syncStatus === 'sending') {
-      syncLabelHtml = `<span class="text-[8px] font-black text-[#2563eb] animate-pulse ml-2 tracking-widest bg-[#2563eb]/10 px-2 py-0.5 rounded-full">FIELD DATA SYNCING...</span>`;
+      syncLabelHtml = `<span class="text-[8px] font-black text-[#2563eb] animate-pulse tracking-widest bg-[#2563eb]/10 px-2 py-0.5 rounded-full ml-auto">FIELD DATA SYNCING...</span>`;
     } else if (p.syncStatus === 'failed') {
-      syncLabelHtml = `<span class="text-[8px] font-black text-red-500 animate-pulse ml-2 tracking-widest bg-red-500/10 px-2 py-0.5 rounded-full">UPLOAD RETRYING...</span>`;
+      syncLabelHtml = `<span class="text-[8px] font-black text-red-500 animate-pulse tracking-widest bg-red-500/10 px-2 py-0.5 rounded-full ml-auto">UPLOAD RETRYING...</span>`;
     } else if (p.syncStatus === 'pending') {
-      syncLabelHtml = `<span class="text-[8px] font-black text-white/40 animate-pulse ml-2 tracking-widest bg-white/5 px-2 py-0.5 rounded-full">SYNC PENDING...</span>`;
+      syncLabelHtml = `<span class="text-[8px] font-black text-white/40 animate-pulse tracking-widest bg-white/5 px-2 py-0.5 rounded-full ml-auto">SYNC PENDING...</span>`;
     }
   }
 
   // 🔒アイコン
   const lockIconHtml = isOtherStaff ? `<span class="text-xs mr-1">🔒</span>` : '';
 
-  // テンポラリ表示用写真URLの取得
-  // photoUrl (r[9]) はDriveのfileId（非公開）のためサムネイルは表示しない
-  // 送信直後のtempPhotoUrl（メモリ上のblob URL）のみ一時表示
+  // 写真表示・追加・変更ブロック
   const photoId = p.photoUrl || '';
   const tempUrl = p.tempPhotoUrl || '';
   let photoBlockHtml = '';
-  if (tempUrl) {
-    // 送信直後のローカルBlobプレビュー（リロードすると消える）
-    photoBlockHtml = `
-    <div class="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center my-3">
-      <img src="${tempUrl}" class="w-full h-full object-cover">
-    </div>
-  `;
-  } else if (photoId) {
-    // リロード後：完全非公開ファイルのため、📸 PHOTO SENT バッジで状態を通知
-    photoBlockHtml = `
-    <div class="flex items-center gap-2 my-2 px-3 py-2 rounded-xl bg-[#2563eb]/08 border border-[#2563eb]/15">
-      <span class="text-sm">📸</span>
-      <span class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO SENT</span>
-    </div>
-  `;
+  if (p.isDone) {
+    if (tempUrl) {
+      photoBlockHtml = `
+        <div class="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+          <img src="${tempUrl}" class="w-full h-full object-cover">
+        </div>
+      `;
+    } else if (photoId) {
+      photoBlockHtml = `
+        <div class="flex items-center justify-between p-4 rounded-2xl bg-[#2563eb]/05 border border-[#2563eb]/15">
+          <div class="flex items-center gap-2">
+            <span class="text-sm">📸</span>
+            <span class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO SENT</span>
+          </div>
+          ${!isOtherStaff ? `
+            <button onclick="addPhotoToDetail(${p.rowId})" class="text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 px-3 py-1.5 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">写真を変更</button>
+          ` : ''}
+        </div>
+      `;
+    } else {
+      photoBlockHtml = `
+        <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-white/30">📸</span>
+            <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
+          </div>
+          ${!isOtherStaff ? `
+            <button onclick="addPhotoToDetail(${p.rowId})" class="text-[10px] font-black text-white/80 uppercase tracking-wider bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 active:scale-95 transition-all">📸 写真を追加</button>
+          ` : ''}
+        </div>
+      `;
+    }
   }
 
   // ロック状態によるスタイル分岐
   const labelClasses = isOtherStaff
     ? "rounded-3xl p-5 flex items-center gap-5 cursor-default bg-white/[0.01] border border-white/[0.03]"
-    : `rounded-3xl p-5 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all`;
+    : `rounded-3xl p-5 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all bg-white/5 border border-white/10`;
   
   const labelStyle = !isOtherStaff && p.isDone
     ? 'background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);'
     : '';
 
+  const areaName = window.currentCityDetailAreaName || '';
+
   return `
     <div class="flex justify-between items-start gap-4">
-      <div class="flex-1 space-y-2">
-        <div class="text-lg font-black text-white tracking-tight leading-tight">${p.address}</div>
-        ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5">${p.memo}</div>` : ''}
-        ${photoBlockHtml}
+      <div class="flex-1 space-y-2 min-w-0">
+        <div class="text-lg font-black text-white tracking-tight leading-tight select-text">${p.address}</div>
+        ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5 select-text">${p.memo}</div>` : ''}
       </div>
       <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
     </div>
@@ -198,21 +247,29 @@ function renderPointCardHtml(areaName, p) {
         <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(255,255,255,0.2); background-color: transparent;'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0">
           ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
         </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center flex-wrap gap-1">
-            ${lockIconHtml}
-            <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">
-              ${p.isDone ? 'MISSION COMPLETED' : 'READY TO DEPLOY'}
-            </span>
-            ${syncLabelHtml}
+        <div class="flex-1 min-w-0 flex items-center justify-between">
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-1">
+              ${lockIconHtml}
+              <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">
+                ${p.isDone ? 'MISSION COMPLETED' : 'READY TO DEPLOY'}
+              </span>
+            </div>
+            ${p.isDone && p.completedAt ? `
+              <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">${formatCompletedAt(p.completedAt)} ${p.staffName ? `· ${p.staffName}` : ''}</div>
+            ` : ''}
           </div>
-          ${p.isDone && p.completedAt ? `
-            <div class="text-[10px] text-white/40 font-bold mt-0.5 tracking-wider uppercase">${formatCompletedAt(p.completedAt)} ${p.staffName ? `· ${p.staffName}` : ''}</div>
-          ` : ''}
+          ${syncLabelHtml}
         </div>
       </label>
 
       ${p.isDone ? `
+        <div class="flex flex-wrap items-center gap-2">
+          ${gpsBadgeHtml}
+        </div>
+        
+        ${photoBlockHtml}
+
         <div class="flex justify-between items-center bg-white/5 border border-white/5 rounded-2xl p-5">
           <div class="flex items-baseline">
             <span class="text-3xl font-black text-white tracking-tight">${p.count || 0}</span>
@@ -227,12 +284,26 @@ function renderPointCardHtml(areaName, p) {
   `;
 }
 
-// Render the entire details list using global allPoints
+// Render the entire details list using global allPoints (1-line simple card)
 function renderDetailList(areaName) {
-  const cardsHtml = allPoints.map((p, i) => `
-    <div id="point-card-${p.rowId}" class="premium-glass p-8 space-y-6">
-      ${renderPointCardHtml(areaName, p)}
-    </div>`).join('');
+  const cardsHtml = allPoints.map((p, i) => {
+    const statusDot = p.isDone 
+      ? 'background-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);' 
+      : 'background-color: rgba(255, 255, 255, 0.2);';
+    const statusText = p.isDone ? '完了' : '未完了';
+    const statusColor = p.isDone ? 'text-[#10b981]' : 'text-white/40';
+    return `
+      <div class="clickable-card premium-glass p-5 flex items-center justify-between gap-4" onclick="openPointDetailModal(${p.rowId})">
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-black text-white truncate leading-tight">${p.address}</div>
+          <div class="text-[9px] font-bold ${statusColor} uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
+            <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
+            ${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}
+          </div>
+        </div>
+        <div class="text-white/30 text-lg shrink-0">›</div>
+      </div>`;
+  }).join('');
 
   // リストの最下部（左下）に戻るボタンを追加
   const bottomBackButtonHtml = `
@@ -241,7 +312,7 @@ function renderDetailList(areaName) {
     </div>
   `;
 
-  $('detail-list').innerHTML = cardsHtml + bottomBackButtonHtml;
+  $('detail-list').innerHTML = `<div class="space-y-4">${cardsHtml}</div>` + bottomBackButtonHtml;
 }
 
 async function openDetail(name) {
@@ -294,10 +365,13 @@ function toggleDone(areaName, rowId, checkbox) {
     delete p.syncStatus;
     delete p.tempPhotoUrl;
     
-    // Update local card
-    const card = $(`point-card-${rowId}`);
-    if (card) {
-      card.innerHTML = renderPointCardHtml(areaName, p);
+    // Update local card list
+    renderDetailList(areaName);
+    
+    // Update active modal content
+    const modalContent = $('detail-modal-content');
+    if (modalContent) {
+      modalContent.innerHTML = renderDetailModalContent(p);
     }
     
     // Send update to server

@@ -380,7 +380,6 @@ function compressImage(file) {
   });
 }
 
-// UI上の同期状態を全カードへ伝搬・再描画する
 window.triggerUISyncRefresh = async function() {
   if (!window.allPoints) return;
   if (typeof getQueue !== 'function') return;
@@ -394,16 +393,70 @@ window.triggerUISyncRefresh = async function() {
       } else {
         delete p.syncStatus;
       }
-      
-      const card = document.getElementById(`point-card-${p.rowId}`);
-      if (card && typeof renderPointCardHtml === 'function') {
-        card.innerHTML = renderPointCardHtml(window.currentCityDetailAreaName || '', p);
-      }
     });
+    
+    // リスト全体の再描画
+    const areaName = window.currentCityDetailAreaName || '';
+    if (areaName) {
+      renderDetailList(areaName);
+    }
+
+    // 開いている詳細モーダルの再描画
+    if (window.currentPointDetailRowId) {
+      const p = window.allPoints.find(point => point.rowId === window.currentPointDetailRowId);
+      const modalContent = $('detail-modal-content');
+      if (p && modalContent && typeof renderDetailModalContent === 'function') {
+        modalContent.innerHTML = renderDetailModalContent(p);
+      }
+    }
   } catch (err) {
     console.error("triggerUISyncRefresh error:", err);
   }
 };
+
+// 後から写真を追加・変更する処理
+async function addPhotoToDetail(rowId) {
+  const p = window.allPoints.find(point => point.rowId === rowId);
+  if (!p) return;
+  const areaName = window.currentCityDetailAreaName || '';
+  
+  const imageBlob = await capturePhoto();
+  if (!imageBlob) return;
+  
+  // ローカルBlobプレビューを即座に適用
+  p.tempPhotoUrl = URL.createObjectURL(imageBlob);
+  renderDetailList(areaName);
+  const modalContent = $('detail-modal-content');
+  if (modalContent) {
+    modalContent.innerHTML = renderDetailModalContent(p);
+  }
+  
+  // 非同期でIndexedDB送信キューに登録
+  const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+  const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+  const staffId = userInfo.id || '';
+  
+  if (typeof enqueueSync === 'function') {
+    p.syncStatus = 'pending';
+    if (modalContent) {
+      modalContent.innerHTML = renderDetailModalContent(p);
+    }
+    
+    const gps = p.gps ? { latitude: p.gps.split(',')[0], longitude: p.gps.split(',')[1] } : { latitude: '', longitude: '' };
+    
+    await enqueueSync({
+      areaName,
+      rowId,
+      isDone: true,
+      count: p.count || 0,
+      latitude: gps.latitude,
+      longitude: gps.longitude,
+      imageBlob,
+      staffName,
+      staffId
+    });
+  }
+}
 
 function pressNum(key) {
   if (!numpadContext) return;
@@ -429,9 +482,11 @@ function pressNum(key) {
       p.completedAt = timeStr;
       p.syncStatus = 'pending';
       
-      const card = $(`point-card-${rowId}`);
-      if (card) {
-        card.innerHTML = renderPointCardHtml(areaName, p);
+      // リストと詳細モーダルを再描画
+      renderDetailList(areaName);
+      const modalContent = $('detail-modal-content');
+      if (modalContent) {
+        modalContent.innerHTML = renderDetailModalContent(p);
       }
     }
     
@@ -441,18 +496,26 @@ function pressNum(key) {
     // 2. バックグラウンドで非同期にGPS取得と写真撮影・キューイングを行う
     (async () => {
       const gps = await getGPSLocation();
-      let imageBlob = null;
+      if (p && gps.latitude && gps.longitude) {
+        p.gps = `${gps.latitude},${gps.longitude}`;
+        const modalContent = $('detail-modal-content');
+        if (modalContent) {
+          modalContent.innerHTML = renderDetailModalContent(p);
+        }
+      }
       
+      let imageBlob = null;
       if (confirm("投函証明写真を追加しますか？")) {
         imageBlob = await capturePhoto();
       }
       
-      // 撮影直後にローカルBlobプレビューをカードへ反映
+      // 撮影直後にローカルBlobプレビューを反映
       if (imageBlob && p) {
         p.tempPhotoUrl = URL.createObjectURL(imageBlob);
-        const card = $(`point-card-${rowId}`);
-        if (card && typeof renderPointCardHtml === 'function') {
-          card.innerHTML = renderPointCardHtml(areaName, p);
+        renderDetailList(areaName);
+        const modalContent = $('detail-modal-content');
+        if (modalContent) {
+          modalContent.innerHTML = renderDetailModalContent(p);
         }
       }
       
