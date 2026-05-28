@@ -133,10 +133,19 @@ function renderPointCardHtml(areaName, p) {
 
 // Render the entire details list using global allPoints
 function renderDetailList(areaName) {
-  $('detail-list').innerHTML = allPoints.map((p, i) => `
+  const cardsHtml = allPoints.map((p, i) => `
     <div id="point-card-${p.rowId}" class="premium-glass p-8 space-y-6">
       ${renderPointCardHtml(areaName, p)}
     </div>`).join('');
+
+  // リストの最下部（左下）に戻るボタンを追加
+  const bottomBackButtonHtml = `
+    <div class="flex items-center justify-start mt-8 pb-10">
+      <button onclick="switchPage('areas')" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+    </div>
+  `;
+
+  $('detail-list').innerHTML = cardsHtml + bottomBackButtonHtml;
 }
 
 async function openDetail(name) {
