@@ -80,8 +80,9 @@ function doGet(e) {
 function doPost(e) {
   let postData;
   try {
-    // JSONとフォーム送信(urlencoded)でパース方法を安全に切り分け
-    if (e.postData && e.postData.contents && e.postData.type === 'application/json') {
+    // Content-Typeに依存せずbodyのJSONパースを試みる
+    // (フロントエンドはCORSプリフライト回避のためContent-Type未指定で送信)
+    if (e.postData && e.postData.contents) {
       postData = JSON.parse(e.postData.contents);
     } else {
       postData = e.parameter;

@@ -131,8 +131,8 @@ async function processQueue() {
           staffId: item.staffId
         };
 
-        // app.jsのcallApiを呼び出す
-        const res = await callApi('updateRecordWithGPSPhoto', payload);
+        // 写真データはURL長制限を超えるためPOSTで送信
+        const res = await callApiPost('updateRecordWithGPSPhoto', payload);
         if (res && res.success) {
           await dequeueSync(item.id);
           

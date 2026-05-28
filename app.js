@@ -116,6 +116,59 @@ async function callApi(action, params = {}) {
   }
 }
 
+/**
+ * 写真アップロードなど大容量データ用 POST API呼び出し
+ * Content-Type未指定（text/plain扱い）でCORSプリフライトを回避しながらJSONボディを送信
+ */
+async function callApiPost(action, payload = {}) {
+  const MAX_RETRIES = 3;
+  let delay = 1000;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const url = `${API_URL}?_t=${Date.now()}`; // actionはbodyに含める
+    const body = JSON.stringify({ action, ...payload });
+
+    const options = {
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'omit',
+      cache: 'no-store',
+      redirect: 'follow'
+      // Content-Typeを設定しない → text/plain扱い → CORSプリフライト不要
+    };
+
+    try {
+      logDebug(`[callApiPost] START (Attempt ${attempt}/${MAX_RETRIES}): action=${action}, bodySize=${body.length}`);
+      const response = await fetch(url, { ...options, body });
+      logDebug(`[callApiPost] FETCH OK. status=${response.status}`);
+
+      if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+
+      const text = await response.text();
+      logDebug(`[callApiPost] TEXT RECEIVED (length=${text.length})`);
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        throw new Error("JSON形式ではない応答を受け取りました: " + parseErr.message);
+      }
+
+      if (data.success === false) throw new Error(data.message || "API Error");
+      return data;
+    } catch (err) {
+      logDebug(`[callApiPost] Attempt ${attempt} failed: ${err.message}`);
+      if (attempt === MAX_RETRIES) {
+        console.error("API POST Error:", err);
+        alert("通信エラーが発生しました。\n内容: " + err.message);
+        throw err;
+      }
+      await new Promise(r => setTimeout(r, delay));
+      delay *= 2;
+    }
+  }
+}
+
 function startApp(profile = null) {
   $('screen-gateway').classList.add('hidden');
   $('loading').classList.remove('hidden');
