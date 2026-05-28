@@ -106,7 +106,7 @@ if [[ "$EXECUTE" == true ]]; then
     echo -e "${GREEN}✅ ローカル履歴のクリーンアップ完了${RESET}"
   else
     echo -e "${YELLOW}  BFGはベアクローンが必要です。手動手順を参照してください:${RESET}"
-    echo -e "  📄 EMERGENCY_REMOVE_SECRET.md の STEP 2 → 方法A"
+    echo -e "  📄 docs/security/EMERGENCY_REMOVE_SECRET.md の STEP 2 → 方法A"
   fi
 
   # ── STEP 4: 強制プッシュ確認 ────────────────────────────
