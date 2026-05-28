@@ -171,7 +171,6 @@ async function openDetail(name) {
   try {
     const data = await callApi('getAreaDetails', { name: name });
     if (data && data.points) {
-      $('detail-title').textContent = name;
       allPoints = data.points;
       renderDetailList(name);
       
