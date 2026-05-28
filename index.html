@@ -23,7 +23,7 @@
 
 
   </script>
-  <!-- Force Refresh: v298 (2026-05-28T13:05:00) -->
+  <!-- Force Refresh: v299 (2026-05-28T13:16:00) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="apple-touch-icon" href="./assets/icon180-v2.png?v=258">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
     }, { passive: false });
   </script>
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="./style.css?v=298">
+  <link rel="stylesheet" href="./style.css?v=299">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -197,7 +197,9 @@
   <!-- 5. ID INFO MODAL -->
   <div id="id-info-modal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="closeIdInfoModal()">
     <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 flex flex-col items-center text-center space-y-4 max-h-[50dvh]" onclick="event.stopPropagation()">
-      <div class="w-12 h-1 bg-white/10 rounded-full mb-1 shrink-0"></div>
+      <div onclick="closeIdInfoModal(); event.stopPropagation();" class="py-3 px-6 cursor-pointer shrink-0 -mt-3 flex items-center justify-center">
+        <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+      </div>
       
       <!-- タイトル (上部に固定) -->
       <h4 id="id-info-title" class="font-black text-white text-[12px] uppercase tracking-wider shrink-0 w-full text-left"></h4>
@@ -209,7 +211,7 @@
     </div>
   </div>
 
-  <script defer src="./app.js?v=298"></script>
-  <script defer src="./render.js?v=298"></script>
+  <script defer src="./app.js?v=299"></script>
+  <script defer src="./render.js?v=299"></script>
 </body>
 </html>
