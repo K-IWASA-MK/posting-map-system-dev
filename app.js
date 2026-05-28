@@ -805,7 +805,36 @@ const ID_INFO_DATA = {
     title: 'License',
     body: `
       <div class="space-y-4 text-[11px] leading-relaxed text-white/50 select-none">
-        <p>STANDARD LICENSE<br>© FIELD OPERATIONS All Rights Reserved.</p>
+        <p class="text-white font-bold">FIELD OPERATIONS LICENSE</p>
+        
+        <p class="text-white/60 font-black">LICENSED ORGANIZATION<br>【__BRANCH_NAME__】</p>
+
+        <div class="space-y-1">
+          <p class="text-white/70 font-black">AUTHORIZED SYSTEMS：</p>
+          <div class="pl-3 text-white/40 space-y-0.5">
+            <div>・STAFF APP</div>
+            <div>・ADMIN CONTROL</div>
+            <div>・HQ MONITORING</div>
+            <div>・REALTIME FIELD SYNC</div>
+          </div>
+        </div>
+
+        <p class="text-white/60 font-black">LICENSE STATUS:<br><span class="text-emerald-500/80 font-black">ACTIVE</span></p>
+
+        <p class="text-white/40">本ライセンスは、契約地域内のみ有効です。<br>地域外利用・再配布は禁止します。</p>
+
+        <div class="space-y-1">
+          <p class="text-white/70 font-black">POSTING MAP は：</p>
+          <div class="pl-3 text-white/40 space-y-0.5">
+            <div>・LINE認証</div>
+            <div>・STAFF ID</div>
+            <div>・ライセンス管理</div>
+            <div>・権限制御</div>
+          </div>
+          <p class="text-white/40">により、FIELD OPERATIONS を保護します。</p>
+        </div>
+
+        <p class="text-white/40 pt-2 border-t border-white/5">LICENSED FIELD OPERATIONS SYSTEM<br>© POSTING MAP</p>
       </div>
     `
   }
@@ -826,8 +855,16 @@ function openIdInfoModal(type, event) {
   
   if (titleEl) titleEl.textContent = data.title;
   if (bodyEl) {
-    // 改行コードを <br> に変換して反映
-    bodyEl.innerHTML = data.body.replace(/\n/g, '<br>');
+    let bodyText = data.body;
+    
+    // ライセンス表示時のみ、支部名を動的に差し替える
+    if (type === 'license') {
+      const rawBranch = localStorage.getItem('branch_name') || '';
+      const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : 'MIE-02 支部';
+      bodyText = bodyText.replace('__BRANCH_NAME__', displayBranch);
+    }
+    
+    bodyEl.innerHTML = bodyText;
   }
   
   modal.classList.remove('pointer-events-none', 'opacity-0');
