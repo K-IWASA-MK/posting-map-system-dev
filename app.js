@@ -736,15 +736,52 @@ safeInitApp();
 const ID_INFO_DATA = {
   terms: {
     title: 'Terms of Service',
-    body: '利用規約は準備中です。本プラットフォームの利用における標準運用規約が適用されます。'
+    body: `
+      <div class="space-y-4 text-[11px] leading-relaxed text-white/50 select-none">
+        <p>POSTING MAP は、<br>認証された配布員・管理者向けの<br><span class="text-white font-bold">FIELD OPERATIONS SYSTEM</span> です。</p>
+        
+        <div class="space-y-1">
+          <p class="text-white/70 font-black">本システムは：</p>
+          <div class="pl-3 text-white/40 space-y-0.5">
+            <div>・配布進捗</div>
+            <div>・エリア管理</div>
+            <div>・GPSログ</div>
+            <div>・活動データ</div>
+            <div>・ランキング</div>
+          </div>
+          <p class="text-white/40">をリアルタイム管理します。</p>
+        </div>
+
+        <div class="space-y-1">
+          <p class="text-white/70 font-black">本システムの：</p>
+          <div class="pl-3 text-white/40 space-y-0.5">
+            <div>・無断複製</div>
+            <div>・再配布</div>
+            <div>・不正利用</div>
+            <div>・地域外利用</div>
+          </div>
+          <p class="text-white/40">を禁止します。</p>
+        </div>
+
+        <p class="text-white/40 pt-2 border-t border-white/5">各地域ライセンスは、<br>契約支部・契約組織にのみ付与されます。</p>
+      </div>
+    `
   },
   privacy: {
     title: 'Privacy Policy',
-    body: 'プライバシーポリシーは準備中です。位置情報および配布データは保護され、運用目的以外には使用されません。'
+    body: `
+      <div class="space-y-4 text-[11px] leading-relaxed text-white/50 select-none">
+        <p>プライバシーポリシーは準備中です。位置情報および配布データは保護され、運用目的以外には使用されません。</p>
+      </div>
+    `
   },
   license: {
     title: 'License',
-    body: 'STANDARD LICENSE\n© FIELD OPERATIONS All Rights Reserved.'
+    body: `
+      <div class="space-y-4 text-[11px] leading-relaxed text-white/50 select-none">
+        <p>STANDARD LICENSE<br>© FIELD OPERATIONS All Rights Reserved.</p>
+      </div>
+    `
   }
 };
 
