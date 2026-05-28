@@ -347,9 +347,9 @@ function renderRanking() {
       </div>
       <div class="text-right">
         <p class="text-[9px] font-black text-white/40 uppercase tracking-widest">現在の順位</p>
-        <p class="text-2xl font-mono font-black text-white tracking-tighter mt-0.5">
-          ${myRank === "圏外" ? '<span class="text-base font-black text-white/40">圏外</span>' : `${myRank}<span class="text-xs text-white/50 font-bold ml-1">位</span>`}
-        </p>
+        <h4 class="text-sm font-black text-white tracking-tight mt-0.5">
+          ${myRank === "圏外" ? '<span class="text-white/40">圏外</span>' : `${myRank}<span class="text-xs text-white/60 ml-0.5">位</span>`}
+        </h4>
       </div>
     </div>
   ` : '';
