@@ -488,13 +488,14 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
       // 2. 写真のGoogleドライブ保存 (J列: 10列目)
       if (photoData && photoData.indexOf("data:image") === 0) {
         try {
-          const folderName = "PostingMapPhotos";
+          const parentFolderId = CONFIG.STORAGE_PARENT_ID || "1c62olbuKpFr80IYGnsTXxcGr99S9lfN7";
+          const parentFolder = DriveApp.getFolderById(parentFolderId);
+          const folders = parentFolder.getFoldersByName("evidence");
           let folder;
-          const folders = DriveApp.getFoldersByName(folderName);
           if (folders.hasNext()) {
             folder = folders.next();
           } else {
-            folder = DriveApp.createFolder(folderName);
+            folder = parentFolder.createFolder("evidence");
           }
           
           // 自己記述型ファイル名の作成: [地区名]_配布員名_時刻.jpg
@@ -508,8 +509,8 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
           const blob = Utilities.newBlob(decoded, "image/jpeg", fileName);
           
           const file = folder.createFile(blob);
-          file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-          photoUrl = file.getUrl();
+          // 完全非公開で保存するため、setSharing は行わない
+          photoUrl = file.getId();
           s.getRange(rowId, 10).setValue(photoUrl);
         } catch (driveErr) {
           console.error("Google Drive Save Error:", driveErr);

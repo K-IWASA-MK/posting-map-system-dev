@@ -244,3 +244,94 @@ function checkEndOfMonthAndReset() {
     }
   }
 }
+
+// =============================================
+// Drive写真 自動整理バッチ
+// - 90日超: /evidence → /archive へ移動
+// - 180日超: /archive 内ファイルをゴミ箱へ
+// =============================================
+
+/**
+ * Googleドライブの証拠写真を自動整理する。
+ * setupCleanupTrigger() で毎日深夜2〜3時に自動実行される。
+ */
+function cleanupDrivePhotos() {
+  const parentFolderId = CONFIG.STORAGE_PARENT_ID || "1c62olbuKpFr80IYGnsTXxcGr99S9lfN7";
+  let parentFolder;
+  try {
+    parentFolder = DriveApp.getFolderById(parentFolderId);
+  } catch (e) {
+    console.error("cleanupDrivePhotos: parent folder not found:", e);
+    return;
+  }
+
+  const now = new Date();
+  const MS_90_DAYS  = 90  * 24 * 60 * 60 * 1000;
+  const MS_180_DAYS = 180 * 24 * 60 * 60 * 1000;
+
+  // --- /evidence フォルダを取得 ---
+  const evidenceFolders = parentFolder.getFoldersByName("evidence");
+  if (evidenceFolders.hasNext()) {
+    const evidenceFolder = evidenceFolders.next();
+
+    // /archive フォルダを取得または作成
+    const archiveFolders = parentFolder.getFoldersByName("archive");
+    let archiveFolder;
+    if (archiveFolders.hasNext()) {
+      archiveFolder = archiveFolders.next();
+    } else {
+      archiveFolder = parentFolder.createFolder("archive");
+    }
+
+    // 90日以上経過したファイルを /archive へ移動
+    const evidenceFiles = evidenceFolder.getFiles();
+    let movedCount = 0;
+    while (evidenceFiles.hasNext()) {
+      const file = evidenceFiles.next();
+      const age = now - file.getDateCreated();
+      if (age > MS_90_DAYS) {
+        file.moveTo(archiveFolder);
+        movedCount++;
+      }
+    }
+    if (movedCount > 0) {
+      console.log(`cleanupDrivePhotos: ${movedCount} files moved to /archive`);
+    }
+  }
+
+  // --- /archive フォルダを取得 ---
+  const archiveFolders2 = parentFolder.getFoldersByName("archive");
+  if (archiveFolders2.hasNext()) {
+    const archiveFolder = archiveFolders2.next();
+
+    // 180日以上経過したファイルをゴミ箱へ
+    const archiveFiles = archiveFolder.getFiles();
+    let deletedCount = 0;
+    while (archiveFiles.hasNext()) {
+      const file = archiveFiles.next();
+      const age = now - file.getDateCreated();
+      if (age > MS_180_DAYS) {
+        file.setTrashed(true);
+        deletedCount++;
+      }
+    }
+    if (deletedCount > 0) {
+      console.log(`cleanupDrivePhotos: ${deletedCount} files trashed from /archive`);
+    }
+  }
+}
+
+/**
+ * cleanupDrivePhotos の時間主導型トリガーを設定する。
+ * GASエディタから手動で1回だけ実行すること。
+ * 既存トリガーを削除してから新規作成するため、重複しない。
+ */
+function setupCleanupTrigger() {
+  deleteTriggers("cleanupDrivePhotos");
+  ScriptApp.newTrigger("cleanupDrivePhotos")
+    .timeBased()
+    .everyDays(1)
+    .atHour(2)
+    .create();
+  console.log("cleanupDrivePhotos trigger set: daily at 2:00 AM JST");
+}

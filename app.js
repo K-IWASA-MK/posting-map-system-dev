@@ -447,6 +447,15 @@ function pressNum(key) {
         imageBlob = await capturePhoto();
       }
       
+      // 撮影直後にローカルBlobプレビューをカードへ反映
+      if (imageBlob && p) {
+        p.tempPhotoUrl = URL.createObjectURL(imageBlob);
+        const card = $(`point-card-${rowId}`);
+        if (card && typeof renderPointCardHtml === 'function') {
+          card.innerHTML = renderPointCardHtml(areaName, p);
+        }
+      }
+      
       if (typeof enqueueSync === 'function') {
         await enqueueSync({
           areaName,

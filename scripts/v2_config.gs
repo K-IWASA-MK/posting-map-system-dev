@@ -33,4 +33,7 @@ const CONFIG = {
   // デフォルト対象
   DEFAULT_DISTRICT: "第2区",
   DEFAULT_PREFECTURE: "三重県",
+  
+  // ストレージ設定
+  STORAGE_PARENT_ID: "1c62olbuKpFr80IYGnsTXxcGr99S9lfN7"
 };

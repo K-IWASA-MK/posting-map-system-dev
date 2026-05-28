@@ -140,8 +140,11 @@ async function processQueue() {
           if (window.allPoints) {
             const p = window.allPoints.find(point => point.rowId === item.rowId);
             if (p) {
+              // GASから返却されるのはfileId（非公開）なのでphotoUrlとして保持
               p.photoUrl = res.photoUrl || '';
-              // UI再描画
+              // ローカルBlobプレビューは送信完了後にクリア
+              delete p.tempPhotoUrl;
+              // UI再描画: 📸 PHOTO SENT バッジが表示される
               const card = document.getElementById(`point-card-${item.rowId}`);
               if (card && typeof renderPointCardHtml === 'function') {
                 card.innerHTML = renderPointCardHtml(item.areaName, p);

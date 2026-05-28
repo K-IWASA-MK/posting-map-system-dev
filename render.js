@@ -150,13 +150,28 @@ function renderPointCardHtml(areaName, p) {
   // 🔒アイコン
   const lockIconHtml = isOtherStaff ? `<span class="text-xs mr-1">🔒</span>` : '';
 
-  // テンポラリ表示用または公開済みの写真URLの取得
-  let photoUrl = p.photoUrl || p.tempPhotoUrl || '';
-  const photoThumbnailHtml = photoUrl ? `
+  // テンポラリ表示用写真URLの取得
+  // photoUrl (r[9]) はDriveのfileId（非公開）のためサムネイルは表示しない
+  // 送信直後のtempPhotoUrl（メモリ上のblob URL）のみ一時表示
+  const photoId = p.photoUrl || '';
+  const tempUrl = p.tempPhotoUrl || '';
+  let photoBlockHtml = '';
+  if (tempUrl) {
+    // 送信直後のローカルBlobプレビュー（リロードすると消える）
+    photoBlockHtml = `
     <div class="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center my-3">
-      <img src="${photoUrl}" class="w-full h-full object-cover">
+      <img src="${tempUrl}" class="w-full h-full object-cover">
     </div>
-  ` : '';
+  `;
+  } else if (photoId) {
+    // リロード後：完全非公開ファイルのため、📸 PHOTO SENT バッジで状態を通知
+    photoBlockHtml = `
+    <div class="flex items-center gap-2 my-2 px-3 py-2 rounded-xl bg-[#2563eb]/08 border border-[#2563eb]/15">
+      <span class="text-sm">📸</span>
+      <span class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO SENT</span>
+    </div>
+  `;
+  }
 
   // ロック状態によるスタイル分岐
   const labelClasses = isOtherStaff
@@ -172,7 +187,7 @@ function renderPointCardHtml(areaName, p) {
       <div class="flex-1 space-y-2">
         <div class="text-lg font-black text-white tracking-tight leading-tight">${p.address}</div>
         ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5">${p.memo}</div>` : ''}
-        ${photoThumbnailHtml}
+        ${photoBlockHtml}
       </div>
       <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
     </div>
