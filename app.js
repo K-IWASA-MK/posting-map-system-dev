@@ -70,9 +70,13 @@ async function callApi(action, params = {}) {
     try {
       logDebug(`[callApi] START (Attempt ${attempt}/${MAX_RETRIES}): action=${action}`);
       logDebug(`[callApi] URL: ${url.substring(0, 80)}...`);
-      
-      const response = await fetch(url, options);
-      
+
+      // 20秒タイムアウト（GASコールドスタート対策）
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timeoutId);
+
       logDebug(`[callApi] FETCH OK. status=${response.status}, type=${response.type}`);
       
       if (!response.ok) {
@@ -139,7 +143,12 @@ async function callApiPost(action, payload = {}) {
 
     try {
       logDebug(`[callApiPost] START (Attempt ${attempt}/${MAX_RETRIES}): action=${action}, bodySize=${body.length}`);
-      const response = await fetch(url, { ...options, body });
+
+      // 30秒タイムアウト（大容量POST + GASコールドスタート対策）
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const response = await fetch(url, { ...options, body, signal: controller.signal });
+      clearTimeout(timeoutId);
       logDebug(`[callApiPost] FETCH OK. status=${response.status}`);
 
       if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
