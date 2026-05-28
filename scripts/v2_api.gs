@@ -480,7 +480,8 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
     s.getRange(rowId, 7, 1, 2).setValues([[isDone ? staffName : "", isDone ? (staffId || "") : ""]]);
 
     let photoUrl = "";
-    
+    let driveError = null; // 診断用: Drive保存エラー
+
     if (isDone) {
       // 1. GPSの書き込み (I列: 9列目)
       const gpsStr = (latitude && longitude) ? `${latitude},${longitude}` : "";
@@ -510,10 +511,10 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
           const blob = Utilities.newBlob(decoded, "image/jpeg", fileName);
           
           const file = folder.createFile(blob);
-          // 完全非公開で保存するため、setSharing は行わない
           photoUrl = file.getId();
           s.getRange(rowId, 10).setValue(photoUrl);
         } catch (driveErr) {
+          driveError = driveErr.toString(); // 診断用: エラー内容をレスポンスに含める
           console.error("Google Drive Save Error:", driveErr);
         }
       }
@@ -532,7 +533,19 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
       } catch (e) {}
     }
 
-    return { success: true, photoUrl: photoUrl };
+    return {
+      success: true,
+      photoUrl: photoUrl,
+      // 診断フィールド（本番確認後に削除可）
+      _debug: {
+        receivedIsDone: isDone,
+        nowDone: nowDone,
+        hasPhotoData: !!(photoData && photoData.indexOf("data:image") === 0),
+        photoDataLength: photoData ? photoData.length : 0,
+        driveError: driveError,
+        photoSaved: !!photoUrl
+      }
+    };
   } finally {
     lock.releaseLock();
   }

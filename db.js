@@ -133,6 +133,10 @@ async function processQueue() {
 
         // 写真データはURL長制限を超えるためPOSTで送信
         const res = await callApiPost('updateRecordWithGPSPhoto', payload);
+        // 診断ログ: GASが何を受け取ったか確認
+        if (res && res._debug) {
+          console.log('[DRIVE DEBUG]', JSON.stringify(res._debug));
+        }
         if (res && res.success) {
           await dequeueSync(item.id);
           
