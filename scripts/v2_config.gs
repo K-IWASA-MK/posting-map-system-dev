@@ -35,5 +35,5 @@ const CONFIG = {
   DEFAULT_PREFECTURE: "三重県",
   
   // ストレージ設定
-  STORAGE_PARENT_ID: "1c62olbuKpFr80IYGnsTXxcGr99S9lfN7"
+  STORAGE_PARENT_ID: "17DqCq4hIquqvK96ig8-n6fwb5pTgRE_-"
 };
