@@ -67,16 +67,9 @@
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
-  <!-- デバッグ用ログ領域 (原因特定後に削除します) -->
-  <div id="debug-log" class="fixed top-0 left-0 w-full max-h-[35dvh] overflow-y-auto bg-red-950/95 text-red-200 text-[10px] p-4 font-mono z-[9999] hidden border-b border-red-500">
-    <div class="flex justify-between items-center mb-2 pb-1 border-b border-red-800">
-      <span class="font-bold text-red-400">DEBUG LOG</span>
-      <button onclick="document.getElementById('debug-log').classList.add('hidden')" class="bg-red-800 text-white px-2 py-0.5 rounded text-[9px]">閉じる</button>
-    </div>
-    <div id="debug-log-content" class="space-y-1"></div>
-  </div>
 
   <!-- 1. GATEWAY / SPLASH (LINE LOGIN SYSTEM) -->
+
   <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
     <div class="gateway-header-wrap flex flex-col items-center justify-center mb-4 mt-0">
       <div class="gateway-icon-container w-32 h-32 bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-4 p-1 relative shadow-2xl">

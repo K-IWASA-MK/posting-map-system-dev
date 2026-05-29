@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ADMIN DASHBOARD v2.0</title>
-  <!-- Force Refresh: v200 (2026-05-15T09:14:45) -->
+  <title>POSTING MAP — ADMIN PANEL</title>
+  <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- C-1: favicon 追加 + preconnect -->
+  <link rel="icon" href="./assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -25,12 +29,13 @@
   <script>
     // 画面の意図しないスクロールやバウンスを物理的に防止（スクロール可能なメインコンテンツ領域等のみ許可）
     document.addEventListener('touchmove', function(e) {
-      const scrollable = e.target.closest('#content, .scrollable, #log-console');
+      const scrollable = e.target.closest('#content, .scrollable, #log-console, #admin-modal-body');
       if (scrollable) return;
       e.preventDefault();
     }, { passive: false });
   </script>
-  <link rel="stylesheet" href="./style.css?v=241">
+  <!-- C-1: キャッシュバスター v318 に統一 -->
+  <link rel="stylesheet" href="./style.css?v=318">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -38,11 +43,11 @@
   <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center">
     <div class="gateway-header-wrap flex flex-col items-center justify-center mb-6 mt-0">
       <div class="gateway-icon-container w-44 h-44 bg-white/5 backdrop-blur-2xl rounded-[3.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
-        <img src="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=101" class="w-full h-full object-cover rounded-[3.5rem] z-10">
+        <img src="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201" class="w-full h-full object-cover rounded-[3.5rem] z-10">
       </div>
       <div class="text-center">
-        <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">管理者専用画面です</h2>
-        <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2">ホーム画面に追加してご利用ください</p>
+        <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">POSTING MAP</h2>
+        <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2">管理者専用 — Administrator Only</p>
       </div>
     </div>
     <div class="gateway-content-wrap w-full max-w-sm space-y-6">
@@ -72,25 +77,26 @@
     <header class="safe-top px-8 py-8 flex justify-between items-center">
       <h1 class="text-2xl font-black tracking-tighter text-white leading-none">ADMIN PANEL</h1>
       <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
-        <div class="w-2 h-2 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
-        <span class="text-xs font-black text-[#2563eb] tracking-tighter uppercase">API ACTIVE</span>
+        <div id="api-dot" class="w-2 h-2 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
+        <span id="api-status-text" class="text-xs font-black text-[#2563eb] tracking-tighter uppercase">API ACTIVE</span>
       </div>
     </header>
 
     <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
       <!-- 1. KPI Panel -->
+      <!-- W-4: ラベル文字 9px → 10px に修正 -->
       <section class="grid grid-cols-2 gap-4">
         <div class="premium-glass p-6 flex flex-col justify-between h-36">
-          <span class="text-[9px] font-black text-white/40 uppercase tracking-widest">Overall Coverage</span>
+          <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Overall Coverage</span>
           <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
           <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
             <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
           </div>
         </div>
         <div class="premium-glass p-6 flex flex-col justify-between h-36">
-          <span class="text-[9px] font-black text-white/40 uppercase tracking-widest">Active Staff</span>
+          <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Active Staff</span>
           <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
-          <span class="text-[8px] font-black text-[#10b981] tracking-wider uppercase">● Online Roster</span>
+          <span class="text-[10px] font-black text-[#10b981] tracking-wider uppercase">● Online Roster</span>
         </div>
       </section>
 
@@ -129,11 +135,56 @@
     </main>
   </div>
 
+  <!-- W-2/W-3: alert()/confirm() 置換 — ガラスモーダル -->
+  <div id="admin-modal" class="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-end justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 space-y-6" id="admin-modal-inner">
+      <!-- ドラッグバー -->
+      <div class="flex justify-center -mt-3 mb-0">
+        <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+      </div>
+      <div class="space-y-2">
+        <p id="admin-modal-title" class="text-[10px] font-black text-white/40 uppercase tracking-widest"></p>
+        <p id="admin-modal-body" class="text-sm font-medium text-white/80 leading-relaxed overflow-y-auto max-h-[30dvh]"></p>
+      </div>
+      <div id="admin-modal-actions" class="space-y-3"></div>
+    </div>
+  </div>
+
   <script>
     const $ = id => document.getElementById(id);
     const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
 
-    // JS Touch Active Handlers
+    // ── ガラスモーダル制御 ──────────────────────────────────────────
+    function showModal({ title = '', body = '', actions = [] }) {
+      $('admin-modal-title').textContent = title;
+      $('admin-modal-body').textContent = body;
+      const actionsEl = $('admin-modal-actions');
+      actionsEl.innerHTML = '';
+      actions.forEach(({ label, style, onClick }) => {
+        const btn = document.createElement('button');
+        btn.textContent = label;
+        btn.className = style === 'danger'
+          ? 'w-full py-4 rounded-2xl bg-rose-600 text-white font-black text-sm uppercase tracking-widest'
+          : style === 'primary'
+          ? 'w-full py-4 rounded-2xl bg-[#2563eb] text-white font-black text-sm uppercase tracking-widest'
+          : 'w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white/60 font-black text-sm uppercase tracking-widest';
+        btn.onclick = () => { closeModal(); onClick && onClick(); };
+        actionsEl.appendChild(btn);
+      });
+      const modal = $('admin-modal');
+      const inner = $('admin-modal-inner');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      requestAnimationFrame(() => inner.classList.remove('translate-y-full'));
+    }
+
+    function closeModal() {
+      const modal = $('admin-modal');
+      const inner = $('admin-modal-inner');
+      inner.classList.add('translate-y-full');
+      setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 300);
+    }
+
+    // ── Touch Active Handlers ───────────────────────────────────────
     document.addEventListener('touchstart', e => {
       const el = e.target.closest('.btn-neu, .clickable-card');
       if (!el) return;
@@ -146,6 +197,7 @@
       document.querySelectorAll('.pressed-primary, .pressed-secondary').forEach(el => el.classList.remove('pressed-primary', 'pressed-secondary'));
     }
 
+    // ── ログ出力 ────────────────────────────────────────────────────
     function addLog(msg) {
       const consoleEl = $('log-console');
       const time = new Date().toLocaleTimeString('ja-JP', { hour12: false });
@@ -156,76 +208,105 @@
       consoleEl.scrollTop = consoleEl.scrollHeight;
     }
 
+    // ── API ─────────────────────────────────────────────────────────
     async function callApi(action, params = {}) {
-      let url = API_URL + "?action=" + action;
-      let options = { method: 'POST', redirect: 'follow' };
-      options.body = JSON.stringify({ action: action, ...params });
-      options.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
-
-      const response = await fetch(url, options);
+      const options = {
+        method: 'POST',
+        redirect: 'follow',
+        body: JSON.stringify({ action, ...params }),
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+      };
+      const response = await fetch(API_URL + '?action=' + action, options);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     }
 
+    // ── コマンド実行 ────────────────────────────────────────────────
     async function runCommand(action) {
-      if (action === 'resetAllSheets' && !confirm("【警告】すべての地区シートを削除し、システムを完全初期化しますか？\nこの操作は取り消せません。")) {
+      // W-3: confirm() → ガラスモーダルに置換
+      if (action === 'resetAllSheets') {
+        showModal({
+          title: '⚠️ System Reset — 最終確認',
+          body: 'すべての地区シートを削除し、システムを完全初期化します。\nこの操作は取り消せません。',
+          actions: [
+            { label: 'System Reset を実行', style: 'danger', onClick: () => _executeCommand(action) },
+            { label: 'キャンセル', style: 'cancel' }
+          ]
+        });
         return;
       }
-      
+      await _executeCommand(action);
+    }
+
+    async function _executeCommand(action) {
       $('loading').classList.remove('hidden');
       addLog(`Initiated command: ${action}`);
-      
       try {
         const res = await callApi(action);
         if (res && res.success) {
           addLog(`Success: ${res.message || 'Operation completed.'}`);
-          alert("コマンドが正常に実行されました。");
+          // W-2: alert() → ガラスモーダルに置換
+          showModal({
+            title: '✅ Command Complete',
+            body: res.message || 'コマンドが正常に実行されました。',
+            actions: [{ label: '閉じる', style: 'primary' }]
+          });
           loadDashboardData();
         } else {
-          throw new Error(res ? res.message : "API response failed");
+          throw new Error(res ? res.message : 'API response failed');
         }
       } catch (err) {
-        addLog(`Error execution failed: ${err.message}`);
-        alert(`エラー: ${err.message}`);
+        addLog(`Error: ${err.message}`);
+        // W-2: alert() → ガラスモーダルに置換
+        showModal({
+          title: '❌ Command Failed',
+          body: err.message,
+          actions: [{ label: '閉じる', style: 'cancel' }]
+        });
       } finally {
         $('loading').classList.add('hidden');
       }
     }
 
+    // ── ダッシュボードデータ読み込み（W-6: API統合 → Promise.all で並列化）──
     async function loadDashboardData() {
       try {
-        const appData = await (await fetch(API_URL + "?action=getAppData")).json();
+        // W-6: getAppData + getRoster を Promise.all で同時リクエスト
+        const [appData, rosterData] = await Promise.all([
+          fetch(API_URL + '?action=getAppData').then(r => r.json()),
+          fetch(API_URL + '?action=getRoster').then(r => r.json())
+        ]);
+
         if (appData && appData.success) {
           const areas = appData.areas || [];
-          const total = areas.length;
-          let totalDone = 0;
-          let totalPoints = 0;
-          areas.forEach(area => {
-            totalDone += area.done || 0;
-            totalPoints += area.total || 0;
-          });
+          let totalDone = 0, totalPoints = 0;
+          areas.forEach(area => { totalDone += area.done || 0; totalPoints += area.total || 0; });
           const coverage = totalPoints > 0 ? Math.round((totalDone / totalPoints) * 100) : 0;
-          
           $('stat-coverage').textContent = `${coverage}%`;
           $('stat-progress-bar').style.width = `${coverage}%`;
-          addLog(`Stats updated: overall coverage is ${coverage}% across ${total} districts (Total: ${totalDone}/${totalPoints} points).`);
+          addLog(`Stats updated: coverage ${coverage}% (${totalDone}/${totalPoints} across ${areas.length} districts)`);
         }
-        
-        const rosterData = await (await fetch(API_URL + "?action=getRoster")).json();
+
         if (rosterData) {
           $('stat-staff').textContent = rosterData.length || 0;
-          addLog(`Online staff list loaded: ${rosterData.length} distributor(s) registered.`);
+          addLog(`Roster loaded: ${rosterData.length} distributor(s) registered.`);
         }
+
+        // I-4: API接続確認後にインジケーターを更新
+        $('api-dot').className = 'w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]';
+        $('api-status-text').textContent = 'CONNECTED';
       } catch (e) {
         addLog(`Dashboard sync failed: ${e.message}`);
+        $('api-dot').className = 'w-2 h-2 bg-rose-500 rounded-full';
+        $('api-status-text').textContent = 'API ERROR';
+        $('api-status-text').classList.replace('text-[#2563eb]', 'text-rose-500');
       }
     }
 
+    // ── 起動 ────────────────────────────────────────────────────────
     function startAdmin() {
       $('screen-gateway').classList.add('hidden');
-      $('loading').classList.remove('hidden');
-      $('loading').classList.remove('opacity-0');
-      
+      $('loading').classList.remove('hidden', 'opacity-0');
       loadDashboardData().finally(() => {
         $('app').classList.remove('hidden');
         setTimeout(() => {
@@ -236,12 +317,11 @@
       });
     }
 
-
     window.onload = () => {
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js')
-          .then(reg => console.log('Service Worker registered for Admin. Scope:', reg.scope))
-          .catch(err => console.error('Service Worker registration failed:', err));
+          .then(reg => console.log('SW registered. Scope:', reg.scope))
+          .catch(err => console.error('SW registration failed:', err));
       }
     };
   </script>
