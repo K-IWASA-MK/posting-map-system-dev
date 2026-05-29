@@ -72,8 +72,8 @@ function renderAreas() {
           <span class="text-xs">🏢</span>
           <span>${c.name}</span>
         </div>
+        <div class="text-sm ${pctColorClass}">${c.progress}%</div>
         <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider">( ${paddedDone}/${c.total} )</div>
-        <div class="text-xs font-black ${pctColorClass}">${c.progress}%</div>
       </div>`;
     }).join('');
 
@@ -101,8 +101,8 @@ function renderAreas() {
           <span class="text-xs">🏘</span>
           <span>${s.name}</span>
         </div>
+        <div class="text-sm ${pctColorClass}">${s.progress}%</div>
         <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider">( ${paddedDone}/${s.total || 0} )</div>
-        <div class="text-xs font-black ${pctColorClass}">${s.progress}%</div>
       </div>`;
     }).join('');
 
