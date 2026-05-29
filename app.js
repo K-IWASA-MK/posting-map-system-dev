@@ -853,19 +853,14 @@ function updateStats() {
   const pctEl = $('header-pct');
 
   if (totalPoints === 0) {
-    if (countEl) countEl.textContent = '(0/0)';
+    if (countEl) countEl.textContent = '0/ 0';
     if (pctEl) pctEl.textContent = '0%';
     return;
   }
 
   const pct = Math.round((totalDone / totalPoints) * 100);
-  
-  // 全体数の桁数に合わせて、完了数の左側を半角スペースでパディングする
-  const doneStr = String(totalDone);
-  const totalStr = String(totalPoints);
-  const paddedDone = doneStr.padStart(totalStr.length, ' ');
 
-  if (countEl) countEl.textContent = `(${paddedDone}/${totalPoints})`;
+  if (countEl) countEl.textContent = `${totalDone}/ ${totalPoints}`;
   if (pctEl) pctEl.textContent = `${pct}%`;
 }
 
