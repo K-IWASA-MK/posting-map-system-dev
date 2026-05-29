@@ -432,14 +432,20 @@ function removeAllProtections() {
   const sheets = ss.getSheets();
   let sheetCount = 0;
   let rangeCount = 0;
+  let skipCount = 0;
 
   sheets.forEach(sheet => {
     // シート保護の解除
     const sheetProtections = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET);
     sheetProtections.forEach(p => {
       try {
-        p.remove();
-        sheetCount++;
+        if (p.canEdit()) {
+          p.remove();
+          SpreadsheetApp.flush(); // 強制的に即時反映してエラーをtry-catchで補足
+          sheetCount++;
+        } else {
+          skipCount++;
+        }
       } catch (e) {
         console.error("シート保護の解除に失敗: " + sheet.getName(), e);
       }
@@ -449,13 +455,22 @@ function removeAllProtections() {
     const rangeProtections = sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE);
     rangeProtections.forEach(p => {
       try {
-        p.remove();
-        rangeCount++;
+        if (p.canEdit()) {
+          p.remove();
+          SpreadsheetApp.flush(); // 強制的に即時反映してエラーをtry-catchで補足
+          rangeCount++;
+        } else {
+          skipCount++;
+        }
       } catch (e) {
         console.error("範囲保護の解除に失敗: " + sheet.getName(), e);
       }
     });
   });
 
-  ss.toast(`シート保護: ${sheetCount}件、範囲保護: ${rangeCount}件 のロックをすべて解除しました。`, "解除完了", 10);
+  let msg = `シート保護: ${sheetCount}件、範囲保護: ${rangeCount}件 のロックをすべて解除しました。`;
+  if (skipCount > 0) {
+    msg += ` (権限不足のため ${skipCount}件をスキップしました)`;
+  }
+  ss.toast(msg, "解除完了", 10);
 }
