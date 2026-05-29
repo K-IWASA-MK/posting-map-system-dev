@@ -108,7 +108,7 @@
 .space-y-8 > * + * { margin-top: 2rem; }
 
 /* ── Typography: Font ────────────────────────────── */
-.font-sans   { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+.font-sans   { font-family: 'Inter', -apple-system, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', sans-serif; }
 .font-mono   { font-family: ui-monospace, "SF Mono", monospace; }
 .font-medium { font-weight: 500; }
 .font-bold   { font-weight: 700; }

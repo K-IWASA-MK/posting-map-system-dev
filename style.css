@@ -158,7 +158,7 @@ input::placeholder { text-align: center; }
   padding: 1.5rem !important;
   text-align: center !important;
   box-sizing: border-box !important;
-  font-family: "Inter", "Noto Sans JP", sans-serif !important;
+  font-family: 'Inter', -apple-system, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', sans-serif !important;
   /* スマホブラウザでのバウンススクロールやタッチでの挙動ブレを完全防止 */
   overscroll-behavior: none !important;
   touch-action: none !important;
