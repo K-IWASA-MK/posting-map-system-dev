@@ -318,16 +318,16 @@ function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) 
       isDoneChange = -1;
     }
 
-    // 2. セルの更新 (F列の枚数は count を書き込む。isDone が false の場合はクリア)
+    // 2. D〜H列を1回のsetValuesでまとめて更新（Sheets API呼び出しを3→1回に削減）
     const now = new Date();
     const completedAt = Utilities.formatDate(now, "JST", "MM/dd HH:mm");
-    
-    // D, E列の更新 (完了、日付)
-    s.getRange(rowId, 4, 1, 2).setValues([[isDone, isDone ? completedAt : ""]]);
-    // F列（枚数）の更新
-    s.getRange(rowId, 6).setValue(isDone ? (parseFloat(count) || 0) : "");
-    // G, H列の更新 (担当、スタッフID)
-    s.getRange(rowId, 7, 1, 2).setValues([[isDone ? staffName : "", isDone ? (staffId || "") : ""]]);
+    s.getRange(rowId, 4, 1, 5).setValues([[
+      isDone,
+      isDone ? completedAt : "",
+      isDone ? (parseFloat(count) || 0) : "",
+      isDone ? (staffName || "") : "",
+      isDone ? (staffId || "") : ""
+    ]]);
 
     // 3. キャッシュの更新
     if (isDoneChange !== 0) {
@@ -517,49 +517,43 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
 
     const now = new Date();
     const completedAt = Utilities.formatDate(now, "JST", "MM/dd HH:mm");
-    
-    // D, E列の更新 (完了、日付)
-    s.getRange(rowId, 4, 1, 2).setValues([[isDone, isDone ? completedAt : ""]]);
-    // F列（枚数）の更新
-    s.getRange(rowId, 6).setValue(isDone ? (parseFloat(count) || 0) : "");
-    // G, H列の更新 (担当、スタッフID)
-    s.getRange(rowId, 7, 1, 2).setValues([[isDone ? staffName : "", isDone ? (staffId || "") : ""]]);
+
+    // D〜H列を1回のsetValuesでまとめて更新（Sheets API呼び出しを4→1回に削減）
+    s.getRange(rowId, 4, 1, 5).setValues([[
+      isDone,
+      isDone ? completedAt : "",
+      isDone ? (parseFloat(count) || 0) : "",
+      isDone ? (staffName || "") : "",
+      isDone ? (staffId || "") : ""
+    ]]);
 
     let photoUrl = "";
-    let driveError = null; // 診断用: Drive保存エラー
 
     if (isDone) {
-      // 1. GPSの書き込み (I列: 9列目)
+      // I列（GPS）の書き込み
       const gpsStr = (latitude && longitude) ? `${latitude},${longitude}` : "";
       s.getRange(rowId, 9).setValue(gpsStr);
-      
-      // 2. 写真のGoogleドライブ保存 (J列: 10列目)
+
+      // J列（写真）: photoDataがBase64画像の場合のみDrive保存
       if (photoData && photoData.indexOf("data:image") === 0) {
         try {
-          // STORAGE_PARENT_IDのフォルダに直接保存（サブフォルダなし）
           const folderId = CONFIG.STORAGE_PARENT_ID || "17DqCq4hIquqvK96ig8-n6fwb5pTgRE_-";
           const folder = DriveApp.getFolderById(folderId);
-          
-          // 自己記述型ファイル名の作成: [地区名]_配布員名_時刻.jpg
           const timeStr = Utilities.formatDate(now, "JST", "HHmm");
           const safeStaffName = staffName ? staffName.replace(/[\s　]/g, "") : "Unknown";
           const fileName = `[${areaName}]_${safeStaffName}_${timeStr}.jpg`;
-          
-          // Base64デコード
           const base64Data = photoData.split(",")[1];
           const decoded = Utilities.base64Decode(base64Data);
           const blob = Utilities.newBlob(decoded, "image/jpeg", fileName);
-          
           const file = folder.createFile(blob);
           photoUrl = file.getId();
           s.getRange(rowId, 10).setValue(photoUrl);
         } catch (driveErr) {
-          driveError = driveErr.toString(); // 診断用: エラー内容をレスポンスに含める
           console.error("Google Drive Save Error:", driveErr);
         }
       }
     } else {
-      // 解除時はGPSと写真URLもクリア
+      // 完了解除時はGPS・写真URLをクリア
       s.getRange(rowId, 9, 1, 2).setValues([["", ""]]);
     }
 
@@ -575,16 +569,7 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
 
     return {
       success: true,
-      photoUrl: photoUrl,
-      // 診断フィールド（本番確認後に削除可）
-      _debug: {
-        receivedIsDone: isDone,
-        nowDone: nowDone,
-        hasPhotoData: !!(photoData && photoData.indexOf("data:image") === 0),
-        photoDataLength: photoData ? photoData.length : 0,
-        driveError: driveError,
-        photoSaved: !!photoUrl
-      }
+      photoUrl: photoUrl
     };
   } finally {
     lock.releaseLock();
