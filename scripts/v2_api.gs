@@ -62,6 +62,9 @@ function doGet(e) {
       case 'getAppData':
         response = getAppData();
         break;
+      case 'getRanking':
+        response = { success: true, ranking: getRankingData() };
+        break;
       case 'getRoster':
         response = getRoster();
         break;
@@ -144,6 +147,9 @@ function doPost(e) {
     switch (action) {
       case 'getAppData':
         response = getAppData();
+        break;
+      case 'getRanking':
+        response = { success: true, ranking: getRankingData() };
         break;
       case 'getRoster':
         response = getRoster();
@@ -231,20 +237,13 @@ function getAppData() {
 
   const stats = (dashboardData && dashboardData.stats) ? dashboardData.stats : { done: 0, total: 0 };
 
-  // 個人ランキングデータの取得
-  let ranking = [];
-  try {
-    ranking = getRankingData();
-  } catch (e) {
-    // 集計エラー時は空
-  }
 
+  // ranking は getRanking アクションで遅延取得（初期ロード軽量化）
   return {
     success: true,
-    branchName: getSS().getName().split(/[ 　]/)[0] || "支部",
+    branchName: getSS().getName().split(/[ \u3000]/)[0] || "支部",
     areas: areas,
-    stats: stats,
-    ranking: ranking
+    stats: stats
   };
 }
 

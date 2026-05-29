@@ -15,6 +15,7 @@ window.onunhandledrejection = function(event) {
 
 let allPoints = [], areaSummary = [], roster = [], rankingData = [];
 let _appDataPromise = null; // ⑤ getAppData並列プリフェッチ用
+let _rankingFetched = false;  // ランキング遅延取得済みフラグ
 let currentCity = null;
 let lastAreaSubPage = 'areas'; // 直前のエリアサブページ ('areas' または 'detail') を記憶
 let scrollPositions = { areas: 0, detail: 0, settings: 0, ranking: 0 };
@@ -276,7 +277,7 @@ async function loadData(skipSync = false) {
     logDebug("[loadData] getAppData fetched successfully.");
     if (data && data.success) {
       areaSummary = data.areas;
-      rankingData = data.ranking || [];
+      // ranking は switchPage('ranking') 初回タップ時に遅延取得
       if (data.branchName) localStorage.setItem('branch_name', data.branchName);
       
       logDebug("[loadData] Rendering areas...");
@@ -737,7 +738,28 @@ async function switchPage(id, force = false) {
   // 2. 設定画面の場合はレンダリングを行う
   if (id === 'settings') renderSettings();
   if (id === 'ranking') {
-    if (typeof renderRanking === 'function') renderRanking();
+    const container = $('ranking-list');
+    if (!_rankingFetched) {
+      // 初回: スケルトン表示 → 非同期取得 → レンダリング
+      if (container) {
+        container.innerHTML = `
+          <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+            <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
+            <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Loading Leaderboard...</p>
+          </div>`;
+      }
+      callApi('getRanking').then(data => {
+        if (data && data.success) {
+          rankingData = data.ranking || [];
+          _rankingFetched = true;
+        }
+        if (typeof renderRanking === 'function') renderRanking();
+      }).catch(() => {
+        if (typeof renderRanking === 'function') renderRanking();
+      });
+    } else {
+      if (typeof renderRanking === 'function') renderRanking();
+    }
   }
   
   // 3. ナビゲーションの表示制御
