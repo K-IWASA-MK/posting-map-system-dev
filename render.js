@@ -66,8 +66,8 @@ function renderAreas() {
       const totalStr = String(c.total);
       const paddedDone = doneStr.padStart(totalStr.length, ' ');
       return `
-      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-1.5" onclick="selectCity('${c.name}')">
-        <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full mb-1"></div>
+      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
+        <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
         <div class="text-lg font-black text-white tracking-tight flex items-center justify-center gap-1.5">
           <span class="text-xs">🏢</span>
           <span>${c.name}</span>
@@ -95,8 +95,8 @@ function renderAreas() {
       const totalStr = String(s.total || 0);
       const paddedDone = doneStr.padStart(totalStr.length, ' ');
       return `
-      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-1.5" onclick="openDetail('${s.name}')">
-        <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full mb-1"></div>
+      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="openDetail('${s.name}')">
+        <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
         <div class="text-lg font-black text-white tracking-tight flex items-center justify-center gap-1.5">
           <span class="text-xs">🏘</span>
           <span>${s.name}</span>
