@@ -359,7 +359,7 @@ function getGPSLocation() {
         console.warn("GPS Error:", err);
         resolve({ latitude: '', longitude: '' });
       },
-      { enableHighAccuracy: true, timeout: 3000, maximumAge: 10000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
     );
   });
 }
