@@ -25,6 +25,8 @@ function onOpen() {
   ui.createMenu("⚙️ ポスティング管理")
     .addItem("🚀 エリアシート一括作成", "forceStartBatch")
     .addSeparator()
+    .addItem("🔓 スプシの保護・ロックをすべて解除", "removeAllProtections")
+    .addSeparator()
     .addItem("🗺 司令室マップを開く (司令室用)", "openMapDashboard")
     .addSeparator()
     .addItem("📊 全体数を集計する（ランキング更新）", "aggregateTotalVolumes")
@@ -420,4 +422,40 @@ function openMapDashboard() {
   const html = HtmlService.createTemplateFromFile('map_dashboard');
   html.apiKey = apiKey;
   SpreadsheetApp.getUi().showModalDialog(html.evaluate().setWidth(1000).setHeight(700), '戦況マップ');
+}
+
+/**
+ * スプレッドシート内のすべてのシート・セル範囲の保護（ロック）を完全に解除する
+ */
+function removeAllProtections() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = ss.getSheets();
+  let sheetCount = 0;
+  let rangeCount = 0;
+
+  sheets.forEach(sheet => {
+    // シート保護の解除
+    const sheetProtections = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET);
+    sheetProtections.forEach(p => {
+      try {
+        p.remove();
+        sheetCount++;
+      } catch (e) {
+        console.error("シート保護の解除に失敗: " + sheet.getName(), e);
+      }
+    });
+
+    // 範囲保護の解除
+    const rangeProtections = sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE);
+    rangeProtections.forEach(p => {
+      try {
+        p.remove();
+        rangeCount++;
+      } catch (e) {
+        console.error("範囲保護の解除に失敗: " + sheet.getName(), e);
+      }
+    });
+  });
+
+  ss.toast(`シート保護: ${sheetCount}件、範囲保護: ${rangeCount}件 のロックをすべて解除しました。`, "解除完了", 10);
 }
