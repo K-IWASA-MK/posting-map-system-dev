@@ -314,3 +314,8 @@
 .rounded-xl  { border-radius: 0.75rem; }
 .rounded-3xl { border-radius: 1.5rem; }
 
+/* ── Splash Screen (追加) ───────────────────────── */
+.rounded-\[1\.5rem\] { border-radius: 1.5rem; }
+.rounded-\[1\.3rem\] { border-radius: 1.3rem; }
+.bg-white\/5 { background-color: rgba(255, 255, 255, 0.05); }
+.border-white\/10 { border-color: rgba(255, 255, 255, 0.1); }
