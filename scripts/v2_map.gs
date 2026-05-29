@@ -18,7 +18,7 @@ function getDashboardData() {
   if (cached) {
     try {
       const data = JSON.parse(cached);
-      cache.put("AREA_SUMMARY_FAST_CACHE", cached, 600);
+      cache.put("AREA_SUMMARY_FAST_CACHE", cached, 1800);
       return data;
     } catch (e) {}
   }
@@ -67,7 +67,7 @@ function refreshAreaSummaryCache() {
 
   const jsonResult = JSON.stringify(result);
   const cache = CacheService.getScriptCache();
-  cache.put("AREA_SUMMARY_FAST_CACHE", jsonResult, 600);
+  cache.put("AREA_SUMMARY_FAST_CACHE", jsonResult, 1800);
   PropertiesService.getScriptProperties().setProperty("AREA_SUMMARY_CACHE", jsonResult);
 
   return result;
@@ -135,6 +135,6 @@ function updateAreaCache(areaName, isDoneChange = 0) {
     }
     const updatedJson = JSON.stringify(data);
     props.setProperty("AREA_SUMMARY_CACHE", updatedJson);
-    cache.put("AREA_SUMMARY_FAST_CACHE", updatedJson, 600);
+    cache.put("AREA_SUMMARY_FAST_CACHE", updatedJson, 1800);
   }
 }

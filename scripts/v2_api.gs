@@ -480,7 +480,7 @@ function getRankingData() {
   if (cached) {
     try {
       const data = JSON.parse(cached);
-      cache.put("RANKING_FAST_CACHE", cached, 600);
+      cache.put("RANKING_FAST_CACHE", cached, 1800);
       return data;
     } catch (e) {}
   }

@@ -184,7 +184,7 @@ function refreshRankingCache() {
 
   const jsonResult = JSON.stringify(rankingList);
   const cache = CacheService.getScriptCache();
-  cache.put("RANKING_FAST_CACHE", jsonResult, 600);
+  cache.put("RANKING_FAST_CACHE", jsonResult, 1800);
   PropertiesService.getScriptProperties().setProperty("RANKING_CACHE", jsonResult);
 
   return rankingList;
