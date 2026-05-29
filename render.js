@@ -62,6 +62,10 @@ function renderAreas() {
     const cityCardsHtml = cities.map(c => {
       const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
       const pctColorClass = 'text-[#2563eb]';
+      const isCompleted = c.done === c.total && c.total > 0;
+      const verifiedLabel = isCompleted 
+        ? '   🔒 VERIFIED' 
+        : '';
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
@@ -70,7 +74,7 @@ function renderAreas() {
           <span>${c.name}</span>
         </div>
         <div class="text-sm ${pctColorClass}">${c.progress}%</div>
-        <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider">${c.done}/ ${c.total}</div>
+        <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider">${c.done}/ ${c.total}${verifiedLabel}</div>
       </div>`;
     }).join('');
 
@@ -88,6 +92,10 @@ function renderAreas() {
     const areaCardsHtml = filteredAreas.map(s => {
       const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
       const pctColorClass = 'text-[#2563eb]';
+      const isCompleted = s.done === s.total && s.total > 0;
+      const verifiedLabel = isCompleted 
+        ? '   🔒 VERIFIED' 
+        : '';
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="openDetail('${s.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
@@ -96,7 +104,7 @@ function renderAreas() {
           <span>${s.name}</span>
         </div>
         <div class="text-sm ${pctColorClass}">${s.progress}%</div>
-        <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider">${s.done || 0}/ ${s.total || 0}</div>
+        <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider">${s.done || 0}/ ${s.total || 0}${verifiedLabel}</div>
       </div>`;
     }).join('');
 
