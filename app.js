@@ -19,6 +19,18 @@ let _rankingFetched = false;  // ランキング遅延取得済みフラグ
 let currentCity = null;
 let lastAreaSubPage = 'areas'; // 直前のエリアサブページ ('areas' または 'detail') を記憶
 let scrollPositions = { areas: 0, detail: 0, settings: 0, ranking: 0 };
+
+// ─── ローディングプログレスバー更新 ──────────────────────────────
+function setLoadingProgress(pct, label) {
+  const bar = document.getElementById('loading-bar');
+  const txt = document.getElementById('loading-status');
+  if (bar) bar.style.width = pct + '%';
+  if (txt) {
+    txt.style.opacity = '0';
+    setTimeout(() => { txt.textContent = label; txt.style.opacity = '1'; }, 180);
+  }
+}
+
 const pageIdMap = {
   'page-areas': 'areas',
   'page-detail': 'detail',
@@ -272,9 +284,11 @@ async function loadData(skipSync = false) {
 
   try {
     logDebug("[loadData] Fetching getAppData...");
+    setLoadingProgress(82, 'SYNCING DATA...');
     const data = await (_appDataPromise || callApi('getAppData')); // ⑤ プリフェッチがあれば再利用
-    _appDataPromise = null;
     logDebug("[loadData] getAppData fetched successfully.");
+    setLoadingProgress(96, 'READY');
+    _appDataPromise = null;
     if (data && data.success) {
       areaSummary = data.areas;
       // ranking は switchPage('ranking') 初回タップ時に遅延取得
@@ -292,6 +306,7 @@ async function loadData(skipSync = false) {
         $('screen-gateway').classList.add('hidden');
         $('app').classList.remove('hidden');
         setTimeout(() => {
+          setLoadingProgress(100, 'READY');
           $('app').classList.remove('opacity-0');
           $('loading').classList.add('opacity-0');
           setTimeout(() => $('loading').classList.add('hidden'), 400);
@@ -946,6 +961,7 @@ async function safeInitApp() {
 
       await Promise.race([liffInitPromise, timeoutPromise]);
       logDebug("LIFF INIT OK"); // ② LIFF初期化成功
+      setLoadingProgress(35, 'AUTHENTICATED');
       
       logDebug("LOGIN CHECK"); // ③ login判定
       if (liff.isLoggedIn()) {
@@ -959,6 +975,7 @@ async function safeInitApp() {
           logDebug("PROFILE START"); // ⑤ profile取得開始
           const profile = await liff.getProfile();
           logDebug("PROFILE OK"); // ⑥ profile取得成功
+          setLoadingProgress(65, 'PROFILE LOADED');
           console.log(profile);
 
           let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
