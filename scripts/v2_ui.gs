@@ -26,6 +26,7 @@ function onOpen() {
     .addItem("🚀 エリアシート一括作成", "forceStartBatch")
     .addSeparator()
     .addItem("🔓 スプシの保護・ロックをすべて解除", "removeAllProtections")
+    .addItem("🔍 保護・ロックの状況を診断する", "diagnoseProtections")
     .addSeparator()
     .addItem("🗺 司令室マップを開く (司令室用)", "openMapDashboard")
     .addSeparator()
@@ -429,43 +430,29 @@ function openMapDashboard() {
  */
 function removeAllProtections() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheets = ss.getSheets();
+  const protections = ss.getProtections();
+  
   let sheetCount = 0;
   let rangeCount = 0;
   let skipCount = 0;
 
-  sheets.forEach(sheet => {
-    // シート保護の解除
-    const sheetProtections = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET);
-    sheetProtections.forEach(p => {
-      try {
-        if (p.canEdit()) {
-          p.remove();
-          SpreadsheetApp.flush(); // 強制的に即時反映してエラーをtry-catchで補足
+  protections.forEach(p => {
+    try {
+      if (p.canEdit()) {
+        const isSheet = p.getProtectionType() === SpreadsheetApp.ProtectionType.SHEET;
+        p.remove();
+        SpreadsheetApp.flush(); // 強制的に即時反映してエラーをtry-catchで捕捉
+        if (isSheet) {
           sheetCount++;
         } else {
-          skipCount++;
-        }
-      } catch (e) {
-        console.error("シート保護の解除に失敗: " + sheet.getName(), e);
-      }
-    });
-
-    // 範囲保護の解除
-    const rangeProtections = sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE);
-    rangeProtections.forEach(p => {
-      try {
-        if (p.canEdit()) {
-          p.remove();
-          SpreadsheetApp.flush(); // 強制的に即時反映してエラーをtry-catchで補足
           rangeCount++;
-        } else {
-          skipCount++;
         }
-      } catch (e) {
-        console.error("範囲保護の解除に失敗: " + sheet.getName(), e);
+      } else {
+        skipCount++;
       }
-    });
+    } catch (e) {
+      console.error("保護の解除に失敗:", e);
+    }
   });
 
   let msg = `シート保護: ${sheetCount}件、範囲保護: ${rangeCount}件 のロックをすべて解除しました。`;
@@ -473,4 +460,38 @@ function removeAllProtections() {
     msg += ` (権限不足のため ${skipCount}件をスキップしました)`;
   }
   ss.toast(msg, "解除完了", 10);
+}
+
+/**
+ * シートおよび範囲保護の状況を詳細に診断してアラート表示する
+ */
+function diagnoseProtections() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheets = ss.getSheets();
+  let result = "【スプレッドシート保護状況 診断結果】\n\n";
+  
+  result += "スプレッドシートID: " + ss.getId() + "\n";
+  result += "現在の実行ユーザー: " + Session.getActiveUser().getEmail() + "\n";
+  result += "シート数: " + sheets.length + "\n\n";
+
+  sheets.forEach(sheet => {
+    const protections = sheet.getProtections();
+    result += `■ シート名: "${sheet.getName()}"\n`;
+    result += `  - 保護オブジェクト数: ${protections.length}\n`;
+    
+    protections.forEach((p, idx) => {
+      const type = p.getProtectionType() === SpreadsheetApp.ProtectionType.SHEET ? "シート全体" : "範囲保護";
+      const desc = p.getDescription() || "説明なし";
+      let canEditVal = false;
+      try {
+        canEditVal = p.canEdit();
+      } catch (e) {
+        canEditVal = "エラー: " + e.message;
+      }
+      result += `    [${idx + 1}] タイプ: ${type}, 説明: "${desc}", 編集権限(canEdit): ${canEditVal}\n`;
+    });
+  });
+
+  const ui = SpreadsheetApp.getUi();
+  ui.alert("スプシ保護状況の診断結果", result, ui.ButtonSet.OK);
 }
