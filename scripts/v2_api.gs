@@ -113,6 +113,9 @@ function doGet(e) {
           response = { success: false, message: 'Write FAILED: ' + writeErr.toString() };
         }
         break;
+      case 'getDeliveryStats':
+        response = getDeliveryStats();
+        break;
       default:
         response = { success: true, message: 'POSTING MAP API is online.' };
     }
@@ -573,4 +576,92 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
   } finally {
     lock.releaseLock();
   }
+}
+
+// =============================
+// 要件9: 配送証跡統計 (管理画面用)
+// =============================
+
+/**
+ * 全エリアシートを集計して配送証跡履歴を返す
+ * CacheService TTL 60s でキャッシュして高速化
+ *
+ * 返却:
+ *   totalCompleted — 完了件数 (isDone=true)
+ *   withGPS        — GPS記録済み件数
+ *   withPhoto      — 写真記録済み件数
+ *   pending        — 未同期件数 (totalCompleted - withGPS)
+ *   lastSyncAt     — 最新の完了時刻文字列
+ */
+function getDeliveryStats() {
+  var CACHE_KEY = 'DELIVERY_STATS_V1';
+  var cache = CacheService.getScriptCache();
+
+  // キャッシュヒット
+  try {
+    var cached = cache.get(CACHE_KEY);
+    if (cached) return JSON.parse(cached);
+  } catch (e) {}
+
+  // 除外シート名リスト（v2_stats.gs の集計と同じ除外ルール）
+  var NON_AREA = [
+    CONFIG.SHEET_GUIDE,
+    CONFIG.SHEET_ROSTER,
+    CONFIG.SHEET_TEMPLATE,
+    CONFIG.SHEET_POSTAL,
+    CONFIG.SHEET_DISTRICT,
+    CONFIG.SHEET_MASTER_EXPORT,
+    CONFIG.SHEET_REPORT,
+    CONFIG.SHEET_MANUAL,
+    CONFIG.SHEET_SYSTEM_CACHE
+  ];
+
+  var ss = getSS();
+  var sheets = ss.getSheets();
+
+  var totalCompleted = 0;
+  var withGPS        = 0;
+  var withPhoto      = 0;
+  var lastSyncAt     = '';
+
+  sheets.forEach(function(sheet) {
+    var name = sheet.getName();
+    if (NON_AREA.indexOf(name) !== -1 || sheet.isSheetHidden()) return;
+
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+
+    // 列構成: A=住所, D=isDone(col4), E=completedAt(col5), F=count(col6),
+    //         G=staffName(col7), H=staffId(col8), I=gps(col9), J=photoUrl(col10)
+    // D列(index 4)から7列分読み取り → D,E,F,G,H,I,J
+    var data = sheet.getRange(2, 4, lastRow - 1, 7).getValues();
+
+    data.forEach(function(row) {
+      var isDone   = row[0] === true || row[0] === 'TRUE' || row[0] === 1;
+      var complAt  = row[1] ? String(row[1]).trim() : '';  // E列: completedAt
+      var gps      = row[5] ? String(row[5]).trim() : '';  // I列 (D=0,E=1,F=2,G=3,H=4,I=5)
+      var photoUrl = row[6] ? String(row[6]).trim() : '';  // J列
+
+      if (isDone) {
+        totalCompleted++;
+        if (gps)      withGPS++;
+        if (photoUrl) withPhoto++;
+        if (complAt && complAt > lastSyncAt) lastSyncAt = complAt;
+      }
+    });
+  });
+
+  var result = {
+    success:        true,
+    totalCompleted: totalCompleted,
+    withGPS:        withGPS,
+    withPhoto:      withPhoto,
+    pending:        totalCompleted - withGPS,
+    lastSyncAt:     lastSyncAt
+  };
+
+  // 60秒キャッシュ
+  try { cache.put(CACHE_KEY, JSON.stringify(result), 60); } catch (e) {}
+
+  return result;
 }

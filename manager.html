@@ -87,6 +87,33 @@
         </div>
       </section>
 
+      <!-- Field Sync Status (要件9: 未送信/同期済/写真付き/最終同期時刻) -->
+      <section class="space-y-4">
+        <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2">Field Sync Status</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="premium-glass p-6 flex flex-col justify-between h-28">
+            <span class="text-[9px] font-black text-white/40 uppercase tracking-widest">未送信</span>
+            <span id="sync-stat-pending" class="text-3xl font-black tracking-tighter text-[#f59e0b]">-</span>
+            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">GPS Pending</span>
+          </div>
+          <div class="premium-glass p-6 flex flex-col justify-between h-28">
+            <span class="text-[9px] font-black text-white/40 uppercase tracking-widest">同期済</span>
+            <span id="sync-stat-synced" class="text-3xl font-black tracking-tighter text-[#22c55e]">-</span>
+            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">GPS Recorded</span>
+          </div>
+          <div class="premium-glass p-6 flex flex-col justify-between h-28">
+            <span class="text-[9px] font-black text-white/40 uppercase tracking-widest">写真付き</span>
+            <span id="sync-stat-photo" class="text-3xl font-black tracking-tighter text-[#2563eb]">-</span>
+            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Drive Saved</span>
+          </div>
+          <div class="premium-glass p-6 flex flex-col justify-between h-28">
+            <span class="text-[9px] font-black text-white/40 uppercase tracking-widest">最終同期</span>
+            <span id="sync-stat-lastsync" class="text-sm font-black tracking-tight text-white/70">-</span>
+            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Last Updated</span>
+          </div>
+        </div>
+      </section>
+
       <!-- 2. Command Operations -->
       <section class="space-y-4">
         <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2">Tactical Command Center</h3>
@@ -258,10 +285,11 @@
     // ── ダッシュボードデータ読み込み（W-6: API統合 → Promise.all で並列化）──
     async function loadDashboardData() {
       try {
-        // W-6: getAppData + getRoster を Promise.all で同時リクエスト
-        const [appData, rosterData] = await Promise.all([
+        // W-6: getAppData + getRoster + getDeliveryStats を Promise.all で同時リクエスト
+        const [appData, rosterData, syncData] = await Promise.all([
           fetch(API_URL + '?action=getAppData').then(r => r.json()),
-          fetch(API_URL + '?action=getRoster').then(r => r.json())
+          fetch(API_URL + '?action=getRoster').then(r => r.json()),
+          fetch(API_URL + '?action=getDeliveryStats').then(r => r.json()).catch(() => null)
         ]);
 
         if (appData && appData.success) {
@@ -277,6 +305,15 @@
         if (rosterData) {
           $('stat-staff').textContent = rosterData.length || 0;
           addLog(`Roster loaded: ${rosterData.length} distributor(s) registered.`);
+        }
+
+        // 同期統計パネル更新 (要件9)
+        if (syncData && syncData.success) {
+          $('sync-stat-pending').textContent  = syncData.pending        ?? '-';
+          $('sync-stat-synced').textContent   = syncData.withGPS        ?? '-';
+          $('sync-stat-photo').textContent    = syncData.withPhoto      ?? '-';
+          $('sync-stat-lastsync').textContent = syncData.lastSyncAt || '-';
+          addLog(`Sync stats: completed=${syncData.totalCompleted}, gps=${syncData.withGPS}, photo=${syncData.withPhoto}`);
         }
 
         // I-4: API接続確認後にインジケーターを更新

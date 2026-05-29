@@ -367,13 +367,14 @@ function getGPSLocation() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         resolve({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude
+          latitude:  pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracy:  pos.coords.accuracy   // GPS精度(m) — 要件2
         });
       },
       (err) => {
         console.warn("GPS Error:", err);
-        resolve({ latitude: '', longitude: '' });
+        resolve({ latitude: '', longitude: '', accuracy: null });
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
     );
@@ -422,7 +423,7 @@ function compressImage(file) {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const MAX_LEN = 1024;
+        const MAX_LEN = 1200; // 要件6: 1024→1200px
         
         if (width > height) {
           if (width > MAX_LEN) {
@@ -531,10 +532,13 @@ async function addPhotoToDetail(rowId) {
     await enqueueSync({
       areaName,
       rowId,
-      isDone: true,
-      count: p.count || 0,
-      latitude: gps.latitude,
-      longitude: gps.longitude,
+      isDone:     true,
+      count:      p.count || 0,
+      latitude:   gps.latitude,
+      longitude:  gps.longitude,
+      accuracy:   gps.accuracy   || null,                    // 要件2
+      branchCode: localStorage.getItem('branch_name') || '', // 要件2
+      areaId:     String(rowId),                             // 要件2
       photoBase64, // BlobではなくBase64文字列で保存
       staffName,
       staffId
@@ -611,10 +615,13 @@ function pressNum(key) {
         await enqueueSync({
           areaName,
           rowId,
-          isDone: true,
-          count: valNum,
-          latitude: gps.latitude,
-          longitude: gps.longitude,
+          isDone:     true,
+          count:      valNum,
+          latitude:   gps.latitude,
+          longitude:  gps.longitude,
+          accuracy:   gps.accuracy   || null,                    // 要件2
+          branchCode: localStorage.getItem('branch_name') || '', // 要件2
+          areaId:     String(rowId),                             // 要件2
           photoBase64, // BlobではなくBase64文字列で保存
           staffName,
           staffId

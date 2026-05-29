@@ -172,14 +172,15 @@ function renderDetailModalContent(p) {
     }
   }
 
-  // 非同期送信ステータスバッジ
+  // 非同期送信ステータスバッジ (要件8: PENDING / SYNCING / COMPLETE / RETRYING...)
   let syncLabelHtml = '';
   if (p.isDone) {
-    if (p.syncStatus === 'sending') {
+    const s = p.syncStatus;
+    if (s === 'SYNCING' || s === 'sending') {
       syncLabelHtml = `<span class="text-[8px] font-black text-[#2563eb] animate-pulse tracking-widest bg-[#2563eb]/10 px-2 py-0.5 rounded-full ml-auto">FIELD DATA SYNCING...</span>`;
-    } else if (p.syncStatus === 'failed') {
+    } else if (s === 'RETRY' || s === 'failed') {
       syncLabelHtml = `<span class="text-[8px] font-black text-red-500 animate-pulse tracking-widest bg-red-500/10 px-2 py-0.5 rounded-full ml-auto">UPLOAD RETRYING...</span>`;
-    } else if (p.syncStatus === 'pending') {
+    } else if (s === 'PENDING' || s === 'pending') {
       syncLabelHtml = `<span class="text-[8px] font-black text-white/40 animate-pulse tracking-widest bg-white/5 px-2 py-0.5 rounded-full ml-auto">SYNC PENDING...</span>`;
     }
   }
@@ -291,18 +292,29 @@ function renderDetailModalContent(p) {
 // Render the entire details list using global allPoints (1-line simple card)
 function renderDetailList(areaName) {
   const cardsHtml = allPoints.map((p, i) => {
-    const statusDot = p.isDone 
+    const statusDot   = p.isDone 
       ? 'background-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);' 
       : 'background-color: rgba(255, 255, 255, 0.2);';
-    const statusText = p.isDone ? '完了' : '未完了';
+    const statusText  = p.isDone ? '完了' : '未完了';
     const statusColor = p.isDone ? 'text-[#10b981]' : 'text-white/40';
+
+    // 同期バッジ (要件8: PENDING↓SYNCING↓COMPLETE / RETRYING...)
+    const _s = p.syncStatus;
+    const syncBadge = (() => {
+      if (!_s) return '';
+      if (_s === 'SYNCING'  || _s === 'sending') return ` <span style="color:#2563eb;font-size:7px;font-weight:900;letter-spacing:0.1em">●</span>`;
+      if (_s === 'RETRY'    || _s === 'failed')  return ` <span style="color:#ef4444;font-size:7px;font-weight:900;letter-spacing:0.08em">RETRY</span>`;
+      if (_s === 'PENDING'  || _s === 'pending') return ` <span style="color:#f59e0b;font-size:7px;font-weight:900;letter-spacing:0.08em">⋯</span>`;
+      return '';
+    })();
+
     return `
       <div class="clickable-card premium-glass p-5 flex items-center justify-between gap-4" onclick="openPointDetailModal(${p.rowId})">
         <div class="flex-1 min-w-0">
           <div class="text-sm font-black text-white truncate leading-tight">${p.address}</div>
           <div class="text-[9px] font-bold ${statusColor} uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
             <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
-            ${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}
+            ${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}
           </div>
         </div>
         <div class="text-white/30 text-lg shrink-0">›</div>
