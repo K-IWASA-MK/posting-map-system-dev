@@ -1,6 +1,22 @@
 * {
   box-sizing: border-box;
 }
+/* button要素のブラウザデフォルトスタイルを完全にリセット */
+button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+p {
+  margin: 0;
+}
 .hidden {
   display: none !important;
 }
