@@ -66,13 +66,14 @@ function renderAreas() {
       const totalStr = String(c.total);
       const paddedDone = doneStr.padStart(totalStr.length, ' ');
       return `
-      <div class="clickable-card premium-glass p-6 flex flex-col items-center justify-center text-center gap-2" onclick="selectCity('${c.name}')">
+      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-1.5" onclick="selectCity('${c.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full mb-1"></div>
         <div class="text-lg font-black text-white tracking-tight flex items-center justify-center gap-1.5">
           <span class="text-xs">🏢</span>
           <span>${c.name}</span>
         </div>
-        <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest flex items-center justify-center gap-1"><span class="${pctColorClass}">${c.progress}%</span> Completed <span class="text-white/20 font-medium font-mono whitespace-pre">(${paddedDone}/${c.total})</span></div>
+        <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider">( ${paddedDone}/${c.total} )</div>
+        <div class="text-xs font-black ${pctColorClass}">${c.progress}%</div>
       </div>`;
     }).join('');
 
@@ -94,13 +95,14 @@ function renderAreas() {
       const totalStr = String(s.total || 0);
       const paddedDone = doneStr.padStart(totalStr.length, ' ');
       return `
-      <div class="clickable-card premium-glass p-6 flex flex-col items-center justify-center text-center gap-2" onclick="openDetail('${s.name}')">
+      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-1.5" onclick="openDetail('${s.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full mb-1"></div>
         <div class="text-lg font-black text-white tracking-tight flex items-center justify-center gap-1.5">
           <span class="text-xs">🏘</span>
           <span>${s.name}</span>
         </div>
-        <div class="text-[9px] font-bold text-white/40 uppercase tracking-widest flex items-center justify-center gap-1"><span class="${pctColorClass}">${s.progress}%</span> Completed <span class="text-white/20 font-medium font-mono whitespace-pre">(${paddedDone}/${s.total || 0})</span></div>
+        <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider">( ${paddedDone}/${s.total || 0} )</div>
+        <div class="text-xs font-black ${pctColorClass}">${s.progress}%</div>
       </div>`;
     }).join('');
 
