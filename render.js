@@ -63,8 +63,8 @@ function renderAreas() {
       const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
       const pctColorClass = 'text-[#2563eb]';
       const isCompleted = c.done === c.total && c.total > 0;
-      const leftDummy = isCompleted ? '<span class="invisible select-none text-[9px] font-sans">🔒 VERIFIED   </span>' : '';
-      const rightLabel = isCompleted ? '<span class="font-sans text-[9px] opacity-90">   🔒 VERIFIED</span>' : '';
+      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
+      const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
@@ -92,8 +92,8 @@ function renderAreas() {
       const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
       const pctColorClass = 'text-[#2563eb]';
       const isCompleted = s.done === s.total && s.total > 0;
-      const leftDummy = isCompleted ? '<span class="invisible select-none text-[9px] font-sans">🔒 VERIFIED   </span>' : '';
-      const rightLabel = isCompleted ? '<span class="font-sans text-[9px] opacity-90">   🔒 VERIFIED</span>' : '';
+      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
+      const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="openDetail('${s.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
