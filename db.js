@@ -265,6 +265,9 @@ async function processQueue() {
           }
 
           console.log(`[Queue] Synced: id=${item.id}, rowId=${item.rowId}`);
+          if (typeof loadData === 'function') {
+            loadData(true);
+          }
         } else {
           throw new Error(res ? (res.message || 'API failure') : 'No response');
         }
