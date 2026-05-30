@@ -332,7 +332,7 @@ function renderDetailModalContent(p) {
     </div>
     
     <!-- 2行目: 横幅いっぱいのGoogle Mapsボタン -->
-    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" class="w-full h-12 premium-glass-btn flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-white/80">
+    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" style="background-color: #2563eb; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-white rounded-2xl active:scale-[0.97] transition-all">
       📍 Googleマップで開く
     </a>
     
