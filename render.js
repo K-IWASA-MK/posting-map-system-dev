@@ -457,6 +457,12 @@ async function openDetail(name) {
         scrollPositions['detail'] = 0;
       }
       
+      // すでに詳細画面にいる状態での切り替え時にも、確実に先頭を表示させるためスクロールをトップにリセット
+      const contentEl = $('content');
+      if (contentEl) {
+        contentEl.scrollTop = 0;
+      }
+      
       switchPage('detail');
     }
   } catch (e) {
