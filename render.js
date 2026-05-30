@@ -332,7 +332,7 @@ function renderDetailModalContent(p) {
     </div>
     
     <!-- 2行目: 横幅いっぱいのGoogle Mapsボタン -->
-    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" style="background-color: #2563eb; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-white rounded-2xl active:scale-[0.97] transition-all">
+    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 0 6px rgba(37,99,235,0.1), 0 0 12px rgba(37,99,235,0.05); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-2xl active:scale-[0.97] transition-all">
       📍 Googleマップで開く
     </a>
     
@@ -354,12 +354,22 @@ function renderDetailModalContent(p) {
                 ${p.isDone ? 'MISSION COMPLETED' : 'READY TO DEPLOY'}
               </span>
             </div>
-            <!-- 未完了状態（READY TO DEPLOY）でも「タップで配布完了」の補助テキストを表示して2段で高さを統一 -->
-            ${p.isDone && p.completedAt ? `
-              <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">${formatCompletedAt(p.completedAt)} ${p.staffName ? `· ${p.staffName}` : ''}</div>
-            ` : `
-              <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">タップで配布完了</div>
-            `}
+            <!-- テキスト2行目: 完了日時 または 配布案内 -->
+            <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">
+              ${p.isDone && p.completedAt ? formatCompletedAt(p.completedAt) : 'タップで配布完了'}
+            </div>
+            <!-- 3行目: 配布員バッジ / 未アサインバッジ -->
+            <div class="flex mt-1.5">
+              ${p.isDone ? `
+                <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); height: 22px; font-size: 10px; color: #10b981;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider">
+                  ${p.staffName || '担当者不明'}
+                </div>
+              ` : `
+                <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); height: 22px; font-size: 10px; color: rgba(255,255,255,0.6);" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider">
+                  未アサイン
+                </div>
+              `}
+            </div>
           </div>
           ${syncLabelHtml}
         </div>
