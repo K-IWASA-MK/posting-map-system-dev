@@ -367,10 +367,10 @@ function renderDetailList(areaName) {
       return '';
     })();
 
-    // 3行目：配布員名（グリーンのバッジ枠で囲み、左側に pl-[24px] を付与して右にシフト）
+    // 3行目：配布員名（グリーンのバッジ枠で囲み、自然に中央揃えに）
     const nameLineHtml = p.isDone && p.staffName
       ? `
-        <div class="w-full pl-[24px] flex justify-center mt-0.5">
+        <div class="w-full flex justify-center mt-0.5">
           <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25);" class="inline-flex items-center justify-center h-5 px-2.5 text-[8px] font-bold text-[#10b981] rounded-full tracking-wider">
             ${p.staffName}
           </div>
@@ -378,16 +378,13 @@ function renderDetailList(areaName) {
       : '';
 
     return `
-      <div class="clickable-card premium-glass p-5 flex items-center justify-between gap-4" onclick="openPointDetailModal(${p.rowId})">
-        <div class="flex-1 min-w-0 flex flex-col items-center justify-center gap-2 text-center">
-          <div class="text-base font-black text-white truncate leading-tight w-full">🏠 ${getCleanAddress(p.address)}</div>
-          <div style="${statusColor}" class="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 w-full pl-[24px]">
-            <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
-            <span>${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}</span>
-          </div>
-          ${nameLineHtml}
+      <div class="clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center" onclick="openPointDetailModal(${p.rowId})">
+        <div class="text-base font-black text-white truncate leading-tight w-full">🏠 ${getCleanAddress(p.address)}</div>
+        <div style="${statusColor}" class="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 w-full">
+          <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
+          <span>${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}</span>
         </div>
-        <div class="text-white/30 text-lg shrink-0 w-6 text-right">›</div>
+        ${nameLineHtml}
       </div>`;
   }).join('');
 
