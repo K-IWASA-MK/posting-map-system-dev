@@ -323,13 +323,18 @@ function renderDetailModalContent(p) {
   }
 
   return `
-    <div class="flex justify-between items-start gap-4">
-      <div class="flex-1 space-y-2 min-w-0">
-        <div class="${addrFontSizeClass} font-black text-white tracking-tight leading-tight select-text" style="text-wrap: balance;">${cleanAddr}</div>
-        ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5 select-text">${p.memo}</div>` : ''}
+    <!-- 1行目: 住所バッジ（中央寄せ） -->
+    <div class="w-full flex flex-col items-center gap-3">
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); height: 26px; font-size: 12px; color: rgba(255, 255, 255, 0.9);" class="inline-flex items-center px-3 font-bold rounded-full tracking-wide truncate max-w-full select-text">
+        🏠 ${cleanAddr}
       </div>
-      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
+      ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5 select-text w-full text-center mt-1">${p.memo}</div>` : ''}
     </div>
+    
+    <!-- 2行目: 横幅いっぱいのGoogle Mapsボタン -->
+    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" class="w-full h-12 premium-glass-btn flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-white/80">
+      📍 Googleマップで開く
+    </a>
     
     <div class="flex flex-col gap-4">
       <label ${labelStyle ? `style="${labelStyle}"` : ''} class="${labelClasses}">
