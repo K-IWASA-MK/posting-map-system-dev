@@ -404,14 +404,39 @@ function renderDetailList(areaName) {
       </div>`;
   }).join('');
 
-  // リストの最下部（左下）に戻るボタンを追加
-  const bottomBackButtonHtml = `
-    <div class="flex items-center justify-start mt-8 pb-10">
-      <button onclick="switchPage('areas')" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+  // 同一市区町村内の隣接エリアへの切り替えナビゲーションを追加
+  const activeCity = currentCity || getCityName(areaName);
+  const cityAreas = areaSummary ? areaSummary.filter(s => getCityName(s.name) === activeCity) : [];
+  const currentIndex = cityAreas.findIndex(s => s.name === areaName);
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex !== -1 && currentIndex < cityAreas.length - 1;
+
+  const bottomNavHtml = `
+    <div class="flex items-center justify-between mt-8 pb-10 w-full gap-4">
+      <button onclick="navigateToSiblingArea(-1)" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold ${hasPrev ? '' : 'opacity-20 pointer-events-none'}" ${hasPrev ? '' : 'disabled'}>‹</button>
+      
+      <button onclick="switchPage('areas')" class="flex-1 h-12 premium-glass-btn flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white/80">一覧に戻る</button>
+      
+      <button onclick="navigateToSiblingArea(1)" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold ${hasNext ? '' : 'opacity-20 pointer-events-none'}" ${hasNext ? '' : 'disabled'}>›</button>
     </div>
   `;
 
-  $('detail-list').innerHTML = `<div class="space-y-4">${cardsHtml}</div>` + bottomBackButtonHtml;
+  $('detail-list').innerHTML = `<div class="space-y-4">${cardsHtml}</div>` + bottomNavHtml;
+}
+
+// 隣のエリアへの切り替えを実行する関数
+function navigateToSiblingArea(direction) {
+  if (!window.currentCityDetailAreaName || !areaSummary || areaSummary.length === 0) return;
+  const activeCity = currentCity || getCityName(window.currentCityDetailAreaName);
+  const cityAreas = areaSummary.filter(s => getCityName(s.name) === activeCity);
+  const currentIndex = cityAreas.findIndex(s => s.name === window.currentCityDetailAreaName);
+  if (currentIndex === -1) return;
+  
+  const targetIndex = currentIndex + direction;
+  if (targetIndex >= 0 && targetIndex < cityAreas.length) {
+    const targetAreaName = cityAreas[targetIndex].name;
+    openDetail(targetAreaName);
+  }
 }
 
 async function openDetail(name) {
