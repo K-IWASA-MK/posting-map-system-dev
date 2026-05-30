@@ -83,9 +83,11 @@ function renderAreas() {
 
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
-        <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug w-full" style="text-wrap: balance;">
-          <span class="text-xs">🏢</span>
-          <span>${c.name}</span>
+        <div class="w-full flex justify-center mb-1">
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="inline-flex items-center justify-center h-7 px-3 ${fontSizeClass} font-black text-white rounded-full tracking-tight">
+            <span class="text-xs mr-1 select-none">🏢</span>
+            <span>${c.name}</span>
+          </div>
         </div>
         <div class="text-sm ${pctColorClass}">${c.progress}%</div>
         <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider flex items-center justify-center w-full">${leftDummy}<span>${c.done}/ ${c.total}</span>${rightLabel}</div>
