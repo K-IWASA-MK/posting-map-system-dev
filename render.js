@@ -336,7 +336,7 @@ function renderDetailModalContent(p) {
     </a>
     
     <div class="flex flex-col gap-4">
-      <div ${labelStyle ? `style="${labelStyle}"` : ''} class="${isOtherStaff ? 'rounded-3xl p-5 bg-white/[0.01] border border-white/[0.03]' : 'rounded-3xl p-5 bg-white/5 border border-white/10'} flex flex-col items-center justify-center gap-3 w-full">
+      <div ${labelStyle ? `style="${labelStyle}"` : ''} class="${isOtherStaff ? 'rounded-3xl py-3.5 px-5 bg-white/[0.01] border border-white/[0.03]' : 'rounded-3xl py-3.5 px-5 bg-white/5 border border-white/10'} flex flex-col items-center justify-center gap-2 w-full">
         
         <!-- テキスト2行 (中央揃え) -->
         <div class="flex flex-col items-center select-none text-center w-full">
