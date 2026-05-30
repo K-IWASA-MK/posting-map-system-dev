@@ -66,14 +66,12 @@ function renderAreas() {
     `;
 
     const cityCardsHtml = cities.map(c => {
-      const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
       const pctColorClass = 'text-[#2563eb]';
       const isCompleted = c.done === c.total && c.total > 0;
       const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
       const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
-        <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
         <div class="text-lg font-black text-white tracking-tight flex items-center justify-center gap-1.5">
           <span class="text-xs">🏢</span>
           <span>${c.name}</span>
@@ -95,25 +93,35 @@ function renderAreas() {
     `;
 
     const areaCardsHtml = filteredAreas.map(s => {
-      const dotStyle = 'background-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);';
       const pctColorClass = 'text-[#2563eb]';
       const isCompleted = s.done === s.total && s.total > 0;
       const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
       const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
       
-      // A2の代表住所を表示用にクリーンアップ（改行を半角スペースに変換）し、ポスティング用ポスト絵文字（📮）を付与
-      let displayTitle = '';
+      // A2の代表住所を郵便番号と住所に分離して解析
+      let zipCode = '';
+      let cleanAddress = s.name;
+      
       if (s.repAddress) {
-        displayTitle = `📮 ${s.repAddress.replace(/\r?\n/g, ' ')}`;
-      } else {
-        displayTitle = `📮 ${s.name}`; // フォールバック
+        const match = s.repAddress.match(/^〒(\d{3}-\d{4})\s*([\s\S]*)$/);
+        if (match) {
+          zipCode = match[1];
+          cleanAddress = match[2].trim().replace(/\r?\n/g, ' ');
+        } else {
+          cleanAddress = s.repAddress.replace(/\r?\n/g, ' ');
+        }
       }
+
+      // 郵便番号バッジHTML（郵便番号が存在する場合のみ生成）
+      const zipBadgeHtml = zipCode 
+        ? `<div style="text-indent: 0.12em; letter-spacing: 0.12em; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2);" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono rounded-full mb-1">📮 〒${zipCode}</div>`
+        : '';
 
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="openDetail('${s.name}')">
-        <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
+        ${zipBadgeHtml}
         <div class="text-base font-black text-white tracking-tight flex items-center justify-center gap-1.5 leading-snug">
-          <span>${displayTitle}</span>
+          <span>${cleanAddress}</span>
         </div>
         <div class="text-sm ${pctColorClass}">${s.progress}%</div>
         <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider flex items-center justify-center w-full">${leftDummy}<span>${s.done || 0}/ ${s.total || 0}</span>${rightLabel}</div>
