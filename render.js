@@ -90,7 +90,13 @@ function renderAreas() {
           </div>
         </div>
         <div class="text-sm ${pctColorClass}">${c.progress}%</div>
-        <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider flex items-center justify-center w-full">${leftDummy}<span>${c.done}/ ${c.total}</span>${rightLabel}</div>
+        <div class="flex items-center justify-center w-full">
+          ${leftDummy}
+          <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
+            ${c.done}/ ${c.total}
+          </div>
+          ${rightLabel}
+        </div>
       </div>`;
     }).join('');
 
