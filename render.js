@@ -1,3 +1,9 @@
+// 住所から郵便番号(〒000-0000およびその後の改行/スペース)を除去したクリーンな住所を返す
+function getCleanAddress(addr) {
+  if (!addr) return '';
+  return addr.replace(/^〒\d{3}-\d{4}\s*/, '');
+}
+
 function formatCompletedAt(dateStr) {
   if (!dateStr) return '';
   if (/^\d{2}\/\d{2} \d{2}:\d{2}$/.test(dateStr)) {
@@ -247,10 +253,10 @@ function renderDetailModalContent(p) {
   return `
     <div class="flex justify-between items-start gap-4">
       <div class="flex-1 space-y-2 min-w-0">
-        <div class="text-lg font-black text-white tracking-tight leading-tight select-text">${p.address}</div>
+        <div class="text-lg font-black text-white tracking-tight leading-tight select-text">${getCleanAddress(p.address)}</div>
         ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5 select-text">${p.memo}</div>` : ''}
       </div>
-      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getCleanAddress(p.address))}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
     </div>
     
     <div class="flex flex-col gap-4">
@@ -318,7 +324,7 @@ function renderDetailList(areaName) {
     return `
       <div class="clickable-card premium-glass p-5 flex items-center justify-between gap-4" onclick="openPointDetailModal(${p.rowId})">
         <div class="flex-1 min-w-0">
-          <div class="text-sm font-black text-white truncate leading-tight">${p.address}</div>
+          <div class="text-sm font-black text-white truncate leading-tight">${getCleanAddress(p.address)}</div>
           <div class="text-[9px] font-bold ${statusColor} uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
             <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
             ${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}
