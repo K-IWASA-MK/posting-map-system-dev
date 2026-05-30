@@ -368,10 +368,10 @@ function renderDetailList(areaName) {
     return `
       <div class="clickable-card premium-glass p-5 flex items-center justify-between gap-4" onclick="openPointDetailModal(${p.rowId})">
         <div class="flex-1 min-w-0">
-          <div class="text-sm font-black text-white truncate leading-tight">${getCleanAddress(p.address)}</div>
-          <div class="text-[9px] font-bold ${statusColor} uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
+          <div class="text-base font-black text-white truncate leading-tight text-center">🏠 ${getCleanAddress(p.address)}</div>
+          <div class="text-[9px] font-bold ${statusColor} uppercase tracking-widest mt-1.5 flex items-center justify-center gap-1.5">
             <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
-            ${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}
+            <span>${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''} ${p.isDone && p.staffName ? `· ${p.staffName}` : ''}${syncBadge}</span>
           </div>
         </div>
         <div class="text-white/30 text-lg shrink-0">›</div>
