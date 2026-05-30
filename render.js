@@ -229,6 +229,9 @@ function renderDetailModalContent(p) {
     (!p.staffId && p.staffName && p.staffName !== myName)
   );
 
+  // 配布完了時は編集ロック
+  const isLocked = p.isDone;
+
   // GPS接続バッジ
   let gpsBadgeHtml = '';
   if (p.isDone) {
@@ -262,7 +265,7 @@ function renderDetailModalContent(p) {
   }
 
   // 🔒アイコン
-  const lockIconHtml = isOtherStaff ? `<span class="text-xs mr-1">🔒</span>` : '';
+  const lockIconHtml = isLocked ? `<span class="text-xs mr-1">🔒</span>` : '';
 
   // 写真表示・追加・変更ブロック
   const photoId = p.photoUrl || '';
@@ -282,7 +285,7 @@ function renderDetailModalContent(p) {
             <span class="text-sm">📸</span>
             <span class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO VERIFIED</span>
           </div>
-          ${!isOtherStaff ? `
+          ${!isLocked ? `
             <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">写真を変更</button>
           ` : ''}
         </div>
@@ -293,7 +296,7 @@ function renderDetailModalContent(p) {
           <div class="flex items-center justify-center text-center w-full">
             <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
           </div>
-          ${!isOtherStaff ? `
+          ${!isLocked ? `
             <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">📸 写真を追加</button>
           ` : ''}
         </div>
@@ -354,8 +357,8 @@ function renderDetailModalContent(p) {
 
         <!-- 3行目: 中央にチェックボックス（タップで物理的に沈む＆枠をグリーンに変更＆反応領域を四角のみに限定＆サイズ拡大） -->
         <div class="w-full flex justify-center">
-          <label ontouchstart="" class="${isOtherStaff ? 'cursor-default' : 'cursor-pointer active:scale-75 active:translate-y-1 transition-all duration-75'} block shrink-0">
-            <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isOtherStaff?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
+          <label ontouchstart="" class="${isLocked ? 'cursor-default' : 'cursor-pointer active:scale-75 active:translate-y-1 transition-all duration-75'} block shrink-0">
+            <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isLocked?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
             <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(16, 185, 129, 0.5); background-color: rgba(16, 185, 129, 0.06);'}" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all">
               ${p.isDone ? '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
             </div>
@@ -377,7 +380,7 @@ function renderDetailModalContent(p) {
             <span class="text-3xl font-black text-white tracking-tight">${p.count || 0}</span>
             <span class="text-xs font-bold text-white/60 ml-1">枚</span>
           </div>
-          ${!isOtherStaff ? `
+          ${!isLocked ? `
             <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all">枚数変更</button>
           ` : ''}
         </div>
@@ -397,7 +400,7 @@ function renderDetailList(areaName) {
     const statusDot   = p.isDone 
       ? 'background-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6);' 
       : 'background-color: rgba(255, 255, 255, 0.2);';
-    const statusText  = p.isDone ? '完了' : '未完了';
+    const statusText  = p.isDone ? '🔒 完了' : '未完了';
     const statusColor = p.isDone ? 'color: #2563eb;' : 'color: rgba(255, 255, 255, 0.4);';
 
     // 同期バッジ (要件8: PENDING↓SYNCING↓COMPLETE / RETRYING...)
@@ -420,8 +423,13 @@ function renderDetailList(areaName) {
         </div>`
       : '';
 
+    const onclickAttr = p.isDone ? '' : `onclick="openPointDetailModal(${p.rowId})"`;
+    const cardClass = p.isDone 
+      ? "premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center" 
+      : "clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center";
+
     return `
-      <div class="clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center" onclick="openPointDetailModal(${p.rowId})">
+      <div class="${cardClass}" ${onclickAttr}>
         <div class="w-full flex justify-center">
           <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); height: 26px; font-size: 12px; color: rgba(255, 255, 255, 0.9);" class="inline-flex items-center justify-center px-3 font-bold rounded-full tracking-wide truncate max-w-full">
             🏠 ${getCleanAddress(p.address)}
