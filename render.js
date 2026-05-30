@@ -337,42 +337,31 @@ function renderDetailModalContent(p) {
     </a>
     
     <div class="flex flex-col gap-4">
-      <div ${labelStyle ? `style="${labelStyle}"` : ''} class="${cardClasses}">
-        <!-- チェックボックスの「四角」部分のみをlabelとし、タップ反応領域を限定（Safariの縦中央バグを修正） -->
-        <label class="flex items-center justify-center self-center ${isOtherStaff ? 'cursor-default' : 'cursor-pointer active:scale-95 transition-all'} shrink-0">
+      <div ${labelStyle ? `style="${labelStyle}"` : ''} class="${isOtherStaff ? 'rounded-3xl p-5 bg-white/[0.01] border border-white/[0.03]' : 'rounded-3xl p-5 bg-white/5 border border-white/10'} flex flex-col items-center justify-center gap-3 w-full">
+        
+        <!-- テキスト2行 (中央揃え) -->
+        <div class="flex flex-col items-center select-none text-center w-full">
+          <div class="flex items-center justify-center gap-1">
+            ${lockIconHtml}
+            <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">
+              ${p.isDone ? 'MISSION COMPLETED' : 'READY TO DEPLOY'}
+            </span>
+          </div>
+          <!-- 完了日時 または 配布案内 -->
+          <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">
+            ${p.isDone && p.completedAt ? `${formatCompletedAt(p.completedAt)}${p.staffName ? ` · ${p.staffName}` : ''}` : 'タップで配布完了'}
+          </div>
+        </div>
+
+        <!-- 3行目: チェックボックス (中央配置) -->
+        <label class="${isOtherStaff ? 'cursor-default' : 'cursor-pointer active:scale-95 transition-all'} flex justify-center shrink-0 w-full">
           <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isOtherStaff?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
           <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(255,255,255,0.2); background-color: transparent;'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all">
             ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
           </div>
         </label>
         
-        <div class="flex-1 min-w-0 flex items-center justify-between">
-          <div class="flex flex-col min-w-0 select-none">
-            <div class="flex items-center gap-1">
-              ${lockIconHtml}
-              <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">
-                ${p.isDone ? 'MISSION COMPLETED' : 'READY TO DEPLOY'}
-              </span>
-            </div>
-            <!-- テキスト2行目: 完了日時 または 配布案内 -->
-            <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">
-              ${p.isDone && p.completedAt ? formatCompletedAt(p.completedAt) : 'タップで配布完了'}
-            </div>
-            <!-- 3行目: 配布員バッジ / 未アサインバッジ -->
-            <div class="flex mt-1.5">
-              ${p.isDone ? `
-                <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); height: 22px; font-size: 10px; color: #10b981;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider">
-                  ${p.staffName || '担当者不明'}
-                </div>
-              ` : `
-                <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); height: 22px; font-size: 10px; color: rgba(255,255,255,0.6);" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider">
-                  未アサイン
-                </div>
-              `}
-            </div>
-          </div>
-          ${syncLabelHtml}
-        </div>
+        ${syncLabelHtml ? `<div class="w-full flex justify-center">${syncLabelHtml.replace('ml-auto', '')}</div>` : ''}
       </div>
 
       ${p.isDone ? `
