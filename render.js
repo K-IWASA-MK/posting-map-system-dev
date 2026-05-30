@@ -100,7 +100,14 @@ function renderAreas() {
       </div>`;
     }).join('');
 
-    $('area-list').innerHTML = headerCardHtml + `<div class="space-y-6">${cityCardsHtml}</div>`;
+    // 1層目の最下部にスムーズスクロールで上部に戻る「↑ トップに戻る」ボタンを追加
+    const bottomTopButtonHtml = `
+      <div class="flex items-center justify-center mt-8 pb-10">
+        <button onclick="$('content').scrollTo({top: 0, behavior: 'smooth'})" class="px-6 h-12 premium-glass-btn flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white/80">↑ トップに戻る</button>
+      </div>
+    `;
+
+    $('area-list').innerHTML = headerCardHtml + `<div class="space-y-6">${cityCardsHtml}</div>` + bottomTopButtonHtml;
   } else {
     // 【第2層：選択された市のエリアシート一覧画面】
     const filteredAreas = areaSummary.filter(s => getCityName(s.name) === currentCity);
@@ -161,13 +168,20 @@ function renderAreas() {
       </div>`;
     }).join('');
 
-    const bottomBackButtonHtml = filteredAreas.length > 3 ? `
+    // 2層目の最下部ナビゲーション（戻る ‹ / ↑ トップに戻る）
+    const bottomNavHtml = filteredAreas.length > 3 ? `
+      <div class="flex items-center justify-between mt-8 pb-10 w-full gap-4">
+        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+        <button onclick="$('content').scrollTo({top: 0, behavior: 'smooth'})" class="flex-1 h-12 premium-glass-btn flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white/80">↑ トップに戻る</button>
+        <div class="w-12 h-12"></div>
+      </div>
+    ` : `
       <div class="flex items-center justify-start mt-8 pb-10">
         <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
       </div>
-    ` : '';
+    `;
 
-    $('area-list').innerHTML = backButtonHtml + `<div class="space-y-6">${areaCardsHtml}</div>` + bottomBackButtonHtml;
+    $('area-list').innerHTML = backButtonHtml + `<div class="space-y-6">${areaCardsHtml}</div>` + bottomNavHtml;
   }
 }
 
