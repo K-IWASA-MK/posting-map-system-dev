@@ -350,10 +350,10 @@ function renderDetailModalContent(p) {
 function renderDetailList(areaName) {
   const cardsHtml = allPoints.map((p, i) => {
     const statusDot   = p.isDone 
-      ? 'background-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);' 
+      ? 'background-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6);' 
       : 'background-color: rgba(255, 255, 255, 0.2);';
     const statusText  = p.isDone ? '完了' : '未完了';
-    const statusColor = p.isDone ? 'text-[#10b981]' : 'text-white/40';
+    const statusColor = p.isDone ? 'color: #2563eb;' : 'color: rgba(255, 255, 255, 0.4);';
 
     // 同期バッジ (要件8: PENDING↓SYNCING↓COMPLETE / RETRYING...)
     const _s = p.syncStatus;
@@ -365,14 +365,20 @@ function renderDetailList(areaName) {
       return '';
     })();
 
+    // 3行目：配布員名（完了しており、かつ名前が存在する場合のみグリーンで描画）
+    const nameLineHtml = p.isDone && p.staffName
+      ? `<div style="color: #10b981;" class="text-[9px] font-bold uppercase tracking-widest mt-0.5 flex items-center justify-center gap-1.5">${p.staffName}</div>`
+      : '';
+
     return `
       <div class="clickable-card premium-glass p-5 flex items-center justify-between gap-4" onclick="openPointDetailModal(${p.rowId})">
         <div class="flex-1 min-w-0">
           <div class="text-base font-black text-white truncate leading-tight text-center">🏠 ${getCleanAddress(p.address)}</div>
-          <div class="text-[9px] font-bold ${statusColor} uppercase tracking-widest mt-1.5 flex items-center justify-center gap-1.5">
+          <div style="${statusColor}" class="text-[9px] font-bold uppercase tracking-widest mt-1.5 flex items-center justify-center gap-1.5">
             <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
-            <span>${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''} ${p.isDone && p.staffName ? `· ${p.staffName}` : ''}${syncBadge}</span>
+            <span>${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}</span>
           </div>
+          ${nameLineHtml}
         </div>
         <div class="text-white/30 text-lg shrink-0">›</div>
       </div>`;
