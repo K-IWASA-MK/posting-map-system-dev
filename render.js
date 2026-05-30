@@ -294,7 +294,7 @@ function renderDetailModalContent(p) {
             <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
           </div>
           ${!isOtherStaff ? `
-            <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-white/80 uppercase tracking-wider bg-white/5 rounded-xl border border-white/10 active:scale-95 transition-all">写真を追加</button>
+            <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">📸 写真を追加</button>
           ` : ''}
         </div>
       `;
