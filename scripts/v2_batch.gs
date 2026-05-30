@@ -23,8 +23,17 @@ function forceStartBatch() {
   ss.toast(`【デバッグ】住所データを ${addresses.length} 件抽出しました。ソート中...`, "デバッグ", 10);
   
   addresses.sort((a, b) => {
+    // 1. 市町村カナでソート（同一市町村のシート生成を連続させるため）
     const comp = (a.cityKana || "").localeCompare(b.cityKana || "", 'ja');
     if (comp !== 0) return comp;
+    
+    // 2. 郵便番号でソート（ハイフンを除去して比較）
+    const pA = (a.postalCode || "").replace(/-/g, "");
+    const pB = (b.postalCode || "").replace(/-/g, "");
+    const compPostal = pA.localeCompare(pB);
+    if (compPostal !== 0) return compPostal;
+    
+    // 3. 同じ郵便番号の中は住所（漢字）でソート
     return a.address.localeCompare(b.address, 'ja');
   });
 
