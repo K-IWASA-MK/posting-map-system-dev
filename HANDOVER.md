@@ -105,7 +105,7 @@
 - `clasp push` を行っただけでは、本番の Webアプリ に変更が反映されません。
 - 変更後は、必ず以下のコマンドを実行して**デプロイIDを固定してデプロイを更新**してください。
   ```bash
-  npx clasp deploy -i AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA
+  npx clasp deploy -i AKfycbyoIK8marCDlhz8_Rr8H_rBtBeFUKw_9PcFKD0-0xQgmeV8CmDAT3hqrgu3f35CFH0O
   ```
 - これを行わないと、APIは古いバージョンのロジックで動作し続けます。
 
