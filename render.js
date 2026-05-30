@@ -277,25 +277,25 @@ function renderDetailModalContent(p) {
       `;
     } else if (photoId) {
       photoBlockHtml = `
-        <div class="flex items-center justify-between p-4 rounded-2xl bg-[#2563eb]/05 border border-[#2563eb]/15">
-          <div class="flex items-center gap-2">
+        <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-[#2563eb]/05 border border-[#2563eb]/15 gap-3">
+          <div class="flex items-center justify-center gap-2">
             <span class="text-sm">📸</span>
             <span class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO SENT</span>
           </div>
           ${!isOtherStaff ? `
-            <button onclick="addPhotoToDetail(${p.rowId})" class="text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 px-3 py-1.5 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">写真を変更</button>
+            <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">写真を変更</button>
           ` : ''}
         </div>
       `;
     } else {
       photoBlockHtml = `
-        <div class="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-          <div class="flex items-center gap-2">
+        <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 border border-white/5 gap-3">
+          <div class="flex items-center justify-center gap-2">
             <span class="text-sm text-white/30">📸</span>
             <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
           </div>
           ${!isOtherStaff ? `
-            <button onclick="addPhotoToDetail(${p.rowId})" class="text-[10px] font-black text-white/80 uppercase tracking-wider bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 active:scale-95 transition-all">📸 写真を追加</button>
+            <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-white/80 uppercase tracking-wider bg-white/5 rounded-xl border border-white/10 active:scale-95 transition-all">📸 写真を追加</button>
           ` : ''}
         </div>
       `;
@@ -365,19 +365,19 @@ function renderDetailModalContent(p) {
       </div>
 
       ${p.isDone ? `
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center justify-center gap-2 w-full">
           ${gpsBadgeHtml}
         </div>
         
         ${photoBlockHtml}
 
-        <div class="flex justify-between items-center bg-white/5 border border-white/5 rounded-2xl p-5">
-          <div class="flex items-baseline">
+        <div class="flex flex-col items-center justify-center bg-white/5 border border-white/5 rounded-2xl p-5 gap-3">
+          <div class="flex items-baseline justify-center">
             <span class="text-3xl font-black text-white tracking-tight">${p.count || 0}</span>
             <span class="text-xs font-bold text-white/60 ml-1">枚</span>
           </div>
           ${!isOtherStaff ? `
-            <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all">枚数変更</button>
+            <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all">枚数変更</button>
           ` : ''}
         </div>
       ` : ''}
