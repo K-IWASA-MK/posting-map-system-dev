@@ -46,7 +46,7 @@
     }, { passive: false });
   </script>
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="./style.css?v=352">
+  <link rel="stylesheet" href="./style.css?v=353">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -198,19 +198,19 @@
 
   <!-- 6. DETAIL ACTION MODAL (3層目の詳細操作カード) -->
   <div id="detail-modal" class="fixed inset-0 z-[4500] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="closeDetailModal()">
-    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md max-h-[85dvh] bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 flex flex-col space-y-4" onclick="event.stopPropagation()">
-      <div onclick="closeDetailModal(); event.stopPropagation();" class="py-2 px-6 cursor-pointer shrink-0 -mt-3 flex items-center justify-center">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem);" class="w-full max-w-md max-h-[80dvh] bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 px-6 pt-4 pb-0 overflow-hidden transform translate-y-full transition-transform duration-300 flex flex-col space-y-4" onclick="event.stopPropagation()">
+      <div onclick="closeDetailModal(); event.stopPropagation();" class="py-2 px-6 cursor-pointer shrink-0 flex items-center justify-center">
         <div class="w-12 h-1 bg-white/10 rounded-full"></div>
       </div>
-      <div id="detail-modal-content" class="space-y-6 overflow-y-auto hide-scrollbar flex-1 pr-1 overscroll-y-contain">
+      <div id="detail-modal-content" class="space-y-6 overflow-y-auto hide-scrollbar flex-1 pr-1 pb-6 overscroll-y-contain">
         <!-- Dynamically rendered -->
       </div>
     </div>
   </div>
 
   <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
-  <script defer src="./db.js?v=352"></script>
-  <script defer src="./app.js?v=352"></script>
-  <script defer src="./render.js?v=352"></script>
+  <script defer src="./db.js?v=353"></script>
+  <script defer src="./app.js?v=353"></script>
+  <script defer src="./render.js?v=353"></script>
 </body>
 </html>

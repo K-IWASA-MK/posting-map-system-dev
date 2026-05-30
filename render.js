@@ -201,6 +201,7 @@ function openPointDetailModal(rowId) {
   const modalContent = $('detail-modal-content');
   if (modalContent) {
     modalContent.innerHTML = renderDetailModalContent(p);
+    modalContent.scrollTop = 0; // スクロール位置を確実に一番上へリセット
   }
 
   const modal = $('detail-modal');
@@ -324,6 +325,14 @@ function renderDetailModalContent(p) {
     addrFontSizeClass = 'text-base';
   }
 
+  // 完了済み(p.isDone)の場合はGoogle Mapsボタンを非表示にする
+  const googleMapsButtonHtml = !p.isDone ? `
+    <!-- 2行目: 横幅いっぱいのGoogle Mapsボタン -->
+    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 0 6px rgba(37,99,235,0.1), 0 0 12px rgba(37,99,235,0.05); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-2xl active:scale-[0.97] transition-all">
+      📍 Googleマップで開く
+    </a>
+  ` : '';
+
   return `
     <!-- 1行目: 住所バッジ（中央寄せ） -->
     <div class="w-full flex flex-col items-center gap-3">
@@ -333,10 +342,7 @@ function renderDetailModalContent(p) {
       ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5 select-text w-full text-center mt-1">${p.memo}</div>` : ''}
     </div>
     
-    <!-- 2行目: 横幅いっぱいのGoogle Mapsボタン -->
-    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 0 6px rgba(37,99,235,0.1), 0 0 12px rgba(37,99,235,0.05); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-2xl active:scale-[0.97] transition-all">
-      📍 Googleマップで開く
-    </a>
+    ${googleMapsButtonHtml}
     
     <div class="flex flex-col gap-4">
       <div ${labelStyle ? `style="${labelStyle}"` : ''} class="${isOtherStaff ? 'rounded-3xl py-3.5 px-5 bg-white/[0.01] border border-white/[0.03]' : 'rounded-3xl py-3.5 px-5 bg-white/5 border border-white/10'} flex flex-col items-center justify-center gap-2 w-full">
