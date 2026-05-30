@@ -236,7 +236,7 @@ function renderDetailModalContent(p) {
       gpsBadgeHtml = `
         <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[9px] font-black text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-full tracking-wider">
           <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse shadow-[0_0_6px_#22c55e]"></span>
-          GPS SECURED
+          GPS VERIFIED
         </span>
       `;
     } else {
