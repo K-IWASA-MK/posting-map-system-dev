@@ -70,9 +70,20 @@ function renderAreas() {
       const isCompleted = c.done === c.total && c.total > 0;
       const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
       const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
+
+      // 市名の文字数に応じてフォントサイズを自動調整（折り返し・はみ出し防止）
+      let fontSizeClass = 'text-lg';
+      if (c.name.length > 12) {
+        fontSizeClass = 'text-xs';
+      } else if (c.name.length > 8) {
+        fontSizeClass = 'text-sm';
+      } else if (c.name.length > 5) {
+        fontSizeClass = 'text-base';
+      }
+
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
-        <div class="text-lg font-black text-white tracking-tight flex items-center justify-center gap-1.5">
+        <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug w-full" style="text-wrap: balance;">
           <span class="text-xs">🏢</span>
           <span>${c.name}</span>
         </div>
@@ -274,13 +285,22 @@ function renderDetailModalContent(p) {
 
   const areaName = window.currentCityDetailAreaName || '';
 
+  const cleanAddr = getCleanAddress(p.address);
+  // 住所の文字数に応じてフォントサイズを自動調整（折り返し・はみ出し防止）
+  let addrFontSizeClass = 'text-lg';
+  if (cleanAddr.length > 16) {
+    addrFontSizeClass = 'text-sm';
+  } else if (cleanAddr.length > 10) {
+    addrFontSizeClass = 'text-base';
+  }
+
   return `
     <div class="flex justify-between items-start gap-4">
       <div class="flex-1 space-y-2 min-w-0">
-        <div class="text-lg font-black text-white tracking-tight leading-tight select-text">${getCleanAddress(p.address)}</div>
+        <div class="${addrFontSizeClass} font-black text-white tracking-tight leading-tight select-text" style="text-wrap: balance;">${cleanAddr}</div>
         ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5 select-text">${p.memo}</div>` : ''}
       </div>
-      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getCleanAddress(p.address))}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" class="w-14 h-14 premium-glass-btn flex items-center justify-center text-xl shrink-0">📍</a>
     </div>
     
     <div class="flex flex-col gap-4">
