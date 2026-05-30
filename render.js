@@ -353,12 +353,12 @@ function renderDetailModalContent(p) {
           </div>
         </div>
 
-        <!-- 3行目: 中央にチェックボックス（タップで物理的に沈む＆枠をグリーンに変更＆反応領域を四角のみに限定） -->
+        <!-- 3行目: 中央にチェックボックス（タップで物理的に沈む＆枠をグリーンに変更＆反応領域を四角のみに限定＆サイズ拡大） -->
         <div class="w-full flex justify-center">
-          <label class="${isOtherStaff ? 'cursor-default' : 'cursor-pointer active:scale-90 active:translate-y-[2px] transition-all'} shrink-0">
+          <label ontouchstart="" class="${isOtherStaff ? 'cursor-default' : 'cursor-pointer active:scale-75 active:translate-y-1 transition-all duration-75'} block shrink-0">
             <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isOtherStaff?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
-            <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(16, 185, 129, 0.5); background-color: rgba(16, 185, 129, 0.06);'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all">
-              ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
+            <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(16, 185, 129, 0.5); background-color: rgba(16, 185, 129, 0.06);'}" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all">
+              ${p.isDone ? '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
             </div>
           </label>
         </div>
