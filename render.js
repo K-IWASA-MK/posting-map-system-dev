@@ -117,10 +117,18 @@ function renderAreas() {
         ? `<div style="text-indent: 0.12em; letter-spacing: 0.12em; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2);" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono rounded-full mb-1">📮 〒${zipCode}</div>`
         : '';
 
+      // 住所の文字数に応じてフォントサイズを自動調整（折り返し・はみ出し防止）
+      let fontSizeClass = 'text-base';
+      if (cleanAddress.length > 12) {
+        fontSizeClass = 'text-xs'; // 12文字超は小さめ (12px)
+      } else if (cleanAddress.length > 8) {
+        fontSizeClass = 'text-sm';  // 8〜12文字は中くらい (14px)
+      }
+
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="openDetail('${s.name}')">
         ${zipBadgeHtml}
-        <div class="text-base font-black text-white tracking-tight flex items-center justify-center gap-1.5 leading-snug">
+        <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug w-full" style="text-wrap: balance;">
           <span>${cleanAddress}</span>
         </div>
         <div class="text-sm ${pctColorClass}">${s.progress}%</div>
