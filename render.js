@@ -338,8 +338,8 @@ function renderDetailModalContent(p) {
     
     <div class="flex flex-col gap-4">
       <div ${labelStyle ? `style="${labelStyle}"` : ''} class="${cardClasses}">
-        <!-- チェックボックスの「四角」部分のみをlabelとし、タップ反応領域を限定 -->
-        <label class="${isOtherStaff ? 'cursor-default' : 'cursor-pointer active:scale-95 transition-all'} shrink-0">
+        <!-- チェックボックスの「四角」部分のみをlabelとし、タップ反応領域を限定（Safariの縦中央バグを修正） -->
+        <label class="flex items-center justify-center self-center ${isOtherStaff ? 'cursor-default' : 'cursor-pointer active:scale-95 transition-all'} shrink-0">
           <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isOtherStaff?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
           <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(255,255,255,0.2); background-color: transparent;'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all">
             ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
