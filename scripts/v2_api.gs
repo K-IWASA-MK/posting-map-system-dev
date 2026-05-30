@@ -191,6 +191,7 @@ function doPost(e) {
         response = { success: true, message: 'Batch run initiated successfully' };
         break;
       case 'refreshCache':
+        createSystemCacheSheet(); // スキーマ変更に対応するためキャッシュシートを再作成
         const cacheResult = refreshAreaSummaryCache();
         response = { success: true, message: 'Cache sync completed successfully', data: cacheResult };
         break;
@@ -235,7 +236,8 @@ function getAppData() {
     name: item.name,
     progress: item.total > 0 ? Math.round((item.done / item.total) * 100) : 0,
     done: item.done || 0,
-    total: item.total || 0
+    total: item.total || 0,
+    repAddress: item.repAddress || ""
   })) : [];
 
   const stats = (dashboardData && dashboardData.stats) ? dashboardData.stats : { done: 0, total: 0 };

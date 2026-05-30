@@ -44,15 +44,16 @@ function refreshAreaSummaryCache() {
   let totalPoints = 0;
 
   if (lastRow >= 2) {
-    // 1回のAPI通信で全エリアの集計結果を取得 (A:エリア名, B:完了数, C:合計数)
-    const data = shadowSheet.getRange(2, 1, lastRow - 1, 3).getValues();
+    // 1回のAPI通信で全エリアの集計結果を取得 (A:エリア名, B:完了数, C:合計数, D:代表住所)
+    const data = shadowSheet.getRange(2, 1, lastRow - 1, 4).getValues();
     data.forEach((row) => {
       const name = row[0];
       const done = Number(row[1]) || 0;
       const total = Number(row[2]) || 0;
+      const repAddress = row[3] ? String(row[3]).trim() : "";
 
       if (name) {
-        summary.push({ name: name, done: done, total: total });
+        summary.push({ name: name, done: done, total: total, repAddress: repAddress });
         totalDone += done;
         totalPoints += total;
       }
@@ -87,7 +88,7 @@ function createSystemCacheSheet() {
   }
   
   sheet.clear();
-  sheet.getRange(1, 1, 1, 3).setValues([["エリア名", "完了数", "合計数"]]);
+  sheet.getRange(1, 1, 1, 4).setValues([["エリア名", "完了数", "合計数", "代表住所"]]);
 
   const exclude = [
     CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE,
@@ -103,18 +104,25 @@ function createSystemCacheSheet() {
     return;
   }
 
-  const areaNames = areaSheets.map(s => [s.getName()]);
-  const formulas = areaSheets.map(s => {
+  const rows = areaSheets.map(s => {
     const name = s.getName();
+    const lastRow = s.getLastRow();
+    let repAddress = "";
+    
+    if (lastRow >= 2) {
+      repAddress = s.getRange(2, 1).getValue() || "";
+    }
+    
     const escapedName = name.replace(/'/g, "''");
     return [
+      name,
       `=COUNTIF('${escapedName}'!D:D, TRUE)`,
-      `=COUNTA('${escapedName}'!A2:A)`
+      `=COUNTA('${escapedName}'!A2:A)`,
+      repAddress
     ];
   });
 
-  sheet.getRange(2, 1, areaNames.length, 1).setValues(areaNames);
-  sheet.getRange(2, 2, formulas.length, 2).setFormulas(formulas);
+  sheet.getRange(2, 1, rows.length, 4).setValues(rows);
 }
 
 /**

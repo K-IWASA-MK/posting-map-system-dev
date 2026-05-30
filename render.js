@@ -100,12 +100,20 @@ function renderAreas() {
       const isCompleted = s.done === s.total && s.total > 0;
       const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
       const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
+      
+      // A2の代表住所を表示用にクリーンアップ（改行を半角スペースに変換）し、ポスティング用ポスト絵文字（📮）を付与
+      let displayTitle = '';
+      if (s.repAddress) {
+        displayTitle = `📮 ${s.repAddress.replace(/\r?\n/g, ' ')}`;
+      } else {
+        displayTitle = `📮 ${s.name}`; // フォールバック
+      }
+
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="openDetail('${s.name}')">
         <div style="${dotStyle}" class="w-2.5 h-2.5 rounded-full"></div>
-        <div class="text-lg font-black text-white tracking-tight flex items-center justify-center gap-1.5">
-          <span class="text-xs">🏘</span>
-          <span>${s.name}</span>
+        <div class="text-base font-black text-white tracking-tight flex items-center justify-center gap-1.5 leading-snug">
+          <span>${displayTitle}</span>
         </div>
         <div class="text-sm ${pctColorClass}">${s.progress}%</div>
         <div class="text-[10px] font-bold text-[#22c55e] font-mono tracking-wider flex items-center justify-center w-full">${leftDummy}<span>${s.done || 0}/ ${s.total || 0}</span>${rightLabel}</div>
