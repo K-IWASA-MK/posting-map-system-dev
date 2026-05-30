@@ -145,7 +145,7 @@ function renderAreas() {
       }
 
       return `
-      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="openDetail('${s.name}')">
+      <div id="area-card-${s.name}" class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="openDetail('${s.name}')">
         ${zipBadgeHtml}
         <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug w-full" style="text-wrap: balance;">
           <span>${cleanAddress}</span>

@@ -1,16 +1,16 @@
-const CACHE_NAME = 'posting-map-cache-v333';
+const CACHE_NAME = 'posting-map-cache-v334';
 const ASSETS = [
   './',
   './index.html',
   './manager.html',
   './style.css',
-  './style.css?v=333',
+  './style.css?v=334',
   './db.js',
-  './db.js?v=333',
+  './db.js?v=334',
   './app.js',
-  './app.js?v=333',
+  './app.js?v=334',
   './render.js',
-  './render.js?v=333',
+  './render.js?v=334',
   './manifest.json',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap',

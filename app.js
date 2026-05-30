@@ -825,7 +825,18 @@ async function switchPage(id, force = false) {
   });
 
   // スクロール位置の復元
-  $('content').scrollTo(0, scrollPositions[id] || 0);
+  if (id === 'areas' && window.currentCityDetailAreaName) {
+    setTimeout(() => {
+      const cardEl = document.getElementById(`area-card-${window.currentCityDetailAreaName}`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ block: 'center', behavior: 'auto' });
+      } else {
+        $('content').scrollTo(0, scrollPositions[id] || 0);
+      }
+    }, 50);
+  } else {
+    $('content').scrollTo(0, scrollPositions[id] || 0);
+  }
 }
 
 // 下ナビの「エリア」ボタンタップ時に直前のサブページへ戻る
