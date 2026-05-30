@@ -303,9 +303,9 @@ function renderDetailModalContent(p) {
   }
 
   // ロック状態によるスタイル分岐
-  const labelClasses = isOtherStaff
-    ? "rounded-3xl p-5 flex items-center gap-5 cursor-default bg-white/[0.01] border border-white/[0.03]"
-    : `rounded-3xl p-5 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all bg-white/5 border border-white/10`;
+  const cardClasses = isOtherStaff
+    ? "rounded-3xl p-5 flex items-center gap-5 bg-white/[0.01] border border-white/[0.03]"
+    : "rounded-3xl p-5 flex items-center gap-5 bg-white/5 border border-white/10";
   
   const labelStyle = !isOtherStaff && p.isDone
     ? 'background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);'
@@ -337,26 +337,33 @@ function renderDetailModalContent(p) {
     </a>
     
     <div class="flex flex-col gap-4">
-      <label ${labelStyle ? `style="${labelStyle}"` : ''} class="${labelClasses}">
-        <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isOtherStaff?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
-        <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(255,255,255,0.2); background-color: transparent;'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0">
-          ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
-        </div>
+      <div ${labelStyle ? `style="${labelStyle}"` : ''} class="${cardClasses}">
+        <!-- チェックボックスの「四角」部分のみをlabelとし、タップ反応領域を限定 -->
+        <label class="${isOtherStaff ? 'cursor-default' : 'cursor-pointer active:scale-95 transition-all'} shrink-0">
+          <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isOtherStaff?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
+          <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(255,255,255,0.2); background-color: transparent;'}" class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all">
+            ${p.isDone ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
+          </div>
+        </label>
+        
         <div class="flex-1 min-w-0 flex items-center justify-between">
-          <div class="flex flex-col min-w-0">
+          <div class="flex flex-col min-w-0 select-none">
             <div class="flex items-center gap-1">
               ${lockIconHtml}
               <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">
                 ${p.isDone ? 'MISSION COMPLETED' : 'READY TO DEPLOY'}
               </span>
             </div>
+            <!-- 未完了状態（READY TO DEPLOY）でも「タップで配布完了」の補助テキストを表示して2段で高さを統一 -->
             ${p.isDone && p.completedAt ? `
               <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">${formatCompletedAt(p.completedAt)} ${p.staffName ? `· ${p.staffName}` : ''}</div>
-            ` : ''}
+            ` : `
+              <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">タップで配布完了</div>
+            `}
           </div>
           ${syncLabelHtml}
         </div>
-      </label>
+      </div>
 
       ${p.isDone ? `
         <div class="flex flex-wrap items-center gap-2">
