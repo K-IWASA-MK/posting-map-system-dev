@@ -278,8 +278,7 @@ function renderDetailModalContent(p) {
     } else if (photoId) {
       photoBlockHtml = `
         <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-[#2563eb]/05 border border-[#2563eb]/15 gap-3">
-          <div class="flex items-center justify-center gap-2">
-            <span class="text-sm">📸</span>
+          <div class="flex items-center justify-center text-center w-full">
             <span class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO SENT</span>
           </div>
           ${!isOtherStaff ? `
@@ -290,12 +289,11 @@ function renderDetailModalContent(p) {
     } else {
       photoBlockHtml = `
         <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 border border-white/5 gap-3">
-          <div class="flex items-center justify-center gap-2">
-            <span class="text-sm text-white/30">📸</span>
+          <div class="flex items-center justify-center text-center w-full">
             <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
           </div>
           ${!isOtherStaff ? `
-            <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-white/80 uppercase tracking-wider bg-white/5 rounded-xl border border-white/10 active:scale-95 transition-all">📸 写真を追加</button>
+            <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-white/80 uppercase tracking-wider bg-white/5 rounded-xl border border-white/10 active:scale-95 transition-all">写真を追加</button>
           ` : ''}
         </div>
       `;
