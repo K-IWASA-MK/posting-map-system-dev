@@ -393,9 +393,10 @@ function renderDetailModalContent(p) {
         ${photoBlockHtml}
 
         <div class="flex flex-col items-center justify-center bg-white/5 border border-white/5 rounded-2xl p-5 gap-3">
-          <div class="flex items-baseline justify-center">
+          <div class="flex items-baseline justify-center gap-2">
+            <span class="text-xs font-bold text-white/60">配布数</span>
             <span class="text-3xl font-black text-white tracking-tight">${p.count || 0}</span>
-            <span class="text-xs font-bold text-white/60 ml-1">枚</span>
+            <span class="text-xs font-bold text-white/60">枚</span>
           </div>
           ${!isLocked ? `
             <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all">枚数変更</button>
