@@ -157,9 +157,9 @@ async function callApiPost(action, payload = {}) {
     try {
       logDebug(`[callApiPost] START (Attempt ${attempt}/${MAX_RETRIES}): action=${action}, bodySize=${body.length}`);
 
-      // 30秒タイムアウト（大容量POST + GASコールドスタート対策）
+      // 90秒タイムアウト（大容量画像POST + GASコールドスタート + ドライブ保存処理の遅延対策）
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const timeoutId = setTimeout(() => controller.abort(), 90000);
       const response = await fetch(url, { ...options, body, signal: controller.signal });
       clearTimeout(timeoutId);
       logDebug(`[callApiPost] FETCH OK. status=${response.status}`);
@@ -182,7 +182,6 @@ async function callApiPost(action, payload = {}) {
       logDebug(`[callApiPost] Attempt ${attempt} failed: ${err.message}`);
       if (attempt === MAX_RETRIES) {
         console.error("API POST Error:", err);
-        alert("通信エラーが発生しました。\n内容: " + err.message);
         throw err;
       }
       await new Promise(r => setTimeout(r, delay));
