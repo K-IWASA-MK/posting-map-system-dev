@@ -390,12 +390,13 @@ function renderDetailModalContent(p) {
         
         ${photoBlockHtml}
 
-        <div class="flex flex-col items-center justify-center bg-white/5 border border-white/5 rounded-2xl p-5 gap-3">
-          <div class="text-3xl font-black text-white text-center tracking-tight">
+        <!-- 【配布数】上2つの証拠カードと枠サイズ・デザイン・青色テーマを完全統一 -->
+        <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4); box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.15), 0 0 30px rgba(37, 99, 235, 0.05);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
+          <div class="text-3xl font-black text-[#2563eb] text-center tracking-tight">
             配布数 ${p.count || 0}枚
           </div>
           ${!isLocked ? `
-            <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all">枚数変更</button>
+            <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all mt-2">枚数変更</button>
           ` : ''}
         </div>
 
