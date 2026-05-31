@@ -346,8 +346,8 @@ function renderDetailModalContent(p) {
     
     <div class="flex flex-col gap-4">
       ${!p.isDone ? `
-        <!-- 【未完了】全体がタップ可能な極上シンメトリーカード (反応領域拡大・物理フィードバック対応) -->
-        <label ontouchstart="" class="cursor-pointer rounded-3xl py-6 px-5 bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-4 w-full active:scale-[0.98] transition-all duration-100">
+        <!-- 【未完了】全体がタップ可能な極上シンメトリーカード (グリーン枠・強力沈み込みフィードバック対応) -->
+        <label ontouchstart="" class="cursor-pointer rounded-3xl py-6 px-5 bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-4 w-full active:scale-[0.95] active:translate-y-0.5 transition-all duration-75">
           <input type="checkbox" class="hidden" onchange="toggleDone('${areaName}', ${p.rowId}, this)">
           
           <!-- 1. テキスト（中央揃え） -->
@@ -356,9 +356,9 @@ function renderDetailModalContent(p) {
             <span class="text-xs font-bold text-white/40 mt-1 tracking-wider">タップで配布完了</span>
           </div>
 
-          <!-- 2. チェックボックス（中央揃え・薄いチェックマークシルエットで空洞感解消） -->
-          <div style="border-color: rgba(255, 255, 255, 0.15); background-color: rgba(255, 255, 255, 0.02);" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all">
-            <svg class="w-6 h-6 text-white/10" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+          <!-- 2. チェックボックス（中央揃え・グリーン枠線・薄いグリーンチェックシルエット） -->
+          <div style="border-color: rgba(16, 185, 129, 0.4); background-color: rgba(16, 185, 129, 0.06); box-shadow: 0 0 10px rgba(16, 185, 129, 0.05);" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all">
+            <svg class="w-6 h-6 text-[#10b981]/20" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
             </svg>
           </div>
