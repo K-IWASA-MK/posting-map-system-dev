@@ -281,13 +281,12 @@ function renderDetailModalContent(p) {
       `;
     } else if (photoId) {
       photoBlockHtml = `
-        <!-- 【写真あり】青色（#2563eb）テーマの写真確認カード (ボタンを常時表示) -->
-        <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-[#2563eb]/05 border border-[#2563eb]/15 gap-3">
+        <!-- 【写真あり】青色（#2563eb）テーマの写真確認カード (コンパクト化・ボタン廃止・外枠青色化) -->
+        <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4); box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.15), 0 0 30px rgba(37, 99, 235, 0.05);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
           <div class="flex items-center justify-center gap-2 w-full">
             <span class="text-sm">📸</span>
-            <span class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO VERIFIED</span>
+            <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO VERIFIED</span>
           </div>
-          <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">写真を変更</button>
         </div>
       `;
     } else {
