@@ -345,34 +345,47 @@ function renderDetailModalContent(p) {
     ${googleMapsButtonHtml}
     
     <div class="flex flex-col gap-4">
-      <div ${labelStyle ? `style="${labelStyle}"` : ''} class="${isOtherStaff ? 'rounded-3xl py-3.5 px-5 bg-white/[0.01] border border-white/[0.03]' : 'rounded-3xl py-3.5 px-5 bg-white/5 border border-white/10'} flex flex-col items-center justify-center gap-2 w-full">
-        
-        <!-- テキスト2行 (中央揃え) -->
-        <div class="flex flex-col items-center select-none text-center w-full">
-          <div class="flex items-center justify-center gap-1">
-            ${lockIconHtml}
-            <span class="text-[10px] font-black uppercase tracking-widest ${p.isDone ? 'text-[#10b981]' : 'text-white/60'}">
-              ${p.isDone ? 'MISSION COMPLETED' : 'READY TO DEPLOY'}
-            </span>
+      ${!p.isDone ? `
+        <!-- 【未完了】全体がタップ可能な極上シンメトリーカード (反応領域拡大・物理フィードバック対応) -->
+        <label ontouchstart="" class="cursor-pointer rounded-3xl py-6 px-5 bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-4 w-full active:scale-[0.98] transition-all duration-100">
+          <input type="checkbox" class="hidden" onchange="toggleDone('${areaName}', ${p.rowId}, this)">
+          
+          <!-- 1. テキスト（中央揃え） -->
+          <div class="flex flex-col items-center select-none text-center">
+            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">READY TO DEPLOY</span>
+            <span class="text-xs font-bold text-white/40 mt-1 tracking-wider">タップで配布完了</span>
           </div>
-          <!-- 完了日時 または 配布案内 -->
-          <div class="text-[10px] text-white/40 font-bold mt-1 tracking-wider uppercase truncate">
-            ${p.isDone && p.completedAt ? `${formatCompletedAt(p.completedAt)}${p.staffName ? ` · ${p.staffName}` : ''}` : 'タップで配布完了'}
-          </div>
-        </div>
 
-        <!-- 3行目: 中央にチェックボックス（タップで物理的に沈む＆枠をグリーンに変更＆反応領域を四角のみに限定＆サイズ拡大） -->
-        <div class="w-full flex justify-center">
-          <label ontouchstart="" class="${isLocked ? 'cursor-default' : 'cursor-pointer active:scale-75 active:translate-y-1 transition-all duration-75'} block shrink-0">
-            <input type="checkbox" class="hidden" ${p.isDone?'checked':''} ${isLocked?'disabled':''} onchange="toggleDone('${areaName}', ${p.rowId}, this)">
-            <div style="${p.isDone ? 'border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);' : 'border-color: rgba(16, 185, 129, 0.5); background-color: rgba(16, 185, 129, 0.06);'}" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all">
-              ${p.isDone ? '<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' : ''}
+          <!-- 2. チェックボックス（中央揃え・薄いチェックマークシルエットで空洞感解消） -->
+          <div style="border-color: rgba(255, 255, 255, 0.15); background-color: rgba(255, 255, 255, 0.02);" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all">
+            <svg class="w-6 h-6 text-white/10" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+        </label>
+      ` : `
+        <!-- 【完了済み】編集ロックがかかった上品なグリーンステータス表示 -->
+        <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.1), 0 0 30px rgba(16, 185, 129, 0.05);" class="w-full rounded-3xl py-6 px-5 flex flex-col items-center justify-center gap-4">
+          
+          <!-- 1. テキスト（中央揃え） -->
+          <div class="flex flex-col items-center select-none text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <span class="text-xs">🔒</span>
+              <span class="text-[10px] font-black uppercase tracking-widest text-[#10b981]">MISSION COMPLETED</span>
             </div>
-          </label>
+            <span class="text-xs font-bold text-white/80 mt-1">${p.completedAt ? `${formatCompletedAt(p.completedAt)}${p.staffName ? ` · ${p.staffName}` : ''}` : ''}</span>
+          </div>
+
+          <!-- 2. チェックボックス（中央揃え・検証済みグリーンに発光） -->
+          <div style="border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);" class="w-12 h-12 rounded-2xl border flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          
+          ${syncLabelHtml ? `<div class="w-full flex justify-center mt-1">${syncLabelHtml.replace('ml-auto', '')}</div>` : ''}
         </div>
-        
-        ${syncLabelHtml ? `<div class="w-full flex justify-center">${syncLabelHtml.replace('ml-auto', '')}</div>` : ''}
-      </div>
+      `}
 
       ${p.isDone ? `
         <div class="flex flex-wrap items-center justify-center gap-2 w-full">
