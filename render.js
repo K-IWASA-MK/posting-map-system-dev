@@ -281,25 +281,24 @@ function renderDetailModalContent(p) {
       `;
     } else if (photoId) {
       photoBlockHtml = `
+        <!-- 【写真あり】青色（#2563eb）テーマの写真確認カード (ボタンを常時表示) -->
         <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-[#2563eb]/05 border border-[#2563eb]/15 gap-3">
           <div class="flex items-center justify-center gap-2 w-full">
             <span class="text-sm">📸</span>
             <span class="text-[9px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO VERIFIED</span>
           </div>
-          ${!isLocked ? `
-            <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">写真を変更</button>
-          ` : ''}
+          <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">写真を変更</button>
         </div>
       `;
     } else {
       photoBlockHtml = `
-        <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 border border-white/5 gap-3">
-          <div class="flex items-center justify-center text-center w-full">
+        <!-- 【写真なし】カメラアイコンを表示し、青色の追加ボタンを常時配置 -->
+        <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 border border-white/10 gap-3">
+          <div class="flex items-center justify-center gap-2 w-full">
+            <span class="text-sm text-white/30">📸</span>
             <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
           </div>
-          ${!isLocked ? `
-            <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">📸 写真を追加</button>
-          ` : ''}
+          <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">📸 写真を追加</button>
         </div>
       `;
     }

@@ -581,23 +581,25 @@ function pressNum(key) {
     numpadContext.isDoneToggle = false;
     closeNumpad();
     
-    // 2. バックグラウンドで非同期にGPS取得と写真撮影・キューイングを行う
+    // 2. バックグラウンドで非同期に写真撮影とGPS取得・キューイングを行う
     (async () => {
-      const gps = await getGPSLocation();
-      if (p && gps.latitude && gps.longitude) {
-        p.gps = `${gps.latitude},${gps.longitude}`;
-        const modalContent = $('detail-modal-content');
-        if (modalContent) {
-          modalContent.innerHTML = renderDetailModalContent(p);
-        }
-      }
-      
+      // タップジェスチャーが生きているうちにカメラを最優先で起動（GPS待ちによるブロックを回避）
       let imageBlob = null;
-      imageBlob = await capturePhoto(); // confirm()を廃止 → カメラ自動起動（LINE LIFF対応・端末側でキャンセル可）
-      
-      // 撮影直後にローカルBlobプレビューを反映
-      if (imageBlob && p) {
-        p.tempPhotoUrl = URL.createObjectURL(imageBlob);
+      try {
+        imageBlob = await capturePhoto();
+      } catch (err) {
+        console.error("Camera activation failed:", err);
+      }
+
+      // カメラ処理の完了後にGPSを取得
+      const gps = await getGPSLocation();
+      if (p) {
+        if (gps.latitude && gps.longitude) {
+          p.gps = `${gps.latitude},${gps.longitude}`;
+        }
+        if (imageBlob) {
+          p.tempPhotoUrl = URL.createObjectURL(imageBlob);
+        }
         renderDetailList(areaName);
         const modalContent = $('detail-modal-content');
         if (modalContent) {
