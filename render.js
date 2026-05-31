@@ -238,16 +238,23 @@ function renderDetailModalContent(p) {
   if (p.isDone) {
     if (p.gps) {
       gpsBadgeHtml = `
-        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[9px] font-black text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-full tracking-wider">
-          <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse shadow-[0_0_6px_#22c55e]"></span>
-          GPS VERIFIED
-        </span>
+        <!-- 【GPSあり】横幅いっぱいの青色カード型 (PHOTO VERIFIED と完全同一スタイル) -->
+        <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4); box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.15), 0 0 30px rgba(37, 99, 235, 0.05);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
+          <div class="flex items-center justify-center gap-2 w-full">
+            <span class="text-sm">📍</span>
+            <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em]">GPS VERIFIED</span>
+          </div>
+        </div>
       `;
     } else {
       gpsBadgeHtml = `
-        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[9px] font-black text-white/30 bg-white/5 border border-white/10 rounded-full tracking-wider">
-          NO GPS DATA
-        </span>
+        <!-- 【GPSなし】横幅いっぱいのカード型 -->
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
+          <div class="flex items-center justify-center gap-2 w-full">
+            <span class="text-sm opacity-30">📍</span>
+            <span class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">NO GPS DATA</span>
+          </div>
+        </div>
       `;
     }
   }
@@ -379,9 +386,7 @@ function renderDetailModalContent(p) {
       `}
 
       ${p.isDone ? `
-        <div class="flex flex-wrap items-center justify-center gap-2 w-full">
-          ${gpsBadgeHtml}
-        </div>
+        ${gpsBadgeHtml}
         
         ${photoBlockHtml}
 
