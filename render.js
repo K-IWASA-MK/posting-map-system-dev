@@ -800,7 +800,7 @@ function renderRanking() {
       <div style="${cardStyle}" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 transition-all">
         <!-- 1行目: 順位バッジ -->
         <div class="flex items-center justify-center">
-          <div class="h-7 px-3.5 rounded-full flex items-center justify-center font-mono font-black text-[11px] ${rankBadgeClass}">
+          <div class="h-7 min-w-[76px] px-3.5 rounded-full flex items-center justify-center font-mono font-black text-[11px] ${rankBadgeClass}">
             ${glowDotHtml}
             <span>${rank}位</span>
           </div>

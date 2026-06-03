@@ -61,12 +61,20 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v370`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v371`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】順位カプセルバッジの最小横幅（min-w）設定と整列化（担当: Gemini 3.5 Flash）
+- **変更内容**:
+  - 配布ランキング画面の順位バッジに `min-w-[76px]` の最小横幅制限を設定。
+  - これにより、1位から2桁順位（例: `10位` や `12位`）まで、バッジの形状が歪まず綺麗な横長カプセル型を維持するよう改善。
+  - リスト全体の縦軸のラインが揃い、デザインの対称性と視認性が向上。
+  - `index.html` および `service-worker.js` のキャッシュバスターを `v371` にインクリメント。
+- **修正ファイル**: `render.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】GPS/写真証跡の確実な取得とメモリ同期バグ修正（担当: Gemini 3.5 Flash）
 - **不具合事象**: モバイル環境（LINE WebView等）で写真とGPSの両方を取得したにもかかわらず、提出前の詳細画面で「NO GPS DATA」「NO EVIDENCE PHOTO」と表示されてしまう。
