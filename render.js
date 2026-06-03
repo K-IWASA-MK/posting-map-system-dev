@@ -742,7 +742,7 @@ function renderRanking() {
       <div class="text-lg font-black text-white tracking-tight">${myName}</div>
       <div class="flex items-center justify-center mt-0.5">
         <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wide">
-          現在の順位 : ${myRank === "圏外" ? '圏外' : `${myRank}位`}
+          現在までの配布数 : ${myCount.toLocaleString()}枚
         </div>
       </div>
     </div>

@@ -61,12 +61,21 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v367`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v368`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】マイステータスカードの3行目「配布数」への差し替え（担当: Gemini 3.5 Flash）
+- **変更内容**:
+  - 配布ランキング画面の「My Performance（本人のステータス）カード」の3行目の内容を「現在の順位」から「現在までの配布数」に差し替え。
+    - 1行目: `My Performance`
+    - 2行目: 自分の名前（`text-lg`）
+    - 3行目: 現在までの配布数（緑色のカプセル型バッジ内に `現在までの配布数 : ○○,○○○枚` の形式で格納。5桁の枚数が入るスペースを考慮）
+  - `index.html` および `service-worker.js` のキャッシュバスターを `v368` にインクリメント。
+- **修正ファイル**: `render.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】マイステータスカードの3行構成・中央揃え化（担当: Gemini 3.5 Flash）
 - **変更内容**:
