@@ -576,12 +576,15 @@ function pressNum(key) {
     numpadContext.isDoneToggle = false;
     closeNumpad();
     
-    // 2. バックグラウンドで非同期に写真撮影とGPS取得・キューイングを行う
+    // 2. 非同期でGPS取得、写真撮影、およびキューイングを順次実行する
     (async () => {
-      // ★対策1: カメラ起動前にGPSの取得を非同期で先行開始しておく（サスペンドによるタイムアウトを防ぐ）
-      const gpsPromise = getGPSLocation();
+      // テンキーが完全に閉じるのを待つ
+      await new Promise(r => setTimeout(r, 350));
 
-      // タップジェスチャーが生きているうちにカメラを最優先で起動（GPS待ちによるブロックを回避）
+      // ① まずGPS取得を実行し、その完了を確実に待つ（カメラ起動によるサスペンドを回避）
+      const gps = await getGPSLocation();
+
+      // ② GPS完了後、カメラを起動して写真撮影を行う
       let imageBlob = null;
       try {
         imageBlob = await capturePhoto();
@@ -589,12 +592,6 @@ function pressNum(key) {
         console.error("Camera activation failed:", err);
       }
 
-      // カメラから戻ってきた後、先行開始しておいたGPSの結果を待つ
-      let gps = await gpsPromise;
-      if (!gps.latitude || !gps.longitude) {
-        console.log("GPS fetch timed out or empty during camera active. Retrying GPS fetch...");
-        gps = await getGPSLocation();
-      }
       if (p) {
         if (gps.latitude && gps.longitude) {
           p.gps = `${gps.latitude},${gps.longitude}`;
@@ -611,8 +608,8 @@ function pressNum(key) {
 
       // BlobはSafari/LINE WebViewのIndexedDBで失われるため送信前にbase64変換
       let photoBase64 = '';
-      if (imageBlob && typeof blobToBase64 === 'function') {
-        photoBase64 = await blobToBase64(imageBlob);
+      if (imageBlob && typeof window.blobToBase64 === 'function') {
+        photoBase64 = await window.blobToBase64(imageBlob);
       }
       
       if (typeof enqueueSync === 'function') {
