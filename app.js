@@ -576,20 +576,25 @@ function pressNum(key) {
     numpadContext.isDoneToggle = false;
     closeNumpad();
     
-    // 2. 非同期でGPS取得、写真撮影、およびキューイングを順次実行する
+    // 2. バックグラウンドで非同期に写真撮影とGPS取得・キューイングを行う
     (async () => {
-      // テンキーが完全に閉じるのを待つ
-      await new Promise(r => setTimeout(r, 350));
+      // GPS取得をカメラ起動と並行して先行開始（サスペンドによるタイムアウト対策）
+      const gpsPromise = getGPSLocation();
 
-      // ① まずGPS取得を実行し、その完了を確実に待つ（カメラ起動によるサスペンドを回避）
-      const gps = await getGPSLocation();
-
-      // ② GPS完了後、カメラを起動して写真撮影を行う
+      // タップジェスチャーが生きているうちにカメラを最優先で起動（GPS待ちによるブロックを回避）
       let imageBlob = null;
       try {
         imageBlob = await capturePhoto();
       } catch (err) {
         console.error("Camera activation failed:", err);
+      }
+
+      // カメラから戻った後、先行開始しておいたGPSの結果を待つ
+      let gps = await gpsPromise;
+      // GPS未取得の場合はカメラ復帰後にリトライ
+      if (!gps.latitude || !gps.longitude) {
+        console.log("GPS empty after camera, retrying...");
+        gps = await getGPSLocation();
       }
 
       if (p) {
