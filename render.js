@@ -123,8 +123,8 @@ function renderAreas() {
     const areaCardsHtml = filteredAreas.map(s => {
       const pctColorClass = 'text-[#2563eb]';
       const isCompleted = s.done === s.total && s.total > 0;
-      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
-      const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
+      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 8px; white-space: nowrap;" class="select-none text-xs font-sans">🔒</span>' : '';
+      const rightLabel = isCompleted ? '<span style="margin-left: 8px; white-space: nowrap;" class="font-sans text-xs opacity-90">🔒</span>' : '';
       
       // A2の代表住所を郵便番号と住所に分離して解析
       let zipCode = '';
@@ -157,9 +157,14 @@ function renderAreas() {
         ? `https://www.google.com/maps/search/${zipCode}`
         : `https://www.google.com/maps/search/${encodeURIComponent(cleanAddress + ' 日本')}`;
 
-      return `
-      <div id="area-card-${s.name}" class="premium-glass py-5 px-6 flex items-center justify-center">
-        <div style="display: inline-flex; flex-direction: column; align-items: stretch; gap: 8px; text-align: center;">
+      const googleMapsButtonHtml = isCompleted
+        ? `
+          <button style="background: rgba(37,99,235,0.02); border: 1px solid rgba(37,99,235,0.1); color: rgba(37,99,235,0.3); pointer-events: none; font-family: monospace;"
+            class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none opacity-40">
+            📮 〒${zipCode || '---'} → 🗺
+          </button>
+        `
+        : `
           <button ontouchstart="" onclick="window.open('${mapUrl}', '_blank')"
             style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.25); color: rgba(37,99,235,0.88); transition: transform 75ms ease-out; white-space: nowrap; font-family: monospace;"
             onpointerdown="this.style.transform='scale(0.94)'"
@@ -168,17 +173,16 @@ function renderAreas() {
             class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none">
             📮 〒${zipCode || '---'} → 🗺
           </button>
-          <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug" style="text-wrap: balance; padding: 4px 0;">
-            ${cleanAddress}
-          </div>
-          <div class="text-sm ${pctColorClass}">${s.progress}%</div>
-          <div class="flex items-center justify-center">
-            ${leftDummy}
-            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
-              ${s.done || 0}/ ${s.total || 0}
-            </div>
-            ${rightLabel}
-          </div>
+        `;
+
+      const actionButtonHtml = isCompleted
+        ? `
+          <button style="background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.15); color: rgba(255,255,255,0.3); pointer-events: none;"
+            class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none opacity-40">
+            配布詳細へ →
+          </button>
+        `
+        : `
           <button ontouchstart="" onclick="openDetail('${s.name}')"
             style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out; white-space: nowrap;"
             onpointerdown="this.style.transform='scale(0.96)'"
@@ -187,6 +191,24 @@ function renderAreas() {
             class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none">
             配布詳細へ →
           </button>
+        `;
+
+      return `
+      <div id="area-card-${s.name}" class="premium-glass py-5 px-6 flex items-center justify-center">
+        <div style="display: inline-flex; flex-direction: column; align-items: stretch; gap: 8px; text-align: center;">
+          ${googleMapsButtonHtml}
+          <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug" style="text-wrap: balance; padding: 4px 0;">
+            ${cleanAddress}
+          </div>
+          <div class="text-sm ${pctColorClass}">${s.progress}%</div>
+          <div class="flex items-center justify-center">
+            ${leftDummy}
+            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e; white-space: nowrap; flex-shrink: 0;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
+              ${s.done || 0}/ ${s.total || 0}
+            </div>
+            ${rightLabel}
+          </div>
+          ${actionButtonHtml}
         </div>
       </div>`;
     }).join('');
