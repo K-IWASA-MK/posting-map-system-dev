@@ -574,17 +574,20 @@ function pressNum(key) {
     }
     
     numpadContext.isDoneToggle = false;
-    closeNumpad();
-    
-    // 2. バックグラウンドで非同期に写真撮影とGPS取得・キューイングを行う
-    (async () => {
-      // GPS取得をカメラ起動と並行して先行開始（サスペンドによるタイムアウト対策）
-      const gpsPromise = getGPSLocation();
 
-      // タップジェスチャーが生きているうちにカメラを最優先で起動（GPS待ちによるブロックを回避）
+    // GPS・カメラを先に開始（ユーザーのタップジェスチャーが生きている間に呼ぶ）
+    const gpsPromise = getGPSLocation();
+    // capturePhoto()内のinput.click()はここで同期的に実行される
+    // → テンキーを閉じる前にカメラが起動するため、裏画面が一瞬見える現象を防ぐ
+    const cameraPromise = capturePhoto();
+
+    closeNumpad(); // カメラ起動後にテンキーを閉じる
+
+    // 2. バックグラウンドで写真取得完了とGPS結果を待ちキューイングする
+    (async () => {
       let imageBlob = null;
       try {
-        imageBlob = await capturePhoto();
+        imageBlob = await cameraPromise;
       } catch (err) {
         console.error("Camera activation failed:", err);
       }
