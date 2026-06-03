@@ -13,7 +13,7 @@ function forceStartBatch() {
   props.setProperty("BATCH_STATUS", "running");
   props.setProperty("BATCH_INDEX", "0");
   
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSS(); // Web APIでも安全に取得できるよう getSS() を使用
   
   // 1. 最初に巨大CSVから住所を一括展開・ソートして一時シートへ保存
   ss.toast("住所データを抽出・ソート中...", "準備中", 5);

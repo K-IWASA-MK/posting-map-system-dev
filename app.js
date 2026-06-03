@@ -247,7 +247,7 @@ async function syncOfflineQueue() {
   const failedItems = [];
   for (const item of queue) {
     try {
-      const result = await callApi('submitDistribution', item);
+      const result = await callApiPost('submitDistribution', item);
       if (!result || !result.success) {
         failedItems.push(item);
       }
@@ -657,8 +657,8 @@ async function updateRecord(areaName, rowId, isDone, count) {
     staffName: staffName,
     staffId: staffId,
     isDone: isDone,
-    count: count,
-    action: 'submitDistribution'
+    count: count
+    // actionはcallApiPostの引数として渡すためここには不要
   };
 
   // Optimistic UI updates if offline or connection fails
@@ -669,7 +669,7 @@ async function updateRecord(areaName, rowId, isDone, count) {
   }
   
   try {
-    const result = await callApi('submitDistribution', payload);
+    const result = await callApiPost('submitDistribution', payload);
     if (result.success) {
       loadData(true); // skip recursive sync
     }

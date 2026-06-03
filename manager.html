@@ -302,9 +302,10 @@
           addLog(`Stats updated: coverage ${coverage}% (${totalDone}/${totalPoints} across ${areas.length} districts)`);
         }
 
-        if (rosterData) {
-          $('stat-staff').textContent = rosterData.length || 0;
-          addLog(`Roster loaded: ${rosterData.length} distributor(s) registered.`);
+        if (rosterData && rosterData.success) {
+          const rosterList = rosterData.roster || [];
+          $('stat-staff').textContent = rosterList.length;
+          addLog(`Roster loaded: ${rosterList.length} distributor(s) registered.`);
         }
 
         // 同期統計パネル更新 (要件9)

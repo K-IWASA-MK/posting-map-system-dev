@@ -66,20 +66,14 @@ function doGet(e) {
         response = { success: true, ranking: getRankingData() };
         break;
       case 'getRoster':
-        response = getRoster();
+        response = { success: true, roster: getRoster() };
         break;
       case 'getAreaDetails':
         response = getAreaDetails(e.parameter.name);
         break;
       case 'submitDistribution':
-        response = submitDistribution(
-          e.parameter.areaName,
-          parseInt(e.parameter.rowId, 10),
-          e.parameter.staffName,
-          parseFloat(e.parameter.count) || 0,
-          e.parameter.isDone === 'true' || e.parameter.isDone === true,
-          e.parameter.staffId
-        );
+        // ⚠️ 書き込み操作はGET禁止。フロントエンドはPOSTで呼び出すこと。
+        response = { success: false, message: 'Write operations require POST. Please update the client.' };
         break;
       case 'registerStaff':
         response = registerStaff(e.parameter.lastName, e.parameter.firstName);
@@ -155,7 +149,7 @@ function doPost(e) {
         response = { success: true, ranking: getRankingData() };
         break;
       case 'getRoster':
-        response = getRoster();
+        response = { success: true, roster: getRoster() };
         break;
       case 'getAreaDetails':
         response = getAreaDetails(postData.name || e.parameter.name);
