@@ -292,7 +292,7 @@ function getRoster() {
 function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) {
   const lock = LockService.getScriptLock();
   try {
-    lock.waitLock(15000); // 15 seconds maximum wait
+    lock.waitLock(5000); // 5秒（setValuesのみの軽量操作なので十分）
   } catch (e) {
     throw new Error("サーバーが混雑しています。時間をおいて再度お試しください。");
   }

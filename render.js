@@ -495,6 +495,16 @@ function navigateToSiblingArea(direction) {
 }
 
 async function openDetail(name) {
+  // ① 同一エリアへの再タップ: メモリキャッシュを使って即時描画（API スキップ）
+  if (window.currentCityDetailAreaName === name && allPoints && allPoints.length > 0) {
+    if (typeof scrollPositions !== 'undefined') scrollPositions['detail'] = 0;
+    const contentEl = $('content');
+    if (contentEl) contentEl.scrollTop = 0;
+    renderDetailList(name); // 最新の allPoints（キュー同期済み）で再描画
+    switchPage('detail');
+    return; // API呼び出しなしで完了
+  }
+
   $('loading').classList.remove('hidden');
   $('loading').classList.remove('opacity-0');
   
