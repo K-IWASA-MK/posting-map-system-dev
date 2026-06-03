@@ -569,12 +569,8 @@ function pressNum(key) {
       p.completedAt = timeStr;
       p.syncStatus = 'pending';
       
-      // リストと詳細モーダルを再描画
+      // リストを再描画（裏画面用）
       renderDetailList(areaName);
-      const modalContent = $('detail-modal-content');
-      if (modalContent) {
-        modalContent.innerHTML = renderDetailModalContent(p);
-      }
     }
     
     numpadContext.isDoneToggle = false;

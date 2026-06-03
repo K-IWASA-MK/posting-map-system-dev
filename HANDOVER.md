@@ -61,12 +61,18 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v376`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v377`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】カメラ起動前の詳細モーダルフライング描画の削除 (v377)（担当: Gemini 3.5 Flash）
+- **不具合事象**: テンキーで枚数を入れて確定（OK）した直後、カメラ起動に移る前に、一瞬だけ裏画面（詳細モーダル）が未完了または中途半端な証跡なし（NO GPS / NO PHOTO）の状態で再描画されて見えてしまうチラつき・ガタつきが発生。
+- **原因**: `app.js` 内の `pressNum` 関数において、カメラを起動して証跡を取得し終わる前の段階で、`renderDetailModalContent(p)` を呼び出して詳細モーダルをフライング描画してしまっていた。
+- **対策**: カメラ起動前の詳細モーダル再描画処理を削除。カメラから復帰してGPS座標と写真が確定したタイミングで初めて詳細モーダルを描画するように順序を整理し、チラつきのない滑らかな遷移に修正。
+- **修正ファイル**: `app.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】詳細画面のGPS・写真消失バグの修正 & 写真追加ボタン削除 (v376)（担当: Gemini 3.5 Flash）
 - **不具合事象**: 配布完了したはずのデータの詳細モーダルを開き直すと「NO GPS DATA」や「NO EVIDENCE PHOTO」と表示されてしまうバグが発生。また、完了画面に余分な「写真を追加」ボタンが残っていた。
