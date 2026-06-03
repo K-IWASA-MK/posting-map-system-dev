@@ -22,6 +22,8 @@ function formatCompletedAt(dateStr) {
 
 function getCityName(areaName) {
   if (!areaName) return 'その他';
+  // 注意: 以下のハードコードは「四日市(市)」のようにエリア名に「市」が含まれる特殊ケースへの対処。
+  // 正規表現 /^[^市町...]/ では「四日市」と不完全にマッチするため意図的に残している。
   if (areaName.startsWith('四日市')) return '四日市市';
   if (areaName.startsWith('鈴鹿')) return '鈴鹿市';
   if (areaName.startsWith('亀山')) return '亀山市';
@@ -438,10 +440,9 @@ function renderDetailList(areaName) {
         </div>`
       : '';
 
-    const onclickAttr = p.isDone ? '' : `onclick="openPointDetailModal(${p.rowId})"`;
-    const cardClass = p.isDone 
-      ? "premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center" 
-      : "clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center";
+    // 完了済みカードもタップでモーダルを開ける（写真・GPS確認などの利用ケースがあるため）
+    const onclickAttr = `onclick="openPointDetailModal(${p.rowId})"`;
+    const cardClass = "clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center";
 
     return `
       <div class="${cardClass}" ${onclickAttr}>
@@ -520,7 +521,17 @@ async function openDetail(name) {
       switchPage('detail');
     }
   } catch (e) {
-    alert("詳細データの取得に失敗しました。");
+    // alert()はLINE WebViewで不安定なためDOM表示に切り替え
+    const detailList = $('detail-list');
+    if (detailList) {
+      detailList.innerHTML = `
+        <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3 mt-8">
+          <span class="text-2xl">⚠️</span>
+          <p class="text-sm font-black text-white/60">データの取得に失敗しました</p>
+          <p class="text-[10px] font-bold text-white/30 uppercase tracking-wider">時間をおいて再度お試しください</p>
+        </div>`;
+    }
+    switchPage('detail');
   }
   
   $('loading').classList.add('opacity-0');

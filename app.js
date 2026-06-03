@@ -650,29 +650,36 @@ async function updateRecord(areaName, rowId, isDone, count) {
   const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
   const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
   const staffId = userInfo.id || '';
-  
-  const payload = {
-    areaName: areaName,
-    rowId: rowId,
-    staffName: staffName,
-    staffId: staffId,
-    isDone: isDone,
-    count: count
-    // actionはcallApiPostの引数として渡すためここには不要
-  };
 
-  // Optimistic UI updates if offline or connection fails
+  // IndexedDB キュー経由で送信（db.js のフローと統一 → オフライン対応・リトライあり）
+  if (typeof enqueueSync === 'function') {
+    await enqueueSync({
+      areaName,
+      rowId,
+      isDone,
+      count,
+      latitude:    '',
+      longitude:   '',
+      accuracy:    null,
+      branchCode:  localStorage.getItem('branch_name') || '',
+      areaId:      String(rowId),
+      photoBase64: '',
+      staffName,
+      staffId
+    });
+    return;
+  }
+
+  // フォールバック: db.js が未ロードの場合のみ旧フローを使用
+  const payload = { areaName, rowId, staffName, staffId, isDone, count };
   if (!navigator.onLine) {
     saveToOfflineQueue(payload);
     applyOptimisticCheck(areaName, rowId, isDone, count);
     return;
   }
-  
   try {
     const result = await callApiPost('submitDistribution', payload);
-    if (result.success) {
-      loadData(true); // skip recursive sync
-    }
+    if (result.success) loadData(true);
   } catch (e) {
     console.warn("API write failed. Storing report to offline queue.");
     saveToOfflineQueue(payload);

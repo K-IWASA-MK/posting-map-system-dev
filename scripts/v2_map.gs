@@ -129,20 +129,28 @@ function createSystemCacheSheet() {
  * 特定のエリアの進捗だけをキャッシュ内で更新する（高速）
  */
 function updateAreaCache(areaName, isDoneChange = 0) {
+  if (isDoneChange === 0) return; // 変化なし: 更新不要
   const props = PropertiesService.getScriptProperties();
   const cache = CacheService.getScriptCache();
   const cached = props.getProperty("AREA_SUMMARY_CACHE");
-  if (!cached) return;
-
-  const data = JSON.parse(cached);
-  const area = data.summary.find((s) => s.name === areaName);
-  if (area) {
-    if (isDoneChange !== 0) {
-      area.done += isDoneChange;
-      data.stats.done += isDoneChange;
+  if (!cached) {
+    // キャッシュなし: FastCacheのみクリアして次回フル再取得を促す
+    cache.remove("AREA_SUMMARY_FAST_CACHE");
+    return;
+  }
+  try {
+    const data = JSON.parse(cached);
+    const area = data.summary.find((s) => s.name === areaName);
+    if (area) {
+      area.done = Math.max(0, area.done + isDoneChange); // 負数防止
+      data.stats.done = Math.max(0, data.stats.done + isDoneChange); // 負数防止
+      const updatedJson = JSON.stringify(data);
+      props.setProperty("AREA_SUMMARY_CACHE", updatedJson);
+      cache.put("AREA_SUMMARY_FAST_CACHE", updatedJson, 1800);
     }
-    const updatedJson = JSON.stringify(data);
-    props.setProperty("AREA_SUMMARY_CACHE", updatedJson);
-    cache.put("AREA_SUMMARY_FAST_CACHE", updatedJson, 1800);
+  } catch (e) {
+    // JSONパースエラー: 破損キャッシュを全クリアして次回フル再取得を促す
+    props.deleteProperty("AREA_SUMMARY_CACHE");
+    cache.remove("AREA_SUMMARY_FAST_CACHE");
   }
 }

@@ -214,6 +214,7 @@ async function processQueue() {
     }
 
     console.log(`[Queue] Processing ${targets.length} item(s)...`);
+    let anySuccess = false; // 全アイテム処理後に1回だけloadDataを呼ぶフラグ
 
     for (const item of targets) {
       // 送信中マーク
@@ -265,9 +266,7 @@ async function processQueue() {
           }
 
           console.log(`[Queue] Synced: id=${item.id}, rowId=${item.rowId}`);
-          if (typeof loadData === 'function') {
-            loadData(true);
-          }
+          anySuccess = true; // 1件でも成功 → 後でまとめてUI更新
         } else {
           throw new Error(res ? (res.message || 'API failure') : 'No response');
         }
@@ -286,6 +285,11 @@ async function processQueue() {
           }
         }
       }
+    }
+
+    // 全キュー処理完了後に1回だけUI更新（件数分の連続API呼び出しを防止）
+    if (anySuccess && typeof loadData === 'function') {
+      loadData(true);
     }
 
   } catch (err) {

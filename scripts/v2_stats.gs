@@ -22,6 +22,7 @@ function aggregateTotalVolumes() {
   ];
 
   let totalUnitsDone = 0;
+  let totalUnits = 0; // 実データから動的に算出する分母
   let grandTotalVolume = 0;
 
   // 名簿から最新のID->名前マップを作成
@@ -41,6 +42,7 @@ function aggregateTotalVolumes() {
       if (lastRow >= 2) {
         // D:完了, E:日時, F:枚数, G:スタッフ, H:ID
         const data = sheet.getRange(2, 4, lastRow - 1, 5).getValues();
+        totalUnits += data.length; // 全シートの行数を累積（分母の動的算出）
 
         data.forEach((row) => {
           const isDone = row[0] === true;
@@ -59,8 +61,9 @@ function aggregateTotalVolumes() {
     }
   });
 
-  // 進捗率の計算 (母数 651)
-  const progressPercent = (totalUnitsDone / CONFIG.DENOMINATOR_UNITS) * 100;
+  // 進捗率の計算（分母は実データから動的算出、シートゼロの場合のみ CONFIG.DENOMINATOR_UNITS をフォールバック）
+  const denominator = totalUnits > 0 ? totalUnits : CONFIG.DENOMINATOR_UNITS;
+  const progressPercent = (totalUnitsDone / denominator) * 100;
 
   // ランキングキャッシュの再構築
   try {
