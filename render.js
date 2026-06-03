@@ -99,6 +99,20 @@ function renderAreas() {
           </div>
           ${rightLabel}
         </div>
+        <!-- 🗺 Google マップで市全体を確認するボタン -->
+        <button
+          ontouchstart=""
+          onclick="event.stopPropagation(); window.open('https://www.google.com/maps/search/${encodeURIComponent(c.name + ' 日本')}', '_blank')"
+          style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.2); color: rgba(37,99,235,0.9); transition: transform 75ms ease-out, background 75ms ease-out;"
+          onpointerdown="this.style.transform='scale(0.94)'; this.style.background='rgba(37,99,235,0.14)'"
+          onpointerup="this.style.transform=''; this.style.background='rgba(37,99,235,0.06)'"
+          onpointerleave="this.style.transform=''; this.style.background='rgba(37,99,235,0.06)'"
+          class="mt-1 w-full h-8 rounded-xl flex items-center justify-center gap-1.5 text-[10px] font-black uppercase tracking-widest select-none">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+          ${c.name}を地図で見る
+        </button>
       </div>`;
     }).join('');
 
