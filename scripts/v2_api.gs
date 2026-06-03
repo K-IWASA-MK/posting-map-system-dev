@@ -15,16 +15,18 @@ function getSS() {
       const ss = SpreadsheetApp.getActiveSpreadsheet();
       if (ss && ss.getId()) {
         id = ss.getId();
-        props.setProperty("SPREADSHEET_ID", id);
+        props.setProperty("SPREADSHEET_ID", id); // 次回以降はキャッシュから取得
       }
     } catch (e) {
-      // ignore
+      // Webアプリ実行時はgetActiveSpreadsheet()はnullのため無視して次のフォールバックへ
     }
   }
   
   if (!id) {
-    // 現在のマスターのSpreadsheet ID（フォールバック）
-    id = '1KuA5pN0ltODhwSJph-fwgj_U_ZyHrn9Osew92D99xBs';
+    // 緊急フォールバック: PropertiesServiceに SPREADSHEET_ID を設定してください。
+    // 設定方法: GASエディタ → [Project Settings] → [Script Properties] → SPREADSHEET_IDを追加。
+    console.error('[getSS] SPREADSHEET_ID が未設定です。PropertiesServiceに設定してください。');
+    throw new Error('SPREADSHEET_ID is not configured. Please set it in Script Properties.');
   }
   return SpreadsheetApp.openById(id);
 }
@@ -44,10 +46,6 @@ function authorizeAndTestDriveWrite() {
     Logger.log("❌ Drive write FAILED: " + e.toString());
   }
 }
-
-// =============================
-// ⓪ 基本設定
-// =============================
 
 
 /**

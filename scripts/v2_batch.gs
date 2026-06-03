@@ -226,6 +226,8 @@ function checkEndOfMonthAndReset() {
   if (now.getDate() === 1) {
     // 1. 前月データをすべてクリア（リセット）
     deleteAllAreaSheets();
+    // シャドウシートも即座に再構築（旧エリア名が残らないよう空状態にする）
+    createSystemCacheSheet();
     
     // 2. 契約終了予約の有無を確認
     const props = PropertiesService.getScriptProperties();

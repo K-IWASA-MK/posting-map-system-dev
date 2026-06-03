@@ -228,6 +228,8 @@
         method: 'POST',
         redirect: 'follow',
         body: JSON.stringify({ action, ...params }),
+        // 管理画面はCORSのシンプルリクエスト条件を満たすためContent-Typeを明示。
+        // app.js/db.jsはContent-Typeを未設定（プリフライト回避のため）。設計意図の違いに注意。
         headers: { 'Content-Type': 'text/plain;charset=utf-8' }
       };
       const response = await fetch(API_URL + '?action=' + action, options);
