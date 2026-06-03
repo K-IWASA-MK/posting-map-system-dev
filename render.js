@@ -353,8 +353,8 @@ function renderDetailModalContent(p) {
     
     <div class="flex flex-col gap-4">
       ${!p.isDone ? `
-        <!-- 【未完了】全体がタップ可能な極上シンメトリーカード (反応領域拡大・強力沈み込み・ソリッド緑チェック統一) -->
-        <label ontouchstart="" class="cursor-pointer rounded-3xl py-6 px-5 bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-4 w-full active:scale-[0.95] active:translate-y-0.5 transition-all duration-75">
+        <!-- 【未完了】全体がタップ可能な極上シンメトリーカード -->
+        <label ontouchstart="" class="cursor-pointer rounded-3xl py-6 px-5 bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-4 w-full">
           <input type="checkbox" class="hidden" onchange="toggleDone('${areaName}', ${p.rowId}, this)">
           
           <!-- 1. テキスト（中央揃え） -->
@@ -363,12 +363,12 @@ function renderDetailModalContent(p) {
             <span class="text-xs font-bold text-white/40 mt-1 tracking-wider">タップで配布完了</span>
           </div>
 
-          <!-- 2. チェックボックス（タップ時に独立した沈み込みアニメーション） -->
-          <div ontouchstart="" style="border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4); transition: transform 75ms ease-out, box-shadow 75ms ease-out, filter 75ms ease-out;" class="w-16 h-16 rounded-2xl border flex items-center justify-center active:scale-[0.82] active:brightness-90 select-none"
+          <!-- 2. チェックボックス（押した瞬間だけ沈み込む） -->
+          <div ontouchstart="" style="border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4); transition: transform 75ms ease-out, box-shadow 75ms ease-out, filter 75ms ease-out;" class="w-12 h-12 rounded-2xl border flex items-center justify-center select-none"
             onpointerdown="this.style.transform='scale(0.82)'; this.style.boxShadow='0 0 4px rgba(16,185,129,0.2)'; this.style.filter='brightness(0.85)'"
             onpointerup="this.style.transform=''; this.style.boxShadow='0 0 10px rgba(16,185,129,0.4)'; this.style.filter=''"
             onpointerleave="this.style.transform=''; this.style.boxShadow='0 0 10px rgba(16,185,129,0.4)'; this.style.filter=''">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
             </svg>
           </div>
