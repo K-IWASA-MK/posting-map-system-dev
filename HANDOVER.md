@@ -61,7 +61,7 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v380`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v381`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---

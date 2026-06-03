@@ -796,15 +796,15 @@ function renderRanking() {
     if (rank === 1) {
       cardStyle = 'border: 1px solid rgba(250, 204, 21, 0.35); box-shadow: inset 0 0 15px rgba(250, 204, 21, 0.08), 0 0 25px rgba(250, 204, 21, 0.12);';
       rankBadgeClass = 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20';
-      glowDotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse mr-2 shadow-[0_0_8px_#eab308]"></span>';
+      glowDotHtml = '<span style="position:absolute;left:10px;" class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse shadow-[0_0_8px_#eab308]"></span>';
     } else if (rank === 2) {
       cardStyle = 'border: 1px solid rgba(226, 232, 240, 0.3); box-shadow: inset 0 0 12px rgba(226, 232, 240, 0.06), 0 0 20px rgba(226, 232, 240, 0.08);';
       rankBadgeClass = 'bg-slate-300/10 text-slate-300 border border-slate-300/20';
-      glowDotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2 shadow-[0_0_6px_#cbd5e1]"></span>';
+      glowDotHtml = '<span style="position:absolute;left:10px;" class="w-1.5 h-1.5 rounded-full bg-slate-300 shadow-[0_0_6px_#cbd5e1]"></span>';
     } else if (rank === 3) {
       cardStyle = 'border: 1px solid rgba(217, 119, 6, 0.3); box-shadow: inset 0 0 12px rgba(217, 119, 6, 0.06), 0 0 20px rgba(217, 119, 6, 0.08);';
       rankBadgeClass = 'bg-amber-600/10 text-amber-500 border border-amber-600/20';
-      glowDotHtml = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-2 shadow-[0_0_6px_#f59e0b]"></span>';
+      glowDotHtml = '<span style="position:absolute;left:10px;" class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_6px_#f59e0b]"></span>';
     } else {
       cardStyle = isMe 
         ? 'border: 1px solid rgba(37, 99, 235, 0.4); box-shadow: inset 0 0 12px rgba(37, 99, 235, 0.1), 0 0 20px rgba(37, 99, 235, 0.15);' 
@@ -813,7 +813,7 @@ function renderRanking() {
         ? 'bg-[#2563eb]/20 text-[#2563eb] border border-[#2563eb]/30' 
         : 'bg-white/5 text-white/50 border border-white/5';
       glowDotHtml = isMe 
-        ? '<span class="w-1.5 h-1.5 rounded-full bg-[#2563eb] animate-pulse mr-2 shadow-[0_0_8px_#2563eb]"></span>' 
+        ? '<span style="position:absolute;left:10px;" class="w-1.5 h-1.5 rounded-full bg-[#2563eb] animate-pulse shadow-[0_0_8px_#2563eb]"></span>' 
         : '';
     }
 
@@ -821,7 +821,7 @@ function renderRanking() {
       <div style="${cardStyle}" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 transition-all">
         <!-- 1行目: 順位バッジ -->
         <div class="flex items-center justify-center">
-          <div style="min-width: 76px;" class="h-7 px-3.5 rounded-full flex items-center justify-center font-mono font-black text-[11px] ${rankBadgeClass}">
+          <div style="min-width: 76px; position: relative;" class="h-7 px-3.5 rounded-full flex items-center justify-center font-mono font-black text-[11px] ${rankBadgeClass}">
             ${glowDotHtml}
             <span>${rank}位</span>
           </div>
