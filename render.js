@@ -737,16 +737,13 @@ function renderRanking() {
 
   // 1. 本人のステータスカード（ID登録されている場合のみ表示）
   const myStatusCardHtml = myName ? `
-    <div style="border: 1px solid rgba(255, 255, 255, 0.04);" class="premium-glass p-6 flex items-center justify-between mb-6">
-      <div>
-        <p class="text-[9px] font-black text-[#22c55e] uppercase tracking-widest">My Performance</p>
-        <h4 class="text-sm font-black text-white tracking-tight mt-0.5">${myName}</h4>
-      </div>
-      <div class="text-right">
-        <p class="text-[9px] font-black text-white/40 uppercase tracking-widest">現在の順位</p>
-        <h4 class="text-sm font-black text-white tracking-tight mt-0.5">
-          ${myRank === "圏外" ? '<span class="text-white/40">圏外</span>' : `${myRank}<span class="text-xs text-white/60 ml-0.5">位</span>`}
-        </h4>
+    <div style="border: 1px solid rgba(255, 255, 255, 0.04);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">
+      <div class="text-[9px] font-black text-[#22c55e] uppercase tracking-[0.2em]">My Performance</div>
+      <div class="text-lg font-black text-white tracking-tight">${myName}</div>
+      <div class="flex items-center justify-center mt-0.5">
+        <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wide">
+          現在の順位 : ${myRank === "圏外" ? '圏外' : `${myRank}位`}
+        </div>
       </div>
     </div>
   ` : '';

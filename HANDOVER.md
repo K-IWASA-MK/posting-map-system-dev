@@ -61,12 +61,21 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v366`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v367`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】マイステータスカードの3行構成・中央揃え化（担当: Gemini 3.5 Flash）
+- **変更内容**:
+  - 配布ランキング画面の「My Performance（本人のステータス）カード」を中央揃えの3行構成に変更。
+    - 1行目: `My Performance`（緑小文字）
+    - 2行目: 自分の名前（`text-lg`）
+    - 3行目: 現在の順位（緑色のカプセル型バッジ内に `現在の順位 : 1位` の形式で格納）
+  - `index.html` および `service-worker.js` のキャッシュバスターを `v367` にインクリメント。
+- **修正ファイル**: `render.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】ランキングヘッダーカードのUI統一（担当: Gemini 3.5 Flash）
 - **変更内容**:
