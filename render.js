@@ -171,23 +171,25 @@ function renderAreas() {
           </div>
           ${rightLabel}
         </div>
-        <div class="flex gap-2 w-full mt-2">
-          <button ontouchstart="" onclick="openDetail('${s.name}')"
-            style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out;"
-            onpointerdown="this.style.transform='scale(0.96)'"
-            onpointerup="this.style.transform=''"
-            onpointerleave="this.style.transform=''"
-            class="flex-1 h-10 rounded-xl text-xs font-black tracking-wide select-none">
-            配布詳細へ →
-          </button>
-          <button ontouchstart="" onclick="window.open('${mapUrl}', '_blank')"
-            style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.2); color: rgba(37,99,235,0.9); transition: transform 75ms ease-out;"
-            onpointerdown="this.style.transform='scale(0.94)'"
-            onpointerup="this.style.transform=''"
-            onpointerleave="this.style.transform=''"
-            class="w-10 h-10 rounded-xl flex items-center justify-center text-base select-none">
-            🗺
-          </button>
+        <div class="w-full flex justify-center mt-3">
+          <div style="display: inline-flex; flex-direction: column; gap: 8px;">
+            <button ontouchstart="" onclick="window.open('${mapUrl}', '_blank')"
+              style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.2); color: rgba(37,99,235,0.85); transition: transform 75ms ease-out; white-space: nowrap;"
+              onpointerdown="this.style.transform='scale(0.94)'"
+              onpointerup="this.style.transform=''"
+              onpointerleave="this.style.transform=''"
+              class="h-9 px-5 rounded-xl text-[10px] font-black tracking-widest uppercase select-none">
+              📮 〒${zipCode || cleanAddress} → 🗺
+            </button>
+            <button ontouchstart="" onclick="openDetail('${s.name}')"
+              style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out; white-space: nowrap;"
+              onpointerdown="this.style.transform='scale(0.96)'"
+              onpointerup="this.style.transform=''"
+              onpointerleave="this.style.transform=''"
+              class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none text-center">
+              配布詳細へ →
+            </button>
+          </div>
         </div>
       </div>`;
     }).join('');
