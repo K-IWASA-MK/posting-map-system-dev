@@ -154,8 +154,8 @@ function renderAreas() {
       }
 
       const mapUrl = zipCode
-        ? `https://www.google.com/maps/search/${zipCode}`
-        : `https://www.google.com/maps/search/${encodeURIComponent(cleanAddress + ' 日本')}`;
+        ? `https://www.google.com/maps/search/?api=1&query=${zipCode}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress + ' 日本')}`;
 
       const googleMapsButtonHtml = isCompleted
         ? `

@@ -61,12 +61,18 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v373`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v374`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】2層目Google Maps連携リンクのUniversal Link形式修正 (v374)（担当: Gemini 3.5 Flash）
+- **不具合事象**: エリア一覧（2層目）のGoogle Maps連携ボタンをタップした際、アプリが直接起動せずWeb版Google Mapsの「アップグレード/アプリ誘導モーダル」が立ち上がる現象が発生していた。
+- **原因**: 2層目で生成されるURLが、Google公式のユニバーサルリンク形式（`https://www.google.com/maps/search/?api=1&query=...`）ではなく、非公式なパス形式（`https://www.google.com/maps/search/...`）になっていたため、OSがアプリ用リンクとして検知できなかった。
+- **対策**: 2層目のGoogle Maps連携URLを、3層目と同じ公式のユニバーサルリンク形式（`?api=1&query=`）に統一。
+- **修正ファイル**: `render.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】エリア完了カードのダブルロックとバグ修正 (v373)（担当: Gemini 3.5 Flash）
 - **不具合事象**: エリア一覧（2層目）で完了（`10/10` など 100%）したエリアカードにロックが掛かっておらずタップ可能であり、完了時の `🔒` バッジでデザインが崩れていた。また、`render.js` 編集時の記述重複により JavaScript 構文エラーが発生していた。
