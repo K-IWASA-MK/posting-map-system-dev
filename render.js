@@ -464,9 +464,11 @@ function renderDetailList(areaName) {
         </div>`
       : '';
 
-    // 完了済みカードもタップでモーダルを開ける（写真・GPS確認などの利用ケースがあるため）
-    const onclickAttr = `onclick="openPointDetailModal(${p.rowId})"`;
-    const cardClass = "clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center";
+    // 完了済みカードはタップ無効（ロック状態）
+    const onclickAttr = p.isDone ? '' : `onclick="openPointDetailModal(${p.rowId})"`;
+    const cardClass = p.isDone
+      ? "premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center"
+      : "clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center";
 
     return `
       <div class="${cardClass}" ${onclickAttr}>
