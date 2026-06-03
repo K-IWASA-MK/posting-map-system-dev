@@ -797,19 +797,23 @@ function renderRanking() {
     }
 
     return `
-      <div style="${cardStyle}" class="premium-glass p-6 flex items-center justify-between transition-all">
-        <div class="flex items-center">
-          <div class="h-8 px-3 rounded-full flex items-center justify-center font-mono font-black text-xs ${rankBadgeClass} mr-4">
+      <div style="${cardStyle}" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 transition-all">
+        <!-- 1行目: 順位バッジ -->
+        <div class="flex items-center justify-center">
+          <div class="h-7 px-3.5 rounded-full flex items-center justify-center font-mono font-black text-[11px] ${rankBadgeClass}">
             ${glowDotHtml}
-            ${rank}位
-          </div>
-          <div class="flex flex-col">
-            <span class="text-sm font-black ${isMe ? 'text-white' : 'text-white/80'}">${r.name}${isMe ? '<span class="text-[9px] font-black uppercase text-[#2563eb] tracking-widest ml-2 bg-[#2563eb]/10 px-2 py-0.5 rounded-full">YOU</span>' : ''}</span>
+            <span>${rank}位</span>
           </div>
         </div>
-        <div class="flex items-baseline">
-          <span class="text-xl font-black text-white tracking-tight">${r.count.toLocaleString()}</span>
-          <span class="text-[9px] font-bold text-white/40 ml-1">枚</span>
+        
+        <!-- 2行目: 配布員名 -->
+        <div class="text-sm font-black text-white tracking-tight">
+          ${r.name}
+        </div>
+        
+        <!-- 3行目: 配布枚数 -->
+        <div class="text-lg font-black text-white tracking-tight">
+          ${r.count.toLocaleString()}<span class="text-[10px] font-bold text-white/40 ml-1">枚</span>
         </div>
       </div>
     `;

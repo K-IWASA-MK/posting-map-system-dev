@@ -61,12 +61,21 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v368`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v369`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】ランキングリスト項目の3行構成・中央揃え化（担当: Gemini 3.5 Flash）
+- **変更内容**:
+  - 配布ランキング画面のランキング一覧の各行（カード）を中央揃えの3行構成に変更。
+    - 1行目: 順位バッジ（ドットライト & `○○位` のカプセルバッジ）
+    - 2行目: 配布員名（余分な `YOU` バッジは完全に削除しシンプル化）
+    - 3行目: 配布枚数（`text-lg` で `○○,○○○枚` の形式）
+  - `index.html` および `service-worker.js` のキャッシュバスターを `v369` にインクリメント。
+- **修正ファイル**: `render.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】マイステータスカードの3行目「配布数」への差し替え（担当: Gemini 3.5 Flash）
 - **変更内容**:
