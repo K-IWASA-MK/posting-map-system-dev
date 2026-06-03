@@ -158,38 +158,35 @@ function renderAreas() {
         : `https://www.google.com/maps/search/${encodeURIComponent(cleanAddress + ' 日本')}`;
 
       return `
-      <div id="area-card-${s.name}" class="premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5">
-        ${zipBadgeHtml}
-        <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug w-full" style="text-wrap: balance;">
-          <span>${cleanAddress}</span>
-        </div>
-        <div class="text-sm ${pctColorClass}">${s.progress}%</div>
-        <div class="flex items-center justify-center w-full">
-          ${leftDummy}
-          <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
-            ${s.done || 0}/ ${s.total || 0}
+      <div id="area-card-${s.name}" class="premium-glass py-5 px-6 flex items-center justify-center">
+        <div style="display: inline-flex; flex-direction: column; align-items: stretch; gap: 8px; text-align: center;">
+          <button ontouchstart="" onclick="window.open('${mapUrl}', '_blank')"
+            style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.25); color: rgba(37,99,235,0.88); transition: transform 75ms ease-out; white-space: nowrap; font-family: monospace;"
+            onpointerdown="this.style.transform='scale(0.94)'"
+            onpointerup="this.style.transform=''"
+            onpointerleave="this.style.transform=''"
+            class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none">
+            📮 〒${zipCode || '---'} → 🗺
+          </button>
+          <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug" style="text-wrap: balance; padding: 4px 0;">
+            ${cleanAddress}
           </div>
-          ${rightLabel}
-        </div>
-        <div class="w-full flex justify-center mt-3">
-          <div style="display: inline-flex; flex-direction: column; gap: 8px;">
-            <button ontouchstart="" onclick="window.open('${mapUrl}', '_blank')"
-              style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.2); color: rgba(37,99,235,0.85); transition: transform 75ms ease-out; white-space: nowrap;"
-              onpointerdown="this.style.transform='scale(0.94)'"
-              onpointerup="this.style.transform=''"
-              onpointerleave="this.style.transform=''"
-              class="h-9 px-5 rounded-xl text-[10px] font-black tracking-widest uppercase select-none">
-              📮 〒${zipCode || cleanAddress} → 🗺
-            </button>
-            <button ontouchstart="" onclick="openDetail('${s.name}')"
-              style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out; white-space: nowrap;"
-              onpointerdown="this.style.transform='scale(0.96)'"
-              onpointerup="this.style.transform=''"
-              onpointerleave="this.style.transform=''"
-              class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none text-center">
-              配布詳細へ →
-            </button>
+          <div class="text-sm ${pctColorClass}">${s.progress}%</div>
+          <div class="flex items-center justify-center">
+            ${leftDummy}
+            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
+              ${s.done || 0}/ ${s.total || 0}
+            </div>
+            ${rightLabel}
           </div>
+          <button ontouchstart="" onclick="openDetail('${s.name}')"
+            style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out; white-space: nowrap;"
+            onpointerdown="this.style.transform='scale(0.96)'"
+            onpointerup="this.style.transform=''"
+            onpointerleave="this.style.transform=''"
+            class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none">
+            配布詳細へ →
+          </button>
         </div>
       </div>`;
     }).join('');
