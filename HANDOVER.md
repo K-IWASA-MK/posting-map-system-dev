@@ -61,12 +61,20 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v371`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v372`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】順位カプセルバッジのインラインスタイル修正（担当: Gemini 3.5 Flash）
+- **不具合事象**: 前セッションで `min-w-[76px]` クラスを適用したものの、実機でバッジ幅が広がらず、二桁対応できないまま狭く潰れた円形になっていた。
+- **原因**: プロジェクトの `tailwind-utils.css` が静的にビルドされたものであるため、新しく指定した `min-w-[76px]` という TailwindCSS クラス定義が物理的に存在せず、ブラウザに無視されていた。
+- **対策**:
+  - `render.js` 内の順位バッジに、Tailwind クラスではなく直接 `style="min-width: 76px;"` のインラインスタイルを指定。これにより確実に 76px 幅が適用されるように修正。
+  - `index.html` および `service-worker.js` のキャッシュバスターを `v372` にインクリメント。
+- **修正ファイル**: `render.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】順位カプセルバッジの最小横幅（min-w）設定と整列化（担当: Gemini 3.5 Flash）
 - **変更内容**:
