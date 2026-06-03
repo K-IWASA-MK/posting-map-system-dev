@@ -250,6 +250,9 @@ async function processQueue() {
             const p = allPoints.find(pt => pt.rowId === item.rowId);
             if (p) {
               p.photoUrl    = res.photoUrl || '';
+              if (item.latitude && item.longitude) {
+                p.gps = `${item.latitude},${item.longitude}`;
+              }
               p.syncStatus  = undefined;
               delete p.tempPhotoUrl;
 

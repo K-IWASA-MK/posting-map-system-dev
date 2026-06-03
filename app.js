@@ -467,7 +467,7 @@ window.triggerUISyncRefresh = async function() {
     allPoints.forEach(p => {
       const found = queue.find(q => q.rowId === p.rowId);
       if (found) {
-        p.syncStatus = found.status; // 'pending' | 'sending' | 'failed'
+        p.syncStatus = found.syncStatus || found.status; // 'pending' | 'sending' | 'failed'
       } else {
         delete p.syncStatus;
       }
@@ -582,6 +582,9 @@ function pressNum(key) {
     
     // 2. バックグラウンドで非同期に写真撮影とGPS取得・キューイングを行う
     (async () => {
+      // ★対策1: カメラ起動前にGPSの取得を非同期で先行開始しておく（サスペンドによるタイムアウトを防ぐ）
+      const gpsPromise = getGPSLocation();
+
       // タップジェスチャーが生きているうちにカメラを最優先で起動（GPS待ちによるブロックを回避）
       let imageBlob = null;
       try {
@@ -590,8 +593,8 @@ function pressNum(key) {
         console.error("Camera activation failed:", err);
       }
 
-      // カメラ処理の完了後にGPSを取得
-      const gps = await getGPSLocation();
+      // カメラから戻ってきた後、先行開始しておいたGPSの結果を待つ
+      const gps = await gpsPromise;
       if (p) {
         if (gps.latitude && gps.longitude) {
           p.gps = `${gps.latitude},${gps.longitude}`;

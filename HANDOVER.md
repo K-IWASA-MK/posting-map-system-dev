@@ -61,12 +61,25 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v369`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v370`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】GPS/写真証跡の確実な取得とメモリ同期バグ修正（担当: Gemini 3.5 Flash）
+- **不具合事象**: モバイル環境（LINE WebView等）で写真とGPSの両方を取得したにもかかわらず、提出前の詳細画面で「NO GPS DATA」「NO EVIDENCE PHOTO」と表示されてしまう。
+- **根本原因**: 
+  1. カメラ起動中にブラウザがサスペンドし、復帰直後にGPS取得を行うとタイムアウト等で位置情報取得が失敗し、空データが送信されていた。
+  2. GASへの送信（同期）成功時、メモリデータ（`allPoints`）への「GPS情報」の再同期が漏れていたため、キューから消えるとGPSが表示されなくなっていた。
+  3. `triggerUISyncRefresh` にてIndexedDBキューの同期状況を判定する際の変数名不一致（`found.status` と `found.syncStatus` のズレ）。
+- **修正内容**:
+  - **対策1 (app.js)**: テンキー「OK」タップ時に、カメラ起動よりも先行してバックグラウンドでGPS取得を開始（Promiseを先行生成）。カメラから復帰した際に取得済みの結果を待つようにし、サスペンドによるタイムアウトを回避。
+  - **対策2 (db.js)**: API送信成功時、メモリデータ（`p.gps`）にも送信成功した緯度経度を同期するように追加。
+  - **対策3 (app.js)**: 同期状況のステータス監視プロパティ名を `found.syncStatus || found.status` に修正。
+  - `index.html` および `service-worker.js` のキャッシュバスターを `v370` にインクリメント。
+- **修正ファイル**: `app.js`, `db.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】ランキングリスト項目の3行構成・中央揃え化（担当: Gemini 3.5 Flash）
 - **変更内容**:
