@@ -159,20 +159,20 @@ function renderAreas() {
 
       const googleMapsButtonHtml = isCompleted
         ? `
-          <button style="background: rgba(37,99,235,0.02); border: 1px solid rgba(37,99,235,0.1); color: rgba(37,99,235,0.3); pointer-events: none; font-family: monospace;"
+          <a style="background: rgba(37,99,235,0.02); border: 1px solid rgba(37,99,235,0.1); color: rgba(37,99,235,0.3); pointer-events: none; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;"
             class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none opacity-40">
             📮 〒${zipCode || '---'} → 🗺
-          </button>
+          </a>
         `
         : `
-          <button ontouchstart="" onclick="window.open('${mapUrl}', '_blank')"
-            style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.25); color: rgba(37,99,235,0.88); transition: transform 75ms ease-out; white-space: nowrap; font-family: monospace;"
+          <a href="${mapUrl}" target="_blank"
+            style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.25); color: rgba(37,99,235,0.88); transition: transform 75ms ease-out; white-space: nowrap; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;"
             onpointerdown="this.style.transform='scale(0.94)'"
             onpointerup="this.style.transform=''"
             onpointerleave="this.style.transform=''"
             class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none">
             📮 〒${zipCode || '---'} → 🗺
-          </button>
+          </a>
         `;
 
       const actionButtonHtml = isCompleted

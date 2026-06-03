@@ -61,12 +61,18 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v374`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v375`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】2層目Google Mapsボタンの `<a>` タグ化とUniversal Links完全対応 (v375)（担当: Gemini 3.5 Flash）
+- **不具合事象**: 2層目のGoogle Maps連携ボタンをUniversal Links形式（`?api=1&query=`）に修正したにもかかわらず、スマホのLINE LIFF（アプリ内WebView）等でマップを開く際に、再び「アップグレード/アプリ誘導モーダル」が表示されてしまう。
+- **根本原因**: 3層目は `<a>` タグによるアンカー遷移を行っていたのに対し、2層目は `<button>` の `window.open` (JavaScript) を使っていた。スマホのOSやLINEはセキュリティや仕様上の制限から、JavaScript起動の画面遷移時はUniversal Links（アプリ起動）を意図的に無視し、WebView内で強引にWebページとして開くため、アップグレード画面が出ていた。
+- **対策**: 2層目のGoogle Maps連携ボタンも3層目と同じく `<a>` タグ（`href="..." target="_blank"`）によるアンカー遷移へ統一。
+- **修正ファイル**: `render.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】2層目Google Maps連携リンクのUniversal Link形式修正 (v374)（担当: Gemini 3.5 Flash）
 - **不具合事象**: エリア一覧（2層目）のGoogle Maps連携ボタンをタップした際、アプリが直接起動せずWeb版Google Mapsの「アップグレード/アプリ誘導モーダル」が立ち上がる現象が発生していた。
