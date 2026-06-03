@@ -1,8 +1,8 @@
-# 開発引き継ぎ事項 (更新: 2026-06-03)
+# 開発引き継ぎ事項 (更新: 2026-06-04)
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Claude Sonnet (Google Antigravity) — 2026-05-29 着任  
+> **現担当AI**: Gemini 3.5 Flash (Google Antigravity) — 2026-06-04 着任  
 > **前担当AI**: Flash (〜v316)
 
 ---
@@ -61,12 +61,20 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v365`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v366`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】ランキングヘッダーカードのUI統一（担当: Gemini 3.5 Flash）
+- **変更内容**:
+  - 配布ランキングのヘッダーカード（青枠）から `LEADERBOARD` というテキストを削除。
+  - アイコンの枠サイズを `w-12 h-12` から `w-8 h-8`（SVGも `w-6 h-6` から `w-4 h-4`）へ縮小。
+  - 外枠の padding を `p-6` から `py-5 px-6` に変更し、下部マージン等を「全体エリア」カードと完全に揃えることで、縦幅（高さ）をミリピクセル単位で統一。
+  - `index.html` および `service-worker.js` のキャッシュバスターを `v366` にインクリメント。
+- **修正ファイル**: `render.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-03 セッション】配布員アプリ UI 改善（担当: Sonnet）
 
