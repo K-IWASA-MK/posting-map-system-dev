@@ -363,9 +363,12 @@ function renderDetailModalContent(p) {
             <span class="text-xs font-bold text-white/40 mt-1 tracking-wider">タップで配布完了</span>
           </div>
 
-          <!-- 2. チェックボックス（完了時と全く同一の「緑色の塗りつぶし背景 ＆ 白チェック」に統一） -->
-          <div style="border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4);" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+          <!-- 2. チェックボックス（タップ時に独立した沈み込みアニメーション） -->
+          <div ontouchstart="" style="border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4); transition: transform 75ms ease-out, box-shadow 75ms ease-out, filter 75ms ease-out;" class="w-16 h-16 rounded-2xl border flex items-center justify-center active:scale-[0.82] active:brightness-90 select-none"
+            onpointerdown="this.style.transform='scale(0.82)'; this.style.boxShadow='0 0 4px rgba(16,185,129,0.2)'; this.style.filter='brightness(0.85)'"
+            onpointerup="this.style.transform=''; this.style.boxShadow='0 0 10px rgba(16,185,129,0.4)'; this.style.filter=''"
+            onpointerleave="this.style.transform=''; this.style.boxShadow='0 0 10px rgba(16,185,129,0.4)'; this.style.filter=''">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
             </svg>
           </div>
