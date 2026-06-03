@@ -343,13 +343,12 @@ function renderDetailModalContent(p) {
       `;
     } else {
       photoBlockHtml = `
-        <!-- 【写真なし】カメラアイコンを表示し、青色の追加ボタンを常時配置 -->
-        <div class="flex flex-col items-center justify-center p-5 rounded-2xl bg-white/5 border border-white/10 gap-3">
+        <!-- 【写真なし】「写真を追加」ボタンを排除し、証跡なし状態のみをシンプルに表示 -->
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
           <div class="flex items-center justify-center gap-2 w-full">
-            <span class="text-sm text-white/30">📸</span>
-            <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
+            <span class="text-sm opacity-30">📸</span>
+            <span class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
           </div>
-          <button onclick="addPhotoToDetail(${p.rowId})" class="w-full py-3 text-[10px] font-black text-[#2563eb] uppercase tracking-wider bg-[#2563eb]/10 rounded-xl border border-[#2563eb]/20 active:scale-95 transition-all">📸 写真を追加</button>
         </div>
       `;
     }

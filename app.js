@@ -594,7 +594,11 @@ function pressNum(key) {
       }
 
       // カメラから戻ってきた後、先行開始しておいたGPSの結果を待つ
-      const gps = await gpsPromise;
+      let gps = await gpsPromise;
+      if (!gps.latitude || !gps.longitude) {
+        console.log("GPS fetch timed out or empty during camera active. Retrying GPS fetch...");
+        gps = await getGPSLocation();
+      }
       if (p) {
         if (gps.latitude && gps.longitude) {
           p.gps = `${gps.latitude},${gps.longitude}`;

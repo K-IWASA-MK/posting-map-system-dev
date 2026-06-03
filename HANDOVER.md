@@ -61,12 +61,24 @@
 - **フロントエンド**: GitHub Pages (`area-management.github.io/posting-map-system`)
 - **管理者アプリ**: `area-management.github.io/posting-map-system/manager.html`
 - **バックエンド**: Google Apps Script (GAS) API
-- **現在のキャッシュバスター**: `v375`（service-worker.js 更新済み）
+- **現在のキャッシュバスター**: `v376`（service-worker.js 更新済み）
 - **Gitブランチ**: `main`
 
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-04 セッション】詳細画面のGPS・写真消失バグの修正 & 写真追加ボタン削除 (v376)（担当: Gemini 3.5 Flash）
+- **不具合事象**: 配布完了したはずのデータの詳細モーダルを開き直すと「NO GPS DATA」や「NO EVIDENCE PHOTO」と表示されてしまうバグが発生。また、完了画面に余分な「写真を追加」ボタンが残っていた。
+- **根本原因**: 
+  1. `app.js` 内で写真BlobをBase64に変換する `blobToBase64` が `db.js` のローカル関数として宣言されていたため、`app.js` からは `undefined` となり写真データのエンコード・送信処理が常にスキップされていた。
+  2. カメラ起動中のサスペンドにより、先行して動かしていたGPS Promiseが復帰時にタイムアウトエラーを起こし、空座標で送信されていた。
+- **対策**:
+  - **対策1 (db.js & app.js)**: `blobToBase64` 関数を `window.blobToBase64` としてグローバル定義に変更し、`app.js` で正しく画像Base64データを生成できるように修正。
+  - **対策2 (app.js)**: カメラから復帰した際にGPSが空だった場合のフォールバック（リトライ）処理を追加し、復帰後に確実に現在地を取得。
+  - **対策3 (render.js)**: 完了済み詳細画面の写真表示ロジックから不要な「📸 写真を追加」ボタンを完全に削除し、「NO EVIDENCE PHOTO」というシンプルな証跡なしステータス表示のみに統一。
+  - `index.html` および `service-worker.js` のキャッシュバスターを `v376` にインクリメント。
+- **修正ファイル**: `render.js`, `app.js`, `db.js`, `index.html`, `service-worker.js`
 
 ### 【2026-06-04 セッション】2層目Google Mapsボタンの `<a>` タグ化とUniversal Links完全対応 (v375)（担当: Gemini 3.5 Flash）
 - **不具合事象**: 2層目のGoogle Maps連携ボタンをUniversal Links形式（`?api=1&query=`）に修正したにもかかわらず、スマホのLINE LIFF（アプリ内WebView）等でマップを開く際に、再び「アップグレード/アプリ誘導モーダル」が表示されてしまう。

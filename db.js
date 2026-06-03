@@ -316,6 +316,7 @@ function blobToBase64(blob) {
     reader.readAsDataURL(blob);
   });
 }
+window.blobToBase64 = blobToBase64;
 
 /**
  * UI の同期ステータス表示を更新（app.js の triggerUISyncRefresh を呼ぶ）
