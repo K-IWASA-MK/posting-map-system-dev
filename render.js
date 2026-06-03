@@ -99,17 +99,6 @@ function renderAreas() {
           </div>
           ${rightLabel}
         </div>
-        <!-- 🗺 Google マップで市全体を確認するボタン -->
-        <button
-          ontouchstart=""
-          onclick="event.stopPropagation(); window.open('https://www.google.com/maps/search/${encodeURIComponent(c.name + ' 日本')}', '_blank')"
-          style="background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2); color: rgba(37,99,235,0.85); transition: transform 75ms ease-out;"
-          onpointerdown="this.style.transform='scale(0.94)'"
-          onpointerup="this.style.transform=''"
-          onpointerleave="this.style.transform=''"
-          class="mt-2 w-full h-8 rounded-xl flex items-center justify-center gap-1 text-[10px] font-black uppercase tracking-widest select-none">
-          🗺 ${c.name}を地図で見る
-        </button>
       </div>`;
     }).join('');
 
