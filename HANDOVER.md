@@ -2,10 +2,41 @@
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Gemini 3.5 Flash (Google Antigravity) — 2026-06-04 着任  
-> **前担当AI**: Flash (〜v316)
+> **現担当AI**: Gemini 3.5 Pro (Google Antigravity) — 2026-06-04 着任（開発環境の構築とスプシクリーンアップを担当）  
+> **次回のテーマ**: 🛠️ 管理者アプリ (`manager.html`) の UIデザインをプロ仕様（漆黒・超高級ガラスUI）へ修正  
 
 ---
+
+## 🚀 次回タスク：管理者アプリのUIデザイン「プロ仕様」への昇華
+
+### 背景と目的
+本番のデモ環境を保護した上で、独立して検証できる「開発用環境（`dev`ブランチ、テスト用スプシ、テスト用GAS、テスト用LIFF ID、LINE Messaging API）」がすべて結合完了しました。
+次回からは、**管理者アプリ（`manager.html`）のUIデザインのリニューアル**に本格着手します。
+
+`AGENTS.md` の運用規範に基づき、以下の「超プレミアムな選挙DXプラットフォーム」にふさわしいデザインシステムを適用します。
+- **漆黒背景 (#000000) と極上ガラスモーフィズム (backdrop-filter) の徹底**
+- **微発光（グローエフェクト）と静かなアニメーション (200~400ms)**
+- **Apple級のゆったりとした余白設計と直感的フォント**
+- **LINE LIFF WebView（モバイル・スマホ片手操作）でのレスポンシブ崩れゼロの流動的構造**
+
+---
+
+## 🛠️ 現在構築済みの「開発・テスト用環境」パラメータ
+
+| 項目 | 🎬 本番・デモ環境（`main` ブランチ） | 🛠️ 開発・検証環境（`dev` ブランチ） |
+| :--- | :--- | :--- |
+| **スプシ本体** | MIE-02 （四日市支部フォルダ内） | MIE-02 支部 ポスティングエリアマップ _開発用 |
+| **スプシID** | `1gFM1GRmF-uMCBMzorwWEsMQcFnldbK9H6xS2th6K4QE` | `14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4` |
+| **GASスクリプトID** | `1QV8N0NVYw3PBHuLSbQhgWC0FaLFFVGNaUx4lC13BTmZc...` | `158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmH...` |
+| **Web AppデプロイID** | `AKfycbyoIK8marCDlhz8_Rr8H_rBtBeFUKw_9PcFKD0-0...` | `AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-...` |
+| **配布員用LIFF ID** | `2010177345-h9Fjv1iU` | `2010177345-tXZIMAJK` |
+| **管理者用LIFF ID** | `2010177345-h9Fjv1iU` | `2010177345-5y5ayk0h` |
+
+* 開発環境用APIには、開発用のLINE Messaging API（チャネルシークレット・アクセストークン）がセキュアにバインド済みです。
+* ローカルの開発ブランチ (`dev`) は、開発用GitHubリポジトリ（`K-IWASA-MK/posting-map-system-dev`）の `main` ブランチ（Pagesホスト）にプッシュされる構成になっています。
+
+---
+
 
 ## ⚠️ 最重要：GAS Drive権限の教訓（2026-05-29 発生・解決済み）
 
