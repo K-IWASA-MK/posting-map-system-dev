@@ -235,6 +235,23 @@ function selectCity(cityName) {
   renderAreas();
   const contentEl = $('content');
   if (contentEl) contentEl.scrollTop = 0;
+
+  // 市区町村全体の詳細データをバックグラウンドで先読み開始
+  if (window.currentCityDetailsName !== cityName) {
+    window.cityAreaCache = {}; // キャッシュリセット
+    window.currentCityDetailsName = cityName;
+    window.activeCityDetailsPromise = callApi('getCityAreaDetails', { cityName: cityName })
+      .then(data => {
+        if (data && data.success) {
+          window.cityAreaCache = data.details || {};
+        }
+        return data;
+      })
+      .catch(err => {
+        console.error("Background prefetch failed:", err);
+        return null;
+      });
+  }
 }
 
 // Open point detail modal
@@ -542,39 +559,70 @@ function navigateToSiblingArea(direction) {
 }
 
 async function openDetail(name) {
-  // ① 同一エリアへの再タップ: メモリキャッシュを使って即時描画（API スキップ）
+  // 1. 同一エリアへの再タップ: メモリキャッシュを使って即時描画
   if (window.currentCityDetailAreaName === name && allPoints && allPoints.length > 0) {
     if (typeof scrollPositions !== 'undefined') scrollPositions['detail'] = 0;
     const contentEl = $('content');
     if (contentEl) contentEl.scrollTop = 0;
-    renderDetailList(name); // 最新の allPoints（キュー同期済み）で再描画
+    renderDetailList(name);
     switchPage('detail');
-    return; // API呼び出しなしで完了
+    return;
   }
 
+  // 2. メモリキャッシュの確認（改善④）
+  if (window.cityAreaCache && window.cityAreaCache[name]) {
+    window.currentCityDetailAreaName = name;
+    allPoints = window.cityAreaCache[name];
+    if (typeof scrollPositions !== 'undefined') {
+      scrollPositions['detail'] = 0;
+    }
+    const contentEl = $('content');
+    if (contentEl) contentEl.scrollTop = 0;
+    renderDetailList(name);
+    switchPage('detail');
+    return;
+  }
+
+  // 3. フォールバック: キャッシュ未取得の場合
   $('loading').classList.remove('hidden');
   $('loading').classList.remove('opacity-0');
   
   await new Promise(r => setTimeout(r, 50));
   
   try {
+    // 実行中の先読みPromiseがあればそれを待つ
+    if (window.activeCityDetailsPromise) {
+      const data = await window.activeCityDetailsPromise;
+      if (data && data.success && data.details && data.details[name]) {
+        window.cityAreaCache = data.details;
+        window.currentCityDetailAreaName = name;
+        allPoints = data.details[name];
+        renderDetailList(name);
+        
+        if (typeof scrollPositions !== 'undefined') scrollPositions['detail'] = 0;
+        const contentEl = $('content');
+        if (contentEl) contentEl.scrollTop = 0;
+        
+        switchPage('detail');
+        $('loading').classList.add('opacity-0');
+        setTimeout(() => $('loading').classList.add('hidden'), 700);
+        return;
+      }
+    }
+
+    // 先読みPromiseがない、または取得に失敗した場合は個別取得を実行
     const data = await callApi('getAreaDetails', { name: name });
     if (data && data.points) {
       window.currentCityDetailAreaName = name;
       allPoints = data.points;
+      
+      if (!window.cityAreaCache) window.cityAreaCache = {};
+      window.cityAreaCache[name] = data.points;
+      
       renderDetailList(name);
-      
-      // 新しい地区を開くため、詳細画面のスクロール位置をキャッシュからクリア
-      if (typeof scrollPositions !== 'undefined') {
-        scrollPositions['detail'] = 0;
-      }
-      
-      // すでに詳細画面にいる状態での切り替え時にも、確実に先頭を表示させるためスクロールをトップにリセット
+      if (typeof scrollPositions !== 'undefined') scrollPositions['detail'] = 0;
       const contentEl = $('content');
-      if (contentEl) {
-        contentEl.scrollTop = 0;
-      }
-      
+      if (contentEl) contentEl.scrollTop = 0;
       switchPage('detail');
     }
   } catch (e) {

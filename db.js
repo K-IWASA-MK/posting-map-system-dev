@@ -245,25 +245,31 @@ async function processQueue() {
         if (res && res.success) {
           await dequeueSync(item.id);
 
-          // メモリ上の allPoints を同期
-          if (typeof allPoints !== 'undefined' && allPoints) {
-            const p = allPoints.find(pt => pt.rowId === item.rowId);
+          // 1. メモリキャッシュ（一括保存用）の同期更新
+          if (window.cityAreaCache && window.cityAreaCache[item.areaName]) {
+            const cachedPoints = window.cityAreaCache[item.areaName];
+            const p = cachedPoints.find(pt => pt.rowId === item.rowId);
             if (p) {
-              p.photoUrl    = res.photoUrl || '';
+              p.photoUrl = res.photoUrl || '';
               if (item.latitude && item.longitude) {
                 p.gps = `${item.latitude},${item.longitude}`;
               }
-              p.syncStatus  = undefined;
+              p.syncStatus = undefined;
               delete p.tempPhotoUrl;
+            }
+          }
 
-              if (typeof renderDetailList === 'function') {
-                renderDetailList(item.areaName);
-              }
-              if (window.currentPointDetailRowId === item.rowId) {
-                const mc = document.getElementById('detail-modal-content');
-                if (mc && typeof renderDetailModalContent === 'function') {
-                  mc.innerHTML = renderDetailModalContent(p);
-                }
+          // 2. 現在開いている画面(L3)のallPointsを同期
+          if (typeof allPoints !== 'undefined' && allPoints && window.currentCityDetailAreaName === item.areaName) {
+            // allPointsはキャッシュ配列への参照であるため、上記1の処理で自動的に値が更新されています
+            if (typeof renderDetailList === 'function') {
+              renderDetailList(item.areaName);
+            }
+            if (window.currentPointDetailRowId === item.rowId) {
+              const mc = document.getElementById('detail-modal-content');
+              if (mc && typeof renderDetailModalContent === 'function') {
+                const p = allPoints.find(pt => pt.rowId === item.rowId);
+                if (p) mc.innerHTML = renderDetailModalContent(p);
               }
             }
           }
@@ -278,13 +284,19 @@ async function processQueue() {
         console.error(`[Queue] Failed: id=${item.id}`, err.message);
         await scheduleRetry(item);
 
-        // UI上のステータスも更新
-        if (typeof allPoints !== 'undefined' && allPoints) {
-          const p = allPoints.find(pt => pt.rowId === item.rowId);
+        // 1. メモリキャッシュのステータス更新
+        if (window.cityAreaCache && window.cityAreaCache[item.areaName]) {
+          const cachedPoints = window.cityAreaCache[item.areaName];
+          const p = cachedPoints.find(pt => pt.rowId === item.rowId);
           if (p) {
             p.syncStatus = 'RETRY';
-            const areaName = window.currentCityDetailAreaName || item.areaName;
-            if (typeof renderDetailList === 'function') renderDetailList(areaName);
+          }
+        }
+
+        // 2. 現在表示中の画面(L3)のステータス更新
+        if (typeof allPoints !== 'undefined' && allPoints && window.currentCityDetailAreaName === item.areaName) {
+          if (typeof renderDetailList === 'function') {
+            renderDetailList(item.areaName);
           }
         }
       }

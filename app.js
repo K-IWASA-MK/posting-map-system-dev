@@ -19,6 +19,9 @@ let _rankingFetched = false;  // ランキング遅延取得済みフラグ
 let currentCity = null;
 let lastAreaSubPage = 'areas'; // 直前のエリアサブページ ('areas' または 'detail') を記憶
 let scrollPositions = { areas: 0, detail: 0, settings: 0, ranking: 0 };
+window.cityAreaCache = {};
+window.activeCityDetailsPromise = null;
+window.currentCityDetailsName = null;
 
 // ─── ローディングプログレスバー更新 ──────────────────────────────
 function setLoadingProgress(pct, label) {
@@ -462,10 +465,13 @@ window.triggerUISyncRefresh = async function() {
   if (!allPoints || allPoints.length === 0) return; // let変数は window に付かないため直接参照
   if (typeof getQueue !== 'function') return;
   
+  const currentAreaName = window.currentCityDetailAreaName;
+  if (!currentAreaName) return;
+
   try {
     const queue = await getQueue();
     allPoints.forEach(p => {
-      const found = queue.find(q => q.rowId === p.rowId);
+      const found = queue.find(q => q.rowId === p.rowId && q.areaName === currentAreaName);
       if (found) {
         p.syncStatus = found.syncStatus || found.status; // 'pending' | 'sending' | 'failed'
       } else {

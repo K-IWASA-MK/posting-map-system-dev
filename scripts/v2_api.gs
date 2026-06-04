@@ -69,6 +69,9 @@ function doGet(e) {
       case 'getAreaDetails':
         response = getAreaDetails(e.parameter.name);
         break;
+      case 'getCityAreaDetails':
+        response = getCityAreaDetails(e.parameter.cityName);
+        break;
       case 'submitDistribution':
         // ⚠️ 書き込み操作はGET禁止。フロントエンドはPOSTで呼び出すこと。
         response = { success: false, message: 'Write operations require POST. Please update the client.' };
@@ -151,6 +154,9 @@ function doPost(e) {
         break;
       case 'getAreaDetails':
         response = getAreaDetails(postData.name || e.parameter.name);
+        break;
+      case 'getCityAreaDetails':
+        response = getCityAreaDetails(postData.cityName || e.parameter.cityName);
         break;
       case 'submitDistribution':
         response = submitDistribution(
@@ -267,6 +273,67 @@ function getAreaDetails(areaName) {
   }));
 
   return { success: true, points: points };
+}
+
+// getCityName ヘルパー関数をGAS側にも定義
+function getCityName(areaName) {
+  if (!areaName) return 'その他';
+  if (areaName.indexOf('四日市') === 0) return '四日市市';
+  if (areaName.indexOf('鈴鹿') === 0) return '鈴鹿市';
+  if (areaName.indexOf('亀山') === 0) return '亀山市';
+  if (areaName.indexOf('菰野') === 0) return '菰野町';
+  const match = areaName.match(/^[^市町\(\d]+(?:市|町)/);
+  if (match) return match[0];
+  return areaName + '市';
+}
+
+// 市区町村内の全エリア詳細を一括取得する関数
+function getCityAreaDetails(cityName) {
+  if (!cityName) return { success: false, message: "City name required" };
+  const ss = getSS();
+  const sheets = ss.getSheets();
+  const details = {};
+
+  const excludeSheets = [
+    CONFIG.SHEET_GUIDE,
+    CONFIG.SHEET_ROSTER,
+    CONFIG.SHEET_TEMPLATE,
+    CONFIG.SHEET_POSTAL,
+    CONFIG.SHEET_DISTRICT,
+    CONFIG.SHEET_MASTER_EXPORT,
+    CONFIG.SHEET_REPORT,
+    CONFIG.SHEET_MANUAL,
+    CONFIG.SHEET_SYSTEM_CACHE
+  ];
+
+  sheets.forEach(sheet => {
+    const sheetName = sheet.getName();
+    if (excludeSheets.indexOf(sheetName) !== -1 || sheet.isSheetHidden()) return;
+
+    if (getCityName(sheetName) === cityName) {
+      const lastRow = sheet.getLastRow();
+      if (lastRow < 2) {
+        details[sheetName] = [];
+        return;
+      }
+      const values = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
+      const points = values.map((r, i) => ({
+        rowId: i + 2,
+        address: r[0],
+        memo: r[2],
+        isDone: r[3] === true || r[3] === "TRUE",
+        completedAt: r[4] ? String(r[4]).trim() : "",
+        count: parseFloat(r[5]) || 0,
+        staffName: r[6],
+        staffId: r[7] ? String(r[7]).trim() : "",
+        gps: r[8] ? String(r[8]).trim() : "",
+        photoUrl: r[9] ? String(r[9]).trim() : ""
+      }));
+      details[sheetName] = points;
+    }
+  });
+
+  return { success: true, details: details };
 }
 
 function getRoster() {
