@@ -52,6 +52,8 @@ function onOpen() {
     .addSeparator()
     .addItem("🎨 全シートを「プロ仕様」に一斉整形", "formatAllSheets")
     .addItem("🔧 名簿シートを初期化・復旧する", "setupRosterSheet")
+    .addSeparator()
+    .addItem("📁 ドライブフォルダを自動セットアップ", "setupGoogleDriveFolders")
     .addToUi();
 }
 
@@ -507,4 +509,76 @@ function diagnoseProtections() {
 
   const ui = SpreadsheetApp.getUi();
   ui.alert("スプシ保護状況の診断結果", result, ui.ButtonSet.OK);
+}
+
+/**
+ * デモ・本番用のGoogleドライブフォルダ構造を自動セットアップし、スプレッドシートを移動する
+ */
+function setupGoogleDriveFolders() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ssName = ss.getName(); // 例: "MIE-02"
+  const folderNameSuffix = "四日市支部"; // 顧客名
+  const targetFolderName = `${ssName}_${folderNameSuffix}`; // 例: "MIE-02_四日市支部"
+  
+  // 1. 親フォルダ「POSTING_MAP_SYSTEM」を探す、なければ作成
+  let systemFolder;
+  const systemFolders = DriveApp.getFoldersByName("POSTING_MAP_SYSTEM");
+  if (systemFolders.hasNext()) {
+    systemFolder = systemFolders.next();
+  } else {
+    systemFolder = DriveApp.createFolder("POSTING_MAP_SYSTEM");
+  }
+  
+  // 2. 「00_TEMPLATE」と「01_ACTIVE_CLIENTS」フォルダを作成
+  let templateFolder;
+  const templateFolders = systemFolder.getFoldersByName("00_TEMPLATE");
+  if (templateFolders.hasNext()) {
+    templateFolder = templateFolders.next();
+  } else {
+    templateFolder = systemFolder.createFolder("00_TEMPLATE");
+  }
+  
+  let activeClientsFolder;
+  const activeClientsFolders = systemFolder.getFoldersByName("01_ACTIVE_CLIENTS");
+  if (activeClientsFolders.hasNext()) {
+    activeClientsFolder = activeClientsFolders.next();
+  } else {
+    activeClientsFolder = systemFolder.createFolder("01_ACTIVE_CLIENTS");
+  }
+  
+  // 3. 顧客個別フォルダ「MIE-02_四日市支部」を作成
+  let clientFolder;
+  const clientFolders = activeClientsFolder.getFoldersByName(targetFolderName);
+  if (clientFolders.hasNext()) {
+    clientFolder = clientFolders.next();
+  } else {
+    clientFolder = activeClientsFolder.createFolder(targetFolderName);
+  }
+  
+  // 4. 写真格納用フォルダ「MIE-02_STORAGE」を作成
+  let storageFolder;
+  const storageFolderName = `${ssName}_STORAGE`;
+  const storageFolders = clientFolder.getFoldersByName(storageFolderName);
+  if (storageFolders.hasNext()) {
+    storageFolder = storageFolders.next();
+  } else {
+    storageFolder = clientFolder.createFolder(storageFolderName);
+    // 全員が写真をアップロードできるよう、リンクを知っている全員に編集権限を付与
+    storageFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT);
+  }
+  
+  // 5. スプレッドシート自体を顧客個別フォルダに移動
+  const ssFile = DriveApp.getFileById(ss.getId());
+  const currentParents = ssFile.getParents();
+  while (currentParents.hasNext()) {
+    const parent = currentParents.next();
+    parent.removeFile(ssFile);
+  }
+  clientFolder.addFile(ssFile);
+  
+  // 6. 新しい写真フォルダIDをスクリプトプロパティに設定
+  PropertiesService.getScriptProperties().setProperty("STORAGE_PARENT_ID", storageFolder.getId());
+  
+  ss.toast("フォルダ構造の自動セットアップが完了しました！", "セットアップ完了", 10);
+  return `Setup completed. Storage Folder ID: ${storageFolder.getId()}`;
 }

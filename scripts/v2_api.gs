@@ -31,12 +31,17 @@ function getSS() {
   return SpreadsheetApp.openById(id);
 }
 
+function getStorageFolderId() {
+  const id = PropertiesService.getScriptProperties().getProperty("STORAGE_PARENT_ID");
+  return id || CONFIG.STORAGE_PARENT_ID;
+}
+
 // =============================
 // Drive 認証テスト用（認証後は削除可）
 // =============================
 function authorizeAndTestDriveWrite() {
   try {
-    const folderId = CONFIG.STORAGE_PARENT_ID;
+    const folderId = getStorageFolderId();
     const folder = DriveApp.getFolderById(folderId);
     const blob = Utilities.newBlob("DRIVE_AUTH_TEST", "text/plain", "_auth_test.txt");
     const file = folder.createFile(blob);
@@ -82,7 +87,7 @@ function doGet(e) {
       case 'testDriveAccess':
         // Driveフォルダアクセステスト（診断用）
         try {
-          const testFolderId = CONFIG.STORAGE_PARENT_ID;
+          const testFolderId = getStorageFolderId();
           const testFolder = DriveApp.getFolderById(testFolderId);
           response = {
             success: true,
@@ -92,13 +97,13 @@ function doGet(e) {
             folderUrl: testFolder.getUrl()
           };
         } catch (driveErr) {
-          response = { success: false, message: 'Drive access FAILED: ' + driveErr.toString(), folderId: CONFIG.STORAGE_PARENT_ID };
+          response = { success: false, message: 'Drive access FAILED: ' + driveErr.toString(), folderId: getStorageFolderId() };
         }
         break;
       case 'testDriveWrite':
         // Driveファイル書き込みテスト（診断用）
         try {
-          const wFolder = DriveApp.getFolderById(CONFIG.STORAGE_PARENT_ID);
+          const wFolder = DriveApp.getFolderById(getStorageFolderId());
           const testBlob = Utilities.newBlob("POSTING_MAP_TEST_" + Date.now(), "text/plain", "test_write.txt");
           const file = wFolder.createFile(testBlob);
           response = { success: true, message: 'Write OK', fileId: file.getId(), fileName: file.getName() };
@@ -187,6 +192,10 @@ function doPost(e) {
       case 'resetRoster':
         const rosterMsg = setupRosterSheet();
         response = { success: true, message: rosterMsg };
+        break;
+      case 'setupFolders':
+        const setupMsg = setupGoogleDriveFolders();
+        response = { success: true, message: setupMsg };
         break;
       case 'forceStartBatch':
         forceStartBatch();
@@ -604,7 +613,7 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
       // J列（写真）: photoDataがBase64画像の場合のみDrive保存
       if (photoData && photoData.indexOf("data:image") === 0) {
         try {
-          const folderId = CONFIG.STORAGE_PARENT_ID || "17DqCq4hIquqvK96ig8-n6fwb5pTgRE_-";
+          const folderId = getStorageFolderId();
           const folder = DriveApp.getFolderById(folderId);
           const timeStr = Utilities.formatDate(now, "JST", "HHmm");
           const safeStaffName = staffName ? staffName.replace(/[\s　]/g, "") : "Unknown";

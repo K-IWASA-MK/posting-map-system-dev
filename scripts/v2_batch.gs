@@ -267,7 +267,7 @@ function checkEndOfMonthAndReset() {
  * setupCleanupTrigger() で毎日深夜2〜3時に自動実行される。
  */
 function cleanupDrivePhotos() {
-  const parentFolderId = CONFIG.STORAGE_PARENT_ID || "1c62olbuKpFr80IYGnsTXxcGr99S9lfN7";
+  const parentFolderId = getStorageFolderId();
   let parentFolder;
   try {
     parentFolder = DriveApp.getFolderById(parentFolderId);
