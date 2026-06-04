@@ -21,28 +21,21 @@
       e.preventDefault();
     }, { passive: false });
   </script>
-  <!-- C-1: キャッシュバスター v318 に統一 -->
+  <!-- C-1: キャッシュバスター v384 に統一 -->
   <link rel="stylesheet" href="./style.css?v=384">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
-  <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) -->
-  <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center">
-    <!-- Icon: 黄金比に基づき mb-6 で統一。ネストされたラッパーは削除 -->
+  <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) - hidden by default -->
+  <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
     <div class="w-36 h-36 bg-white/5 backdrop-blur-2xl rounded-[2.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
       <img src="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201" class="w-full h-full object-cover rounded-[2.5rem] z-10">
     </div>
-    
-    <!-- Title & Subtitle: ラッパーを削除し、大元の flex-col で自動中央揃え。下部は mb-6 -->
     <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">POSTING MAP</h2>
     <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2 mb-6">管理者専用 — Administrator Only</p>
-    
-    <!-- Button Card: 下部は mb-6 -->
     <div class="w-full max-w-sm bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl mb-6">
       <button onclick="startAdmin()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">管理画面を起動する</button>
     </div>
-    
-    <!-- Footer: 2行大文字トラッキング -->
     <div class="gateway-footer space-y-1">
       <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Administrator</p>
       <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Command Mode</p>
@@ -60,119 +53,155 @@
     <p class="mt-6 text-[10px] font-black text-white/40 uppercase tracking-[0.3em] animate-pulse">Connecting command console...</p>
   </div>
 
-  <!-- 3. MAIN ADMIN APP -->
-  <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-1000 hidden">
+  <!-- 3. MAIN ADMIN APP - displayed by default -->
+  <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] transition-opacity duration-1000">
     <header class="safe-top px-8 py-8 flex justify-between items-center shrink-0">
-      <h1 class="text-2xl font-black tracking-tighter text-white leading-none">ADMIN PANEL</h1>
+      <div class="flex flex-col gap-1">
+        <h1 class="text-2xl font-black tracking-tighter text-white leading-none">管理指令室</h1>
+        <span class="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none">ADMIN PANEL</span>
+      </div>
       <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
         <div id="api-dot" class="w-2 h-2 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
         <span id="api-status-text" class="text-xs font-black text-[#2563eb] tracking-tighter uppercase">API ACTIVE</span>
       </div>
     </header>
 
-    <!-- Tab Selector (MONITOR と SYSTEM COMMANDS の切り替えトグル) -->
+    <!-- Tab Selector -->
     <div class="px-6 mb-6 flex gap-3 justify-center shrink-0">
       <button id="tab-btn-monitor" onclick="switchAdminTab('monitor')" class="flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all">
-        MONITOR
+        エリア監視
       </button>
       <button id="tab-btn-system" onclick="switchAdminTab('system')" class="flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all">
-        SYSTEM COMMANDS
+        システム制御
       </button>
     </div>
 
     <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
       
-      <!-- ── MONITOR タブ（メインの実用的なエリア監視画面） ── -->
+      <!-- ── MONITOR タブ ── -->
       <div id="panel-monitor" class="space-y-10">
-        <!-- 1. KPI Panel (1列・完全中央揃え化、レスポンシブ高さ min-h-[9rem]) -->
-        <section class="grid grid-cols-2 gap-4">
+        <!-- 1. KPI Panel (1カラム化、日本語・英語併記、縦サイズ統一) -->
+        <section class="space-y-4">
+          <!-- 全体配布率 -->
           <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Overall Coverage</span>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-xs font-black text-white/70 tracking-widest">全体配布率</span>
+              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">OVERALL COVERAGE</span>
+            </div>
             <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
             <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
               <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
             </div>
           </div>
+          <!-- 稼働配布員 -->
           <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Active Staff</span>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-xs font-black text-white/70 tracking-widest">稼働配布員</span>
+              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">ACTIVE STAFF</span>
+            </div>
             <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
             <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25);" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-[#22c55e] uppercase tracking-wider mt-1">
               <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-soft-pulse shadow-[0_0_6px_#22c55e]"></span>
-              <span>Online Roster</span>
+              <span>オンライン稼働中</span>
             </div>
           </div>
         </section>
 
-        <!-- Field Sync Status (1列・完全中央揃え化、レスポンシブ高さ min-h-[7.5rem]) -->
+        <!-- 同期状況 (1列化、日本語・英語併記、縦サイズ統一) -->
         <section class="space-y-4">
-          <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Field Sync Status</h3>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">データ同期状況</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">FIELD SYNC STATUS</span>
+          </div>
+          <div class="space-y-4">
+            <!-- 未送信 -->
             <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">未送信</span>
+              <span class="text-xs font-black text-white/70 tracking-widest">未送信</span>
               <span id="sync-stat-pending" class="text-3xl font-black tracking-tighter text-[#f59e0b]">-</span>
-              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">GPS Pending</span>
+              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">GPS Pending</span>
             </div>
+            <!-- 同期済 -->
             <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">同期済</span>
+              <span class="text-xs font-black text-white/70 tracking-widest">同期済</span>
               <span id="sync-stat-synced" class="text-3xl font-black tracking-tighter text-[#22c55e]">-</span>
-              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">GPS Recorded</span>
+              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">GPS Recorded</span>
             </div>
+            <!-- 写真付き -->
             <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">写真付き</span>
+              <span class="text-xs font-black text-white/70 tracking-widest">写真付き</span>
               <span id="sync-stat-photo" class="text-3xl font-black tracking-tighter text-[#2563eb]">-</span>
-              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Drive Saved</span>
+              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">Drive Saved</span>
             </div>
+            <!-- 最終同期 -->
             <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">最終同期</span>
+              <span class="text-xs font-black text-white/70 tracking-widest">最終同期</span>
               <span id="sync-stat-lastsync" class="text-sm font-black tracking-tight text-white/70 truncate max-w-full">-</span>
-              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Last Updated</span>
+              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">Last Updated</span>
             </div>
           </div>
         </section>
 
-        <!-- 管理対象のエリア（市町村別）一覧 -->
+        <!-- 管轄エリア一覧 (1列化、日本語・英語併記、縦サイズ統一) -->
         <section class="space-y-4">
-          <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Your Areas</h3>
-          <div id="admin-area-list" class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">管轄エリア</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">YOUR AREAS</span>
+          </div>
+          <div id="admin-area-list" class="space-y-4">
             <!-- エリアカード一覧が動的レンダリングされます -->
           </div>
         </section>
       </div>
 
-      <!-- ── SYSTEM タブ（顧客にアピールするための機能演出画面） ── -->
+      <!-- ── SYSTEM タブ ── -->
       <div id="panel-system" class="space-y-10 hidden">
-        <!-- 2. Command Operations (カードを静的にし、内部に完全に同一サイズの独立ボタン＋沈み込みアニメを設定) -->
+        <!-- システム操作 -->
         <section class="space-y-4">
-          <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Tactical Command Center</h3>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">システム操作</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">TACTICAL COMMAND CENTER</span>
+          </div>
+          <div class="space-y-4">
             <!-- Batch Run -->
-            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
+            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
               <span class="text-2xl select-none">🚀</span>
-              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Batch Run</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-black text-white/70 tracking-widest">一括エリア作成</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Batch Run</span>
+              </div>
               <button onclick="runCommand('forceStartBatch')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
                 起動する
               </button>
             </div>
             <!-- Cache Sync -->
-            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
+            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
               <span class="text-2xl select-none">🔄</span>
-              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Cache Sync</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-black text-white/70 tracking-widest">キャッシュ同期</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Cache Sync</span>
+              </div>
               <button onclick="runCommand('refreshCache')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
                 同期する
               </button>
             </div>
             <!-- Aggregate -->
-            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
+            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
               <span class="text-2xl select-none">📊</span>
-              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Aggregate</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-black text-white/70 tracking-widest">統計情報集計</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Aggregate</span>
+              </div>
               <button onclick="runCommand('aggregateStats')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
                 集計する
               </button>
             </div>
             <!-- System Reset -->
-            <div style="border-color: rgba(244, 63, 94, 0.2);" class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
+            <div style="border-color: rgba(244, 63, 94, 0.2);" class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
               <span class="text-2xl select-none">⚠️</span>
-              <span class="text-[10px] font-black text-rose-500 uppercase tracking-widest">System Reset</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-black text-rose-500 tracking-widest">システム完全初期化</span>
+                <span class="text-[8px] font-black text-rose-500/50 uppercase tracking-widest">System Reset</span>
+              </div>
               <button onclick="runCommand('resetAllSheets')" class="w-full h-11 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-rose-600/20">
                 初期化する
               </button>
@@ -180,9 +209,12 @@
           </div>
         </section>
 
-        <!-- 3. Intel Live Stream Console -->
+        <!-- ログコンソール -->
         <section class="space-y-4">
-          <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Intel Live Stream</h3>
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">システムログ</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">INTEL LIVE STREAM</span>
+          </div>
           <div class="premium-glass p-6">
             <div id="log-console" class="h-40 overflow-y-auto font-mono text-[10px] space-y-2 text-white/50 hide-scrollbar selection:bg-[#2563eb]">
               <div class="text-white/30">&gt; Command console initialized. Ready.</div>
@@ -365,6 +397,7 @@
       }
     }
 
+    // saveDashboardCache
     function saveDashboardCache({ coverage, staffCount, syncData, areasHtml }) {
       try {
         const cacheData = {
@@ -411,11 +444,11 @@
           $('stat-progress-bar').style.width = coverageText;
           addLog(`Stats updated: coverage ${coverageText} (${totalDone}/${totalPoints} across ${areas.length} districts)`);
 
-          // 管轄エリアリストを動的レンダリング
+          // 管轄エリアリストを動的レンダリング (フルサイズ・1列カード)
           areasHtml = areas.map(area => {
             const progress = area.progress ?? (area.total > 0 ? Math.round((area.done / area.total) * 100) : 0);
             return `
-              <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1.5 min-h-[7.5rem]">
+              <div class="premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5">
                 <div class="w-full flex justify-center mb-1">
                   <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="inline-flex items-center justify-center h-7 px-3 text-xs font-black text-white rounded-full tracking-tight">
                     <span class="text-xs mr-1 select-none">🏢</span>
@@ -426,7 +459,7 @@
                 <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mb-1">
                   <div class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: ${progress}%;"></div>
                 </div>
-                <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 20px; font-size: 9px; color: #22c55e;" class="inline-flex items-center justify-center px-2 font-bold rounded-full tracking-wider font-mono">
+                <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
                   ${area.done}/ ${area.total}
                 </div>
               </div>
@@ -450,7 +483,6 @@
           addLog(`Sync stats: completed=${syncData.totalCompleted}, gps=${syncData.withGPS}, photo=${syncData.withPhoto}`);
         }
 
-        // キャッシュに保存
         saveDashboardCache({
           coverage: coverageText,
           staffCount: staffCount,
@@ -458,7 +490,6 @@
           areasHtml: areasHtml
         });
 
-        // 接続確認後にインジケーターを更新
         $('api-dot').className = 'w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]';
         $('api-status-text').textContent = 'CONNECTED';
         $('api-status-text').className = 'text-xs font-black text-[#10b981] tracking-tighter uppercase';
@@ -492,6 +523,8 @@
           .then(reg => console.log('SW registered. Scope:', reg.scope))
           .catch(err => console.error('SW registration failed:', err));
       }
+      // スプラッシュをスキップして直接起動
+      startAdmin();
     };
   </script>
 </body>
