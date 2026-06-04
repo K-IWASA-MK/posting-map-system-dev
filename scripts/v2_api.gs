@@ -184,6 +184,10 @@ function doPost(e) {
       case 'registerStaff':
         response = registerStaff(postData.lastName, postData.firstName);
         break;
+      case 'resetRoster':
+        const rosterMsg = setupRosterSheet();
+        response = { success: true, message: rosterMsg };
+        break;
       case 'forceStartBatch':
         forceStartBatch();
         response = { success: true, message: 'Batch run initiated successfully' };
