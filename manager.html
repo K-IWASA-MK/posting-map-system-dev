@@ -62,7 +62,7 @@
 
   <!-- 3. MAIN ADMIN APP -->
   <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-1000 hidden">
-    <header class="safe-top px-8 py-8 flex justify-between items-center">
+    <header class="safe-top px-8 py-8 flex justify-between items-center shrink-0">
       <h1 class="text-2xl font-black tracking-tighter text-white leading-none">ADMIN PANEL</h1>
       <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
         <div id="api-dot" class="w-2 h-2 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
@@ -70,101 +70,127 @@
       </div>
     </header>
 
+    <!-- Tab Selector (MONITOR と SYSTEM COMMANDS の切り替えトグル) -->
+    <div class="px-6 mb-6 flex gap-3 justify-center shrink-0">
+      <button id="tab-btn-monitor" onclick="switchAdminTab('monitor')" class="flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all">
+        MONITOR
+      </button>
+      <button id="tab-btn-system" onclick="switchAdminTab('system')" class="flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all">
+        SYSTEM COMMANDS
+      </button>
+    </div>
+
     <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
-      <!-- 1. KPI Panel (1列・完全中央揃え化、レスポンシブ高さ min-h-[9rem]) -->
-      <section class="grid grid-cols-2 gap-4">
-        <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
-          <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Overall Coverage</span>
-          <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
-          <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
-            <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
+      
+      <!-- ── MONITOR タブ（メインの実用的なエリア監視画面） ── -->
+      <div id="panel-monitor" class="space-y-10">
+        <!-- 1. KPI Panel (1列・完全中央揃え化、レスポンシブ高さ min-h-[9rem]) -->
+        <section class="grid grid-cols-2 gap-4">
+          <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
+            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Overall Coverage</span>
+            <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
+            <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
+              <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
+            </div>
           </div>
-        </div>
-        <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
-          <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Active Staff</span>
-          <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
-          <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25);" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-[#22c55e] uppercase tracking-wider mt-1">
-            <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-soft-pulse shadow-[0_0_6px_#22c55e]"></span>
-            <span>Online Roster</span>
+          <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
+            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Active Staff</span>
+            <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
+            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25);" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-[#22c55e] uppercase tracking-wider mt-1">
+              <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-soft-pulse shadow-[0_0_6px_#22c55e]"></span>
+              <span>Online Roster</span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Field Sync Status (1列・完全中央揃え化、レスポンシブ高さ min-h-[7.5rem]) -->
-      <section class="space-y-4">
-        <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Field Sync Status</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">未送信</span>
-            <span id="sync-stat-pending" class="text-3xl font-black tracking-tighter text-[#f59e0b]">-</span>
-            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">GPS Pending</span>
+        <!-- Field Sync Status (1列・完全中央揃え化、レスポンシブ高さ min-h-[7.5rem]) -->
+        <section class="space-y-4">
+          <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Field Sync Status</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">未送信</span>
+              <span id="sync-stat-pending" class="text-3xl font-black tracking-tighter text-[#f59e0b]">-</span>
+              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">GPS Pending</span>
+            </div>
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">同期済</span>
+              <span id="sync-stat-synced" class="text-3xl font-black tracking-tighter text-[#22c55e]">-</span>
+              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">GPS Recorded</span>
+            </div>
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">写真付き</span>
+              <span id="sync-stat-photo" class="text-3xl font-black tracking-tighter text-[#2563eb]">-</span>
+              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Drive Saved</span>
+            </div>
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">最終同期</span>
+              <span id="sync-stat-lastsync" class="text-sm font-black tracking-tight text-white/70 truncate max-w-full">-</span>
+              <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Last Updated</span>
+            </div>
           </div>
-          <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">同期済</span>
-            <span id="sync-stat-synced" class="text-3xl font-black tracking-tighter text-[#22c55e]">-</span>
-            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">GPS Recorded</span>
-          </div>
-          <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">写真付き</span>
-            <span id="sync-stat-photo" class="text-3xl font-black tracking-tighter text-[#2563eb]">-</span>
-            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Drive Saved</span>
-          </div>
-          <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">最終同期</span>
-            <span id="sync-stat-lastsync" class="text-sm font-black tracking-tight text-white/70 truncate max-w-full">-</span>
-            <span class="text-[9px] font-black text-white/20 uppercase tracking-widest">Last Updated</span>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- 2. Command Operations (カードを静的にし、内部に完全に同一サイズの独立ボタン＋沈み込みアニメを設定) -->
-      <section class="space-y-4">
-        <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Tactical Command Center</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Batch Run -->
-          <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
-            <span class="text-2xl select-none">🚀</span>
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Batch Run</span>
-            <button onclick="runCommand('forceStartBatch')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
-              起動する
-            </button>
+        <!-- 管理対象のエリア（市町村別）一覧 -->
+        <section class="space-y-4">
+          <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Your Areas</h3>
+          <div id="admin-area-list" class="grid grid-cols-2 gap-4">
+            <!-- エリアカード一覧が動的レンダリングされます -->
           </div>
-          <!-- Cache Sync -->
-          <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
-            <span class="text-2xl select-none">🔄</span>
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Cache Sync</span>
-            <button onclick="runCommand('refreshCache')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
-              同期する
-            </button>
-          </div>
-          <!-- Aggregate -->
-          <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
-            <span class="text-2xl select-none">📊</span>
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Aggregate</span>
-            <button onclick="runCommand('aggregateStats')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
-              集計する
-            </button>
-          </div>
-          <!-- System Reset -->
-          <div style="border-color: rgba(244, 63, 94, 0.2);" class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
-            <span class="text-2xl select-none">⚠️</span>
-            <span class="text-[10px] font-black text-rose-500 uppercase tracking-widest">System Reset</span>
-            <button onclick="runCommand('resetAllSheets')" class="w-full h-11 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-rose-600/20">
-              初期化する
-            </button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <!-- 3. Intel Live Stream Console -->
-      <section class="space-y-4">
-        <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Intel Live Stream</h3>
-        <div class="premium-glass p-6">
-          <div id="log-console" class="h-40 overflow-y-auto font-mono text-[10px] space-y-2 text-white/50 hide-scrollbar selection:bg-[#2563eb]">
-            <div class="text-white/30">&gt; Command console initialized. Ready.</div>
+      <!-- ── SYSTEM タブ（顧客にアピールするための機能演出画面） ── -->
+      <div id="panel-system" class="space-y-10 hidden">
+        <!-- 2. Command Operations (カードを静的にし、内部に完全に同一サイズの独立ボタン＋沈み込みアニメを設定) -->
+        <section class="space-y-4">
+          <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Tactical Command Center</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Batch Run -->
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
+              <span class="text-2xl select-none">🚀</span>
+              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Batch Run</span>
+              <button onclick="runCommand('forceStartBatch')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
+                起動する
+              </button>
+            </div>
+            <!-- Cache Sync -->
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
+              <span class="text-2xl select-none">🔄</span>
+              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Cache Sync</span>
+              <button onclick="runCommand('refreshCache')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
+                同期する
+              </button>
+            </div>
+            <!-- Aggregate -->
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
+              <span class="text-2xl select-none">📊</span>
+              <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Aggregate</span>
+              <button onclick="runCommand('aggregateStats')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
+                集計する
+              </button>
+            </div>
+            <!-- System Reset -->
+            <div style="border-color: rgba(244, 63, 94, 0.2);" class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-4 min-h-[11rem]">
+              <span class="text-2xl select-none">⚠️</span>
+              <span class="text-[10px] font-black text-rose-500 uppercase tracking-widest">System Reset</span>
+              <button onclick="runCommand('resetAllSheets')" class="w-full h-11 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-rose-600/20">
+                初期化する
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <!-- 3. Intel Live Stream Console -->
+        <section class="space-y-4">
+          <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] px-2 text-center">Intel Live Stream</h3>
+          <div class="premium-glass p-6">
+            <div id="log-console" class="h-40 overflow-y-auto font-mono text-[10px] space-y-2 text-white/50 hide-scrollbar selection:bg-[#2563eb]">
+              <div class="text-white/30">&gt; Command console initialized. Ready.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
     </main>
   </div>
 
@@ -247,8 +273,6 @@
         method: 'POST',
         redirect: 'follow',
         body: JSON.stringify({ action, ...params }),
-        // 管理画面はCORSのシンプルリクエスト条件を満たすためContent-Typeを明示。
-        // app.js/db.jsはContent-Typeを未設定（プリフライト回避のため）。設計意図の違いに注意。
         headers: { 'Content-Type': 'text/plain;charset=utf-8' }
       };
       const response = await fetch(API_URL + '?action=' + action, options);
@@ -258,7 +282,6 @@
 
     // ── コマンド実行 ────────────────────────────────────────────────
     async function runCommand(action) {
-      // W-3: confirm() → ガラスモーダルに置換
       if (action === 'resetAllSheets') {
         showModal({
           title: '⚠️ System Reset — 最終確認',
@@ -280,7 +303,6 @@
         const res = await callApi(action);
         if (res && res.success) {
           addLog(`Success: ${res.message || 'Operation completed.'}`);
-          // W-2: alert() → ガラスモーダルに置換
           showModal({
             title: '✅ Command Complete',
             body: res.message || 'コマンドが正常に実行されました。',
@@ -292,7 +314,6 @@
         }
       } catch (err) {
         addLog(`Error: ${err.message}`);
-        // W-2: alert() → ガラスモーダルに置換
         showModal({
           title: '❌ Command Failed',
           body: err.message,
@@ -300,6 +321,23 @@
         });
       } finally {
         $('loading').classList.add('hidden');
+      }
+    }
+
+    // ── タブ切り替えロジック ─────────────────────────────────────────
+    function switchAdminTab(tabName) {
+      if (tabName === 'monitor') {
+        $('panel-monitor').classList.remove('hidden');
+        $('panel-system').classList.add('hidden');
+        
+        $('tab-btn-monitor').className = 'flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all';
+        $('tab-btn-system').className = 'flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all';
+      } else {
+        $('panel-monitor').classList.add('hidden');
+        $('panel-system').classList.remove('hidden');
+        
+        $('tab-btn-monitor').className = 'flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all';
+        $('tab-btn-system').className = 'flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all';
       }
     }
 
@@ -316,6 +354,10 @@
           $('sync-stat-synced').textContent   = data.syncWithGPS        ?? '-';
           $('sync-stat-photo').textContent    = data.syncWithPhoto      ?? '-';
           $('sync-stat-lastsync').textContent = data.syncLastSyncAt     ?? '-';
+          
+          if (data.areasHtml) {
+            $('admin-area-list').innerHTML = data.areasHtml;
+          }
           addLog(`Cached stats restored (Last sync: ${data.syncLastSyncAt || 'N/A'})`);
         }
       } catch (e) {
@@ -323,7 +365,7 @@
       }
     }
 
-    function saveDashboardCache({ coverage, staffCount, syncData }) {
+    function saveDashboardCache({ coverage, staffCount, syncData, areasHtml }) {
       try {
         const cacheData = {
           coverage,
@@ -332,6 +374,7 @@
           syncWithGPS: syncData ? syncData.withGPS : '-',
           syncWithPhoto: syncData ? syncData.withPhoto : '-',
           syncLastSyncAt: syncData ? syncData.lastSyncAt : '-',
+          areasHtml: areasHtml || '',
           timestamp: Date.now()
         };
         localStorage.setItem('admin_dashboard_cache', JSON.stringify(cacheData));
@@ -340,7 +383,7 @@
       }
     }
 
-    // ── ダッシュボードデータ読み込み（W-6: API統合 → Promise.all で並列化）──
+    // ── ダッシュボードデータ読み込み ──
     async function loadDashboardData() {
       // 接続中のステータス表示（黄色）
       $('api-dot').className = 'w-2 h-2 bg-yellow-500 rounded-full animate-pulse shadow-[0_0_8px_#eab308]';
@@ -348,7 +391,6 @@
       $('api-status-text').className = 'text-xs font-black text-yellow-500 tracking-tighter uppercase';
 
       try {
-        // W-6: getAppData + getRoster + getDeliveryStats を Promise.all で同時リクエスト
         const [appData, rosterData, syncData] = await Promise.all([
           fetch(API_URL + '?action=getAppData').then(r => r.json()),
           fetch(API_URL + '?action=getRoster').then(r => r.json()),
@@ -357,6 +399,7 @@
 
         let coverageText = '0%';
         let staffCount = 0;
+        let areasHtml = '';
 
         if (appData && appData.success) {
           const areas = appData.areas || [];
@@ -367,6 +410,29 @@
           $('stat-coverage').textContent = coverageText;
           $('stat-progress-bar').style.width = coverageText;
           addLog(`Stats updated: coverage ${coverageText} (${totalDone}/${totalPoints} across ${areas.length} districts)`);
+
+          // 管轄エリアリストを動的レンダリング
+          areasHtml = areas.map(area => {
+            const progress = area.progress ?? (area.total > 0 ? Math.round((area.done / area.total) * 100) : 0);
+            return `
+              <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1.5 min-h-[7.5rem]">
+                <div class="w-full flex justify-center mb-1">
+                  <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="inline-flex items-center justify-center h-7 px-3 text-xs font-black text-white rounded-full tracking-tight">
+                    <span class="text-xs mr-1 select-none">🏢</span>
+                    <span>${area.name}</span>
+                  </div>
+                </div>
+                <div class="text-sm text-[#2563eb]">${progress}%</div>
+                <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mb-1">
+                  <div class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: ${progress}%;"></div>
+                </div>
+                <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 20px; font-size: 9px; color: #22c55e;" class="inline-flex items-center justify-center px-2 font-bold rounded-full tracking-wider font-mono">
+                  ${area.done}/ ${area.total}
+                </div>
+              </div>
+            `;
+          }).join('');
+          $('admin-area-list').innerHTML = areasHtml;
         }
 
         if (rosterData && rosterData.success) {
@@ -376,7 +442,6 @@
           addLog(`Roster loaded: ${staffCount} distributor(s) registered.`);
         }
 
-        // 同期統計パネル更新 (要件9)
         if (syncData && syncData.success) {
           $('sync-stat-pending').textContent  = syncData.pending        ?? '-';
           $('sync-stat-synced').textContent   = syncData.withGPS        ?? '-';
@@ -389,10 +454,11 @@
         saveDashboardCache({
           coverage: coverageText,
           staffCount: staffCount,
-          syncData: syncData && syncData.success ? syncData : null
+          syncData: syncData && syncData.success ? syncData : null,
+          areasHtml: areasHtml
         });
 
-        // I-4: API接続確認後にインジケーターを更新
+        // 接続確認後にインジケーターを更新
         $('api-dot').className = 'w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]';
         $('api-status-text').textContent = 'CONNECTED';
         $('api-status-text').className = 'text-xs font-black text-[#10b981] tracking-tighter uppercase';
