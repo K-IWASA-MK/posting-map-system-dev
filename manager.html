@@ -303,8 +303,50 @@
       }
     }
 
+    // ── ダッシュボードキャッシュの復元・保存 ──────────────────────────
+    function restoreDashboardCache() {
+      try {
+        const cached = localStorage.getItem('admin_dashboard_cache');
+        if (cached) {
+          const data = JSON.parse(cached);
+          $('stat-coverage').textContent = data.coverage;
+          $('stat-progress-bar').style.width = data.coverage;
+          $('stat-staff').textContent = data.staffCount;
+          $('sync-stat-pending').textContent  = data.syncPending        ?? '-';
+          $('sync-stat-synced').textContent   = data.syncWithGPS        ?? '-';
+          $('sync-stat-photo').textContent    = data.syncWithPhoto      ?? '-';
+          $('sync-stat-lastsync').textContent = data.syncLastSyncAt     ?? '-';
+          addLog(`Cached stats restored (Last sync: ${data.syncLastSyncAt || 'N/A'})`);
+        }
+      } catch (e) {
+        console.error("Failed to restore cache:", e);
+      }
+    }
+
+    function saveDashboardCache({ coverage, staffCount, syncData }) {
+      try {
+        const cacheData = {
+          coverage,
+          staffCount,
+          syncPending: syncData ? syncData.pending : '-',
+          syncWithGPS: syncData ? syncData.withGPS : '-',
+          syncWithPhoto: syncData ? syncData.withPhoto : '-',
+          syncLastSyncAt: syncData ? syncData.lastSyncAt : '-',
+          timestamp: Date.now()
+        };
+        localStorage.setItem('admin_dashboard_cache', JSON.stringify(cacheData));
+      } catch (e) {
+        console.error("Failed to save cache:", e);
+      }
+    }
+
     // ── ダッシュボードデータ読み込み（W-6: API統合 → Promise.all で並列化）──
     async function loadDashboardData() {
+      // 接続中のステータス表示（黄色）
+      $('api-dot').className = 'w-2 h-2 bg-yellow-500 rounded-full animate-pulse shadow-[0_0_8px_#eab308]';
+      $('api-status-text').textContent = 'CONNECTING...';
+      $('api-status-text').className = 'text-xs font-black text-yellow-500 tracking-tighter uppercase';
+
       try {
         // W-6: getAppData + getRoster + getDeliveryStats を Promise.all で同時リクエスト
         const [appData, rosterData, syncData] = await Promise.all([
@@ -313,20 +355,25 @@
           fetch(API_URL + '?action=getDeliveryStats').then(r => r.json()).catch(() => null)
         ]);
 
+        let coverageText = '0%';
+        let staffCount = 0;
+
         if (appData && appData.success) {
           const areas = appData.areas || [];
           let totalDone = 0, totalPoints = 0;
           areas.forEach(area => { totalDone += area.done || 0; totalPoints += area.total || 0; });
           const coverage = totalPoints > 0 ? Math.round((totalDone / totalPoints) * 100) : 0;
-          $('stat-coverage').textContent = `${coverage}%`;
-          $('stat-progress-bar').style.width = `${coverage}%`;
-          addLog(`Stats updated: coverage ${coverage}% (${totalDone}/${totalPoints} across ${areas.length} districts)`);
+          coverageText = `${coverage}%`;
+          $('stat-coverage').textContent = coverageText;
+          $('stat-progress-bar').style.width = coverageText;
+          addLog(`Stats updated: coverage ${coverageText} (${totalDone}/${totalPoints} across ${areas.length} districts)`);
         }
 
         if (rosterData && rosterData.success) {
           const rosterList = rosterData.roster || [];
-          $('stat-staff').textContent = rosterList.length;
-          addLog(`Roster loaded: ${rosterList.length} distributor(s) registered.`);
+          staffCount = rosterList.length;
+          $('stat-staff').textContent = staffCount;
+          addLog(`Roster loaded: ${staffCount} distributor(s) registered.`);
         }
 
         // 同期統計パネル更新 (要件9)
@@ -338,29 +385,39 @@
           addLog(`Sync stats: completed=${syncData.totalCompleted}, gps=${syncData.withGPS}, photo=${syncData.withPhoto}`);
         }
 
+        // キャッシュに保存
+        saveDashboardCache({
+          coverage: coverageText,
+          staffCount: staffCount,
+          syncData: syncData && syncData.success ? syncData : null
+        });
+
         // I-4: API接続確認後にインジケーターを更新
         $('api-dot').className = 'w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]';
         $('api-status-text').textContent = 'CONNECTED';
+        $('api-status-text').className = 'text-xs font-black text-[#10b981] tracking-tighter uppercase';
       } catch (e) {
         addLog(`Dashboard sync failed: ${e.message}`);
         $('api-dot').className = 'w-2 h-2 bg-rose-500 rounded-full';
         $('api-status-text').textContent = 'API ERROR';
-        $('api-status-text').classList.replace('text-[#2563eb]', 'text-rose-500');
+        $('api-status-text').className = 'text-xs font-black text-rose-500 tracking-tighter uppercase';
       }
     }
 
     // ── 起動 ────────────────────────────────────────────────────────
     function startAdmin() {
+      // 1. キャッシュから即座に画面を描画
+      restoreDashboardCache();
+
+      // 2. スプラッシュからアプリ画面へ一瞬で切り替え
       $('screen-gateway').classList.add('hidden');
-      $('loading').classList.remove('hidden', 'opacity-0');
-      loadDashboardData().finally(() => {
-        $('app').classList.remove('hidden');
-        setTimeout(() => {
-          $('app').classList.remove('opacity-0');
-          $('loading').classList.add('opacity-0');
-          setTimeout(() => $('loading').classList.add('hidden'), 400);
-        }, 100);
-      });
+      $('app').classList.remove('hidden');
+      setTimeout(() => {
+        $('app').classList.remove('opacity-0');
+      }, 50);
+
+      // 3. バックグラウンドでAPIから最新データを非同期取得して更新
+      loadDashboardData();
     }
 
     window.onload = () => {
