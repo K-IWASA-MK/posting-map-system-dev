@@ -22,6 +22,7 @@ let scrollPositions = { areas: 0, detail: 0, settings: 0, ranking: 0 };
 window.cityAreaCache = {};
 window.activeCityDetailsPromise = null;
 window.currentCityDetailsName = null;
+window.activeRankingPromise = null;
 
 // ─── ローディングプログレスバー更新 ──────────────────────────────
 function setLoadingProgress(pct, label) {
@@ -300,6 +301,9 @@ async function loadData(skipSync = false) {
       renderAreas();
       logDebug("[loadData] Rendering areas OK. Updating stats...");
       updateStats();
+
+      // バックグラウンドでランキングデータを先読み/更新
+      prefetchRanking();
       
       if (!skipSync) {
         logDebug("[loadData] Initial load. Switching page to settings and animating app entry...");
@@ -323,6 +327,28 @@ async function loadData(skipSync = false) {
     $('loading').classList.add('hidden');
     $('screen-gateway').classList.remove('hidden');
   }
+}
+
+// ランキングデータのバックグラウンド先読み関数
+function prefetchRanking() {
+  window.activeRankingPromise = callApi('getRanking')
+    .then(data => {
+      if (data && data.success) {
+        rankingData = data.ranking || [];
+        _rankingFetched = true;
+        logDebug("[prefetchRanking] Ranking pre-fetched in background.");
+        // 現在ランキングページを表示中であれば再描画
+        const activePage = document.querySelector('.page:not(.hidden)');
+        if (activePage && activePage.id === 'page-ranking' && typeof renderRanking === 'function') {
+          renderRanking();
+        }
+      }
+      return data;
+    })
+    .catch(err => {
+      logDebug("[prefetchRanking] Failed to pre-fetch ranking: " + err.message);
+      return null;
+    });
 }
 
 let numpadContext = null;
@@ -784,7 +810,6 @@ async function switchPage(id, force = false) {
   if (id === 'ranking') {
     const container = $('ranking-list');
     if (!_rankingFetched) {
-      // 初回: スケルトン表示 → 非同期取得 → レンダリング
       if (container) {
         container.innerHTML = `
           <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
@@ -792,7 +817,8 @@ async function switchPage(id, force = false) {
             <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Loading Leaderboard...</p>
           </div>`;
       }
-      callApi('getRanking').then(data => {
+      const p = window.activeRankingPromise || callApi('getRanking');
+      p.then(data => {
         if (data && data.success) {
           rankingData = data.ranking || [];
           _rankingFetched = true;

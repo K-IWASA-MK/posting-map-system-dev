@@ -1,18 +1,18 @@
-const CACHE_NAME = 'posting-map-cache-v382';
+const CACHE_NAME = 'posting-map-cache-v383';
 const ASSETS = [
   './',
   './index.html',
   './manager.html',
   './style.css',
-  './style.css?v=382',
+  './style.css?v=383',
   './tailwind-utils.css',
   './tailwind-utils.css?v=319',
   './db.js',
-  './db.js?v=382',
+  './db.js?v=383',
   './app.js',
-  './app.js?v=382',
+  './app.js?v=383',
   './render.js',
-  './render.js?v=382',
+  './render.js?v=383',
   './manifest.json',
   // 外部CDN URLはCORSポリシーによりキャッシュ失敗の原因になるため除外
   './assets/icon180-v2.png?v=257',
