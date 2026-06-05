@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- LINEブラウザキャッシュ防止 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>POSTING MAP</title>
+  <style>.hidden { display: none !important; }</style>
+  <script>
+    // 「早期エラーハンドラ」: app.js 読み込み前のエラーを捕捉するために定義。
+    // app.js が読み込まれると同内容で上書きされる（正常動作）。
+    window.logDebug = function(msg) { console.log("[DEBUG]", msg); };
+    window.onerror = function(message, source, lineno, colno, error) {
+      if (message === "Script error.") return false;
+      window.logDebug(`ERROR: ${message} at ${source}:${lineno}:${colno}`);
+      return false;
+    };
+    window.onunhandledrejection = function(event) {
+      window.logDebug(`UNHANDLED PROMISE: ${event.reason}`);
+    };
+  </script>
+  <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
+  <link rel="stylesheet" href="../tailwind-utils.css?v=385">
+  <!-- A: favicon 404解消 (-191ms) -->
+  <link rel="icon" href="../assets/icon180-v2.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/icon180-v2.png?v=258">
+  <!-- B: Google Fonts preconnect (-30ms) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    // 画面の意図しないスクロールやバウンスを物理的に防止（スクロール可能なメインコンテンツ領域等のみ許可）
+    document.addEventListener('touchmove', function(e) {
+      const scrollable = e.target.closest('#content, #debug-log, #debug-log-content, #id-info-body-container, #detail-modal-content');
+      if (scrollable) return;
+      e.preventDefault();
+    }, { passive: false });
+  </script>
+  <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- 共通API モジュール (shared/api.js) -->
+  <script defer src="../shared/api.js?v=385"></script>
+  <link rel="stylesheet" href="../style.css?v=385">
+</head>
+<body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
+
+
+  <!-- 1. GATEWAY / SPLASH (LINE LOGIN SYSTEM) -->
+
+  <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
+    <div class="gateway-header-wrap flex flex-col items-center justify-center mb-4 mt-0">
+      <div class="gateway-icon-container w-32 h-32 bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-4 p-1 relative shadow-2xl">
+        <img src="./assets/icon180-v2.png?v=257" class="w-full h-full object-cover rounded-[2.2rem] z-10">
+      </div>
+      <div class="text-center">
+        <h2 id="gateway-title" style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight"></h2>
+        <p id="gateway-subtitle" style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2"></p>
+      </div>
+    </div>
+    <div class="gateway-content-wrap w-full max-w-sm space-y-4">
+      <div class="gateway-btn-card bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl">
+        <button id="btn-login-manual" onclick="startApp()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-5 text-lg font-black shadow-xl uppercase tracking-tighter hidden">ログインして起動</button>
+        <div id="login-spinner" class="flex justify-center py-2">
+          <svg class="w-8 h-8 animate-spin" viewBox="0 0 50 50" fill="none" stroke-width="4">
+            <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
+            <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="gateway-footer space-y-1">
+        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Operational</p>
+        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Environment</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading" class="fixed top-0 left-0 w-full h-[100dvh] z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700">
+    <!-- App icon -->
+    <div class="w-16 h-16 bg-white/5 backdrop-blur-2xl rounded-[1.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-8 shadow-xl">
+      <img src="./assets/icon180-v2.png?v=257" class="w-full h-full object-cover rounded-[1.3rem]" loading="eager">
+    </div>
+    <!-- Status label -->
+    <p id="loading-status" style="transition: opacity 0.2s ease;" class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">CONNECTING...</p>
+    <!-- Progress bar -->
+    <div class="mt-5 w-48 h-[2px] bg-white/5 rounded-full overflow-hidden">
+      <div id="loading-bar" style="width: 8%; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 8px rgba(37,99,235,0.6); background: #2563eb;" class="h-full rounded-full"></div>
+    </div>
+  </div>
+
+  <!-- 3. MAIN APP -->
+  <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-300 hidden">
+    <header class="safe-top px-6 pt-8 pb-4 flex items-center">
+      <div class="bg-white/5 backdrop-blur-xl px-6 py-3 rounded-full flex items-center justify-between border border-white/10 text-xs font-black tracking-tight w-full">
+        <div class="flex items-center gap-3">
+          <span class="text-white/40">全体進捗</span>
+          <span id="header-count" class="text-white/70 font-mono whitespace-pre">(  0/0)</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1.5">
+            <span id="sync-text" class="text-[8px] font-black uppercase tracking-[0.2em] text-[#22c55e] transition-all duration-300">ONLINE</span>
+            <div id="sync-status" class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e] animate-soft-pulse transition-all duration-300"></div>
+          </div>
+          <span id="header-pct" class="text-[#2563eb] font-mono">0%</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-6 overscroll-y-contain">
+      <!-- AREAS PAGE -->
+      <section id="page-areas" class="page space-y-8">
+        <div id="area-list" class="space-y-6"></div>
+      </section>
+
+      <!-- DETAIL PAGE -->
+      <section id="page-detail" class="page hidden space-y-8">
+        <div class="flex items-center gap-4 mb-4">
+          <button onclick="switchPage('areas')" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+        </div>
+        <div id="detail-list" class="space-y-8 pb-20"></div>
+      </section>
+
+      <!-- AUTH/SETTINGS PAGE -->
+      <section id="page-settings" class="page hidden space-y-8">
+        <div id="settings-content" class="space-y-8">
+          <!-- Dynamic Content (Card 1 or Card 2) -->
+        </div>
+      </section>
+
+      <!-- RANKING PAGE (NEW) -->
+      <section id="page-ranking" class="page hidden space-y-8">
+
+        <div id="ranking-list" class="space-y-6 pb-20">
+          <!-- ランキングカードが動的に挿入されます -->
+        </div>
+      </section>
+    </main>
+
+    <!-- 下ナビ：iOSライクなガラス感に調整 -->
+    <nav id="bottom-nav" style="bottom: calc(env(safe-area-inset-bottom) + 1rem); display: none;" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
+      <div style="background: rgba(20,20,20,0.72); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.02);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
+        <button onclick="navigateToAreaTab()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🗺️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">エリア</span></button>
+        <button onclick="switchPage('ranking')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🏆</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ランキング</span></button>
+        <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ID</span></button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- 4. CUSTOM NUMPAD MODAL -->
+  <div id="numpad-modal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 space-y-6">
+      <div class="flex justify-between items-center">
+        <span class="text-[10px] font-black uppercase tracking-widest text-white/40">配布枚数入力</span>
+        <button id="numpad-close" onclick="closeNumpad()" class="text-sm font-bold text-[#2563eb]">キャンセル</button>
+      </div>
+      <div class="flex justify-center items-baseline py-4 border-b border-white/5">
+        <div id="numpad-display" class="text-5xl font-black text-white tracking-tighter">0</div>
+        <span class="text-sm font-bold text-white/60 ml-2">枚</span>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <button onclick="pressNum(1)" class="numpad-key">1</button>
+        <button onclick="pressNum(2)" class="numpad-key">2</button>
+        <button onclick="pressNum(3)" class="numpad-key">3</button>
+        <button onclick="pressNum(4)" class="numpad-key">4</button>
+        <button onclick="pressNum(5)" class="numpad-key">5</button>
+        <button onclick="pressNum(6)" class="numpad-key">6</button>
+        <button onclick="pressNum(7)" class="numpad-key">7</button>
+        <button onclick="pressNum(8)" class="numpad-key">8</button>
+        <button onclick="pressNum(9)" class="numpad-key">9</button>
+        <button onclick="pressNum('C')" class="numpad-key text-red-500 font-bold">C</button>
+        <button onclick="pressNum(0)" class="numpad-key">0</button>
+        <button onclick="pressNum('OK')" class="numpad-key bg-[#2563eb] text-white font-black shadow-[0_0_15px_rgba(37,99,235,0.4)]">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. ID INFO MODAL -->
+  <div id="id-info-modal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="closeIdInfoModal()">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 flex flex-col items-center text-center space-y-4 max-h-[50dvh]" onclick="event.stopPropagation()">
+      <div onclick="closeIdInfoModal(); event.stopPropagation();" class="py-3 px-6 cursor-pointer shrink-0 -mt-3 flex items-center justify-center">
+        <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+      </div>
+      
+      <!-- タイトル (上部に固定) -->
+      <h4 id="id-info-title" class="font-black text-white text-[12px] uppercase tracking-wider shrink-0 w-full text-left"></h4>
+      
+      <!-- 本文 (このコンテナ内のみスクロール) -->
+      <div id="id-info-body-container" class="w-full text-left overflow-y-auto hide-scrollbar flex-1 pr-1 overscroll-y-contain">
+        <p id="id-info-body" class="leading-relaxed text-xs text-white/40"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. DETAIL ACTION MODAL (3層目の詳細操作カード) -->
+  <div id="detail-modal" class="fixed inset-0 z-[4500] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="closeDetailModal()">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem);" class="w-full max-w-md max-h-[80dvh] bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 px-6 pt-4 pb-0 overflow-hidden transform translate-y-full transition-transform duration-300 flex flex-col space-y-4" onclick="event.stopPropagation()">
+      <div onclick="closeDetailModal(); event.stopPropagation();" class="py-2 px-6 cursor-pointer shrink-0 flex items-center justify-center">
+        <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+      </div>
+      <div id="detail-modal-content" class="space-y-6 overflow-y-auto hide-scrollbar flex-1 pr-1 pb-6 overscroll-y-contain">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
+  <script defer src="./db.js?v=385"></script>
+  <script defer src="./app.js?v=385"></script>
+  <script defer src="./render.js?v=385"></script>
+</body>
+</html>

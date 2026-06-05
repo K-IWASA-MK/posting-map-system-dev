@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>POSTING MAP — ADMIN PANEL</title>
+  <!-- Force Refresh: v385 (2026-06-06) -->
+  <link rel="stylesheet" href="../tailwind-utils.css?v=385">
+  <!-- favicon -->
+  <link rel="icon" href="../assets/icon-admin-panel-180.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/icon-admin-panel-180.png?v=201">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    // 画面の意図しないスクロールやバウンスを物理的に防止
+    document.addEventListener('touchmove', function(e) {
+      const scrollable = e.target.closest('#content, .scrollable, #log-console, #admin-modal-body');
+      if (scrollable) return;
+      e.preventDefault();
+    }, { passive: false });
+  </script>
+  <!-- 共通APIモジュール -->
+  <script defer src="../shared/api.js?v=385"></script>
+  <!-- 管理者アプリロジック -->
+  <script defer src="./manager.js?v=385"></script>
+  <link rel="stylesheet" href="../style.css?v=385">
+</head>
+<body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
+
+  <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) - hidden by default -->
+  <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
+    <div class="w-36 h-36 bg-white/5 backdrop-blur-2xl rounded-[2.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
+      <img src="../assets/icon-admin-panel-180.png?v=201" class="w-full h-full object-cover rounded-[2.5rem] z-10">
+    </div>
+    <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">POSTING MAP</h2>
+    <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2 mb-6">管理者専用 — Administrator Only</p>
+    <div class="w-full max-w-sm bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl mb-6">
+      <button onclick="startAdmin()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">管理画面を起動する</button>
+    </div>
+    <div class="gateway-footer space-y-1">
+      <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Administrator</p>
+      <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Command Mode</p>
+    </div>
+  </div>
+
+  <!-- 2. LOADING -->
+  <div id="loading" class="fixed top-0 left-0 w-full h-[100dvh] z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
+    <svg class="w-12 h-12" viewBox="0 0 50 50" fill="none" stroke-width="4">
+      <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
+      <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite" />
+      </path>
+    </svg>
+    <p class="mt-6 text-[10px] font-black text-white/40 uppercase tracking-[0.3em] animate-pulse">Connecting command console...</p>
+  </div>
+
+  <!-- 3. MAIN ADMIN APP - displayed by default -->
+  <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] transition-opacity duration-1000">
+    <header class="safe-top px-8 py-8 flex justify-between items-center shrink-0">
+      <div class="flex flex-col gap-1">
+        <h1 class="text-2xl font-black tracking-tighter text-white leading-none">管理指令室</h1>
+        <span class="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none">ADMIN PANEL</span>
+      </div>
+      <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
+        <div id="api-dot" class="w-2 h-2 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
+        <span id="api-status-text" class="text-xs font-black text-[#2563eb] tracking-tighter uppercase">API ACTIVE</span>
+      </div>
+    </header>
+
+    <!-- Tab Selector -->
+    <div class="px-6 mb-6 flex flex-wrap gap-2 justify-center shrink-0">
+      <button id="tab-btn-monitor" onclick="switchAdminTab('monitor')" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all min-w-[70px]">
+        監視 (P1)
+      </button>
+      <button id="tab-btn-areas" onclick="switchAdminTab('areas')" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/5 text-white/20 active:scale-[0.95] transition-all min-w-[70px]">
+        地区 (P2)
+      </button>
+      <button id="tab-btn-detail" onclick="switchAdminTab('detail')" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/5 text-white/20 active:scale-[0.95] transition-all min-w-[70px]">
+        詳細 (P3)
+      </button>
+      <button id="tab-btn-system" onclick="switchAdminTab('system')" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all min-w-[70px]">
+        システム
+      </button>
+    </div>
+
+    <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
+      
+      <!-- ── MONITOR タブ ── -->
+      <div id="panel-monitor" class="space-y-10">
+        <!-- 三重2区全体マップ -->
+        <section class="space-y-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">全体戦略マップ</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">STRATEGY MAP</span>
+          </div>
+          <div class="premium-glass p-1 overflow-hidden relative" style="height: 18rem;">
+            <div id="map" class="w-full h-full rounded-2xl" style="background: #000;"></div>
+            <div id="map-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm rounded-2xl transition-opacity duration-500">
+              <svg class="w-10 h-10" viewBox="0 0 50 50" fill="none" stroke-width="4">
+                <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
+                <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
+                  <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite" />
+                </path>
+              </svg>
+              <p class="mt-4 text-[9px] font-black text-white/50 uppercase tracking-[0.2em] animate-pulse">地図データを読み込み中...</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 1. KPI Panel (1カラム化、日本語・英語併記、縦サイズ統一) -->
+        <section class="space-y-4">
+          <!-- 全体配布率 -->
+          <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-xs font-black text-white/70 tracking-widest">全体配布率</span>
+              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">OVERALL COVERAGE</span>
+            </div>
+            <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
+            <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
+              <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
+            </div>
+          </div>
+          <!-- 稼働配布員 -->
+          <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-xs font-black text-white/70 tracking-widest">稼働配布員</span>
+              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">ACTIVE STAFF</span>
+            </div>
+            <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
+            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25);" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-[#22c55e] uppercase tracking-wider mt-1">
+              <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-soft-pulse shadow-[0_0_6px_#22c55e]"></span>
+              <span>オンライン稼働中</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 同期状況 (1列化、日本語・英語併記、縦サイズ統一) -->
+        <section class="space-y-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">データ同期状況</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">FIELD SYNC STATUS</span>
+          </div>
+          <div class="space-y-4">
+            <!-- 未送信 -->
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+              <span class="text-xs font-black text-white/70 tracking-widest">未送信</span>
+              <span id="sync-stat-pending" class="text-3xl font-black tracking-tighter text-[#f59e0b]">-</span>
+              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">GPS Pending</span>
+            </div>
+            <!-- 同期済 -->
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+              <span class="text-xs font-black text-white/70 tracking-widest">同期済</span>
+              <span id="sync-stat-synced" class="text-3xl font-black tracking-tighter text-[#22c55e]">-</span>
+              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">GPS Recorded</span>
+            </div>
+            <!-- 写真付き -->
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+              <span class="text-xs font-black text-white/70 tracking-widest">写真付き</span>
+              <span id="sync-stat-photo" class="text-3xl font-black tracking-tighter text-[#2563eb]">-</span>
+              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">Drive Saved</span>
+            </div>
+            <!-- 最終同期 -->
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+              <span class="text-xs font-black text-white/70 tracking-widest">最終同期</span>
+              <span id="sync-stat-lastsync" class="text-sm font-black tracking-tight text-white/70 truncate max-w-full">-</span>
+              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">Last Updated</span>
+            </div>
+          </div>
+        </section>
+
+
+      </div>
+
+      <!-- ── AREAS タブ (P2) ── -->
+      <div id="panel-areas" class="space-y-10 hidden">
+        <section class="space-y-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">地区一覧</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">DISTRICT OVERVIEW</span>
+          </div>
+          <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-4">
+            <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
+            <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">実装中 — Phase 3</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ── DETAIL タブ (P3) ── -->
+      <div id="panel-detail" class="space-y-10 hidden">
+        <section class="space-y-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">配布詳細</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">FIELD DETAIL</span>
+          </div>
+          <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-4">
+            <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
+            <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">実装中 — Phase 3</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ── SYSTEM タブ ── -->
+      <div id="panel-system" class="space-y-10 hidden">
+        <!-- システム操作 -->
+        <section class="space-y-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">システム操作</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">TACTICAL COMMAND CENTER</span>
+          </div>
+          <div class="space-y-4">
+            <!-- Batch Run -->
+            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
+              <span class="text-2xl select-none">🚀</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-black text-white/70 tracking-widest">一括エリア作成</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Batch Run</span>
+              </div>
+              <button onclick="runCommand('forceStartBatch')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
+                起動する
+              </button>
+            </div>
+            <!-- Cache Sync -->
+            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
+              <span class="text-2xl select-none">🔄</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-black text-white/70 tracking-widest">キャッシュ同期</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Cache Sync</span>
+              </div>
+              <button onclick="runCommand('refreshCache')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
+                同期する
+              </button>
+            </div>
+            <!-- Aggregate -->
+            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
+              <span class="text-2xl select-none">📊</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-black text-white/70 tracking-widest">統計情報集計</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Aggregate</span>
+              </div>
+              <button onclick="runCommand('aggregateStats')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
+                集計する
+              </button>
+            </div>
+            <!-- System Reset -->
+            <div style="border-color: rgba(244, 63, 94, 0.2);" class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
+              <span class="text-2xl select-none">⚠️</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="text-xs font-black text-rose-500 tracking-widest">システム完全初期化</span>
+                <span class="text-[8px] font-black text-rose-500/50 uppercase tracking-widest">System Reset</span>
+              </div>
+              <button onclick="runCommand('resetAllSheets')" class="w-full h-11 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-rose-600/20">
+                初期化する
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ログコンソール -->
+        <section class="space-y-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">システムログ</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">INTEL LIVE STREAM</span>
+          </div>
+          <div class="premium-glass p-6">
+            <div id="log-console" class="h-40 overflow-y-auto font-mono text-[10px] space-y-2 text-white/50 hide-scrollbar selection:bg-[#2563eb]">
+              <div class="text-white/30">&gt; Command console initialized. Ready.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- W-2/W-3: alert()/confirm() 置換 — ガラスモーダル -->
+  <div id="admin-modal" class="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-end justify-center opacity-0 pointer-events-none transition-all duration-300">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 space-y-6" id="admin-modal-inner">
+      <!-- ドラッグバー -->
+      <div class="flex justify-center -mt-3 mb-0">
+        <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+      </div>
+      <div class="space-y-2">
+        <p id="admin-modal-title" class="text-[10px] font-black text-white/40 uppercase tracking-widest"></p>
+        <p id="admin-modal-body" class="text-sm font-medium text-white/80 leading-relaxed overflow-y-auto max-h-[30dvh]"></p>
+      </div>
+      <div id="admin-modal-actions" class="space-y-3"></div>
+    </div>
+  </div>
+
+</body>
+</html>
