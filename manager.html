@@ -80,6 +80,26 @@
       
       <!-- ── MONITOR タブ ── -->
       <div id="panel-monitor" class="space-y-10">
+        <!-- 三重2区全体マップ -->
+        <section class="space-y-4">
+          <div class="flex flex-col items-center gap-0.5 px-2">
+            <h3 class="text-xs font-black text-white/60 tracking-widest">全体戦略マップ</h3>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">STRATEGY MAP</span>
+          </div>
+          <div class="premium-glass p-1 overflow-hidden relative" style="height: 18rem;">
+            <div id="map" class="w-full h-full rounded-2xl" style="background: #000;"></div>
+            <div id="map-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm rounded-2xl transition-opacity duration-500">
+              <svg class="w-10 h-10" viewBox="0 0 50 50" fill="none" stroke-width="4">
+                <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
+                <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
+                  <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite" />
+                </path>
+              </svg>
+              <p class="mt-4 text-[9px] font-black text-white/50 uppercase tracking-[0.2em] animate-pulse">地図データを読み込み中...</p>
+            </div>
+          </div>
+        </section>
+
         <!-- 1. KPI Panel (1カラム化、日本語・英語併記、縦サイズ統一) -->
         <section class="space-y-4">
           <!-- 全体配布率 -->
@@ -244,6 +264,12 @@
   <script>
     const $ = id => document.getElementById(id);
     const API_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
+
+    // ── マップ関連変数 ──────────────────────────────────────────────
+    let googleMap = null;
+    let googleMapLoaded = false;
+    let mapCircles = [];
+    let mapInfoWindow = null;
 
     // ── ガラスモーダル制御 ──────────────────────────────────────────
     function showModal({ title = '', body = '', actions = [] }) {
@@ -444,6 +470,14 @@
           $('stat-progress-bar').style.width = coverageText;
           addLog(`Stats updated: coverage ${coverageText} (${totalDone}/${totalPoints} across ${areas.length} districts)`);
 
+          // 全体戦略マップの描画処理
+          if (appData.apiKey) {
+            loadGoogleMaps(appData.apiKey, areas);
+          } else {
+            const mapLoader = $('map-loading');
+            if (mapLoader) mapLoader.innerHTML = '<p class="text-[9px] font-black text-rose-500 uppercase tracking-[0.2em]">APIキーが未設定です</p>';
+          }
+
           // 管轄エリアリストを動的レンダリング (フルサイズ・1列カード)
           areasHtml = areas.map(area => {
             const progress = area.progress ?? (area.total > 0 ? Math.round((area.done / area.total) * 100) : 0);
@@ -498,6 +532,122 @@
         $('api-dot').className = 'w-2 h-2 bg-rose-500 rounded-full';
         $('api-status-text').textContent = 'API ERROR';
         $('api-status-text').className = 'text-xs font-black text-rose-500 tracking-tighter uppercase';
+      }
+    }
+
+    // ── Google Maps 動的ロード ──────────────────────────────────────
+    function loadGoogleMaps(apiKey, areas) {
+      if (googleMapLoaded || window.googleMapsLoading) {
+        if (googleMapLoaded) {
+          drawMap(areas);
+        }
+        return;
+      }
+      window.googleMapsLoading = true;
+      
+      window.initAdminMapCallback = function() {
+        googleMapLoaded = true;
+        window.googleMapsLoading = false;
+        drawMap(areas);
+      };
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initAdminMapCallback&language=ja`;
+      script.async = true;
+      script.defer = true;
+      script.onerror = function() {
+        const loader = $('map-loading');
+        if (loader) loader.innerHTML = '<p class="text-[9px] font-black text-rose-500 uppercase tracking-[0.2em]">地図のロードに失敗しました</p>';
+      };
+      document.head.appendChild(script);
+    }
+
+    // ── 三重2区の全体マップ描画 ──────────────────────────────────────
+    function drawMap(areas) {
+      if (!window.google || !window.google.maps) return;
+
+      const mapContainer = $('map');
+      if (!mapContainer) return;
+
+      if (!googleMap) {
+        const darkStyle = [
+          { "elementType": "geometry", "stylers": [{ "color": "#111111" }] },
+          { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+          { "elementType": "labels.text.fill", "stylers": [{ "color": "#757575" }] },
+          { "elementType": "labels.text.stroke", "stylers": [{ "color": "#111111" }] },
+          { "featureType": "administrative", "elementType": "geometry", "stylers": [{ "color": "#555555" }] },
+          { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#000000" }] },
+          { "featureType": "road", "elementType": "geometry.fill", "stylers": [{ "color": "#222222" }] },
+          { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#666666" }] },
+          { "featureType": "poi", "stylers": [{ "visibility": "off" }] }
+        ];
+
+        googleMap = new google.maps.Map(mapContainer, {
+          center: { lat: 34.862, lng: 136.538 },
+          zoom: 10,
+          styles: darkStyle,
+          disableDefaultUI: true,
+          zoomControl: true
+        });
+        
+        mapInfoWindow = new google.maps.InfoWindow();
+      }
+
+      mapCircles.forEach(c => c.setMap(null));
+      mapCircles = [];
+
+      let validCoordsCount = 0;
+      let bounds = new google.maps.LatLngBounds();
+
+      areas.forEach(area => {
+        if (!area.lat || !area.lng) return;
+
+        const pos = { lat: parseFloat(area.lat), lng: parseFloat(area.lng) };
+        bounds.extend(pos);
+        validCoordsCount++;
+
+        const progress = area.progress ?? 0;
+        const color = progress >= 80 ? "#22c55e" : progress >= 30 ? "#eab308" : "#2563eb";
+
+        const circle = new google.maps.Circle({
+          strokeColor: "#ffffff",
+          strokeOpacity: 0.8,
+          strokeWeight: 1.5,
+          fillColor: color,
+          fillOpacity: 0.45,
+          map: googleMap,
+          center: pos,
+          radius: 1200
+        });
+
+        circle.addListener("click", () => {
+          const content = `
+            <div style="color: #000; font-family: sans-serif; padding: 8px; font-size: 11px; line-height: 1.4;">
+              <div style="font-weight: 900; font-size: 12px; margin-bottom: 4px;">🏢 ${area.name}</div>
+              <div>進捗率: <span style="color: #2563eb; font-weight: bold;">${progress}%</span></div>
+              <div>配布完了数: ${area.done} / ${area.total}</div>
+            </div>
+          `;
+          mapInfoWindow.setContent(content);
+          mapInfoWindow.setPosition(pos);
+          mapInfoWindow.open(googleMap);
+        });
+
+        mapCircles.push(circle);
+      });
+
+      if (validCoordsCount > 0) {
+        googleMap.fitBounds(bounds);
+        const listener = google.maps.event.addListener(googleMap, "idle", () => {
+          if (googleMap.getZoom() > 11) googleMap.setZoom(11);
+          google.maps.event.removeListener(listener);
+        });
+      }
+
+      const loader = $('map-loading');
+      if (loader) {
+        loader.classList.add('opacity-0');
+        setTimeout(() => loader.style.display = "none", 500);
       }
     }
 
