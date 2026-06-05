@@ -53,7 +53,15 @@ function refreshAreaSummaryCache() {
       const repAddress = row[3] ? String(row[3]).trim() : "";
 
       if (name) {
-        summary.push({ name: name, done: done, total: total, repAddress: repAddress });
+        let lat = null;
+        let lng = null;
+        const coords = getCoordsFromAddress(repAddress);
+        if (coords) {
+          lat = coords.lat;
+          lng = coords.lng;
+        }
+
+        summary.push({ name: name, done: done, total: total, repAddress: repAddress, lat: lat, lng: lng });
         totalDone += done;
         totalPoints += total;
       }
@@ -153,4 +161,42 @@ function updateAreaCache(areaName, isDoneChange = 0) {
     props.deleteProperty("AREA_SUMMARY_CACHE");
     cache.remove("AREA_SUMMARY_FAST_CACHE");
   }
+}
+
+/**
+ * 永続座標キャッシュ付きジオコーディング
+ * 同じ代表住所に対するジオコーディングをPropertiesServiceで永続化し、高速化・API制限回避を行う
+ */
+function getCoordsFromAddress(address) {
+  if (!address) return null;
+  const cleanAddr = address.replace(/\r?\n/g, ' ').trim();
+  if (!cleanAddr) return null;
+
+  const propKey = "GEO_" + cleanAddr.replace(/[\s\t]/g, '_');
+  const props = PropertiesService.getScriptProperties();
+  
+  try {
+    const cached = props.getProperty(propKey);
+    if (cached) {
+      const parts = cached.split(',');
+      if (parts.length === 2) {
+        return { lat: parseFloat(parts[0]), lng: parseFloat(parts[1]) };
+      }
+    }
+  } catch (err) {
+    // スクリプトプロパティ取得エラー時はジオコーディングにフォールバック
+  }
+
+  try {
+    const geocoder = Maps.newGeocoder().setLanguage('ja');
+    const response = geocoder.geocode(cleanAddr);
+    if (response.status === 'OK' && response.results.length > 0) {
+      const location = response.results[0].geometry.location;
+      props.setProperty(propKey, `${location.lat},${location.lng}`);
+      return { lat: location.lat, lng: location.lng };
+    }
+  } catch (e) {
+    console.error("Geocoding failed for: " + cleanAddr + " error: " + e.toString());
+  }
+  return null;
 }

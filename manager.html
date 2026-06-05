@@ -67,12 +67,18 @@
     </header>
 
     <!-- Tab Selector -->
-    <div class="px-6 mb-6 flex gap-3 justify-center shrink-0">
-      <button id="tab-btn-monitor" onclick="switchAdminTab('monitor')" class="flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all">
-        エリア監視
+    <div class="px-6 mb-6 flex flex-wrap gap-2 justify-center shrink-0">
+      <button id="tab-btn-monitor" onclick="switchAdminTab('monitor')" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all min-w-[70px]">
+        監視 (P1)
       </button>
-      <button id="tab-btn-system" onclick="switchAdminTab('system')" class="flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all">
-        システム制御
+      <button onclick="showPendingPageModal(2)" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/5 text-white/20 active:scale-[0.95] transition-all min-w-[70px]">
+        地区 (P2)
+      </button>
+      <button onclick="showPendingPageModal(3)" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/5 text-white/20 active:scale-[0.95] transition-all min-w-[70px]">
+        詳細 (P3)
+      </button>
+      <button id="tab-btn-system" onclick="switchAdminTab('system')" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all min-w-[70px]">
+        システム
       </button>
     </div>
 
@@ -161,16 +167,7 @@
           </div>
         </section>
 
-        <!-- 管轄エリア一覧 (1列化、日本語・英語併記、縦サイズ統一) -->
-        <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">管轄エリア</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">YOUR AREAS</span>
-          </div>
-          <div id="admin-area-list" class="space-y-4">
-            <!-- エリアカード一覧が動的レンダリングされます -->
-          </div>
-        </section>
+
       </div>
 
       <!-- ── SYSTEM タブ ── -->
@@ -413,9 +410,7 @@
           $('sync-stat-photo').textContent    = data.syncWithPhoto      ?? '-';
           $('sync-stat-lastsync').textContent = data.syncLastSyncAt     ?? '-';
           
-          if (data.areasHtml) {
-            $('admin-area-list').innerHTML = data.areasHtml;
-          }
+
           addLog(`Cached stats restored (Last sync: ${data.syncLastSyncAt || 'N/A'})`);
         }
       } catch (e) {
@@ -424,7 +419,7 @@
     }
 
     // saveDashboardCache
-    function saveDashboardCache({ coverage, staffCount, syncData, areasHtml }) {
+    function saveDashboardCache({ coverage, staffCount, syncData }) {
       try {
         const cacheData = {
           coverage,
@@ -433,7 +428,6 @@
           syncWithGPS: syncData ? syncData.withGPS : '-',
           syncWithPhoto: syncData ? syncData.withPhoto : '-',
           syncLastSyncAt: syncData ? syncData.lastSyncAt : '-',
-          areasHtml: areasHtml || '',
           timestamp: Date.now()
         };
         localStorage.setItem('admin_dashboard_cache', JSON.stringify(cacheData));
@@ -458,7 +452,6 @@
 
         let coverageText = '0%';
         let staffCount = 0;
-        let areasHtml = '';
 
         if (appData && appData.success) {
           const areas = appData.areas || [];
@@ -477,29 +470,6 @@
             const mapLoader = $('map-loading');
             if (mapLoader) mapLoader.innerHTML = '<p class="text-[9px] font-black text-rose-500 uppercase tracking-[0.2em]">APIキーが未設定です</p>';
           }
-
-          // 管轄エリアリストを動的レンダリング (フルサイズ・1列カード)
-          areasHtml = areas.map(area => {
-            const progress = area.progress ?? (area.total > 0 ? Math.round((area.done / area.total) * 100) : 0);
-            return `
-              <div class="premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5">
-                <div class="w-full flex justify-center mb-1">
-                  <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="inline-flex items-center justify-center h-7 px-3 text-xs font-black text-white rounded-full tracking-tight">
-                    <span class="text-xs mr-1 select-none">🏢</span>
-                    <span>${area.name}</span>
-                  </div>
-                </div>
-                <div class="text-sm text-[#2563eb]">${progress}%</div>
-                <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mb-1">
-                  <div class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: ${progress}%;"></div>
-                </div>
-                <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
-                  ${area.done}/ ${area.total}
-                </div>
-              </div>
-            `;
-          }).join('');
-          $('admin-area-list').innerHTML = areasHtml;
         }
 
         if (rosterData && rosterData.success) {
@@ -520,8 +490,7 @@
         saveDashboardCache({
           coverage: coverageText,
           staffCount: staffCount,
-          syncData: syncData && syncData.success ? syncData : null,
-          areasHtml: areasHtml
+          syncData: syncData && syncData.success ? syncData : null
         });
 
         $('api-dot').className = 'w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]';
@@ -625,7 +594,8 @@
             <div style="color: #000; font-family: sans-serif; padding: 8px; font-size: 11px; line-height: 1.4;">
               <div style="font-weight: 900; font-size: 12px; margin-bottom: 4px;">🏢 ${area.name}</div>
               <div>進捗率: <span style="color: #2563eb; font-weight: bold;">${progress}%</span></div>
-              <div>配布完了数: ${area.done} / ${area.total}</div>
+              <div style="margin-bottom: 8px;">配布完了数: ${area.done} / ${area.total}</div>
+              <button onclick="window.openAreaDetail('${area.name}')" style="background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-weight: bold; cursor: pointer; text-align: center; width: 100%; display: block; outline: none; -webkit-tap-highlight-color: transparent;">詳細を開く</button>
             </div>
           `;
           mapInfoWindow.setContent(content);
@@ -666,6 +636,26 @@
       // 3. バックグラウンドでAPIから最新データを非同期取得して更新
       loadDashboardData();
     }
+
+    function showPendingPageModal(pageNum) {
+      const pageNames = {
+        2: "地区一覧 (ページ2)",
+        3: "配布詳細 (ページ3)"
+      };
+      showModal({
+        title: `🏢 ${pageNames[pageNum]}`,
+        body: `${pageNames[pageNum]} への遷移機能は、将来の開発フェーズで実装されます。`,
+        actions: [{ label: '閉じる', style: 'primary' }]
+      });
+    }
+
+    window.openAreaDetail = function(areaName) {
+      showModal({
+        title: `🏢 エリア詳細`,
+        body: `「${areaName}」のエリア詳細画面（ページ2・3）へ遷移する機能は、将来のフェーズで実装されます。`,
+        actions: [{ label: '閉じる', style: 'primary' }]
+      });
+    };
 
     window.onload = () => {
       if ('serviceWorker' in navigator) {

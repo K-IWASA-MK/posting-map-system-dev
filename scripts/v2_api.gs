@@ -248,18 +248,22 @@ function getAppData() {
     progress: item.total > 0 ? Math.round((item.done / item.total) * 100) : 0,
     done: item.done || 0,
     total: item.total || 0,
-    repAddress: item.repAddress || ""
+    repAddress: item.repAddress || "",
+    lat: item.lat || null,
+    lng: item.lng || null
   })) : [];
 
   const stats = (dashboardData && dashboardData.stats) ? dashboardData.stats : { done: 0, total: 0 };
 
 
   // ranking は getRanking アクションで遅延取得（初期ロード軽量化）
+  const apiKey = PropertiesService.getScriptProperties().getProperty('GOOGLE_MAPS_API_KEY') || "";
   return {
     success: true,
     branchName: getSS().getName().split(/[ \u3000]/)[0] || "支部",
     areas: areas,
-    stats: stats
+    stats: stats,
+    apiKey: apiKey
   };
 }
 
