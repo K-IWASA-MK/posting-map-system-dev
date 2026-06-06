@@ -68,7 +68,7 @@ body {
 /* Ultimate Apple Native Glass UI Style */
 .premium-glass {
   border-radius: 28px;
-  background: rgba(20, 20, 20, 0.08);
+  background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 0 30px rgba(37, 99, 235, 0.03);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
