@@ -391,3 +391,61 @@ Less information = stronger design.
 * Base Layout: 常に `w-full` や Flexbox、均等な余白 (`px-` 等) を駆使し、どんな画面幅でも絶対にレイアウトが崩れない、または非対称にならない「流動的で強牢な構造」をベースとすること。固定幅(px指定)でレイアウトを制限してはならない。
 * Device Agnosticism: iOS/Android問わず、横スクロールが発生したり、要素が見切れたりすることは絶対に許されない。
 * Progressive Enhancement: iPhoneネイティブの極上ガラスUI（超微弱グロー、`-webkit-backdrop-filter`、0.04のエッジライトなど）を「最高到達点」として実装しつつ、必ず標準CSS（`backdrop-filter` 等）を併記し、他の端末でも高級感が損なわれず安全に表示される汎用コードを書くこと。
+
+## ■ 確定デザインシステム (2026-06-07 岩佐CEO承認)
+
+### レイヤー構造（絶対ルール）
+
+```
+Layer 1: #000000              ← 純黒・ページ背景・絶対に触らない
+Layer 2: #1C1C1E              ← 全UI要素（カード・ヘッダー）の固定背景色
+Special:  Liquid Glass        ← ボトムナビのみ例外（backdrop-filter: blur）
+```
+
+### カード・枠線ルール
+
+| 要素 | 背景色 | 枠線 |
+|---|---|---|
+| コンテンツカード（`.premium-glass`） | `#1C1C1E` | `1px solid rgba(255,255,255,0.1)` |
+| セクションヘッダーカード（全体エリア・配布ランキング） | `#1C1C1E` | `1px solid rgba(37,99,235,0.35)` + 青グロー |
+| ヘッダーpill（全体進捗バー） | `#1C1C1E` | `1px solid rgba(255,255,255,0.1)` |
+| ボトムナビ | Liquid Glass | `1px solid rgba(255,255,255,0.1)` |
+
+### カラーアクセントルール
+
+```
+アクセント青: #2563eb  ← セクションヘッダー枠・数値バッジ・ボタン・アイコン
+アクセント緑: #22c55e  ← ステータス表示（ONLINE・AUTHORIZED・カウンター）
+```
+
+- どの画面を開いても「青と緑」が自然に目に入る配置にする
+- 数は厳密でなく「見た目でバランスが取れていること」が基準
+- 純黒ベースに色を置くことで「暗いが死んでいない」画面を作る
+
+### premium-glassクラス（CSSの定義）
+
+```css
+.premium-glass {
+  border-radius: 28px;
+  background: #1C1C1E;
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+```
+
+### ボトムナビ（Liquid Glass）定義
+
+```html
+<div style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);"
+     class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px]">
+```
+
+### 新規画面・機能を作る際の手順
+
+1. カード背景 → `premium-glass` クラスを使う（自動で `#1C1C1E + 白枠`）
+2. セクションヘッダーカード → `style="border: 1px solid rgba(37,99,235,0.35); box-shadow: ..."` を追加
+3. 各カードに青か緑のアクセントを1〜2点配置する
+4. ボトムナビはLiquid Glassスタイルで追加（固定色禁止）
