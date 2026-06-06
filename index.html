@@ -43,7 +43,7 @@
     }, { passive: false });
   </script>
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="./style.css?v=393">
+  <link rel="stylesheet" href="./style.css?v=394">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -93,7 +93,7 @@
   <!-- 3. MAIN APP -->
   <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-300 hidden">
     <header class="safe-top px-6 pt-8 pb-4 flex items-center">
-      <div style="background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);" class="px-6 py-3 rounded-full flex items-center justify-between text-xs font-black tracking-tight w-full">
+      <div style="background: #1C1C1E; border: 1px solid rgba(255,255,255,0.1);" class="px-6 py-3 rounded-full flex items-center justify-between text-xs font-black tracking-tight w-full">
         <div class="flex items-center gap-3">
           <span class="text-white/40">全体進捗</span>
           <span id="header-count" class="text-white/70 font-mono whitespace-pre">(  0/0)</span>
@@ -140,7 +140,7 @@
 
     <!-- 下ナビ：iOSライクなガラス感に調整 -->
     <nav id="bottom-nav" style="bottom: calc(env(safe-area-inset-bottom) + 1rem); display: none;" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
-      <div style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
+      <div style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
         <button onclick="navigateToAreaTab()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🗺️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">エリア</span></button>
         <button onclick="switchPage('ranking')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🏆</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ランキング</span></button>
         <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ID</span></button>
@@ -206,8 +206,8 @@
   </div>
 
   <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
-  <script defer src="./db.js?v=393"></script>
-  <script defer src="./app.js?v=393"></script>
-  <script defer src="./render.js?v=393"></script>
+  <script defer src="./db.js?v=394"></script>
+  <script defer src="./app.js?v=394"></script>
+  <script defer src="./render.js?v=394"></script>
 </body>
 </html>
