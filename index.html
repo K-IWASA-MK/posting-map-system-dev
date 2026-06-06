@@ -43,7 +43,7 @@
     }, { passive: false });
   </script>
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="./style.css?v=392">
+  <link rel="stylesheet" href="./style.css?v=393">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -93,7 +93,7 @@
   <!-- 3. MAIN APP -->
   <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-300 hidden">
     <header class="safe-top px-6 pt-8 pb-4 flex items-center">
-      <div class="bg-white/[0.02] backdrop-blur-xl px-6 py-3 rounded-full flex items-center justify-between border border-white/10 text-xs font-black tracking-tight w-full">
+      <div style="background: rgba(255,255,255,0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);" class="px-6 py-3 rounded-full flex items-center justify-between text-xs font-black tracking-tight w-full">
         <div class="flex items-center gap-3">
           <span class="text-white/40">全体進捗</span>
           <span id="header-count" class="text-white/70 font-mono whitespace-pre">(  0/0)</span>
@@ -206,8 +206,8 @@
   </div>
 
   <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
-  <script defer src="./db.js?v=392"></script>
-  <script defer src="./app.js?v=392"></script>
-  <script defer src="./render.js?v=392"></script>
+  <script defer src="./db.js?v=393"></script>
+  <script defer src="./app.js?v=393"></script>
+  <script defer src="./render.js?v=393"></script>
 </body>
 </html>
