@@ -95,8 +95,8 @@ function switchAdminTab(tabName) {
     system:  $('tab-btn-system')
   };
 
-  const activeClass   = 'flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all min-w-[70px]';
-  const inactiveClass = 'flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all min-w-[70px]';
+  const activeClass   = 'nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-[#2563eb]';
+  const inactiveClass = 'nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-white/40';
 
   Object.entries(panels).forEach(([name, panel]) => {
     if (!panel) return;
