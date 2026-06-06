@@ -806,7 +806,7 @@ function renderRanking() {
 
   // 1. 本人のステータスカード（ID登録されている場合のみ表示）
   const myStatusCardHtml = myName ? `
-    <div style="border: 1px solid rgba(255, 255, 255, 0.04);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">
+    <div class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">
       <div class="text-[9px] font-black text-[#22c55e] uppercase tracking-[0.2em]">My Performance</div>
       <div class="text-lg font-black text-white tracking-tight">${myName}</div>
       <div class="flex items-center justify-center mt-0.5">
