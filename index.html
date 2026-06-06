@@ -43,7 +43,7 @@
     }, { passive: false });
   </script>
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="stylesheet" href="./style.css?v=384">
+  <link rel="stylesheet" href="./style.css?v=385">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -140,7 +140,7 @@
 
     <!-- 下ナビ：iOSライクなガラス感に調整 -->
     <nav id="bottom-nav" style="bottom: calc(env(safe-area-inset-bottom) + 1rem); display: none;" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
-      <div style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(20,20,20,0.35); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
+      <div style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(20,20,20,0.15); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
         <button onclick="navigateToAreaTab()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🗺️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">エリア</span></button>
         <button onclick="switchPage('ranking')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🏆</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ランキング</span></button>
         <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ID</span></button>
@@ -206,8 +206,8 @@
   </div>
 
   <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
-  <script defer src="./db.js?v=384"></script>
-  <script defer src="./app.js?v=384"></script>
-  <script defer src="./render.js?v=384"></script>
+  <script defer src="./db.js?v=385"></script>
+  <script defer src="./app.js?v=385"></script>
+  <script defer src="./render.js?v=385"></script>
 </body>
 </html>
