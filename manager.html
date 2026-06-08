@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP — ADMIN PANEL</title>
   <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
-  <link rel="stylesheet" href="tailwind-utils.css?v=399">
+  <link rel="stylesheet" href="tailwind-utils.css?v=400">
   <!-- C-1: favicon 追加 + preconnect -->
   <link rel="icon" href="./assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201">
@@ -22,7 +22,7 @@
     }, { passive: false });
   </script>
   <!-- C-1: キャッシュバスター v384 に統一 -->
-  <link rel="stylesheet" href="./style.css?v=399">
+  <link rel="stylesheet" href="./style.css?v=400">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -65,15 +65,19 @@
   <!-- 3. MAIN ADMIN APP - displayed by default -->
   <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] transition-opacity duration-1000">
     <header class="safe-top px-6 pt-8 pb-4 flex items-center shrink-0">
-      <div style="background: #1C1C1E; border: 1px solid rgba(255,255,255,0.1);" class="px-6 py-3 rounded-full flex items-center justify-between text-xs font-black tracking-tight w-full">
-        <div class="flex flex-col gap-0.5 text-left">
-          <h1 class="text-xs font-black tracking-tighter text-white leading-none">ポスティング戦略センター</h1>
-          <span class="text-[8px] font-black text-white/30 uppercase tracking-widest leading-none">ADMIN PANEL</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-1.5">
-            <span id="api-status-text" class="text-[8px] font-black uppercase tracking-[0.2em] text-[#10b981] transition-all duration-300">CONNECTED</span>
-            <div id="api-dot" class="w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981] animate-soft-pulse transition-all duration-300"></div>
+      <div style="background: #1C1C1E; border: 1px solid rgba(255,255,255,0.1);" class="px-6 py-4 rounded-[1.8rem] flex flex-col items-center gap-3 w-full">
+        <!-- 1行目: 中央揃えタイトル -->
+        <h1 class="text-xs font-black tracking-tighter text-white leading-none">ポスティング戦略センター</h1>
+        
+        <!-- 2行目: 左右分割配置 -->
+        <div class="flex justify-between items-center w-full text-xs font-black tracking-tight">
+          <div class="flex items-center gap-2">
+            <span class="text-white/40">全体進捗</span>
+            <span id="header-count" class="text-white/70 font-mono whitespace-pre">(  0/0)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-white/40">TODAY'S ACTIVE STAFF</span>
+            <span id="header-active-staff" class="text-[#2563eb] font-mono">0</span>
           </div>
         </div>
       </div>
@@ -128,18 +132,6 @@
             <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
             <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
               <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
-            </div>
-          </div>
-          <!-- 稼働配布員 -->
-          <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
-            <div class="flex flex-col gap-0.5">
-              <span class="text-xs font-black text-white/70 tracking-widest">本日の稼働配布員</span>
-              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">TODAY'S ACTIVE STAFF</span>
-            </div>
-            <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
-            <div id="stat-staff-badge" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-white/40 uppercase tracking-wider mt-1">
-              <span class="w-1.5 h-1.5 bg-white/20 rounded-full"></span>
-              <span>稼働なし</span>
             </div>
           </div>
         </section>
@@ -472,7 +464,15 @@
           $('stat-progress-bar').style.width = data.coverage;
           
           const activeCount = parseInt(data.activeStaffCount ?? '0', 10);
-          $('stat-staff').textContent = activeCount;
+          const headerActiveEl = $('header-active-staff');
+          if (headerActiveEl) headerActiveEl.textContent = activeCount;
+          
+          const headerCountEl = $('header-count');
+          if (headerCountEl) headerCountEl.textContent = data.headerCount ?? '(  0/0)';
+          
+          // 削除されたメインボディ要素への代入は安全ガード
+          const statStaffEl = $('stat-staff');
+          if (statStaffEl) statStaffEl.textContent = activeCount;
           
           const badgeEl = $('stat-staff-badge');
           if (badgeEl) {
@@ -502,11 +502,12 @@
     }
 
     // saveDashboardCache
-    function saveDashboardCache({ coverage, activeStaffCount, syncData }) {
+    function saveDashboardCache({ coverage, activeStaffCount, headerCount, syncData }) {
       try {
         const cacheData = {
           coverage,
           activeStaffCount,
+          headerCount,
           syncPending: syncData ? syncData.pending : '-',
           syncWithGPS: syncData ? syncData.withGPS : '-',
           syncWithPhoto: syncData ? syncData.withPhoto : '-',
@@ -521,10 +522,16 @@
 
     // ── ダッシュボードデータ読み込み ──
     async function loadDashboardData() {
-      // 接続中のステータス表示（黄色）
-      $('api-dot').className = 'w-2 h-2 bg-yellow-500 rounded-full animate-pulse shadow-[0_0_8px_#eab308]';
-      $('api-status-text').textContent = 'CONNECTING...';
-      $('api-status-text').className = 'text-[8px] font-black text-yellow-500 tracking-tighter uppercase';
+      // 接続中のステータス表示（存在する場合のみ書き換え。ヘッダーから削除されたため通常は実行されません）
+      const dotEl = $('api-dot');
+      const textEl = $('api-status-text');
+      if (dotEl) {
+        dotEl.className = 'w-2 h-2 bg-yellow-500 rounded-full animate-pulse shadow-[0_0_8px_#eab308]';
+      }
+      if (textEl) {
+        textEl.textContent = 'CONNECTING...';
+        textEl.className = 'text-[8px] font-black text-yellow-500 tracking-tighter uppercase';
+      }
 
       try {
         const [appData, rosterData, syncData] = await Promise.all([
@@ -535,6 +542,7 @@
 
         let coverageText = '0%';
         let activeStaffCount = 0;
+        let headerCountText = '(  0/0)';
 
         if (appData && appData.success) {
           const areas = appData.areas || [];
@@ -544,6 +552,12 @@
           coverageText = `${coverage}%`;
           $('stat-coverage').textContent = coverageText;
           $('stat-progress-bar').style.width = coverageText;
+          
+          // ヘッダー全体進捗を更新
+          headerCountText = `(${String(totalDone).padStart(3, ' ')}/${totalPoints})`;
+          const headerCountEl = $('header-count');
+          if (headerCountEl) headerCountEl.textContent = headerCountText;
+          
           addLog(`Stats updated: coverage ${coverageText} (${totalDone}/${totalPoints} across ${areas.length} districts)`);
 
           // 全体戦略マップの描画処理
@@ -567,7 +581,14 @@
           $('sync-stat-lastsync').textContent = syncData.lastSyncAt || '-';
           
           activeStaffCount = syncData.activeStaffCount ?? 0;
-          $('stat-staff').textContent = activeStaffCount;
+          
+          // ヘッダーのTODAY'S ACTIVE STAFFを更新
+          const headerActiveEl = $('header-active-staff');
+          if (headerActiveEl) headerActiveEl.textContent = activeStaffCount;
+          
+          // メインボディ（削除されたが念のためガード）
+          const statStaffEl = $('stat-staff');
+          if (statStaffEl) statStaffEl.textContent = activeStaffCount;
           
           const badgeEl = $('stat-staff-badge');
           if (badgeEl) {
@@ -589,17 +610,28 @@
         saveDashboardCache({
           coverage: coverageText,
           activeStaffCount: activeStaffCount,
+          headerCount: headerCountText,
           syncData: syncData && syncData.success ? syncData : null
         });
 
-        $('api-dot').className = 'w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]';
-        $('api-status-text').textContent = 'CONNECTED';
-        $('api-status-text').className = 'text-[8px] font-black text-[#10b981] tracking-tighter uppercase';
+        const dotSuccessEl = $('api-dot');
+        const textSuccessEl = $('api-status-text');
+        if (dotSuccessEl) {
+          dotSuccessEl.className = 'w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]';
+        }
+        if (textSuccessEl) {
+          textSuccessEl.textContent = 'CONNECTED';
+          textSuccessEl.className = 'text-[8px] font-black text-[#10b981] tracking-tighter uppercase';
+        }
       } catch (e) {
         addLog(`Dashboard sync failed: ${e.message}`);
-        $('api-dot').className = 'w-2 h-2 bg-rose-500 rounded-full';
-        $('api-status-text').textContent = 'API ERROR';
-        $('api-status-text').className = 'text-[8px] font-black text-rose-500 tracking-tighter uppercase';
+        const dotErrEl = $('api-dot');
+        const textErrEl = $('api-status-text');
+        if (dotErrEl) dotErrEl.className = 'w-2 h-2 bg-rose-500 rounded-full';
+        if (textErrEl) {
+          textErrEl.textContent = 'API ERROR';
+          textErrEl.className = 'text-[8px] font-black text-rose-500 tracking-tighter uppercase';
+        }
       }
     }
 
