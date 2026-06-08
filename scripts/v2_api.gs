@@ -672,7 +672,7 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
  *   lastSyncAt     — 最新の完了時刻文字列
  */
 function getDeliveryStats() {
-  var CACHE_KEY = 'DELIVERY_STATS_V1';
+  var CACHE_KEY = 'DELIVERY_STATS_V2';
   var cache = CacheService.getScriptCache();
 
   // キャッシュヒット
@@ -702,6 +702,10 @@ function getDeliveryStats() {
   var withPhoto      = 0;
   var lastSyncAt     = '';
 
+  var now = new Date();
+  var todayPrefix = Utilities.formatDate(now, "JST", "MM/dd"); // 例: "06/09"
+  var activeStaffs = {}; // 本日稼働した配布員の staffId を保持
+
   sheets.forEach(function(sheet) {
     var name = sheet.getName();
     if (NON_AREA.indexOf(name) !== -1 || sheet.isSheetHidden()) return;
@@ -717,6 +721,7 @@ function getDeliveryStats() {
     data.forEach(function(row) {
       var isDone   = row[0] === true || row[0] === 'TRUE' || row[0] === 1;
       var complAt  = row[1] ? String(row[1]).trim() : '';  // E列: completedAt
+      var staffId  = row[4] ? String(row[4]).trim() : '';  // H列: staffId
       var gps      = row[5] ? String(row[5]).trim() : '';  // I列 (D=0,E=1,F=2,G=3,H=4,I=5)
       var photoUrl = row[6] ? String(row[6]).trim() : '';  // J列
 
@@ -725,9 +730,16 @@ function getDeliveryStats() {
         if (gps)      withGPS++;
         if (photoUrl) withPhoto++;
         if (complAt && complAt > lastSyncAt) lastSyncAt = complAt;
+
+        // 本日の打刻、かつ配布員ID、GPS、写真がすべて揃っている場合のみ、ユニーク稼働として判定
+        if (complAt.indexOf(todayPrefix) === 0 && staffId !== '' && gps !== '' && photoUrl !== '') {
+          activeStaffs[staffId] = true;
+        }
       }
     });
   });
+
+  var activeStaffCount = Object.keys(activeStaffs).length;
 
   var result = {
     success:        true,
@@ -735,7 +747,8 @@ function getDeliveryStats() {
     withGPS:        withGPS,
     withPhoto:      withPhoto,
     pending:        totalCompleted - withGPS,
-    lastSyncAt:     lastSyncAt
+    lastSyncAt:     lastSyncAt,
+    activeStaffCount: activeStaffCount
   };
 
   // 60秒キャッシュ

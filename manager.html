@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP — ADMIN PANEL</title>
   <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
-  <link rel="stylesheet" href="tailwind-utils.css?v=398">
+  <link rel="stylesheet" href="tailwind-utils.css?v=399">
   <!-- C-1: favicon 追加 + preconnect -->
   <link rel="icon" href="./assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201">
@@ -22,7 +22,7 @@
     }, { passive: false });
   </script>
   <!-- C-1: キャッシュバスター v384 に統一 -->
-  <link rel="stylesheet" href="./style.css?v=398">
+  <link rel="stylesheet" href="./style.css?v=399">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -133,13 +133,13 @@
           <!-- 稼働配布員 -->
           <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
             <div class="flex flex-col gap-0.5">
-              <span class="text-xs font-black text-white/70 tracking-widest">稼働配布員</span>
-              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">ACTIVE STAFF</span>
+              <span class="text-xs font-black text-white/70 tracking-widest">本日の稼働配布員</span>
+              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">TODAY'S ACTIVE STAFF</span>
             </div>
             <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
-            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25);" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-[#22c55e] uppercase tracking-wider mt-1">
-              <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-soft-pulse shadow-[0_0_6px_#22c55e]"></span>
-              <span>オンライン稼働中</span>
+            <div id="stat-staff-badge" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-white/40 uppercase tracking-wider mt-1">
+              <span class="w-1.5 h-1.5 bg-white/20 rounded-full"></span>
+              <span>稼働なし</span>
             </div>
           </div>
         </section>
@@ -470,13 +470,30 @@
           const data = JSON.parse(cached);
           $('stat-coverage').textContent = data.coverage;
           $('stat-progress-bar').style.width = data.coverage;
-          $('stat-staff').textContent = data.staffCount;
+          
+          const activeCount = parseInt(data.activeStaffCount ?? '0', 10);
+          $('stat-staff').textContent = activeCount;
+          
+          const badgeEl = $('stat-staff-badge');
+          if (badgeEl) {
+            if (activeCount > 0) {
+              badgeEl.style.background = 'rgba(34, 197, 94, 0.08)';
+              badgeEl.style.borderColor = 'rgba(34, 197, 94, 0.25)';
+              badgeEl.style.color = '#22c55e';
+              badgeEl.innerHTML = '<span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-soft-pulse shadow-[0_0_6px_#22c55e]"></span><span>本日稼働あり</span>';
+            } else {
+              badgeEl.style.background = 'rgba(255, 255, 255, 0.04)';
+              badgeEl.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              badgeEl.style.color = 'rgba(255, 255, 255, 0.4)';
+              badgeEl.innerHTML = '<span class="w-1.5 h-1.5 bg-white/20 rounded-full"></span><span>稼働なし</span>';
+            }
+          }
+          
           $('sync-stat-pending').textContent  = data.syncPending        ?? '-';
           $('sync-stat-synced').textContent   = data.syncWithGPS        ?? '-';
           $('sync-stat-photo').textContent    = data.syncWithPhoto      ?? '-';
           $('sync-stat-lastsync').textContent = data.syncLastSyncAt     ?? '-';
           
-
           addLog(`Cached stats restored (Last sync: ${data.syncLastSyncAt || 'N/A'})`);
         }
       } catch (e) {
@@ -485,11 +502,11 @@
     }
 
     // saveDashboardCache
-    function saveDashboardCache({ coverage, staffCount, syncData }) {
+    function saveDashboardCache({ coverage, activeStaffCount, syncData }) {
       try {
         const cacheData = {
           coverage,
-          staffCount,
+          activeStaffCount,
           syncPending: syncData ? syncData.pending : '-',
           syncWithGPS: syncData ? syncData.withGPS : '-',
           syncWithPhoto: syncData ? syncData.withPhoto : '-',
@@ -517,7 +534,7 @@
         ]);
 
         let coverageText = '0%';
-        let staffCount = 0;
+        let activeStaffCount = 0;
 
         if (appData && appData.success) {
           const areas = appData.areas || [];
@@ -540,9 +557,7 @@
 
         if (rosterData && rosterData.success) {
           const rosterList = rosterData.roster || [];
-          staffCount = rosterList.length;
-          $('stat-staff').textContent = staffCount;
-          addLog(`Roster loaded: ${staffCount} distributor(s) registered.`);
+          addLog(`Roster loaded: ${rosterList.length} distributor(s) registered.`);
         }
 
         if (syncData && syncData.success) {
@@ -550,12 +565,30 @@
           $('sync-stat-synced').textContent   = syncData.withGPS        ?? '-';
           $('sync-stat-photo').textContent    = syncData.withPhoto      ?? '-';
           $('sync-stat-lastsync').textContent = syncData.lastSyncAt || '-';
-          addLog(`Sync stats: completed=${syncData.totalCompleted}, gps=${syncData.withGPS}, photo=${syncData.withPhoto}`);
+          
+          activeStaffCount = syncData.activeStaffCount ?? 0;
+          $('stat-staff').textContent = activeStaffCount;
+          
+          const badgeEl = $('stat-staff-badge');
+          if (badgeEl) {
+            if (activeStaffCount > 0) {
+              badgeEl.style.background = 'rgba(34, 197, 94, 0.08)';
+              badgeEl.style.borderColor = 'rgba(34, 197, 94, 0.25)';
+              badgeEl.style.color = '#22c55e';
+              badgeEl.innerHTML = '<span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-soft-pulse shadow-[0_0_6px_#22c55e]"></span><span>本日稼働あり</span>';
+            } else {
+              badgeEl.style.background = 'rgba(255, 255, 255, 0.04)';
+              badgeEl.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              badgeEl.style.color = 'rgba(255, 255, 255, 0.4)';
+              badgeEl.innerHTML = '<span class="w-1.5 h-1.5 bg-white/20 rounded-full"></span><span>稼働なし</span>';
+            }
+          }
+          addLog(`Sync stats: completed=${syncData.totalCompleted}, gps=${syncData.withGPS}, photo=${syncData.withPhoto}, activeStaff=${activeStaffCount}`);
         }
 
         saveDashboardCache({
           coverage: coverageText,
-          staffCount: staffCount,
+          activeStaffCount: activeStaffCount,
           syncData: syncData && syncData.success ? syncData : null
         });
 
