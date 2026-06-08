@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP — ADMIN PANEL</title>
   <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
-  <link rel="stylesheet" href="tailwind-utils.css?v=401">
+  <link rel="stylesheet" href="tailwind-utils.css?v=402">
   <!-- C-1: favicon 追加 + preconnect -->
   <link rel="icon" href="./assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201">
@@ -22,7 +22,7 @@
     }, { passive: false });
   </script>
   <!-- C-1: キャッシュバスター v384 に統一 -->
-  <link rel="stylesheet" href="./style.css?v=401">
+  <link rel="stylesheet" href="./style.css?v=402">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -73,7 +73,7 @@
         <div class="flex justify-between items-center w-full text-xs font-black tracking-tight">
           <div class="flex items-center gap-2">
             <span class="text-white/40">全体進捗</span>
-            <span id="header-count" class="text-white/70 font-mono whitespace-pre">(  0/0)</span>
+            <span id="header-count" class="text-white/70 font-mono whitespace-pre">  0/0</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-white/40">TODAY'S ACTIVE STAFF</span>
@@ -468,7 +468,7 @@
           if (headerActiveEl) headerActiveEl.textContent = activeCount;
           
           const headerCountEl = $('header-count');
-          if (headerCountEl) headerCountEl.textContent = data.headerCount ?? '(  0/0)';
+          if (headerCountEl) headerCountEl.textContent = data.headerCount ?? '  0/0';
           
           // 削除されたメインボディ要素への代入は安全ガード
           const statStaffEl = $('stat-staff');
@@ -554,7 +554,7 @@
           $('stat-progress-bar').style.width = coverageText;
           
           // ヘッダー全体進捗を更新
-          headerCountText = `(${String(totalDone).padStart(3, ' ')}/${totalPoints})`;
+          headerCountText = `${String(totalDone).padStart(3, ' ')}/${totalPoints}`;
           const headerCountEl = $('header-count');
           if (headerCountEl) headerCountEl.textContent = headerCountText;
           
