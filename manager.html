@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP — ADMIN PANEL</title>
   <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
-  <link rel="stylesheet" href="tailwind-utils.css?v=384">
+  <link rel="stylesheet" href="tailwind-utils.css?v=396">
   <!-- C-1: favicon 追加 + preconnect -->
   <link rel="icon" href="./assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201">
@@ -22,35 +22,44 @@
     }, { passive: false });
   </script>
   <!-- C-1: キャッシュバスター v384 に統一 -->
-  <link rel="stylesheet" href="./style.css?v=384">
+  <link rel="stylesheet" href="./style.css?v=396">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
   <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) - hidden by default -->
-  <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
-    <div class="w-36 h-36 bg-white/5 backdrop-blur-2xl rounded-[2.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
-      <img src="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201" class="w-full h-full object-cover rounded-[2.5rem] z-10">
+  <div id="screen-gateway" class="hidden">
+    <div class="gateway-header-wrap">
+      <div class="gateway-icon-container">
+        <img src="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201" alt="Admin Panel Logo">
+      </div>
+      <div>
+        <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">POSTING MAP</h2>
+        <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2">管理者専用 — Administrator Only</p>
+      </div>
     </div>
-    <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">POSTING MAP</h2>
-    <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2 mb-6">管理者専用 — Administrator Only</p>
-    <div class="w-full max-w-sm bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl mb-6">
-      <button onclick="startAdmin()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">管理画面を起動する</button>
-    </div>
-    <div class="gateway-footer space-y-1">
-      <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Administrator</p>
-      <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Command Mode</p>
+    <div class="gateway-content-wrap">
+      <div class="gateway-btn-card">
+        <button onclick="startAdmin()" class="btn-neu">管理画面を起動する</button>
+      </div>
+      <div class="gateway-footer">
+        <p>Administrator</p>
+        <p>Command Mode</p>
+      </div>
     </div>
   </div>
 
   <!-- 2. LOADING -->
   <div id="loading" class="fixed top-0 left-0 w-full h-[100dvh] z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
-    <svg class="w-12 h-12" viewBox="0 0 50 50" fill="none" stroke-width="4">
-      <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
-      <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
-        <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite" />
-      </path>
-    </svg>
-    <p class="mt-6 text-[10px] font-black text-white/40 uppercase tracking-[0.3em] animate-pulse">Connecting command console...</p>
+    <!-- App icon -->
+    <div class="w-16 h-16 bg-white/5 backdrop-blur-2xl rounded-[1.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-8 shadow-xl">
+      <img src="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201" class="w-full h-full object-cover rounded-[1.3rem]" loading="eager">
+    </div>
+    <!-- Status label -->
+    <p id="loading-status" style="transition: opacity 0.2s ease;" class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">CONNECTING COMMAND CONSOLE...</p>
+    <!-- Progress bar -->
+    <div class="mt-5 w-48 h-[2px] bg-white/5 rounded-full overflow-hidden">
+      <div id="loading-bar" style="width: 8%; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 8px rgba(37,99,235,0.6); background: #2563eb;" class="h-full rounded-full"></div>
+    </div>
   </div>
 
   <!-- 3. MAIN ADMIN APP - displayed by default -->
@@ -60,37 +69,26 @@
         <h1 class="text-2xl font-black tracking-tighter text-white leading-none">管理指令室</h1>
         <span class="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none">ADMIN PANEL</span>
       </div>
-      <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
+      <div style="background: #1C1C1E; border: 1px solid rgba(255,255,255,0.1);" class="px-5 py-2 rounded-full flex items-center gap-3">
         <div id="api-dot" class="w-2 h-2 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
-        <span id="api-status-text" class="text-xs font-black text-[#2563eb] tracking-tighter uppercase">API ACTIVE</span>
+        <span id="api-status-text" class="text-xs font-black text-[#10b981] tracking-tighter uppercase">API ACTIVE</span>
       </div>
     </header>
 
-    <!-- Tab Selector -->
-    <div class="px-6 mb-6 flex flex-wrap gap-2 justify-center shrink-0">
-      <button id="tab-btn-monitor" onclick="switchAdminTab('monitor')" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all min-w-[70px]">
-        監視 (P1)
-      </button>
-      <button onclick="showPendingPageModal(2)" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/5 text-white/20 active:scale-[0.95] transition-all min-w-[70px]">
-        地区 (P2)
-      </button>
-      <button onclick="showPendingPageModal(3)" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/5 text-white/20 active:scale-[0.95] transition-all min-w-[70px]">
-        詳細 (P3)
-      </button>
-      <button id="tab-btn-system" onclick="switchAdminTab('system')" class="flex-1 py-3 text-[10px] font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all min-w-[70px]">
-        システム
-      </button>
-    </div>
-
-    <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
+    <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 8rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
       
       <!-- ── MONITOR タブ ── -->
       <div id="panel-monitor" class="space-y-10">
         <!-- 三重2区全体マップ -->
         <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">全体戦略マップ</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">STRATEGY MAP</span>
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-4 px-6 flex flex-col items-center justify-center text-center gap-1.5 mb-6">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+            </div>
+            <div class="text-base font-black text-white tracking-tight">全体戦略マップ</div>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] -mt-1">STRATEGY MAP</span>
           </div>
           <div class="premium-glass p-1 overflow-hidden relative" style="height: 18rem;">
             <div id="map" class="w-full h-full rounded-2xl" style="background: #000;"></div>
@@ -106,8 +104,17 @@
           </div>
         </section>
 
-        <!-- 1. KPI Panel (1カラム化、日本語・英語併記、縦サイズ統一) -->
+        <!-- 主要実績指標 -->
         <section class="space-y-4">
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-4 px-6 flex flex-col items-center justify-center text-center gap-1.5 mb-6">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v16.5M21 19.5H3.75M6.75 12v-3m4.5 3V6m4.5 6v-6M18 12V3" />
+              </svg>
+            </div>
+            <div class="text-base font-black text-white tracking-tight">主要実績指標</div>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] -mt-1">OVERALL KPI</span>
+          </div>
           <!-- 全体配布率 -->
           <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
             <div class="flex flex-col gap-0.5">
@@ -133,13 +140,18 @@
           </div>
         </section>
 
-        <!-- 同期状況 (1列化、日本語・英語併記、縦サイズ統一) -->
+        <!-- 同期状況 -->
         <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">データ同期状況</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">FIELD SYNC STATUS</span>
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-4 px-6 flex flex-col items-center justify-center text-center gap-1.5 mb-6">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </div>
+            <div class="text-base font-black text-white tracking-tight">データ同期状況</div>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] -mt-1">FIELD SYNC STATUS</span>
           </div>
-          <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
             <!-- 未送信 -->
             <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
               <span class="text-xs font-black text-white/70 tracking-widest">未送信</span>
@@ -159,7 +171,7 @@
               <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">Drive Saved</span>
             </div>
             <!-- 最終同期 -->
-            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
+            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem] col-span-2">
               <span class="text-xs font-black text-white/70 tracking-widest">最終同期</span>
               <span id="sync-stat-lastsync" class="text-sm font-black tracking-tight text-white/70 truncate max-w-full">-</span>
               <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">Last Updated</span>
@@ -167,57 +179,61 @@
           </div>
         </section>
 
-
       </div>
 
       <!-- ── SYSTEM タブ ── -->
       <div id="panel-system" class="space-y-10 hidden">
         <!-- システム操作 -->
         <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">システム操作</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">TACTICAL COMMAND CENTER</span>
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-4 px-6 flex flex-col items-center justify-center text-center gap-1.5 mb-6">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+              </svg>
+            </div>
+            <div class="text-base font-black text-white tracking-tight">システム操作</div>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] -mt-1">TACTICAL COMMAND CENTER</span>
           </div>
-          <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
             <!-- Batch Run -->
-            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
+            <div class="premium-glass p-5 flex flex-col items-center justify-between text-center gap-4 min-h-[11rem]">
               <span class="text-2xl select-none">🚀</span>
               <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-white/70 tracking-widest">一括エリア作成</span>
-                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Batch Run</span>
+                <span class="text-[11px] font-black text-white/70 tracking-widest">一括エリア作成</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest font-mono">Batch Run</span>
               </div>
               <button onclick="runCommand('forceStartBatch')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
                 起動する
               </button>
             </div>
             <!-- Cache Sync -->
-            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
+            <div class="premium-glass p-5 flex flex-col items-center justify-between text-center gap-4 min-h-[11rem]">
               <span class="text-2xl select-none">🔄</span>
               <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-white/70 tracking-widest">キャッシュ同期</span>
-                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Cache Sync</span>
+                <span class="text-[11px] font-black text-white/70 tracking-widest">キャッシュ同期</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest font-mono">Cache Sync</span>
               </div>
               <button onclick="runCommand('refreshCache')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
                 同期する
               </button>
             </div>
             <!-- Aggregate -->
-            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
+            <div class="premium-glass p-5 flex flex-col items-center justify-between text-center gap-4 min-h-[11rem]">
               <span class="text-2xl select-none">📊</span>
               <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-white/70 tracking-widest">統計情報集計</span>
-                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Aggregate</span>
+                <span class="text-[11px] font-black text-white/70 tracking-widest">統計情報集計</span>
+                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest font-mono">Aggregate</span>
               </div>
               <button onclick="runCommand('aggregateStats')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
                 集計する
               </button>
             </div>
             <!-- System Reset -->
-            <div style="border-color: rgba(244, 63, 94, 0.2);" class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
+            <div style="border-color: rgba(244, 63, 94, 0.2);" class="premium-glass p-5 flex flex-col items-center justify-between text-center gap-4 min-h-[11rem]">
               <span class="text-2xl select-none">⚠️</span>
               <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-rose-500 tracking-widest">システム完全初期化</span>
-                <span class="text-[8px] font-black text-rose-500/50 uppercase tracking-widest">System Reset</span>
+                <span class="text-[11px] font-black text-rose-500 tracking-widest">システム完全初期化</span>
+                <span class="text-[8px] font-black text-rose-500/50 uppercase tracking-widest font-mono">System Reset</span>
               </div>
               <button onclick="runCommand('resetAllSheets')" class="w-full h-11 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-rose-600/20">
                 初期化する
@@ -228,9 +244,14 @@
 
         <!-- ログコンソール -->
         <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">システムログ</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">INTEL LIVE STREAM</span>
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-4 px-6 flex flex-col items-center justify-center text-center gap-1.5 mb-6">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <div class="text-base font-black text-white tracking-tight">システムログ</div>
+            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] -mt-1">INTEL LIVE STREAM</span>
           </div>
           <div class="premium-glass p-6">
             <div id="log-console" class="h-40 overflow-y-auto font-mono text-[10px] space-y-2 text-white/50 hide-scrollbar selection:bg-[#2563eb]">
@@ -241,6 +262,28 @@
       </div>
 
     </main>
+
+    <!-- 下ナビ：iOSライクなガラス感に調整 (管理者用) -->
+    <nav id="bottom-nav" style="bottom: calc(env(safe-area-inset-bottom) + 1rem);" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
+      <div style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
+        <button id="tab-btn-monitor" onclick="switchAdminTab('monitor')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all">
+          <div class="text-xl">📡</div>
+          <span class="text-[9px] font-black uppercase tracking-widest text-[#2563eb]">監視</span>
+        </button>
+        <button onclick="showPendingPageModal(2)" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40">
+          <div class="text-xl">🏢</div>
+          <span class="text-[9px] font-black uppercase tracking-widest text-white/40">地区</span>
+        </button>
+        <button onclick="showPendingPageModal(3)" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40">
+          <div class="text-xl">📋</div>
+          <span class="text-[9px] font-black uppercase tracking-widest text-white/40">詳細</span>
+        </button>
+        <button id="tab-btn-system" onclick="switchAdminTab('system')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40">
+          <div class="text-xl">⚙️</div>
+          <span class="text-[9px] font-black uppercase tracking-widest text-white/40">システム</span>
+        </button>
+      </div>
+    </nav>
   </div>
 
   <!-- W-2/W-3: alert()/confirm() 置換 — ガラスモーダル -->
@@ -381,18 +424,37 @@
 
     // ── タブ切り替えロジック ─────────────────────────────────────────
     function switchAdminTab(tabName) {
+      const monitorBtn = $('tab-btn-monitor');
+      const systemBtn = $('tab-btn-system');
+      
       if (tabName === 'monitor') {
         $('panel-monitor').classList.remove('hidden');
         $('panel-system').classList.add('hidden');
         
-        $('tab-btn-monitor').className = 'flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all';
-        $('tab-btn-system').className = 'flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all';
+        if (monitorBtn) {
+          monitorBtn.classList.remove('opacity-40');
+          const label = monitorBtn.querySelector('span');
+          if (label) label.className = 'text-[9px] font-black uppercase tracking-widest text-[#2563eb]';
+        }
+        if (systemBtn) {
+          systemBtn.classList.add('opacity-40');
+          const label = systemBtn.querySelector('span');
+          if (label) label.className = 'text-[9px] font-black uppercase tracking-widest text-white/40';
+        }
       } else {
         $('panel-monitor').classList.add('hidden');
         $('panel-system').classList.remove('hidden');
         
-        $('tab-btn-monitor').className = 'flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/40 active:scale-[0.95] transition-all';
-        $('tab-btn-system').className = 'flex-1 py-3 text-xs font-black tracking-widest rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/30 text-[#2563eb] active:scale-[0.95] transition-all';
+        if (monitorBtn) {
+          monitorBtn.classList.add('opacity-40');
+          const label = monitorBtn.querySelector('span');
+          if (label) label.className = 'text-[9px] font-black uppercase tracking-widest text-white/40';
+        }
+        if (systemBtn) {
+          systemBtn.classList.remove('opacity-40');
+          const label = systemBtn.querySelector('span');
+          if (label) label.className = 'text-[9px] font-black uppercase tracking-widest text-[#2563eb]';
+        }
       }
     }
 
@@ -632,6 +694,9 @@
       setTimeout(() => {
         $('app').classList.remove('opacity-0');
       }, 50);
+
+      // 初期アクティブタブを設定
+      switchAdminTab('monitor');
 
       // 3. バックグラウンドでAPIから最新データを非同期取得して更新
       loadDashboardData();
