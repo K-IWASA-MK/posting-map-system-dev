@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP — ADMIN PANEL</title>
   <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
-  <link rel="stylesheet" href="tailwind-utils.css?v=410">
+  <link rel="stylesheet" href="tailwind-utils.css?v=411">
   <!-- C-1: favicon 追加 + preconnect -->
   <link rel="icon" href="./assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201">
@@ -22,7 +22,7 @@
     }, { passive: false });
   </script>
   <!-- C-1: キャッシュバスター v384 に統一 -->
-  <link rel="stylesheet" href="./style.css?v=410">
+  <link rel="stylesheet" href="./style.css?v=411">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -83,21 +83,12 @@
       </div>
     </header>
 
-    <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 8rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
+    <main id="content" style="padding-top: 16px; padding-bottom: calc(env(safe-area-inset-bottom) + 8rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
       
       <!-- ── MONITOR タブ ── -->
       <div id="panel-monitor" class="space-y-10">
         <!-- 三重2区全体マップ -->
         <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-4 px-6 flex flex-col items-center justify-center text-center gap-1.5 mb-6">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-            </div>
-            <div class="text-base font-black text-white tracking-tight">全体戦略マップ</div>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] -mt-1">STRATEGY MAP</span>
-          </div>
           <div class="premium-glass p-1 overflow-hidden relative" style="height: 18rem;">
             <div id="map" class="w-full h-full rounded-2xl" style="background: #000;"></div>
             <div id="map-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm rounded-2xl transition-opacity duration-500">
