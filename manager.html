@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP — ADMIN PANEL</title>
-  <!-- Force Refresh: v419 -->
-  <link rel="stylesheet" href="tailwind-utils.css?v=419">
+  <!-- Force Refresh: v420 -->
+  <link rel="stylesheet" href="tailwind-utils.css?v=420">
   <!-- C-1: favicon 追加 + preconnect -->
   <link rel="icon" href="./assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201">
@@ -22,7 +22,7 @@
     }, { passive: false });
   </script>
   <!-- C-1: キャッシュバスター v384 に統一 -->
-  <link rel="stylesheet" href="./style.css?v=419">
+  <link rel="stylesheet" href="./style.css?v=420">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -106,13 +106,13 @@
         <!-- 主要実績指標 -->
         <section class="space-y-4">
           <!-- 全体配布率 -->
-          <div class="premium-glass py-4 px-6 flex flex-col items-center justify-center text-center gap-2 min-h-[7rem]">
+          <div class="premium-glass px-6 flex flex-col items-center justify-center text-center gap-2 min-h-[7rem]" style="padding-top: 22px; padding-bottom: 12px;">
             <div class="flex flex-col gap-0.5">
               <span class="text-xs font-black text-white/70 tracking-widest">全体配布率</span>
               <span class="text-[8px] font-black text-[#22c55e] uppercase tracking-widest">OVERALL COVERAGE</span>
             </div>
             <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-[#2563eb]">0%</span>
-            <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
+            <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden">
               <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
             </div>
           </div>
