@@ -864,12 +864,25 @@ async function switchPage(id, force = false) {
   target.style.transform = 'translateY(0)';
   
 
-  // 下ナビのタブのアクティブ状態の不透明度を調整
+  // 下ナビのタブのアクティブ状態の不透明度とカラーを調整
   document.querySelectorAll('.nav-btn').forEach((b, i) => { 
     const isActive = ((id === 'areas' || id === 'detail') && i === 0) || 
                      (id === 'ranking' && i === 1) || 
                      (id === 'settings' && i === 2);
-    b.style.opacity = isActive ? '1' : '0.3'; 
+    b.style.opacity = '';
+    if (isActive) {
+      b.classList.remove('opacity-40');
+    } else {
+      b.classList.add('opacity-40');
+    }
+    const label = b.querySelector('span');
+    if (label) {
+      if (isActive) {
+        label.className = 'text-[10px] font-black uppercase tracking-widest text-white';
+      } else {
+        label.className = 'text-[10px] font-black uppercase tracking-widest text-white/40';
+      }
+    }
   });
 
   // スクロール位置の復元

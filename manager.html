@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP — ADMIN PANEL</title>
   <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
-  <link rel="stylesheet" href="tailwind-utils.css?v=417">
+  <link rel="stylesheet" href="tailwind-utils.css?v=418">
   <!-- C-1: favicon 追加 + preconnect -->
   <link rel="icon" href="./assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=201">
@@ -22,7 +22,7 @@
     }, { passive: false });
   </script>
   <!-- C-1: キャッシュバスター v384 に統一 -->
-  <link rel="stylesheet" href="./style.css?v=417">
+  <link rel="stylesheet" href="./style.css?v=418">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -245,7 +245,7 @@
       <div style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
         <button id="tab-btn-monitor" onclick="switchAdminTab('monitor')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all">
           <div class="text-xl">🗺️</div>
-          <span class="text-[9px] font-black uppercase tracking-widest text-[#2563eb]">マップ</span>
+          <span class="text-[9px] font-black uppercase tracking-widest text-white">マップ</span>
         </button>
         <button onclick="showPendingPageModal(2)" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40">
           <div class="text-xl">🏢</div>
@@ -411,7 +411,7 @@
         if (monitorBtn) {
           monitorBtn.classList.remove('opacity-40');
           const label = monitorBtn.querySelector('span');
-          if (label) label.className = 'text-[9px] font-black uppercase tracking-widest text-[#2563eb]';
+          if (label) label.className = 'text-[9px] font-black uppercase tracking-widest text-white';
         }
         if (systemBtn) {
           systemBtn.classList.add('opacity-40');
@@ -430,7 +430,7 @@
         if (systemBtn) {
           systemBtn.classList.remove('opacity-40');
           const label = systemBtn.querySelector('span');
-          if (label) label.className = 'text-[9px] font-black uppercase tracking-widest text-[#2563eb]';
+          if (label) label.className = 'text-[9px] font-black uppercase tracking-widest text-white';
         }
       }
     }
