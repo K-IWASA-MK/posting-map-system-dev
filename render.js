@@ -943,7 +943,7 @@ function renderStorageList(stocks) {
     
     const rowsHtml = list.map(s => {
       return `
-        <div class="stock-row flex flex-col py-3 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer gap-2"
+        <div class="stock-row flex flex-col pt-1 pb-4 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer gap-2"
           data-name="${(s.staffName||'').replace(/"/g,'&quot;')}"
           data-id="${(s.staffId||'').replace(/"/g,'&quot;')}"
           data-loc="${(s.location||'').replace(/"/g,'&quot;')}"
@@ -957,7 +957,7 @@ function renderStorageList(stocks) {
           <!-- 2行目：中央揃え（枚数とLINEボタン） -->
           <div class="flex items-center justify-center gap-6 w-full py-1">
             <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
-            <button class="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#06C755]/10 border border-[#06C755]/30 text-[#06C755] transition-all active:bg-[#06C755]/20">
+            <button class="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-500 transition-all active:bg-green-500/20">
               <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current">
                 <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 3.53 8.871 8.435 9.619.645.138 1.517.42 1.737.96.196.48-.04.935-.084 1.353l-.22 1.34c-.066.383-.314 1.536 1.351.83 1.666-.707 8.971-5.283 11.233-8.232C23.513 14.61 24 12.553 24 10.304z"/>
               </svg>
