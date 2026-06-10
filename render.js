@@ -27,7 +27,6 @@ function getCityName(areaName) {
   if (areaName.startsWith('四日市')) return '四日市市';
   if (areaName.startsWith('鈴鹿')) return '鈴鹿市';
   if (areaName.startsWith('亀山')) return '亀山市';
-  if (areaName.startsWith('菰野')) return '菰野町';
   const match = areaName.match(/^[^市町\(\d]+(?:市|町)/);
   if (match) return match[0];
   return areaName + '市';
@@ -922,7 +921,7 @@ function renderStorageList(stocks) {
     groups[loc].push(s);
   });
 
-  const CITY_ORDER = { '伊賀市': 1, '亀山市': 2, '菰野町': 3, '鈴鹿市': 4, '名張市': 5, '四日市市': 6 };
+  const CITY_ORDER = { '伊賀市': 1, '亀山市': 2, '鈴鹿市': 3, '名張市': 4, '四日市市': 5 };
   const sortedLocations = Object.keys(groups).sort((a, b) => {
     const orderA = CITY_ORDER[a] || 99;
     const orderB = CITY_ORDER[b] || 99;

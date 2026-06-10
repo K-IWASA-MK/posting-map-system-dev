@@ -27,7 +27,6 @@ function getCityName(areaName) {
   if (areaName.startsWith('四日市')) return '四日市市';
   if (areaName.startsWith('鈴鹿')) return '鈴鹿市';
   if (areaName.startsWith('亀山')) return '亀山市';
-  if (areaName.startsWith('菰野')) return '菰野町';
   const match = areaName.match(/^[^市町\(\d]+(?:市|町)/);
   if (match) return match[0];
   return areaName + '市';
