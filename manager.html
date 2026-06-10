@@ -644,7 +644,7 @@
       }
     }
 
-    // チラシ保管状況 (Simple Flyer Storage) ロードと描画
+    // チラシ保管状況 (Simple Flyer Storage) ロードと描画 ※配布員アプリと同一レンダリング
     async function loadFlyerStock() {
       const container = $('manager-storage-list-container');
       if (!container) return;
@@ -664,7 +664,7 @@
             return;
           }
 
-          // 保管場所ごとにグループ化
+          // 保管場所ごとにグループ化（配布員アプリと同一ロジック）
           const groups = {};
           stocks.forEach(s => {
             const loc = s.location || 'その他';
@@ -677,32 +677,26 @@
           const groupsHtml = sortedLocations.map(loc => {
             const list = groups[loc];
             const staffCount = list.length;
-            
-            const rowsHtml = list.map(s => {
-              return `
-                <div class="flex justify-between items-center py-3 border-b border-white/5 last:border-b-0">
-                  <div>
-                    <div class="text-sm font-black text-white">${s.staffName}</div>
-                    <div class="text-[9px] text-white/40 font-mono mt-0.5">${s.staffId} · ${s.updatedAt || '---'}</div>
-                  </div>
-                  <div class="flex items-center gap-4">
-                    <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
-                    <button onclick="sendLineContact('${s.staffName}', '${s.staffId}', '${s.location}', ${s.count})" class="h-9 px-4 rounded-xl bg-[#2563eb] text-white text-xs font-black flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all">
-                      <span>💬</span> LINE
-                    </button>
-                  </div>
-                </div>`;
-            }).join('');
+
+            const rowsHtml = list.map(s => `
+              <div onclick="sendLineContact('${s.staffName}', '${s.staffId}', '${s.location}', ${s.count})" class="flex justify-between items-center py-4 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer">
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm font-black text-white">${s.staffName}</div>
+                  <div class="text-[9px] text-white/40 font-mono mt-0.5">${s.staffId} · ${s.updatedAt || '---'}</div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                  <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
+                  <span class="text-[10px] font-black text-[#2563eb]">💬</span>
+                </div>
+              </div>`).join('');
 
             return `
-              <div class="premium-glass p-6 space-y-4">
-                <div class="flex justify-between items-center border-b border-white/10 pb-3">
+              <div class="premium-glass p-6 space-y-1">
+                <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-2">
                   <span class="text-xs font-black text-white tracking-wider">${loc}</span>
                   <span style="background: rgba(37,99,235,0.1); color: #2563eb;" class="text-[10px] font-black px-2 py-0.5 rounded-full font-mono">${staffCount}名保管</span>
                 </div>
-                <div class="space-y-1">
-                  ${rowsHtml}
-                </div>
+                <div>${rowsHtml}</div>
               </div>`;
           }).join('');
 
