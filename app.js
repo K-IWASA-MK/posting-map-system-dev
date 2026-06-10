@@ -980,7 +980,7 @@ window.toggleNavTier = function(tier) {
   if (tier === 2) {
     $('nav-tier-1').classList.add('hidden');
     $('nav-tier-2').classList.remove('hidden');
-    switchPage('storage-register');
+    switchPage('storage-list');
   } else {
     $('nav-tier-2').classList.add('hidden');
     $('nav-tier-1').classList.remove('hidden');
