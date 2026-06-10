@@ -865,7 +865,14 @@ async function switchPage(id, force = false) {
           if (cName) cities.add(cName);
         });
       }
-      const cityList = Array.from(cities).sort();
+      const CITY_ORDER = { '伊賀市': 1, '亀山市': 2, '菰野町': 3, '鈴鹿市': 4, '名張市': 5, '四日市市': 6 };
+      const cityList = Array.from(cities).sort((a, b) => {
+        const orderA = CITY_ORDER[a] || 99;
+        const orderB = CITY_ORDER[b] || 99;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.localeCompare(b);
+      });
+      
       if (cityList.length === 0) {
         cityList.push('伊賀市', '亀山市', '菰野町', '鈴鹿市', '名張市', '四日市市');
       }

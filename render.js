@@ -922,10 +922,24 @@ function renderStorageList(stocks) {
     groups[loc].push(s);
   });
 
-  const sortedLocations = Object.keys(groups).sort();
+  const CITY_ORDER = { '伊賀市': 1, '亀山市': 2, '菰野町': 3, '鈴鹿市': 4, '名張市': 5, '四日市市': 6 };
+  const sortedLocations = Object.keys(groups).sort((a, b) => {
+    const orderA = CITY_ORDER[a] || 99;
+    const orderB = CITY_ORDER[b] || 99;
+    if (orderA !== orderB) return orderA - orderB;
+    return a.localeCompare(b);
+  });
 
   const groupsHtml = sortedLocations.map(loc => {
     const list = groups[loc];
+    
+    // 日時の降順（新しい順）にソート
+    list.sort((a, b) => {
+      const dateA = a.updatedAt || '';
+      const dateB = b.updatedAt || '';
+      return dateB.localeCompare(dateA);
+    });
+
     const staffCount = list.length;
     
     const rowsHtml = list.map(s => {
