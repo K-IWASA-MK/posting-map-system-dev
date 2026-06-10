@@ -955,9 +955,9 @@ function renderStorageList(stocks) {
           </div>
           
           <!-- 2行目：中央揃え（枚数とLINEボタン） -->
-          <div class="flex items-center justify-center gap-6 w-full py-1">
+          <div class="flex items-center justify-center gap-8 w-full py-1">
             <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
-            <button class="flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-500 transition-all active:bg-green-500/20">
+            <button style="background: rgba(6,199,85,0.1); border-color: rgba(6,199,85,0.3); color: #06C755;" class="flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-full border transition-all active:opacity-70">
               <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current">
                 <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 3.53 8.871 8.435 9.619.645.138 1.517.42 1.737.96.196.48-.04.935-.084 1.353l-.22 1.34c-.066.383-.314 1.536 1.351.83 1.666-.707 8.971-5.283 11.233-8.232C23.513 14.61 24 12.553 24 10.304z"/>
               </svg>
