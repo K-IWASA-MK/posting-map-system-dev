@@ -890,3 +890,66 @@ function renderRanking() {
 
   container.innerHTML = headerCardHtml + myStatusCardHtml + `<div class="space-y-4">${itemsHtml}</div>`;
 }
+
+// チラシ保管状況の描画処理
+function renderStorageList(stocks) {
+  const container = $('storage-list-container');
+  if (!container) return;
+  if (!stocks || stocks.length === 0) {
+    container.innerHTML = `
+      <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+        <span class="text-2xl">📦</span>
+        <p class="text-sm font-black text-white/60">現在、保管されているチラシはありません</p>
+      </div>`;
+    return;
+  }
+
+  // 保管場所ごとにグループ化
+  const groups = {};
+  stocks.forEach(s => {
+    const loc = s.location || 'その他';
+    if (!groups[loc]) groups[loc] = [];
+    groups[loc].push(s);
+  });
+
+  const sortedLocations = Object.keys(groups).sort();
+
+  const groupsHtml = sortedLocations.map(loc => {
+    const list = groups[loc];
+    const staffCount = list.length;
+    
+    const rowsHtml = list.map(s => {
+      return `
+        <div onclick="sendLineContact('${s.staffName}', '${s.staffId}', '${s.location}', ${s.count})" class="flex justify-between items-center py-4 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer">
+          <div class="min-w-0 flex-1">
+            <div class="text-sm font-black text-white">${s.staffName}</div>
+            <div class="text-[9px] text-white/40 font-mono mt-0.5">${s.staffId} · ${s.updatedAt || '---'}</div>
+          </div>
+          <div class="flex items-center gap-3 shrink-0">
+            <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
+            <span class="text-[10px] font-black text-[#2563eb] flex items-center gap-1">💬<span class="hidden sm:inline">LINE</span></span>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="premium-glass p-6 space-y-4">
+        <div class="flex justify-between items-center border-b border-white/10 pb-3">
+          <span class="text-xs font-black text-white tracking-wider">${loc}</span>
+          <span style="background: rgba(37,99,235,0.1); color: #2563eb;" class="text-[10px] font-black px-2 py-0.5 rounded-full font-mono">${staffCount}名保管</span>
+        </div>
+        <div class="space-y-1">
+          ${rowsHtml}
+        </div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = groupsHtml;
+}
+
+// LINE受渡連絡用の共有リンク生成
+window.sendLineContact = function(staffName, staffId, location, count) {
+  const text = `【チラシ受渡のお願い】\n${staffName}さんの保管チラシ（${location} ${Number(count).toLocaleString()}枚）を一部分けていただけないでしょうか？`;
+  const lineUrl = `https://line.me/R/share?text=${encodeURIComponent(text)}`;
+  window.open(lineUrl, '_blank');
+};
