@@ -174,15 +174,6 @@ function deleteAllAreaSheets() {
     if (!exclude.includes(s.getName())) ss.deleteSheet(s);
   });
   
-  // チラシ保管庫（在庫一覧）のデータをクリア（ヘッダー行は維持）
-  const storageSheet = ss.getSheetByName(CONFIG.SHEET_STORAGE || "チラシ保管庫");
-  if (storageSheet) {
-    const lastRow = storageSheet.getLastRow();
-    if (lastRow >= 2) {
-      storageSheet.getRange(2, 1, lastRow - 1, 6).clearContent();
-    }
-  }
-  
   createSystemCacheSheet();
   refreshAreaSummaryCache();
   
