@@ -920,10 +920,14 @@ function renderStorageList(stocks) {
     
     const rowsHtml = list.map(s => {
       return `
-        <div onclick="sendLineContact('${s.staffName}', '${s.staffId}', '${s.location}', ${s.count})" class="flex justify-between items-center py-4 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer">
+        <div class="stock-row flex justify-between items-center py-4 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer"
+          data-name="${(s.staffName||'').replace(/"/g,'&quot;')}"
+          data-id="${(s.staffId||'').replace(/"/g,'&quot;')}"
+          data-loc="${(s.location||'').replace(/"/g,'&quot;')}"
+          data-count="${s.count||0}">
           <div class="min-w-0 flex-1">
-            <div class="text-sm font-black text-white">${s.staffName}</div>
-            <div class="text-[9px] text-white/40 font-mono mt-0.5">${s.staffId} · ${s.updatedAt || '---'}</div>
+            <div class="text-sm font-black text-white">${(s.staffName||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="text-[9px] text-white/40 font-mono mt-0.5">${(s.staffId||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')} · ${(s.updatedAt||'---').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
           </div>
           <div class="flex items-center gap-3 shrink-0">
             <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
@@ -945,6 +949,18 @@ function renderStorageList(stocks) {
   }).join('');
 
   container.innerHTML = groupsHtml;
+
+  // data-* 属性経由で安全にLINE連絡（シングルクォート等を含む名前でも破損しない）
+  container.querySelectorAll('.stock-row').forEach(row => {
+    row.addEventListener('click', () => {
+      sendLineContact(
+        row.dataset.name,
+        row.dataset.id,
+        row.dataset.loc,
+        parseFloat(row.dataset.count) || 0
+      );
+    });
+  });
 }
 
 // LINE受渡連絡用の共有リンク生成
