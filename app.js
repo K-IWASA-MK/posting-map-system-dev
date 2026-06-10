@@ -1167,13 +1167,17 @@ async function safeInitApp() {
   
   // URLに死んだパラメータが残っている、かつ初期化前（または失敗時）の保険
   const urlParams = new URLSearchParams(window.location.search);
-  if ((urlParams.has('code') || urlParams.has('liff.state')) && !sessionStorage.getItem('liff_initializing')) {
-      // 処理がスタックするのを防ぐため、パラメータを完全に削ったクリーンなURLで入り直させる
-      sessionStorage.setItem('liff_initializing', 'true'); // ループ防止用フラグ
+  const hasOAuthParams = urlParams.has('code') || urlParams.has('liff.state');
+  const isReturningFromLogin = sessionStorage.getItem('liff_initializing') === 'true';
+
+  // liff.login()で戻ってきた場合（?code= あり & フラグあり）→ LIFFに正常処理させる
+  // 孤立した ?code=（フラグなし）→ クリーンURLでやり直し（スタック防止）
+  if (hasOAuthParams && !isReturningFromLogin) {
+      sessionStorage.setItem('liff_initializing', 'true');
       window.location.href = window.location.origin + window.location.pathname;
       return;
   }
-  sessionStorage.removeItem('liff_initializing');
+  // ※ フラグはここでは削除しない。ログイン確認成功後（isLoggedIn()=true）に削除する。
   
   const liffId = "2010177345-tXZIMAJK";
   const btn = $('btn-login-manual');
@@ -1199,6 +1203,7 @@ async function safeInitApp() {
       logDebug("LOGIN CHECK"); // ③ login判定
       if (liff.isLoggedIn()) {
         logDebug("LOGIN OK");
+        sessionStorage.removeItem('liff_initializing'); // ✅ ログイン確認後にフラグを削除（ここが正しいタイミング）
         // ⑤ getAppDataを並列プリフェッチ開始（profile取得・登録処理と並行）
         _appDataPromise = callApi('getAppData');
         try {
