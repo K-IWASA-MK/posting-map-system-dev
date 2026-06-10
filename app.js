@@ -976,8 +976,15 @@ async function switchPage(id, force = false) {
 }
 
 // 2層フリップ式ナビゲーション制御
+let _prevPageBeforeTier2 = 'areas'; // 次へを押す前にいたページを記憶
+
 window.toggleNavTier = function(tier) {
   if (tier === 2) {
+    // 現在アクティブなページIDを記憶してから切り替え
+    const activePage = document.querySelector('.page:not(.hidden)');
+    if (activePage) {
+      _prevPageBeforeTier2 = pageIdMap[activePage.id] || 'areas';
+    }
     $('nav-tier-1').classList.add('hidden');
     $('nav-tier-2').classList.remove('hidden');
     switchPage('storage-list');
@@ -989,7 +996,16 @@ window.toggleNavTier = function(tier) {
 
 window.backToTier1 = function() {
   toggleNavTier(1);
-  navigateToAreaTab();
+  // 次へを押す前にいたページへ戻る
+  if (_prevPageBeforeTier2 === 'ranking') {
+    switchPage('ranking');
+  } else if (_prevPageBeforeTier2 === 'settings') {
+    switchPage('settings');
+  } else if (_prevPageBeforeTier2 === 'detail') {
+    switchPage('detail');
+  } else {
+    navigateToAreaTab();
+  }
 };
 
 // 在庫登録フォームの処理
