@@ -957,9 +957,9 @@ function renderStorageList(stocks) {
           <!-- 2行目：中央揃え（枚数とLINEボタン） -->
           <div class="flex items-center justify-center w-full py-1" style="gap: 32px;">
             <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
-            <button style="background: rgba(6,199,85,0.1); border-color: rgba(6,199,85,0.3); color: #06C755; gap: 6px;" class="transfer-request-btn flex items-center justify-center px-5 py-1.5 rounded-full border transition-all active:opacity-70">
-              <span class="text-sm">🤝</span>
-              <span class="text-[10px] font-black tracking-wider">受渡要請</span>
+            <button type="button" style="background: rgba(6,199,85,0.1); border-color: rgba(6,199,85,0.3); color: #06C755; gap: 6px;" class="transfer-request-btn flex items-center justify-center px-5 py-1.5 rounded-full border transition-all active:opacity-70">
+              <span class="text-sm pointer-events-none">🤝</span>
+              <span class="text-[10px] font-black tracking-wider pointer-events-none">受渡要請</span>
             </button>
           </div>
           
@@ -987,8 +987,13 @@ function renderStorageList(stocks) {
   // 受渡要請ダイアログを開くイベントを付与する
   container.querySelectorAll('.transfer-request-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const row = e.target.closest('.stock-row');
-      if (!row) return;
+      if (!row) {
+        console.error("stock-row not found");
+        return;
+      }
       if (typeof window.openTransferRequestDialog === 'function') {
         window.openTransferRequestDialog(
           row.dataset.name,
@@ -996,6 +1001,8 @@ function renderStorageList(stocks) {
           row.dataset.loc,
           parseFloat(row.dataset.count) || 0
         );
+      } else {
+        console.error("openTransferRequestDialog is not defined");
       }
     });
   });
