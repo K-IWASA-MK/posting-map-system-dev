@@ -819,15 +819,23 @@ function updateFlyerStock(location, count, staffName, staffId) {
     }
     
     let targetRow = 0;
+    let existingCount = 0;
+    let existingLocation = "";
     for (let i = 0; i < values.length; i++) {
       if (values[i][1] === staffId) {
         targetRow = i + 2;
+        existingCount = parseFloat(values[i][4]) || 0;
+        existingLocation = values[i][3];
         break;
       }
     }
     
     if (targetRow > 0) {
-      s.getRange(targetRow, 3, 1, 4).setValues([[staffName, location, count, updatedAt]]);
+      if (existingLocation !== location) {
+        return { success: false, message: "このIDはすでに " + existingLocation + " で登録されています。他の市には登録できません。" };
+      }
+      const finalCount = existingCount + count;
+      s.getRange(targetRow, 3, 1, 4).setValues([[staffName, location, finalCount, updatedAt]]);
     } else {
       const newRow = lastRow + 1;
       const newId = "ST" + String(newRow - 1).padStart(3, '0');
