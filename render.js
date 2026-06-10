@@ -943,7 +943,7 @@ function renderStorageList(stocks) {
     
     const rowsHtml = list.map(s => {
       return `
-        <div class="stock-row flex flex-col py-4 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer gap-2"
+        <div class="stock-row flex flex-col py-3 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer gap-2"
           data-name="${(s.staffName||'').replace(/"/g,'&quot;')}"
           data-id="${(s.staffId||'').replace(/"/g,'&quot;')}"
           data-loc="${(s.location||'').replace(/"/g,'&quot;')}"
@@ -971,7 +971,7 @@ function renderStorageList(stocks) {
     }).join('');
 
     return `
-      <div class="premium-glass p-6 space-y-4">
+      <div class="premium-glass p-6 space-y-2">
         <div class="flex justify-between items-center border-b border-white/10 pb-3">
           <span class="text-sm font-black text-white tracking-wider">${loc}</span>
           <span style="background: rgba(37,99,235,0.1); color: #2563eb;" class="text-[10px] font-black px-2 py-0.5 rounded-full font-mono">${staffCount}名保管</span>
