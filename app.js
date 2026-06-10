@@ -1252,7 +1252,8 @@ async function safeInitApp() {
             logDebug("API START (初回登録)");
             const res = await callApi('registerStaff', { 
               lastName: profile.displayName, 
-              firstName: "(LINE)" 
+              firstName: "(LINE)",
+              lineUserId: profile.userId
             });
             logDebug("API OK");
             if (res && res.success) {
@@ -1488,3 +1489,91 @@ function closeIdInfoModal() {
   modal.classList.add('opacity-0', 'pointer-events-none');
   modal.firstElementChild.classList.add('translate-y-full');
 }
+
+// =============================
+// 受渡要請システム (Flyer Transfer Request System)
+// =============================
+let currentTransferRequest = null;
+
+window.openTransferRequestDialog = function(name, id, loc, count) {
+  currentTransferRequest = { holderName: name, holderUserId: id, requestArea: loc, stockCount: count };
+  const dialog = document.getElementById('transfer-request-dialog');
+  if (!dialog) return;
+  document.getElementById('tr-holder-name').textContent = name;
+  document.getElementById('tr-holder-stock').textContent = count.toLocaleString() + '枚';
+  
+  dialog.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    dialog.classList.remove('opacity-0');
+    dialog.firstElementChild.classList.remove('scale-95');
+  });
+};
+
+window.closeTransferRequestDialog = function() {
+  const dialog = document.getElementById('transfer-request-dialog');
+  if (!dialog) return;
+  dialog.classList.add('opacity-0');
+  dialog.firstElementChild.classList.add('scale-95');
+  setTimeout(() => dialog.classList.add('hidden'), 300);
+};
+
+// ダイアログのイベントリスナー設定
+document.addEventListener('DOMContentLoaded', () => {
+  const cancelBtn = document.getElementById('tr-cancel-btn');
+  if (cancelBtn) cancelBtn.addEventListener('click', closeTransferRequestDialog);
+
+  const submitBtn = document.getElementById('tr-submit-btn');
+  if (submitBtn) {
+    submitBtn.addEventListener('click', async () => {
+      if (!currentTransferRequest) return;
+      
+      const btnText = submitBtn.querySelector('.btn-text');
+      const btnSpinner = submitBtn.querySelector('.btn-spinner');
+      
+      if (btnText) btnText.classList.add('opacity-0');
+      if (btnSpinner) btnSpinner.classList.remove('hidden');
+      submitBtn.disabled = true;
+
+      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+
+      const res = await callApi('requestFlyerTransfer', {
+        requestUserId: userInfo.id || 'UNKNOWN',
+        requestUserName: userInfo.last || '不明',
+        requestArea: currentTransferRequest.requestArea,
+        holderUserId: currentTransferRequest.holderUserId,
+        holderName: currentTransferRequest.holderName,
+        stockCount: currentTransferRequest.stockCount
+      });
+
+      if (btnText) btnText.classList.remove('opacity-0');
+      if (btnSpinner) btnSpinner.classList.add('hidden');
+      submitBtn.disabled = false;
+
+      closeTransferRequestDialog();
+
+      if (res && res.success) {
+        const successDialog = document.getElementById('transfer-success-dialog');
+        if (successDialog) {
+          successDialog.classList.remove('hidden');
+          requestAnimationFrame(() => {
+            successDialog.classList.remove('opacity-0');
+            successDialog.firstElementChild.classList.remove('scale-95');
+          });
+        }
+      } else {
+        alert('要請の送信に失敗しました: ' + (res ? res.message : 'Unknown error'));
+      }
+    });
+  }
+
+  const okBtn = document.getElementById('tr-success-ok-btn');
+  if (okBtn) {
+    okBtn.addEventListener('click', () => {
+      const successDialog = document.getElementById('transfer-success-dialog');
+      if (!successDialog) return;
+      successDialog.classList.add('opacity-0');
+      successDialog.firstElementChild.classList.add('scale-95');
+      setTimeout(() => successDialog.classList.add('hidden'), 300);
+    });
+  }
+});

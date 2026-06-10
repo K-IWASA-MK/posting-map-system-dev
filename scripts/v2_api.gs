@@ -190,7 +190,10 @@ function doPost(e) {
         );
         break;
       case 'registerStaff':
-        response = registerStaff(postData.lastName, postData.firstName);
+        response = registerStaff(postData.lastName, postData.firstName, postData.lineUserId);
+        break;
+      case 'requestFlyerTransfer':
+        response = handleRequestFlyerTransfer(postData);
         break;
       case 'resetRoster':
         const rosterMsg = setupRosterSheet();
@@ -451,7 +454,7 @@ function normalizeName(str) {
   return s.replace(/[\s\u3000\u200b\u200c\u200d\uFEFF]/g, "");
 }
 
-function registerStaff(lastName, firstName) {
+function registerStaff(lastName, firstName, lineUserId) {
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(15000);
@@ -479,7 +482,8 @@ function registerStaff(lastName, firstName) {
     const lastRow = s.getLastRow();
     let values = [];
     if (lastRow >= 1) {
-      values = s.getRange(1, 1, lastRow, 3).getValues();
+      // D列(4)まで取得する（A:ID, B:名前, C:アプリ名, D:LINE_USER_ID）
+      values = s.getRange(1, 1, lastRow, 4).getValues();
     }
 
     // 1. 既存の同名スタッフがいないかチェック (表記揺れ吸収の上で比較)
@@ -549,8 +553,8 @@ function registerStaff(lastName, firstName) {
       newId = prefix + nextIdNum;
     }
 
-    // 指定の行に書き込む (A: ID, B: 名前, C: アプリ名)
-    s.getRange(targetRow, 1, 1, 3).setValues([[newId, cleanName, cleanAppName]]);
+    // 指定の行に書き込む (A: ID, B: 名前, C: アプリ名, D: LINE_USER_ID)
+    s.getRange(targetRow, 1, 1, 4).setValues([[newId, cleanName, cleanAppName, lineUserId || ""]]);
 
     return { success: true, id: newId, name: fullName, message: "new" };
   } finally {
@@ -846,3 +850,94 @@ function updateFlyerStock(location, count, staffName, staffId) {
   }
 }
 
+// =============================
+// ③ 受渡要請システム (Flyer Transfer Request System)
+// =============================
+
+function handleRequestFlyerTransfer(data) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch (e) {
+    return { success: false, message: "システムが混雑しています。時間をおいて再度お試しください。" };
+  }
+
+  try {
+    const ss = getSS();
+    let sheetName = "受渡要請履歴";
+    let s = ss.getSheetByName(sheetName);
+    if (!s) {
+      s = ss.insertSheet(sheetName);
+      s.getRange(1, 1, 1, 8).setValues([["日時", "要請者", "要請者ID", "保管者", "保管者ID", "地区", "在庫枚数", "状態"]]);
+    }
+
+    const now = new Date();
+    const requestTime = Utilities.formatDate(now, "JST", "yyyy/MM/dd HH:mm:ss");
+
+    s.appendRow([
+      requestTime,
+      data.requestUserName,
+      data.requestUserId,
+      data.holderName,
+      data.holderUserId,
+      data.requestArea,
+      data.stockCount,
+      "申請中"
+    ]);
+
+    // Push通知処理：名簿シートから保管者のLINE_USER_ID（D列）を取得する
+    let targetLineUserId = null;
+    const rosterSheet = ss.getSheetByName(CONFIG.SHEET_ROSTER);
+    if (rosterSheet) {
+      const lastRow = rosterSheet.getLastRow();
+      if (lastRow >= 1) {
+        const values = rosterSheet.getRange(1, 1, lastRow, 4).getValues();
+        for (let i = 1; i < values.length; i++) {
+          if (values[i][0] === data.holderUserId) {
+            targetLineUserId = values[i][3]; // D列
+            break;
+          }
+        }
+      }
+    }
+
+    if (targetLineUserId) {
+      sendLinePushMessage(targetLineUserId, data.requestUserName, data.requestArea, data.stockCount);
+    }
+
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function sendLinePushMessage(toUserId, requesterName, areaName, stockCount) {
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty("LINE_CHANNEL_ACCESS_TOKEN");
+  if (!token) return; // トークン未設定の場合はスキップ
+
+  const text = `【ポスティング戦略センター】\n\nチラシ受渡要請が届きました。\n\n要請者：\n${requesterName}\n\n地区：\n${areaName}\n\n現在在庫：\n${Number(stockCount).toLocaleString()}枚\n\nアプリを開いて確認してください。`;
+
+  const url = "https://api.line.me/v2/bot/message/push";
+  const payload = {
+    to: toUserId,
+    messages: [{
+      type: "text",
+      text: text
+    }]
+  };
+
+  const options = {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  UrlFetchApp.fetch(url, options);
+}
