@@ -848,6 +848,12 @@ async function switchPage(id, force = false) {
     if (idEl) idEl.textContent = 'ID: ' + (staffId || '---');
     if (nameEl) nameEl.textContent = staffName || '---';
 
+    // Clear input and feedback message on entry
+    const countInput = $('storage-register-count');
+    if (countInput) countInput.value = '';
+    const msgEl = $('storage-register-message');
+    if (msgEl) msgEl.classList.add('hidden');
+
     // Dropdown dynamic population
     const locSelect = $('storage-register-location');
     if (locSelect) {
