@@ -895,6 +895,16 @@ function renderRanking() {
 function renderStorageList(stocks) {
   const container = $('storage-list-container');
   if (!container) return;
+
+  // テスト用データを除外
+  if (stocks && stocks.length > 0) {
+    stocks = stocks.filter(s => {
+      const name = s.staffName || '';
+      const id = s.staffId || '';
+      return !name.includes('テスト') && !id.toUpperCase().includes('TEST');
+    });
+  }
+
   if (!stocks || stocks.length === 0) {
     container.innerHTML = `
       <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
@@ -925,9 +935,9 @@ function renderStorageList(stocks) {
           data-id="${(s.staffId||'').replace(/"/g,'&quot;')}"
           data-loc="${(s.location||'').replace(/"/g,'&quot;')}"
           data-count="${s.count||0}">
-          <div class="min-w-0 flex-1">
-            <div class="text-sm font-black text-white">${(s.staffName||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-            <div class="text-[9px] text-white/40 font-mono mt-0.5">${(s.staffId||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')} · ${(s.updatedAt||'---').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+          <div class="min-w-0 flex-1 pr-4">
+            <div class="text-sm font-black text-white truncate">${(s.staffName||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="text-[9px] text-white/40 font-mono mt-0.5 truncate">${(s.staffId||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')} · ${(s.updatedAt||'---').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
           </div>
           <div class="flex items-center gap-3 shrink-0">
             <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
