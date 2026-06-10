@@ -950,7 +950,7 @@ function renderStorageList(stocks) {
           data-count="${s.count||0}">
           <div class="min-w-0 flex-1 pr-4">
             <div class="text-sm font-black text-white truncate">${(s.staffName||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-            <div class="text-[9px] text-white/40 font-mono mt-0.5 truncate">${(s.staffId||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')} · ${(s.updatedAt||'---').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+            <div class="text-[9px] text-white/40 font-mono mt-0.5 truncate">${(s.updatedAt||'---').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
           </div>
           <div class="flex items-center gap-3 shrink-0">
             <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
