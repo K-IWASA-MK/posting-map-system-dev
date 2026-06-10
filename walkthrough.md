@@ -1,32 +1,25 @@
-# 動作検証・余白およびカラー修正レポート — 管理者アプリ UI の検証結果
+# 動作検証・セクションヘッダー中央揃え（縦並び）修正レポート
 
-管理者用アプリ（`manager.html`）におけるカード間の余白調整、および「全体配布率」カードのパディングと配色の修正を行い、最終動作検証を実施いたしました。
+ポスティング管理アプリ（`index.html`、`field/index.html`、`manager.html`）の「簡易チラシ保管庫（在庫登録）」および「保管状況一覧（在庫一覧）」のセクションヘッダーカードを、他画面と同様にアイコンとテキストを縦に積み重ねた**「完璧な中央揃え」レイアウト**に修正し、動作検証を実施いたしました。
 
----
-
-## 🎬 動作キャプチャ (最終修正後の操作録画)
-
-以下は、最新バージョン `v419` における検証操作の記録映像です。サービスワーカーが更新され、新デザインが即座に適用されています。
-「全体配布率」カードがコンパクトに収まり、指定されたカラーリングが反映されています。
-
-![最終修正後の操作録画](/Users/katsujiiwasa/.gemini/antigravity-ide/brain/7f68de32-b3c7-400c-955a-1bf224b6016e/verify_manager_v419_1781043438896.webp)
+さらに、二度とこのデザイン崩れ（絵文字とテキストを同じ行に横並びにして中央揃えできない問題）が発生しないよう、デザイン規範書（`.md`）に禁止・必須ルールとして明文化して記録しました。
 
 ---
 
-## 📸 画面スクリーンショット（最終修正後）
+## 🛠️ 実施した変更点
 
-### 1. 全体配布率カードのコンパクト化とカラー調整 (P1)
-「全体配布率」カードの内部縦余白を縮小し、高さを `min-h-[7rem]` に抑えてスリムにしました。
-さらに、以下の配色ルールを適用いたしました：
-- **`OVERALL COVERAGE`**（英名ラベル）: **緑色（`#22c55e`）**
-- **`0%`**（進捗数値）: **青色（`#2563eb`）**
+### 1. デザインガイドライン（.md）へのルール追加
+* **[AGENTS.md](file:///Volumes/SSD_DATA/posting-map-system/AGENTS.md)** および **[agents/uiux/AGENT.md](file:///Volumes/SSD_DATA/posting-map-system/agents/uiux/AGENT.md)** の「レイアウト固定ルール」セクションに以下を追記しました。
+  > **セクションヘッダーの中央揃え構造**
+  > 絵文字とテキストを同じ行に横並びで置くと、正しく中央揃え（センタリング）ができません。そのため、各機能画面のセクションヘッダーカードは、上段に「絵文字（またはアイコン）を含む極小ボックス」、下段に「テキストタイトル＋英語サブタイトル」を配置した、縦並び（`flex-col items-center justify-center text-center`）の構造を必須とします。
 
-![全体配布率カードの拡大](/Users/katsujiiwasa/.gemini/antigravity-ide/brain/7f68de32-b3c7-400c-955a-1bf224b6016e/overall_coverage_card_1781043455635.png)
+### 2. HTMLファイルのヘッダー構造の修正
+* **[index.html](file:///Volumes/SSD_DATA/posting-map-system/index.html)**、**[field/index.html](file:///Volumes/SSD_DATA/posting-map-system/field/index.html)**、および **[manager.html](file:///Volumes/SSD_DATA/posting-map-system/manager.html)**
+  * 「簡易チラシ保管庫」（STOCK REGISTRATION）および「保管状況一覧」（FLYER STOCK INVENTORY）の横並び（`flex items-center gap-3`）を廃止。
+  * 縦並び（`flex flex-col items-center justify-center text-center gap-2`）に変更し、絵文字 `📦` / `📊` を専用の `w-8 h-8 rounded-xl bg-[#2563eb]/10` ボックスに格納して中央上に配置。
 
-### 2. システム制御画面 (P4)
-「システム」タブも `v419` に更新され、各システムセクション間の適切な余白が維持されています。
-
-![システム制御画面（余白適用後）](/Users/katsujiiwasa/.gemini/antigravity-ide/brain/7f68de32-b3c7-400c-955a-1bf224b6016e/system_tab_spacing_1781042677233.png)
+### 3. キャッシュバスターのインクリメント (v423)
+* 最新の変更が実機で即座に反映されるよう、`service-worker.js` および各HTMLファイルのキャッシュバスターを `v=423` に更新しました。
 
 ---
 
@@ -34,9 +27,8 @@
 
 | 検証項目 | 評価 | 状態 | 備考 |
 |---|---|---|---|
-| **全体配布率カラー** | ✅ 合格 | 正常 | `OVERALL COVERAGE` が緑色、`0%` が青色に正しく描画されていることを確認。 |
-| **全体配布率パディング** | ✅ 合格 | 正常 | 縦パディングが削削され、余分な空白がなくなり極めてコンパクトにフィット。 |
-| **キャッシュクリア検証** | ✅ 合格 | 正常 | `service-worker.js` のバージョンを `v419` に上げ、自動的に新アセットがロードされることを確認。 |
-| **エラーログの有無** | ✅ 合格 | 正常 | コンソールエラーやGAS APIの接続エラーは発生せず。 |
+| **ヘッダー中央揃え** | ✅ 合格 | 正常 | 在庫登録・在庫一覧の両画面で、ヘッダー要素が中央縦軸で綺麗に整列されていることを確認。 |
+| **規範書の明文化** | ✅ 合格 | 正常 | `AGENTS.md` および `uiux/AGENT.md` に同一規則を保存完了。 |
+| **キャッシュ更新検証** | ✅ 合格 | 正常 | キャッシュバスター `v423` を適用し、既存のキャッシュが破棄されて新しいHTMLがロードされることを確認。 |
 
-デザイン上のすべての要件およびパディング・配色の調整が完了し、極上のユーザー体験（[AGENTS.md](file:///Volumes/SSD_DATA/posting-map-system/AGENTS.md)）を維持できていることを確認いたしました。
+これにて、すべての画面で [AGENTS.md](file:///Volumes/SSD_DATA/posting-map-system/AGENTS.md) の高級感と中央対称レイアウトが保たれました。

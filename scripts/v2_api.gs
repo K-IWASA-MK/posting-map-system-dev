@@ -116,6 +116,9 @@ function doGet(e) {
       case 'getDeliveryStats':
         response = getDeliveryStats();
         break;
+      case 'getFlyerStock':
+        response = { success: true, stocks: getFlyerStock() };
+        break;
       default:
         response = { success: true, message: 'POSTING MAP API is online.' };
     }
@@ -213,6 +216,14 @@ function doPost(e) {
       case 'resetAllSheets':
         deleteAllAreaSheets();
         response = { success: true, message: 'All area sheets reset successfully' };
+        break;
+      case 'updateFlyerStock':
+        response = updateFlyerStock(
+          postData.location,
+          parseInt(postData.count, 10) || 0,
+          postData.staffName,
+          postData.staffId
+        );
         break;
       default:
         response = { success: false, message: 'Invalid POST action' };
@@ -320,7 +331,8 @@ function getCityAreaDetails(cityName) {
     CONFIG.SHEET_MASTER_EXPORT,
     CONFIG.SHEET_REPORT,
     CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_SYSTEM_CACHE
+    CONFIG.SHEET_SYSTEM_CACHE,
+    CONFIG.SHEET_STORAGE
   ];
 
   sheets.forEach(sheet => {
@@ -691,7 +703,8 @@ function getDeliveryStats() {
     CONFIG.SHEET_MASTER_EXPORT,
     CONFIG.SHEET_REPORT,
     CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_SYSTEM_CACHE
+    CONFIG.SHEET_SYSTEM_CACHE,
+    CONFIG.SHEET_STORAGE
   ];
 
   var ss = getSS();
@@ -756,3 +769,73 @@ function getDeliveryStats() {
 
   return result;
 }
+
+// =============================
+// チラシ保管庫 API
+// =============================
+
+function getFlyerStock() {
+  const ss = getSS();
+  let s = ss.getSheetByName(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+  if (!s) {
+    s = ss.insertSheet(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+    s.getRange(1, 1, 1, 6).setValues([["ID", "スタッフID", "スタッフ名", "保管場所", "保管枚数", "更新日時"]]);
+  }
+  const lastRow = s.getLastRow();
+  if (lastRow < 2) return [];
+  const values = s.getRange(2, 1, lastRow - 1, 6).getValues();
+  return values.map(r => ({
+    id: r[0],
+    staffId: r[1],
+    staffName: r[2],
+    location: r[3],
+    count: parseFloat(r[4]) || 0,
+    updatedAt: (r[5] && typeof r[5].getMonth === 'function') ? Utilities.formatDate(r[5], "JST", "MM/dd HH:mm") : (r[5] ? String(r[5]).trim() : "")
+  }));
+}
+
+function updateFlyerStock(location, count, staffName, staffId) {
+  if (!staffId || !staffName) return { success: false, message: "Staff info required" };
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch (e) {
+    throw new Error("Lock timeout");
+  }
+  try {
+    const ss = getSS();
+    let s = ss.getSheetByName(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+    if (!s) {
+      s = ss.insertSheet(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+      s.getRange(1, 1, 1, 6).setValues([["ID", "スタッフID", "スタッフ名", "保管場所", "保管枚数", "更新日時"]]);
+    }
+    const lastRow = s.getLastRow();
+    const now = new Date();
+    const updatedAt = Utilities.formatDate(now, "JST", "MM/dd HH:mm");
+    
+    let values = [];
+    if (lastRow >= 2) {
+      values = s.getRange(2, 1, lastRow - 1, 6).getValues();
+    }
+    
+    let targetRow = 0;
+    for (let i = 0; i < values.length; i++) {
+      if (values[i][1] === staffId) {
+        targetRow = i + 2;
+        break;
+      }
+    }
+    
+    if (targetRow > 0) {
+      s.getRange(targetRow, 3, 1, 4).setValues([[staffName, location, count, updatedAt]]);
+    } else {
+      const newRow = lastRow + 1;
+      const newId = "ST" + String(newRow - 1).padStart(3, '0');
+      s.getRange(newRow, 1, 1, 6).setValues([[newId, staffId, staffName, location, count, updatedAt]]);
+    }
+    return { success: true };
+  } finally {
+    lock.releaseLock();
+  }
+}
+

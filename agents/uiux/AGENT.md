@@ -65,6 +65,8 @@ min-height: 44px;      /* touch target */
 - ONLINEインジケーター: `animate-soft-pulse` 1.5秒微パルス
 - 下部ナビゲーション: 3ボタン（🗺️ エリア / 🏆 ランキング / 👤 ID）
 - IDカード外側ラッパー: `pt-2 pb-0 px-4 flex flex-col items-center`
+- セクションヘッダーの中央揃え構造: 絵文字とテキストを同じ行に横並びで置くと、正しく中央揃え（センタリング）ができません。各機能画面のセクションヘッダーは、上段に「絵文字（またはアイコン）を含む極小ボックス」、下段に「テキストタイトル＋英語サブタイトル」を配置した、縦並び（`flex-col items-center justify-center text-center`）の構造とします。
+
 
 ### 7. 画面・デバイス対応
 - ベース: `w-full`, Flexbox, 均等余白

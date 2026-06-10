@@ -24,6 +24,7 @@ const CONFIG = {
   SHEET_REPORT: "📄 活動報告書",
   SHEET_MANUAL: "📖 らくらくマニュアル",
   SHEET_SYSTEM_CACHE: "__SYSTEM_CACHE__", // 高速集計用シャドウシート
+  SHEET_STORAGE: "チラシ保管庫",
 
   // 動作設定
   CHUNK_SIZE: 10,

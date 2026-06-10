@@ -25,7 +25,7 @@
     };
   </script>
   <!-- Force Refresh: v318 (2026-05-29T09:00:00) -->
-  <link rel="stylesheet" href="../tailwind-utils.css?v=385">
+  <link rel="stylesheet" href="../tailwind-utils.css?v=423">
   <!-- A: favicon 404解消 (-191ms) -->
   <link rel="icon" href="../assets/icon180-v2.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/icon180-v2.png?v=258">
@@ -44,8 +44,8 @@
   </script>
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <!-- 共通API モジュール (shared/api.js) -->
-  <script defer src="../shared/api.js?v=385"></script>
-  <link rel="stylesheet" href="../style.css?v=385">
+  <script defer src="../shared/api.js?v=423"></script>
+  <link rel="stylesheet" href="../style.css?v=423">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -133,19 +133,93 @@
 
       <!-- RANKING PAGE (NEW) -->
       <section id="page-ranking" class="page hidden space-y-8">
-
         <div id="ranking-list" class="space-y-6 pb-20">
           <!-- ランキングカードが動的に挿入されます -->
+        </div>
+      </section>
+
+      <!-- STORAGE REGISTER PAGE -->
+      <section id="page-storage-register" class="page hidden space-y-8 pb-20">
+        <!-- Section Header Card -->
+        <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+            <span class="text-sm">📦</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-black tracking-wider text-white">簡易チラシ保管庫</h3>
+            <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">STOCK REGISTRATION</p>
+          </div>
+        </div>
+
+        <!-- ID Card (Read-Only Staff Profile) -->
+        <div class="premium-glass p-6 space-y-4">
+          <span class="text-[10px] font-black uppercase tracking-widest text-white/40 font-mono">公式配布員情報</span>
+          <div class="flex items-center justify-between">
+            <span id="storage-register-staff-id" class="text-base font-black text-white/80 font-mono">ID: ---</span>
+            <span id="storage-register-staff-name" class="text-base font-black text-white/80">---</span>
+          </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="premium-glass p-6 space-y-6">
+          <span class="text-[10px] font-black uppercase tracking-widest text-white/40 font-mono">保管情報の登録</span>
+          
+          <!-- Dropdown -->
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-white/40 tracking-wider">保管場所（市名）</label>
+            <select id="storage-register-location" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-4 text-sm font-bold text-white focus:outline-none focus:border-[#2563eb] transition-colors">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <!-- Sheet Count Input -->
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-white/40 tracking-wider">保管枚数 (枚)</label>
+            <input id="storage-register-count" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="4000" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-4 text-lg font-black text-white focus:outline-none focus:border-[#2563eb] transition-colors text-center font-mono">
+          </div>
+
+          <!-- Submit Button -->
+          <button id="btn-storage-register-submit" onclick="submitFlyerStock()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-4 text-base font-black shadow-xl uppercase tracking-wider">在庫を登録する</button>
+          
+          <!-- Feedback Message -->
+          <div id="storage-register-message" class="hidden text-center text-xs font-bold text-[#22c55e]"></div>
+        </div>
+      </section>
+
+      <!-- STORAGE LIST PAGE -->
+      <section id="page-storage-list" class="page hidden space-y-8 pb-20">
+        <!-- Section Header Card -->
+        <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+            <span class="text-sm">📊</span>
+          </div>
+          <div>
+            <h3 class="text-sm font-black tracking-wider text-white">保管状況一覧</h3>
+            <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">FLYER STOCK INVENTORY</p>
+          </div>
+        </div>
+
+        <!-- Grouped List Container -->
+        <div id="storage-list-container" class="space-y-6">
+          <!-- Group cards dynamically populated -->
         </div>
       </section>
     </main>
 
     <!-- 下ナビ：iOSライクなガラス感に調整 -->
     <nav id="bottom-nav" style="bottom: calc(env(safe-area-inset-bottom) + 1rem); display: none;" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
-      <div style="background: rgba(20,20,20,0.72); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.02);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
-        <button onclick="navigateToAreaTab()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🗺️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">エリア</span></button>
-        <button onclick="switchPage('ranking')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🏆</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ランキング</span></button>
-        <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ID</span></button>
+      <!-- Tier 1 Container -->
+      <div id="nav-tier-1" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
+        <button data-page="areas" onclick="navigateToAreaTab()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🗺️</div><span class="text-[10px] font-black uppercase tracking-widest text-white">エリア</span></button>
+        <button data-page="ranking" onclick="switchPage('ranking')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">🏆</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ランキング</span></button>
+        <button data-page="settings" onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ID</span></button>
+        <button data-page="next" onclick="toggleNavTier(2)" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">⚙️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">次へ</span></button>
+      </div>
+      <!-- Tier 2 Container -->
+      <div id="nav-tier-2" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl hidden">
+        <button data-page="storage-register" onclick="switchPage('storage-register')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">📦</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">在庫登録</span></button>
+        <button data-page="storage-list" onclick="switchPage('storage-list')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">📊</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">在庫一覧</span></button>
+        <button data-page="back" onclick="backToTier1()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">↩️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">戻る</span></button>
       </div>
     </nav>
   </div>
@@ -208,8 +282,8 @@
   </div>
 
   <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
-  <script defer src="./db.js?v=385"></script>
-  <script defer src="./app.js?v=385"></script>
-  <script defer src="./render.js?v=385"></script>
+  <script defer src="./db.js?v=423"></script>
+  <script defer src="./app.js?v=423"></script>
+  <script defer src="./render.js?v=423"></script>
 </body>
 </html>

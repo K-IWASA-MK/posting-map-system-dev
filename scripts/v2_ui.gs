@@ -94,6 +94,7 @@ function onEdit(e) {
     CONFIG.SHEET_MASTER_EXPORT,
     CONFIG.SHEET_REPORT,
     CONFIG.SHEET_MANUAL,
+    CONFIG.SHEET_STORAGE,
   ];
   if (exclude.includes(name) || sheet.isSheetHidden()) return;
 
@@ -167,6 +168,7 @@ function deleteAllAreaSheets() {
     CONFIG.SHEET_TEMPLATE,
     CONFIG.SHEET_POSTAL,
     CONFIG.SHEET_DISTRICT,
+    CONFIG.SHEET_STORAGE,
   ];
   ss.getSheets().forEach((s) => {
     if (!exclude.includes(s.getName())) ss.deleteSheet(s);
@@ -193,6 +195,7 @@ function formatAllSheets() {
     CONFIG.SHEET_MASTER_EXPORT,
     CONFIG.SHEET_REPORT,
     CONFIG.SHEET_MANUAL,
+    CONFIG.SHEET_STORAGE,
   ];
 
   // 1. まずは「原本」を完璧に整える
