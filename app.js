@@ -39,7 +39,9 @@ const pageIdMap = {
   'page-areas': 'areas',
   'page-detail': 'detail',
   'page-settings': 'settings',
-  'page-ranking': 'ranking'
+  'page-ranking': 'ranking',
+  'page-storage-register': 'storage-register',
+  'page-storage-list': 'storage-list'
 };
 
 // プレミアム・インタラクション・スキル (JS Touch Handler)
@@ -775,7 +777,12 @@ window.addEventListener('offline', () => {
 
 async function switchPage(id, force = false) {
   const pages = document.querySelectorAll('.page');
-  const targetId = id === 'detail' ? 'page-detail' : (id === 'settings' ? 'page-settings' : (id === 'ranking' ? 'page-ranking' : 'page-areas'));
+  const targetId = id === 'detail' ? 'page-detail' :
+                   id === 'settings' ? 'page-settings' :
+                   id === 'ranking' ? 'page-ranking' :
+                   id === 'storage-register' ? 'page-storage-register' :
+                   id === 'storage-list' ? 'page-storage-list' :
+                   'page-areas';
   const target = $(targetId);
   if (!target) return;
 
@@ -805,7 +812,7 @@ async function switchPage(id, force = false) {
     });
   }
 
-  // 2. 設定画面の場合はレンダリングを行う
+  // 2. ページに応じた処理・レンダリングを行う
   if (id === 'settings') renderSettings();
   if (id === 'ranking') {
     const container = $('ranking-list');
@@ -830,6 +837,72 @@ async function switchPage(id, force = false) {
     } else {
       if (typeof renderRanking === 'function') renderRanking();
     }
+  }
+
+  if (id === 'storage-register') {
+    const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+    const staffId = userInfo.id || '';
+    const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+    const idEl = $('storage-register-staff-id');
+    const nameEl = $('storage-register-staff-name');
+    if (idEl) idEl.textContent = 'ID: ' + (staffId || '---');
+    if (nameEl) nameEl.textContent = staffName || '---';
+
+    // Dropdown dynamic population
+    const locSelect = $('storage-register-location');
+    if (locSelect) {
+      locSelect.innerHTML = '';
+      const cities = new Set();
+      if (Array.isArray(areaSummary)) {
+        areaSummary.forEach(s => {
+          const cName = getCityName(s.name);
+          if (cName) cities.add(cName);
+        });
+      }
+      const cityList = Array.from(cities).sort();
+      if (cityList.length === 0) {
+        cityList.push('伊賀市', '亀山市', '菰野町', '鈴鹿市', '名張市', '四日市市');
+      }
+      cityList.forEach(city => {
+        const opt = document.createElement('option');
+        opt.value = city;
+        opt.textContent = city;
+        locSelect.appendChild(opt);
+      });
+    }
+  }
+
+  if (id === 'storage-list') {
+    const listContainer = $('storage-list-container');
+    if (listContainer) {
+      listContainer.innerHTML = `
+        <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+          <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
+          <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Loading Inventory...</p>
+        </div>`;
+    }
+    callApi('getFlyerStock').then(data => {
+      if (data && data.success) {
+        _stockData = data.stocks || [];
+        if (typeof renderStorageList === 'function') renderStorageList(_stockData);
+      } else {
+        if (listContainer) {
+          listContainer.innerHTML = `
+            <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+              <span class="text-2xl">⚠️</span>
+              <p class="text-sm font-black text-white/60">データ取得に失敗しました</p>
+            </div>`;
+        }
+      }
+    }).catch(err => {
+      if (listContainer) {
+        listContainer.innerHTML = `
+          <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+            <span class="text-2xl">⚠️</span>
+            <p class="text-sm font-black text-white/60">エラーが発生しました</p>
+          </div>`;
+      }
+    });
   }
   
   // 3. ナビゲーションの表示制御
@@ -865,10 +938,12 @@ async function switchPage(id, force = false) {
   
 
   // 下ナビのタブのアクティブ状態の不透明度とカラーを調整
-  document.querySelectorAll('.nav-btn').forEach((b, i) => { 
-    const isActive = ((id === 'areas' || id === 'detail') && i === 0) || 
-                     (id === 'ranking' && i === 1) || 
-                     (id === 'settings' && i === 2);
+  document.querySelectorAll('.nav-btn').forEach((b) => { 
+    const pageAttr = b.getAttribute('data-page');
+    let isActive = false;
+    if (pageAttr === 'areas' && (id === 'areas' || id === 'detail')) isActive = true;
+    else if (pageAttr === id) isActive = true;
+
     b.style.opacity = '';
     if (isActive) {
       b.classList.remove('opacity-40');
@@ -899,6 +974,80 @@ async function switchPage(id, force = false) {
     $('content').scrollTo(0, scrollPositions[id] || 0);
   }
 }
+
+// 2層フリップ式ナビゲーション制御
+window.toggleNavTier = function(tier) {
+  if (tier === 2) {
+    $('nav-tier-1').classList.add('hidden');
+    $('nav-tier-2').classList.remove('hidden');
+    switchPage('storage-register');
+  } else {
+    $('nav-tier-2').classList.add('hidden');
+    $('nav-tier-1').classList.remove('hidden');
+  }
+};
+
+window.backToTier1 = function() {
+  toggleNavTier(1);
+  navigateToAreaTab();
+};
+
+// 在庫登録フォームの処理
+window.submitFlyerStock = async function() {
+  const locSelect = $('storage-register-location');
+  const countInput = $('storage-register-count');
+  const msgEl = $('storage-register-message');
+  const btn = $('btn-storage-register-submit');
+  
+  if (!locSelect || !countInput || !msgEl || !btn) return;
+  
+  const location = locSelect.value;
+  const count = parseInt(countInput.value, 10);
+  
+  if (!location) {
+    alert("保管場所を選択してください。");
+    return;
+  }
+  if (isNaN(count) || count < 0) {
+    alert("正しい枚数を入力してください。");
+    return;
+  }
+  
+  const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+  const staffId = userInfo.id || '';
+  const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+  
+  if (!staffId || !staffName) {
+    alert("ID情報がありません。ID登録を行ってください。");
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = "登録中...";
+  msgEl.classList.add('hidden');
+  
+  try {
+    const res = await callApiPost('updateFlyerStock', {
+      location: location,
+      count: count,
+      staffName: staffName,
+      staffId: staffId
+    });
+    
+    if (res && res.success) {
+      msgEl.textContent = "✓ 在庫を登録しました";
+      msgEl.classList.remove('hidden');
+      countInput.value = '';
+    } else {
+      alert("登録に失敗しました: " + (res.message || "エラー"));
+    }
+  } catch (e) {
+    alert("エラーが発生しました: " + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "在庫を登録する";
+  }
+};
 
 // 下ナビの「エリア」ボタンタップ時に直前のサブページへ戻る
 function navigateToAreaTab() {
@@ -1016,6 +1165,16 @@ async function safeInitApp() {
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
   
+  // URLに死んだパラメータが残っている、かつ初期化前（または失敗時）の保険
+  const urlParams = new URLSearchParams(window.location.search);
+  if ((urlParams.has('code') || urlParams.has('liff.state')) && !sessionStorage.getItem('liff_initializing')) {
+      // 処理がスタックするのを防ぐため、パラメータを完全に削ったクリーンなURLで入り直させる
+      sessionStorage.setItem('liff_initializing', 'true'); // ループ防止用フラグ
+      window.location.href = window.location.origin + window.location.pathname;
+      return;
+  }
+  sessionStorage.removeItem('liff_initializing');
+  
   const liffId = "2010177345-tXZIMAJK";
   const btn = $('btn-login-manual');
   const spinner = $('login-spinner');
@@ -1107,6 +1266,7 @@ async function safeInitApp() {
         logDebug("Not logged in.");
         if (liff.isInClient()) {
           logDebug("In LINE client. Redirecting to LINE Login automatically...");
+          sessionStorage.setItem('liff_initializing', 'true');
           liff.login();
         } else {
           logDebug("In external browser. Showing manual login button.");
@@ -1114,6 +1274,7 @@ async function safeInitApp() {
             btn.textContent = "LINEでログイン";
             btn.onclick = () => {
               logDebug("Manual login button clicked. Redirecting...");
+              sessionStorage.setItem('liff_initializing', 'true');
               liff.login();
             };
             btn.classList.remove('hidden');
