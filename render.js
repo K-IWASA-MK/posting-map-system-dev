@@ -943,7 +943,7 @@ function renderStorageList(stocks) {
     
     const rowsHtml = list.map(s => {
       return `
-        <div class="stock-row flex flex-col pt-1 pb-4 border-b border-white/5 last:border-b-0 active:bg-white/5 transition-colors rounded-xl px-2 -mx-2 cursor-pointer gap-2"
+        <div class="stock-row flex flex-col pt-1 pb-4 border-b border-white/5 last:border-b-0 rounded-xl px-2 -mx-2 gap-2"
           data-name="${(s.staffName||'').replace(/"/g,'&quot;')}"
           data-id="${(s.staffId||'').replace(/"/g,'&quot;')}"
           data-loc="${(s.location||'').replace(/"/g,'&quot;')}"
@@ -957,7 +957,7 @@ function renderStorageList(stocks) {
           <!-- 2行目：中央揃え（枚数とLINEボタン） -->
           <div class="flex items-center justify-center w-full py-1" style="gap: 32px;">
             <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
-            <button style="background: rgba(6,199,85,0.1); border-color: rgba(6,199,85,0.3); color: #06C755; gap: 6px;" class="flex items-center justify-center px-5 py-1.5 rounded-full border transition-all active:opacity-70">
+            <button style="background: rgba(6,199,85,0.1); border-color: rgba(6,199,85,0.3); color: #06C755; gap: 6px;" class="line-contact-btn flex items-center justify-center px-5 py-1.5 rounded-full border transition-all active:opacity-70">
               <span class="text-sm">💬</span>
               <span class="text-[10px] font-black tracking-wider">LINE</span>
             </button>
@@ -984,9 +984,11 @@ function renderStorageList(stocks) {
 
   container.innerHTML = groupsHtml;
 
-  // data-* 属性経由で安全にLINE連絡（シングルクォート等を含む名前でも破損しない）
-  container.querySelectorAll('.stock-row').forEach(row => {
-    row.addEventListener('click', () => {
+  // ボタンのみにLINE連絡イベントを付与する
+  container.querySelectorAll('.line-contact-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const row = e.target.closest('.stock-row');
+      if (!row) return;
       sendLineContact(
         row.dataset.name,
         row.dataset.id,
