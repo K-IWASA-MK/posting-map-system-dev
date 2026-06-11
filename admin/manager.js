@@ -437,12 +437,36 @@ function startAdmin() {
   loadDashboardData();
 }
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('../service-worker.js')
       .then(reg => console.log('SW registered. Scope:', reg.scope))
       .catch(err => console.error('SW registration failed:', err));
   }
-  // スプラッシュをスキップして直接起動
+
+  // LIFF初期化 → 管理者IDをGASに登録 → アプリ起動
+  const LIFF_ID = '2010177345-5y5ayk0h'; // Kアプリ LIFF ID
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    if (liff.isLoggedIn()) {
+      const profile = await liff.getProfile();
+      // バックグラウンドでregisterAdmin（失敗しても起動を止めない）
+      callApiPost('registerAdmin', {
+        displayName: profile.displayName,
+        lineUserId: profile.userId
+      }).then(res => {
+        addLog(`Admin registered: ${profile.displayName} (${res && res.message === 'new' ? '新規' : '既存'})`);
+      }).catch(() => {
+        addLog('Admin registration skipped (offline)');
+      });
+    } else {
+      liff.login();
+      return; // ログイン画面へリダイレクト
+    }
+  } catch (e) {
+    console.warn('LIFF init failed, starting without LINE auth:', e);
+    addLog('LIFF init failed — started without LINE auth');
+  }
+
   startAdmin();
 });
