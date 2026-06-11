@@ -1531,7 +1531,7 @@ window.openTransferRequestDialog = function(name, id, loc, count) {
         <div style="color:white;font-size:15px;font-weight:900;letter-spacing:0.05em;">受渡要請の確認</div>
         <div style="color:rgba(255,255,255,0.4);font-size:11px;margin-top:4px;">以下の方にチラシ受渡を要請します</div>
       </div>
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:24px;">
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:24px;text-align:center;">
         <div style="color:rgba(255,255,255,0.45);font-size:10px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">保管者</div>
         <div style="color:white;font-size:17px;font-weight:900;">${name}</div>
         <div style="color:rgba(255,255,255,0.45);font-size:10px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;margin-top:12px;margin-bottom:4px;">保管枚数</div>
