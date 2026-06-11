@@ -1517,14 +1517,23 @@ window.openTransferRequestDialog = function(name, id, loc, count) {
   if (nameEl) nameEl.textContent = name;
   if (stockEl) stockEl.textContent = Number(count).toLocaleString() + '枚';
 
-  // style直接制御（Tailwindの hidden !important を確実に上書き）
+  // hidden!importantを必ずclassListで削除してからstyleで上書き
+  dialog.classList.remove('hidden');
+  dialog.classList.remove('opacity-0');
   dialog.style.display = 'flex';
   dialog.style.opacity = '0';
   const inner = dialog.firstElementChild;
-  if (inner) inner.style.transform = 'scale(0.95)';
+  if (inner) {
+    inner.classList.remove('scale-95');
+    inner.style.transform = 'scale(0.95)';
+  }
   requestAnimationFrame(() => {
+    dialog.style.transition = 'opacity 0.3s ease';
     dialog.style.opacity = '1';
-    if (inner) inner.style.transform = 'scale(1)';
+    if (inner) {
+      inner.style.transition = 'transform 0.3s ease';
+      inner.style.transform = 'scale(1)';
+    }
   });
 };
 
@@ -1534,7 +1543,10 @@ window.closeTransferRequestDialog = function() {
   dialog.style.opacity = '0';
   const inner = dialog.firstElementChild;
   if (inner) inner.style.transform = 'scale(0.95)';
-  setTimeout(() => { dialog.style.display = 'none'; }, 300);
+  setTimeout(() => {
+    dialog.style.display = 'none';
+    dialog.classList.add('hidden');
+  }, 300);
 };
 
 // ダイアログのイベントリスナー設定
