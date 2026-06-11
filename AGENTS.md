@@ -291,7 +291,56 @@ Never push (Strictly enforced for AI):
 - temporary files
 
 
-# Stability Rules
+# アプリ命名規則 (App Naming Convention)
+# 2026-06-11 岩佐CEO決定
+
+## H アプリ（はいふいん = 配布員アプリ）
+
+- **正式名称**: 配布員アプリ
+- **略称**: H アプリ（「は」いふいん の頭文字）
+- **対象ユーザー**: 現場で歩いてポスティングする配布員
+- **メインファイル**: `index.html` / `app.js` / `render.js`
+- **Git リモート**: `origin-dev`（`K-IWASA-MK/posting-map-system-dev`）
+- **LIFF**: `2010177345-tXZIMAJK`（`k-iwasa-mk.github.io/posting-map-system-dev/`）
+
+## K アプリ（かんりしゃ = 管理者アプリ）
+
+- **正式名称**: 管理者アプリ
+- **略称**: K アプリ（「か」んりしゃ の頭文字）
+- **対象ユーザー**: 配布状況を監視・操作する管理者
+- **メインファイル**: `admin/index.html` / `admin/manager.js`
+- **Git リモート**: 未定（開発完成後に設定）
+- **LIFF**: 未発行（H アプリ完成後に作成予定）
+
+## 🚨 Git リモート使い分けルール（厳守）
+
+```
+開発・変更は常に origin-dev のみ:
+git push origin-dev HEAD:main
+
+origin（area-management）は放置:
+→ 絶対に push しない
+→ H アプリの安定版バックアップとして保管
+```
+
+## クライアント展開構造（Case C 方針）
+
+将来 289 クライアントへ展開する際の構造：
+
+```
+posting-map-system/（コードは1つ・共通）
+├── app.js / render.js（共通・触らない）
+└── clients/
+    ├── MIE-02/config.js   ← LIFF ID・GAS URL・エリア名
+    ├── TOKYO-01/config.js
+    └── OSAKA-01/config.js
+```
+
+- **MIE-02** が最初の本番案件（現在開発中）
+- バグ修正は1回のプッシュで全クライアントに反映
+- 各クライアントは config.js の設定値のみ異なる
+
+
 
 Do NOT refactor working API logic unless explicitly instructed.
 
