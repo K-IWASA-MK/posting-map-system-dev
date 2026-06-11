@@ -1257,10 +1257,11 @@ async function safeInitApp() {
 
           let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
           
-          // ④ 未登録の場合のみGASへ登録（登録済みはAPIコールをスキップ）
+          // ④ 初回・再登録ともにPOSTでlineUserIdをGASに送信
           if (!userInfo.id) {
+            // 初回登録
             logDebug("API START (初回登録)");
-            const res = await callApi('registerStaff', { 
+            const res = await callApiPost('registerStaff', { 
               lastName: profile.displayName, 
               firstName: "(LINE)",
               lineUserId: profile.userId
@@ -1280,11 +1281,18 @@ async function safeInitApp() {
               throw new Error("GAS registration failed");
             }
           } else {
-            // 登録済み：LINE情報をローカルキャッシュのみ更新（API不要）
+            // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
             userInfo.lineUserId = profile.userId;
             userInfo.picture = profile.pictureUrl;
             localStorage.setItem('user_info', JSON.stringify(userInfo));
+            // D列にLINE_USER_IDが未設定の可能性があるためバックグラウンドで更新
+            callApiPost('registerStaff', {
+              lastName: userInfo.last,
+              firstName: userInfo.first || '(LINE)',
+              lineUserId: profile.userId
+            }).catch(() => {});
           }
+
 
           // ③ 800msディレイ削除
           logDebug("START APP");
