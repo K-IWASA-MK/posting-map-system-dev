@@ -1506,28 +1506,71 @@ function closeIdInfoModal() {
 let currentTransferRequest = null;
 
 window.openTransferRequestDialog = function(name, id, loc, count) {
-  alert('[DEBUG] ダイアログ起動: ' + name + ' / ' + count + '枚');
   currentTransferRequest = { holderName: name, holderUserId: id, requestArea: loc, stockCount: count };
-  const dialog = document.getElementById('transfer-request-dialog');
-  if (!dialog) {
-    alert('ダイアログ要素が見つかりません');
-    return;
-  }
-  const nameEl = document.getElementById('tr-holder-name');
-  const stockEl = document.getElementById('tr-holder-stock');
-  if (nameEl) nameEl.textContent = name;
-  if (stockEl) stockEl.textContent = Number(count).toLocaleString() + '枚';
 
-  dialog.style.setProperty('display', 'flex', 'important');
-  dialog.style.setProperty('opacity', '1', 'important');
-  dialog.style.setProperty('pointer-events', 'auto', 'important');
+  // 既存を削除して再生成（CSS競合を完全排除）
+  const prev = document.getElementById('dynamic-transfer-dialog');
+  if (prev) prev.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'dynamic-transfer-dialog';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,0.85);';
+
+  overlay.innerHTML = `
+    <div style="background:#1C1C1E;border-radius:24px;border:1px solid rgba(255,255,255,0.12);padding:32px 24px;width:100%;max-width:340px;box-sizing:border-box;">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:24px;margin-bottom:10px;">📦</div>
+        <div style="color:white;font-size:15px;font-weight:900;letter-spacing:0.05em;">受渡要請の確認</div>
+        <div style="color:rgba(255,255,255,0.4);font-size:11px;margin-top:4px;">以下の方にチラシ受渡を要請します</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:24px;">
+        <div style="color:rgba(255,255,255,0.45);font-size:10px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">保管者</div>
+        <div style="color:white;font-size:17px;font-weight:900;">${name}</div>
+        <div style="color:rgba(255,255,255,0.45);font-size:10px;font-weight:900;letter-spacing:0.1em;text-transform:uppercase;margin-top:12px;margin-bottom:4px;">保管枚数</div>
+        <div style="color:#22c55e;font-size:22px;font-weight:900;font-family:monospace;">${Number(count).toLocaleString()}枚</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button id="dyn-cancel" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border-radius:14px;padding:14px 8px;font-size:13px;font-weight:900;cursor:pointer;">キャンセル</button>
+        <button id="dyn-submit" style="flex:2;background:#2563eb;border:none;color:white;border-radius:14px;padding:14px 8px;font-size:13px;font-weight:900;cursor:pointer;">🤝 要請する</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  document.getElementById('dyn-cancel').addEventListener('click', () => overlay.remove());
+
+  document.getElementById('dyn-submit').addEventListener('click', async () => {
+    const btn = document.getElementById('dyn-submit');
+    if (btn) { btn.textContent = '送信中...'; btn.disabled = true; }
+    const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+    try {
+      const res = await callApiPost('requestFlyerTransfer', {
+        requestUserId: userInfo.id || 'UNKNOWN',
+        requestUserName: userInfo.last || '不明',
+        requestArea: currentTransferRequest.requestArea,
+        holderUserId: currentTransferRequest.holderUserId,
+        holderName: currentTransferRequest.holderName,
+        stockCount: currentTransferRequest.stockCount
+      });
+      overlay.remove();
+      if (res && res.success) {
+        alert('✅ 受渡要請を送信しました！\n保管者に通知されます。');
+      } else {
+        alert('送信に失敗しました: ' + (res ? res.message : 'Unknown error'));
+      }
+    } catch(err) {
+      alert('通信エラー: ' + err.message);
+      if (btn) { btn.textContent = '🤝 要請する'; btn.disabled = false; }
+    }
+  });
 };
 
 window.closeTransferRequestDialog = function() {
-  const dialog = document.getElementById('transfer-request-dialog');
-  if (!dialog) return;
-  dialog.style.setProperty('display', 'none', 'important');
+  const d = document.getElementById('dynamic-transfer-dialog');
+  if (d) d.remove();
 };
+
 
 // ダイアログのイベントリスナー設定
 document.addEventListener('DOMContentLoaded', () => {
