@@ -4,6 +4,20 @@
  */
 
 // =============================
+// 【手動実行用】管理者IDシート初期セットアップ
+// GASエディタで選択して「実行」ボタンを押すだけ
+// =============================
+function setupAdminSheet() {
+  // ここに管理者情報を追加してください
+  const admins = [
+    { name: 'K. IWASA', lineUserId: 'U7375015ea7c5380e2c8da827eb8d3f08' }
+  ];
+  admins.forEach(a => registerAdmin(a.name, a.lineUserId));
+  Logger.log('✅ 管理者IDシートのセットアップ完了');
+}
+
+
+// =============================
 // ⓪ 基本設定
 // =============================
 function getSS() {
