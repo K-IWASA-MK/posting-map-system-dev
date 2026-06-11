@@ -958,9 +958,8 @@ function renderStorageList(stocks) {
           <div class="flex items-center justify-center w-full py-1" style="gap: 32px;">
             <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
             <button type="button"
-              ontouchstart="this._moved=false; this.style.transform='scale(0.92)'; this.style.opacity='0.7';"
-              ontouchmove="this._moved=true;"
-              ontouchend="this.style.transform='scale(1)'; this.style.opacity='1'; if(!this._moved){ event.preventDefault(); var r=this.closest('.stock-row'); if(window.openTransferRequestDialog){window.openTransferRequestDialog(r.dataset.name,r.dataset.id,r.dataset.loc,parseFloat(r.dataset.count)||0);}else{alert('システムが準備中です。');} }"
+              ontouchstart="this.style.transform='scale(0.92)'; this.style.opacity='0.7';"
+              ontouchend="this.style.transform='scale(1)'; this.style.opacity='1'; event.preventDefault(); var r=this.closest('.stock-row'); if(window.openTransferRequestDialog){window.openTransferRequestDialog(r.dataset.name,r.dataset.id,r.dataset.loc,parseFloat(r.dataset.count)||0);}else{alert('[DEBUG]関数未定義');}"
               ontouchcancel="this.style.transform='scale(1)'; this.style.opacity='1';"
               onclick="var r=this.closest('.stock-row'); if(window.openTransferRequestDialog){window.openTransferRequestDialog(r.dataset.name,r.dataset.id,r.dataset.loc,parseFloat(r.dataset.count)||0);}"
               style="background: rgba(6,199,85,0.1); border-color: rgba(6,199,85,0.3); color: #06C755; gap: 6px; transition: transform 0.15s ease, opacity 0.15s ease; touch-action: manipulation;"

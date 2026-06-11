@@ -1506,10 +1506,11 @@ function closeIdInfoModal() {
 let currentTransferRequest = null;
 
 window.openTransferRequestDialog = function(name, id, loc, count) {
+  alert('[DEBUG] ダイアログ起動: ' + name + ' / ' + count + '枚');
   currentTransferRequest = { holderName: name, holderUserId: id, requestArea: loc, stockCount: count };
   const dialog = document.getElementById('transfer-request-dialog');
   if (!dialog) {
-    alert('ダイアログが見つかりません (transfer-request-dialog)');
+    alert('ダイアログ要素が見つかりません');
     return;
   }
   const nameEl = document.getElementById('tr-holder-name');
@@ -1517,7 +1518,6 @@ window.openTransferRequestDialog = function(name, id, loc, count) {
   if (nameEl) nameEl.textContent = name;
   if (stockEl) stockEl.textContent = Number(count).toLocaleString() + '枚';
 
-  // setProperty('important')でTailwindの!importantを確実に上書き
   dialog.style.setProperty('display', 'flex', 'important');
   dialog.style.setProperty('opacity', '1', 'important');
   dialog.style.setProperty('pointer-events', 'auto', 'important');
