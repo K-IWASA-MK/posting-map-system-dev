@@ -1,4 +1,4 @@
-const CACHE_NAME = 'posting-map-cache-v442';
+const CACHE_NAME = 'posting-map-cache-v443';
 const ASSETS = [
   './',
   './index.html',
@@ -7,7 +7,7 @@ const ASSETS = [
   './tailwind-utils.css',
   './db.js',
   './app.js',
-  './app.js?v=442',
+  './app.js?v=443',
   './render.js',
   './manifest.json',
   './stock.html',
