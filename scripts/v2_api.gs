@@ -962,22 +962,12 @@ function registerAdmin(displayName, lineUserId) {
           if (existing[i][0] !== displayName) {
             s.getRange(i + 2, 1).setValue(displayName);
           }
-          try {
-            linkRichMenuToUser(lineUserId);
-          } catch(e) {
-            Logger.log('Failed to link rich menu (existing): ' + e.toString());
-          }
           return { success: true, message: 'existing' };
         }
       }
     }
     // 新規追加
     s.appendRow([displayName, lineUserId, now]);
-    try {
-      linkRichMenuToUser(lineUserId);
-    } catch(e) {
-      Logger.log('Failed to link rich menu: ' + e.toString());
-    }
     return { success: true, message: 'new' };
   } finally {
     lock.releaseLock();
@@ -1015,35 +1005,7 @@ function sendLinePushMessage(toUserId, requesterName, holderName, areaName, stoc
   Logger.log('LINE Push → status:' + response.getResponseCode() + ' body:' + response.getContentText());
 }
 
-// 特定のユーザーに管理者リッチメニューを紐づける (ポスティングADMIN PANELトークンを使用)
-function linkRichMenuToUser(lineUserId) {
-  const props = PropertiesService.getScriptProperties();
-  const token = props.getProperty("LINE_CHANNEL_ACCESS_TOKEN_ADMIN") || props.getProperty("LINE_CHANNEL_ACCESS_TOKEN");
-  const richMenuId = props.getProperty("LINE_RICH_MENU_ADMIN"); // スクリプトプロパティから取得
-  
-  if (!token || !richMenuId) {
-    Logger.log('linkRichMenuToUser: token or richMenuId is missing');
-    return false;
-  }
 
-  const url = `https://api.line.me/v2/bot/user/${lineUserId}/richmenu/${richMenuId}`;
-  const options = {
-    method: "post",
-    headers: {
-      "Authorization": "Bearer " + token
-    },
-    muteHttpExceptions: true
-  };
-
-  try {
-    const response = UrlFetchApp.fetch(url, options);
-    Logger.log(`linkRichMenuToUser: status=${response.getResponseCode()}, body=${response.getContentText()}`);
-    return response.getResponseCode() === 200;
-  } catch (e) {
-    Logger.log(`linkRichMenuToUser error: ${e.toString()}`);
-    return false;
-  }
-}
 
 // 受渡要請履歴の取得 API
 function getTransferRequests() {
