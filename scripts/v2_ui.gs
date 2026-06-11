@@ -52,9 +52,73 @@ function onOpen() {
     .addSeparator()
     .addItem("🎨 全シートを「プロ仕様」に一斉整形", "formatAllSheets")
     .addItem("🔧 名簿シートを初期化・復旧する", "setupRosterSheet")
+    .addItem("📦 受渡要請・保管庫シートの準備", "setupTransferSheets")
+    .addItem("💬 LINEプッシュ通知の設定 (トークン登録)", "setLineTokenFromUI")
     .addSeparator()
     .addItem("📁 ドライブフォルダを自動セットアップ", "setupGoogleDriveFolders")
     .addToUi();
+}
+
+/**
+ * LINEチャネルアクセストークンをスプレッドシート上から安全に設定する
+ */
+function setLineTokenFromUI() {
+  const ui = SpreadsheetApp.getUi();
+  const response = ui.prompt(
+    "LINE Messaging API トークン設定",
+    "LINE Developersで取得した「チャネルアクセストークン（長期）」を貼り付けてください。\n\n※すでに設定済みの場合は上書きされます。\n※空欄のままOKを押すと設定が削除されます。",
+    ui.ButtonSet.OK_CANCEL
+  );
+
+  if (response.getSelectedButton() == ui.Button.OK) {
+    const token = response.getResponseText().trim();
+    if (token === "") {
+      PropertiesService.getScriptProperties().deleteProperty("LINE_CHANNEL_ACCESS_TOKEN");
+      ui.alert("LINEトークンを削除しました。");
+    } else {
+      PropertiesService.getScriptProperties().setProperty("LINE_CHANNEL_ACCESS_TOKEN", token);
+      ui.alert("LINEトークンを保存しました！\nこれで受渡要請のプッシュ通知が有効になります。");
+    }
+  }
+}
+
+/**
+ * 受渡要請履歴シートとチラシ保管庫シートを初期化・準備する
+ */
+function setupTransferSheets() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let msg = "";
+
+  // 1. チラシ保管庫
+  let storageSheetName = "チラシ保管庫";
+  if (typeof CONFIG !== 'undefined' && CONFIG.SHEET_STORAGE) {
+    storageSheetName = CONFIG.SHEET_STORAGE;
+  }
+  let storageSheet = ss.getSheetByName(storageSheetName);
+  if (!storageSheet) {
+    storageSheet = ss.insertSheet(storageSheetName);
+    storageSheet.getRange(1, 1, 1, 6).setValues([["ID", "スタッフID", "スタッフ名", "保管場所", "保管枚数", "更新日時"]]);
+    storageSheet.getRange("A1:F1").setBackground("#1a237e").setFontColor("#ffffff").setFontWeight("bold");
+    storageSheet.setFrozenRows(1);
+    msg += `「${storageSheetName}」を作成しました。\n`;
+  } else {
+    msg += `「${storageSheetName}」は既に存在します。\n`;
+  }
+
+  // 2. 受渡要請履歴
+  let transferSheetName = "受渡要請履歴";
+  let transferSheet = ss.getSheetByName(transferSheetName);
+  if (!transferSheet) {
+    transferSheet = ss.insertSheet(transferSheetName);
+    transferSheet.getRange(1, 1, 1, 8).setValues([["日時", "要請者", "要請者ID", "保管者", "保管者ID", "地区", "在庫枚数", "状態"]]);
+    transferSheet.getRange("A1:H1").setBackground("#1a237e").setFontColor("#ffffff").setFontWeight("bold");
+    transferSheet.setFrozenRows(1);
+    msg += `「${transferSheetName}」を作成しました。\n`;
+  } else {
+    msg += `「${transferSheetName}」は既に存在します。\n`;
+  }
+
+  SpreadsheetApp.getUi().alert("シート準備完了", msg, SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
 /**

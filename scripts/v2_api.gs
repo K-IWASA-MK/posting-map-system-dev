@@ -192,6 +192,9 @@ function doPost(e) {
       case 'registerStaff':
         response = registerStaff(postData.lastName, postData.firstName, postData.lineUserId);
         break;
+      case 'registerAdmin':
+        response = registerAdmin(postData.displayName, postData.lineUserId);
+        break;
       case 'requestFlyerTransfer':
         response = handleRequestFlyerTransfer(postData);
         break;
@@ -888,24 +891,19 @@ function handleRequestFlyerTransfer(data) {
       "申請中"
     ]);
 
-    // Push通知処理：名簿シートから保管者のLINE_USER_ID（D列）を取得する
-    let targetLineUserId = null;
-    const rosterSheet = ss.getSheetByName(CONFIG.SHEET_ROSTER);
-    if (rosterSheet) {
-      const lastRow = rosterSheet.getLastRow();
-      if (lastRow >= 1) {
-        const values = rosterSheet.getRange(1, 1, lastRow, 4).getValues();
-        for (let i = 1; i < values.length; i++) {
-          if (values[i][0] === data.holderUserId) {
-            targetLineUserId = values[i][3]; // D列
-            break;
+    // Push通知処理：管理者IDシートの全管理者に通知
+    const adminSheet = ss.getSheetByName(CONFIG.SHEET_ADMIN);
+    if (adminSheet) {
+      const adminLastRow = adminSheet.getLastRow();
+      if (adminLastRow >= 2) {
+        const adminValues = adminSheet.getRange(2, 1, adminLastRow - 1, 2).getValues();
+        for (let i = 0; i < adminValues.length; i++) {
+          const adminLineId = String(adminValues[i][1] || '').trim();
+          if (adminLineId) {
+            sendLinePushMessage(adminLineId, data.requestUserName, data.holderName, data.requestArea, data.stockCount);
           }
         }
       }
-    }
-
-    if (targetLineUserId) {
-      sendLinePushMessage(targetLineUserId, data.requestUserName, data.requestArea, data.stockCount);
     }
 
     return { success: true };
@@ -916,12 +914,52 @@ function handleRequestFlyerTransfer(data) {
   }
 }
 
-function sendLinePushMessage(toUserId, requesterName, areaName, stockCount) {
+// =============================
+// ④ 管理者登録 (Admin Registration)
+// =============================
+
+function registerAdmin(displayName, lineUserId) {
+  if (!lineUserId) return { success: false, message: 'LINE User ID required' };
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(10000); } catch(e) { return { success: false, message: 'Lock timeout' }; }
+  try {
+    const ss = getSS();
+    let s = ss.getSheetByName(CONFIG.SHEET_ADMIN);
+    if (!s) {
+      s = ss.insertSheet(CONFIG.SHEET_ADMIN);
+      s.getRange(1, 1, 1, 3).setValues([['管理者名', 'LINE_USER_ID', '登録日時']]);
+      // ヘッダー行のスタイル設定
+      s.getRange(1, 1, 1, 3).setBackground('#1a237e').setFontColor('#ffffff').setFontWeight('bold');
+    }
+    const now = Utilities.formatDate(new Date(), 'JST', 'yyyy/MM/dd HH:mm:ss');
+    const lastRow = s.getLastRow();
+    // 既存チェック（LINE_USER_IDで重複防止）
+    if (lastRow >= 2) {
+      const existing = s.getRange(2, 1, lastRow - 1, 2).getValues();
+      for (let i = 0; i < existing.length; i++) {
+        if (String(existing[i][1]).trim() === lineUserId) {
+          // 名前が変わっていたら更新
+          if (existing[i][0] !== displayName) {
+            s.getRange(i + 2, 1).setValue(displayName);
+          }
+          return { success: true, message: 'existing' };
+        }
+      }
+    }
+    // 新規追加
+    s.appendRow([displayName, lineUserId, now]);
+    return { success: true, message: 'new' };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function sendLinePushMessage(toUserId, requesterName, holderName, areaName, stockCount) {
   const props = PropertiesService.getScriptProperties();
   const token = props.getProperty("LINE_CHANNEL_ACCESS_TOKEN");
   if (!token) return; // トークン未設定の場合はスキップ
 
-  const text = `【ポスティング戦略センター】\n\nチラシ受渡要請が届きました。\n\n要請者：\n${requesterName}\n\n地区：\n${areaName}\n\n現在在庫：\n${Number(stockCount).toLocaleString()}枚\n\nアプリを開いて確認してください。`;
+  const text = `【ポスティング戦略センター】\n\nチラシ受渡要請が届きました。\n\n要請者：\n${requesterName}\n\n保管者：\n${holderName}\n\n地区：\n${areaName}\n\n在庫枚数：\n${Number(stockCount).toLocaleString()}枚\n\nKアプリで対応してください。`;
 
   const url = "https://api.line.me/v2/bot/message/push";
   const payload = {
@@ -942,5 +980,6 @@ function sendLinePushMessage(toUserId, requesterName, areaName, stockCount) {
     muteHttpExceptions: true
   };
 
-  UrlFetchApp.fetch(url, options);
+  const response = UrlFetchApp.fetch(url, options);
+  Logger.log('LINE Push → status:' + response.getResponseCode() + ' body:' + response.getContentText());
 }
