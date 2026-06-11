@@ -1509,7 +1509,7 @@ window.openTransferRequestDialog = function(name, id, loc, count) {
   currentTransferRequest = { holderName: name, holderUserId: id, requestArea: loc, stockCount: count };
   const dialog = document.getElementById('transfer-request-dialog');
   if (!dialog) {
-    alert('受渡要請ダイアログが見つかりません。ページを再読み込みしてください。');
+    alert('ダイアログが見つかりません (transfer-request-dialog)');
     return;
   }
   const nameEl = document.getElementById('tr-holder-name');
@@ -1517,36 +1517,16 @@ window.openTransferRequestDialog = function(name, id, loc, count) {
   if (nameEl) nameEl.textContent = name;
   if (stockEl) stockEl.textContent = Number(count).toLocaleString() + '枚';
 
-  // hidden!importantを必ずclassListで削除してからstyleで上書き
-  dialog.classList.remove('hidden');
-  dialog.classList.remove('opacity-0');
-  dialog.style.display = 'flex';
-  dialog.style.opacity = '0';
-  const inner = dialog.firstElementChild;
-  if (inner) {
-    inner.classList.remove('scale-95');
-    inner.style.transform = 'scale(0.95)';
-  }
-  requestAnimationFrame(() => {
-    dialog.style.transition = 'opacity 0.3s ease';
-    dialog.style.opacity = '1';
-    if (inner) {
-      inner.style.transition = 'transform 0.3s ease';
-      inner.style.transform = 'scale(1)';
-    }
-  });
+  // setProperty('important')でTailwindの!importantを確実に上書き
+  dialog.style.setProperty('display', 'flex', 'important');
+  dialog.style.setProperty('opacity', '1', 'important');
+  dialog.style.setProperty('pointer-events', 'auto', 'important');
 };
 
 window.closeTransferRequestDialog = function() {
   const dialog = document.getElementById('transfer-request-dialog');
   if (!dialog) return;
-  dialog.style.opacity = '0';
-  const inner = dialog.firstElementChild;
-  if (inner) inner.style.transform = 'scale(0.95)';
-  setTimeout(() => {
-    dialog.style.display = 'none';
-    dialog.classList.add('hidden');
-  }, 300);
+  dialog.style.setProperty('display', 'none', 'important');
 };
 
 // ダイアログのイベントリスナー設定
