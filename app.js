@@ -16,6 +16,8 @@ window.onunhandledrejection = function(event) {
 let allPoints = [], areaSummary = [], roster = [], rankingData = [];
 let _appDataPromise = null; // ⑤ getAppData並列プリフェッチ用
 let _rankingFetched = false;  // ランキング遅延取得済みフラグ
+let _stockFetched = false;    // 在庫一覧取得済みフラグ
+let _stockData = [];          // 在庫一覧キャッシュデータ
 let currentCity = null;
 let lastAreaSubPage = 'areas'; // 直前のエリアサブページ ('areas' または 'detail') を記憶
 let scrollPositions = { areas: 0, detail: 0, settings: 0, ranking: 0 };
@@ -892,19 +894,28 @@ async function switchPage(id, force = false) {
 
   if (id === 'storage-list') {
     const listContainer = $('storage-list-container');
-    if (listContainer) {
-      listContainer.innerHTML = `
-        <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
-          <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
-          <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Loading Inventory...</p>
-        </div>`;
+    
+    // 1. キャッシュがあれば即時描画（ローディング表示なしで即時表示）
+    if (_stockFetched && _stockData && _stockData.length > 0) {
+      if (typeof renderStorageList === 'function') renderStorageList(_stockData);
+    } else {
+      if (listContainer) {
+        listContainer.innerHTML = `
+          <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+            <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
+            <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Loading Inventory...</p>
+          </div>`;
+      }
     }
+    
+    // 2. バックグラウンドで最新データを取得し、サイレント更新
     callApi('getFlyerStock').then(data => {
       if (data && data.success) {
         _stockData = data.stocks || [];
+        _stockFetched = true;
         if (typeof renderStorageList === 'function') renderStorageList(_stockData);
       } else {
-        if (listContainer) {
+        if (!_stockFetched && listContainer) {
           listContainer.innerHTML = `
             <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
               <span class="text-2xl">⚠️</span>
@@ -913,7 +924,7 @@ async function switchPage(id, force = false) {
         }
       }
     }).catch(err => {
-      if (listContainer) {
+      if (!_stockFetched && listContainer) {
         listContainer.innerHTML = `
           <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
             <span class="text-2xl">⚠️</span>
@@ -1072,6 +1083,7 @@ window.submitFlyerStock = async function() {
       msgEl.textContent = "✓ 在庫を登録しました";
       msgEl.classList.remove('hidden');
       countInput.value = '';
+      _stockFetched = false; // キャッシュを無効化し、次回遷移時に最新の在庫を取得させる
     } else {
       alert("登録に失敗しました: " + (res.message || "エラー"));
     }
