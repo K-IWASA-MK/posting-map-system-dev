@@ -1508,23 +1508,33 @@ let currentTransferRequest = null;
 window.openTransferRequestDialog = function(name, id, loc, count) {
   currentTransferRequest = { holderName: name, holderUserId: id, requestArea: loc, stockCount: count };
   const dialog = document.getElementById('transfer-request-dialog');
-  if (!dialog) return;
-  document.getElementById('tr-holder-name').textContent = name;
-  document.getElementById('tr-holder-stock').textContent = count.toLocaleString() + '枚';
-  
-  dialog.classList.remove('hidden');
+  if (!dialog) {
+    alert('受渡要請ダイアログが見つかりません。ページを再読み込みしてください。');
+    return;
+  }
+  const nameEl = document.getElementById('tr-holder-name');
+  const stockEl = document.getElementById('tr-holder-stock');
+  if (nameEl) nameEl.textContent = name;
+  if (stockEl) stockEl.textContent = Number(count).toLocaleString() + '枚';
+
+  // style直接制御（Tailwindの hidden !important を確実に上書き）
+  dialog.style.display = 'flex';
+  dialog.style.opacity = '0';
+  const inner = dialog.firstElementChild;
+  if (inner) inner.style.transform = 'scale(0.95)';
   requestAnimationFrame(() => {
-    dialog.classList.remove('opacity-0');
-    dialog.firstElementChild.classList.remove('scale-95');
+    dialog.style.opacity = '1';
+    if (inner) inner.style.transform = 'scale(1)';
   });
 };
 
 window.closeTransferRequestDialog = function() {
   const dialog = document.getElementById('transfer-request-dialog');
   if (!dialog) return;
-  dialog.classList.add('opacity-0');
-  dialog.firstElementChild.classList.add('scale-95');
-  setTimeout(() => dialog.classList.add('hidden'), 300);
+  dialog.style.opacity = '0';
+  const inner = dialog.firstElementChild;
+  if (inner) inner.style.transform = 'scale(0.95)';
+  setTimeout(() => { dialog.style.display = 'none'; }, 300);
 };
 
 // ダイアログのイベントリスナー設定
