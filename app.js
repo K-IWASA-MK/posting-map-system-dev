@@ -1213,7 +1213,12 @@ async function safeInitApp() {
   }
   // ※ フラグはここでは削除しない。ログイン確認成功後（isLoggedIn()=true）に削除する。
   
-  const liffId = "2010177345-tXZIMAJK";
+  // デプロイ先（ホスト名）に応じてLIFF IDを自動切り替え
+  // area-management.github.io → モニター用LIFF（h9Fjv1iU）
+  // k-iwasa-mk.github.io → スマホ用LIFF（tXZIMAJK）
+  const liffId = window.location.hostname === 'area-management.github.io'
+    ? "2010177345-h9Fjv1iU"
+    : "2010177345-tXZIMAJK";
   const btn = $('btn-login-manual');
   const spinner = $('login-spinner');
   const subtitle = $('gateway-subtitle');
