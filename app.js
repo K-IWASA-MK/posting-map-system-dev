@@ -279,15 +279,15 @@ async function syncOfflineQueue() {
 
 async function loadData(skipSync = false) {
   logDebug("[loadData] START");
-  if (!skipSync && navigator.onLine) {
-    logDebug("[loadData] Syncing offline queue...");
-    await syncOfflineQueue();
-  } else if (!navigator.onLine) {
-    logDebug("[loadData] Offline. Setting status...");
-    setSyncStatus('offline');
-  }
 
   try {
+    if (!skipSync && navigator.onLine) {
+      logDebug("[loadData] Syncing offline queue...");
+      await syncOfflineQueue();
+    } else if (!navigator.onLine) {
+      logDebug("[loadData] Offline. Setting status...");
+      setSyncStatus('offline');
+    }
     logDebug("[loadData] Fetching getAppData...");
     setLoadingProgress(82, 'SYNCING DATA...');
     const data = await (_appDataPromise || callApi('getAppData')); // ⑤ プリフェッチがあれば再利用
@@ -327,6 +327,11 @@ async function loadData(skipSync = false) {
     console.error("Startup Error:", err);
     logDebug(`[loadData] ERROR: ${err.message}`);
     $('loading').classList.add('hidden');
+    // 🔍 診断: エラー内容を画面に表示して実機でも原因がわかるようにする
+    const titleEl = $('gateway-title');
+    const subtitleEl = $('gateway-subtitle');
+    if (titleEl) titleEl.textContent = '起動エラー';
+    if (subtitleEl) subtitleEl.textContent = String(err.message || err).slice(0, 120);
     $('screen-gateway').classList.remove('hidden');
   }
 }
