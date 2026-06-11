@@ -1,4 +1,4 @@
-const CACHE_NAME = 'posting-map-cache-v458';
+const CACHE_NAME = 'posting-map-cache-v460';
 const ASSETS = [
   './',
   './index.html',
@@ -11,7 +11,9 @@ const ASSETS = [
   './render.js?v=458',
   './manifest.json',
   './stock.html',
-  // 外部CDN URLはCORSポリシーによりキャッシュ失敗の原因になるため除外
+  './admin/index.html',
+  './admin/manager.js?v=460',
+  './shared/api.js?v=460',
   './assets/icon180-v2.png?v=257',
   './assets/icon-admin-panel-180.png?v=243'
 ];

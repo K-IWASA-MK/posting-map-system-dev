@@ -133,6 +133,9 @@ function doGet(e) {
       case 'getFlyerStock':
         response = { success: true, stocks: getFlyerStock() };
         break;
+      case 'getTransferRequests':
+        response = { success: true, requests: getTransferRequests() };
+        break;
       default:
         response = { success: true, message: 'POSTING MAP API is online.' };
     }
@@ -211,6 +214,9 @@ function doPost(e) {
         break;
       case 'requestFlyerTransfer':
         response = handleRequestFlyerTransfer(postData);
+        break;
+      case 'resolveTransferRequest':
+        response = resolveTransferRequest(postData);
         break;
       case 'resetRoster':
         const rosterMsg = setupRosterSheet();
@@ -956,12 +962,22 @@ function registerAdmin(displayName, lineUserId) {
           if (existing[i][0] !== displayName) {
             s.getRange(i + 2, 1).setValue(displayName);
           }
+          try {
+            linkRichMenuToUser(lineUserId);
+          } catch(e) {
+            Logger.log('Failed to link rich menu (existing): ' + e.toString());
+          }
           return { success: true, message: 'existing' };
         }
       }
     }
     // 新規追加
     s.appendRow([displayName, lineUserId, now]);
+    try {
+      linkRichMenuToUser(lineUserId);
+    } catch(e) {
+      Logger.log('Failed to link rich menu: ' + e.toString());
+    }
     return { success: true, message: 'new' };
   } finally {
     lock.releaseLock();
@@ -970,10 +986,11 @@ function registerAdmin(displayName, lineUserId) {
 
 function sendLinePushMessage(toUserId, requesterName, holderName, areaName, stockCount) {
   const props = PropertiesService.getScriptProperties();
-  const token = props.getProperty("LINE_CHANNEL_ACCESS_TOKEN");
+  // 管理者用アクセストークンを優先、なければ一般用トークンにフォールバック
+  const token = props.getProperty("LINE_CHANNEL_ACCESS_TOKEN_ADMIN") || props.getProperty("LINE_CHANNEL_ACCESS_TOKEN");
   if (!token) return; // トークン未設定の場合はスキップ
 
-  const text = `【ポスティング戦略センター】\n\nチラシ受渡要請が届きました。\n\n要請者：\n${requesterName}\n\n保管者：\n${holderName}\n\n地区：\n${areaName}\n\n在庫枚数：\n${Number(stockCount).toLocaleString()}枚\n\nKアプリで対応してください。`;
+  const text = `【受渡要請通知】\n\n配布員からチラシの受渡要請がありました。\n\n要請者：\n${requesterName}\n\n保管者：\n${holderName}\n\n地区：\n${areaName}\n\n希望枚数：\n${Number(stockCount).toLocaleString()}枚\n\nポスティングADMIN PANELで確認し、保管者への連絡・調整を行ってください。`;
 
   const url = "https://api.line.me/v2/bot/message/push";
   const payload = {
@@ -996,4 +1013,81 @@ function sendLinePushMessage(toUserId, requesterName, holderName, areaName, stoc
 
   const response = UrlFetchApp.fetch(url, options);
   Logger.log('LINE Push → status:' + response.getResponseCode() + ' body:' + response.getContentText());
+}
+
+// 特定のユーザーに管理者リッチメニューを紐づける (ポスティングADMIN PANELトークンを使用)
+function linkRichMenuToUser(lineUserId) {
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty("LINE_CHANNEL_ACCESS_TOKEN_ADMIN") || props.getProperty("LINE_CHANNEL_ACCESS_TOKEN");
+  const richMenuId = props.getProperty("LINE_RICH_MENU_ADMIN"); // スクリプトプロパティから取得
+  
+  if (!token || !richMenuId) {
+    Logger.log('linkRichMenuToUser: token or richMenuId is missing');
+    return false;
+  }
+
+  const url = `https://api.line.me/v2/bot/user/${lineUserId}/richmenu/${richMenuId}`;
+  const options = {
+    method: "post",
+    headers: {
+      "Authorization": "Bearer " + token
+    },
+    muteHttpExceptions: true
+  };
+
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    Logger.log(`linkRichMenuToUser: status=${response.getResponseCode()}, body=${response.getContentText()}`);
+    return response.getResponseCode() === 200;
+  } catch (e) {
+    Logger.log(`linkRichMenuToUser error: ${e.toString()}`);
+    return false;
+  }
+}
+
+// 受渡要請履歴の取得 API
+function getTransferRequests() {
+  const ss = getSS();
+  const sheetName = "受渡要請履歴";
+  const s = ss.getSheetByName(sheetName);
+  if (!s) return [];
+  const lastRow = s.getLastRow();
+  if (lastRow < 2) return [];
+  const values = s.getRange(2, 1, lastRow - 1, 8).getValues();
+  return values.map((r, i) => ({
+    rowNumber: i + 2, // 行番号（更新用）
+    requestTime: (r[0] && typeof r[0].getMonth === 'function') ? Utilities.formatDate(r[0], "JST", "yyyy/MM/dd HH:mm:ss") : String(r[0] || ''),
+    requesterName: r[1],
+    requesterId: r[2],
+    holderName: r[3],
+    holderId: r[4],
+    areaName: r[5],
+    count: parseFloat(r[6]) || 0,
+    status: r[7] || "申請中"
+  }));
+}
+
+// 受渡要請のステータス更新 API
+function resolveTransferRequest(data) {
+  const rowNumber = parseInt(data.rowNumber);
+  const status = data.status || "完了";
+  if (!rowNumber || rowNumber < 2) return { success: false, message: "Invalid row number" };
+  
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(10000); } catch(e) { return { success: false, message: "Lock timeout" }; }
+  
+  try {
+    const ss = getSS();
+    const sheetName = "受渡要請履歴";
+    const s = ss.getSheetByName(sheetName);
+    if (!s) return { success: false, message: "Sheet not found" };
+    
+    // ステータス（H列 = 8列目）を更新
+    s.getRange(rowNumber, 8).setValue(status);
+    return { success: true };
+  } catch(e) {
+    return { success: false, message: e.toString() };
+  } finally {
+    lock.releaseLock();
+  }
 }

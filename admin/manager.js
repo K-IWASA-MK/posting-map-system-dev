@@ -171,15 +171,18 @@ function setApiStatus(state) {
 }
 
 // ── ダッシュボードデータ読み込み ─────────────────────────────────
+// ── ダッシュボードデータ読み込み ─────────────────────────────────
 async function loadDashboardData() {
   setApiStatus('connecting');
 
   try {
-    // 3つのAPIを並行取得（全て個別にエラー保護）
-    const [appData, rosterData, syncData] = await Promise.all([
+    // 5つのAPIを並行取得（全て個別にエラー保護）
+    const [appData, rosterData, syncData, stockData, requestData] = await Promise.all([
       callApi('getAppData').catch(() => null),
       callApi('getRoster').catch(() => null),
-      callApi('getDeliveryStats').catch(() => null)
+      callApi('getDeliveryStats').catch(() => null),
+      callApi('getFlyerStock').catch(() => null),
+      callApi('getTransferRequests').catch(() => null)
     ]);
 
     let coverageText = '0%';
@@ -227,6 +230,22 @@ async function loadDashboardData() {
       addLog(`Sync stats: completed=${syncData.totalCompleted}, gps=${syncData.withGPS}, photo=${syncData.withPhoto}`);
     } else {
       addLog('Warning: getDeliveryStats failed or returned no data.');
+    }
+
+    // ── チラシ保管状況 ──
+    if (stockData && stockData.success) {
+      renderFlyerStock(stockData.stocks || []);
+      addLog('Flyer inventory loaded.');
+    } else {
+      addLog('Warning: getFlyerStock failed.');
+    }
+
+    // ── 受渡要請 ──
+    if (requestData && requestData.success) {
+      renderTransferRequests(requestData.requests || []);
+      addLog('Transfer requests loaded.');
+    } else {
+      addLog('Warning: getTransferRequests failed.');
     }
 
     saveDashboardCache({ coverage: coverageText, staffCount, syncData: syncData?.success ? syncData : null });
@@ -473,4 +492,158 @@ window.addEventListener('load', () => {
   // LIFF SDKが非同期ロードのため少し遅らせて実行
   setTimeout(tryRegisterAdmin, 1500);
 });
+
+// 保管状況一覧（FLYER STOCK INVENTORY）の描画
+function renderFlyerStock(stocks) {
+  const container = $('manager-storage-list-container');
+  if (!container) return;
+
+  if (!stocks || stocks.length === 0) {
+    container.innerHTML = `
+      <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+        <span class="text-2xl">📦</span>
+        <p class="text-sm font-black text-white/60">現在、保管されているチラシはありません</p>
+      </div>`;
+    return;
+  }
+
+  // テストデータ除外
+  stocks = stocks.filter(s => {
+    const name = s.staffName || '';
+    const id = s.staffId || '';
+    return !name.includes('テスト') && !id.toUpperCase().includes('TEST');
+  });
+
+  // 保管場所ごとにグループ化
+  const groups = {};
+  stocks.forEach(s => {
+    const loc = s.location || 'その他';
+    if (!groups[loc]) groups[loc] = [];
+    groups[loc].push(s);
+  });
+
+  const sortedLocations = Object.keys(groups).sort();
+
+  const groupsHtml = sortedLocations.map(loc => {
+    const list = groups[loc];
+    const staffCount = list.length;
+
+    const rowsHtml = list.map(s => `
+      <div class="flex justify-between items-center py-4 border-b border-white/5 last:border-b-0 px-2 -mx-2">
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-black text-white">${(s.staffName||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+          <div class="text-[9px] text-white/40 font-mono mt-0.5">${(s.staffId||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')} · ${(s.updatedAt||'---').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <span class="text-base font-black text-[#22c55e] font-mono">${(s.count || 0).toLocaleString()}枚</span>
+        </div>
+      </div>`).join('');
+
+    return `
+      <div class="premium-glass p-6 space-y-1">
+        <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-2">
+          <span class="text-xs font-black text-white tracking-wider">${loc}</span>
+          <span style="background: rgba(37,99,235,0.1); color: #2563eb;" class="text-[10px] font-black px-2 py-0.5 rounded-full font-mono">${staffCount}名保管</span>
+        </div>
+        <div>${rowsHtml}</div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = groupsHtml;
+}
+
+// 受渡要請一覧の描画
+function renderTransferRequests(requests) {
+  const container = $('manager-transfer-list-container');
+  if (!container) return;
+
+  // 申請中の要請のみ表示
+  const activeRequests = requests.filter(r => r.status === '申請中');
+
+  if (activeRequests.length === 0) {
+    container.innerHTML = `
+      <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+        <p class="text-sm font-black text-white/40">現在、処理待ちの要請はありません</p>
+      </div>`;
+    return;
+  }
+
+  const itemsHtml = activeRequests.map(r => {
+    return `
+      <div class="premium-glass p-6 space-y-4" data-row="${r.rowNumber}">
+        <div class="flex justify-between items-start border-b border-white/10 pb-3">
+          <div>
+            <div class="text-[10px] font-black text-white/40 font-mono">${r.requestTime}</div>
+            <div class="text-sm font-black text-white mt-1">
+              要請者: ${r.requesterName}
+            </div>
+          </div>
+          <span style="background: rgba(245,158,11,0.1); color: #f59e0b;" class="text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            ${r.status}
+          </span>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between">
+            <span class="text-white/60">希望地区:</span>
+            <span class="font-black text-white">${r.areaName}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-white/60">希望枚数:</span>
+            <span class="font-black text-[#22c55e] font-mono">${(r.count).toLocaleString()}枚</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-white/60">保管者 (希望):</span>
+            <span class="font-black text-white">${r.holderName || '-'}</span>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button onclick="contactHolder('${r.holderName}', '${r.holderId}', '${r.requesterName}', '${r.areaName}', ${r.count})" 
+            style="background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3); color: #2563eb;" 
+            class="flex-1 py-3 text-xs font-black rounded-xl border active:scale-[0.97] transition-all flex items-center justify-center gap-1.5">
+            💬 保管者に連絡
+          </button>
+          <button onclick="resolveRequest(${r.rowNumber})" 
+            style="background: #2563eb;" 
+            class="flex-1 py-3 text-xs font-black text-white rounded-xl active:scale-[0.97] transition-all flex items-center justify-center gap-1.5">
+            ✅ 完了にする
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = itemsHtml;
+}
+
+// 保管者にLINE連絡する共有リンクを起動する
+window.contactHolder = function(holderName, holderId, requesterName, areaName, count) {
+  if (!holderName || holderName === '-') {
+    alert('保管者が指定されていません。保管状況一覧から余剰在庫を持つ方をご確認ください。');
+    return;
+  }
+  const text = `【チラシ受渡依頼】\n${holderName}さん、配布員の${requesterName}さんが、${holderName}さんの保管するチラシ${Number(count).toLocaleString()}枚（${areaName}）の受渡を希望しています。\nお手数ですが、${requesterName}さんへ直接ご連絡の上、受け渡しをお願いいたします。\n■ 連絡先 (${requesterName}さん): LINEトーク等で直接ご連絡ください。`;
+  const lineUrl = `https://line.me/R/share?text=${encodeURIComponent(text)}`;
+  window.open(lineUrl, '_blank');
+};
+
+// 要請を完了にする
+window.resolveRequest = async function(rowNumber) {
+  if (!confirm('この要請を完了にしますか？')) return;
+  try {
+    const res = await callApiPost('resolveTransferRequest', {
+      rowNumber: rowNumber,
+      status: '完了'
+    });
+    if (res && res.success) {
+      addLog(`Request row ${rowNumber} resolved to completed.`);
+      loadDashboardData(); // リロードして最新化
+    } else {
+      alert('完了処理に失敗しました: ' + (res ? res.message : 'Unknown error'));
+    }
+  } catch(e) {
+    alert('通信エラー: ' + e.message);
+  }
+};
 

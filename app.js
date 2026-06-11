@@ -1575,7 +1575,7 @@ window.openTransferRequestDialog = function(name, id, loc, count) {
       });
       overlay.remove();
       if (res && res.success) {
-        alert('✅ 受渡要請を送信しました！\n保管者に通知されます。');
+        alert('✅ 受渡要請を送信しました！\n管理者が確認の上、調整連絡を行います。');
       } else {
         alert('送信に失敗しました: ' + (res ? res.message : 'Unknown error'));
       }
