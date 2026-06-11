@@ -493,7 +493,10 @@ function registerStaff(lastName, firstName, lineUserId) {
       const rowAppName = normalizeName(values[i][2]);
 
       if (rowName === normName && rowAppName === normAppName && rowId !== "") {
-        // 既に存在する場合はそのIDを返す (重複防止・ID復元)
+        // 既存ユーザー：LINE_USER_IDが未設定でlineUserIdが渡された場合はD列を更新
+        if (lineUserId && !values[i][3]) {
+          s.getRange(i + 1, 4).setValue(lineUserId);
+        }
         return { success: true, id: rowId, name: values[i][1], message: "existing" };
       }
     }
