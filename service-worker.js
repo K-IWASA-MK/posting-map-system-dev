@@ -1,4 +1,4 @@
-const CACHE_NAME = 'posting-map-cache-v457';
+const CACHE_NAME = 'posting-map-cache-v458';
 const ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const ASSETS = [
   './db.js',
   './app.js',
   './app.js?v=455',
-  './render.js?v=457',
+  './render.js?v=458',
   './manifest.json',
   './stock.html',
   // 外部CDN URLはCORSポリシーによりキャッシュ失敗の原因になるため除外
