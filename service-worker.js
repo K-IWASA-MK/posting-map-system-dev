@@ -1,4 +1,4 @@
-const CACHE_NAME = 'posting-map-cache-v444';
+const CACHE_NAME = 'posting-map-cache-v445';
 const ASSETS = [
   './',
   './index.html',

@@ -1546,35 +1546,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
 
-      const res = await callApi('requestFlyerTransfer', {
-        requestUserId: userInfo.id || 'UNKNOWN',
-        requestUserName: userInfo.last || '不明',
-        requestArea: currentTransferRequest.requestArea,
-        holderUserId: currentTransferRequest.holderUserId,
-        holderName: currentTransferRequest.holderName,
-        stockCount: currentTransferRequest.stockCount
-      });
+      try {
+        // ✅ POST送信（GASのdoPostにrequestFlyerTransferが実装されているため）
+        const res = await callApiPost('requestFlyerTransfer', {
+          requestUserId: userInfo.id || 'UNKNOWN',
+          requestUserName: userInfo.last || '不明',
+          requestArea: currentTransferRequest.requestArea,
+          holderUserId: currentTransferRequest.holderUserId,
+          holderName: currentTransferRequest.holderName,
+          stockCount: currentTransferRequest.stockCount
+        });
 
-      if (btnText) btnText.classList.remove('opacity-0');
-      if (btnSpinner) btnSpinner.classList.add('hidden');
-      submitBtn.disabled = false;
+        closeTransferRequestDialog();
 
-      closeTransferRequestDialog();
-
-      if (res && res.success) {
-        const successDialog = document.getElementById('transfer-success-dialog');
-        if (successDialog) {
-          successDialog.classList.remove('hidden');
-          requestAnimationFrame(() => {
-            successDialog.classList.remove('opacity-0');
-            successDialog.firstElementChild.classList.remove('scale-95');
-          });
+        if (res && res.success) {
+          const successDialog = document.getElementById('transfer-success-dialog');
+          if (successDialog) {
+            successDialog.classList.remove('hidden');
+            requestAnimationFrame(() => {
+              successDialog.classList.remove('opacity-0');
+              successDialog.firstElementChild.classList.remove('scale-95');
+            });
+          }
+        } else {
+          alert('要請の送信に失敗しました: ' + (res ? res.message : 'Unknown error'));
         }
-      } else {
-        alert('要請の送信に失敗しました: ' + (res ? res.message : 'Unknown error'));
+      } catch (err) {
+        alert('通信エラーが発生しました。\n' + err.message);
+      } finally {
+        if (btnText) btnText.classList.remove('opacity-0');
+        if (btnSpinner) btnSpinner.classList.add('hidden');
+        submitBtn.disabled = false;
       }
     });
   }
+
 
   const okBtn = document.getElementById('tr-success-ok-btn');
   if (okBtn) {
