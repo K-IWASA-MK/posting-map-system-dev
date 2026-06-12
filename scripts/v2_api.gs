@@ -966,6 +966,10 @@ function registerAdmin(displayName, lineUserId) {
         }
       }
     }
+    // 上限チェック (3名制限)
+    if (lastRow >= 4) { // ヘッダー1行 + データ3行 = 4行以上の場合は登録不可
+      return { success: false, message: '管理者アカウントの登録上限(3名)に達しています。' };
+    }
     // 新規追加
     s.appendRow([displayName, lineUserId, now]);
     return { success: true, message: 'new' };

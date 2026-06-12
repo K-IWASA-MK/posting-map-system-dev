@@ -1,4 +1,4 @@
-const CACHE_NAME = 'posting-map-cache-v460';
+const CACHE_NAME = 'posting-map-cache-v461';
 const ASSETS = [
   './',
   './index.html',
@@ -12,8 +12,8 @@ const ASSETS = [
   './manifest.json',
   './stock.html',
   './admin/index.html',
-  './admin/manager.js?v=460',
-  './shared/api.js?v=460',
+  './admin/manager.js?v=461',
+  './shared/api.js?v=461',
   './assets/icon180-v2.png?v=257',
   './assets/icon-admin-panel-180.png?v=243'
 ];
