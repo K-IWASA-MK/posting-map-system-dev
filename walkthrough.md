@@ -52,3 +52,26 @@
 | **キャッシュ更新検証** | ✅ 合格 | 正常 | キャッシュバスター `v427` を適用し、既存のキャッシュが破棄されて新しいHTML/CSS/JSがロードされることを確認。 |
 
 これにて、すべての画面で [AGENTS.md](file:///Volumes/SSD_DATA/posting-map-system/AGENTS.md) の高級感と中央対称レイアウトが保たれました。
+
+---
+
+## 💬 LINE設定の調査およびリッチメニュー・トークン設定（2026-06-13）
+
+LINEお友だち追加画面が表示されない問題およびリッチメニューが表示されない問題について、セキュアな解決策を構築して反映しました。
+
+### 1. ⚙️ 設定ねじれの特定
+* **現象**: LIFFアプリ（ログイン画面）がリンクしている公式アカウントが `MIE-2/H` (`@196vjbpq`) であるのに対し、GAS側のアクセストークンが `MIE-2/K` (`@278kxomk`) に接続されていました。
+* **Bot prompt**: LINE DevelopersのLIFF設定は `On (aggressive)` で正常ですが、岩佐さんのLINEアカウントがすでにリンク先アカウント（`MIE-2/H`）と友だちになっていたため、友だち追加プロンプトがスキップされていました。
+
+### 2. 🔐 セキュアなトークン設定UIの実装
+トークンをチャットに貼らずにスプレッドシート上で安全に入力できるよう、 `scripts/v2_ui.gs` に以下を追加しました。
+* `setLineTokenHFromUI`: スプレッドシートメニューから `MIE-2/H`（配布員用）トークンを安全に登録。
+* `setLineTokenKFromUI`: スプレッドシートメニューから `MIE-2/K`（管理者用）トークンを安全に登録。
+* `createRichMenuForHApp`: 登録したトークンを使用して、LINE APIへリッチメニューを自動登録・一発適用。
+
+### 🎨 3. 公式アプリアイコンを使用したリッチメニュー画像アセット
+既存のアセットアイコン（`POSTINGMAP` および `ADMINPANEL`）を `2500x1686` の黒背景の中央に配置したプレミアム画像を自動作成し、以下にコミットしました。
+* 配布員用 (H): [assets/richmenu_default.png](file:///Volumes/SSD_DATA/posting-map-system/assets/richmenu_default.png)
+* 管理者用 (K): [assets/richmenu_admin.png](file:///Volumes/SSD_DATA/posting-map-system/assets/richmenu_admin.png)
+
+これらは `git push` を通してGithub Pagesに公開され、GASから自動参照されて適用されるようになりました。

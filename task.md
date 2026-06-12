@@ -1,3 +1,23 @@
+# タスクチェックリスト - LINE設定の調査・セキュア化・リッチメニュー自動設定 (2026-06-13)
+
+- [x] LINE DevelopersおよびMessaging APIの接続調査
+  - [x] 一時的なデバッグAPI (`getLineConfigDebug`) をGASに追加しデプロイして疎通テスト
+  - [x] LINEアクセストークンの有効性確認 (疎通OK, ボット `MIE-2/K` と接続)
+  - [x] リッチメニュー設定状況の確認 (初期状態は空 `[]` であることを特定)
+  - [x] LIFF ID `2010374196-gIYb6PDH` のBot prompt設定 (`On (aggressive)`) とリンクアカウント (`MIE-2/H`) のねじれを検知
+  - [x] 検証後に一時的デバッグコードを安全にクリーンアップして再デプロイ
+- [x] スプレッドシートメニューのセキュア設定拡張
+  - [x] 配布員用(H)トークン (`LINE_CHANNEL_ACCESS_TOKEN`) を登録するメニュー `setLineTokenHFromUI` を実装
+  - [x] 管理者用(K)トークン (`LINE_CHANNEL_ACCESS_TOKEN_ADMIN`) を登録するメニュー `setLineTokenKFromUI` を実装
+  - [x] 平文でチャットに貼らず、暗号化プロパティへ直接保存可能なセキュアなUIを構築
+- [x] リッチメニューの自動作成・適用機能の実装
+  - [x] 既存の公式アプリ用アイコンアセット (`POSTINGMAP(600 x 600 px).png`, `ADMINPANEL (600 x 600 px).png`) を使い、2500x1686のリッチメニュー画像をPythonで自動作成
+  - [x] 画像アセットを `assets/richmenu_default.png` および `richmenu_admin.png` に保存してGitにコミット
+  - [x] GAS側にリッチメニュー自動作成APIを叩く `createRichMenuForHApp` 関数を実装しデプロイ
+- [x] 実地検証と引継ぎ完了
+  - [x] ユーザーによるGitプッシュ完了
+  - [x] ユーザーによるトークン登録・自動リッチメニュー作成機能の展開完了
+
 # タスクチェックリスト - 管理者アプリUIデザインのリニューアル
 
 - [x] スプラッシュ画面（`#screen-gateway`）のレイアウト修正
