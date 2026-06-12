@@ -1229,8 +1229,8 @@ async function safeInitApp() {
   // area-management.github.io → モニター用LIFF（h9Fjv1iU）
   // k-iwasa-mk.github.io → スマホ用LIFF（tXZIMAJK）
   const liffId = window.location.hostname === 'area-management.github.io'
-    ? "2010177345-h9Fjv1iU"
-    : "2010177345-tXZIMAJK";
+    ? "2010374196-gIYb6PDH"
+    : "2010374196-gIYb6PDH";
   const btn = $('btn-login-manual');
   const spinner = $('login-spinner');
   const subtitle = $('gateway-subtitle');

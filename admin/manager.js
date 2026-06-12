@@ -467,7 +467,7 @@ window.addEventListener('load', () => {
   startAdmin();
 
   // LIFFは完全バックグラウンドで管理者ID登録（アプリ起動を妨げない）
-  const LIFF_ID = '2010177345-5y5ayk0h';
+  const LIFF_ID = '2010374196-nqrj70WC';
   const tryRegisterAdmin = () => {
     if (typeof liff === 'undefined') return; // LIFF SDK未ロードならスキップ
     liff.init({ liffId: LIFF_ID })

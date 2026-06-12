@@ -798,7 +798,7 @@ async function safeInitApp() {
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
   
-  const liffId = "2010177345-tXZIMAJK";
+  const liffId = "2010374196-gIYb6PDH";
   const btn = $('btn-login-manual');
   const spinner = $('login-spinner');
   const subtitle = $('gateway-subtitle');
