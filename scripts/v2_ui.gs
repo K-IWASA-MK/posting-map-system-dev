@@ -53,20 +53,23 @@ function onOpen() {
     .addItem("🎨 全シートを「プロ仕様」に一斉整形", "formatAllSheets")
     .addItem("🔧 名簿シートを初期化・復旧する", "setupRosterSheet")
     .addItem("📦 受渡要請・保管庫シートの準備", "setupTransferSheets")
-    .addItem("💬 LINEプッシュ通知の設定 (トークン登録)", "setLineTokenFromUI")
+    .addSeparator()
+    .addItem("💬 LINE配布員用(H)トークン設定", "setLineTokenHFromUI")
+    .addItem("💬 LINE管理者用(K)トークン設定", "setLineTokenKFromUI")
+    .addItem("💬 配布員用(H)リッチメニューを自動作成・適用", "createRichMenuForHApp")
     .addSeparator()
     .addItem("📁 ドライブフォルダを自動セットアップ", "setupGoogleDriveFolders")
     .addToUi();
 }
 
 /**
- * LINEチャネルアクセストークンをスプレッドシート上から安全に設定する
+ * LINE配布員用(H)トークンをスプレッドシート上から安全に設定する
  */
-function setLineTokenFromUI() {
+function setLineTokenHFromUI() {
   const ui = SpreadsheetApp.getUi();
   const response = ui.prompt(
-    "LINE Messaging API トークン設定",
-    "LINE Developersで取得した「チャネルアクセストークン（長期）」を貼り付けてください。\n\n※すでに設定済みの場合は上書きされます。\n※空欄のままOKを押すと設定が削除されます。",
+    "LINE配布員用(H)トークン設定",
+    "LINE Developersで取得した『MIE-2/H』の「チャネルアクセストークン（長期）」を貼り付けてください。\n\n※すでに設定済みの場合は上書きされます。\n※空欄のままOKを押すと設定が削除されます。",
     ui.ButtonSet.OK_CANCEL
   );
 
@@ -74,12 +77,166 @@ function setLineTokenFromUI() {
     const token = response.getResponseText().trim();
     if (token === "") {
       PropertiesService.getScriptProperties().deleteProperty("LINE_CHANNEL_ACCESS_TOKEN");
-      ui.alert("LINEトークンを削除しました。");
+      ui.alert("LINE配布員用トークンを削除しました。");
     } else {
       PropertiesService.getScriptProperties().setProperty("LINE_CHANNEL_ACCESS_TOKEN", token);
-      ui.alert("LINEトークンを保存しました！\nこれで受渡要請のプッシュ通知が有効になります。");
+      ui.alert("LINE配布員用トークンを保存しました！");
     }
   }
+}
+
+/**
+ * LINE管理者用(K)トークンをスプレッドシート上から安全に設定する
+ */
+function setLineTokenKFromUI() {
+  const ui = SpreadsheetApp.getUi();
+  const response = ui.prompt(
+    "LINE管理者用(K)トークン設定",
+    "LINE Developersで取得した『MIE-2/K』の「チャネルアクセストークン（長期）」を貼り付けてください。\n\n※すでに設定済みの場合は上書きされます。\n※空欄のままOKを押すと設定が削除されます。",
+    ui.ButtonSet.OK_CANCEL
+  );
+
+  if (response.getSelectedButton() == ui.Button.OK) {
+    const token = response.getResponseText().trim();
+    if (token === "") {
+      PropertiesService.getScriptProperties().deleteProperty("LINE_CHANNEL_ACCESS_TOKEN_ADMIN");
+      ui.alert("LINE管理者用トークンを削除しました。");
+    } else {
+      PropertiesService.getScriptProperties().setProperty("LINE_CHANNEL_ACCESS_TOKEN_ADMIN", token);
+      ui.alert("LINE管理者用トークンを保存しました！\nこれで管理者への受渡要請プッシュ通知が有効になります。");
+    }
+  }
+}
+
+/**
+ * 配布員用(H)アカウントに対してリッチメニューを自動作成して適用する
+ */
+function createRichMenuForHApp() {
+  const ui = SpreadsheetApp.getUi();
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty("LINE_CHANNEL_ACCESS_TOKEN"); // MIE-2/H のトークン
+  const liffId = "2010374196-gIYb6PDH"; // Hアプリ用のLIFF ID
+  
+  if (!token) {
+    ui.alert("エラー: 配布員用(H)トークンが未設定です。スプレッドシートのメニューから先に登録してください。");
+    return;
+  }
+  
+  const headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + token
+  };
+  
+  // 1. 既存のリッチメニューを全削除して綺麗にする
+  try {
+    const listRes = UrlFetchApp.fetch("https://api.line.me/v2/bot/richmenu/list", {
+      method: "GET",
+      headers: headers,
+      muteHttpExceptions: true
+    });
+    if (listRes.getResponseCode() === 200) {
+      const list = JSON.parse(listRes.getContentText());
+      if (list && list.richmenus) {
+        list.richmenus.forEach(menu => {
+          UrlFetchApp.fetch("https://api.line.me/v2/bot/richmenu/" + menu.richMenuId, {
+            method: "DELETE",
+            headers: headers,
+            muteHttpExceptions: true
+          });
+        });
+      }
+    }
+  } catch (e) {
+    Logger.log("リッチメニューの事前削除でエラー: " + e.toString());
+  }
+
+  // 2. リッチメニューのエリア定義をPOSTする (1つの大きなボタン：タップするとLIFF URLを開く)
+  const richMenuData = {
+    size: {
+      width: 2500,
+      height: 1686
+    },
+    selected: true,
+    name: "POSTING_MAP_H",
+    chatBarText: "配布用マップを開く",
+    areas: [
+      {
+        bounds: {
+          x: 0,
+          y: 0,
+          width: 2500,
+          height: 1686
+        },
+        action: {
+          type: "uri",
+          uri: "https://liff.line.me/" + liffId
+        }
+      }
+    ]
+  };
+
+  let richMenuId = "";
+  try {
+    const response = UrlFetchApp.fetch("https://api.line.me/v2/bot/richmenu", {
+      method: "POST",
+      headers: headers,
+      payload: JSON.stringify(richMenuData),
+      muteHttpExceptions: true
+    });
+    
+    if (response.getResponseCode() !== 200) {
+      ui.alert("リッチメニュー作成失敗: " + response.getContentText());
+      return;
+    }
+    
+    const resData = JSON.parse(response.getContentText());
+    richMenuId = resData.richMenuId;
+  } catch (e) {
+    ui.alert("API接続エラー: " + e.toString());
+    return;
+  }
+  
+  // 3. リッチメニューに画像をアップロードする
+  const imageUrl = "https://k-iwasa-mk.github.io/posting-map-system-dev/assets/richmenu_default.png";
+  try {
+    const imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
+    const uploadRes = UrlFetchApp.fetch("https://api-data.line.me/v2/bot/richmenu/" + richMenuId + "/content", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Content-Type": "image/png"
+      },
+      payload: imageBlob.getBytes(),
+      muteHttpExceptions: true
+    });
+    
+    if (uploadRes.getResponseCode() !== 200) {
+      ui.alert("画像アップロード失敗: " + uploadRes.getContentText() + " (richMenuId: " + richMenuId + ")");
+      return;
+    }
+  } catch (e) {
+    ui.alert("画像アップロード中にエラー: " + e.toString() + " (richMenuId: " + richMenuId + ")");
+    return;
+  }
+  
+  // 4. デフォルトリッチメニューとして全体に適用
+  try {
+    const applyRes = UrlFetchApp.fetch("https://api.line.me/v2/bot/user/all/richmenu/" + richMenuId, {
+      method: "POST",
+      headers: headers,
+      muteHttpExceptions: true
+    });
+    
+    if (applyRes.getResponseCode() !== 200) {
+      ui.alert("デフォルトメニュー設定失敗: " + applyRes.getContentText());
+      return;
+    }
+  } catch (e) {
+    ui.alert("デフォルトメニュー設定中にエラー: " + e.toString());
+    return;
+  }
+  
+  ui.alert("✅ 成功", "リッチメニューの作成とデフォルト適用が完了しました！\n反映には数分かかる場合があります。", ui.ButtonSet.OK);
 }
 
 /**
