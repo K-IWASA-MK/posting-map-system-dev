@@ -32,7 +32,7 @@
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
   <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) - hidden by default -->
-  <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
+  <div id="screen-gateway" style="height: 100vh; height: 100dvh;" class="fixed top-0 left-0 w-full z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
     <div class="w-36 h-36 bg-white/5 backdrop-blur-2xl rounded-[2.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
       <img src="../assets/icon-admin-panel-180.png?v=201" class="w-full h-full object-cover rounded-[2.5rem] z-10">
     </div>
@@ -48,7 +48,7 @@
   </div>
 
   <!-- 2. LOADING -->
-  <div id="loading" class="fixed top-0 left-0 w-full h-[100dvh] z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
+  <div id="loading" style="height: 100vh; height: 100dvh;" class="fixed top-0 left-0 w-full z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
     <svg class="w-12 h-12" viewBox="0 0 50 50" fill="none" stroke-width="4">
       <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
       <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
@@ -59,7 +59,7 @@
   </div>
 
   <!-- 3. MAIN ADMIN APP - displayed by default -->
-  <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] transition-opacity duration-1000">
+  <div id="app" style="height: 100vh; height: 100dvh;" class="fixed top-0 left-0 w-full z-[2000] flex flex-col bg-[#000000] transition-opacity duration-1000">
     <header class="safe-top px-8 py-8 flex justify-between items-center shrink-0">
       <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-black tracking-tighter text-white leading-none">管理指令室</h1>
@@ -73,7 +73,7 @@
 
 
 
-    <main id="content" style="padding-bottom: calc(env(safe-area-inset-bottom) + 8rem);" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
+    <main id="content" style="min-height: 0; padding-bottom: 7.5rem;" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
       
       <!-- ── MONITOR タブ ── -->
       <div id="panel-monitor" class="space-y-10">
@@ -376,7 +376,7 @@
 
     </main>
     <!-- ボトムナビ (Liquid Glass) -->
-    <nav style="bottom: calc(env(safe-area-inset-bottom) + 1rem);" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
+    <nav style="bottom: 12px;" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
       <!-- Tier 1 Container -->
       <div id="nav-tier-1" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
         <button id="tab-btn-monitor" data-page="monitor" onclick="switchAdminTab('monitor')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-[#2563eb]">
