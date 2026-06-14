@@ -24,8 +24,8 @@
       window.logDebug(`UNHANDLED PROMISE: ${event.reason}`);
     };
   </script>
-  <!-- Force Refresh: v440 (2026-06-11T09:15:00) -->
-  <link rel="stylesheet" href="../tailwind-utils.css?v=440">
+  <!-- Force Refresh: v460 -->
+  <link rel="stylesheet" href="../tailwind-utils.css?v=460">
   <!-- A: favicon 404解消 (-191ms) -->
   <link rel="icon" href="../assets/icon180-v2.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/icon180-v2.png?v=258">
@@ -45,7 +45,7 @@
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <!-- 共通API モジュール (shared/api.js) -->
   <script defer src="../shared/api.js?v=440"></script>
-  <link rel="stylesheet" href="../style.css?v=440">
+  <link rel="stylesheet" href="../style.css?v=460">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -55,7 +55,7 @@
   <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
     <div class="gateway-header-wrap flex flex-col items-center justify-center mb-4 mt-0">
       <div class="gateway-icon-container w-32 h-32 bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-4 p-1 relative shadow-2xl">
-        <img src="./assets/icon180-v2.png?v=257" class="w-full h-full object-cover rounded-[2.2rem] z-10">
+        <img src="../assets/icon180-v2.png?v=257" class="w-full h-full object-cover rounded-[2.2rem] z-10">
       </div>
       <div class="text-center">
         <h2 id="gateway-title" style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight"></h2>
@@ -82,7 +82,7 @@
   <div id="loading" class="fixed top-0 left-0 w-full h-[100dvh] z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700">
     <!-- App icon -->
     <div class="w-16 h-16 bg-white/5 backdrop-blur-2xl rounded-[1.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-8 shadow-xl">
-      <img src="./assets/icon180-v2.png?v=257" class="w-full h-full object-cover rounded-[1.3rem]" loading="eager">
+      <img src="../assets/icon180-v2.png?v=257" class="w-full h-full object-cover rounded-[1.3rem]" loading="eager">
     </div>
     <!-- Status label -->
     <p id="loading-status" style="transition: opacity 0.2s ease;" class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">CONNECTING...</p>
@@ -95,7 +95,7 @@
   <!-- 3. MAIN APP -->
   <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-300 hidden">
     <header class="safe-top px-6 pt-8 pb-4 flex items-center">
-      <div class="bg-white/5 backdrop-blur-xl px-6 py-3 rounded-full flex items-center justify-between border border-white/10 text-xs font-black tracking-tight w-full">
+      <div style="background: #1C1C1E; border: 1px solid rgba(255,255,255,0.1);" class="px-6 py-3 rounded-full flex items-center justify-between text-xs font-black tracking-tight w-full">
         <div class="flex items-center gap-3">
           <span class="text-white/40">全体進捗</span>
           <span id="header-count" class="text-white/70 font-mono whitespace-pre">(  0/0)</span>
