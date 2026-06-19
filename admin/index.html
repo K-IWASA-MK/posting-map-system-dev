@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP — ADMIN PANEL</title>
-  <!-- Force Refresh: v461 (2026-06-13) -->
-  <link rel="stylesheet" href="../tailwind-utils.css?v=461">
+  <!-- Force Refresh: v462 (2026-06-19) -->
+  <link rel="stylesheet" href="../tailwind-utils.css?v=462">
   <!-- favicon -->
   <link rel="icon" href="../assets/icon-admin-panel-180.png" type="image/png">
-  <link rel="apple-touch-icon" href="../assets/icon-admin-panel-180.png?v=201">
+  <link rel="apple-touch-icon" href="../assets/icon-admin-panel-180.png?v=202">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -22,12 +22,12 @@
     }, { passive: false });
   </script>
   <!-- 共通APIモジュール -->
-  <script defer src="../shared/api.js?v=461"></script>
+  <script defer src="../shared/api.js?v=462"></script>
   <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <!-- 管理者アプリロジック -->
-  <script defer src="./manager.js?v=461"></script>
-  <link rel="stylesheet" href="../style.css?v=461">
+  <script defer src="./manager.js?v=462"></script>
+  <link rel="stylesheet" href="../style.css?v=462">
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
@@ -66,7 +66,7 @@
         <span class="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none">ADMIN PANEL</span>
       </div>
       <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
-        <div id="api-dot" class="w-2 h-2 bg-[#10b981] rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
+        <div id="api-dot" class="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></div>
         <span id="api-status-text" class="text-xs font-black text-[#2563eb] tracking-tighter uppercase">API ACTIVE</span>
       </div>
     </header>
@@ -79,9 +79,14 @@
       <div id="panel-monitor" class="space-y-10">
         <!-- 三重2区全体マップ -->
         <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">全体戦略マップ</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">STRATEGY MAP</span>
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <span class="text-sm">🗺️</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-wider text-white">全体戦略マップ</h3>
+              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">STRATEGY MAP</p>
+            </div>
           </div>
           <div class="premium-glass p-1 overflow-hidden relative" style="height: 18rem;">
             <div id="map" class="w-full h-full rounded-2xl" style="background: #000;"></div>
@@ -126,9 +131,14 @@
 
         <!-- 同期状況 (2x2グリッド化、日本語・英語併記、縦サイズ統一) -->
         <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">データ同期状況</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">FIELD SYNC STATUS</span>
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <span class="text-sm">🔄</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-wider text-white">データ同期状況</h3>
+              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">FIELD SYNC STATUS</p>
+            </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <!-- 未送信 -->
@@ -308,9 +318,14 @@
       <div id="panel-system" class="space-y-10 hidden">
         <!-- システム操作 -->
         <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">システム操作</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">TACTICAL COMMAND CENTER</span>
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <span class="text-sm">🛠️</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-wider text-white">システム操作</h3>
+              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">TACTICAL COMMAND CENTER</p>
+            </div>
           </div>
           <div class="space-y-4">
             <!-- Batch Run -->
@@ -362,9 +377,14 @@
 
         <!-- ログコンソール -->
         <section class="space-y-4">
-          <div class="flex flex-col items-center gap-0.5 px-2">
-            <h3 class="text-xs font-black text-white/60 tracking-widest">システムログ</h3>
-            <span class="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">INTEL LIVE STREAM</span>
+          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+              <span class="text-sm">📄</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-black tracking-wider text-white">システムログ</h3>
+              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">INTEL LIVE STREAM</p>
+            </div>
           </div>
           <div class="premium-glass p-6">
             <div id="log-console" class="h-40 overflow-y-auto font-mono text-[10px] space-y-2 text-white/50 hide-scrollbar selection:bg-[#2563eb]">
@@ -379,9 +399,9 @@
     <nav style="bottom: 12px;" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
       <!-- Tier 1 Container -->
       <div id="nav-tier-1" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
-        <button id="tab-btn-monitor" data-page="monitor" onclick="switchAdminTab('monitor')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-[#2563eb]">
+        <button id="tab-btn-monitor" data-page="monitor" onclick="switchAdminTab('monitor')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-white">
           <div class="text-xl">📍</div>
-          <span class="text-[10px] font-black uppercase tracking-widest">監視</span>
+          <span class="text-[10px] font-black uppercase tracking-widest text-white">監視</span>
         </button>
         <button id="tab-btn-storage" data-page="storage" onclick="switchAdminTab('storage')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40 text-white/40">
           <div class="text-xl">📦</div>

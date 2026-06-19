@@ -9,6 +9,7 @@
 const CONFIG = {
   VERSION: "2.2.0 (Mobile & Pro Integrated)",
   // ファイル名設定
+  // ⚠️ 以下はクライアント固有値 — clients/[ID]/config.js への移行を推奨
   DISTRICT_CSV: "三重県選挙区区割り",
   POSTAL_CSV: "MIE_POSTAL.CSV",
   TURNOUT_CSV: "voter_turnout.csv",
@@ -32,10 +33,14 @@ const CONFIG = {
   ROW_HEIGHT_STAFF: 60,
   DENOMINATOR_UNITS: 651, // 三重第2区の戦略ユニット総数
 
-  // デフォルト対象
+  // ⚠️ クライアント固有値 — 展開時に要変更
   DEFAULT_DISTRICT: "第2区",
   DEFAULT_PREFECTURE: "三重県",
   
   // ストレージ設定
-  STORAGE_PARENT_ID: "17DqCq4hIquqvK96ig8-n6fwb5pTgRE_-"
+  // ⚠️ STORAGE_PARENT_ID は PropertiesService で管理（スクリプトプロパティ: STORAGE_PARENT_ID）
+  // 「📁 ドライブフォルダを自動セットアップ」を実行後、スクリプトプロパティに自動保存されます
+  get STORAGE_PARENT_ID() {
+    return PropertiesService.getScriptProperties().getProperty('STORAGE_PARENT_ID') || '';
+  }
 };

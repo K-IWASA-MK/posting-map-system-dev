@@ -75,3 +75,76 @@ LINEお友だち追加画面が表示されない問題およびリッチメニ�
 * 管理者用 (K): [assets/richmenu_admin.png](file:///Volumes/SSD_DATA/posting-map-system/assets/richmenu_admin.png)
 
 これらは `git push` を通してGithub Pagesに公開され、GASから自動参照されて適用されるようになりました。
+
+---
+
+## 🛠️ コードレビュー＆バグ修正（2026-06-15）
+
+### 背景
+セッション開始時に `app.js`・`field/index.html`・`scripts/v2_config.gs` を包括レビューし、バグ・設計上の問題点を5件特定。全件修正・デプロイまで完了しました。
+
+---
+
+### 修正1：`field/index.html` — アイコン404バグ（🔴 重大）
+
+**原因**: `field/` サブフォルダ内のHTMLがルートの `assets/` を `./assets/` で参照しており、パスが存在しないため404が発生していた。
+
+```diff
+- <img src="./assets/icon180-v2.png?v=257" ...>
++ <img src="../assets/icon180-v2.png?v=257" ...>
+```
+
+対象箇所：ゲートウェイ画面（58行）・ローディング画面（85行）の2箇所。
+
+---
+
+### 修正2：`field/index.html` — ヘッダースタイル不一致（🟡 中）
+
+**原因**: `field/` のヘッダー背景が旧スタイル（`bg-white/5 backdrop-blur-xl`）のままで、2026-06-07に確定したデザインシステム（`#1C1C1E` 固定背景）と乖離していた。
+
+```diff
+- <div class="bg-white/5 backdrop-blur-xl ...">
++ <div style="background: #1C1C1E; border: 1px solid rgba(255,255,255,0.1);" class="...">
+```
+
+---
+
+### 修正3：`index.html` / `field/index.html` — CSSキャッシュバスター不一致（🟢 低）
+
+共通CSS（`tailwind-utils.css` / `style.css`）のバージョン番号が両ファイルで異なっており、キャッシュ不整合のリスクがあった。両ファイルを **v=460** に統一。
+
+| ファイル | 変更前 | 変更後 |
+|---|---|---|
+| `index.html` | `v=434` / `v=443` | `v=460` |
+| `field/index.html` | `v=440` | `v=460` |
+
+---
+
+### 修正4：`scripts/v2_config.gs` — `STORAGE_PARENT_ID` のハードコード除去（🟡 中・セキュリティ）
+
+GoogleドライブフォルダIDがソースコードに直書きされていた。環境依存の機密値は `PropertiesService` で管理するよう変更。
+
+```diff
+- STORAGE_PARENT_ID: "17DqCq4hIquqvK96ig8-n6fwb5pTgRE_-"
++ get STORAGE_PARENT_ID() {
++   return PropertiesService.getScriptProperties().getProperty('STORAGE_PARENT_ID') || '';
++ }
+```
+
+> 「📁 ドライブフォルダを自動セットアップ」メニューを実行すれば、IDはスクリプトプロパティに自動保存されます。
+
+---
+
+### 修正5：`scripts/v2_config.gs` — クライアント固有値への警告コメント追加（🟢 低・保守性）
+
+将来の289クライアント展開に備え、地域固有のハードコード値（`DISTRICT_CSV`・`DEFAULT_DISTRICT`・`DEFAULT_PREFECTURE` 等）に `⚠️ クライアント固有値` のコメントを追記。
+
+---
+
+### デプロイ完了
+
+| 対象 | コマンド | 結果 |
+|---|---|---|
+| GAS (`v2_config.gs`) | `clasp push` | ✅ 18ファイル反映 |
+| GitHub Pages (`index.html`, `field/index.html`) | `git push origin-dev HEAD:main` | ✅ `e769c65..6230af1` |
+

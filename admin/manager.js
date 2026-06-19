@@ -99,8 +99,8 @@ function switchAdminTab(tabName) {
     system:   $('tab-btn-system')
   };
 
-  const activeClass   = 'nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-[#2563eb]';
-  const inactiveClass = 'nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-white/40';
+  const activeClass   = 'nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-white';
+  const inactiveClass = 'nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-white/40 opacity-40';
 
   Object.entries(panels).forEach(([name, panel]) => {
     if (!panel) return;
@@ -117,7 +117,7 @@ function switchAdminTab(tabName) {
     const span = btn.querySelector('span');
     if (span) {
       if (name === tabName) {
-        span.className = 'text-[10px] font-black uppercase tracking-widest text-[#2563eb]';
+        span.className = 'text-[10px] font-black uppercase tracking-widest text-white';
       } else {
         span.className = 'text-[10px] font-black uppercase tracking-widest text-white/40';
       }
@@ -187,9 +187,9 @@ function setApiStatus(state) {
     text.textContent = 'CONNECTING...';
     text.className   = 'text-xs font-black text-yellow-500 tracking-tighter uppercase';
   } else if (state === 'connected') {
-    dot.className  = 'w-2 h-2 bg-[#10b981] rounded-full shadow-[0_0_8px_#10b981]';
+    dot.className  = 'w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]';
     text.textContent = 'CONNECTED';
-    text.className   = 'text-xs font-black text-[#10b981] tracking-tighter uppercase';
+    text.className   = 'text-xs font-black text-[#22c55e] tracking-tighter uppercase';
   } else {
     dot.className  = 'w-2 h-2 bg-rose-500 rounded-full';
     text.textContent = 'API ERROR';
@@ -524,7 +524,7 @@ async function loadFlyerStock() {
       const stocks = data.stocks;
       if (stocks.length === 0) {
         container.innerHTML = `
-          <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+          <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
             <span class="text-2xl">📦</span>
             <p class="text-sm font-black text-white/60">現在、保管されているチラシはありません</p>
           </div>`;
@@ -587,7 +587,7 @@ async function loadFlyerStock() {
   } catch(e) {
     console.error("loadFlyerStock Error:", e);
     container.innerHTML = `
-      <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+      <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
         <span class="text-2xl">⚠️</span>
         <p class="text-sm font-black text-rose-500">保管状況の取得に失敗しました</p>
       </div>`;
@@ -663,7 +663,7 @@ async function loadTransferRequests() {
 
       if (activeRequests.length === 0) {
         container.innerHTML = `
-          <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+          <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
             <p class="text-sm font-black text-white/40">現在、処理待ちの要請はありません</p>
           </div>`;
         return;
@@ -718,7 +718,7 @@ async function loadTransferRequests() {
   } catch(e) {
     console.error("loadTransferRequests Error:", e);
     container.innerHTML = `
-      <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+      <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
         <span class="text-2xl">⚠️</span>
         <p class="text-sm font-black text-rose-500">受渡要請の取得に失敗しました</p>
       </div>`;
@@ -763,7 +763,7 @@ async function loadRanking() {
       const list = data.ranking;
       if (list.length === 0) {
         container.innerHTML = `
-          <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+          <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
             <span class="text-2xl">🏆</span>
             <p class="text-sm font-black text-white/60">現在、ランキングデータはありません</p>
           </div>`;
@@ -805,7 +805,7 @@ async function loadRanking() {
   } catch(e) {
     console.error("loadRanking Error:", e);
     container.innerHTML = `
-      <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+      <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
         <span class="text-2xl">⚠️</span>
         <p class="text-sm font-black text-rose-500">ランキングの取得に失敗しました</p>
       </div>`;
@@ -822,7 +822,7 @@ async function loadRoster() {
       const list = data.roster;
       if (list.length === 0) {
         container.innerHTML = `
-          <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+          <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
             <span class="text-2xl">👥</span>
             <p class="text-sm font-black text-white/60">現在、登録されている配布員はいません</p>
           </div>`;
@@ -846,7 +846,7 @@ async function loadRoster() {
   } catch(e) {
     console.error("loadRoster Error:", e);
     container.innerHTML = `
-      <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
+      <div class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
         <span class="text-2xl">⚠️</span>
         <p class="text-sm font-black text-rose-500">配布員名簿の取得に失敗しました</p>
       </div>`;
