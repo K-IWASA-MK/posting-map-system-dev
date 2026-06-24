@@ -1304,6 +1304,22 @@ async function safeInitApp() {
       await Promise.race([liffInitPromise, timeoutPromise]);
       logDebug("LIFF INIT OK"); // ② LIFF初期化成功
       setLoadingProgress(35, 'AUTHENTICATED');
+
+      // ★ Phase 18.5: LINEアプリ外での起動を完全ブロック
+      if (!liff.isInClient()) {
+        document.body.innerHTML = `
+          <div style="padding:40px 20px; color:white; text-align:center; font-family:sans-serif; background:#000000; height:100dvh;">
+            <h2 style="font-size:18px; margin-bottom:10px;">⚠️ LINEアプリ専用</h2>
+            <p style="font-size:14px; color:rgba(255,255,255,0.7); margin-bottom:30px;">
+              このシステムはセキュリティ確保のため<br>LINEアプリ内でのみ動作します。
+            </p>
+            <a href="https://liff.line.me/2010177345-tXZIMAJK" style="display:inline-block; background:#2563eb; color:white; padding:16px 32px; border-radius:16px; text-decoration:none; font-weight:bold; letter-spacing:0.05em; box-shadow:0 4px 15px rgba(37,99,235,0.4);">
+              LINEから起動する
+            </a>
+          </div>
+        `;
+        throw new Error("Not in LINE client");
+      }
       
       logDebug("LOGIN CHECK"); // ③ login判定
       if (liff.isLoggedIn()) {
