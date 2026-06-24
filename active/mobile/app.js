@@ -1269,9 +1269,9 @@ async function safeInitApp() {
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
   
-  const userId = sessionStorage.getItem("userId");
-  const displayName = sessionStorage.getItem("displayName");
-  const pictureUrl = sessionStorage.getItem("pictureUrl");
+  const userId = sessionStorage.getItem("userId") || localStorage.getItem("userId");
+  const displayName = sessionStorage.getItem("displayName") || localStorage.getItem("displayName");
+  const pictureUrl = sessionStorage.getItem("pictureUrl") || localStorage.getItem("pictureUrl");
 
   if (!userId) {
     window.location.replace("./");
