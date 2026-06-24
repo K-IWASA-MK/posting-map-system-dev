@@ -16,7 +16,7 @@ const DEFAULT_STORE = {
       EVENTLOG: "EventLog"
     },
     PATH: {
-      CSV: "/data/",
+      CSV: "/reference/",
       CORE: "v2_core.gs",
       API: "v2_api.gs"
     },
