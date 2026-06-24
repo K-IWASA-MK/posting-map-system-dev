@@ -1279,7 +1279,12 @@ async function safeInitApp() {
 
   // Phase 19.2: セッション有効期限チェック（12時間）
   const isExpired = Date.now() - session.timestamp > 1000 * 60 * 60 * 12;
-  if (isExpired) {
+  
+  // Phase 19.3: デバイスバインディング検証
+  const currentDeviceId = localStorage.getItem("deviceId");
+  const isDeviceMismatch = session.deviceId !== currentDeviceId;
+
+  if (isExpired || isDeviceMismatch) {
     localStorage.removeItem("session");
     sessionStorage.removeItem("session");
     window.location.replace("./");

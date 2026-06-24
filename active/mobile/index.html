@@ -81,10 +81,20 @@
 
             try {
               const profile = await liff.getProfile();
+              function getDeviceId() {
+                let id = localStorage.getItem("deviceId");
+                if (!id) {
+                  id = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+                  localStorage.setItem("deviceId", id);
+                }
+                return id;
+              }
+
               const sessionData = {
                 userId: profile.userId,
                 displayName: profile.displayName,
                 pictureUrl: profile.pictureUrl || "",
+                deviceId: getDeviceId(),
                 timestamp: Date.now()
               };
               const sessionJson = JSON.stringify(sessionData);
