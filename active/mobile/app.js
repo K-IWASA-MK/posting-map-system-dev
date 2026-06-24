@@ -1386,7 +1386,9 @@ async function safeInitApp() {
         if (liff.isInClient()) {
           logDebug("In LINE client. Redirecting to LINE Login automatically...");
           sessionStorage.setItem('liff_initializing', 'true');
-          liff.login();
+          liff.login({
+            redirectUri: "https://k-iwasa-mk.github.io/posting-map-system-dev/active/mobile/home.html"
+          });
         } else {
           logDebug("In external browser. Showing manual login button.");
           if (btn) {
@@ -1394,7 +1396,9 @@ async function safeInitApp() {
             btn.onclick = () => {
               logDebug("Manual login button clicked. Redirecting...");
               sessionStorage.setItem('liff_initializing', 'true');
-              liff.login();
+              liff.login({
+                redirectUri: "https://k-iwasa-mk.github.io/posting-map-system-dev/active/mobile/home.html"
+              });
             };
             btn.classList.remove('hidden');
           }
