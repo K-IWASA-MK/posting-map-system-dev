@@ -201,7 +201,7 @@ async function callApiPost(action, payload = {}) {
 let RUNTIME_CONFIG = {};
 
 async function startApp(profile = null) {
-  $('screen-gateway').classList.add('hidden');
+  if ($('screen-gateway')) $('screen-gateway').classList.add('hidden');
   $('loading').classList.remove('hidden');
   
   try {
@@ -371,7 +371,7 @@ async function loadData(skipSync = false) {
         logDebug("[loadData] Initial load. Switching page to settings and animating app entry...");
         switchPage('settings');
         logDebug("[loadData] Showing main app div...");
-        $('screen-gateway').classList.add('hidden');
+        if ($('screen-gateway')) $('screen-gateway').classList.add('hidden');
         $('app').classList.remove('hidden');
         setTimeout(() => {
           setLoadingProgress(100, 'READY');
@@ -392,7 +392,7 @@ async function loadData(skipSync = false) {
     const subtitleEl = $('gateway-subtitle');
     if (titleEl) titleEl.textContent = '起動エラー';
     if (subtitleEl) subtitleEl.textContent = String(err.message || err).slice(0, 120);
-    $('screen-gateway').classList.remove('hidden');
+    if ($('screen-gateway')) $('screen-gateway').classList.remove('hidden');
   }
 }
 
