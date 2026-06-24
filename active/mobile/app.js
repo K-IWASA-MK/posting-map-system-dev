@@ -1265,6 +1265,37 @@ async function saveProfile() {
   }
 }
 
+function showBlockScreen() {
+  document.body.innerHTML = `
+    <div style="
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      background:#000;
+      color:#fff;
+      text-align:center;
+      padding:20px;
+    ">
+      <h2>このアプリはLINE専用です</h2>
+      <p>LINEから再度開いてください</p>
+      <a style="
+        margin-top:20px;
+        padding:12px 20px;
+        background:#00c300;
+        color:#fff;
+        border-radius:8px;
+        text-decoration:none;
+        font-weight:bold;
+      "
+      href="https://liff.line.me/2010177345-tXZIMAJK">
+        LINEで開く
+      </a>
+    </div>
+  `;
+}
+
 async function safeInitApp() {
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
@@ -1307,18 +1338,8 @@ async function safeInitApp() {
 
       // ★ Phase 18.5: LINEアプリ外での起動を完全ブロック
       if (!liff.isInClient()) {
-        document.body.innerHTML = `
-          <div style="padding:40px 20px; color:white; text-align:center; font-family:sans-serif; background:#000000; height:100dvh;">
-            <h2 style="font-size:18px; margin-bottom:10px;">⚠️ LINEアプリ専用</h2>
-            <p style="font-size:14px; color:rgba(255,255,255,0.7); margin-bottom:30px;">
-              このシステムはセキュリティ確保のため<br>LINEアプリ内でのみ動作します。
-            </p>
-            <a href="https://liff.line.me/2010177345-tXZIMAJK" style="display:inline-block; background:#2563eb; color:white; padding:16px 32px; border-radius:16px; text-decoration:none; font-weight:bold; letter-spacing:0.05em; box-shadow:0 4px 15px rgba(37,99,235,0.4);">
-              LINEから起動する
-            </a>
-          </div>
-        `;
-        throw new Error("Not in LINE client");
+        showBlockScreen();
+        return;
       }
       
       logDebug("LOGIN CHECK"); // ③ login判定
