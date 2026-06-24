@@ -1265,49 +1265,67 @@ async function saveProfile() {
   }
 }
 
+function showBlockScreen() {
+  document.body.innerHTML = `
+    <div style="
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      background:#000;
+      color:#fff;
+      text-align:center;
+      padding:20px;
+    ">
+      <h2>このアプリはLINE専用です</h2>
+      <p>LINEから再度開いてください</p>
+      <a style="
+        margin-top:20px;
+        padding:12px 20px;
+        background:#00c300;
+        color:#fff;
+        border-radius:8px;
+        text-decoration:none;
+        font-weight:bold;
+      "
+      href="https://liff.line.me/2010374196-gIYb6PDH">
+        LINEで開く
+      </a>
+    </div>
+  `;
+}
+
 async function safeInitApp() {
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
-  
-  const rawSession = sessionStorage.getItem("session") || localStorage.getItem("session");
-  const session = rawSession ? JSON.parse(rawSession) : null;
-
-  if (!session || !session.userId) {
-    window.location.replace("./");
-    return;
-  }
-
-  // Phase 19.2: セッション有効期限チェック（12時間）
-  const isExpired = Date.now() - session.timestamp > 1000 * 60 * 60 * 12;
-  
-  // Phase 19.3: デバイスバインディング検証
-  const currentDeviceId = localStorage.getItem("deviceId");
-  const isDeviceMismatch = session.deviceId !== currentDeviceId;
-
-  if (isExpired || isDeviceMismatch) {
-    localStorage.removeItem("session");
-    sessionStorage.removeItem("session");
-    window.location.replace("./");
-    return;
-  }
-
-  const profile = {
-    userId: session.userId,
-    displayName: session.displayName,
-    pictureUrl: session.pictureUrl
-  };
-
-  setLoadingProgress(35, 'AUTHENTICATED');
-  
-  // ⑤ getAppDataを並列プリフェッチ開始
-  _appDataPromise = callApi('getAppData');
 
   try {
+    logDebug("LIFF INIT START");
+    await liff.init({ liffId: CONFIG.LIFF_ID });
+    logDebug("LIFF INIT OK");
+    setLoadingProgress(35, 'AUTHENTICATED');
+
+    if (!liff.isInClient()) {
+      showBlockScreen();
+      return;
+    }
+
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+
+    _appDataPromise = callApi('getAppData');
+
+    logDebug("PROFILE START");
+    const profile = await liff.getProfile();
+    logDebug("PROFILE OK");
     setLoadingProgress(65, 'PROFILE LOADED');
-    
+
     let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
     
-    // ④ 初回・再登録ともにPOSTでlineUserIdをGASに送信
+    // 初回・再登録ともにPOSTでlineUserIdをGASに送信
     if (!userInfo.id) {
       logDebug("API START (初回登録)");
       const res = await callApiPost('registerStaff', { 
@@ -1330,7 +1348,6 @@ async function safeInitApp() {
         throw new Error("GAS registration failed");
       }
     } else {
-      // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
       userInfo.lineUserId = profile.userId;
       userInfo.picture = profile.pictureUrl;
       localStorage.setItem('user_info', JSON.stringify(userInfo));
@@ -1343,9 +1360,11 @@ async function safeInitApp() {
 
     logDebug("START APP");
     startApp(profile);
+
   } catch (err) {
     console.error("APP INIT ERROR", err);
-    alert("初期化エラーが発生しました。再読込してください。");
+    logDebug("ERROR: " + err.message);
+    document.body.innerHTML = "<div style='color:white;padding:20px;'>初期化エラーが発生しました。LINEから再度開いてください。</div>";
   }
 }
 
