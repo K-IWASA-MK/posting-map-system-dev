@@ -1269,19 +1269,27 @@ async function safeInitApp() {
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
   
-  const userId = sessionStorage.getItem("userId") || localStorage.getItem("userId");
-  const displayName = sessionStorage.getItem("displayName") || localStorage.getItem("displayName");
-  const pictureUrl = sessionStorage.getItem("pictureUrl") || localStorage.getItem("pictureUrl");
+  const rawSession = sessionStorage.getItem("session") || localStorage.getItem("session");
+  const session = rawSession ? JSON.parse(rawSession) : null;
 
-  if (!userId) {
+  if (!session || !session.userId) {
+    window.location.replace("./");
+    return;
+  }
+
+  // Phase 19.2: セッション有効期限チェック（12時間）
+  const isExpired = Date.now() - session.timestamp > 1000 * 60 * 60 * 12;
+  if (isExpired) {
+    localStorage.removeItem("session");
+    sessionStorage.removeItem("session");
     window.location.replace("./");
     return;
   }
 
   const profile = {
-    userId: userId,
-    displayName: displayName,
-    pictureUrl: pictureUrl
+    userId: session.userId,
+    displayName: session.displayName,
+    pictureUrl: session.pictureUrl
   };
 
   setLoadingProgress(35, 'AUTHENTICATED');

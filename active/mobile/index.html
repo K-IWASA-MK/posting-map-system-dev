@@ -81,18 +81,18 @@
 
             try {
               const profile = await liff.getProfile();
-              sessionStorage.setItem("userId", profile.userId);
-              sessionStorage.setItem("displayName", profile.displayName);
-              if (profile.pictureUrl) {
-                sessionStorage.setItem("pictureUrl", profile.pictureUrl);
-              }
+              const sessionData = {
+                userId: profile.userId,
+                displayName: profile.displayName,
+                pictureUrl: profile.pictureUrl || "",
+                timestamp: Date.now()
+              };
+              const sessionJson = JSON.stringify(sessionData);
 
-              // Phase 19.1: 永続セッションOS化
-              localStorage.setItem("userId", profile.userId);
-              localStorage.setItem("displayName", profile.displayName);
-              if (profile.pictureUrl) {
-                localStorage.setItem("pictureUrl", profile.pictureUrl);
-              }
+              sessionStorage.setItem("session", sessionJson);
+              
+              // Phase 19.1 & 19.2: 永続セッションOS化（12時間有効）
+              localStorage.setItem("session", sessionJson);
               
               window.location.replace("./home.html");
             } catch (err) {
