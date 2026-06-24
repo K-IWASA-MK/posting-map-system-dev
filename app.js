@@ -217,6 +217,48 @@ async function startApp(profile = null) {
   loadData();
 }
 
+async function loadStrategy(branchId) {
+  try {
+    const res = await callApi("getStrategy", {
+      branchId,
+      tenantId: "MIE-02" // For now hardcoded to current tenant, could be RUNTIME_CONFIG.TENANT_ID if we had it
+    });
+    
+    if (res && res.success) {
+      console.log("Phase 15 Strategic Engine Loaded:", res.data);
+      // TODO: renderMap(res.data.map);
+      // TODO: renderSummary(res.data.summary);
+    }
+  } catch (err) {
+    console.error("Failed to load strategy:", err);
+  }
+}
+
+async function loadHeatmap(branchId) {
+  try {
+    const res = await callApi("getHeatmap", { branchId, tenantId: RUNTIME_CONFIG?.TENANT_ID || "DEFAULT" });
+    if (res && res.success) {
+      // renderMap(res.data); // 赤・黄・青の描画処理へ連携
+      console.log("Heatmap Data:", res.data);
+    }
+  } catch (err) {
+    console.error("Failed to load heatmap:", err);
+  }
+}
+
+async function loadPrediction(branchId) {
+  try {
+    const res = await callApi("getPrediction", { branchId, tenantId: RUNTIME_CONFIG?.TENANT_ID || "DEFAULT" });
+    if (res && res.success) {
+      console.log("WIN STATUS:", res.data.status);
+      console.log("WIN SCORE:", res.data.winScore);
+    }
+  } catch (err) {
+    console.error("Failed to load prediction:", err);
+  }
+}
+
+
 function setSyncStatus(state) {
   const statusEl = $('sync-status');
   const textEl = $('sync-text');

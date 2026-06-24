@@ -45,6 +45,11 @@ function appendEventLog(event) {
     
     // キャッシュをフラッシュ
     CacheService.getScriptCache().remove("EVENT_LOGS_V2");
+    
+    // Phase 16: リアルタイム戦略OSキャッシュ無効化
+    if (typeof onNewEventLogEntry === "function") {
+      onNewEventLogEntry(event.branchId || "DEFAULT_BRANCH");
+    }
   } finally {
     lock.releaseLock();
   }

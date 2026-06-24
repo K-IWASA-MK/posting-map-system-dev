@@ -45,7 +45,14 @@ const DEFAULT_STORE = {
     ROW_HEIGHT_STAFF: 60,
     DENOMINATOR_UNITS: 651,
     DEFAULT_DISTRICT: "第2区",
-    DEFAULT_PREFECTURE: "三重県"
+    DEFAULT_PREFECTURE: "三重県",
+    
+    // Phase 15: Strategic Engine Map
+    DISTRICT_MAP: {
+      "MIE-02": [
+        // Placeholder blocks. Will be managed via PropertiesService in Production.
+      ]
+    }
   },
   "MIE-02": {
     // Override example for tenant

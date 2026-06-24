@@ -148,6 +148,15 @@ function doGet(e) {
       case 'getConfig':
         response = { success: true, config: getConfig(e.parameter.tenantId || "DEFAULT") };
         break;
+      case 'getStrategy':
+        response = { success: true, data: generateStrategy(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
+        break;
+      case 'getHeatmap':
+        response = { success: true, data: generateHeatmap(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
+        break;
+      case 'getPrediction':
+        response = { success: true, data: predictOutcome(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
+        break;
       default:
         response = { success: true, message: 'POSTING MAP API is online.' };
     }
@@ -185,6 +194,15 @@ function doPost(e) {
         break;
       case 'getConfig':
         response = { success: true, config: getConfig(postData.tenantId || e.parameter.tenantId || "DEFAULT") };
+        break;
+      case 'getStrategy':
+        response = { success: true, data: generateStrategy(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
+        break;
+      case 'getHeatmap':
+        response = { success: true, data: generateHeatmap(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
+        break;
+      case 'getPrediction':
+        response = { success: true, data: predictOutcome(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
         break;
       case 'getRanking':
         response = { success: true, ranking: getRankingData() };
