@@ -40,6 +40,8 @@
       const scrollable = e.target.closest('#content, #debug-log, #debug-log-content, #id-info-body-container, #detail-modal-content');
       if (scrollable) return;
       e.preventDefault();
+    }, { passive: false });
+  </script>
   <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <link rel="stylesheet" href="./style.css?v=460">
 </head>
