@@ -461,6 +461,8 @@ function startAdmin() {
   $('app').classList.remove('hidden');
   setTimeout(() => $('app').classList.remove('opacity-0'), 50);
 
+  return; // Phase 1 Wireframe Guard
+
   // 3. バックグラウンドでAPIから最新データを非同期取得
   loadDashboardData();
 }
@@ -478,6 +480,7 @@ window.addEventListener('load', () => {
   // LIFFは完全バックグラウンドで管理者ID登録（アプリ起動を妨げない）
   const LIFF_ID = '2010374196-nqrj70WC';
   const tryRegisterAdmin = () => {
+    return; // Phase 1 Wireframe Guard
     if (typeof liff === 'undefined') return; // LIFF SDK未ロードならスキップ
     liff.init({ liffId: LIFF_ID })
       .then(() => {

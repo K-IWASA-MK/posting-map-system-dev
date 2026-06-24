@@ -29,44 +29,92 @@ function getDashboardData() {
  * 全エリアのサマリーを再計算してキャッシュに保存する (爆速シャドウシート版)
  */
 function refreshAreaSummaryCache() {
+  // Phase B/C: 集計(done)は必ずEventLogのみで行う(Single Aggregation Rule)
+  // マスターデータ(total, repAddress)のみ__SYSTEM_CACHE__から取得し、EventLog実績とマージする
   const ss = getSS();
-  let shadowSheet = ss.getSheetByName(CONFIG.SHEET_SYSTEM_CACHE);
+  let shadowSheet = ss.getSheetByName(CONFIG.get("SHEET_SYSTEM_CACHE"));
 
-  // シャドウシートがなければ作成
   if (!shadowSheet) {
     createSystemCacheSheet();
-    shadowSheet = ss.getSheetByName(CONFIG.SHEET_SYSTEM_CACHE);
+    shadowSheet = ss.getSheetByName(CONFIG.get("SHEET_SYSTEM_CACHE"));
   }
 
   const lastRow = shadowSheet.getLastRow();
+  let masterMap = {};
+  if (lastRow >= 2) {
+    // 1回のAPI通信でマスターデータを取得 (A:エリア名, B:(廃止), C:合計数, D:代表住所)
+    const data = shadowSheet.getRange(2, 1, lastRow - 1, 4).getValues();
+    data.forEach((row) => {
+      const name = row[0];
+      const total = Number(row[2]) || 0;
+      const repAddress = row[3] ? String(row[3]).trim() : "";
+      if (name) {
+        masterMap[name] = { total: total, repAddress: repAddress };
+      }
+    });
+  }
+
+  // EventLogから最新の完了実績を取得
+  const eventLogs = aggregateByBlock("DEFAULT_TENANT", null);
+
   let summary = [];
   let totalDone = 0;
   let totalPoints = 0;
 
-  if (lastRow >= 2) {
-    // 1回のAPI通信で全エリアの集計結果を取得 (A:エリア名, B:完了数, C:合計数, D:代表住所)
-    const data = shadowSheet.getRange(2, 1, lastRow - 1, 4).getValues();
-    data.forEach((row) => {
-      const name = row[0];
-      const done = Number(row[1]) || 0;
-      const total = Number(row[2]) || 0;
-      const repAddress = row[3] ? String(row[3]).trim() : "";
-
-      if (name) {
-        let lat = null;
-        let lng = null;
-        const coords = getCoordsFromAddress(repAddress);
-        if (coords) {
-          lat = coords.lat;
-          lng = coords.lng;
-        }
-
-        summary.push({ name: name, done: done, total: total, repAddress: repAddress, lat: lat, lng: lng });
-        totalDone += done;
-        totalPoints += total;
+  // EventLogに存在するエリアの実績をマスターと結合
+  eventLogs.forEach(block => {
+    const name = block.name;
+    const done = block.done;
+    const master = masterMap[name] || { total: 0, repAddress: "" };
+    
+    let lat = block.lat;
+    let lng = block.lng;
+    if (!lat || !lng) {
+      const coords = getCoordsFromAddress(master.repAddress);
+      if (coords) {
+        lat = coords.lat;
+        lng = coords.lng;
       }
+    }
+
+    summary.push({
+      name: name,
+      done: done,
+      total: master.total,
+      repAddress: master.repAddress,
+      lat: lat,
+      lng: lng
     });
-  }
+    
+    totalDone += done;
+    totalPoints += master.total;
+    
+    // 処理済みマーク
+    masterMap[name].processed = true;
+  });
+
+  // EventLogに存在しないがマスターに存在するエリア（未着手）を補完
+  Object.keys(masterMap).forEach(name => {
+    const master = masterMap[name];
+    if (!master.processed) {
+      let lat = null;
+      let lng = null;
+      const coords = getCoordsFromAddress(master.repAddress);
+      if (coords) {
+        lat = coords.lat;
+        lng = coords.lng;
+      }
+      summary.push({
+        name: name,
+        done: 0,
+        total: master.total,
+        repAddress: master.repAddress,
+        lat: lat,
+        lng: lng
+      });
+      totalPoints += master.total;
+    }
+  });
 
   const result = {
     summary: summary,
@@ -88,10 +136,10 @@ function refreshAreaSummaryCache() {
  */
 function createSystemCacheSheet() {
   const ss = getSS();
-  let sheet = ss.getSheetByName(CONFIG.SHEET_SYSTEM_CACHE);
+  let sheet = ss.getSheetByName(CONFIG.get("SHEET_SYSTEM_CACHE"));
   
   if (!sheet) {
-    sheet = ss.insertSheet(CONFIG.SHEET_SYSTEM_CACHE);
+    sheet = ss.insertSheet(CONFIG.get("SHEET_SYSTEM_CACHE"));
     sheet.hideSheet();
   }
   
@@ -99,10 +147,10 @@ function createSystemCacheSheet() {
   sheet.getRange(1, 1, 1, 4).setValues([["エリア名", "完了数", "合計数", "代表住所"]]);
 
   const exclude = [
-    CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL, CONFIG.SHEET_DISTRICT, CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL, CONFIG.SHEET_SYSTEM_CACHE,
-    CONFIG.SHEET_STORAGE,
+    CONFIG.get("SHEET_GUIDE"), CONFIG.get("SHEET_ROSTER"), CONFIG.get("SHEET_TEMPLATE"),
+    CONFIG.get("SHEET_POSTAL"), CONFIG.get("SHEET_DISTRICT"), CONFIG.get("SHEET_MASTER_EXPORT"),
+    CONFIG.get("SHEET_REPORT"), CONFIG.get("SHEET_MANUAL"), CONFIG.get("SHEET_SYSTEM_CACHE"),
+    CONFIG.get("SHEET_STORAGE"),
     "__TEMP_ADDRESSES__" // バッチ一時シート（完了前に残った場合も除外）
   ];
 
@@ -125,8 +173,8 @@ function createSystemCacheSheet() {
     const escapedName = name.replace(/'/g, "''");
     return [
       name,
-      `=COUNTIF('${escapedName}'!D:D, TRUE)`,
-      `=COUNTA('${escapedName}'!A2:A)`,
+      0, // Phase 13: 完了数はEventLogから集計するため、ここはダミー(0)とする
+      `=COUNTA('${escapedName}'!A2:A)`, // マスター件数
       repAddress
     ];
   });

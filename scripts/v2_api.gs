@@ -136,6 +136,18 @@ function doGet(e) {
       case 'getTransferRequests':
         response = { success: true, requests: getTransferRequests() };
         break;
+      case 'runMigration':
+        response = { success: true, message: runMigrationToEventLog() };
+        break;
+      case 'runReconciliation':
+        response = generateReconciliationReport();
+        break;
+      case 'runFreeze':
+        response = executeSystemFreeze();
+        break;
+      case 'getConfig':
+        response = { success: true, config: getConfig(e.parameter.tenantId || "DEFAULT") };
+        break;
       default:
         response = { success: true, message: 'POSTING MAP API is online.' };
     }
@@ -171,6 +183,9 @@ function doPost(e) {
       case 'getAppData':
         response = getAppData();
         break;
+      case 'getConfig':
+        response = { success: true, config: getConfig(postData.tenantId || e.parameter.tenantId || "DEFAULT") };
+        break;
       case 'getRanking':
         response = { success: true, ranking: getRankingData() };
         break;
@@ -184,27 +199,10 @@ function doPost(e) {
         response = getCityAreaDetails(postData.cityName || e.parameter.cityName);
         break;
       case 'submitDistribution':
-        response = submitDistribution(
-          postData.areaName,
-          parseInt(postData.rowId, 10),
-          postData.staffName,
-          parseFloat(postData.count) || 0,
-          postData.isDone === 'true' || postData.isDone === true,
-          postData.staffId
-        );
+        response = submitDistribution(postData);
         break;
       case 'updateRecordWithGPSPhoto':
-        response = updateRecordWithGPSPhoto(
-          postData.areaName,
-          parseInt(postData.rowId, 10),
-          postData.isDone === 'true' || postData.isDone === true,
-          parseFloat(postData.count) || 0,
-          postData.latitude,
-          postData.longitude,
-          postData.photoData,
-          postData.staffName,
-          postData.staffId
-        );
+        response = updateRecordWithGPSPhoto(postData);
         break;
       case 'registerStaff':
         response = registerStaff(postData.lastName, postData.firstName, postData.lineUserId);
@@ -272,33 +270,81 @@ function createJsonResponse(data) {
 // =============================
 
 function getAppData() {
-  let dashboardData;
+  // Phase 13: EventLogから全ブロック（エリア）の集計データを取得
+  let blocks = [];
+  let totalDone = 0;
+  
   try {
-    dashboardData = getDashboardData();
+    blocks = aggregateByBlock("DEFAULT_TENANT", null); // 全支部の場合はnull、特定支部の場合はbranchId
   } catch (e) {
-    dashboardData = { summary: [], stats: { done: 0, total: 0 } };
+    blocks = [];
   }
 
-  // キャッシュデータをそのままマップして返却（シートへのアクセスを完全にゼロにする）
-  const areas = (dashboardData && dashboardData.summary) ? dashboardData.summary.map(item => ({
-    name: item.name,
-    progress: item.total > 0 ? Math.round((item.done / item.total) * 100) : 0,
-    done: item.done || 0,
-    total: item.total || 0,
-    repAddress: item.repAddress || "",
-    lat: item.lat || null,
-    lng: item.lng || null
-  })) : [];
+  // 既存のマスター(CONFIGや別シート)からエリアごとの「目標値(total)」「代表住所(repAddress)」を取得するロジックが必要だが、
+  // 現状は互換性維持のため、一時的に静的マスター（または旧システムキャッシュ）をマージする。
+  // ここではEventLogのデータを最優先とする。
+  let cachedMaster = {};
+  try {
+    const dashboardData = getDashboardData();
+    if (dashboardData && dashboardData.summary) {
+      dashboardData.summary.forEach(item => {
+        cachedMaster[item.name] = item;
+      });
+    }
+  } catch(e) {}
 
-  const stats = (dashboardData && dashboardData.stats) ? dashboardData.stats : { done: 0, total: 0 };
+  const areas = blocks.map(b => {
+    const master = cachedMaster[b.name] || {};
+    const total = master.total || 100; // 例: 未知のエリアは適当な値
+    totalDone += b.done;
+    return {
+      name: b.name,
+      progress: total > 0 ? Math.round((b.done / total) * 100) : 0,
+      done: b.done,
+      total: total,
+      repAddress: master.repAddress || "",
+      lat: b.lat || master.lat || null,
+      lng: b.lng || master.lng || null
+    };
+  });
+  
+  // EventLogに存在しないがマスターに存在するエリアの補完
+  Object.keys(cachedMaster).forEach(areaName => {
+    if (!blocks.find(b => b.name === areaName)) {
+      const master = cachedMaster[areaName];
+      areas.push({
+        name: areaName,
+        progress: 0,
+        done: 0,
+        total: master.total || 0,
+        repAddress: master.repAddress || "",
+        lat: master.lat || null,
+        lng: master.lng || null
+      });
+    }
+  });
 
-
-  // ranking は getRanking アクションで遅延取得（初期ロード軽量化）
+  const stats = { done: totalDone, total: CONFIG.get("DENOMINATOR_UNITS") || 0 };
   const apiKey = PropertiesService.getScriptProperties().getProperty('GOOGLE_MAPS_API_KEY') || "";
+  
+  // UI計算を避けるため、API側で都市（City）ごとの集計も行っておく
+  const cityMap = {};
+  areas.forEach(a => {
+    const cityName = getCityName(a.name);
+    if (!cityMap[cityName]) cityMap[cityName] = { name: cityName, done: 0, total: 0 };
+    cityMap[cityName].done += a.done || 0;
+    cityMap[cityName].total += a.total || 0;
+  });
+  const cities = Object.values(cityMap).map(c => {
+    c.progress = c.total > 0 ? Math.round((c.done / c.total) * 100) : 0;
+    return c;
+  });
+
   return {
     success: true,
     branchName: getSS().getName().split(/[ \u3000]/)[0] || "支部",
     areas: areas,
+    cities: cities,
     stats: stats,
     apiKey: apiKey
   };
@@ -317,14 +363,34 @@ function getAreaDetails(areaName) {
     rowId: i + 2,
     address: r[0],
     memo: r[2],
-    isDone: r[3] === true || r[3] === "TRUE",
-    completedAt: r[4] ? String(r[4]).trim() : "",
+    isDone: false, // EventLogから後でマージ
+    completedAt: "",
     count: parseFloat(r[5]) || 0,
-    staffName: r[6],
-    staffId: r[7] ? String(r[7]).trim() : "",
-    gps: r[8] ? String(r[8]).trim() : "",
-    photoUrl: r[9] ? String(r[9]).trim() : ""
+    staffName: "",
+    staffId: "",
+    gps: "",
+    photoUrl: ""
   }));
+
+  // EventLogから完了状態をマージ（Phase 13 Data Architecture）
+  const logs = getAllEventLogs().filter(log => log.blockId === areaName);
+  logs.forEach(log => {
+    if (log.meta && log.meta.legacyRow) {
+      const idx = log.meta.legacyRow - 2;
+      if (points[idx]) {
+        if (log.actionType === "distribute") {
+          points[idx].isDone = true;
+          points[idx].staffName = log.meta.staffName || "";
+          points[idx].staffId = log.userId || "";
+          points[idx].gps = (log.lat && log.lng) ? `${log.lat},${log.lng}` : "";
+          points[idx].photoUrl = log.meta.photoUrl || "";
+          points[idx].completedAt = Utilities.formatDate(new Date(log.timestamp), "JST", "MM/dd HH:mm");
+        } else if (log.actionType === "revert_distribute") {
+          points[idx].isDone = false;
+        }
+      }
+    }
+  });
 
   return { success: true, points: points };
 }
@@ -348,16 +414,16 @@ function getCityAreaDetails(cityName) {
   const details = {};
 
   const excludeSheets = [
-    CONFIG.SHEET_GUIDE,
-    CONFIG.SHEET_ROSTER,
-    CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL,
-    CONFIG.SHEET_DISTRICT,
-    CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT,
-    CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_SYSTEM_CACHE,
-    CONFIG.SHEET_STORAGE
+    CONFIG.get("SHEET_GUIDE"),
+    CONFIG.get("SHEET_ROSTER"),
+    CONFIG.get("SHEET_TEMPLATE"),
+    CONFIG.get("SHEET_POSTAL"),
+    CONFIG.get("SHEET_DISTRICT"),
+    CONFIG.get("SHEET_MASTER_EXPORT"),
+    CONFIG.get("SHEET_REPORT"),
+    CONFIG.get("SHEET_MANUAL"),
+    CONFIG.get("SHEET_SYSTEM_CACHE"),
+    CONFIG.get("SHEET_STORAGE")
   ];
 
   sheets.forEach(sheet => {
@@ -375,15 +441,36 @@ function getCityAreaDetails(cityName) {
         rowId: i + 2,
         address: r[0],
         memo: r[2],
-        isDone: r[3] === true || r[3] === "TRUE",
-        completedAt: r[4] ? String(r[4]).trim() : "",
+        isDone: false, // EventLogから後でマージ
+        completedAt: "",
         count: parseFloat(r[5]) || 0,
-        staffName: r[6],
-        staffId: r[7] ? String(r[7]).trim() : "",
-        gps: r[8] ? String(r[8]).trim() : "",
-        photoUrl: r[9] ? String(r[9]).trim() : ""
+        staffName: "",
+        staffId: "",
+        gps: "",
+        photoUrl: ""
       }));
       details[sheetName] = points;
+    }
+  });
+
+  // EventLogから一括マージ（Phase 13 Data Architecture）
+  const logs = getAllEventLogs();
+  logs.forEach(log => {
+    const areaPoints = details[log.blockId];
+    if (areaPoints && log.meta && log.meta.legacyRow) {
+      const idx = log.meta.legacyRow - 2;
+      if (areaPoints[idx]) {
+        if (log.actionType === "distribute") {
+          areaPoints[idx].isDone = true;
+          areaPoints[idx].staffName = log.meta.staffName || "";
+          areaPoints[idx].staffId = log.userId || "";
+          areaPoints[idx].gps = (log.lat && log.lng) ? `${log.lat},${log.lng}` : "";
+          areaPoints[idx].photoUrl = log.meta.photoUrl || "";
+          areaPoints[idx].completedAt = Utilities.formatDate(new Date(log.timestamp), "JST", "MM/dd HH:mm");
+        } else if (log.actionType === "revert_distribute") {
+          areaPoints[idx].isDone = false;
+        }
+      }
     }
   });
 
@@ -391,7 +478,7 @@ function getCityAreaDetails(cityName) {
 }
 
 function getRoster() {
-  const s = getSS().getSheetByName(CONFIG.SHEET_ROSTER);
+  const s = getSS().getSheetByName(CONFIG.get("SHEET_ROSTER"));
   if (!s) return [];
   const lastRow = s.getLastRow();
   if (lastRow < 2) return [];
@@ -410,57 +497,66 @@ function getRoster() {
   return roster;
 }
 
-function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) {
+function submitDistribution(data) {
   const lock = LockService.getScriptLock();
   try {
-    lock.waitLock(5000); // 5秒（setValuesのみの軽量操作なので十分）
+    lock.waitLock(15000);
   } catch (e) {
-    throw new Error("サーバーが混雑しています。時間をおいて再度お試しください。");
+    return { success: false, message: "サーバーが混雑しています。時間をおいて再度お試しください。" };
   }
 
   try {
+    const isComplete = data.isDone === 'true' || data.isDone === true;
+    const actType = isComplete ? "distribute" : "revert_distribute";
+    const actCount = isComplete ? (parseFloat(data.count) || 1) : -(parseFloat(data.count) || 1);
+
+    const event = {
+      id: Utilities.getUuid(),
+      timestamp: Date.now(),
+      tenantId: data.tenantId || "IWASA-HQ",
+      branchId: data.branchId || "MIE-02",
+      prefectureId: data.prefectureId || "MIE",
+      blockId: data.blockId || data.areaName, // システムID (e.g. MIE-02-YOK-001)
+      userId: data.userId || data.staffId, // staffIdからのフォールバック互換性
+      actionType: actType,
+      count: actCount,
+      lat: data.lat || 0,
+      lng: data.lng || 0,
+      meta: data.meta || { 
+        legacyRow: data.rowId, 
+        staffName: data.staffName,
+        legacySheetName: data.legacySheetName
+      }
+    };
+
+    // ① 旧シート（互換）- Phase A Shadow Write
+    // ※ appendRow ではなく既存システムの構造（特定行のD〜H列の更新）を維持し、運用を一切壊さない
     const ss = getSS();
-    const s = ss.getSheetByName(areaName);
-    if (!s) return { success: false, message: "Sheet not found" };
-
-    // 1. キャッシュ更新のための値の変化を検知
-    const prevVal = s.getRange(rowId, 4).getValue();
-    const wasDone = prevVal === true || prevVal === "TRUE";
-    const nowDone = isDone === true || isDone === "TRUE";
+    const legacySheetName = data.legacySheetName || data.areaName; // 互換性維持
+    const legacySheet = ss.getSheetByName(legacySheetName);
     
-    let isDoneChange = 0;
-    if (!wasDone && nowDone) {
-      isDoneChange = 1;
-    } else if (wasDone && !nowDone) {
-      isDoneChange = -1;
-    }
+    if (legacySheet) {
+      const rowNum = parseInt(data.rowId, 10);
+      const completedAt = Utilities.formatDate(new Date(event.timestamp), "JST", "MM/dd HH:mm");
+      legacySheet.getRange(rowNum, 4, 1, 5).setValues([[
+        isComplete,
+        isComplete ? completedAt : "",
+        isComplete ? (parseFloat(data.count) || 0) : "",
+        isComplete ? (data.staffName || "") : "",
+        isComplete ? (data.userId || data.staffId || "") : ""
+      ]]);
 
-    // 2. D〜H列を1回のsetValuesでまとめて更新（Sheets API呼び出しを3→1回に削減）
-    const now = new Date();
-    const completedAt = Utilities.formatDate(now, "JST", "MM/dd HH:mm");
-    s.getRange(rowId, 4, 1, 5).setValues([[
-      isDone,
-      isDone ? completedAt : "",
-      isDone ? (parseFloat(count) || 0) : "",
-      isDone ? (staffName || "") : "",
-      isDone ? (staffId || "") : ""
-    ]]);
-
-    // 3. キャッシュの更新
-    if (isDoneChange !== 0) {
-      try {
-        updateAreaCache(areaName, isDoneChange);
-        
-        // ランキングキャッシュをフラッシュ（次回取得時に再集計）
-        const cache = CacheService.getScriptCache();
-        cache.remove("RANKING_FAST_CACHE");
-        PropertiesService.getScriptProperties().deleteProperty("RANKING_CACHE");
-      } catch (e) {
-        // キャッシュ更新エラーは無視
+      if (!isComplete) {
+        legacySheet.getRange(rowNum, 9, 1, 2).setValues([["", ""]]);
       }
     }
 
-    return { success: true };
+    // ② EventLog（正）
+    appendEventLog(event);
+
+    return { success: true, status: "ok", id: event.id };
+  } catch (e) {
+    return { success: false, message: e.toString() };
   } finally {
     lock.releaseLock();
   }
@@ -487,7 +583,7 @@ function registerStaff(lastName, firstName, lineUserId) {
 
   try {
     const ss = getSS();
-    const s = ss.getSheetByName(CONFIG.SHEET_ROSTER);
+    const s = ss.getSheetByName(CONFIG.get("SHEET_ROSTER"));
     if (!s) return { success: false, message: "Roster sheet not found" };
 
     const cleanName = String(lastName || "").trim();
@@ -592,106 +688,99 @@ function registerStaff(lastName, firstName, lineUserId) {
  * 個人別配布ランキングのキャッシュデータを取得する（なければ再集計）
  */
 function getRankingData() {
-  const cache = CacheService.getScriptCache();
-  const fastCached = cache.get("RANKING_FAST_CACHE");
-  if (fastCached) return JSON.parse(fastCached);
-
-  const props = PropertiesService.getScriptProperties();
-  const cached = props.getProperty("RANKING_CACHE");
-  if (cached) {
-    try {
-      const data = JSON.parse(cached);
-      cache.put("RANKING_FAST_CACHE", cached, 1800);
-      return data;
-    } catch (e) {}
-  }
-  return refreshRankingCache();
+  // Phase 13: 完全に v2_core.gs 経由に変更
+  return getRankingDataCore();
 }
 
 /**
  * GPS座標と写真データを伴う実績の登録・更新。
  * 送信された写真Base64データをGoogleドライブに「自己記述型ファイル名」で保存し、共有リンクをスプレッドシートに記録する。
  */
-function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, longitude, photoData, staffName, staffId) {
+function updateRecordWithGPSPhoto(data) {
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(15000);
   } catch (e) {
-    throw new Error("サーバーが混雑しています。時間をおいて再度お試しください。");
+    return { success: false, message: "サーバーが混雑しています。時間をおいて再度お試しください。" };
   }
 
   try {
-    const ss = getSS();
-    const s = ss.getSheetByName(areaName);
-    if (!s) return { success: false, message: "Sheet not found" };
-
-    const prevVal = s.getRange(rowId, 4).getValue();
-    const wasDone = prevVal === true || prevVal === "TRUE";
-    const nowDone = isDone === true || isDone === "TRUE";
-    
-    let isDoneChange = 0;
-    if (!wasDone && nowDone) {
-      isDoneChange = 1;
-    } else if (wasDone && !nowDone) {
-      isDoneChange = -1;
-    }
-
-    const now = new Date();
-    const completedAt = Utilities.formatDate(now, "JST", "MM/dd HH:mm");
-
-    // D〜H列を1回のsetValuesでまとめて更新（Sheets API呼び出しを4→1回に削減）
-    s.getRange(rowId, 4, 1, 5).setValues([[
-      isDone,
-      isDone ? completedAt : "",
-      isDone ? (parseFloat(count) || 0) : "",
-      isDone ? (staffName || "") : "",
-      isDone ? (staffId || "") : ""
-    ]]);
+    const isComplete = data.isDone === 'true' || data.isDone === true;
+    const actType = isComplete ? "photo" : "revert_photo";
+    const actCount = isComplete ? (parseFloat(data.count) || 1) : -(parseFloat(data.count) || 1);
 
     let photoUrl = "";
-
-    if (isDone) {
-      // I列（GPS）の書き込み
-      const gpsStr = (latitude && longitude) ? `${latitude},${longitude}` : "";
-      s.getRange(rowId, 9).setValue(gpsStr);
-
-      // J列（写真）: photoDataがBase64画像の場合のみDrive保存
-      if (photoData && photoData.indexOf("data:image") === 0) {
-        try {
-          const folderId = getStorageFolderId();
-          const folder = DriveApp.getFolderById(folderId);
-          const timeStr = Utilities.formatDate(now, "JST", "HHmm");
-          const safeStaffName = staffName ? staffName.replace(/[\s　]/g, "") : "Unknown";
-          const fileName = `[${areaName}]_${safeStaffName}_${timeStr}.jpg`;
-          const base64Data = photoData.split(",")[1];
-          const decoded = Utilities.base64Decode(base64Data);
-          const blob = Utilities.newBlob(decoded, "image/jpeg", fileName);
-          const file = folder.createFile(blob);
-          photoUrl = file.getId();
-          s.getRange(rowId, 10).setValue(photoUrl);
-        } catch (driveErr) {
-          console.error("Google Drive Save Error:", driveErr);
-        }
-      }
-    } else {
-      // 完了解除時はGPS・写真URLをクリア
-      s.getRange(rowId, 9, 1, 2).setValues([["", ""]]);
-    }
-
-    // キャッシュ更新
-    if (isDoneChange !== 0) {
+    
+    if (isComplete && data.photoData && data.photoData.indexOf("data:image") === 0) {
       try {
-        updateAreaCache(areaName, isDoneChange);
-        const cache = CacheService.getScriptCache();
-        cache.remove("RANKING_FAST_CACHE");
-        PropertiesService.getScriptProperties().deleteProperty("RANKING_CACHE");
-      } catch (e) {}
+        const folderId = getStorageFolderId();
+        const folder = DriveApp.getFolderById(folderId);
+        const now = new Date();
+        const timeStr = Utilities.formatDate(now, "JST", "HHmm");
+        const safeStaffName = data.staffName ? data.staffName.replace(/[\s　]/g, "") : "Unknown";
+        const legacySheetName = data.legacySheetName || data.areaName || "UnknownArea";
+        const fileName = `[${legacySheetName}]_${safeStaffName}_${timeStr}.jpg`;
+        const base64Data = data.photoData.split(",")[1];
+        const decoded = Utilities.base64Decode(base64Data);
+        const blob = Utilities.newBlob(decoded, "image/jpeg", fileName);
+        const file = folder.createFile(blob);
+        photoUrl = file.getId();
+      } catch (driveErr) {
+        console.error("Google Drive Save Error:", driveErr);
+      }
     }
 
-    return {
-      success: true,
-      photoUrl: photoUrl
+    const event = {
+      id: Utilities.getUuid(),
+      timestamp: Date.now(),
+      tenantId: data.tenantId || "IWASA-HQ",
+      branchId: data.branchId || "MIE-02",
+      prefectureId: data.prefectureId || "MIE",
+      blockId: data.blockId || data.areaName,
+      userId: data.userId || data.staffId,
+      actionType: actType,
+      count: actCount,
+      lat: data.lat || data.latitude || 0,
+      lng: data.lng || data.longitude || 0,
+      meta: data.meta || { 
+        photoUrl: photoUrl || data.photoUrl,
+        legacyRow: data.rowId, 
+        staffName: data.staffName,
+        legacySheetName: data.legacySheetName || data.areaName
+      }
     };
+
+    const ss = getSS();
+    const legacySheetName = data.legacySheetName || data.areaName || "UnknownArea";
+    const legacySheet = ss.getSheetByName(legacySheetName);
+    
+    if (legacySheet) {
+      const rowNum = parseInt(data.rowId || data.legacyRow, 10);
+      const completedAt = Utilities.formatDate(new Date(event.timestamp), "JST", "MM/dd HH:mm");
+      legacySheet.getRange(rowNum, 4, 1, 5).setValues([[
+        isComplete,
+        isComplete ? completedAt : "",
+        isComplete ? (parseFloat(data.count) || 0) : "",
+        isComplete ? (data.staffName || "") : "",
+        isComplete ? (data.userId || data.staffId || "") : ""
+      ]]);
+
+      if (isComplete) {
+        const gpsStr = (event.lat && event.lng) ? `${event.lat},${event.lng}` : "";
+        legacySheet.getRange(rowNum, 9).setValue(gpsStr);
+        if (photoUrl) {
+          legacySheet.getRange(rowNum, 10).setValue(photoUrl);
+        }
+      } else {
+        legacySheet.getRange(rowNum, 9, 1, 2).setValues([["", ""]]);
+      }
+    }
+
+    appendEventLog(event);
+
+    return { success: true, status: "ok", id: event.id };
+  } catch (e) {
+    return { success: false, message: e.toString() };
   } finally {
     lock.releaseLock();
   }
@@ -713,90 +802,8 @@ function updateRecordWithGPSPhoto(areaName, rowId, isDone, count, latitude, long
  *   lastSyncAt     — 最新の完了時刻文字列
  */
 function getDeliveryStats() {
-  var CACHE_KEY = 'DELIVERY_STATS_V2';
-  var cache = CacheService.getScriptCache();
-
-  // キャッシュヒット
-  try {
-    var cached = cache.get(CACHE_KEY);
-    if (cached) return JSON.parse(cached);
-  } catch (e) {}
-
-  // 除外シート名リスト（v2_stats.gs の集計と同じ除外ルール）
-  var NON_AREA = [
-    CONFIG.SHEET_GUIDE,
-    CONFIG.SHEET_ROSTER,
-    CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL,
-    CONFIG.SHEET_DISTRICT,
-    CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT,
-    CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_SYSTEM_CACHE,
-    CONFIG.SHEET_STORAGE
-  ];
-
-  var ss = getSS();
-  var sheets = ss.getSheets();
-
-  var totalCompleted = 0;
-  var withGPS        = 0;
-  var withPhoto      = 0;
-  var lastSyncAt     = '';
-
-  var now = new Date();
-  var todayPrefix = Utilities.formatDate(now, "JST", "MM/dd"); // 例: "06/09"
-  var activeStaffs = {}; // 本日稼働した配布員の staffId を保持
-
-  sheets.forEach(function(sheet) {
-    var name = sheet.getName();
-    if (NON_AREA.indexOf(name) !== -1 || sheet.isSheetHidden()) return;
-
-    var lastRow = sheet.getLastRow();
-    if (lastRow < 2) return;
-
-    // 列構成: A=住所, D=isDone(col4), E=completedAt(col5), F=count(col6),
-    //         G=staffName(col7), H=staffId(col8), I=gps(col9), J=photoUrl(col10)
-    // D列(index 4)から7列分読み取り → D,E,F,G,H,I,J
-    var data = sheet.getRange(2, 4, lastRow - 1, 7).getValues();
-
-    data.forEach(function(row) {
-      var isDone   = row[0] === true || row[0] === 'TRUE' || row[0] === 1;
-      var complAt  = row[1] ? String(row[1]).trim() : '';  // E列: completedAt
-      var staffId  = row[4] ? String(row[4]).trim() : '';  // H列: staffId
-      var gps      = row[5] ? String(row[5]).trim() : '';  // I列 (D=0,E=1,F=2,G=3,H=4,I=5)
-      var photoUrl = row[6] ? String(row[6]).trim() : '';  // J列
-
-      if (isDone) {
-        totalCompleted++;
-        if (gps)      withGPS++;
-        if (photoUrl) withPhoto++;
-        if (complAt && complAt > lastSyncAt) lastSyncAt = complAt;
-
-        // 本日の打刻、かつ配布員ID、GPS、写真がすべて揃っている場合のみ、ユニーク稼働として判定
-        if (complAt.indexOf(todayPrefix) === 0 && staffId !== '' && gps !== '' && photoUrl !== '') {
-          activeStaffs[staffId] = true;
-        }
-      }
-    });
-  });
-
-  var activeStaffCount = Object.keys(activeStaffs).length;
-
-  var result = {
-    success:        true,
-    totalCompleted: totalCompleted,
-    withGPS:        withGPS,
-    withPhoto:      withPhoto,
-    pending:        totalCompleted - withGPS,
-    lastSyncAt:     lastSyncAt,
-    activeStaffCount: activeStaffCount
-  };
-
-  // 60秒キャッシュ
-  try { cache.put(CACHE_KEY, JSON.stringify(result), 60); } catch (e) {}
-
-  return result;
+  // Phase 13: v2_core.gs 経由に変更
+  return getDeliveryStatsCore();
 }
 
 // =============================
@@ -805,9 +812,9 @@ function getDeliveryStats() {
 
 function getFlyerStock() {
   const ss = getSS();
-  let s = ss.getSheetByName(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+  let s = ss.getSheetByName(CONFIG.get("SHEET_STORAGE") || "チラシ保管庫");
   if (!s) {
-    s = ss.insertSheet(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+    s = ss.insertSheet(CONFIG.get("SHEET_STORAGE") || "チラシ保管庫");
     s.getRange(1, 1, 1, 6).setValues([["ID", "スタッフID", "スタッフ名", "保管場所", "保管枚数", "更新日時"]]);
   }
   const lastRow = s.getLastRow();
@@ -833,9 +840,9 @@ function updateFlyerStock(location, count, staffName, staffId) {
   }
   try {
     const ss = getSS();
-    let s = ss.getSheetByName(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+    let s = ss.getSheetByName(CONFIG.get("SHEET_STORAGE") || "チラシ保管庫");
     if (!s) {
-      s = ss.insertSheet(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+      s = ss.insertSheet(CONFIG.get("SHEET_STORAGE") || "チラシ保管庫");
       s.getRange(1, 1, 1, 6).setValues([["ID", "スタッフID", "スタッフ名", "保管場所", "保管枚数", "更新日時"]]);
     }
     const lastRow = s.getLastRow();
@@ -912,7 +919,7 @@ function handleRequestFlyerTransfer(data) {
     ]);
 
     // Push通知処理：管理者IDシートの全管理者に通知
-    const adminSheet = ss.getSheetByName(CONFIG.SHEET_ADMIN);
+    const adminSheet = ss.getSheetByName(CONFIG.get("SHEET_ADMIN"));
     if (adminSheet) {
       const adminLastRow = adminSheet.getLastRow();
       if (adminLastRow >= 2) {
@@ -944,9 +951,9 @@ function registerAdmin(displayName, lineUserId) {
   try { lock.waitLock(10000); } catch(e) { return { success: false, message: 'Lock timeout' }; }
   try {
     const ss = getSS();
-    let s = ss.getSheetByName(CONFIG.SHEET_ADMIN);
+    let s = ss.getSheetByName(CONFIG.get("SHEET_ADMIN"));
     if (!s) {
-      s = ss.insertSheet(CONFIG.SHEET_ADMIN);
+      s = ss.insertSheet(CONFIG.get("SHEET_ADMIN"));
       s.getRange(1, 1, 1, 3).setValues([['管理者名', 'LINE_USER_ID', '登録日時']]);
       // ヘッダー行のスタイル設定
       s.getRange(1, 1, 1, 3).setBackground('#1a237e').setFontColor('#ffffff').setFontWeight('bold');

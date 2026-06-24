@@ -59,7 +59,7 @@ function generateAreaSheetsBatch() {
   if (props.getProperty("BATCH_STATUS") !== "running") return;
   const startTime = new Date().getTime();
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const baseSheet = ss.getSheetByName(CONFIG.SHEET_TEMPLATE);
+  const baseSheet = ss.getSheetByName(CONFIG.get("SHEET_TEMPLATE"));
 
   // 2. CSV読み込みの代わりに一時シートから高速ロード
   const tempSheet = ss.getSheetByName("__TEMP_ADDRESSES__");
@@ -74,7 +74,7 @@ function generateAreaSheetsBatch() {
   const addresses = tempValues.map(r => ({ postalCode: r[0], address: r[1] }));
   
   const startIndex = parseInt(props.getProperty("BATCH_INDEX")) || 0;
-  const chunkSize = CONFIG.CHUNK_SIZE;
+  const chunkSize = CONFIG.get("CHUNK_SIZE");
 
   // 3. 再開時の状態シミュレーション
   let cityCounts = {};
@@ -234,7 +234,7 @@ function checkEndOfMonthAndReset() {
     
     if (disableRollover) {
       // 【契約終了予約がある場合】 ➔ 在庫一覧も含めてデータを完全消去し、システムを完全停止
-      const storageSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_STORAGE || "チラシ保管庫");
+      const storageSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.get("SHEET_STORAGE") || "チラシ保管庫");
       if (storageSheet) {
         const lastRow = storageSheet.getLastRow();
         if (lastRow >= 2) {

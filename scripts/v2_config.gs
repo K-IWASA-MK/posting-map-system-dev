@@ -1,45 +1,111 @@
 /**
  * GAS v2（最強安定・統合版） - 設定モジュール
  * - 全体の動作パラメータ管理
+ * - Phase 14: Runtime Config System (OS化)
  */
 
 // ==========================================
-// GLOBAL CONFIGURATION (gas.gs 準拠)
+// RUNTIME OS CONFIGURATION
+// ==========================================
+
+const DEFAULT_STORE = {
+  "DEFAULT": {
+    VERSION: "2.2.0 (Mobile & Pro Integrated)",
+    MODE: "production",
+    SHEETS: {
+      EVENTLOG: "EventLog"
+    },
+    PATH: {
+      CSV: "/data/",
+      CORE: "v2_core.gs",
+      API: "v2_api.gs"
+    },
+
+    // ファイル名設定
+    DISTRICT_CSV: "三重県選挙区区割り",
+    POSTAL_CSV: "MIE_POSTAL.CSV",
+    TURNOUT_CSV: "voter_turnout.csv",
+    TARGET_GOAL: 300000,
+
+    // シート名設定
+    SHEET_GUIDE: "初めての方「使い方ガイド」",
+    SHEET_ROSTER: "名簿",
+    SHEET_TEMPLATE: "原本",
+    SHEET_POSTAL: "郵便番号",
+    SHEET_DISTRICT: "区割り",
+    SHEET_MASTER_EXPORT: "📥 集計用マスターデータ",
+    SHEET_REPORT: "📄 活動報告書",
+    SHEET_MANUAL: "📖 らくらくマニュアル",
+    SHEET_SYSTEM_CACHE: "__SYSTEM_CACHE__",
+    SHEET_STORAGE: "チラシ保管庫",
+    SHEET_ADMIN: "管理者ID",
+
+    // 動作設定
+    CHUNK_SIZE: 10,
+    ROW_HEIGHT_STAFF: 60,
+    DENOMINATOR_UNITS: 651,
+    DEFAULT_DISTRICT: "第2区",
+    DEFAULT_PREFECTURE: "三重県"
+  },
+  "MIE-02": {
+    // Override example for tenant
+    MODE: "production"
+  }
+};
+
+function loadConfigStore() {
+  try {
+    const cache = CacheService.getScriptCache().get("CONFIG_STORE");
+    if (cache) return JSON.parse(cache);
+
+    const storeRaw = PropertiesService.getScriptProperties().getProperty("CONFIG_STORE");
+
+    let parsed;
+    if (!storeRaw) {
+      parsed = DEFAULT_STORE;
+    } else {
+      parsed = JSON.parse(storeRaw);
+    }
+
+    CacheService.getScriptCache().put("CONFIG_STORE", JSON.stringify(parsed), 300);
+    return parsed;
+  } catch (e) {
+    // 🔥 フェイルセーフ（OS停止防止）
+    return DEFAULT_STORE;
+  }
+}
+
+function deepMerge(base, override) {
+  const result = JSON.parse(JSON.stringify(base));
+  for (const k in override) {
+    if (typeof override[k] === "object" && override[k] !== null && !Array.isArray(override[k])) {
+      result[k] = deepMerge(result[k] || {}, override[k]);
+    } else {
+      result[k] = override[k];
+    }
+  }
+  return result;
+}
+
+function getConfig(tenantId = "DEFAULT") {
+  const store = loadConfigStore();
+  return deepMerge(
+    store.DEFAULT,
+    store[tenantId] || {}
+  );
+}
+
+// ==========================================
+// GLOBAL ACCESSOR (OS CONFIG)
 // ==========================================
 const CONFIG = {
-  VERSION: "2.2.0 (Mobile & Pro Integrated)",
-  // ファイル名設定
-  // ⚠️ 以下はクライアント固有値 — clients/[ID]/config.js への移行を推奨
-  DISTRICT_CSV: "三重県選挙区区割り",
-  POSTAL_CSV: "MIE_POSTAL.CSV",
-  TURNOUT_CSV: "voter_turnout.csv",
-  TARGET_GOAL: 300000, // 目標配布枚数（ダッシュボード用）
-
-  // シート名設定
-  SHEET_GUIDE: "初めての方「使い方ガイド」",
-  SHEET_ROSTER: "名簿",
-  SHEET_TEMPLATE: "原本",
-  SHEET_POSTAL: "郵便番号",
-  SHEET_DISTRICT: "区割り",
-  SHEET_MASTER_EXPORT: "📥 集計用マスターデータ",
-  SHEET_REPORT: "📄 活動報告書",
-  SHEET_MANUAL: "📖 らくらくマニュアル",
-  SHEET_SYSTEM_CACHE: "__SYSTEM_CACHE__", // 高速集計用シャドウシート
-  SHEET_STORAGE: "チラシ保管庫",
-  SHEET_ADMIN: "管理者ID",
-
-  // 動作設定
-  CHUNK_SIZE: 10,
-  ROW_HEIGHT_STAFF: 60,
-  DENOMINATOR_UNITS: 651, // 三重第2区の戦略ユニット総数
-
-  // ⚠️ クライアント固有値 — 展開時に要変更
-  DEFAULT_DISTRICT: "第2区",
-  DEFAULT_PREFECTURE: "三重県",
+  get: function(path, tenantId = "DEFAULT") {
+    const cfg = getConfig(tenantId);
+    return path.split(".").reduce((obj, key) => obj?.[key], cfg);
+  },
   
   // ストレージ設定
   // ⚠️ STORAGE_PARENT_ID は PropertiesService で管理（スクリプトプロパティ: STORAGE_PARENT_ID）
-  // 「📁 ドライブフォルダを自動セットアップ」を実行後、スクリプトプロパティに自動保存されます
   get STORAGE_PARENT_ID() {
     return PropertiesService.getScriptProperties().getProperty('STORAGE_PARENT_ID') || '';
   }

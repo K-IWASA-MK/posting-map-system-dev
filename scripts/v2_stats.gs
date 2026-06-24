@@ -9,69 +9,27 @@
  */
 function aggregateTotalVolumes() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const guideSheet = ss.getSheetByName(CONFIG.SHEET_GUIDE);
-  const exclude = [
-    CONFIG.SHEET_GUIDE,
-    CONFIG.SHEET_ROSTER,
-    CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL,
-    CONFIG.SHEET_DISTRICT,
-    CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT,
-    CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_STORAGE,
-  ];
+  const guideSheet = ss.getSheetByName(CONFIG.get("SHEET_GUIDE"));
 
+  // Phase 13: EventLog経由の集計
+  const logs = getAllEventLogs();
+  
   let totalUnitsDone = 0;
-  let totalUnits = 0; // 実データから動的に算出する分母
   let grandTotalVolume = 0;
 
-  // 名簿から最新のID->名前マップを作成
-  const rosterData = getRoster();
-  const rosterMap = {};
-  rosterData.forEach((r) => {
-    rosterMap[r.id] = r.displayName;
-  });
-
-  let staffRanking = {}; // { IDまたは名前: 合計枚数 }
-
-  const sheets = ss.getSheets();
-  sheets.forEach((sheet) => {
-    const name = sheet.getName();
-    if (!exclude.includes(name) && !sheet.isSheetHidden()) {
-      const lastRow = sheet.getLastRow();
-      if (lastRow >= 2) {
-        // D:完了, E:日時, F:枚数, G:スタッフ, H:ID
-        const data = sheet.getRange(2, 4, lastRow - 1, 5).getValues();
-        totalUnits += data.length; // 全シートの行数を累積（分母の動的算出）
-
-        data.forEach((row) => {
-          const isDone = row[0] === true;
-          const count = parseFloat(row[2]) || 0;
-          const staff = row[3];
-
-          if (isDone) {
-            totalUnitsDone++;
-            grandTotalVolume += count;
-            if (staff) {
-              staffRanking[staff] = (staffRanking[staff] || 0) + count;
-            }
-          }
-        });
-      }
+  logs.forEach(log => {
+    if (log.actionType === "distribute") {
+      totalUnitsDone++;
+      grandTotalVolume += log.count;
     }
   });
 
-  // 進捗率の計算（分母は実データから動的算出、シートゼロの場合のみ CONFIG.DENOMINATOR_UNITS をフォールバック）
-  const denominator = totalUnits > 0 ? totalUnits : CONFIG.DENOMINATOR_UNITS;
+  // 進捗率の計算（分母はCONFIG.get("DENOMINATOR_UNITS")を利用、もしくは別途マスタから取得）
+  const denominator = CONFIG.get("DENOMINATOR_UNITS") || 1000; // 安全のためフォールバック
   const progressPercent = (totalUnitsDone / denominator) * 100;
 
-  // ランキングキャッシュの再構築
-  try {
-    refreshRankingCache();
-  } catch (e) {
-    // キャッシュ再構築のエラーは単に無視
-  }
+  // ランキング取得
+  const rankingList = getRankingDataCore().slice(0, 10);
 
   if (guideSheet) {
     // 1. 全体進捗表示 (H5セル) - パーセントのみ
@@ -87,18 +45,14 @@ function aggregateTotalVolumes() {
       .setValue(`総配布枚数: ${grandTotalVolume.toLocaleString()} 枚`);
 
     // 3. ランキング表示 (M列などに反映)
-    const sortedRanking = Object.entries(staffRanking)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
-
     guideSheet.getRange("M10:O20").clearContent();
     guideSheet.getRange("M9").setValue("🏆 配布枚数ランキング");
 
-    sortedRanking.forEach((entry, index) => {
+    rankingList.forEach((entry, index) => {
       const row = 10 + index;
       guideSheet.getRange(row, 13).setValue(`${index + 1}位`);
-      guideSheet.getRange(row, 14).setValue(entry[0]);
-      guideSheet.getRange(row, 15).setValue(`${entry[1].toLocaleString()} 枚`);
+      guideSheet.getRange(row, 14).setValue(entry.name);
+      guideSheet.getRange(row, 15).setValue(`${entry.count.toLocaleString()} 枚`);
     });
 
     ss.toast(`集計完了: 進捗 ${progressPercent.toFixed(1)}%`, "システム更新");
@@ -119,8 +73,8 @@ function updateSheetSummary(sheet) {
 function createManualSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet =
-    ss.getSheetByName(CONFIG.SHEET_MANUAL) ||
-    ss.insertSheet(CONFIG.SHEET_MANUAL);
+    ss.getSheetByName(CONFIG.get("SHEET_MANUAL")) ||
+    ss.insertSheet(CONFIG.get("SHEET_MANUAL"));
   sheet.clear();
   sheet
     .getRange("B2")
@@ -133,8 +87,8 @@ function createManualSheet() {
 function exportAllDataToMasterSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let master =
-    ss.getSheetByName(CONFIG.SHEET_MASTER_EXPORT) ||
-    ss.insertSheet(CONFIG.SHEET_MASTER_EXPORT);
+    ss.getSheetByName(CONFIG.get("SHEET_MASTER_EXPORT")) ||
+    ss.insertSheet(CONFIG.get("SHEET_MASTER_EXPORT"));
   master.clear();
   ss.toast("マスター抽出完了。");
 }
@@ -143,49 +97,8 @@ function exportAllDataToMasterSheet() {
  * 全エリアのシートをスキャンして個人ランキングを集計し、キャッシュに保存する
  */
 function refreshRankingCache() {
-  const ss = getSS();
-  const exclude = [
-    CONFIG.SHEET_GUIDE,
-    CONFIG.SHEET_ROSTER,
-    CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL,
-    CONFIG.SHEET_DISTRICT,
-    CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT,
-    CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_SYSTEM_CACHE,
-    CONFIG.SHEET_STORAGE,
-    "__TEMP_ADDRESSES__" // バッチ一時シート（完了前に残った場合も除外）
-  ];
-
-  let staffRanking = {}; // { 名前: 合計枚数 }
-
-  const sheets = ss.getSheets();
-  sheets.forEach((sheet) => {
-    const name = sheet.getName();
-    if (!exclude.includes(name) && !sheet.isSheetHidden()) {
-      const lastRow = sheet.getLastRow();
-      if (lastRow >= 2) {
-        // D:完了, E:日時, F:枚数, G:スタッフ
-        const data = sheet.getRange(2, 4, lastRow - 1, 4).getValues();
-
-        data.forEach((row) => {
-          const isDone = row[0] === true || row[0] === "TRUE";
-          const count = parseFloat(row[2]) || 0;
-          const staffName = String(row[3] || "").trim();
-
-          if (isDone && staffName) {
-            staffRanking[staffName] = (staffRanking[staffName] || 0) + count;
-          }
-        });
-      }
-    }
-  });
-
-  // ランキング順（枚数降順）にソートしてオブジェクト配列に変換
-  const rankingList = Object.entries(staffRanking)
-    .map(([name, count]) => ({ name: name, count: count }))
-    .sort((a, b) => b.count - a.count);
+  // Phase 13: 集計（Ranking）は必ずEventLogから行う（旧シート走査禁止）
+  const rankingList = getRankingDataCore();
 
   const jsonResult = JSON.stringify(rankingList);
   const cache = CacheService.getScriptCache();

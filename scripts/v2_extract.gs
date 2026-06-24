@@ -12,7 +12,7 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
   // 1. 「区割り」を含むファイルをスマート検索
-  const districtFile = findFileByPattern("区割り", CONFIG.DISTRICT_CSV);
+  const districtFile = findFileByPattern("区割り", CONFIG.get("DISTRICT_CSV"));
   if (!districtFile) {
     ss.toast("Google Drive上に「区割り」を含むCSVファイルが見つかりません。", "エラー", 5);
     return [];
@@ -30,8 +30,8 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
     if (detected.prefecture && !finalPrefecture) finalPrefecture = detected.prefecture;
   }
 
-  if (!finalDistrictName) finalDistrictName = CONFIG.DEFAULT_DISTRICT;
-  if (!finalPrefecture) finalPrefecture = CONFIG.DEFAULT_PREFECTURE;
+  if (!finalDistrictName) finalDistrictName = CONFIG.get("DEFAULT_DISTRICT");
+  if (!finalPrefecture) finalPrefecture = CONFIG.get("DEFAULT_PREFECTURE");
 
   const firstDataRow = districtData[1]; // 0番目はヘッダー
   if (!finalDistrictName) finalDistrictName = firstDataRow[0];
@@ -46,7 +46,7 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
   }
 
   // 3. ドライブから「postal」または「郵便番号」を含むファイルをスマート検索
-  const postalFile = findFileByPattern("postal", CONFIG.POSTAL_CSV) || findFileByPattern("郵便番号", CONFIG.POSTAL_CSV);
+  const postalFile = findFileByPattern("postal", CONFIG.get("POSTAL_CSV")) || findFileByPattern("郵便番号", CONFIG.get("POSTAL_CSV"));
   if (!postalFile) {
     ss.toast("Google Drive上に「postal」または「郵便番号」を含むCSVファイルが見つかりません。", "エラー", 5);
     return [];

@@ -40,20 +40,7 @@ function renderAreas() {
 
   if (currentCity === null) {
     // 【第1層：市・自治体一覧画面】
-    const cityMap = {};
-    areaSummary.forEach(s => {
-      const cityName = getCityName(s.name);
-      if (!cityMap[cityName]) {
-        cityMap[cityName] = { name: cityName, done: 0, total: 0 };
-      }
-      cityMap[cityName].done += s.done || 0;
-      cityMap[cityName].total += s.total || 0;
-    });
-
-    const cities = Object.values(cityMap).map(c => {
-      c.progress = c.total > 0 ? Math.round((c.done / c.total) * 100) : 0;
-      return c;
-    });
+    const cities = citySummary;
 
     const headerCardHtml = `
       <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">

@@ -248,8 +248,8 @@ function setupTransferSheets() {
 
   // 1. チラシ保管庫
   let storageSheetName = "チラシ保管庫";
-  if (typeof CONFIG !== 'undefined' && CONFIG.SHEET_STORAGE) {
-    storageSheetName = CONFIG.SHEET_STORAGE;
+  if (typeof CONFIG !== 'undefined' && CONFIG.get("SHEET_STORAGE")) {
+    storageSheetName = CONFIG.get("SHEET_STORAGE");
   }
   let storageSheet = ss.getSheetByName(storageSheetName);
   if (!storageSheet) {
@@ -307,15 +307,15 @@ function onEdit(e) {
 
   // 除外シート
   const exclude = [
-    CONFIG.SHEET_GUIDE,
-    CONFIG.SHEET_ROSTER,
-    CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL,
-    CONFIG.SHEET_DISTRICT,
-    CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT,
-    CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_STORAGE,
+    CONFIG.get("SHEET_GUIDE"),
+    CONFIG.get("SHEET_ROSTER"),
+    CONFIG.get("SHEET_TEMPLATE"),
+    CONFIG.get("SHEET_POSTAL"),
+    CONFIG.get("SHEET_DISTRICT"),
+    CONFIG.get("SHEET_MASTER_EXPORT"),
+    CONFIG.get("SHEET_REPORT"),
+    CONFIG.get("SHEET_MANUAL"),
+    CONFIG.get("SHEET_STORAGE"),
   ];
   if (exclude.includes(name) || sheet.isSheetHidden()) return;
 
@@ -384,12 +384,12 @@ function deleteAllAreaSheets() {
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const exclude = [
-    CONFIG.SHEET_GUIDE,
-    CONFIG.SHEET_ROSTER,
-    CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL,
-    CONFIG.SHEET_DISTRICT,
-    CONFIG.SHEET_STORAGE,
+    CONFIG.get("SHEET_GUIDE"),
+    CONFIG.get("SHEET_ROSTER"),
+    CONFIG.get("SHEET_TEMPLATE"),
+    CONFIG.get("SHEET_POSTAL"),
+    CONFIG.get("SHEET_DISTRICT"),
+    CONFIG.get("SHEET_STORAGE"),
   ];
   ss.getSheets().forEach((s) => {
     if (!exclude.includes(s.getName())) ss.deleteSheet(s);
@@ -406,17 +406,17 @@ function deleteAllAreaSheets() {
  */
 function formatAllSheets() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const template = ss.getSheetByName(CONFIG.SHEET_TEMPLATE);
+  const template = ss.getSheetByName(CONFIG.get("SHEET_TEMPLATE"));
   const exclude = [
-    CONFIG.SHEET_GUIDE,
-    CONFIG.SHEET_ROSTER,
-    CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL,
-    CONFIG.SHEET_DISTRICT,
-    CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT,
-    CONFIG.SHEET_MANUAL,
-    CONFIG.SHEET_STORAGE,
+    CONFIG.get("SHEET_GUIDE"),
+    CONFIG.get("SHEET_ROSTER"),
+    CONFIG.get("SHEET_TEMPLATE"),
+    CONFIG.get("SHEET_POSTAL"),
+    CONFIG.get("SHEET_DISTRICT"),
+    CONFIG.get("SHEET_MASTER_EXPORT"),
+    CONFIG.get("SHEET_REPORT"),
+    CONFIG.get("SHEET_MANUAL"),
+    CONFIG.get("SHEET_STORAGE"),
   ];
 
   // 1. まずは「原本」を完璧に整える
@@ -516,7 +516,7 @@ function applyProDesign(sheet) {
  */
 function formatRosterSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.SHEET_ROSTER);
+  const sheet = ss.getSheetByName(CONFIG.get("SHEET_ROSTER"));
   if (!sheet) return;
 
   const maxRows = sheet.getMaxRows();
@@ -567,9 +567,9 @@ function formatRosterSheet() {
  */
 function setupRosterSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(CONFIG.SHEET_ROSTER);
+  let sheet = ss.getSheetByName(CONFIG.get("SHEET_ROSTER"));
   if (!sheet) {
-    sheet = ss.insertSheet(CONFIG.SHEET_ROSTER);
+    sheet = ss.insertSheet(CONFIG.get("SHEET_ROSTER"));
   }
 
   // ★ 修正: 一旦全データをクリアして真っ新にする

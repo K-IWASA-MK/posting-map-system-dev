@@ -13,7 +13,7 @@ window.onunhandledrejection = function(event) {
   logDebug(`UNHANDLED PROMISE: ${event.reason}`);
 };
 
-let allPoints = [], areaSummary = [], roster = [], rankingData = [];
+let allPoints = [], areaSummary = [], citySummary = [], roster = [], rankingData = [];
 let _appDataPromise = null; // ⑤ getAppData並列プリフェッチ用
 let _rankingFetched = false;  // ランキング遅延取得済みフラグ
 let _stockFetched = false;    // 在庫一覧取得済みフラグ
@@ -66,7 +66,7 @@ function removePressed() {
 
 
 // GAS API CONFIG (JSON ONLY)
-const API_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
+// API_URL has been moved to CONFIG.API_BASE in config.js
 
 async function callApi(action, params = {}) {
   const MAX_RETRIES = 3;
@@ -79,7 +79,7 @@ async function callApi(action, params = {}) {
       ...params
     });
     
-    const url = `${API_URL}?${queryParams.toString()}`;
+    const url = `${CONFIG.API_BASE}?${queryParams.toString()}`;
     const options = {
       method: 'GET',
       mode: 'cors',
@@ -150,7 +150,7 @@ async function callApiPost(action, payload = {}) {
   let delay = 1000;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    const url = `${API_URL}?_t=${Date.now()}`; // actionはbodyに含める
+    const url = `${CONFIG.API_BASE}?_t=${Date.now()}`; // actionはbodyに含める
     const body = JSON.stringify({ action, ...payload });
 
     const options = {
@@ -198,9 +198,22 @@ async function callApiPost(action, payload = {}) {
   }
 }
 
-function startApp(profile = null) {
+let RUNTIME_CONFIG = {};
+
+async function startApp(profile = null) {
   $('screen-gateway').classList.add('hidden');
   $('loading').classList.remove('hidden');
+  
+  try {
+    const configRes = await callApi('getConfig', { tenantId: "MIE-02" });
+    if (configRes && configRes.success && configRes.config) {
+      RUNTIME_CONFIG = configRes.config;
+      logDebug("OS Config Loaded successfully.");
+    }
+  } catch (err) {
+    logDebug("Failed to load OS Config: " + err.message);
+  }
+
   loadData();
 }
 
@@ -292,14 +305,17 @@ async function loadData(skipSync = false) {
     }
     logDebug("[loadData] Fetching getAppData...");
     setLoadingProgress(82, 'SYNCING DATA...');
-    const data = await (_appDataPromise || callApi('getAppData')); // ⑤ プリフェッチがあれば再利用
+    const appData = await (_appDataPromise || callApi('getAppData')); // ⑤ プリフェッチがあれば再利用
     logDebug("[loadData] getAppData fetched successfully.");
     setLoadingProgress(96, 'READY');
     _appDataPromise = null;
-    if (data && data.success) {
-      areaSummary = data.areas;
-      // ranking は switchPage('ranking') 初回タップ時に遅延取得
-      if (data.branchName) localStorage.setItem('branch_name', data.branchName);
+    if (appData && appData.areas) {
+      areaSummary = appData.areas;
+      citySummary = appData.cities || [];
+      
+      const overallStats = appData.stats || { done: 0, total: 0 };
+      
+      if (appData.branchName) localStorage.setItem('branch_name', appData.branchName);
       
       logDebug("[loadData] Rendering areas...");
       renderAreas();
@@ -1225,12 +1241,8 @@ async function safeInitApp() {
   }
   // ※ フラグはここでは削除しない。ログイン確認成功後（isLoggedIn()=true）に削除する。
   
-  // デプロイ先（ホスト名）に応じてLIFF IDを自動切り替え
-  // area-management.github.io → モニター用LIFF（h9Fjv1iU）
-  // k-iwasa-mk.github.io → スマホ用LIFF（tXZIMAJK）
-  const liffId = window.location.hostname === 'area-management.github.io'
-    ? "2010374196-gIYb6PDH"
-    : "2010374196-gIYb6PDH";
+  // デプロイ先（ホスト名）に応じてLIFF IDを自動切り替え (現在はCONFIGで管理)
+  const liffId = CONFIG.LIFF_ID;
   const btn = $('btn-login-manual');
   const spinner = $('login-spinner');
   const subtitle = $('gateway-subtitle');

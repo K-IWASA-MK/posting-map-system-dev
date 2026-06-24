@@ -3,43 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>POSTING MAP — ADMIN PANEL</title>
-  <!-- Force Refresh: v462 (2026-06-19) -->
-  <link rel="stylesheet" href="../tailwind-utils.css?v=462">
-  <!-- favicon -->
+  <title>POSTING MAP — ADMIN PANEL (Phase 1: Wireframe)</title>
+  <!-- Tailwind Utils for basic layout grid -->
+  <link rel="stylesheet" href="../tailwind-utils.css?v=500">
   <link rel="icon" href="../assets/icon-admin-panel-180.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/icon-admin-panel-180.png?v=202">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
- 
-  <script>
-    // 画面の意図しないスクロールやバウンスを物理的に防止
-    document.addEventListener('touchmove', function(e) {
-      const scrollable = e.target.closest('#content, .scrollable, #log-console, #admin-modal-body');
-      if (scrollable) return;
-      e.preventDefault();
-    }, { passive: false });
-  </script>
-  <!-- 共通APIモジュール -->
+  <!-- API & Logic scripts link -->
   <script defer src="../shared/api.js?v=462"></script>
-  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <!-- 管理者アプリロジック -->
   <script defer src="./manager.js?v=462"></script>
   <link rel="stylesheet" href="../style.css?v=462">
 </head>
-<body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
+<body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none">
 
-  <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) - hidden by default -->
-  <div id="screen-gateway" style="height: 100vh; height: 100dvh;" class="fixed top-0 left-0 w-full z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
-    <div class="w-36 h-36 bg-white/5 backdrop-blur-2xl rounded-[2.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
-      <img src="../assets/icon-admin-panel-180.png?v=201" class="w-full h-full object-cover rounded-[2.5rem] z-10">
+  <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) -->
+  <div id="screen-gateway" style="height: 100vh; height: 100dvh;" class="fixed top-0 left-0 w-full z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 text-center">
+    <div class="w-36 h-36 bg-white/5 rounded-[2.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative">
+      <img src="../assets/icon-admin-panel-180.png?v=201" class="w-full h-full object-cover rounded-[2.5rem]">
     </div>
-    <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">POSTING MAP</h2>
-    <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2 mb-6">管理者専用 — Administrator Only</p>
-    <div class="w-full max-w-sm bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl mb-6">
-      <button onclick="startAdmin()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">管理画面を起動する</button>
+    <h2 class="text-base font-black text-white/70">POSTING MAP</h2>
+    <p class="text-[10px] text-white/40 mt-2 mb-6">管理者専用 — Administrator Only</p>
+    <div class="w-full max-w-sm bg-white/5 rounded-[2.5rem] p-8 border border-white/10 mb-6">
+      <button onclick="startAdmin()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black uppercase tracking-tighter">管理画面を起動する</button>
     </div>
     <div class="gateway-footer space-y-1">
       <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Administrator</p>
@@ -58,390 +46,246 @@
     <p class="mt-6 text-[10px] font-black text-white/40 uppercase tracking-[0.3em] animate-pulse">Connecting command console...</p>
   </div>
 
-  <!-- 3. MAIN ADMIN APP - displayed by default -->
-  <div id="app" style="height: 100vh; height: 100dvh;" class="fixed top-0 left-0 w-full z-[2000] flex flex-col bg-[#000000] transition-opacity duration-1000">
-    <header class="safe-top px-8 py-8 flex justify-between items-center shrink-0">
+  <!-- 3. MAIN ADMIN APP -->
+  <div id="app" style="height: 100vh; height: 100dvh;" class="fixed top-0 left-0 w-full z-[2000] flex flex-col bg-[#000000] transition-opacity duration-1000 opacity-0 hidden">
+    
+    <!-- HEADER (上部ヘッダー配置・更新ボタン・最終更新時刻追加) -->
+    <header class="safe-top px-8 py-3 flex justify-between items-center shrink-0 border-b border-white/5">
       <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-black tracking-tighter text-white leading-none">管理指令室</h1>
         <span class="text-[9px] font-black text-white/30 uppercase tracking-widest leading-none">ADMIN PANEL</span>
       </div>
-      <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
-        <div id="api-dot" class="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></div>
-        <span id="api-status-text" class="text-xs font-black text-[#2563eb] tracking-tighter uppercase">API ACTIVE</span>
+      <div class="flex items-center gap-5">
+        <div class="flex flex-col items-end">
+          <span id="last-updated" class="text-[10px] font-mono text-white/40">最終更新: YYYY/MM/DD HH:MM:SS</span>
+        </div>
+        <button id="btn-refresh" class="bg-[#2563eb] text-white px-5 py-2 rounded-full text-xs font-black tracking-wider uppercase flex items-center gap-1.5 opacity-80 cursor-default">
+          <span>🔄</span><span>更新</span>
+        </button>
+        <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
+          <div id="api-dot" class="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></div>
+          <span id="api-status-text" class="text-xs font-black text-[#2563eb] tracking-tighter uppercase">API ACTIVE</span>
+        </div>
       </div>
     </header>
 
+    <!-- KPI BAR (高さを小さく - Compact KPI cards) -->
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 px-8 pt-3 pb-1 shrink-0">
+      <!-- 配布率 -->
+      <div class="premium-glass p-3 flex flex-col justify-between min-h-[4.5rem]">
+        <div class="flex justify-between items-start">
+          <span class="text-[9px] font-black text-white/50 tracking-wider">配布率</span>
+          <span class="text-[9px] font-black font-mono text-[#22c55e]">昨日比 ±X%</span>
+        </div>
+        <div class="flex items-baseline justify-between mt-1">
+          <span class="text-xl font-black font-mono tracking-tighter text-white">XX%</span>
+          <span class="text-[7px] font-bold text-white/30 uppercase tracking-widest font-mono">Coverage</span>
+        </div>
+      </div>
+      <!-- 配布枚数 -->
+      <div class="premium-glass p-3 flex flex-col justify-between min-h-[4.5rem]">
+        <div class="flex justify-between items-start">
+          <span class="text-[9px] font-black text-white/50 tracking-wider">配布枚数</span>
+          <span class="text-[9px] font-black font-mono text-[#22c55e]">昨日比 ±X</span>
+        </div>
+        <div class="flex items-baseline justify-between mt-1">
+          <span class="text-xl font-black font-mono tracking-tighter text-white">XX,XXX</span>
+          <span class="text-[7px] font-bold text-white/30 uppercase tracking-widest font-mono">Distributed</span>
+        </div>
+      </div>
+      <!-- 未配布 -->
+      <div class="premium-glass p-3 flex flex-col justify-between min-h-[4.5rem]">
+        <div class="flex justify-between items-start">
+          <span class="text-[9px] font-black text-white/50 tracking-wider">未配布</span>
+          <span class="text-[9px] font-black font-mono text-[#ef4444]">昨日比 ±X</span>
+        </div>
+        <div class="flex items-baseline justify-between mt-1">
+          <span class="text-xl font-black font-mono tracking-tighter text-white">XX,XXX</span>
+          <span class="text-[7px] font-bold text-white/30 uppercase tracking-widest font-mono">Remaining</span>
+        </div>
+      </div>
+      <!-- 稼働配布員 -->
+      <div class="premium-glass p-3 flex flex-col justify-between min-h-[4.5rem]">
+        <div class="flex justify-between items-start">
+          <span class="text-[9px] font-black text-white/50 tracking-wider">稼働配布員</span>
+          <span class="text-[9px] font-black font-mono text-[#22c55e]">昨日比 ±X</span>
+        </div>
+        <div class="flex items-baseline justify-between mt-1">
+          <span class="text-xl font-black font-mono tracking-tighter text-white">XX人</span>
+          <span class="text-[7px] font-bold text-white/30 uppercase tracking-widest font-mono">Active Staff</span>
+        </div>
+      </div>
+      <!-- 今日の完了地区 -->
+      <div class="premium-glass p-3 flex flex-col justify-between min-h-[4.5rem]">
+        <div class="flex justify-between items-start">
+          <span class="text-[9px] font-black text-white/50 tracking-wider">今日の完了地区</span>
+          <span class="text-[9px] font-black font-mono text-[#22c55e]">昨日比 ±X</span>
+        </div>
+        <div class="flex items-baseline justify-between mt-1">
+          <span class="text-xl font-black font-mono tracking-tighter text-white">X</span>
+          <span class="text-[7px] font-bold text-white/30 uppercase tracking-widest font-mono">Completed</span>
+        </div>
+      </div>
+      <!-- オンライン人数 -->
+      <div class="premium-glass p-3 flex flex-col justify-between min-h-[4.5rem]">
+        <div class="flex justify-between items-start">
+          <span class="text-[9px] font-black text-white/50 tracking-wider">オンライン人数</span>
+          <span class="text-[9px] font-black font-mono text-[#ef4444]">昨日比 ±X</span>
+        </div>
+        <div class="flex items-baseline justify-between mt-1">
+          <span class="text-xl font-black font-mono tracking-tighter text-white">XX人</span>
+          <span class="text-[7px] font-bold text-white/30 uppercase tracking-widest font-mono">Online</span>
+        </div>
+      </div>
+    </section>
 
-
-    <main id="content" style="min-height: 0; padding-bottom: 7.5rem;" class="flex-1 overflow-y-auto hide-scrollbar px-6 space-y-10 overscroll-y-contain">
+    <!-- 3. NOC LAYOUT CONTENT GRID (CSS Grid 2-Column Layout) -->
+    <main id="content" class="flex-1 grid grid-cols-2 gap-4 px-8 pb-4 overflow-hidden" style="min-height: 0;">
       
-      <!-- ── MONITOR タブ ── -->
-      <div id="panel-monitor" class="space-y-10">
-        <!-- 三重2区全体マップ -->
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">🗺️</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">全体戦略マップ</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">STRATEGY MAP</p>
-            </div>
+      <!-- Left Column (Live Map -> Municipality Progress -> Workers) -->
+      <div class="flex flex-col gap-3 overflow-hidden" style="min-height: 0;">
+        <!-- LIVE MAP -->
+        <section class="flex flex-col overflow-hidden space-y-1" style="flex: 1.6 1.6 0%; min-height: 0;">
+          <div class="flex justify-between items-center px-1">
+            <span class="text-[9px] font-black tracking-widest text-[#2563eb] uppercase">🗺️ Live Map (65%)</span>
           </div>
-          <div class="premium-glass p-1 overflow-hidden relative" style="height: 18rem;">
-            <div id="map" class="w-full h-full rounded-2xl" style="background: #000;"></div>
-            <div id="map-loading" class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm rounded-2xl transition-opacity duration-500">
-              <svg class="w-10 h-10" viewBox="0 0 50 50" fill="none" stroke-width="4">
-                <circle cx="25" cy="25" r="20" stroke="rgba(255,255,255,0.1)" />
-                <path d="M 25 5 A 20 20 0 0 1 45 25" stroke="#2563eb" stroke-linecap="round">
-                  <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite" />
-                </path>
-              </svg>
-              <p class="mt-4 text-[9px] font-black text-white/50 uppercase tracking-[0.2em] animate-pulse">地図データを読み込み中...</p>
+          <div class="premium-glass p-1 overflow-hidden relative flex-1" style="min-height: 0;">
+            <div id="map" class="w-full h-full rounded-[24px] flex items-center justify-center bg-[#111111]">
+              <span class="text-[10px] text-white/20 uppercase tracking-wider font-mono">Live Map Placeholder</span>
             </div>
           </div>
         </section>
 
-        <!-- 1. KPI Panel (2カラムグリッド化、日本語・英語併記、縦サイズ統一) -->
-        <section class="grid grid-cols-2 gap-4">
-          <!-- 全体配布率 -->
-          <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
-            <div class="flex flex-col gap-0.5">
-              <span class="text-xs font-black text-white/70 tracking-widest">全体配布率</span>
-              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">OVERALL COVERAGE</span>
-            </div>
-            <span id="stat-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
-            <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
-              <div id="stat-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
-            </div>
+        <!-- MUNICIPALITY PROGRESS -->
+        <section class="flex flex-col overflow-hidden space-y-1" style="flex: 1 1 0%; min-height: 0;">
+          <div class="flex justify-between items-center px-1">
+            <span class="text-[9px] font-black tracking-widest text-[#2563eb] uppercase">📊 Municipality Progress</span>
           </div>
-          <!-- 稼働配布員 -->
-          <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
-            <div class="flex flex-col gap-0.5">
-              <span class="text-xs font-black text-white/70 tracking-widest">稼働配布員</span>
-              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">ACTIVE STAFF</span>
+          <div class="premium-glass p-3 flex flex-col flex-1 overflow-hidden" style="min-height: 0;">
+            <div class="text-[10px] font-black text-white border-b border-white/10 pb-1 flex justify-between items-center shrink-0">
+              <span>市区町村別進捗およびランキング</span>
+              <span class="text-[9px] text-[#2563eb] font-mono">RANKING ACTIVE</span>
             </div>
-            <span id="stat-staff" class="text-4xl font-black tracking-tighter text-white">0</span>
-            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25);" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black text-[#22c55e] uppercase tracking-wider mt-1">
-              <span class="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-soft-pulse shadow-[0_0_6px_#22c55e]"></span>
-              <span>オンライン稼働中</span>
+            <div class="flex-1 border border-dashed border-white/10 rounded-2xl flex items-center justify-center p-3 text-center text-[10px] text-white/20 mt-1.5 overflow-y-auto" style="min-height: 0;">
+              Municipality progress bars & Leaderboard lists placeholder
             </div>
           </div>
         </section>
 
-        <!-- 同期状況 (2x2グリッド化、日本語・英語併記、縦サイズ統一) -->
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">🔄</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">データ同期状況</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">FIELD SYNC STATUS</p>
-            </div>
+        <!-- WORKERS -->
+        <section class="flex flex-col overflow-hidden space-y-1" style="flex: 1 1 0%; min-height: 0;">
+          <div class="flex justify-between items-center px-1">
+            <span class="text-[9px] font-black tracking-widest text-[#2563eb] uppercase">👥 Workers</span>
           </div>
-          <div class="grid grid-cols-2 gap-4">
-            <!-- 未送信 -->
-            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-              <span class="text-xs font-black text-white/70 tracking-widest">未送信</span>
-              <span id="sync-stat-pending" class="text-3xl font-black tracking-tighter text-[#f59e0b]">-</span>
-              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">GPS Pending</span>
+          <div class="premium-glass p-3 flex flex-col flex-1 overflow-hidden" style="min-height: 0;">
+            <div class="text-[10px] font-black text-white border-b border-white/10 pb-1 flex justify-between items-center shrink-0">
+              <span>配布員稼働状況</span>
+              <span class="text-[9px] text-white/40">Active Staff</span>
             </div>
-            <!-- 同期済 -->
-            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-              <span class="text-xs font-black text-white/70 tracking-widest">同期済</span>
-              <span id="sync-stat-synced" class="text-3xl font-black tracking-tighter text-[#22c55e]">-</span>
-              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">GPS Recorded</span>
-            </div>
-            <!-- 写真付き -->
-            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-              <span class="text-xs font-black text-white/70 tracking-widest">写真付き</span>
-              <span id="sync-stat-photo" class="text-3xl font-black tracking-tighter text-[#2563eb]">-</span>
-              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">Drive Saved</span>
-            </div>
-            <!-- 最終同期 -->
-            <div class="premium-glass p-5 flex flex-col items-center justify-center text-center gap-1 min-h-[7.5rem]">
-              <span class="text-xs font-black text-white/70 tracking-widest">最終同期</span>
-              <span id="sync-stat-lastsync" class="text-sm font-black tracking-tight text-white/70 truncate max-w-full">-</span>
-              <span class="text-[8px] font-black text-white/20 uppercase tracking-widest font-mono">Last Updated</span>
-            </div>
-          </div>
-        </section>
-
-
-      </div>
-
-      <!-- ── STORAGE タブ (📦 保管庫) ── -->
-      <div id="panel-storage" class="space-y-10 hidden">
-        <!-- チラシ保管状況 -->
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">📦</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">保管状況一覧</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">FLYER STOCK INVENTORY</p>
-            </div>
-          </div>
-
-          <div id="manager-storage-list-container" class="space-y-6">
-            <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
-              <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
-              <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Loading Inventory...</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- 管理者用在庫登録フォーム -->
-        <section class="space-y-4">
-          <div class="premium-glass p-6 space-y-6">
-            <div class="flex flex-col items-center justify-center text-center gap-1">
-              <span class="text-[10px] font-black uppercase tracking-widest text-[#22c55e] font-mono">管理者 在庫登録</span>
-              <p class="text-[9px] text-white/40">本部でチラシを受け取った際などに登録してください</p>
-            </div>
-            
-            <div class="space-y-2">
-              <label class="text-[10px] font-bold text-white/40 tracking-wider">保管場所（市名）</label>
-              <select id="storage-register-location" class="w-full h-12 bg-[#1C1C1E] border border-white/10 rounded-xl px-4 text-xs font-bold text-white focus:outline-none focus:border-[#2563eb] transition-colors">
-                <option value="伊賀市">伊賀市</option>
-                <option value="亀山市">亀山市</option>
-                <option value="鈴鹿市">鈴鹿市</option>
-                <option value="名張市">名張市</option>
-                <option value="四日市市">四日市市</option>
-              </select>
-            </div>
-            <div class="space-y-2">
-              <label class="text-[10px] font-bold text-white/40 tracking-wider">保管枚数 (枚)</label>
-              <input id="storage-register-count" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="1000" class="w-full h-12 bg-[#1C1C1E] border border-white/10 rounded-xl px-4 text-sm font-black text-white focus:outline-none focus:border-[#2563eb] transition-colors text-center font-mono">
-            </div>
-            <button id="btn-storage-register-submit" onclick="submitFlyerStock()" class="btn-neu w-full bg-[#2563eb] text-white rounded-xl py-3.5 text-xs font-black shadow-lg shadow-[#2563eb]/20 uppercase tracking-wider">
-              在庫を登録する
-            </button>
-            <div id="storage-register-message" class="hidden text-center text-xs font-bold text-[#22c55e]"></div>
-          </div>
-        </section>
-      </div>
-
-      <!-- ── REPORT タブ (📊 レポート) ── -->
-      <div id="panel-report" class="space-y-10 hidden">
-        <!-- 全体配布率 -->
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">📈</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">配布進捗レポート</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">PROGRESS REPORT</p>
-            </div>
-          </div>
-
-          <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-2 min-h-[9rem]">
-            <div class="flex flex-col gap-0.5">
-              <span class="text-xs font-black text-white/70 tracking-widest">全体配布率</span>
-              <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">OVERALL COVERAGE</span>
-            </div>
-            <span id="report-coverage" class="text-4xl font-black tracking-tighter text-white">0%</span>
-            <div class="w-full max-w-[80%] bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
-              <div id="report-progress-bar" class="bg-[#2563eb] h-full transition-all duration-1000 shadow-[0_0_10px_#2563eb]" style="width: 0%;"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 配布員ランキング -->
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">🏆</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">配布員ランキング</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">LEADERBOARD</p>
-            </div>
-          </div>
-
-          <div id="ranking-list" class="space-y-6">
-            <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
-              <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
-              <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Loading Leaderboard...</p>
+            <div class="flex-1 border border-dashed border-white/10 rounded-2xl flex items-center justify-center p-3 text-center text-[10px] text-white/20 mt-1.5 overflow-y-auto" style="min-height: 0;">
+              Workers roster table list placeholder
             </div>
           </div>
         </section>
       </div>
 
-      <!-- ── TRANSFER タブ (🚚 チラシ流通) ── -->
-      <div id="panel-transfer" class="space-y-10 hidden">
-        <!-- チラシ受渡要請 -->
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">🤝</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">受渡要請一覧</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">TRANSFER REQUESTS</p>
-            </div>
+      <!-- Right Column (System Status -> Activity Log -> Alerts) -->
+      <div class="flex flex-col gap-3 overflow-hidden" style="min-height: 0;">
+        <!-- SYSTEM STATUS -->
+        <section class="flex flex-col overflow-hidden space-y-1" style="flex: 1.6 1.6 0%; min-height: 0;">
+          <div class="flex justify-between items-center px-1">
+            <span class="text-[9px] font-black tracking-widest text-[#2563eb] uppercase">⚙️ FIELD OPERATIONS / System Status</span>
           </div>
+          <div class="premium-glass p-3 flex flex-col flex-1 overflow-hidden justify-between space-y-3" style="min-height: 0;">
+            <!-- Sync Status Table -->
+            <div class="space-y-1.5 shrink-0">
+              <div class="text-[10px] font-black text-white border-b border-white/10 pb-1 uppercase tracking-wide">同期ステータス</div>
+              <table class="w-full text-[10px]">
+                <tbody>
+                  <tr class="border-b border-white/5">
+                    <td class="py-1 text-white/50">未送信GPSデータ (GPS Pending)</td>
+                    <td class="py-1 text-right font-black font-mono text-[#f59e0b]">XX 件</td>
+                  </tr>
+                  <tr class="border-b border-white/5">
+                    <td class="py-1 text-white/50">同期済GPS記録 (GPS Recorded)</td>
+                    <td class="py-1 text-right font-black font-mono text-[#22c55e]">X,XXX 件</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1 text-white/50">写真アップロード (Drive Saved)</td>
+                    <td class="py-1 text-right font-black font-mono text-[#2563eb]">XXX 枚</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-          <div id="manager-transfer-list-container" class="space-y-6">
-            <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
-              <p class="text-sm font-black text-white/40">現在、処理待ちの要請はありません</p>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <!-- ── ROSTER タブ (👥 配布員管理) ── -->
-      <div id="panel-roster" class="space-y-10 hidden">
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">👥</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">登録配布員名簿</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">DISTRIBUTOR ROSTER</p>
-            </div>
-          </div>
-
-          <div id="manager-roster-list-container" class="space-y-6">
-            <div style="border: 1px solid rgba(255,255,255,0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
-              <div class="w-8 h-8 rounded-full border-2 border-[#2563eb]/40 border-t-[#2563eb] animate-spin"></div>
-              <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Loading Roster...</p>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <!-- ── SYSTEM タブ ── -->
-      <div id="panel-system" class="space-y-10 hidden">
-        <!-- システム操作 -->
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">🛠️</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">システム操作</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">TACTICAL COMMAND CENTER</p>
-            </div>
-          </div>
-          <div class="space-y-4">
-            <!-- Batch Run -->
-            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
-              <span class="text-2xl select-none">🚀</span>
-              <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-white/70 tracking-widest">一括エリア作成</span>
-                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Batch Run</span>
+            <!-- Flyer Storage & Transfers Summary -->
+            <div class="space-y-1.5 flex-1 flex flex-col" style="min-height: 0;">
+              <div class="text-[10px] font-black text-white border-b border-white/10 pb-1 uppercase tracking-wide flex justify-between items-center shrink-0">
+                <span>チラシ流通要請 (処理待ち)</span>
+                <span class="bg-white/5 border border-white/10 text-white/40 font-bold px-1 py-0.5 rounded text-[8px] font-mono">X REQUESTS</span>
               </div>
-              <button onclick="runCommand('forceStartBatch')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
-                起動する
-              </button>
-            </div>
-            <!-- Cache Sync -->
-            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
-              <span class="text-2xl select-none">🔄</span>
-              <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-white/70 tracking-widest">キャッシュ同期</span>
-                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Cache Sync</span>
+              <div class="flex-1 border border-dashed border-white/10 p-3 rounded-2xl text-center text-[10px] text-white/20 mt-1.5 flex items-center justify-center overflow-y-auto" style="min-height: 0;">
+                Transfers Request Cards list Placeholder
               </div>
-              <button onclick="runCommand('refreshCache')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
-                同期する
-              </button>
             </div>
-            <!-- Aggregate -->
-            <div class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
-              <span class="text-2xl select-none">📊</span>
-              <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-white/70 tracking-widest">統計情報集計</span>
-                <span class="text-[8px] font-black text-white/30 uppercase tracking-widest">Aggregate</span>
+
+            <!-- Tactical Actions -->
+            <div class="space-y-1.5 shrink-0">
+              <div class="text-[10px] font-black text-white border-b border-white/10 pb-1 uppercase tracking-wide">システム指令コマンド</div>
+              <div class="grid grid-cols-2 gap-2 text-[9px]">
+                <button class="bg-[#1C1C1E] border border-white/10 text-white/40 py-1.5 px-1 rounded-lg font-bold uppercase tracking-wider cursor-default">
+                  <span>🚀</span><span>一括エリア作成</span>
+                </button>
+                <button class="bg-[#1C1C1E] border border-white/10 text-white/40 py-1.5 px-1 rounded-lg font-bold uppercase tracking-wider cursor-default">
+                  <span>🔄</span><span>キャッシュ同期</span>
+                </button>
+                <button class="bg-[#1C1C1E] border border-white/10 text-white/40 py-1.5 px-1 rounded-lg font-bold uppercase tracking-wider cursor-default">
+                  <span>📊</span><span>統計情報集計</span>
+                </button>
+                <button class="bg-[#1C1C1E] border border-rose-950/40 text-rose-500/50 py-1.5 px-1 rounded-lg font-bold uppercase tracking-wider cursor-default">
+                  <span>⚠️</span><span>システム初期化</span>
+                </button>
               </div>
-              <button onclick="runCommand('aggregateStats')" class="w-full h-11 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-[#2563eb]/20">
-                集計する
-              </button>
-            </div>
-            <!-- System Reset -->
-            <div style="border-color: rgba(244, 63, 94, 0.2);" class="premium-glass p-6 flex flex-col items-center justify-center text-center gap-4">
-              <span class="text-2xl select-none">⚠️</span>
-              <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-rose-500 tracking-widest">システム完全初期化</span>
-                <span class="text-[8px] font-black text-rose-500/50 uppercase tracking-widest">System Reset</span>
-              </div>
-              <button onclick="runCommand('resetAllSheets')" class="w-full h-11 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl active:scale-[0.95] active:translate-y-0.5 transition-all duration-75 uppercase tracking-widest shadow-lg shadow-rose-600/20">
-                初期化する
-              </button>
             </div>
           </div>
         </section>
 
-        <!-- ログコンソール -->
-        <section class="space-y-4">
-          <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
-            <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-              <span class="text-sm">📄</span>
-            </div>
-            <div>
-              <h3 class="text-sm font-black tracking-wider text-white">システムログ</h3>
-              <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">INTEL LIVE STREAM</p>
+        <!-- ACTIVITY LOG -->
+        <section class="flex flex-col overflow-hidden space-y-1" style="flex: 1 1 0%; min-height: 0;">
+          <div class="flex justify-between items-center px-1">
+            <span class="text-[9px] font-black tracking-widest text-[#2563eb] uppercase">📝 Activity Log</span>
+          </div>
+          <div class="premium-glass p-3 flex flex-col flex-1 overflow-hidden" style="min-height: 0;">
+            <div class="text-[10px] font-black text-white border-b border-white/10 pb-1 shrink-0">リアルタイム活動ログ</div>
+            <div class="flex-1 border border-dashed border-white/10 rounded-2xl flex items-center justify-center p-3 text-center text-[10px] text-white/20 mt-1.5 overflow-y-auto" style="min-height: 0;">
+              Activity log console list placeholder (Newest at Top)
             </div>
           </div>
-          <div class="premium-glass p-6">
-            <div id="log-console" class="h-40 overflow-y-auto font-mono text-[10px] space-y-2 text-white/50 hide-scrollbar selection:bg-[#2563eb]">
-              <div class="text-white/30">&gt; 管理コマンドコンソールが起動しました。準備完了。</div>
+        </section>
+
+        <!-- ALERTS -->
+        <section class="flex flex-col overflow-hidden space-y-1" style="flex: 1 1 0%; min-height: 0;">
+          <div class="flex justify-between items-center px-1">
+            <span class="text-[9px] font-black tracking-widest text-[#2563eb] uppercase">🚨 Alerts</span>
+          </div>
+          <div class="premium-glass p-3 flex flex-col flex-1 overflow-hidden" style="min-height: 0;">
+            <div class="text-[10px] font-black text-white border-b border-white/10 pb-1 flex justify-between items-center shrink-0">
+              <span>アラートストリーム</span>
+              <span class="bg-white/5 border border-white/10 text-white/40 font-bold px-1.5 py-0.5 rounded text-[8px] font-mono">X ALERTS</span>
+            </div>
+            <div class="flex-1 border border-dashed border-white/10 rounded-2xl flex items-center justify-center p-3 text-center text-[10px] text-white/20 mt-1.5 overflow-y-auto" style="min-height: 0;">
+              Alert Stream list placeholder
             </div>
           </div>
         </section>
       </div>
 
     </main>
-    <!-- ボトムナビ (Liquid Glass) -->
-    <nav style="bottom: 12px;" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
-      <!-- Tier 1 Container -->
-      <div id="nav-tier-1" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
-        <button id="tab-btn-monitor" data-page="monitor" onclick="switchAdminTab('monitor')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all text-white">
-          <div class="text-xl">📍</div>
-          <span class="text-[10px] font-black uppercase tracking-widest text-white">監視</span>
-        </button>
-        <button id="tab-btn-storage" data-page="storage" onclick="switchAdminTab('storage')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40 text-white/40">
-          <div class="text-xl">📦</div>
-          <span class="text-[10px] font-black uppercase tracking-widest text-white/40">保管庫</span>
-        </button>
-        <button id="tab-btn-report" data-page="report" onclick="switchAdminTab('report')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40 text-white/40">
-          <div class="text-xl">📊</div>
-          <span class="text-[10px] font-black uppercase tracking-widest text-white/40">レポート</span>
-        </button>
-        <button onclick="toggleNavTier(2)" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40 text-white/40">
-          <div class="text-xl">⚙️</div>
-          <span class="text-[10px] font-black uppercase tracking-widest text-white/40">メニュー</span>
-        </button>
-      </div>
-      <!-- Tier 2 Container -->
-      <div id="nav-tier-2" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl hidden">
-        <button id="tab-btn-transfer" data-page="transfer" onclick="switchAdminTab('transfer')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40 text-white/40">
-          <div class="text-xl">🚚</div>
-          <span class="text-[10px] font-black uppercase tracking-widest text-white/40">流通</span>
-        </button>
-        <button id="tab-btn-roster" data-page="roster" onclick="switchAdminTab('roster')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40 text-white/40">
-          <div class="text-xl">👥</div>
-          <span class="text-[10px] font-black uppercase tracking-widest text-white/40">配布員</span>
-        </button>
-        <button id="tab-btn-system" data-page="system" onclick="switchAdminTab('system')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40 text-white/40">
-          <div class="text-xl">🛠️</div>
-          <span class="text-[10px] font-black uppercase tracking-widest text-white/40">システム</span>
-        </button>
-        <button onclick="toggleNavTier(1)" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40 text-white/40">
-          <div class="text-xl">↩️</div>
-          <span class="text-[10px] font-black uppercase tracking-widest text-white/40">戻る</span>
-        </button>
-      </div>
-    </nav>
   </div>
 
-  <!-- W-2/W-3: alert()/confirm() 置換 — ガラスモーダル -->
+  <!-- alert()/confirm() 置換 — ガラスモーダル -->
   <div id="admin-modal" class="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-sm flex items-end justify-center opacity-0 pointer-events-none transition-all duration-300">
     <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 space-y-6" id="admin-modal-inner">
-      <!-- ドラッグバー -->
       <div class="flex justify-center -mt-3 mb-0">
         <div class="w-12 h-1 bg-white/10 rounded-full"></div>
       </div>
