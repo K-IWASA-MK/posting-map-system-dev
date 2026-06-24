@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>POSTING MAP OS Loader</title>
+  <style>
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: 'Inter', -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100dvh;
+      text-align: center;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: #2563eb;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .status {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+    }
+  </style>
+  <script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script defer src="./config.js"></script>
+</head>
+<body>
+  <div id="loader">
+    <div class="spinner"></div>
+    <div class="status">AUTHENTICATING...</div>
+  </div>
+
+  <script>
+    function showBlock() {
+      document.body.innerHTML = `
+        <div style="height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#000;color:#fff;text-align:center;padding:20px;box-sizing:border-box;">
+          <h2 style="font-size:18px;margin-bottom:10px;">このアプリはLINE専用です</h2>
+          <p style="font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:30px;">LINEから再度開いてください</p>
+          <a style="padding:16px 32px;background:#00c300;color:#fff;border-radius:16px;text-decoration:none;font-weight:bold;" href="https://liff.line.me/2010177345-tXZIMAJK">
+            LINEで開く
+          </a>
+        </div>
+      `;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // 意図的に少し待ってから初期化（LINEブラウザの準備完了を待つ）
+      setTimeout(() => {
+        liff.init({ liffId: CONFIG.LIFF_ID })
+          .then(async () => {
+            if (!liff.isInClient()) {
+              showBlock();
+              return;
+            }
+
+            if (!liff.isLoggedIn()) {
+              liff.login({
+                redirectUri: "https://k-iwasa-mk.github.io/posting-map-system-dev/active/mobile/"
+              });
+              return;
+            }
+
+            try {
+              const profile = await liff.getProfile();
+              sessionStorage.setItem("userId", profile.userId);
+              sessionStorage.setItem("displayName", profile.displayName);
+              if (profile.pictureUrl) {
+                sessionStorage.setItem("pictureUrl", profile.pictureUrl);
+              }
+              
+              window.location.replace("./home.html");
+            } catch (err) {
+              console.error("Profile error:", err);
+              document.querySelector('.status').textContent = "ERROR: FAILED TO LOAD PROFILE";
+            }
+          })
+          .catch((err) => {
+            console.error("LIFF Init Error:", err);
+            document.querySelector('.status').textContent = "ERROR: LIFF INIT FAILED";
+          });
+      }, 50);
+    });
+  </script>
+</body>
+</html>

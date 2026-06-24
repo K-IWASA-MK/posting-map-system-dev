@@ -1265,208 +1265,78 @@ async function saveProfile() {
   }
 }
 
-function showBlockScreen() {
-  document.body.innerHTML = `
-    <div style="
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      background:#000;
-      color:#fff;
-      text-align:center;
-      padding:20px;
-    ">
-      <h2>このアプリはLINE専用です</h2>
-      <p>LINEから再度開いてください</p>
-      <a style="
-        margin-top:20px;
-        padding:12px 20px;
-        background:#00c300;
-        color:#fff;
-        border-radius:8px;
-        text-decoration:none;
-        font-weight:bold;
-      "
-      href="https://liff.line.me/2010177345-tXZIMAJK">
-        LINEで開く
-      </a>
-    </div>
-  `;
-}
-
 async function safeInitApp() {
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
   
-  // URLに死んだパラメータが残っている、かつ初期化前（または失敗時）の保険
-  const urlParams = new URLSearchParams(window.location.search);
-  const hasOAuthParams = urlParams.has('code') || urlParams.has('liff.state');
-  const isReturningFromLogin = sessionStorage.getItem('liff_initializing') === 'true';
+  const userId = sessionStorage.getItem("userId");
+  const displayName = sessionStorage.getItem("displayName");
+  const pictureUrl = sessionStorage.getItem("pictureUrl");
 
-  // liff.login()で戻ってきた場合（?code= あり & フラグあり）→ LIFFに正常処理させる
-  // 孤立した ?code=（フラグなし）→ クリーンURLでやり直し（スタック防止）
-  if (hasOAuthParams && !isReturningFromLogin) {
-      sessionStorage.setItem('liff_initializing', 'true');
-      window.location.href = window.location.origin + window.location.pathname;
-      return;
+  if (!userId) {
+    window.location.replace("./");
+    return;
   }
-  // ※ フラグはここでは削除しない。ログイン確認成功後（isLoggedIn()=true）に削除する。
+
+  const profile = {
+    userId: userId,
+    displayName: displayName,
+    pictureUrl: pictureUrl
+  };
+
+  setLoadingProgress(35, 'AUTHENTICATED');
   
-  // デプロイ先（ホスト名）に応じてLIFF IDを自動切り替え (現在はCONFIGで管理)
-  const liffId = CONFIG.LIFF_ID;
-  const btn = $('btn-login-manual');
-  const spinner = $('login-spinner');
-  const subtitle = $('gateway-subtitle');
-  
-  if (typeof liff !== 'undefined') {
-    try {
-      logDebug("LIFF INIT START"); // ① LIFF初期化開始
-      // ① LINE JS Bridge 接続待ち（最適化済み）
-      await new Promise(r => setTimeout(r, 50));
+  // ⑤ getAppDataを並列プリフェッチ開始
+  _appDataPromise = callApi('getAppData');
 
-      // ⏳ 5秒でタイムアウトする安全装置
-      const liffInitPromise = liff.init({ liffId: liffId });
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("LINEログインの応答がタイムアウトしました(5秒)")), 5000)
-      );
-
-      await Promise.race([liffInitPromise, timeoutPromise]);
-      logDebug("LIFF INIT OK"); // ② LIFF初期化成功
-      setLoadingProgress(35, 'AUTHENTICATED');
-
-      // ★ Phase 18.5: LINEアプリ外での起動を完全ブロック
-      if (!liff.isInClient()) {
-        showBlockScreen();
-        return;
-      }
-      
-      logDebug("LOGIN CHECK"); // ③ login判定
-      if (liff.isLoggedIn()) {
-        logDebug("LOGIN OK");
-        sessionStorage.removeItem('liff_initializing'); // ✅ ログイン確認後にフラグを削除（ここが正しいタイミング）
-        // ⑤ getAppDataを並列プリフェッチ開始（profile取得・登録処理と並行）
-        _appDataPromise = callApi('getAppData');
-        try {
-          // ② LINE内部トークン処理安定ディレイ（最適化済み）
-          await new Promise(r => setTimeout(r, 100));
-
-          logDebug("PROFILE START"); // ⑤ profile取得開始
-          const profile = await liff.getProfile();
-          logDebug("PROFILE OK"); // ⑥ profile取得成功
-          setLoadingProgress(65, 'PROFILE LOADED');
-          console.log(profile);
-
-          let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-          
-          // ④ 初回・再登録ともにPOSTでlineUserIdをGASに送信
-          if (!userInfo.id) {
-            // 初回登録
-            logDebug("API START (初回登録)");
-            const res = await callApiPost('registerStaff', { 
-              lastName: profile.displayName, 
-              firstName: "(LINE)",
-              lineUserId: profile.userId
-            });
-            logDebug("API OK");
-            if (res && res.success) {
-              userInfo = {
-                last: profile.displayName,
-                first: "",
-                id: res.id,
-                lineUserId: profile.userId,
-                picture: profile.pictureUrl
-              };
-              localStorage.setItem('user_info', JSON.stringify(userInfo));
-              logDebug("Registered! Staff ID: " + res.id);
-            } else {
-              throw new Error("GAS registration failed");
-            }
-          } else {
-            // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
-            userInfo.lineUserId = profile.userId;
-            userInfo.picture = profile.pictureUrl;
-            localStorage.setItem('user_info', JSON.stringify(userInfo));
-            // D列にLINE_USER_IDが未設定の可能性があるためバックグラウンドで更新
-            callApiPost('registerStaff', {
-              lastName: userInfo.last,
-              firstName: userInfo.first || '(LINE)',
-              lineUserId: profile.userId
-            }).catch(() => {});
-          }
-
-
-          // ③ 800msディレイ削除
-          logDebug("START APP");
-          startApp(profile);
-        } catch (err) {
-          console.error("LIFF PROFILE ERROR", err);
-          logDebug("LIFF PROFILE ERROR: " + err.message);
-          if (btn) btn.classList.remove('hidden');
-          if (spinner) spinner.classList.add('hidden');
-          $('gateway-title').textContent = "自動ログインに失敗しました";
-          if (subtitle) subtitle.textContent = "手動で起動してください。";
-          $('screen-gateway').classList.remove('hidden');
-          $('loading').classList.add('hidden');
-        }
+  try {
+    setLoadingProgress(65, 'PROFILE LOADED');
+    
+    let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+    
+    // ④ 初回・再登録ともにPOSTでlineUserIdをGASに送信
+    if (!userInfo.id) {
+      logDebug("API START (初回登録)");
+      const res = await callApiPost('registerStaff', { 
+        lastName: profile.displayName, 
+        firstName: "(LINE)",
+        lineUserId: profile.userId
+      });
+      logDebug("API OK");
+      if (res && res.success) {
+        userInfo = {
+          last: profile.displayName,
+          first: "",
+          id: res.id,
+          lineUserId: profile.userId,
+          picture: profile.pictureUrl
+        };
+        localStorage.setItem('user_info', JSON.stringify(userInfo));
+        logDebug("Registered! Staff ID: " + res.id);
       } else {
-        // LINEログイン処理中（OAuthコールバックのパラメータがある）なら、手動ログイン画面を出さずに待機する
-        const urlParams = new URLSearchParams(window.location.search);
-        const isProcessing = urlParams.has('code') || urlParams.has('liff.state');
-        if (isProcessing) {
-          logDebug("LINE login is processing in background, skip showing manual gateway.");
-          return;
-        }
-
-        logDebug("Not logged in.");
-        if (liff.isInClient()) {
-          logDebug("In LINE client. Redirecting to LINE Login automatically...");
-          sessionStorage.setItem('liff_initializing', 'true');
-          liff.login({
-            redirectUri: "https://k-iwasa-mk.github.io/posting-map-system-dev/active/mobile/home.html"
-          });
-        } else {
-          logDebug("In external browser. Showing manual login button.");
-          if (btn) {
-            btn.textContent = "LINEでログイン";
-            btn.onclick = () => {
-              logDebug("Manual login button clicked. Redirecting...");
-              sessionStorage.setItem('liff_initializing', 'true');
-              liff.login({
-                redirectUri: "https://k-iwasa-mk.github.io/posting-map-system-dev/active/mobile/home.html"
-              });
-            };
-            btn.classList.remove('hidden');
-          }
-          if (spinner) spinner.classList.add('hidden');
-          if (subtitle) subtitle.textContent = "ブラウザ環境です。「LINEでログイン」ボタンを押してください。";
-          $('screen-gateway').classList.remove('hidden');
-          $('loading').classList.add('hidden');
-        }
+        throw new Error("GAS registration failed");
       }
-    } catch (err) {
-      console.error("LIFF Init Error:", err);
-      logDebug("LIFF Error: " + err.message);
-      if (btn) btn.classList.remove('hidden');
-      if (spinner) spinner.classList.add('hidden');
-      $('gateway-title').textContent = "自動ログインに失敗しました";
-      if (subtitle) subtitle.textContent = "手動で起動してください。";
-      $('screen-gateway').classList.remove('hidden');
-      $('loading').classList.add('hidden');
+    } else {
+      // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
+      userInfo.lineUserId = profile.userId;
+      userInfo.picture = profile.pictureUrl;
+      localStorage.setItem('user_info', JSON.stringify(userInfo));
+      callApiPost('registerStaff', {
+        lastName: userInfo.last,
+        firstName: userInfo.first || '(LINE)',
+        lineUserId: profile.userId
+      }).catch(() => {});
     }
-  } else {
-    logDebug("Running in standalone web browser. Showing manual launch button.");
-    if (btn) btn.classList.remove('hidden');
-    if (spinner) spinner.classList.add('hidden');
-    $('gateway-title').textContent = "ブラウザ起動";
-    if (subtitle) subtitle.textContent = "手動で起動します。";
-    $('screen-gateway').classList.remove('hidden');
-    $('loading').classList.add('hidden');
+
+    logDebug("START APP");
+    startApp(profile);
+  } catch (err) {
+    console.error("APP INIT ERROR", err);
+    alert("初期化エラーが発生しました。再読込してください。");
   }
 }
 
-// defer属性によりDOM解析完了後・LIFF SDK読み込み後に実行される（DOMContentLoaded待ち不要）
+// defer属性によりDOM解析完了後に実行される
 safeInitApp();
 
 // 規約・ライセンスデータ
