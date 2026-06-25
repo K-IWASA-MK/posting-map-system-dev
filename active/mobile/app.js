@@ -200,21 +200,97 @@ async function callApiPost(action, payload = {}) {
 
 let RUNTIME_CONFIG = {};
 
-async function startApp(profile = null) {
-  if ($('screen-gateway')) $('screen-gateway').classList.add('hidden');
-  $('loading').classList.remove('hidden');
-  
-  try {
-    const configRes = await callApi('getConfig', { tenantId: "MIE-02" });
-    if (configRes && configRes.success && configRes.config) {
-      RUNTIME_CONFIG = configRes.config;
-      logDebug("OS Config Loaded successfully.");
-    }
-  } catch (err) {
-    logDebug("Failed to load OS Config: " + err.message);
+function startApp(user) {
+  console.log("START APP CALLED");
+
+  const isWatchdogReady = window.__watchdog_initialized && window.__watchdog_active;
+  const isBoot = !window.__watchdog_initialized;
+
+  // ■ 稼働中でWatchdogが死んでいる場合のみブロック
+  if (!isBoot && !isWatchdogReady) {
+    console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
+    return;
   }
 
-  loadData();
+  console.log("DOM RESET OK");
+
+  // ■ ① 旧DOM完全破棄（最重要）
+  document.body.innerHTML = "";
+
+  let saved = null;
+
+  try {
+    saved = JSON.parse(localStorage.getItem("currentUser"));
+  } catch (e) {
+    console.error("STORAGE CORRUPTED");
+    localStorage.removeItem("currentUser");
+  }
+
+  user = user || saved;
+
+  // ■ ② userチェック
+  if (!user || !user.userId) {
+    console.error("NO VALID USER");
+    return;
+  }
+
+  // ■ ③ 状態保持
+  window.currentUser = user;
+  localStorage.setItem("currentUser", JSON.stringify(user));
+
+  // ■ Watchdog の待機起動（多重関数起動防止・完全再起動制御）
+  if (window.__watchdog_interval) {
+    clearInterval(window.__watchdog_interval);
+  }
+  window.__watchdog_running = false; // 実行フラグをリセットして新規インスタンス作成を許可
+  window.__watchdog_active = true;
+  window.__watchdog_initialized = true;
+  initWatchdog();
+
+  // ■ ④ SPA描画開始
+  renderHome(user);
+}
+
+function renderHome(user) {
+  if (!window.__watchdog_active) {
+    console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
+    return;
+  }
+  console.log("RENDER HOME");
+
+  document.body.innerHTML = `
+    <div id="home" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
+      <h1 style="font-size:24px;font-weight:900;margin-bottom:10px;">POSTING MAP</h1>
+      <p style="margin-bottom:30px;color:rgba(255,255,255,0.7);">${user.displayName || user.name || 'ユーザー'}</p>
+      <button onclick="goWork()" style="padding:15px 40px;background:#2563eb;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">START</button>
+    </div>
+  `;
+}
+
+function goWork() {
+  if (!window.__watchdog_active) {
+    console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
+    return;
+  }
+  document.body.innerHTML = `
+    <div id="work" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
+      <h1 style="font-size:24px;font-weight:900;margin-bottom:30px;">WORK MODE</h1>
+      <button onclick="goDone()" style="padding:15px 40px;background:#22c55e;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">DONE</button>
+    </div>
+  `;
+}
+
+function goDone() {
+  if (!window.__watchdog_active) {
+    console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
+    return;
+  }
+  document.body.innerHTML = `
+    <div id="done" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
+      <h1 style="font-size:24px;font-weight:900;margin-bottom:30px;">DONE</h1>
+      <button onclick="startApp(window.currentUser)" style="padding:15px 40px;background:#333;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">BACK</button>
+    </div>
+  `;
 }
 
 async function loadStrategy(branchId) {
@@ -754,6 +830,10 @@ function pressNum(key) {
 }
 
 async function updateRecord(areaName, rowId, isDone, count) {
+  if (!window.__watchdog_active) {
+    console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
+    return;
+  }
   const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
   const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
   const staffId = userInfo.id || '';
@@ -1265,37 +1345,6 @@ async function saveProfile() {
   }
 }
 
-function showBlockScreen() {
-  document.body.innerHTML = `
-    <div style="
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      background:#000;
-      color:#fff;
-      text-align:center;
-      padding:20px;
-    ">
-      <h2>このアプリはLINE専用です</h2>
-      <p>LINEから再度開いてください</p>
-      <a style="
-        margin-top:20px;
-        padding:12px 20px;
-        background:#00c300;
-        color:#fff;
-        border-radius:8px;
-        text-decoration:none;
-        font-weight:bold;
-      "
-      href="https://liff.line.me/2010374196-gIYb6PDH">
-        LINEで開く
-      </a>
-    </div>
-  `;
-}
-
 async function safeInitApp() {
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
@@ -1307,7 +1356,7 @@ async function safeInitApp() {
     setLoadingProgress(35, 'AUTHENTICATED');
 
     if (!liff.isInClient()) {
-      showBlockScreen();
+      document.body.innerHTML = "<div style='color:white;padding:20px;text-align:center;'>LINEアプリで開いてください</div>";
       return;
     }
 
@@ -1364,7 +1413,7 @@ async function safeInitApp() {
   } catch (err) {
     console.error("APP INIT ERROR", err);
     logDebug("ERROR: " + err.message);
-    document.body.innerHTML = "<div style='color:white;padding:20px;'>初期化エラーが発生しました。LINEから再度開いてください。</div>";
+    document.body.innerHTML = "<div style='color:white;padding:20px;text-align:center;'>初期化エラーが発生しました。LINEから再度開いてください。</div>";
   }
 }
 
@@ -1587,5 +1636,80 @@ window.closeTransferRequestDialog = function() {
   const d = document.getElementById('dynamic-transfer-dialog');
   if (d) d.remove();
 };
+
+// ===============================
+// AIOS WATCHDOG CORE (Phase 20.5)
+// Fiash Execution Layer (待機起動・多重起動防止完全版)
+// ===============================
+function initWatchdog() {
+  // ★ 多重関数起動防止ガード
+  if (window.__watchdog_running) return;
+  window.__watchdog_running = true;
+
+  const CHECK_INTERVAL = 3000;
+
+  function log(type, msg) {
+    console.log(`[WATCHDOG][${type}] ${msg}`);
+  }
+
+  function isDOMValid() {
+    return document.body && document.body.innerHTML.trim().length > 0;
+  }
+
+  function isUserValid() {
+    return window.currentUser !== null && window.currentUser !== undefined;
+  }
+
+  function isLIFFValid() {
+    try {
+      return typeof liff !== "undefined" && liff.isLoggedIn && liff.isLoggedIn();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function detectAnomaly() {
+    if (!window.__watchdog_active) return false;
+
+    const dom = isDOMValid();
+    const user = isUserValid();
+    const liffState = isLIFFValid();
+
+    if (!dom) return logAndTrue("ERROR", "DOM_EMPTY_DETECTED");
+    if (!user) return logAndTrue("ERROR", "USER_MISSING");
+    if (!liffState) return logAndTrue("WARN", "LIFF_STATE_INVALID");
+
+    log("OK", "SYSTEM_HEALTHY");
+    return false;
+  }
+
+  function logAndTrue(type, msg) {
+    log(type, msg);
+    return true;
+  }
+
+  function recovery() {
+    console.log("[WATCHDOG][RECOVERY] RESTART_TRIGGERED");
+    location.reload();
+  }
+
+  // タイマーIDを window オブジェクトに保持して明示的停止を可能にする
+  window.__watchdog_interval = setInterval(() => {
+    const anomaly = detectAnomaly();
+
+    window.__watchdog_fail_count = window.__watchdog_fail_count || 0;
+
+    if (anomaly) {
+      window.__watchdog_fail_count++;
+    } else {
+      window.__watchdog_fail_count = 0;
+    }
+
+    if (window.__watchdog_fail_count >= 2) {
+      recovery();
+    }
+  }, CHECK_INTERVAL);
+}
+
 
 
