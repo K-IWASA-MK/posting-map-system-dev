@@ -260,51 +260,57 @@ function startApp(user) {
   const decision = AIOS.DecisionEngine.decide(analysis);
   const action = AIOS.DecisionEngine.execute(decision);
 
-  // ■ ④ SPA描画開始
-  renderHome(user);
+  // ■ ④ Dispatcher経由でSPA起動
+  AIOS.ExecutionDispatcher.dispatch(action, {
+    user,
+    currentState: "BOOT"
+  });
 }
 
-function renderHome(user) {
-  if (!window.__watchdog_active) {
-    console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
-    return;
+window.AIOS = window.AIOS || {};
+window.AIOS.Fiash = {
+  renderHome(user) {
+    if (!window.__watchdog_active) {
+      console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
+      return;
+    }
+    console.log("RENDER HOME");
+
+    document.body.innerHTML = `
+      <div id="home" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
+        <h1 style="font-size:24px;font-weight:900;margin-bottom:10px;">POSTING MAP</h1>
+        <p style="margin-bottom:30px;color:rgba(255,255,255,0.7);">${user.displayName || user.name || 'ユーザー'}</p>
+        <button onclick="AIOS.Fiash.goWork()" style="padding:15px 40px;background:#2563eb;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">START</button>
+      </div>
+    `;
+  },
+
+  goWork() {
+    if (!window.__watchdog_active) {
+      console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
+      return;
+    }
+    document.body.innerHTML = `
+      <div id="work" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
+        <h1 style="font-size:24px;font-weight:900;margin-bottom:30px;">WORK MODE</h1>
+        <button onclick="AIOS.Fiash.goDone()" style="padding:15px 40px;background:#22c55e;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">DONE</button>
+      </div>
+    `;
+  },
+
+  goDone() {
+    if (!window.__watchdog_active) {
+      console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
+      return;
+    }
+    document.body.innerHTML = `
+      <div id="done" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
+        <h1 style="font-size:24px;font-weight:900;margin-bottom:30px;">DONE</h1>
+        <button onclick="startApp(window.currentUser)" style="padding:15px 40px;background:#333;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">BACK</button>
+      </div>
+    `;
   }
-  console.log("RENDER HOME");
-
-  document.body.innerHTML = `
-    <div id="home" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
-      <h1 style="font-size:24px;font-weight:900;margin-bottom:10px;">POSTING MAP</h1>
-      <p style="margin-bottom:30px;color:rgba(255,255,255,0.7);">${user.displayName || user.name || 'ユーザー'}</p>
-      <button onclick="goWork()" style="padding:15px 40px;background:#2563eb;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">START</button>
-    </div>
-  `;
-}
-
-function goWork() {
-  if (!window.__watchdog_active) {
-    console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
-    return;
-  }
-  document.body.innerHTML = `
-    <div id="work" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
-      <h1 style="font-size:24px;font-weight:900;margin-bottom:30px;">WORK MODE</h1>
-      <button onclick="goDone()" style="padding:15px 40px;background:#22c55e;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">DONE</button>
-    </div>
-  `;
-}
-
-function goDone() {
-  if (!window.__watchdog_active) {
-    console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
-    return;
-  }
-  document.body.innerHTML = `
-    <div id="done" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
-      <h1 style="font-size:24px;font-weight:900;margin-bottom:30px;">DONE</h1>
-      <button onclick="startApp(window.currentUser)" style="padding:15px 40px;background:#333;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">BACK</button>
-    </div>
-  `;
-}
+};
 
 async function loadStrategy(branchId) {
   try {
@@ -1742,5 +1748,31 @@ window.AIOS.DecisionEngine = {
   execute(decision) {
     console.log(`[DECISION] ACTION ${decision.action}`);
     return decision.action;
+  }
+};
+
+// ===============================
+// AIOS EXECUTION DISPATCHER CORE (Phase 23)
+// System Action Dispatcher
+// ===============================
+window.AIOS.ExecutionDispatcher = {
+  dispatch(action, context) {
+    console.log("[EXECUTION] Dispatch:", action);
+    switch (action) {
+      case AIOS_ACTION.CONTINUE:
+        console.log("[EXECUTION] CONTINUE");
+        AIOS.Fiash.renderHome(context.user);
+        break;
+      case AIOS_ACTION.RELOAD:
+        console.log("[EXECUTION] RELOAD");
+        location.reload();
+        break;
+      case AIOS_ACTION.STOP:
+        console.log("[EXECUTION] STOP");
+        break;
+      default:
+        console.warn("[EXECUTION] UNKNOWN ACTION", action);
+        break;
+    }
   }
 };
