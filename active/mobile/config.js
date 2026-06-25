@@ -15,3 +15,9 @@ const CONFIG = {
     DEFAULT_CENTER: [35.0, 136.0]
   }
 };
+
+const AIOS_ACTION = {
+  CONTINUE: "CONTINUE",
+  RELOAD: "RELOAD",
+  STOP: "STOP"
+};

@@ -247,6 +247,19 @@ function startApp(user) {
   window.__watchdog_initialized = true;
   initWatchdog();
 
+  // ■ Decision Layer Integration (Phase 22)
+  const context = {
+    watchdog: {
+      active: window.__watchdog_active,
+      running: window.__watchdog_running
+    },
+    currentUser: user,
+    currentState: "BOOT"
+  };
+  const analysis = AIOS.DecisionEngine.analyze(context);
+  const decision = AIOS.DecisionEngine.decide(analysis);
+  const action = AIOS.DecisionEngine.execute(decision);
+
   // ■ ④ SPA描画開始
   renderHome(user);
 }
@@ -1711,5 +1724,23 @@ function initWatchdog() {
   }, CHECK_INTERVAL);
 }
 
+// ===============================
+// AIOS DECISION ENGINE CORE (Phase 22)
+// Stateless Decision Layer
+// ===============================
+window.AIOS = window.AIOS || {};
 
-
+window.AIOS.DecisionEngine = {
+  analyze(context) {
+    console.log("[DECISION] ANALYZE");
+    return { status: "NORMAL" };
+  },
+  decide(analysis) {
+    console.log(`[DECISION] STATUS ${analysis.status}`);
+    return { action: AIOS_ACTION.CONTINUE };
+  },
+  execute(decision) {
+    console.log(`[DECISION] ACTION ${decision.action}`);
+    return decision.action;
+  }
+};
