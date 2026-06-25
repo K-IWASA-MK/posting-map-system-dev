@@ -256,6 +256,7 @@ function startApp(user) {
     currentUser: user,
     currentState: "BOOT"
   };
+  const route = window.AIOS.AIRouter.route(context);
   const analysis = AIOS.DecisionEngine.analyze(context);
   const decision = AIOS.DecisionEngine.decide(analysis);
   const action = AIOS.DecisionEngine.execute(decision);
@@ -1774,5 +1775,20 @@ window.AIOS.ExecutionDispatcher = {
         console.warn("[EXECUTION] UNKNOWN ACTION", action);
         break;
     }
+  }
+};
+
+// ===============================
+// AIOS AI ROUTER CORE (Phase 24)
+// Stateless AI Router
+// ===============================
+window.AIOS.AIRouter = {
+  route(context) {
+    console.log("[AI ROUTER] ROUTING");
+    console.log(`[AI ROUTER] SELECT ${AIOS_AI.FLASH} (EXECUTION)`);
+    return {
+      ai: AIOS_AI.FLASH,
+      capability: "EXECUTION"
+    };
   }
 };

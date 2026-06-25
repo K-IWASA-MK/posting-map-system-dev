@@ -21,3 +21,10 @@ const AIOS_ACTION = {
   RELOAD: "RELOAD",
   STOP: "STOP"
 };
+
+const AIOS_AI = {
+  FLASH: "FLASH",
+  SONNET: "SONNET",
+  PRO31: "PRO31",
+  SUMMARY: "SUMMARY"
+};
