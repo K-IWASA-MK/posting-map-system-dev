@@ -257,6 +257,7 @@ function startApp(user) {
     currentState: "BOOT"
   };
   const route = window.AIOS.AIRouter.route(context);
+  const pipeline = window.AIOS.AIPipeline.process(route, context);
   const analysis = AIOS.DecisionEngine.analyze(context);
   const decision = AIOS.DecisionEngine.decide(analysis);
   const action = AIOS.DecisionEngine.execute(decision);
@@ -1789,6 +1790,24 @@ window.AIOS.AIRouter = {
     return {
       ai: AIOS_AI.FLASH,
       capability: "EXECUTION"
+    };
+  }
+};
+
+// ===============================
+// AIOS AI PIPELINE CORE (Phase 25)
+// Stateless AI Collaboration Pipeline
+// ===============================
+window.AIOS.AIPipeline = {
+  process(route, context) {
+    console.log("[AI PIPELINE] START");
+    console.log(`[AI PIPELINE] ${route.ai}`);
+    console.log("[AI PIPELINE] READY");
+    return {
+      ai: route.ai,
+      capability: route.capability,
+      result: "READY",
+      version: "1.0"
     };
   }
 };
