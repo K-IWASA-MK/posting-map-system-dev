@@ -301,7 +301,7 @@ Never push (Strictly enforced for AI):
 - **対象ユーザー**: 現場で歩いてポスティングする配布員
 - **メインファイル**: `index.html` / `app.js` / `render.js`
 - **Git リモート**: `origin-dev`（`K-IWASA-MK/posting-map-system-dev`）
-- **LIFF**: `2010177345-tXZIMAJK`（`k-iwasa-mk.github.io/posting-map-system-dev/`）
+- **LIFF**: `2010374196-gIYb6PDH`（`k-iwasa-mk.github.io/posting-map-system-dev/`）
 
 ## K アプリ（かんりしゃ = 管理者アプリ）
 

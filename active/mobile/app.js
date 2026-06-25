@@ -212,10 +212,8 @@ function startApp(user) {
     return;
   }
 
-  console.log("DOM RESET OK");
-
-  // ■ ① 旧DOM完全破棄（最重要）
-  document.body.innerHTML = "";
+  if ($('screen-gateway')) $('screen-gateway').classList.add('hidden');
+  $('loading').classList.remove('hidden');
 
   let saved = null;
 
@@ -276,18 +274,17 @@ window.AIOS.Fiash = {
       console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
       return;
     }
-    console.log("RENDER HOME");
-
-    document.body.innerHTML = `
-      <div id="home" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;">
-        <h1 style="font-size:24px;font-weight:900;margin-bottom:10px;">POSTING MAP</h1>
-        <p style="margin-bottom:30px;color:rgba(255,255,255,0.7);">${user.displayName || user.name || 'ユーザー'}</p>
-        <button onclick="AIOS.Fiash.goWork()" style="padding:15px 40px;background:#2563eb;color:#fff;font-weight:bold;border-radius:28px;font-size:18px;">START</button>
-      </div>
-    `;
+    console.log("RENDER HOME (POSTING MAP UI START)");
+    
+    // 本来のデータロードフローをキック
+    loadData();
   },
 
+  /**
+   * @deprecated Phase 25.5以降は使用しません。
+   */
   goWork() {
+    console.warn("AIOS.Fiash.goWork is deprecated");
     if (!window.__watchdog_active) {
       console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
       return;
@@ -300,7 +297,11 @@ window.AIOS.Fiash = {
     `;
   },
 
+  /**
+   * @deprecated Phase 25.5以降は使用しません。
+   */
   goDone() {
+    console.warn("AIOS.Fiash.goDone is deprecated");
     if (!window.__watchdog_active) {
       console.warn("FIASH BLOCKED: WATCHDOG INACTIVE");
       return;

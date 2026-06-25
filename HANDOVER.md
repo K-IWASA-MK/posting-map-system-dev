@@ -29,7 +29,7 @@
 | **スプシID** | `1gFM1GRmF-uMCBMzorwWEsMQcFnldbK9H6xS2th6K4QE` | `14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4` |
 | **GASスクリプトID** | `1QV8N0NVYw3PBHuLSbQhgWC0FaLFFVGNaUx4lC13BTmZc...` | `158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmH...` |
 | **Web AppデプロイID** | `AKfycbyoIK8marCDlhz8_Rr8H_rBtBeFUKw_9PcFKD0-0...` | `AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-...` |
-| **配布員用LIFF ID** | `2010177345-h9Fjv1iU` | `2010177345-tXZIMAJK` |
+| **配布員用LIFF ID** | `2010177345-h9Fjv1iU` | `2010374196-gIYb6PDH` |
 | **管理者用LIFF ID** | `2010177345-h9Fjv1iU` | `2010177345-5y5ayk0h` |
 
 * 開発環境用APIには、開発用のLINE Messaging API（チャネルシークレット・アクセストークン）がセキュアにバインド済みです。
