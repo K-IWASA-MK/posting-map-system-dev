@@ -515,3 +515,16 @@ Special:  Liquid Glass        ← ボトムナビのみ例外（backdrop-filter:
   2. 意図しないファイルが更新対象に含まれていないか、または更新対象が漏れていないか確認する。
   3. 問題なければ通常のコミットを実行する（Git Hookが自動で本適用と `git add` を実行する）。
 * **変更なし時の検証（No-op）**: アセットファイルの変更を含まないコミットでは、バージョン情報の更新が走らないことを確認する。
+
+---
+
+### 3. アセット依存関係管理ルール (Dependency Rules)
+* **Asset Dependency Graph**:
+Repository内のHTML・Service Workerと
+静的アセットの依存関係は
+asset_graph.json
+で管理する。
+
+Version Manager は
+asset_graph.json
+を唯一の参照元とする。

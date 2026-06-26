@@ -1,0 +1,28 @@
+{
+  "style.css": [
+    "active/mobile/index.html",
+    "field/index.html",
+    "legacy/admin-app/index.html",
+    "manager.html",
+    "service-worker.js",
+    "stock.html"
+  ],
+  "app.js": [
+    "active/mobile/index.html",
+    "field/index.html",
+    "service-worker.js"
+  ],
+  "render.js": [
+    "active/mobile/index.html",
+    "field/index.html",
+    "service-worker.js"
+  ],
+  "config.js": [
+    "active/mobile/index.html"
+  ],
+  "db.js": [
+    "active/mobile/index.html",
+    "field/index.html",
+    "service-worker.js"
+  ]
+}
