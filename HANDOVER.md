@@ -1,13 +1,38 @@
-# 開発引き継ぎ事項 (更新: 2026-06-04)
+# 開発引き継ぎ事項 (更新: 2026-06-26)
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Gemini 3.5 Pro (Google Antigravity) — 2026-06-04 着任（開発環境の構築とスプシクリーンアップを担当）  
-> **次回のテーマ**: 🛠️ 管理者アプリ (`manager.html`) の UIデザインをプロ仕様（漆黒・超高級ガラスUI）へ修正  
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-26 アセットバージョン管理・キャッシュバスター・アセット依存関係スキャナー自動化基盤を導入  
+> **次回のテーマ**: 🧠 Code Intelligence Engine - Phase 1 (Execution Graph Scanner) の実装  
 
 ---
 
-## 🚀 次回タスク：管理者アプリのUIデザイン「プロ仕様」への昇華
+## 🚀 次回タスク：Code Intelligence Engine - Phase 1 (Execution Graph Scanner)
+
+### 背景と目的
+キャッシュバスター更新漏れや起動不具合の調査（`safeInitApp` ➔ `startApp` ➔ `loadData` などの実行フロー検証）において、手動でのソースコード追跡や Grep 調査には膨大な時間を要していました。
+これらを解決し、AIがソースコードの構造を瞬時に把握するための **Code Intelligence Engine - Phase 1 (Execution Graph Scanner)** を構築します。
+
+### 設計方針 (想定仕様)
+1. **静的解析ツール**: `tools/execution_graph_scanner.py` の新規作成。
+2. **スキャンの対象**: `*.js` (フロントエンドJS・GASコード) を対象とし、ファイル内の関数定義と関数呼び出しの依存関係を解析する。
+3. **出力形式**:
+   * アセット依存関係と同様に `tools/execution_graph.json` を生成する。
+   * JSONの構造例:
+     ```json
+     {
+       "safeInitApp": ["startApp"],
+       "startApp": ["loadData", "renderAreas"],
+       "loadData": ["callApi"],
+       "renderAreas": ["switchPage"]
+     }
+     ```
+   * `--dry-run` モードでコンソールに実行フローを階層的にテキスト出力する機能も備える。
+4. **環境設定**: `tools/config.json` を共有し、スキャン除外ディレクトリに対応する。
+
+---
+
+## 🚀 次回タスク（旧）：管理者アプリのUIデザイン「プロ仕様」への昇華
 
 ### 背景と目的
 本番のデモ環境を保護した上で、独立して検証できる「開発用環境（`dev`ブランチ、テスト用スプシ、テスト用GAS、テスト用LIFF ID、LINE Messaging API）」がすべて結合完了しました。
