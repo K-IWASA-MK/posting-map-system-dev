@@ -500,3 +500,18 @@ Special:  Liquid Glass        ← ボトムナビのみ例外（backdrop-filter:
 2. セクションヘッダーカード → `style="border: 1px solid rgba(37,99,235,0.35); box-shadow: ..."` を追加
 3. 各カードに青か緑のアクセントを1〜2点配置する
 4. ボトムナビはLiquid Glassスタイルで追加（固定色禁止）
+
+---
+
+## ■ アセットバージョン管理・キャッシュ対策ルール
+### 1. 共通基盤ルール (Foundation Rule)
+* **アセット変更 ＝ バージョン更新**: `style.css`、`app.js`、`render.js`、`config.js`、`db.js` のいずれかを変更したコミットでは、必ずキャッシュバスターのバージョン番号（`?v=YYYYMMDDHHMMSS`）も同期して更新されなければならない。
+* **Git Hook 自動化**: バージョン更新漏れを完全に防ぐため、Gitの `pre-commit` フックにより `tools/asset_version_manager.py` が自動実行され、変更があったHTMLおよびService Workerのキャッシュバスター記述を自動更新して `git add` する。
+* **設定ファイル管理**: 除外対象（`.git`, `node_modules` など）は `tools/config.json` にて一元管理し、スクリプトへの直接のハードコードは禁止する。
+
+### 2. コミット時検証ルール (Commit Rules)
+* **ローカル検証**: アセットファイルを修正した場合、コミット実行前に必ず以下の手順で検証を行うこと。
+  1. `python3 tools/asset_version_manager.py --dry-run` を実行し、どのファイルにキャッシュバスターが適用されるかログを確認する。
+  2. 意図しないファイルが更新対象に含まれていないか、または更新対象が漏れていないか確認する。
+  3. 問題なければ通常のコミットを実行する（Git Hookが自動で本適用と `git add` を実行する）。
+* **変更なし時の検証（No-op）**: アセットファイルの変更を含まないコミットでは、バージョン情報の更新が走らないことを確認する。
