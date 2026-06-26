@@ -394,3 +394,16 @@
 - 山田さんなどの保管者が、アプリ上で「保管場所（プルダウン選択：四日市市/鈴鹿市など）」「枚数（テンキー入力）」を入れて登録するだけのシンプルなチラシ保管掲示板。
 - 保管者自身の名前（ID）は、ログインセッションから自動で取得して裏でセットするため入力不要。
 - サポーターはこれを見て、お互い個人IDを登録していなくても、公式LINEを通じて直接チャットを起動して連絡をとる。
+
+---
+
+## 🚀 AI Development Platform ロードマップ (更新: 2026-06-26)
+
+### Foundation (基盤整備)
+* **[x] Asset Version Manager**: アセット更新時のキャッシュバスター自動インクリメント・Service Worker自動同期・Gitステージングの完全自動化。
+* **[x] Asset Dependency Scanner**: アセットとHTML/Service Worker間の依存関係の静的解析および `asset_graph.json` データベースの自動生成。
+
+---
+
+### Phase Next: Execution Graph Scanner (実行フロー可視化)
+* **目的**: フロントエンドおよびバックエンドの関数の実行連鎖（例: `safeInitApp` ➔ `startApp` ➔ `loadData` ➔ `renderAreas` ➔ `switchPage`）を静的解析し、データおよび制御のフロー（Execution Graph）を自動で抽出・可視化するスキャナーを構築する。これにより、アプリの挙動異常の追跡やコード構造の把握を瞬時に行えるようにする。
