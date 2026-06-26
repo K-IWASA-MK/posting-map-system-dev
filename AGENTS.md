@@ -635,3 +635,19 @@ Data Flow
 のみを利用して生成する。
 
 Repository の再解析は禁止する。
+
+---
+
+### 12. 改善候補ルール (Refactor Candidate Rules)
+* **Refactor Candidate Rule**:
+Repository全体の改善候補は
+tools/refactor_candidates.json
+で管理する。
+
+Refactor Candidate は
+Static Analysis
+Knowledge Graph
+Semantic Layer
+のみを利用して生成する。
+
+コードの自動変更は禁止する。

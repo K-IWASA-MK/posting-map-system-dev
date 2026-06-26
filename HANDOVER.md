@@ -444,5 +444,8 @@
 ### Phase 8: AI Static Analysis Foundation (Phase 8)
 * **[x] AI Static Analysis Foundation (Phase 8)**: LLMを使用せず、既存の各種 Graph を用いて、未使用関数候補、孤立ルート候補、影響範囲候補などを静的に抽出するエンジンの構築。
 
-### Phase 9: AI Auto Refactor Foundation
-* **目的**: コードの書き換えは行わず、静的解析結果（Analysis）から各リファクタリング候補（Refactor Candidate）を安全にマッピング・生成する基盤の構築。
+### Phase 9: Refactor Candidate Foundation (Phase 9)
+* **[x] Refactor Candidate Foundation (Phase 9)**: コードの書き換えは行わず、静的解析結果（Analysis）から各リファクタリング候補（Refactor Candidate）を安全にマッピング・生成する基盤の構築。
+
+### Phase 10: Transformation Engine Foundation
+* **目的**: コードの変更は行わず、改善候補（Refactor Candidate）から具体的なプログラム変更計画（Transformation Plan）へと安全に変換するレイヤーの構築。
