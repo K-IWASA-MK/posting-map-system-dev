@@ -148,3 +148,28 @@ GoogleドライブフォルダIDがソースコードに直書きされていた
 | GAS (`v2_config.gs`) | `clasp push` | ✅ 18ファイル反映 |
 | GitHub Pages (`index.html`, `field/index.html`) | `git push origin-dev HEAD:main` | ✅ `e769c65..6230af1` |
 
+---
+
+## 🛠️ 自動キャッシュバスター自動化 (2026-06-26)
+
+アセットファイル（`style.css`、`app.js`、`render.js`、`config.js`、`db.js`）の変更時にキャッシュバスター（`?v=...`）の更新漏れを防ぐため、完全自動化されたバージョン管理システムを導入しました。
+
+### 1. 導入した構成・ツール
+* **[tools/asset_version_manager.py](file:///Volumes/SSD_DATA/posting-map-system/tools/asset_version_manager.py)**
+  * **自動アセット検知**: `git diff` および `git diff --cached` から変更があったアセットを動的に抽出。
+  * **ダイナミックHTMLスキャン**: プロジェクト内の全 `*.html` ファイルおよび `service-worker.js` を再帰スキャンし、対象アセットのバージョン（`?v=...`）とキャッシュ名（`CACHE_NAME`）を現在の日付時間スタンプ（`YYYYMMDDHHMMSS`）へ自動書き換え。
+  * **設定ファイル管理**: 除外対象（`.git`、`node_modules` など）は `tools/config.json` にて一元管理（`legacy` 配下のHTMLも将来の保守のためデフォルトでスキャン対象に含む）。
+  * **ドライランモード**: `--dry-run` オプションで、ディスク変更を発生させずに更新候補と差分を検証。
+* **[tools/config.json](file:///Volumes/SSD_DATA/posting-map-system/tools/config.json)**
+  * 除外ディレクトリ設定（デフォルト: `[".git", ".github", "node_modules", "__pycache__"]`）。
+* **[.git/hooks/pre-commit](file:///Volumes/SSD_DATA/posting-map-system/.git/hooks/pre-commit)**
+  * Git Hookとして登録され、コミット時に自動でアセット変更を検知してHTML/JSのキャッシュバスターを更新し、ステージング（`git add`）まで自動化。
+* **[AGENTS.md](file:///Volumes/SSD_DATA/posting-map-system/AGENTS.md)**
+  * キャッシュバスターに関する「共通基盤ルール」および「コミット時検証ルール」を追記。
+
+### 2. 実施した検証テスト（すべて合格）
+1. **Basic Update Test (合格)**: `active/mobile/style.css` に変更を加え、スクリプトを実行。HTMLのバージョン番号が `v=20260626190759` へ自動更新され、自動でステージングされたことを確認。
+2. **Dry Run Test (合格)**: `--dry-run` 引数を渡して実行した際、変更を行わずに `Detected:` と `Would update:` の候補が綺麗に出力されることを確認。また、`tools/config.json` にて除外を適用したフォルダ（例: `legacy`）が正しくスキップされることを確認。
+3. **No-op Test (合格)**: アセット以外の変更（例: `README.md`）のコミット時、キャッシュバスター更新処理はスキップされ、通常のコミットが正常に進行することを確認。
+4. **Git Hook 結合テスト (合格)**: `git commit` コマンド実行時に pre-commit フックが自動起動し、最新の秒単位タイムスタンプでキャッシュバスターを書き換えて `git add` し、コミットに含まれたことを確認。
+
