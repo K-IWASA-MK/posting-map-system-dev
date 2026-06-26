@@ -1,34 +1,29 @@
-# 開発引き継ぎ事項 (更新: 2026-06-26)
+# 開発引き継ぎ事項 (更新: 2026-06-27)
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-26 アセットバージョン管理・キャッシュバスター・アセット依存関係スキャナー自動化基盤を導入  
-> **次回のテーマ**: 🧠 Code Intelligence Engine - Phase 1 (Execution Graph Scanner) の実装  
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-27 CIE Phase 1〜13の構築を完了（JSONデータ、ビルダー、AGENTSルール等）  
+> **次回のテーマ**: 🧠 Code Intelligence Engine - Phase 14 (Rollback Engine Foundation) の実装  
 
 ---
 
-## 🚀 次回タスク：Code Intelligence Engine - Phase 1 (Execution Graph Scanner)
+## 🚀 次回タスク：Code Intelligence Engine - Phase 14 (Rollback Engine Foundation)
 
 ### 背景と目的
-キャッシュバスター更新漏れや起動不具合の調査（`safeInitApp` ➔ `startApp` ➔ `loadData` などの実行フロー検証）において、手動でのソースコード追跡や Grep 調査には膨大な時間を要していました。
-これらを解決し、AIがソースコードの構造を瞬時に把握するための **Code Intelligence Engine - Phase 1 (Execution Graph Scanner)** を構築します。
+CIE (Code Intelligence Engine) の各基盤モジュールが構築され、変更計画（Transformation）、実行シミュレーション（Execution）、パッチ記述（Patch）、および適用シミュレーション（Apply）のパイプラインが完成しました。
+次回は、適用されたパッチを安全に元の状態に差し戻すためのロールバックシミュレーションを行う **CIE Phase 14 (Rollback Engine Foundation)** を実装します。
+今回と同様、実際のファイル書き換えやコード編集は行わず、ロールバック可能順序の判定や一貫性検証を行い、シミュレーションされたロールバックタスク（Rollback Plan）を構造化データとして生成することのみを目的とします。
 
 ### 設計方針 (想定仕様)
-1. **静的解析ツール**: `tools/execution_graph_scanner.py` の新規作成。
-2. **スキャンの対象**: `*.js` (フロントエンドJS・GASコード) を対象とし、ファイル内の関数定義と関数呼び出しの依存関係を解析する。
-3. **出力形式**:
-   * アセット依存関係と同様に `tools/execution_graph.json` を生成する。
-   * JSONの構造例:
-     ```json
-     {
-       "safeInitApp": ["startApp"],
-       "startApp": ["loadData", "renderAreas"],
-       "loadData": ["callApi"],
-       "renderAreas": ["switchPage"]
-     }
-     ```
-   * `--dry-run` モードでコンソールに実行フローを階層的にテキスト出力する機能も備える。
-4. **環境設定**: `tools/config.json` を共有し、スキャン除外ディレクトリに対応する。
+1. **静的解析ツール**: `tools/rollback_engine_builder.py` の新規作成。
+2. **データ入力**: `tools/patch_plan.json`, `tools/patch_apply_plan.json` を主なインプットとし、リポジトリの再解析は禁止。
+3. **データ出力**: `tools/patch_rollback_plan.json`
+4. **仕様要素**:
+   - 状態: `simulated` 固定
+   - モード: `simulation` 固定
+   - ロールバック検証結果: `validation_summary` (`dependency: passed`, `trace: passed`, `approval: passed` など)
+   - 採番: `rollback:0001` から欠番なしの連番
+   - 順序: パッチ適用順の「逆順」または依存関係を考慮した安全な順序
 
 ---
 
@@ -123,6 +118,20 @@
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-26/27 セッション】CIE (Code Intelligence Engine) 基盤構築（Phase 6 〜 Phase 13）（担当: Antigravity）
+- **目的**: リポジトリ全体の静的関係、遷移図、データフロー、およびAI自動リファクタリング計画までのパイプラインを定義・インデックス化する。
+- **実装内容**:
+  - **Phase 6: Route Graph**: [route_graph_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/route_graph_builder.py) の作成。Navigation カテゴリ関数の画面遷移図 [route_graph.json](file:///Volumes/SSD_DATA/posting-map-system/tools/route_graph.json) を生成。
+  - **Phase 7: Data Flow**: [data_flow_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/data_flow_builder.py) の作成。関数間のデータ伝播経路 [data_flow.json](file:///Volumes/SSD_DATA/posting-map-system/tools/data_flow.json) を生成。
+  - **Phase 8: AI Static Analysis**: [static_analysis_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/static_analysis_builder.py) の作成。未使用関数、孤立ルート、高影響関数、ハブ関数の静的解析結果 [static_analysis.json](file:///Volumes/SSD_DATA/posting-map-system/tools/static_analysis.json) を生成。
+  - **Phase 9: Refactor Candidate**: [refactor_candidate_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/refactor_candidate_builder.py) の作成。改善候補 [refactor_candidates.json](file:///Volumes/SSD_DATA/posting-map-system/tools/refactor_candidates.json) を生成。
+  - **Phase 10: Transformation Engine**: [transformation_plan_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/transformation_plan_builder.py) の作成。変更計画 [transformation_plan.json](file:///Volumes/SSD_DATA/posting-map-system/tools/transformation_plan.json) を生成。
+  - **Phase 11: Execution Engine**: [execution_engine_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/execution_engine_builder.py) の作成。実行計画 [execution_plan.json](file:///Volumes/SSD_DATA/posting-map-system/tools/execution_plan.json) を生成。
+  - **Phase 12: Patch Generator**: [patch_generator_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/patch_generator_builder.py) の作成。パッチメタデータ [patch_plan.json](file:///Volumes/SSD_DATA/posting-map-system/tools/patch_plan.json) を生成。
+  - **Phase 13: Patch Apply Engine**: [patch_apply_engine_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/patch_apply_engine_builder.py) の作成。適用シミュレーション [patch_apply_plan.json](file:///Volumes/SSD_DATA/posting-map-system/tools/patch_apply_plan.json) を生成。
+- **検証テスト**: すべてのビルダーに対して、Coverage / Mapping / Distribution / Sequential ID / Stability などの徹底的な検証テストをクリアし、一貫性を保証。
+- **変更ファイル**: 各ビルダースクリプト、JSONデータ、[AGENTS.md](file:///Volumes/SSD_DATA/posting-map-system/AGENTS.md), [HANDOVER.md](file:///Volumes/SSD_DATA/posting-map-system/HANDOVER.md)
 
 ### 【2026-06-04 セッション】ランキングバッジ中央揃え修正 (v381)（担当: Claude Sonnet）
 - **不具合事象**: ランキング画面の1位〜3位および本人バッジの「N位」テキストが中央揃えになっておらず、左寄りに見えていた。
