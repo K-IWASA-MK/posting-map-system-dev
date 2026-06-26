@@ -450,5 +450,8 @@
 ### Phase 10: Transformation Engine Foundation (Phase 10)
 * **[x] Transformation Engine Foundation (Phase 10)**: コードの変更は行わず、改善候補（Refactor Candidate）から具体的なプログラム変更計画（Transformation Plan）へと安全に変換するレイヤーの構築。
 
-### Phase 11: Execution Engine Foundation
-* **目的**: コード変更は行わず、実際の変更適用シミュレーション、実行順序の決定、依存関係・競合チェック、実行可否判定のみを行うレイヤーの構築。
+### Phase 11: Execution Engine Foundation (Phase 11)
+* **[x] Execution Engine Foundation (Phase 11)**: コード変更は行わず、実際の変更適用シミュレーション、実行順序の決定、依存関係・競合チェック、実行可否判定のみを行うレイヤーの構築。
+
+### Phase 12: Patch Generator Foundation
+* **目的**: コードの書き換えは行わず、実行計画（Execution Plan）に基づき、変更操作を構造化したパッチデータ（Patch Data）を生成するレイヤーの構築。

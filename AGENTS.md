@@ -670,3 +670,22 @@ Repository の再解析は禁止する。
 コード変更は禁止する。
 
 Git操作は禁止する。
+
+---
+
+### 14. 実行計画ルール (Execution Engine Rules)
+* **Execution Plan Rule**:
+Repository全体の実行計画は
+tools/execution_plan.json
+で管理する。
+
+Execution Engine は
+Transformation Plan
+Knowledge Graph
+のみを利用する。
+
+Repository の再解析は禁止する。
+
+コード変更は禁止する。
+
+Simulation Only を維持する。
