@@ -456,5 +456,8 @@
 ### Phase 12: Patch Generator Foundation (Phase 12)
 * **[x] Patch Generator Foundation (Phase 12)**: コードの書き換えは行わず、実行計画（Execution Plan）に基づき、変更操作を構造化したパッチデータ（Patch Data）を生成するレイヤーの構築。
 
-### Phase 13: Patch Apply Engine Foundation
-* **目的**: コード変更は行わず、パッチデータ（Patch Data）に基づく変更適用シミュレーション、変更前後の一貫性検証、競合チェックのみを行うレイヤーの構築。
+### Phase 13: Patch Apply Engine Foundation (Phase 13)
+* **[x] Patch Apply Engine Foundation (Phase 13)**: コード変更は行わず、パッチデータ（Patch Data）に基づく変更適用シミュレーション、変更前後の一貫性検証、競合チェックのみを行うレイヤーの構築。
+
+### Phase 14: Rollback Engine Foundation
+* **目的**: コードの変更は行わず、パッチデータ（Patch Data）に基づき、安全に元の状態へ差し戻すロールバックシミュレーション、一貫性検証、実行可能順序の判定のみを行うレイヤーの構築。

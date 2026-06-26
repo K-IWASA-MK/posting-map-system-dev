@@ -709,3 +709,25 @@ Transformation Plan
 * Git操作は禁止する。
 
 * Patch は Simulation Data として保持する。
+
+---
+
+### 16. Patch Apply Engine Rules
+* Patch Apply Simulation は
+tools/patch_apply_plan.json
+で管理する。
+
+* Patch Apply Engine は
+Patch Plan
+Execution Plan
+のみを利用する。
+
+* Repository の再解析は禁止する。
+
+* コード編集は禁止する。
+
+* Git操作は禁止する。
+
+* Simulation Only を維持する。
+
+* Apply はシミュレーション結果のみ保持する。
