@@ -689,3 +689,23 @@ Repository の再解析は禁止する。
 コード変更は禁止する。
 
 Simulation Only を維持する。
+
+---
+
+### 15. パッチ生成ルール (Patch Generator Rules)
+* Patch Data は
+tools/patch_plan.json
+で管理する。
+
+* Patch Generator は
+Execution Plan
+Transformation Plan
+のみを利用して生成する。
+
+* Repository の再解析は禁止する。
+
+* コード編集は禁止する。
+
+* Git操作は禁止する。
+
+* Patch は Simulation Data として保持する。

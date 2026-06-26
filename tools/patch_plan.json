@@ -1,0 +1,2415 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-26T22:30:20.879175Z",
+    "scanner": "patch_generator_builder"
+  },
+  "patches": [
+    {
+      "id": "patch:0001",
+      "execution": "exec:0001",
+      "target": "func:$",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0001",
+      "trace": {
+        "candidate": "candidate:0001",
+        "plan": "plan:0001",
+        "execution": "exec:0001"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0002",
+      "execution": "exec:0002",
+      "target": "func:_apiLog",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:logDebug"
+      ],
+      "source_plan": "plan:0002",
+      "trace": {
+        "candidate": "candidate:0002",
+        "plan": "plan:0002",
+        "execution": "exec:0002"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0003",
+      "execution": "exec:0003",
+      "target": "func:addPhotoToDetail",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:blobToBase64",
+        "func:capturePhoto",
+        "func:enqueueSync",
+        "func:renderDetailList",
+        "func:renderDetailModalContent"
+      ],
+      "source_plan": "plan:0003",
+      "trace": {
+        "candidate": "candidate:0003",
+        "plan": "plan:0003",
+        "execution": "exec:0003"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0004",
+      "execution": "exec:0004",
+      "target": "func:backToCityList",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:renderAreas"
+      ],
+      "source_plan": "plan:0004",
+      "trace": {
+        "candidate": "candidate:0004",
+        "plan": "plan:0004",
+        "execution": "exec:0004"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0005",
+      "execution": "exec:0005",
+      "target": "func:backToTier1",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:navigateToAreaTab",
+        "func:switchPage",
+        "func:toggleNavTier"
+      ],
+      "source_plan": "plan:0005",
+      "trace": {
+        "candidate": "candidate:0005",
+        "plan": "plan:0005",
+        "execution": "exec:0005"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0006",
+      "execution": "exec:0006",
+      "target": "func:closeDetailModal",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0006",
+      "trace": {
+        "candidate": "candidate:0006",
+        "plan": "plan:0006",
+        "execution": "exec:0006"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0007",
+      "execution": "exec:0007",
+      "target": "func:closeIdInfoModal",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0007",
+      "trace": {
+        "candidate": "candidate:0007",
+        "plan": "plan:0007",
+        "execution": "exec:0007"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0008",
+      "execution": "exec:0008",
+      "target": "func:closeModal",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0008",
+      "trace": {
+        "candidate": "candidate:0008",
+        "plan": "plan:0008",
+        "execution": "exec:0008"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0009",
+      "execution": "exec:0009",
+      "target": "func:closeTransferRequestDialog",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0009",
+      "trace": {
+        "candidate": "candidate:0009",
+        "plan": "plan:0009",
+        "execution": "exec:0009"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0010",
+      "execution": "exec:0010",
+      "target": "func:contactHolder",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0010",
+      "trace": {
+        "candidate": "candidate:0010",
+        "plan": "plan:0010",
+        "execution": "exec:0010"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0011",
+      "execution": "exec:0011",
+      "target": "func:dispatchLineRequest",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:showModal"
+      ],
+      "source_plan": "plan:0011",
+      "trace": {
+        "candidate": "candidate:0011",
+        "plan": "plan:0011",
+        "execution": "exec:0011"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0012",
+      "execution": "exec:0012",
+      "target": "func:extractDistrictAddresses",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:extractCityName",
+        "func:map",
+        "func:toFullWidthKana"
+      ],
+      "source_plan": "plan:0012",
+      "trace": {
+        "candidate": "candidate:0012",
+        "plan": "plan:0012",
+        "execution": "exec:0012"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0013",
+      "execution": "exec:0013",
+      "target": "func:formatCompletedAt",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0013",
+      "trace": {
+        "candidate": "candidate:0013",
+        "plan": "plan:0013",
+        "execution": "exec:0013"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0014",
+      "execution": "exec:0014",
+      "target": "func:getQueueStats",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:getQueue",
+        "func:map"
+      ],
+      "source_plan": "plan:0014",
+      "trace": {
+        "candidate": "candidate:0014",
+        "plan": "plan:0014",
+        "execution": "exec:0014"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0015",
+      "execution": "exec:0015",
+      "target": "func:getRowStatus",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:getQueue"
+      ],
+      "source_plan": "plan:0015",
+      "trace": {
+        "candidate": "candidate:0015",
+        "plan": "plan:0015",
+        "execution": "exec:0015"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0016",
+      "execution": "exec:0016",
+      "target": "func:isHtmlRequest",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0016",
+      "trace": {
+        "candidate": "candidate:0016",
+        "plan": "plan:0016",
+        "execution": "exec:0016"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0017",
+      "execution": "exec:0017",
+      "target": "func:loadHeatmap",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi"
+      ],
+      "source_plan": "plan:0017",
+      "trace": {
+        "candidate": "candidate:0017",
+        "plan": "plan:0017",
+        "execution": "exec:0017"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0018",
+      "execution": "exec:0018",
+      "target": "func:loadPrediction",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi"
+      ],
+      "source_plan": "plan:0018",
+      "trace": {
+        "candidate": "candidate:0018",
+        "plan": "plan:0018",
+        "execution": "exec:0018"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0019",
+      "execution": "exec:0019",
+      "target": "func:loadStrategy",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi"
+      ],
+      "source_plan": "plan:0019",
+      "trace": {
+        "candidate": "candidate:0019",
+        "plan": "plan:0019",
+        "execution": "exec:0019"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0020",
+      "execution": "exec:0020",
+      "target": "func:onunhandledrejection",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:logDebug"
+      ],
+      "source_plan": "plan:0020",
+      "trace": {
+        "candidate": "candidate:0020",
+        "plan": "plan:0020",
+        "execution": "exec:0020"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0021",
+      "execution": "exec:0021",
+      "target": "func:openAreaDetail",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:showModal"
+      ],
+      "source_plan": "plan:0021",
+      "trace": {
+        "candidate": "candidate:0021",
+        "plan": "plan:0021",
+        "execution": "exec:0021"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0022",
+      "execution": "exec:0022",
+      "target": "func:openIdInfoModal",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0022",
+      "trace": {
+        "candidate": "candidate:0022",
+        "plan": "plan:0022",
+        "execution": "exec:0022"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0023",
+      "execution": "exec:0023",
+      "target": "func:openLineChat",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0023",
+      "trace": {
+        "candidate": "candidate:0023",
+        "plan": "plan:0023",
+        "execution": "exec:0023"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0024",
+      "execution": "exec:0024",
+      "target": "func:openPointDetailModal",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:renderDetailModalContent"
+      ],
+      "source_plan": "plan:0024",
+      "trace": {
+        "candidate": "candidate:0024",
+        "plan": "plan:0024",
+        "execution": "exec:0024"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0025",
+      "execution": "exec:0025",
+      "target": "func:openTransferRequestDialog",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApiPost"
+      ],
+      "source_plan": "plan:0025",
+      "trace": {
+        "candidate": "candidate:0025",
+        "plan": "plan:0025",
+        "execution": "exec:0025"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0026",
+      "execution": "exec:0026",
+      "target": "func:pressNum",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:blobToBase64",
+        "func:capturePhoto",
+        "func:closeNumpad",
+        "func:enqueueSync",
+        "func:getGPSLocation",
+        "func:renderDetailList",
+        "func:renderDetailModalContent"
+      ],
+      "source_plan": "plan:0026",
+      "trace": {
+        "candidate": "candidate:0026",
+        "plan": "plan:0026",
+        "execution": "exec:0026"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0027",
+      "execution": "exec:0027",
+      "target": "func:removePressed",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0027",
+      "trace": {
+        "candidate": "candidate:0027",
+        "plan": "plan:0027",
+        "execution": "exec:0027"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0028",
+      "execution": "exec:0028",
+      "target": "func:resolveRequest",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:addLog",
+        "func:callApiPost",
+        "func:loadTransferRequests"
+      ],
+      "source_plan": "plan:0028",
+      "trace": {
+        "candidate": "candidate:0028",
+        "plan": "plan:0028",
+        "execution": "exec:0028"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0029",
+      "execution": "exec:0029",
+      "target": "func:runCommand",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:_executeCommand",
+        "func:showModal"
+      ],
+      "source_plan": "plan:0029",
+      "trace": {
+        "candidate": "candidate:0029",
+        "plan": "plan:0029",
+        "execution": "exec:0029"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0030",
+      "execution": "exec:0030",
+      "target": "func:safeInitApp",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:callApiPost",
+        "func:logDebug",
+        "func:setLoadingProgress",
+        "func:startApp"
+      ],
+      "source_plan": "plan:0030",
+      "trace": {
+        "candidate": "candidate:0030",
+        "plan": "plan:0030",
+        "execution": "exec:0030"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0031",
+      "execution": "exec:0031",
+      "target": "func:saveProfile",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:cleanNameInput",
+        "func:logDebug",
+        "func:switchPage"
+      ],
+      "source_plan": "plan:0031",
+      "trace": {
+        "candidate": "candidate:0031",
+        "plan": "plan:0031",
+        "execution": "exec:0031"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0032",
+      "execution": "exec:0032",
+      "target": "func:selectCity",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:renderAreas",
+        "func:then"
+      ],
+      "source_plan": "plan:0032",
+      "trace": {
+        "candidate": "candidate:0032",
+        "plan": "plan:0032",
+        "execution": "exec:0032"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0033",
+      "execution": "exec:0033",
+      "target": "func:sendDispatchMessage",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0033",
+      "trace": {
+        "candidate": "candidate:0033",
+        "plan": "plan:0033",
+        "execution": "exec:0033"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0034",
+      "execution": "exec:0034",
+      "target": "func:simulateBatch",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:extractCityName"
+      ],
+      "source_plan": "plan:0034",
+      "trace": {
+        "candidate": "candidate:0034",
+        "plan": "plan:0034",
+        "execution": "exec:0034"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0035",
+      "execution": "exec:0035",
+      "target": "func:startAdmin",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:loadDashboardData",
+        "func:restoreDashboardCache"
+      ],
+      "source_plan": "plan:0035",
+      "trace": {
+        "candidate": "candidate:0035",
+        "plan": "plan:0035",
+        "execution": "exec:0035"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0036",
+      "execution": "exec:0036",
+      "target": "func:submitFlyerStock",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApiPost"
+      ],
+      "source_plan": "plan:0036",
+      "trace": {
+        "candidate": "candidate:0036",
+        "plan": "plan:0036",
+        "execution": "exec:0036"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0037",
+      "execution": "exec:0037",
+      "target": "func:toggleDone",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:openNumpad",
+        "func:renderDetailList",
+        "func:renderDetailModalContent",
+        "func:updateRecord"
+      ],
+      "source_plan": "plan:0037",
+      "trace": {
+        "candidate": "candidate:0037",
+        "plan": "plan:0037",
+        "execution": "exec:0037"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0038",
+      "execution": "exec:0038",
+      "target": "func:tryRegisterAdmin",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:addLog",
+        "func:callApiPost",
+        "func:then"
+      ],
+      "source_plan": "plan:0038",
+      "trace": {
+        "candidate": "candidate:0038",
+        "plan": "plan:0038",
+        "execution": "exec:0038"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0039",
+      "execution": "exec:0039",
+      "target": "func:updateQueueStatus",
+      "patch_type": "remove_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:updateQueueItem"
+      ],
+      "source_plan": "plan:0039",
+      "trace": {
+        "candidate": "candidate:0039",
+        "plan": "plan:0039",
+        "execution": "exec:0039"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0040",
+      "execution": "exec:0040",
+      "target": "func:addLog",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0040",
+      "trace": {
+        "candidate": "candidate:0040",
+        "plan": "plan:0040",
+        "execution": "exec:0040"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0041",
+      "execution": "exec:0041",
+      "target": "func:callApi",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0041",
+      "trace": {
+        "candidate": "candidate:0041",
+        "plan": "plan:0041",
+        "execution": "exec:0041"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0042",
+      "execution": "exec:0042",
+      "target": "func:callApiPost",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0042",
+      "trace": {
+        "candidate": "candidate:0042",
+        "plan": "plan:0042",
+        "execution": "exec:0042"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0043",
+      "execution": "exec:0043",
+      "target": "func:logDebug",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0043",
+      "trace": {
+        "candidate": "candidate:0043",
+        "plan": "plan:0043",
+        "execution": "exec:0043"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0044",
+      "execution": "exec:0044",
+      "target": "func:map",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0044",
+      "trace": {
+        "candidate": "candidate:0044",
+        "plan": "plan:0044",
+        "execution": "exec:0044"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0045",
+      "execution": "exec:0045",
+      "target": "func:onerror",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:logDebug"
+      ],
+      "source_plan": "plan:0045",
+      "trace": {
+        "candidate": "candidate:0045",
+        "plan": "plan:0045",
+        "execution": "exec:0045"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0046",
+      "execution": "exec:0046",
+      "target": "func:renderDetailList",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:getCityName",
+        "func:map",
+        "func:syncBadge"
+      ],
+      "source_plan": "plan:0046",
+      "trace": {
+        "candidate": "candidate:0046",
+        "plan": "plan:0046",
+        "execution": "exec:0046"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0047",
+      "execution": "exec:0047",
+      "target": "func:renderDetailModalContent",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:getCleanAddress"
+      ],
+      "source_plan": "plan:0047",
+      "trace": {
+        "candidate": "candidate:0047",
+        "plan": "plan:0047",
+        "execution": "exec:0047"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0048",
+      "execution": "exec:0048",
+      "target": "func:showModal",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0048",
+      "trace": {
+        "candidate": "candidate:0048",
+        "plan": "plan:0048",
+        "execution": "exec:0048"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0049",
+      "execution": "exec:0049",
+      "target": "func:switchPage",
+      "patch_type": "review_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:getCityName",
+        "func:renderRanking",
+        "func:renderSettings",
+        "func:renderStorageList",
+        "func:then"
+      ],
+      "source_plan": "plan:0049",
+      "trace": {
+        "candidate": "candidate:0049",
+        "plan": "plan:0049",
+        "execution": "exec:0049"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0050",
+      "execution": "exec:0050",
+      "target": "func:callApi",
+      "patch_type": "split_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0050",
+      "trace": {
+        "candidate": "candidate:0050",
+        "plan": "plan:0050",
+        "execution": "exec:0050"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0051",
+      "execution": "exec:0051",
+      "target": "func:loadData",
+      "patch_type": "split_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:logDebug",
+        "func:prefetchRanking",
+        "func:renderAreas",
+        "func:setLoadingProgress",
+        "func:setSyncStatus",
+        "func:switchPage",
+        "func:syncOfflineQueue",
+        "func:updateStats"
+      ],
+      "source_plan": "plan:0051",
+      "trace": {
+        "candidate": "candidate:0051",
+        "plan": "plan:0051",
+        "execution": "exec:0051"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0052",
+      "execution": "exec:0052",
+      "target": "func:map",
+      "patch_type": "split_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0052",
+      "trace": {
+        "candidate": "candidate:0052",
+        "plan": "plan:0052",
+        "execution": "exec:0052"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0053",
+      "execution": "exec:0053",
+      "target": "func:processQueue",
+      "patch_type": "split_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApiPost",
+        "func:dequeueSync",
+        "func:getQueue",
+        "func:loadData",
+        "func:renderDetailList",
+        "func:renderDetailModalContent",
+        "func:scheduleRetry",
+        "func:updateQueueItem",
+        "func:updateUISyncStatus"
+      ],
+      "source_plan": "plan:0053",
+      "trace": {
+        "candidate": "candidate:0053",
+        "plan": "plan:0053",
+        "execution": "exec:0053"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0054",
+      "execution": "exec:0054",
+      "target": "func:switchPage",
+      "patch_type": "split_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:getCityName",
+        "func:renderRanking",
+        "func:renderSettings",
+        "func:renderStorageList",
+        "func:then"
+      ],
+      "source_plan": "plan:0054",
+      "trace": {
+        "candidate": "candidate:0054",
+        "plan": "plan:0054",
+        "execution": "exec:0054"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0055",
+      "execution": "exec:0055",
+      "target": "func:$",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0055",
+      "trace": {
+        "candidate": "candidate:0055",
+        "plan": "plan:0055",
+        "execution": "exec:0055"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0056",
+      "execution": "exec:0056",
+      "target": "func:_executeCommand",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:addLog",
+        "func:callApiPost",
+        "func:loadDashboardData",
+        "func:showModal"
+      ],
+      "source_plan": "plan:0056",
+      "trace": {
+        "candidate": "candidate:0056",
+        "plan": "plan:0056",
+        "execution": "exec:0056"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0057",
+      "execution": "exec:0057",
+      "target": "func:addPhotoToDetail",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:blobToBase64",
+        "func:capturePhoto",
+        "func:enqueueSync",
+        "func:renderDetailList",
+        "func:renderDetailModalContent"
+      ],
+      "source_plan": "plan:0057",
+      "trace": {
+        "candidate": "candidate:0057",
+        "plan": "plan:0057",
+        "execution": "exec:0057"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0058",
+      "execution": "exec:0058",
+      "target": "func:applyOptimisticCheck",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0058",
+      "trace": {
+        "candidate": "candidate:0058",
+        "plan": "plan:0058",
+        "execution": "exec:0058"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0059",
+      "execution": "exec:0059",
+      "target": "func:backToCityList",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:renderAreas"
+      ],
+      "source_plan": "plan:0059",
+      "trace": {
+        "candidate": "candidate:0059",
+        "plan": "plan:0059",
+        "execution": "exec:0059"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0060",
+      "execution": "exec:0060",
+      "target": "func:backToTier1",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:navigateToAreaTab",
+        "func:switchPage",
+        "func:toggleNavTier"
+      ],
+      "source_plan": "plan:0060",
+      "trace": {
+        "candidate": "candidate:0060",
+        "plan": "plan:0060",
+        "execution": "exec:0060"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0061",
+      "execution": "exec:0061",
+      "target": "func:blobToBase64",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:onerror"
+      ],
+      "source_plan": "plan:0061",
+      "trace": {
+        "candidate": "candidate:0061",
+        "plan": "plan:0061",
+        "execution": "exec:0061"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0062",
+      "execution": "exec:0062",
+      "target": "func:callApi",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0062",
+      "trace": {
+        "candidate": "candidate:0062",
+        "plan": "plan:0062",
+        "execution": "exec:0062"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0063",
+      "execution": "exec:0063",
+      "target": "func:callApiPost",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0063",
+      "trace": {
+        "candidate": "candidate:0063",
+        "plan": "plan:0063",
+        "execution": "exec:0063"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0064",
+      "execution": "exec:0064",
+      "target": "func:capturePhoto",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:compressImage",
+        "func:onFileChange"
+      ],
+      "source_plan": "plan:0064",
+      "trace": {
+        "candidate": "candidate:0064",
+        "plan": "plan:0064",
+        "execution": "exec:0064"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0065",
+      "execution": "exec:0065",
+      "target": "func:cleanNameInput",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0065",
+      "trace": {
+        "candidate": "candidate:0065",
+        "plan": "plan:0065",
+        "execution": "exec:0065"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0066",
+      "execution": "exec:0066",
+      "target": "func:closeDetailModal",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0066",
+      "trace": {
+        "candidate": "candidate:0066",
+        "plan": "plan:0066",
+        "execution": "exec:0066"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0067",
+      "execution": "exec:0067",
+      "target": "func:closeIdInfoModal",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0067",
+      "trace": {
+        "candidate": "candidate:0067",
+        "plan": "plan:0067",
+        "execution": "exec:0067"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0068",
+      "execution": "exec:0068",
+      "target": "func:closeModal",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0068",
+      "trace": {
+        "candidate": "candidate:0068",
+        "plan": "plan:0068",
+        "execution": "exec:0068"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0069",
+      "execution": "exec:0069",
+      "target": "func:closeNumpad",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0069",
+      "trace": {
+        "candidate": "candidate:0069",
+        "plan": "plan:0069",
+        "execution": "exec:0069"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0070",
+      "execution": "exec:0070",
+      "target": "func:compressImage",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:onerror"
+      ],
+      "source_plan": "plan:0070",
+      "trace": {
+        "candidate": "candidate:0070",
+        "plan": "plan:0070",
+        "execution": "exec:0070"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0071",
+      "execution": "exec:0071",
+      "target": "func:contactHolder",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0071",
+      "trace": {
+        "candidate": "candidate:0071",
+        "plan": "plan:0071",
+        "execution": "exec:0071"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0072",
+      "execution": "exec:0072",
+      "target": "func:dispatchLineRequest",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:showModal"
+      ],
+      "source_plan": "plan:0072",
+      "trace": {
+        "candidate": "candidate:0072",
+        "plan": "plan:0072",
+        "execution": "exec:0072"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0073",
+      "execution": "exec:0073",
+      "target": "func:extractCityName",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0073",
+      "trace": {
+        "candidate": "candidate:0073",
+        "plan": "plan:0073",
+        "execution": "exec:0073"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0074",
+      "execution": "exec:0074",
+      "target": "func:extractDistrictAddresses",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:extractCityName",
+        "func:map",
+        "func:toFullWidthKana"
+      ],
+      "source_plan": "plan:0074",
+      "trace": {
+        "candidate": "candidate:0074",
+        "plan": "plan:0074",
+        "execution": "exec:0074"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0075",
+      "execution": "exec:0075",
+      "target": "func:getCityName",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0075",
+      "trace": {
+        "candidate": "candidate:0075",
+        "plan": "plan:0075",
+        "execution": "exec:0075"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0076",
+      "execution": "exec:0076",
+      "target": "func:getCleanAddress",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0076",
+      "trace": {
+        "candidate": "candidate:0076",
+        "plan": "plan:0076",
+        "execution": "exec:0076"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0077",
+      "execution": "exec:0077",
+      "target": "func:getGPSLocation",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0077",
+      "trace": {
+        "candidate": "candidate:0077",
+        "plan": "plan:0077",
+        "execution": "exec:0077"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0078",
+      "execution": "exec:0078",
+      "target": "func:getRowStatus",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:getQueue"
+      ],
+      "source_plan": "plan:0078",
+      "trace": {
+        "candidate": "candidate:0078",
+        "plan": "plan:0078",
+        "execution": "exec:0078"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0079",
+      "execution": "exec:0079",
+      "target": "func:isHtmlRequest",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0079",
+      "trace": {
+        "candidate": "candidate:0079",
+        "plan": "plan:0079",
+        "execution": "exec:0079"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0080",
+      "execution": "exec:0080",
+      "target": "func:map",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0080",
+      "trace": {
+        "candidate": "candidate:0080",
+        "plan": "plan:0080",
+        "execution": "exec:0080"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0081",
+      "execution": "exec:0081",
+      "target": "func:onFileChange",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:compressImage"
+      ],
+      "source_plan": "plan:0081",
+      "trace": {
+        "candidate": "candidate:0081",
+        "plan": "plan:0081",
+        "execution": "exec:0081"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0082",
+      "execution": "exec:0082",
+      "target": "func:onerror",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:logDebug"
+      ],
+      "source_plan": "plan:0082",
+      "trace": {
+        "candidate": "candidate:0082",
+        "plan": "plan:0082",
+        "execution": "exec:0082"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0083",
+      "execution": "exec:0083",
+      "target": "func:onunhandledrejection",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:logDebug"
+      ],
+      "source_plan": "plan:0083",
+      "trace": {
+        "candidate": "candidate:0083",
+        "plan": "plan:0083",
+        "execution": "exec:0083"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0084",
+      "execution": "exec:0084",
+      "target": "func:openAreaDetail",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:showModal"
+      ],
+      "source_plan": "plan:0084",
+      "trace": {
+        "candidate": "candidate:0084",
+        "plan": "plan:0084",
+        "execution": "exec:0084"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0085",
+      "execution": "exec:0085",
+      "target": "func:openDetail",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:renderDetailList",
+        "func:switchPage"
+      ],
+      "source_plan": "plan:0085",
+      "trace": {
+        "candidate": "candidate:0085",
+        "plan": "plan:0085",
+        "execution": "exec:0085"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0086",
+      "execution": "exec:0086",
+      "target": "func:openIdInfoModal",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0086",
+      "trace": {
+        "candidate": "candidate:0086",
+        "plan": "plan:0086",
+        "execution": "exec:0086"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0087",
+      "execution": "exec:0087",
+      "target": "func:openLineChat",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0087",
+      "trace": {
+        "candidate": "candidate:0087",
+        "plan": "plan:0087",
+        "execution": "exec:0087"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0088",
+      "execution": "exec:0088",
+      "target": "func:openNumpad",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0088",
+      "trace": {
+        "candidate": "candidate:0088",
+        "plan": "plan:0088",
+        "execution": "exec:0088"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0089",
+      "execution": "exec:0089",
+      "target": "func:openPointDetailModal",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:renderDetailModalContent"
+      ],
+      "source_plan": "plan:0089",
+      "trace": {
+        "candidate": "candidate:0089",
+        "plan": "plan:0089",
+        "execution": "exec:0089"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0090",
+      "execution": "exec:0090",
+      "target": "func:prefetchRanking",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:logDebug",
+        "func:renderRanking",
+        "func:then"
+      ],
+      "source_plan": "plan:0090",
+      "trace": {
+        "candidate": "candidate:0090",
+        "plan": "plan:0090",
+        "execution": "exec:0090"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0091",
+      "execution": "exec:0091",
+      "target": "func:pressNum",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:blobToBase64",
+        "func:capturePhoto",
+        "func:closeNumpad",
+        "func:enqueueSync",
+        "func:getGPSLocation",
+        "func:renderDetailList",
+        "func:renderDetailModalContent"
+      ],
+      "source_plan": "plan:0091",
+      "trace": {
+        "candidate": "candidate:0091",
+        "plan": "plan:0091",
+        "execution": "exec:0091"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0092",
+      "execution": "exec:0092",
+      "target": "func:removePressed",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0092",
+      "trace": {
+        "candidate": "candidate:0092",
+        "plan": "plan:0092",
+        "execution": "exec:0092"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0093",
+      "execution": "exec:0093",
+      "target": "func:resolveRequest",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:addLog",
+        "func:callApiPost",
+        "func:loadTransferRequests"
+      ],
+      "source_plan": "plan:0093",
+      "trace": {
+        "candidate": "candidate:0093",
+        "plan": "plan:0093",
+        "execution": "exec:0093"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0094",
+      "execution": "exec:0094",
+      "target": "func:runCommand",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:_executeCommand",
+        "func:showModal"
+      ],
+      "source_plan": "plan:0094",
+      "trace": {
+        "candidate": "candidate:0094",
+        "plan": "plan:0094",
+        "execution": "exec:0094"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0095",
+      "execution": "exec:0095",
+      "target": "func:scheduleRetry",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:updateQueueItem"
+      ],
+      "source_plan": "plan:0095",
+      "trace": {
+        "candidate": "candidate:0095",
+        "plan": "plan:0095",
+        "execution": "exec:0095"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0096",
+      "execution": "exec:0096",
+      "target": "func:selectCity",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApi",
+        "func:renderAreas",
+        "func:then"
+      ],
+      "source_plan": "plan:0096",
+      "trace": {
+        "candidate": "candidate:0096",
+        "plan": "plan:0096",
+        "execution": "exec:0096"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0097",
+      "execution": "exec:0097",
+      "target": "func:sendDispatchMessage",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0097",
+      "trace": {
+        "candidate": "candidate:0097",
+        "plan": "plan:0097",
+        "execution": "exec:0097"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0098",
+      "execution": "exec:0098",
+      "target": "func:sendLineContact",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0098",
+      "trace": {
+        "candidate": "candidate:0098",
+        "plan": "plan:0098",
+        "execution": "exec:0098"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0099",
+      "execution": "exec:0099",
+      "target": "func:setApiStatus",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0099",
+      "trace": {
+        "candidate": "candidate:0099",
+        "plan": "plan:0099",
+        "execution": "exec:0099"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0100",
+      "execution": "exec:0100",
+      "target": "func:showModal",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0100",
+      "trace": {
+        "candidate": "candidate:0100",
+        "plan": "plan:0100",
+        "execution": "exec:0100"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0101",
+      "execution": "exec:0101",
+      "target": "func:simulateBatch",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:extractCityName"
+      ],
+      "source_plan": "plan:0101",
+      "trace": {
+        "candidate": "candidate:0101",
+        "plan": "plan:0101",
+        "execution": "exec:0101"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0102",
+      "execution": "exec:0102",
+      "target": "func:submitFlyerStock",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:callApiPost"
+      ],
+      "source_plan": "plan:0102",
+      "trace": {
+        "candidate": "candidate:0102",
+        "plan": "plan:0102",
+        "execution": "exec:0102"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0103",
+      "execution": "exec:0103",
+      "target": "func:then",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:renderRanking"
+      ],
+      "source_plan": "plan:0103",
+      "trace": {
+        "candidate": "candidate:0103",
+        "plan": "plan:0103",
+        "execution": "exec:0103"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0104",
+      "execution": "exec:0104",
+      "target": "func:toFullWidthKana",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0104",
+      "trace": {
+        "candidate": "candidate:0104",
+        "plan": "plan:0104",
+        "execution": "exec:0104"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0105",
+      "execution": "exec:0105",
+      "target": "func:toggleDone",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:openNumpad",
+        "func:renderDetailList",
+        "func:renderDetailModalContent",
+        "func:updateRecord"
+      ],
+      "source_plan": "plan:0105",
+      "trace": {
+        "candidate": "candidate:0105",
+        "plan": "plan:0105",
+        "execution": "exec:0105"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0106",
+      "execution": "exec:0106",
+      "target": "func:toggleNavTier",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:switchPage"
+      ],
+      "source_plan": "plan:0106",
+      "trace": {
+        "candidate": "candidate:0106",
+        "plan": "plan:0106",
+        "execution": "exec:0106"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0107",
+      "execution": "exec:0107",
+      "target": "func:tryRegisterAdmin",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:addLog",
+        "func:callApiPost",
+        "func:then"
+      ],
+      "source_plan": "plan:0107",
+      "trace": {
+        "candidate": "candidate:0107",
+        "plan": "plan:0107",
+        "execution": "exec:0107"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0108",
+      "execution": "exec:0108",
+      "target": "func:updateRecord",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [
+        "func:applyOptimisticCheck",
+        "func:callApiPost",
+        "func:enqueueSync",
+        "func:loadData",
+        "func:saveToOfflineQueue"
+      ],
+      "source_plan": "plan:0108",
+      "trace": {
+        "candidate": "candidate:0108",
+        "plan": "plan:0108",
+        "execution": "exec:0108"
+      },
+      "checksum": null
+    },
+    {
+      "id": "patch:0109",
+      "execution": "exec:0109",
+      "target": "func:updateStats",
+      "patch_type": "rename_patch",
+      "status": "generated",
+      "approval_required": true,
+      "patch_only": true,
+      "patch_version": 1,
+      "reversible": true,
+      "validation_required": true,
+      "affected_targets": [],
+      "source_plan": "plan:0109",
+      "trace": {
+        "candidate": "candidate:0109",
+        "plan": "plan:0109",
+        "execution": "exec:0109"
+      },
+      "checksum": null
+    }
+  ]
+}
