@@ -438,11 +438,11 @@
 ### Phase 6: Route Graph (Phase 6)
 * **[x] Route Graph (Phase 6)**: 意味分類された関数群（Navigation）の関係を統合し、アプリケーション全体の画面遷移構造を可視化する基盤の構築。
 
-### Phase 7: Data Flow
-* **目的**: 変数の受け渡しやデータ変更（IndexedDB ➔ GAS ➔ スプシ）に沿ったデータフローの静的追跡。
+### Phase 7: Data Flow (Phase 7)
+* **[x] Data Flow (Phase 7)**: 既存の Knowledge Graph と Route Graph を統合し、関数間のデータ伝播（Data Flow）経路を表現・可視化する基盤の構築。
 
-### Phase 8: AI Static Analysis
-* **目的**: CIE が抽出した各種 Graph に基づき、AI がコードベース全体の構造やデバッグ可能性を把握・分析するエンジンの構築。
+### Phase 8: AI Static Analysis Foundation
+* **目的**: LLMを使用せず、既存の各種 Graph を用いて、未使用関数候補、孤立ルート候補、影響範囲候補などを静的に抽出するエンジンの構築。
 
 ### Phase 9: AI Auto Refactor
 * **目的**: CIE が特定したリファクタリング対象や安全な変更ルートに基づき、AI が自律的に安全なコード修正を提案・実行するモジュール。

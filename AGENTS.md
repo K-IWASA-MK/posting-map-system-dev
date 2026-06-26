@@ -605,3 +605,16 @@ Route Graph は
 Knowledge Graph
 Semantic Layer
 をインプットとする唯一の画面遷移図データとする。
+
+---
+
+### 10. データフロー管理ルール (Data Flow Rules)
+* **Data Flow Rule**:
+Repository内のデータ伝播情報は
+tools/data_flow.json
+で管理する。
+
+Data Flow は
+Knowledge Graph
+Route Graph
+を統合した唯一のデータ伝播情報とする。

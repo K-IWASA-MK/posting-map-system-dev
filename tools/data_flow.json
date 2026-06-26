@@ -1,0 +1,2515 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-26T22:11:44.677439Z",
+    "scanner": "data_flow_builder"
+  },
+  "flows": {
+    "func:$": {
+      "id": "flow:$",
+      "flow_type": "function",
+      "function": "func:$",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:$",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:_apiLog": {
+      "id": "flow:_apiLog",
+      "flow_type": "function",
+      "function": "func:_apiLog",
+      "file": "shared/api.js",
+      "incoming": [],
+      "outgoing": [
+        "func:logDebug"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:_apiLog",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:_executeCommand": {
+      "id": "flow:_executeCommand",
+      "flow_type": "function",
+      "function": "func:_executeCommand",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:runCommand"
+      ],
+      "outgoing": [
+        "func:addLog",
+        "func:callApiPost",
+        "func:loadDashboardData",
+        "func:showModal"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:_executeCommand",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:addLog": {
+      "id": "flow:addLog",
+      "flow_type": "function",
+      "function": "func:addLog",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:_executeCommand",
+        "func:loadDashboardData",
+        "func:resolveRequest",
+        "func:restoreDashboardCache",
+        "func:tryRegisterAdmin"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:addLog",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:addPhotoToDetail": {
+      "id": "flow:addPhotoToDetail",
+      "flow_type": "function",
+      "function": "func:addPhotoToDetail",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:blobToBase64",
+        "func:capturePhoto",
+        "func:enqueueSync",
+        "func:renderDetailList",
+        "func:renderDetailModalContent"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:addPhotoToDetail",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:applyOptimisticCheck": {
+      "id": "flow:applyOptimisticCheck",
+      "flow_type": "function",
+      "function": "func:applyOptimisticCheck",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:updateRecord"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:applyOptimisticCheck",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:backToCityList": {
+      "id": "flow:backToCityList",
+      "flow_type": "function",
+      "function": "func:backToCityList",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:renderAreas"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:backToCityList",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:backToTier1": {
+      "id": "flow:backToTier1",
+      "flow_type": "function",
+      "function": "func:backToTier1",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:navigateToAreaTab",
+        "func:switchPage",
+        "func:toggleNavTier"
+      ],
+      "route": [
+        "route:navigateToAreaTab",
+        "route:switchPage"
+      ],
+      "node_links": {
+        "knowledge": "func:backToTier1",
+        "route": [
+          "route:navigateToAreaTab",
+          "route:switchPage"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:blobToBase64": {
+      "id": "flow:blobToBase64",
+      "flow_type": "function",
+      "function": "func:blobToBase64",
+      "file": "field/db.js",
+      "incoming": [
+        "func:addPhotoToDetail",
+        "func:pressNum"
+      ],
+      "outgoing": [
+        "func:onerror"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:blobToBase64",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:callApi": {
+      "id": "flow:callApi",
+      "flow_type": "function",
+      "function": "func:callApi",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:dispatchLineRequest",
+        "func:loadDashboardData",
+        "func:loadData",
+        "func:loadFlyerStock",
+        "func:loadHeatmap",
+        "func:loadPrediction",
+        "func:loadRanking",
+        "func:loadRoster",
+        "func:loadStrategy",
+        "func:loadTransferRequests",
+        "func:openDetail",
+        "func:prefetchRanking",
+        "func:safeInitApp",
+        "func:saveProfile",
+        "func:selectCity",
+        "func:startApp",
+        "func:switchPage"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:callApi",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:callApiPost": {
+      "id": "flow:callApiPost",
+      "flow_type": "function",
+      "function": "func:callApiPost",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:_executeCommand",
+        "func:openTransferRequestDialog",
+        "func:processQueue",
+        "func:resolveRequest",
+        "func:safeInitApp",
+        "func:submitFlyerStock",
+        "func:syncOfflineQueue",
+        "func:tryRegisterAdmin",
+        "func:updateRecord"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:callApiPost",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:capturePhoto": {
+      "id": "flow:capturePhoto",
+      "flow_type": "function",
+      "function": "func:capturePhoto",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:addPhotoToDetail",
+        "func:pressNum"
+      ],
+      "outgoing": [
+        "func:compressImage",
+        "func:onFileChange"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:capturePhoto",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:cleanNameInput": {
+      "id": "flow:cleanNameInput",
+      "flow_type": "function",
+      "function": "func:cleanNameInput",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:saveProfile"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:cleanNameInput",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:closeDetailModal": {
+      "id": "flow:closeDetailModal",
+      "flow_type": "function",
+      "function": "func:closeDetailModal",
+      "file": "active/mobile/render.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:closeDetailModal",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:closeIdInfoModal": {
+      "id": "flow:closeIdInfoModal",
+      "flow_type": "function",
+      "function": "func:closeIdInfoModal",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:closeIdInfoModal",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:closeModal": {
+      "id": "flow:closeModal",
+      "flow_type": "function",
+      "function": "func:closeModal",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:closeModal",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:closeNumpad": {
+      "id": "flow:closeNumpad",
+      "flow_type": "function",
+      "function": "func:closeNumpad",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:pressNum"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:closeNumpad",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:closeTransferRequestDialog": {
+      "id": "flow:closeTransferRequestDialog",
+      "flow_type": "function",
+      "function": "func:closeTransferRequestDialog",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:closeTransferRequestDialog",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:compressImage": {
+      "id": "flow:compressImage",
+      "flow_type": "function",
+      "function": "func:compressImage",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:capturePhoto",
+        "func:onFileChange"
+      ],
+      "outgoing": [
+        "func:onerror"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:compressImage",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:contactHolder": {
+      "id": "flow:contactHolder",
+      "flow_type": "function",
+      "function": "func:contactHolder",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:contactHolder",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:dequeueSync": {
+      "id": "flow:dequeueSync",
+      "flow_type": "function",
+      "function": "func:dequeueSync",
+      "file": "field/db.js",
+      "incoming": [
+        "func:processQueue"
+      ],
+      "outgoing": [
+        "func:getDB",
+        "func:onerror"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:dequeueSync",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:dispatchLineRequest": {
+      "id": "flow:dispatchLineRequest",
+      "flow_type": "function",
+      "function": "func:dispatchLineRequest",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApi",
+        "func:showModal"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:dispatchLineRequest",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:drawMap": {
+      "id": "flow:drawMap",
+      "flow_type": "function",
+      "function": "func:drawMap",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:initAdminMapCallback",
+        "func:loadGoogleMaps"
+      ],
+      "outgoing": [
+        "func:map"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:drawMap",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:enqueueSync": {
+      "id": "flow:enqueueSync",
+      "flow_type": "function",
+      "function": "func:enqueueSync",
+      "file": "field/db.js",
+      "incoming": [
+        "func:addPhotoToDetail",
+        "func:pressNum",
+        "func:updateRecord"
+      ],
+      "outgoing": [
+        "func:getDB",
+        "func:onerror",
+        "func:processQueue"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:enqueueSync",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:extractCityName": {
+      "id": "flow:extractCityName",
+      "flow_type": "function",
+      "function": "func:extractCityName",
+      "file": "test_backend.js",
+      "incoming": [
+        "func:extractDistrictAddresses",
+        "func:simulateBatch"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:extractCityName",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:extractDistrictAddresses": {
+      "id": "flow:extractDistrictAddresses",
+      "flow_type": "function",
+      "function": "func:extractDistrictAddresses",
+      "file": "test_backend.js",
+      "incoming": [],
+      "outgoing": [
+        "func:extractCityName",
+        "func:map",
+        "func:toFullWidthKana"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:extractDistrictAddresses",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:formatCompletedAt": {
+      "id": "flow:formatCompletedAt",
+      "flow_type": "function",
+      "function": "func:formatCompletedAt",
+      "file": "active/mobile/render.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:formatCompletedAt",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:getCityName": {
+      "id": "flow:getCityName",
+      "flow_type": "function",
+      "function": "func:getCityName",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:navigateToSiblingArea",
+        "func:renderAreas",
+        "func:renderDetailList",
+        "func:switchPage"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:getCityName",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:getCleanAddress": {
+      "id": "flow:getCleanAddress",
+      "flow_type": "function",
+      "function": "func:getCleanAddress",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:renderDetailModalContent"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:getCleanAddress",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:getDB": {
+      "id": "flow:getDB",
+      "flow_type": "function",
+      "function": "func:getDB",
+      "file": "field/db.js",
+      "incoming": [
+        "func:dequeueSync",
+        "func:enqueueSync",
+        "func:getQueue",
+        "func:updateQueueItem"
+      ],
+      "outgoing": [
+        "func:onerror"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:getDB",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:getGPSLocation": {
+      "id": "flow:getGPSLocation",
+      "flow_type": "function",
+      "function": "func:getGPSLocation",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:pressNum"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:getGPSLocation",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:getQueue": {
+      "id": "flow:getQueue",
+      "flow_type": "function",
+      "function": "func:getQueue",
+      "file": "field/db.js",
+      "incoming": [
+        "func:getQueueStats",
+        "func:getRowStatus",
+        "func:processQueue",
+        "func:triggerUISyncRefresh"
+      ],
+      "outgoing": [
+        "func:getDB",
+        "func:onerror"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:getQueue",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:getQueueStats": {
+      "id": "flow:getQueueStats",
+      "flow_type": "function",
+      "function": "func:getQueueStats",
+      "file": "field/db.js",
+      "incoming": [],
+      "outgoing": [
+        "func:getQueue",
+        "func:map"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:getQueueStats",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:getRowStatus": {
+      "id": "flow:getRowStatus",
+      "flow_type": "function",
+      "function": "func:getRowStatus",
+      "file": "field/db.js",
+      "incoming": [],
+      "outgoing": [
+        "func:getQueue"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:getRowStatus",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:initAdminMapCallback": {
+      "id": "flow:initAdminMapCallback",
+      "flow_type": "function",
+      "function": "func:initAdminMapCallback",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:loadGoogleMaps"
+      ],
+      "outgoing": [
+        "func:drawMap"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:initAdminMapCallback",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:isHtmlRequest": {
+      "id": "flow:isHtmlRequest",
+      "flow_type": "function",
+      "function": "func:isHtmlRequest",
+      "file": "service-worker.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:isHtmlRequest",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadDashboardData": {
+      "id": "flow:loadDashboardData",
+      "flow_type": "function",
+      "function": "func:loadDashboardData",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:_executeCommand",
+        "func:startAdmin"
+      ],
+      "outgoing": [
+        "func:addLog",
+        "func:callApi",
+        "func:loadGoogleMaps",
+        "func:saveDashboardCache",
+        "func:setApiStatus"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadDashboardData",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadData": {
+      "id": "flow:loadData",
+      "flow_type": "function",
+      "function": "func:loadData",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:processQueue",
+        "func:startApp",
+        "func:syncOfflineQueue",
+        "func:updateRecord"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:logDebug",
+        "func:prefetchRanking",
+        "func:renderAreas",
+        "func:setLoadingProgress",
+        "func:setSyncStatus",
+        "func:switchPage",
+        "func:syncOfflineQueue",
+        "func:updateStats"
+      ],
+      "route": [
+        "route:switchPage"
+      ],
+      "node_links": {
+        "knowledge": "func:loadData",
+        "route": [
+          "route:switchPage"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadFlyerStock": {
+      "id": "flow:loadFlyerStock",
+      "flow_type": "function",
+      "function": "func:loadFlyerStock",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:switchAdminTab"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:map",
+        "func:sendLineContact"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadFlyerStock",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadGoogleMaps": {
+      "id": "flow:loadGoogleMaps",
+      "flow_type": "function",
+      "function": "func:loadGoogleMaps",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:loadDashboardData"
+      ],
+      "outgoing": [
+        "func:drawMap",
+        "func:initAdminMapCallback",
+        "func:onerror"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadGoogleMaps",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadHeatmap": {
+      "id": "flow:loadHeatmap",
+      "flow_type": "function",
+      "function": "func:loadHeatmap",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApi"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadHeatmap",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadPrediction": {
+      "id": "flow:loadPrediction",
+      "flow_type": "function",
+      "function": "func:loadPrediction",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApi"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadPrediction",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadRanking": {
+      "id": "flow:loadRanking",
+      "flow_type": "function",
+      "function": "func:loadRanking",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:switchAdminTab"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:map"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadRanking",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadRoster": {
+      "id": "flow:loadRoster",
+      "flow_type": "function",
+      "function": "func:loadRoster",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:switchAdminTab"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:map"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadRoster",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadStrategy": {
+      "id": "flow:loadStrategy",
+      "flow_type": "function",
+      "function": "func:loadStrategy",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApi"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadStrategy",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:loadTransferRequests": {
+      "id": "flow:loadTransferRequests",
+      "flow_type": "function",
+      "function": "func:loadTransferRequests",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:resolveRequest",
+        "func:switchAdminTab"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:map"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:loadTransferRequests",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:logDebug": {
+      "id": "flow:logDebug",
+      "flow_type": "function",
+      "function": "func:logDebug",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:_apiLog",
+        "func:loadData",
+        "func:onerror",
+        "func:onunhandledrejection",
+        "func:prefetchRanking",
+        "func:safeInitApp",
+        "func:saveProfile",
+        "func:startApp"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:logDebug",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:map": {
+      "id": "flow:map",
+      "flow_type": "function",
+      "function": "func:map",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:drawMap",
+        "func:extractDistrictAddresses",
+        "func:getQueueStats",
+        "func:loadFlyerStock",
+        "func:loadRanking",
+        "func:loadRoster",
+        "func:loadTransferRequests",
+        "func:renderAreas",
+        "func:renderDetailList",
+        "func:renderRanking",
+        "func:renderStorageList"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:map",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:navigateToAreaTab": {
+      "id": "flow:navigateToAreaTab",
+      "flow_type": "function",
+      "function": "func:navigateToAreaTab",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:backToTier1"
+      ],
+      "outgoing": [
+        "func:switchPage"
+      ],
+      "route": [
+        "route:navigateToAreaTab",
+        "route:switchPage"
+      ],
+      "node_links": {
+        "knowledge": "func:navigateToAreaTab",
+        "route": [
+          "route:navigateToAreaTab",
+          "route:switchPage"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:navigateToSiblingArea": {
+      "id": "flow:navigateToSiblingArea",
+      "flow_type": "function",
+      "function": "func:navigateToSiblingArea",
+      "file": "active/mobile/render.js",
+      "incoming": [],
+      "outgoing": [
+        "func:getCityName",
+        "func:openDetail"
+      ],
+      "route": [
+        "route:navigateToSiblingArea"
+      ],
+      "node_links": {
+        "knowledge": "func:navigateToSiblingArea",
+        "route": [
+          "route:navigateToSiblingArea"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:onFileChange": {
+      "id": "flow:onFileChange",
+      "flow_type": "function",
+      "function": "func:onFileChange",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:capturePhoto"
+      ],
+      "outgoing": [
+        "func:compressImage"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:onFileChange",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:onerror": {
+      "id": "flow:onerror",
+      "flow_type": "function",
+      "function": "func:onerror",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:blobToBase64",
+        "func:compressImage",
+        "func:dequeueSync",
+        "func:enqueueSync",
+        "func:getDB",
+        "func:getQueue",
+        "func:loadGoogleMaps",
+        "func:updateQueueItem"
+      ],
+      "outgoing": [
+        "func:logDebug"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:onerror",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:onunhandledrejection": {
+      "id": "flow:onunhandledrejection",
+      "flow_type": "function",
+      "function": "func:onunhandledrejection",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:logDebug"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:onunhandledrejection",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:openAreaDetail": {
+      "id": "flow:openAreaDetail",
+      "flow_type": "function",
+      "function": "func:openAreaDetail",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [
+        "func:showModal"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:openAreaDetail",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:openDetail": {
+      "id": "flow:openDetail",
+      "flow_type": "function",
+      "function": "func:openDetail",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:navigateToSiblingArea"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:renderDetailList",
+        "func:switchPage"
+      ],
+      "route": [
+        "route:switchPage"
+      ],
+      "node_links": {
+        "knowledge": "func:openDetail",
+        "route": [
+          "route:switchPage"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:openIdInfoModal": {
+      "id": "flow:openIdInfoModal",
+      "flow_type": "function",
+      "function": "func:openIdInfoModal",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:openIdInfoModal",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:openLineChat": {
+      "id": "flow:openLineChat",
+      "flow_type": "function",
+      "function": "func:openLineChat",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:openLineChat",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:openNumpad": {
+      "id": "flow:openNumpad",
+      "flow_type": "function",
+      "function": "func:openNumpad",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:toggleDone"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:openNumpad",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:openPointDetailModal": {
+      "id": "flow:openPointDetailModal",
+      "flow_type": "function",
+      "function": "func:openPointDetailModal",
+      "file": "active/mobile/render.js",
+      "incoming": [],
+      "outgoing": [
+        "func:renderDetailModalContent"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:openPointDetailModal",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:openTransferRequestDialog": {
+      "id": "flow:openTransferRequestDialog",
+      "flow_type": "function",
+      "function": "func:openTransferRequestDialog",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApiPost"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:openTransferRequestDialog",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:prefetchRanking": {
+      "id": "flow:prefetchRanking",
+      "flow_type": "function",
+      "function": "func:prefetchRanking",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:loadData"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:logDebug",
+        "func:renderRanking",
+        "func:then"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:prefetchRanking",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:pressNum": {
+      "id": "flow:pressNum",
+      "flow_type": "function",
+      "function": "func:pressNum",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:blobToBase64",
+        "func:capturePhoto",
+        "func:closeNumpad",
+        "func:enqueueSync",
+        "func:getGPSLocation",
+        "func:renderDetailList",
+        "func:renderDetailModalContent"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:pressNum",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:processQueue": {
+      "id": "flow:processQueue",
+      "flow_type": "function",
+      "function": "func:processQueue",
+      "file": "field/db.js",
+      "incoming": [
+        "func:enqueueSync"
+      ],
+      "outgoing": [
+        "func:callApiPost",
+        "func:dequeueSync",
+        "func:getQueue",
+        "func:loadData",
+        "func:renderDetailList",
+        "func:renderDetailModalContent",
+        "func:scheduleRetry",
+        "func:updateQueueItem",
+        "func:updateUISyncStatus"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:processQueue",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:removePressed": {
+      "id": "flow:removePressed",
+      "flow_type": "function",
+      "function": "func:removePressed",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:removePressed",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:renderAreas": {
+      "id": "flow:renderAreas",
+      "flow_type": "function",
+      "function": "func:renderAreas",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:backToCityList",
+        "func:loadData",
+        "func:selectCity"
+      ],
+      "outgoing": [
+        "func:getCityName",
+        "func:map"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:renderAreas",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:renderDetailList": {
+      "id": "flow:renderDetailList",
+      "flow_type": "function",
+      "function": "func:renderDetailList",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:addPhotoToDetail",
+        "func:openDetail",
+        "func:pressNum",
+        "func:processQueue",
+        "func:toggleDone",
+        "func:triggerUISyncRefresh"
+      ],
+      "outgoing": [
+        "func:getCityName",
+        "func:map",
+        "func:syncBadge"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:renderDetailList",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:renderDetailModalContent": {
+      "id": "flow:renderDetailModalContent",
+      "flow_type": "function",
+      "function": "func:renderDetailModalContent",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:addPhotoToDetail",
+        "func:openPointDetailModal",
+        "func:pressNum",
+        "func:processQueue",
+        "func:toggleDone",
+        "func:triggerUISyncRefresh"
+      ],
+      "outgoing": [
+        "func:getCleanAddress"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:renderDetailModalContent",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:renderRanking": {
+      "id": "flow:renderRanking",
+      "flow_type": "function",
+      "function": "func:renderRanking",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:prefetchRanking",
+        "func:switchPage",
+        "func:then"
+      ],
+      "outgoing": [
+        "func:map"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:renderRanking",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:renderSettings": {
+      "id": "flow:renderSettings",
+      "flow_type": "function",
+      "function": "func:renderSettings",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:switchPage"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:renderSettings",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:renderStorageList": {
+      "id": "flow:renderStorageList",
+      "flow_type": "function",
+      "function": "func:renderStorageList",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:switchPage"
+      ],
+      "outgoing": [
+        "func:map"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:renderStorageList",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:resolveRequest": {
+      "id": "flow:resolveRequest",
+      "flow_type": "function",
+      "function": "func:resolveRequest",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [
+        "func:addLog",
+        "func:callApiPost",
+        "func:loadTransferRequests"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:resolveRequest",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:restoreDashboardCache": {
+      "id": "flow:restoreDashboardCache",
+      "flow_type": "function",
+      "function": "func:restoreDashboardCache",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:startAdmin"
+      ],
+      "outgoing": [
+        "func:addLog"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:restoreDashboardCache",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:runCommand": {
+      "id": "flow:runCommand",
+      "flow_type": "function",
+      "function": "func:runCommand",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [
+        "func:_executeCommand",
+        "func:showModal"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:runCommand",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:safeInitApp": {
+      "id": "flow:safeInitApp",
+      "flow_type": "function",
+      "function": "func:safeInitApp",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApi",
+        "func:callApiPost",
+        "func:logDebug",
+        "func:setLoadingProgress",
+        "func:startApp"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:safeInitApp",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:saveDashboardCache": {
+      "id": "flow:saveDashboardCache",
+      "flow_type": "function",
+      "function": "func:saveDashboardCache",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:loadDashboardData"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:saveDashboardCache",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:saveProfile": {
+      "id": "flow:saveProfile",
+      "flow_type": "function",
+      "function": "func:saveProfile",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApi",
+        "func:cleanNameInput",
+        "func:logDebug",
+        "func:switchPage"
+      ],
+      "route": [
+        "route:switchPage"
+      ],
+      "node_links": {
+        "knowledge": "func:saveProfile",
+        "route": [
+          "route:switchPage"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:saveToOfflineQueue": {
+      "id": "flow:saveToOfflineQueue",
+      "flow_type": "function",
+      "function": "func:saveToOfflineQueue",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:updateRecord"
+      ],
+      "outgoing": [
+        "func:setSyncStatus"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:saveToOfflineQueue",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:scheduleRetry": {
+      "id": "flow:scheduleRetry",
+      "flow_type": "function",
+      "function": "func:scheduleRetry",
+      "file": "field/db.js",
+      "incoming": [
+        "func:processQueue"
+      ],
+      "outgoing": [
+        "func:updateQueueItem"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:scheduleRetry",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:selectCity": {
+      "id": "flow:selectCity",
+      "flow_type": "function",
+      "function": "func:selectCity",
+      "file": "active/mobile/render.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApi",
+        "func:renderAreas",
+        "func:then"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:selectCity",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:sendDispatchMessage": {
+      "id": "flow:sendDispatchMessage",
+      "flow_type": "function",
+      "function": "func:sendDispatchMessage",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:sendDispatchMessage",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:sendLineContact": {
+      "id": "flow:sendLineContact",
+      "flow_type": "function",
+      "function": "func:sendLineContact",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:loadFlyerStock"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:sendLineContact",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:setApiStatus": {
+      "id": "flow:setApiStatus",
+      "flow_type": "function",
+      "function": "func:setApiStatus",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:loadDashboardData"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:setApiStatus",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:setLoadingProgress": {
+      "id": "flow:setLoadingProgress",
+      "flow_type": "function",
+      "function": "func:setLoadingProgress",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:loadData",
+        "func:safeInitApp"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:setLoadingProgress",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:setSyncStatus": {
+      "id": "flow:setSyncStatus",
+      "flow_type": "function",
+      "function": "func:setSyncStatus",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:loadData",
+        "func:saveToOfflineQueue",
+        "func:syncOfflineQueue"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:setSyncStatus",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:showModal": {
+      "id": "flow:showModal",
+      "flow_type": "function",
+      "function": "func:showModal",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [
+        "func:_executeCommand",
+        "func:dispatchLineRequest",
+        "func:openAreaDetail",
+        "func:runCommand",
+        "func:showPendingPageModal"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:showModal",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:showPendingPageModal": {
+      "id": "flow:showPendingPageModal",
+      "flow_type": "function",
+      "function": "func:showPendingPageModal",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [
+        "func:showModal"
+      ],
+      "route": [
+        "route:showPendingPageModal"
+      ],
+      "node_links": {
+        "knowledge": "func:showPendingPageModal",
+        "route": [
+          "route:showPendingPageModal"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:simulateBatch": {
+      "id": "flow:simulateBatch",
+      "flow_type": "function",
+      "function": "func:simulateBatch",
+      "file": "test_backend.js",
+      "incoming": [],
+      "outgoing": [
+        "func:extractCityName"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:simulateBatch",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:startAdmin": {
+      "id": "flow:startAdmin",
+      "flow_type": "function",
+      "function": "func:startAdmin",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [
+        "func:loadDashboardData",
+        "func:restoreDashboardCache"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:startAdmin",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:startApp": {
+      "id": "flow:startApp",
+      "flow_type": "function",
+      "function": "func:startApp",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:safeInitApp"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:loadData",
+        "func:logDebug"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:startApp",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:submitFlyerStock": {
+      "id": "flow:submitFlyerStock",
+      "flow_type": "function",
+      "function": "func:submitFlyerStock",
+      "file": "active/mobile/app.js",
+      "incoming": [],
+      "outgoing": [
+        "func:callApiPost"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:submitFlyerStock",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:switchAdminTab": {
+      "id": "flow:switchAdminTab",
+      "flow_type": "function",
+      "function": "func:switchAdminTab",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [
+        "func:loadFlyerStock",
+        "func:loadRanking",
+        "func:loadRoster",
+        "func:loadTransferRequests"
+      ],
+      "route": [
+        "route:switchAdminTab"
+      ],
+      "node_links": {
+        "knowledge": "func:switchAdminTab",
+        "route": [
+          "route:switchAdminTab"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:switchPage": {
+      "id": "flow:switchPage",
+      "flow_type": "function",
+      "function": "func:switchPage",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:backToTier1",
+        "func:loadData",
+        "func:navigateToAreaTab",
+        "func:openDetail",
+        "func:saveProfile",
+        "func:toggleNavTier"
+      ],
+      "outgoing": [
+        "func:callApi",
+        "func:getCityName",
+        "func:renderRanking",
+        "func:renderSettings",
+        "func:renderStorageList",
+        "func:then"
+      ],
+      "route": [
+        "route:switchPage"
+      ],
+      "node_links": {
+        "knowledge": "func:switchPage",
+        "route": [
+          "route:switchPage"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:syncBadge": {
+      "id": "flow:syncBadge",
+      "flow_type": "function",
+      "function": "func:syncBadge",
+      "file": "active/mobile/render.js",
+      "incoming": [
+        "func:renderDetailList"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:syncBadge",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:syncOfflineQueue": {
+      "id": "flow:syncOfflineQueue",
+      "flow_type": "function",
+      "function": "func:syncOfflineQueue",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:loadData"
+      ],
+      "outgoing": [
+        "func:callApiPost",
+        "func:loadData",
+        "func:setSyncStatus"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:syncOfflineQueue",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:then": {
+      "id": "flow:then",
+      "flow_type": "function",
+      "function": "func:then",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:prefetchRanking",
+        "func:selectCity",
+        "func:switchPage",
+        "func:tryRegisterAdmin"
+      ],
+      "outgoing": [
+        "func:renderRanking"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:then",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:toFullWidthKana": {
+      "id": "flow:toFullWidthKana",
+      "flow_type": "function",
+      "function": "func:toFullWidthKana",
+      "file": "test_backend.js",
+      "incoming": [
+        "func:extractDistrictAddresses"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:toFullWidthKana",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:toggleDone": {
+      "id": "flow:toggleDone",
+      "flow_type": "function",
+      "function": "func:toggleDone",
+      "file": "active/mobile/render.js",
+      "incoming": [],
+      "outgoing": [
+        "func:openNumpad",
+        "func:renderDetailList",
+        "func:renderDetailModalContent",
+        "func:updateRecord"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:toggleDone",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:toggleNavTier": {
+      "id": "flow:toggleNavTier",
+      "flow_type": "function",
+      "function": "func:toggleNavTier",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:backToTier1"
+      ],
+      "outgoing": [
+        "func:switchPage"
+      ],
+      "route": [
+        "route:switchPage"
+      ],
+      "node_links": {
+        "knowledge": "func:toggleNavTier",
+        "route": [
+          "route:switchPage"
+        ]
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:triggerUISyncRefresh": {
+      "id": "flow:triggerUISyncRefresh",
+      "flow_type": "function",
+      "function": "func:triggerUISyncRefresh",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:updateUISyncStatus"
+      ],
+      "outgoing": [
+        "func:getQueue",
+        "func:renderDetailList",
+        "func:renderDetailModalContent"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:triggerUISyncRefresh",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:tryRegisterAdmin": {
+      "id": "flow:tryRegisterAdmin",
+      "flow_type": "function",
+      "function": "func:tryRegisterAdmin",
+      "file": "legacy/admin-app/manager.js",
+      "incoming": [],
+      "outgoing": [
+        "func:addLog",
+        "func:callApiPost",
+        "func:then"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:tryRegisterAdmin",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:updateQueueItem": {
+      "id": "flow:updateQueueItem",
+      "flow_type": "function",
+      "function": "func:updateQueueItem",
+      "file": "field/db.js",
+      "incoming": [
+        "func:processQueue",
+        "func:scheduleRetry",
+        "func:updateQueueStatus"
+      ],
+      "outgoing": [
+        "func:getDB",
+        "func:onerror"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:updateQueueItem",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:updateQueueStatus": {
+      "id": "flow:updateQueueStatus",
+      "flow_type": "function",
+      "function": "func:updateQueueStatus",
+      "file": "field/db.js",
+      "incoming": [],
+      "outgoing": [
+        "func:updateQueueItem"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:updateQueueStatus",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:updateRecord": {
+      "id": "flow:updateRecord",
+      "flow_type": "function",
+      "function": "func:updateRecord",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:toggleDone"
+      ],
+      "outgoing": [
+        "func:applyOptimisticCheck",
+        "func:callApiPost",
+        "func:enqueueSync",
+        "func:loadData",
+        "func:saveToOfflineQueue"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:updateRecord",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:updateStats": {
+      "id": "flow:updateStats",
+      "flow_type": "function",
+      "function": "func:updateStats",
+      "file": "active/mobile/app.js",
+      "incoming": [
+        "func:loadData"
+      ],
+      "outgoing": [],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:updateStats",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    },
+    "func:updateUISyncStatus": {
+      "id": "flow:updateUISyncStatus",
+      "flow_type": "function",
+      "function": "func:updateUISyncStatus",
+      "file": "field/db.js",
+      "incoming": [
+        "func:processQueue"
+      ],
+      "outgoing": [
+        "func:triggerUISyncRefresh"
+      ],
+      "route": [],
+      "node_links": {
+        "knowledge": "func:updateUISyncStatus",
+        "route": []
+      },
+      "future": {
+        "runtime": [],
+        "variables": [],
+        "parameters": [],
+        "return_values": []
+      }
+    }
+  }
+}
