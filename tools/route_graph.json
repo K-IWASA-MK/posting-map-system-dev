@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-26T22:07:33.813038Z",
+    "scanner": "route_graph_builder"
+  },
+  "routes": {
+    "navigateToAreaTab": {
+      "id": "route:navigateToAreaTab",
+      "function": "func:navigateToAreaTab",
+      "file": "active/mobile/app.js",
+      "category": "Navigation",
+      "route_type": "screen_transition",
+      "entry_point": false,
+      "calls": [
+        "switchPage"
+      ],
+      "called_by": [
+        "backToTier1"
+      ],
+      "html": [
+        "active/mobile/index.html"
+      ],
+      "future": {
+        "runtime": [],
+        "events": [],
+        "user_flow": [],
+        "state": []
+      }
+    },
+    "navigateToSiblingArea": {
+      "id": "route:navigateToSiblingArea",
+      "function": "func:navigateToSiblingArea",
+      "file": "active/mobile/render.js",
+      "category": "Navigation",
+      "route_type": "screen_transition",
+      "entry_point": true,
+      "calls": [
+        "getCityName",
+        "openDetail"
+      ],
+      "called_by": [],
+      "html": [
+        "active/mobile/index.html"
+      ],
+      "future": {
+        "runtime": [],
+        "events": [],
+        "user_flow": [],
+        "state": []
+      }
+    },
+    "showPendingPageModal": {
+      "id": "route:showPendingPageModal",
+      "function": "func:showPendingPageModal",
+      "file": "legacy/admin-app/manager.js",
+      "category": "Navigation",
+      "route_type": "screen_transition",
+      "entry_point": true,
+      "calls": [
+        "showModal"
+      ],
+      "called_by": [],
+      "html": [],
+      "future": {
+        "runtime": [],
+        "events": [],
+        "user_flow": [],
+        "state": []
+      }
+    },
+    "switchAdminTab": {
+      "id": "route:switchAdminTab",
+      "function": "func:switchAdminTab",
+      "file": "legacy/admin-app/manager.js",
+      "category": "Navigation",
+      "route_type": "screen_transition",
+      "entry_point": true,
+      "calls": [
+        "loadFlyerStock",
+        "loadRanking",
+        "loadRoster",
+        "loadTransferRequests"
+      ],
+      "called_by": [],
+      "html": [],
+      "future": {
+        "runtime": [],
+        "events": [],
+        "user_flow": [],
+        "state": []
+      }
+    },
+    "switchPage": {
+      "id": "route:switchPage",
+      "function": "func:switchPage",
+      "file": "active/mobile/app.js",
+      "category": "Navigation",
+      "route_type": "screen_transition",
+      "entry_point": false,
+      "calls": [
+        "callApi",
+        "getCityName",
+        "renderRanking",
+        "renderSettings",
+        "renderStorageList",
+        "then"
+      ],
+      "called_by": [
+        "backToTier1",
+        "loadData",
+        "navigateToAreaTab",
+        "openDetail",
+        "saveProfile",
+        "toggleNavTier"
+      ],
+      "html": [
+        "active/mobile/index.html"
+      ],
+      "future": {
+        "runtime": [],
+        "events": [],
+        "user_flow": [],
+        "state": []
+      }
+    }
+  }
+}

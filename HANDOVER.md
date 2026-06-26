@@ -422,13 +422,27 @@
 
 ---
 
-## 🚀 AI Development Platform ロードマップ (更新: 2026-06-26)
+## 🧠 Code Intelligence Engine (CIE) ロードマップ (更新: 2026-06-27)
 
 ### Foundation (基盤整備)
 * **[x] Asset Version Manager**: アセット更新時のキャッシュバスター自動インクリメント・Service Worker自動同期・Gitステージングの完全自動化。
 * **[x] Asset Dependency Scanner**: アセットとHTML/Service Worker間の依存関係の静的解析および `asset_graph.json` データベースの自動生成。
+* **[x] Execution Graph Scanner (Phase 1)**: JavaScriptの関数定義と呼び出し関係を静的解析し、決定論的な `execution_graph.json` を自動生成する基盤の構築。
+* **[x] Call Graph Index (Phase 2)**: 逆方向の関数呼び出し関係（Caller Index）を自動解析・生成し、関数の影響範囲を特定する基盤の構築。
+* **[x] Repository Index (Phase 3)**: ファイル別に関数・アセット・HTML などの関係性を紐解き、AI が「どこに何があるか」を一瞬で逆引き検索できるインデックスの構築。
+* **[x] Knowledge Graph (Phase 4)**: Repository Index, Execution Graph, Call Graph, Asset Graph などをすべて統合し、コードベース全体の意味的ネットワーク（Knowledge Graph）を形成。
+* **[x] Semantic Layer (Phase 5)**: Knowledge Graph に対して静的キーワード分類を適用し、関数の意味情報（Initialization, Storage など）を付加する基盤の構築。
 
 ---
 
-### Phase Next: Execution Graph Scanner (実行フロー可視化)
-* **目的**: フロントエンドおよびバックエンドの関数の実行連鎖（例: `safeInitApp` ➔ `startApp` ➔ `loadData` ➔ `renderAreas` ➔ `switchPage`）を静的解析し、データおよび制御のフロー（Execution Graph）を自動で抽出・可視化するスキャナーを構築する。これにより、アプリの挙動異常の追跡やコード構造の把握を瞬時に行えるようにする。
+### Phase 6: Route Graph (Phase 6)
+* **[x] Route Graph (Phase 6)**: 意味分類された関数群（Navigation）の関係を統合し、アプリケーション全体の画面遷移構造を可視化する基盤の構築。
+
+### Phase 7: Data Flow
+* **目的**: 変数の受け渡しやデータ変更（IndexedDB ➔ GAS ➔ スプシ）に沿ったデータフローの静的追跡。
+
+### Phase 8: AI Static Analysis
+* **目的**: CIE が抽出した各種 Graph に基づき、AI がコードベース全体の構造やデバッグ可能性を把握・分析するエンジンの構築。
+
+### Phase 9: AI Auto Refactor
+* **目的**: CIE が特定したリファクタリング対象や安全な変更ルートに基づき、AI が自律的に安全なコード修正を提案・実行するモジュール。

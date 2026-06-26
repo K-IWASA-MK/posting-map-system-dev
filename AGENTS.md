@@ -528,3 +528,80 @@ asset_graph.json
 Version Manager は
 asset_graph.json
 を唯一の参照元とする。
+
+---
+
+### 4. 実行フロー管理ルール (Execution Graph Rules)
+* **Execution Graph Rule**:
+Repository内のJavaScript関数呼び出しは
+tools/execution_graph.json
+で管理する。
+
+Execution Graphは
+Code Intelligence Engine
+Foundationとして利用する。
+
+---
+
+### 5. 逆方向呼び出し管理ルール (Call Graph Rules)
+* **Call Graph Rule**:
+Repository内の逆方向呼び出し関係は
+tools/call_graph_index.json
+で管理する。
+
+Call Graph Index は
+Execution Graph の派生データであり、
+Execution Graph を唯一の正とする。
+
+---
+
+### 6. リポジトリ索引管理ルール (Repository Index Rules)
+* **Repository Index Rule**:
+Repository全体の構造情報は
+tools/repository_index.json
+で管理する。
+
+Repository Index は
+Asset Graph
+Execution Graph
+Call Graph
+を統合する索引データである。
+
+---
+
+### 7. リポジトリ知識ネットワーク管理ルール (Knowledge Graph Rules)
+* **Knowledge Graph Rule**:
+Repository全体の知識ネットワークは
+tools/knowledge_graph.json
+で管理する。
+
+Knowledge Graph は
+Execution Graph
+Call Graph
+Asset Graph
+Repository Index
+を統合した唯一の知識データとする。
+
+---
+
+### 8. 関数意味分類ルール (Semantic Layer Rules)
+* **Semantic Layer Rule**:
+Repository内の関数意味分類は
+tools/semantic_layer.json
+で管理する。
+
+Semantic Layer は
+Knowledge Graph の意味情報を保持する唯一のデータとする。
+
+---
+
+### 9. 画面遷移図管理ルール (Route Graph Rules)
+* **Route Graph Rule**:
+Repository内の画面遷移図（ルート遷移）は
+tools/route_graph.json
+で管理する。
+
+Route Graph は
+Knowledge Graph
+Semantic Layer
+をインプットとする唯一の画面遷移図データとする。

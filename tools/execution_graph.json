@@ -1,0 +1,666 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-26T21:38:16.253478Z",
+    "scanner": "execution_graph_scanner"
+  },
+  "functions": {
+    "$": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "_apiLog": {
+      "file": "shared/api.js",
+      "calls": [
+        "logDebug"
+      ]
+    },
+    "_executeCommand": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "addLog",
+        "callApiPost",
+        "loadDashboardData",
+        "showModal"
+      ]
+    },
+    "addLog": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
+    },
+    "addPhotoToDetail": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "blobToBase64",
+        "capturePhoto",
+        "enqueueSync",
+        "renderDetailList",
+        "renderDetailModalContent"
+      ]
+    },
+    "applyOptimisticCheck": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "backToCityList": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "renderAreas"
+      ]
+    },
+    "backToTier1": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "navigateToAreaTab",
+        "switchPage",
+        "toggleNavTier"
+      ]
+    },
+    "blobToBase64": {
+      "file": "field/db.js",
+      "calls": [
+        "onerror"
+      ]
+    },
+    "callApi": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "callApiPost": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "capturePhoto": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "compressImage",
+        "onFileChange"
+      ]
+    },
+    "cleanNameInput": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "closeDetailModal": {
+      "file": "active/mobile/render.js",
+      "calls": []
+    },
+    "closeIdInfoModal": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "closeModal": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
+    },
+    "closeNumpad": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "closeTransferRequestDialog": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "compressImage": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "onerror"
+      ]
+    },
+    "contactHolder": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
+    },
+    "dequeueSync": {
+      "file": "field/db.js",
+      "calls": [
+        "getDB",
+        "onerror"
+      ]
+    },
+    "dispatchLineRequest": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "callApi",
+        "showModal"
+      ]
+    },
+    "drawMap": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "map"
+      ]
+    },
+    "enqueueSync": {
+      "file": "field/db.js",
+      "calls": [
+        "getDB",
+        "onerror",
+        "processQueue"
+      ]
+    },
+    "extractCityName": {
+      "file": "test_backend.js",
+      "calls": []
+    },
+    "extractDistrictAddresses": {
+      "file": "test_backend.js",
+      "calls": [
+        "extractCityName",
+        "map",
+        "toFullWidthKana"
+      ]
+    },
+    "formatCompletedAt": {
+      "file": "active/mobile/render.js",
+      "calls": []
+    },
+    "getCityName": {
+      "file": "active/mobile/render.js",
+      "calls": []
+    },
+    "getCleanAddress": {
+      "file": "active/mobile/render.js",
+      "calls": []
+    },
+    "getDB": {
+      "file": "field/db.js",
+      "calls": [
+        "onerror"
+      ]
+    },
+    "getGPSLocation": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "getQueue": {
+      "file": "field/db.js",
+      "calls": [
+        "getDB",
+        "onerror"
+      ]
+    },
+    "getQueueStats": {
+      "file": "field/db.js",
+      "calls": [
+        "getQueue",
+        "map"
+      ]
+    },
+    "getRowStatus": {
+      "file": "field/db.js",
+      "calls": [
+        "getQueue"
+      ]
+    },
+    "initAdminMapCallback": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "drawMap"
+      ]
+    },
+    "isHtmlRequest": {
+      "file": "service-worker.js",
+      "calls": []
+    },
+    "loadDashboardData": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "addLog",
+        "callApi",
+        "loadGoogleMaps",
+        "saveDashboardCache",
+        "setApiStatus"
+      ]
+    },
+    "loadData": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi",
+        "logDebug",
+        "prefetchRanking",
+        "renderAreas",
+        "setLoadingProgress",
+        "setSyncStatus",
+        "switchPage",
+        "syncOfflineQueue",
+        "updateStats"
+      ]
+    },
+    "loadFlyerStock": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "callApi",
+        "map",
+        "sendLineContact"
+      ]
+    },
+    "loadGoogleMaps": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "drawMap",
+        "initAdminMapCallback",
+        "onerror"
+      ]
+    },
+    "loadHeatmap": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi"
+      ]
+    },
+    "loadPrediction": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi"
+      ]
+    },
+    "loadRanking": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "callApi",
+        "map"
+      ]
+    },
+    "loadRoster": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "callApi",
+        "map"
+      ]
+    },
+    "loadStrategy": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi"
+      ]
+    },
+    "loadTransferRequests": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "callApi",
+        "map"
+      ]
+    },
+    "logDebug": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "map": {
+      "file": "active/mobile/render.js",
+      "calls": []
+    },
+    "navigateToAreaTab": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "switchPage"
+      ]
+    },
+    "navigateToSiblingArea": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "getCityName",
+        "openDetail"
+      ]
+    },
+    "onFileChange": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "compressImage"
+      ]
+    },
+    "onerror": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "logDebug"
+      ]
+    },
+    "onunhandledrejection": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "logDebug"
+      ]
+    },
+    "openAreaDetail": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "showModal"
+      ]
+    },
+    "openDetail": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "callApi",
+        "renderDetailList",
+        "switchPage"
+      ]
+    },
+    "openIdInfoModal": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "openLineChat": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
+    },
+    "openNumpad": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "openPointDetailModal": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "renderDetailModalContent"
+      ]
+    },
+    "openTransferRequestDialog": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApiPost"
+      ]
+    },
+    "prefetchRanking": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi",
+        "logDebug",
+        "renderRanking",
+        "then"
+      ]
+    },
+    "pressNum": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "blobToBase64",
+        "capturePhoto",
+        "closeNumpad",
+        "enqueueSync",
+        "getGPSLocation",
+        "renderDetailList",
+        "renderDetailModalContent"
+      ]
+    },
+    "processQueue": {
+      "file": "field/db.js",
+      "calls": [
+        "callApiPost",
+        "dequeueSync",
+        "getQueue",
+        "loadData",
+        "renderDetailList",
+        "renderDetailModalContent",
+        "scheduleRetry",
+        "updateQueueItem",
+        "updateUISyncStatus"
+      ]
+    },
+    "removePressed": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "renderAreas": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "getCityName",
+        "map"
+      ]
+    },
+    "renderDetailList": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "getCityName",
+        "map",
+        "syncBadge"
+      ]
+    },
+    "renderDetailModalContent": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "getCleanAddress"
+      ]
+    },
+    "renderRanking": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "map"
+      ]
+    },
+    "renderSettings": {
+      "file": "active/mobile/render.js",
+      "calls": []
+    },
+    "renderStorageList": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "map"
+      ]
+    },
+    "resolveRequest": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "addLog",
+        "callApiPost",
+        "loadTransferRequests"
+      ]
+    },
+    "restoreDashboardCache": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "addLog"
+      ]
+    },
+    "runCommand": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "_executeCommand",
+        "showModal"
+      ]
+    },
+    "safeInitApp": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi",
+        "callApiPost",
+        "logDebug",
+        "setLoadingProgress",
+        "startApp"
+      ]
+    },
+    "saveDashboardCache": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
+    },
+    "saveProfile": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi",
+        "cleanNameInput",
+        "logDebug",
+        "switchPage"
+      ]
+    },
+    "saveToOfflineQueue": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "setSyncStatus"
+      ]
+    },
+    "scheduleRetry": {
+      "file": "field/db.js",
+      "calls": [
+        "updateQueueItem"
+      ]
+    },
+    "selectCity": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "callApi",
+        "renderAreas",
+        "then"
+      ]
+    },
+    "sendDispatchMessage": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
+    },
+    "sendLineContact": {
+      "file": "active/mobile/render.js",
+      "calls": []
+    },
+    "setApiStatus": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
+    },
+    "setLoadingProgress": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "setSyncStatus": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "showModal": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
+    },
+    "showPendingPageModal": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "showModal"
+      ]
+    },
+    "simulateBatch": {
+      "file": "test_backend.js",
+      "calls": [
+        "extractCityName"
+      ]
+    },
+    "startAdmin": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "loadDashboardData",
+        "restoreDashboardCache"
+      ]
+    },
+    "startApp": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi",
+        "loadData",
+        "logDebug"
+      ]
+    },
+    "submitFlyerStock": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApiPost"
+      ]
+    },
+    "switchAdminTab": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "loadFlyerStock",
+        "loadRanking",
+        "loadRoster",
+        "loadTransferRequests"
+      ]
+    },
+    "switchPage": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApi",
+        "getCityName",
+        "renderRanking",
+        "renderSettings",
+        "renderStorageList",
+        "then"
+      ]
+    },
+    "syncBadge": {
+      "file": "active/mobile/render.js",
+      "calls": []
+    },
+    "syncOfflineQueue": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "callApiPost",
+        "loadData",
+        "setSyncStatus"
+      ]
+    },
+    "then": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "renderRanking"
+      ]
+    },
+    "toFullWidthKana": {
+      "file": "test_backend.js",
+      "calls": []
+    },
+    "toggleDone": {
+      "file": "active/mobile/render.js",
+      "calls": [
+        "openNumpad",
+        "renderDetailList",
+        "renderDetailModalContent",
+        "updateRecord"
+      ]
+    },
+    "toggleNavTier": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "switchPage"
+      ]
+    },
+    "triggerUISyncRefresh": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "getQueue",
+        "renderDetailList",
+        "renderDetailModalContent"
+      ]
+    },
+    "tryRegisterAdmin": {
+      "file": "legacy/admin-app/manager.js",
+      "calls": [
+        "addLog",
+        "callApiPost",
+        "then"
+      ]
+    },
+    "updateQueueItem": {
+      "file": "field/db.js",
+      "calls": [
+        "getDB",
+        "onerror"
+      ]
+    },
+    "updateQueueStatus": {
+      "file": "field/db.js",
+      "calls": [
+        "updateQueueItem"
+      ]
+    },
+    "updateRecord": {
+      "file": "active/mobile/app.js",
+      "calls": [
+        "applyOptimisticCheck",
+        "callApiPost",
+        "enqueueSync",
+        "loadData",
+        "saveToOfflineQueue"
+      ]
+    },
+    "updateStats": {
+      "file": "active/mobile/app.js",
+      "calls": []
+    },
+    "updateUISyncStatus": {
+      "file": "field/db.js",
+      "calls": [
+        "triggerUISyncRefresh"
+      ]
+    }
+  }
+}

@@ -1,0 +1,403 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-26T21:48:43.853430Z",
+    "scanner": "repository_index_builder"
+  },
+  "files": {
+    "active/dashboard/admin.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/app.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/area-detail.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/area.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/guide.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/header.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/index.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/map_dashboard.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/nav.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/progress.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/dashboard/settings.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "active/mobile/app.js": {
+      "type": "javascript",
+      "sources": {
+        "asset_graph": true,
+        "call_graph": true,
+        "execution_graph": true
+      },
+      "functions": [
+        "$",
+        "addPhotoToDetail",
+        "applyOptimisticCheck",
+        "backToCityList",
+        "backToTier1",
+        "callApi",
+        "callApiPost",
+        "capturePhoto",
+        "cleanNameInput",
+        "closeIdInfoModal",
+        "closeNumpad",
+        "closeTransferRequestDialog",
+        "compressImage",
+        "getGPSLocation",
+        "loadData",
+        "loadHeatmap",
+        "loadPrediction",
+        "loadStrategy",
+        "logDebug",
+        "navigateToAreaTab",
+        "onFileChange",
+        "onerror",
+        "onunhandledrejection",
+        "openIdInfoModal",
+        "openNumpad",
+        "openTransferRequestDialog",
+        "prefetchRanking",
+        "pressNum",
+        "removePressed",
+        "safeInitApp",
+        "saveProfile",
+        "saveToOfflineQueue",
+        "setLoadingProgress",
+        "setSyncStatus",
+        "startApp",
+        "submitFlyerStock",
+        "switchPage",
+        "syncOfflineQueue",
+        "then",
+        "toggleNavTier",
+        "triggerUISyncRefresh",
+        "updateRecord",
+        "updateStats"
+      ],
+      "assets": [
+        "active/mobile/style.css"
+      ],
+      "html": [
+        "active/mobile/index.html"
+      ]
+    },
+    "active/mobile/config.js": {
+      "type": "javascript",
+      "sources": {
+        "asset_graph": true
+      },
+      "functions": [],
+      "assets": [
+        "active/mobile/style.css"
+      ],
+      "html": [
+        "active/mobile/index.html"
+      ]
+    },
+    "active/mobile/index.html": {
+      "type": "html",
+      "sources": {
+        "asset_graph": true
+      },
+      "scripts": [
+        "active/mobile/app.js",
+        "active/mobile/config.js",
+        "active/mobile/render.js",
+        "db.js"
+      ],
+      "styles": [
+        "active/mobile/style.css"
+      ]
+    },
+    "active/mobile/render.js": {
+      "type": "javascript",
+      "sources": {
+        "asset_graph": true,
+        "call_graph": true,
+        "execution_graph": true
+      },
+      "functions": [
+        "closeDetailModal",
+        "formatCompletedAt",
+        "getCityName",
+        "getCleanAddress",
+        "map",
+        "navigateToSiblingArea",
+        "openDetail",
+        "openPointDetailModal",
+        "renderAreas",
+        "renderDetailList",
+        "renderDetailModalContent",
+        "renderRanking",
+        "renderSettings",
+        "renderStorageList",
+        "selectCity",
+        "sendLineContact",
+        "syncBadge",
+        "toggleDone"
+      ],
+      "assets": [
+        "active/mobile/style.css"
+      ],
+      "html": [
+        "active/mobile/index.html"
+      ]
+    },
+    "active/mobile/style.css": {
+      "type": "css",
+      "sources": {
+        "asset_graph": true
+      }
+    },
+    "db.js": {
+      "type": "javascript",
+      "sources": {
+        "asset_graph": true
+      },
+      "functions": [],
+      "assets": [
+        "active/mobile/style.css"
+      ],
+      "html": [
+        "active/mobile/index.html",
+        "service-worker.js"
+      ]
+    },
+    "field/app.js": {
+      "type": "javascript",
+      "sources": {
+        "asset_graph": true
+      },
+      "functions": [],
+      "assets": [
+        "active/mobile/style.css"
+      ],
+      "html": [
+        "field/index.html",
+        "service-worker.js"
+      ]
+    },
+    "field/db.js": {
+      "type": "javascript",
+      "sources": {
+        "asset_graph": true,
+        "call_graph": true,
+        "execution_graph": true
+      },
+      "functions": [
+        "blobToBase64",
+        "dequeueSync",
+        "enqueueSync",
+        "getDB",
+        "getQueue",
+        "getQueueStats",
+        "getRowStatus",
+        "processQueue",
+        "scheduleRetry",
+        "updateQueueItem",
+        "updateQueueStatus",
+        "updateUISyncStatus"
+      ],
+      "assets": [
+        "active/mobile/style.css"
+      ],
+      "html": [
+        "field/index.html"
+      ]
+    },
+    "field/index.html": {
+      "type": "html",
+      "sources": {
+        "asset_graph": true
+      },
+      "scripts": [
+        "field/app.js",
+        "field/db.js",
+        "field/render.js"
+      ],
+      "styles": [
+        "active/mobile/style.css"
+      ]
+    },
+    "field/render.js": {
+      "type": "javascript",
+      "sources": {
+        "asset_graph": true
+      },
+      "functions": [],
+      "assets": [
+        "active/mobile/style.css"
+      ],
+      "html": [
+        "field/index.html",
+        "service-worker.js"
+      ]
+    },
+    "legacy/admin-app/index.html": {
+      "type": "html",
+      "sources": {
+        "asset_graph": true
+      },
+      "scripts": [],
+      "styles": [
+        "active/mobile/style.css"
+      ]
+    },
+    "legacy/admin-app/manager.js": {
+      "type": "javascript",
+      "sources": {
+        "call_graph": true,
+        "execution_graph": true
+      },
+      "functions": [
+        "_executeCommand",
+        "addLog",
+        "closeModal",
+        "contactHolder",
+        "dispatchLineRequest",
+        "drawMap",
+        "initAdminMapCallback",
+        "loadDashboardData",
+        "loadFlyerStock",
+        "loadGoogleMaps",
+        "loadRanking",
+        "loadRoster",
+        "loadTransferRequests",
+        "openAreaDetail",
+        "openLineChat",
+        "resolveRequest",
+        "restoreDashboardCache",
+        "runCommand",
+        "saveDashboardCache",
+        "sendDispatchMessage",
+        "setApiStatus",
+        "showModal",
+        "showPendingPageModal",
+        "startAdmin",
+        "switchAdminTab",
+        "tryRegisterAdmin"
+      ],
+      "assets": [],
+      "html": []
+    },
+    "manager.html": {
+      "type": "html",
+      "sources": {
+        "asset_graph": true
+      },
+      "scripts": [],
+      "styles": [
+        "active/mobile/style.css"
+      ]
+    },
+    "service-worker.js": {
+      "type": "service_worker",
+      "sources": {
+        "asset_graph": true,
+        "call_graph": true,
+        "execution_graph": true
+      },
+      "functions": [
+        "isHtmlRequest"
+      ],
+      "assets": [],
+      "html": []
+    },
+    "shared/api.js": {
+      "type": "javascript",
+      "sources": {
+        "call_graph": true,
+        "execution_graph": true
+      },
+      "functions": [
+        "_apiLog"
+      ],
+      "assets": [],
+      "html": []
+    },
+    "stock.html": {
+      "type": "html",
+      "sources": {
+        "asset_graph": true
+      },
+      "scripts": [],
+      "styles": [
+        "active/mobile/style.css"
+      ]
+    },
+    "tailwind-utils.css": {
+      "type": "css",
+      "sources": {}
+    },
+    "templates/golden_splash.html": {
+      "type": "html",
+      "sources": {},
+      "scripts": [],
+      "styles": []
+    },
+    "test_backend.js": {
+      "type": "javascript",
+      "sources": {
+        "call_graph": true,
+        "execution_graph": true
+      },
+      "functions": [
+        "extractCityName",
+        "extractDistrictAddresses",
+        "simulateBatch",
+        "toFullWidthKana"
+      ],
+      "assets": [],
+      "html": []
+    }
+  }
+}

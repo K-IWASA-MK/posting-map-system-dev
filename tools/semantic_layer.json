@@ -1,0 +1,639 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-26T21:55:48.571539Z",
+    "scanner": "semantic_layer_builder"
+  },
+  "functions": {
+    "$": {
+      "id": "func:$",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "_apiLog": {
+      "id": "func:_apiLog",
+      "category": "Utility",
+      "confidence": 1.0,
+      "matched_rule": "log"
+    },
+    "_executeCommand": {
+      "id": "func:_executeCommand",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "addLog": {
+      "id": "func:addLog",
+      "category": "Utility",
+      "confidence": 1.0,
+      "matched_rule": "log"
+    },
+    "addPhotoToDetail": {
+      "id": "func:addPhotoToDetail",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "applyOptimisticCheck": {
+      "id": "func:applyOptimisticCheck",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "backToCityList": {
+      "id": "func:backToCityList",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "backToTier1": {
+      "id": "func:backToTier1",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "blobToBase64": {
+      "id": "func:blobToBase64",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "callApi": {
+      "id": "func:callApi",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "callApiPost": {
+      "id": "func:callApiPost",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "capturePhoto": {
+      "id": "func:capturePhoto",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "cleanNameInput": {
+      "id": "func:cleanNameInput",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "closeDetailModal": {
+      "id": "func:closeDetailModal",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "closeIdInfoModal": {
+      "id": "func:closeIdInfoModal",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "closeModal": {
+      "id": "func:closeModal",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "closeNumpad": {
+      "id": "func:closeNumpad",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "closeTransferRequestDialog": {
+      "id": "func:closeTransferRequestDialog",
+      "category": "Utility",
+      "confidence": 1.0,
+      "matched_rule": "log"
+    },
+    "compressImage": {
+      "id": "func:compressImage",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "contactHolder": {
+      "id": "func:contactHolder",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "dequeueSync": {
+      "id": "func:dequeueSync",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "sync"
+    },
+    "dispatchLineRequest": {
+      "id": "func:dispatchLineRequest",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "drawMap": {
+      "id": "func:drawMap",
+      "category": "Rendering",
+      "confidence": 1.0,
+      "matched_rule": "draw"
+    },
+    "enqueueSync": {
+      "id": "func:enqueueSync",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "sync"
+    },
+    "extractCityName": {
+      "id": "func:extractCityName",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "extractDistrictAddresses": {
+      "id": "func:extractDistrictAddresses",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "formatCompletedAt": {
+      "id": "func:formatCompletedAt",
+      "category": "Utility",
+      "confidence": 1.0,
+      "matched_rule": "format"
+    },
+    "getCityName": {
+      "id": "func:getCityName",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "getCleanAddress": {
+      "id": "func:getCleanAddress",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "getDB": {
+      "id": "func:getDB",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "db"
+    },
+    "getGPSLocation": {
+      "id": "func:getGPSLocation",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "getQueue": {
+      "id": "func:getQueue",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "queue"
+    },
+    "getQueueStats": {
+      "id": "func:getQueueStats",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "queue"
+    },
+    "getRowStatus": {
+      "id": "func:getRowStatus",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "initAdminMapCallback": {
+      "id": "func:initAdminMapCallback",
+      "category": "Initialization",
+      "confidence": 1.0,
+      "matched_rule": "init"
+    },
+    "isHtmlRequest": {
+      "id": "func:isHtmlRequest",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "loadDashboardData": {
+      "id": "func:loadDashboardData",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadData": {
+      "id": "func:loadData",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadFlyerStock": {
+      "id": "func:loadFlyerStock",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadGoogleMaps": {
+      "id": "func:loadGoogleMaps",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadHeatmap": {
+      "id": "func:loadHeatmap",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadPrediction": {
+      "id": "func:loadPrediction",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadRanking": {
+      "id": "func:loadRanking",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadRoster": {
+      "id": "func:loadRoster",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadStrategy": {
+      "id": "func:loadStrategy",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "loadTransferRequests": {
+      "id": "func:loadTransferRequests",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "logDebug": {
+      "id": "func:logDebug",
+      "category": "Utility",
+      "confidence": 1.0,
+      "matched_rule": "log"
+    },
+    "map": {
+      "id": "func:map",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "navigateToAreaTab": {
+      "id": "func:navigateToAreaTab",
+      "category": "Navigation",
+      "confidence": 1.0,
+      "matched_rule": "navigate"
+    },
+    "navigateToSiblingArea": {
+      "id": "func:navigateToSiblingArea",
+      "category": "Navigation",
+      "confidence": 1.0,
+      "matched_rule": "navigate"
+    },
+    "onFileChange": {
+      "id": "func:onFileChange",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "onerror": {
+      "id": "func:onerror",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "onunhandledrejection": {
+      "id": "func:onunhandledrejection",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "openAreaDetail": {
+      "id": "func:openAreaDetail",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "openDetail": {
+      "id": "func:openDetail",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "openIdInfoModal": {
+      "id": "func:openIdInfoModal",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "openLineChat": {
+      "id": "func:openLineChat",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "openNumpad": {
+      "id": "func:openNumpad",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "openPointDetailModal": {
+      "id": "func:openPointDetailModal",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "openTransferRequestDialog": {
+      "id": "func:openTransferRequestDialog",
+      "category": "Utility",
+      "confidence": 1.0,
+      "matched_rule": "log"
+    },
+    "prefetchRanking": {
+      "id": "func:prefetchRanking",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "pressNum": {
+      "id": "func:pressNum",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "processQueue": {
+      "id": "func:processQueue",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "queue"
+    },
+    "removePressed": {
+      "id": "func:removePressed",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "renderAreas": {
+      "id": "func:renderAreas",
+      "category": "Rendering",
+      "confidence": 1.0,
+      "matched_rule": "render"
+    },
+    "renderDetailList": {
+      "id": "func:renderDetailList",
+      "category": "Rendering",
+      "confidence": 1.0,
+      "matched_rule": "render"
+    },
+    "renderDetailModalContent": {
+      "id": "func:renderDetailModalContent",
+      "category": "Rendering",
+      "confidence": 1.0,
+      "matched_rule": "render"
+    },
+    "renderRanking": {
+      "id": "func:renderRanking",
+      "category": "Rendering",
+      "confidence": 1.0,
+      "matched_rule": "render"
+    },
+    "renderSettings": {
+      "id": "func:renderSettings",
+      "category": "Rendering",
+      "confidence": 1.0,
+      "matched_rule": "render"
+    },
+    "renderStorageList": {
+      "id": "func:renderStorageList",
+      "category": "Rendering",
+      "confidence": 1.0,
+      "matched_rule": "render"
+    },
+    "resolveRequest": {
+      "id": "func:resolveRequest",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "restoreDashboardCache": {
+      "id": "func:restoreDashboardCache",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "cache"
+    },
+    "runCommand": {
+      "id": "func:runCommand",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "safeInitApp": {
+      "id": "func:safeInitApp",
+      "category": "Initialization",
+      "confidence": 1.0,
+      "matched_rule": "init"
+    },
+    "saveDashboardCache": {
+      "id": "func:saveDashboardCache",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "save"
+    },
+    "saveProfile": {
+      "id": "func:saveProfile",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "save"
+    },
+    "saveToOfflineQueue": {
+      "id": "func:saveToOfflineQueue",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "save"
+    },
+    "scheduleRetry": {
+      "id": "func:scheduleRetry",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "selectCity": {
+      "id": "func:selectCity",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "sendDispatchMessage": {
+      "id": "func:sendDispatchMessage",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "sendLineContact": {
+      "id": "func:sendLineContact",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "setApiStatus": {
+      "id": "func:setApiStatus",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "setLoadingProgress": {
+      "id": "func:setLoadingProgress",
+      "category": "Storage",
+      "confidence": 1.0,
+      "matched_rule": "load"
+    },
+    "setSyncStatus": {
+      "id": "func:setSyncStatus",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "sync"
+    },
+    "showModal": {
+      "id": "func:showModal",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "showPendingPageModal": {
+      "id": "func:showPendingPageModal",
+      "category": "Navigation",
+      "confidence": 1.0,
+      "matched_rule": "page"
+    },
+    "simulateBatch": {
+      "id": "func:simulateBatch",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "startAdmin": {
+      "id": "func:startAdmin",
+      "category": "Initialization",
+      "confidence": 1.0,
+      "matched_rule": "start"
+    },
+    "startApp": {
+      "id": "func:startApp",
+      "category": "Initialization",
+      "confidence": 1.0,
+      "matched_rule": "start"
+    },
+    "submitFlyerStock": {
+      "id": "func:submitFlyerStock",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "switchAdminTab": {
+      "id": "func:switchAdminTab",
+      "category": "Navigation",
+      "confidence": 1.0,
+      "matched_rule": "switch"
+    },
+    "switchPage": {
+      "id": "func:switchPage",
+      "category": "Navigation",
+      "confidence": 1.0,
+      "matched_rule": "switch"
+    },
+    "syncBadge": {
+      "id": "func:syncBadge",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "sync"
+    },
+    "syncOfflineQueue": {
+      "id": "func:syncOfflineQueue",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "sync"
+    },
+    "then": {
+      "id": "func:then",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "toFullWidthKana": {
+      "id": "func:toFullWidthKana",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "toggleDone": {
+      "id": "func:toggleDone",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "toggleNavTier": {
+      "id": "func:toggleNavTier",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "triggerUISyncRefresh": {
+      "id": "func:triggerUISyncRefresh",
+      "category": "Rendering",
+      "confidence": 1.0,
+      "matched_rule": "refresh"
+    },
+    "tryRegisterAdmin": {
+      "id": "func:tryRegisterAdmin",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "updateQueueItem": {
+      "id": "func:updateQueueItem",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "queue"
+    },
+    "updateQueueStatus": {
+      "id": "func:updateQueueStatus",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "queue"
+    },
+    "updateRecord": {
+      "id": "func:updateRecord",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "updateStats": {
+      "id": "func:updateStats",
+      "category": "Unknown",
+      "confidence": 1.0,
+      "matched_rule": null
+    },
+    "updateUISyncStatus": {
+      "id": "func:updateUISyncStatus",
+      "category": "Synchronization",
+      "confidence": 1.0,
+      "matched_rule": "sync"
+    }
+  }
+}
