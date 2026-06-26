@@ -651,3 +651,22 @@ Semantic Layer
 のみを利用して生成する。
 
 コードの自動変更は禁止する。
+
+---
+
+### 13. 変更計画ルール (Transformation Plan Rules)
+* **Transformation Plan Rule**:
+Repository全体の変更計画は
+tools/transformation_plan.json
+で管理する。
+
+Transformation Plan は
+Refactor Candidate
+Knowledge Graph
+のみを利用して生成する。
+
+Repository の再解析は禁止する。
+
+コード変更は禁止する。
+
+Git操作は禁止する。
