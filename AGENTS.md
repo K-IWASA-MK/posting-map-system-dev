@@ -618,3 +618,20 @@ Data Flow は
 Knowledge Graph
 Route Graph
 を統合した唯一のデータ伝播情報とする。
+
+---
+
+### 11. 静的解析ルール (Static Analysis Rules)
+* **Static Analysis Rule**:
+Repository全体の静的解析結果は
+tools/static_analysis.json
+で管理する。
+
+Static Analysis は
+Knowledge Graph
+Semantic Layer
+Route Graph
+Data Flow
+のみを利用して生成する。
+
+Repository の再解析は禁止する。
