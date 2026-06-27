@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -27,11 +27,12 @@ JSON_ARTIFACTS = [
     "plugins/dependency.json",
     "plugins/scheduler.json",
     "plugins/execution_plan.json",
-    "plugins/execution_result.json"
+    "plugins/execution_result.json",
+    "plugins/plugin_invocation.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase31"
+PLATFORM_VERSION = "Phase32"
 
 def run_build(args):
     """
@@ -586,6 +587,109 @@ def run_execution_run(args):
         print(f"Error: Failed to write execution_result.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_invocation(args):
+    """
+    invocation サブコマンド: PluginInvoker を使用して plugin_invocation.json を生成する。
+    注意: この ExecutionResult から直接 PluginRequest を構成するデータフローは、
+    将来的な ExecutionExecutor 接続を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.invocation import PluginRequest, PluginInvoker
+    except ImportError as e:
+        print(f"Error: Failed to import invocation module: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    result_path = os.path.join(script_dir, "plugins", "execution_result.json")
+    if not os.path.exists(result_path):
+        print(f"Error: Execution result not found at {result_path}. Please run 'execution-run' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(result_path, "r", encoding="utf-8") as f:
+            result_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load execution result: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    execution_id = result_data.get("execution_id")
+    plugin_results = result_data.get("plugin_results", [])
+    
+    responses = []
+    
+    # 決定論的ソート
+    sorted_results = sorted(plugin_results, key=lambda x: (x.get("plugin_id", ""), x.get("execution_id", "")))
+    
+    for idx, r in enumerate(sorted_results, 1):
+        plugin_id = r.get("plugin_id")
+        exec_id = r.get("execution_id")
+        trace = r.get("trace", {})
+        
+        request_id = f"request:{idx:04d}"
+        
+        # 暫定入力の明記: ExecutionResult の中からメタデータ及びパラメータをテスト用として構成
+        # 将来の Executor は ExecutionStep から Request を生成する
+        parameters = {}
+        metadata = {
+            "version": 1,
+            "source": "execution_result_test_stub"
+        }
+        
+        trace_id = trace.get("execution", f"trace_stub:{idx:04d}")
+        
+        request = PluginRequest(
+            request_id=request_id,
+            execution_id=exec_id,
+            plugin_id=plugin_id,
+            version=1,
+            parameters=parameters,
+            metadata=metadata,
+            trace_id=trace_id
+        )
+        
+        try:
+            response = PluginInvoker.invoke(request)
+            responses.append(response.to_dict())
+        except AssertionError as e:
+            print(f"Assertion Error during invocation: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "plugin_invocation.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    invocation_registry = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "invocation_count": len(responses)
+        },
+        "invocations": responses
+    }
+    
+    if args.dry_run:
+        print("Plugin Invocation (Dry Run)")
+        print(f"Invocations Count: {len(responses)}")
+        for resp in responses:
+            print(f"- Response: {resp.get('plugin_id')} (Status: {resp.get('status')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(invocation_registry, f, indent=2, ensure_ascii=False)
+        print("Plugin Invocation Result successfully written to plugin_invocation.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write plugin_invocation.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -608,6 +712,7 @@ Available commands:
   scheduler  Map plugins to execution schedule.
   execution  Generate plugin execution plan.
   execution-run Run plugin execution plan.
+  invocation Run plugin invocation simulation (stub).
         """
     )
     
@@ -673,6 +778,10 @@ Available commands:
     execution_run_parser = subparsers.add_parser("execution-run", help="Run plugin execution plan")
     execution_run_parser.add_argument("--dry-run", action="store_true", help="Perform an execution run dry-run without writing result")
     
+    # invocation コマンドパーサー
+    invocation_parser = subparsers.add_parser("invocation", help="Run plugin invocation simulation (stub)")
+    invocation_parser.add_argument("--dry-run", action="store_true", help="Perform an invocation dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -714,6 +823,8 @@ Available commands:
         run_execution(args)
     elif args.command == "execution-run":
         run_execution_run(args)
+    elif args.command == "invocation":
+        run_invocation(args)
     else:
         # Invalid Command
         parser.print_help()

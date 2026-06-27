@@ -2,8 +2,8 @@
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 30 (Plugin Execution Plan Foundation) および Phase 31 (Plugin Execution Engine Foundation) の実装を完了し、決定論的実行基盤を構築 ✅  
-> **次回のテーマ**: 🧠 CIE Phase 32 (Plugin Sandbox / Invocation Simulation) の構築およびテスト実装
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 32 (Plugin Invocation Foundation) の実装を完了し、レイヤー分離とDPOカプセル構造を確立 ✅  
+> **次回のテーマ**: 🧠 CIE Phase 33 (Plugin Sandbox / Execution Staging Integration) の構築およびテスト実装
 
 ---
 
@@ -26,7 +26,8 @@
 * **Phase 29**: Plugin Scheduler Foundation [COMPLETED]
 * **Phase 30**: Plugin Execution Plan Foundation [COMPLETED]
 * **Phase 31**: Plugin Execution Engine Foundation [COMPLETED]
-* **Phase 32**: Plugin Sandbox / Invocation Simulation
+* **Phase 32**: Plugin Invocation Foundation [COMPLETED]
+* **Phase 33**: Plugin Sandbox / Invocation Staging Integration
 
 ### Platform Development Policy
 * **No new Builder should be added unless absolutely necessary.**
@@ -41,11 +42,11 @@
 
 ## 💎 Milestone
 
-- **Tag**: `v2.4.0-alpha.0`
-- **Title**: `Plugin Execution Foundation (Phase 30-31) Complete`
+- **Tag**: `v2.5.0-alpha.0`
+- **Title**: `Plugin Invocation Foundation (Phase 32) Complete`
 - **Status**:
-  - `Plugin Execution Engine Foundation Completed`
-  - `Phase 32 (Plugin Sandbox) Started`
+  - `Plugin Invocation Foundation Completed`
+  - `Phase 33 (Plugin Sandbox) Started`
 
 ---
 
@@ -164,6 +165,15 @@ CIE (Code Intelligence Engine) の基盤（Foundation）構築シリーズはす
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-28 セッション】CIE Phase 32 (Plugin Invocation Foundation) 構築（担当: Antigravity）
+- **目的**: Execution Engine と Plugin Runtime を接続する Invocation Layer の Foundation を実装し、呼び出し要求 (PluginRequest) から結果 (PluginResponse) への Stub 解決および Trace の引き継ぎを一連のデータ構造として確立する。
+- **実装内容**:
+  - **新パッケージ**: `plugin_platform/plugin/invocation/` パッケージを新設。
+  - **モジュールの実装**: [plugin_request.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/invocation/plugin_request.py), [plugin_response.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/invocation/plugin_response.py), [plugin_invocation.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/invocation/plugin_invocation.py), [plugin_invoker.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/invocation/plugin_invoker.py) の実装。Trace ID 整合性アサーションをクリアした上で、status "success" および決定論的 `duration: 0.0` の Stub 呼び出し制御を確立。
+  - **CLI (`cie.py`) の拡張**: `invocation` サブコマンドを追加。`execution_result.json` をテスト用の暫定入力として読み込み、各結果から Request を復元・呼び出しを行って `plugin_invocation.json` を生成する処理を実装。
+  - **verify & doctor の拡張**: `plugins/plugin_invocation.json` を検証対象 (全21個) に追加し、整合性合格を確認。
+- **変更ファイル**: `plugin_platform/plugin/invocation/` 内のモジュール、[cie.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie.py), [HANDOVER.md](file:///Volumes/SSD_DATA/posting-map-system/HANDOVER.md)
 
 ### 【2026-06-28 セッション】CIE Phase 30 & 31 (Plugin Execution Foundation) 構築（担当: Antigravity）
 - **目的**: Pluginの実行計画 (Execution Plan) および実行エンジン (Execution Engine) の Foundation を構築し、決定論的な実行結果 (ExecutionResult) 生成パイプラインを確立する。
