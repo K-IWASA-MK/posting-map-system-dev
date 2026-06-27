@@ -1,0 +1,34 @@
+{
+  "plan_id": "plan:session_cie_default",
+  "steps": [
+    {
+      "plugin_id": "plugin:example",
+      "version": 1,
+      "parameters": {},
+      "dependencies": [],
+      "timeout": 30,
+      "retry": 3,
+      "enabled": true,
+      "id": "execution:0001",
+      "trace": {
+        "registry": "plugin:example",
+        "runtime": "runtime:0001",
+        "lifecycle": "lifecycle:0001",
+        "dependency": "dependency:0001",
+        "scheduler": "scheduler:0001",
+        "execution": "execution:0001"
+      }
+    }
+  ],
+  "created_at": "2026-06-28T00:00:00Z",
+  "trigger": "manual",
+  "metadata": {
+    "version": 1,
+    "session_id": "session_cie_default",
+    "workspace": "/Volumes/SSD_DATA/posting-map-system",
+    "environment": "development",
+    "plugin_count": 1,
+    "enabled_count": 1,
+    "disabled_count": 0
+  }
+}

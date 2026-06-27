@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -22,11 +22,15 @@ JSON_ARTIFACTS = [
     "execution_plan.json",
     "patch_plan.json",
     "patch_apply_plan.json",
-    "patch_rollback_plan.json"
+    "patch_rollback_plan.json",
+    "plugins/registry.json",
+    "plugins/dependency.json",
+    "plugins/scheduler.json",
+    "plugins/execution_plan.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase29"
+PLATFORM_VERSION = "Phase30"
 
 def run_build(args):
     """
@@ -126,7 +130,7 @@ def run_doctor(args):
     print(f"CIE Version      : {CIE_VERSION}")
     print(f"Platform Version : {PLATFORM_VERSION}\n")
     print(f"Builder Count    : 15")
-    print(f"JSON Count       : {valid_count} / 15\n")
+    print(f"JSON Count       : {valid_count} / {len(JSON_ARTIFACTS)}\n")
     
     if missing:
         print(f"Missing Files    : {', '.join(missing)}")
@@ -383,6 +387,100 @@ def run_scheduler(args):
         print(f"Error: Scheduler execution failed with code {e.returncode}.", file=sys.stderr)
         sys.exit(3)
 
+def run_execution(args):
+    """
+    execution サブコマンド: ExecutionPlanBuilder を使用して execution_plan.json を生成する。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.execution import ExecutionContext, ExecutionPlanBuilder
+    except ImportError as e:
+        print(f"Error: Failed to import execution module: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    registry_path = os.path.join(script_dir, "plugins", "registry.json")
+    dependency_path = os.path.join(script_dir, "plugins", "dependency.json")
+    scheduler_path = os.path.join(script_dir, "plugins", "scheduler.json")
+    
+    def load_json(path):
+        if not os.path.exists(path):
+            print(f"Error: Required file not found at {path}", file=sys.stderr)
+            sys.exit(3)
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error: Failed to load {path}: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    registry_data = load_json(registry_path)
+    dependency_data = load_json(dependency_path)
+    scheduler_data = load_json(scheduler_path)
+    
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    timestamp = configuration.get("timestamp", "2026-06-28T00:00:00Z")
+    session_id = configuration.get("session_id", "session_cie_default")
+    workspace = configuration.get("workspace", parent_dir)
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = ExecutionContext(
+        session_id=session_id,
+        workspace=workspace,
+        configuration=configuration,
+        variables=variables,
+        environment=environment,
+        timestamp=timestamp
+    )
+    
+    try:
+        plan = ExecutionPlanBuilder.build_plan(
+            context=context,
+            registry_data=registry_data,
+            dependency_data=dependency_data,
+            scheduler_data=scheduler_data,
+            configuration=configuration
+        )
+    except AssertionError as e:
+        print(f"Assertion Error during plan build: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "execution_plan.json")
+    
+    if args.dry_run:
+        print("Plugin Execution Plan (Dry Run)")
+        print(f"Plan ID: {plan.plan_id}")
+        print(f"Created At: {plan.created_at}")
+        print(f"Steps Count: {len(plan.steps)}")
+        for step in plan.steps:
+            print(f"- Plugin: {step.plugin_id} (Version: {step.version}, Enabled: {step.enabled})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(plan.to_dict(), f, indent=2, ensure_ascii=False)
+        print("Plugin Execution Plan successfully written to execution_plan.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write execution_plan.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -460,6 +558,10 @@ Available commands:
     scheduler_parser = subparsers.add_parser("scheduler", help="Map plugins to execution schedule")
     scheduler_parser.add_argument("--dry-run", action="store_true", help="Perform a scheduler dry-run without writing registry")
     
+    # execution コマンドパーサー
+    execution_parser = subparsers.add_parser("execution", help="Generate plugin execution plan")
+    execution_parser.add_argument("--dry-run", action="store_true", help="Perform an execution dry-run without writing plan")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -497,6 +599,8 @@ Available commands:
         run_dependency(args)
     elif args.command == "scheduler":
         run_scheduler(args)
+    elif args.command == "execution":
+        run_execution(args)
     else:
         # Invalid Command
         parser.print_help()
