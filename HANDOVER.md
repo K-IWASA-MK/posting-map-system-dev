@@ -1,9 +1,9 @@
-# 開発引き継ぎ事項 (更新: 2026-06-27)
+# 開発引き継ぎ事項 (更新: 2026-06-28)
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-27 CIE Phase 25〜29 (Plugin Platform Foundation: Registry/Runtime/Lifecycle/Dependency/Scheduler) の構築を完了し、Plugin基盤の統合を達成 ✅  
-> **次回のテーマ**: 🧠 CIE Phase 30 (Plugin Execution Plan) のシミュレーション構築および Phase 31 (Sandbox), Phase 32 (Executor) の実装
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 30 (Plugin Execution Plan Foundation) および Phase 31 (Plugin Execution Engine Foundation) の実装を完了し、決定論的実行基盤を構築 ✅  
+> **次回のテーマ**: 🧠 CIE Phase 32 (Plugin Sandbox / Invocation Simulation) の構築およびテスト実装
 
 ---
 
@@ -24,7 +24,9 @@
 * **Phase 27**: Plugin Lifecycle Foundation [COMPLETED]
 * **Phase 28**: Plugin Dependency Foundation [COMPLETED]
 * **Phase 29**: Plugin Scheduler Foundation [COMPLETED]
-* **Phase 30**: Plugin Execution Plan Simulation
+* **Phase 30**: Plugin Execution Plan Foundation [COMPLETED]
+* **Phase 31**: Plugin Execution Engine Foundation [COMPLETED]
+* **Phase 32**: Plugin Sandbox / Invocation Simulation
 
 ### Platform Development Policy
 * **No new Builder should be added unless absolutely necessary.**
@@ -39,11 +41,11 @@
 
 ## 💎 Milestone
 
-- **Tag**: `v2.3.0-alpha.0`
-- **Title**: `Plugin Platform Foundation (Phase 25-29) Complete`
+- **Tag**: `v2.4.0-alpha.0`
+- **Title**: `Plugin Execution Foundation (Phase 30-31) Complete`
 - **Status**:
-  - `Plugin Foundation Completed`
-  - `Phase 30 (Execution Plan) Started`
+  - `Plugin Execution Engine Foundation Completed`
+  - `Phase 32 (Plugin Sandbox) Started`
 
 ---
 
@@ -162,6 +164,16 @@ CIE (Code Intelligence Engine) の基盤（Foundation）構築シリーズはす
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-28 セッション】CIE Phase 30 & 31 (Plugin Execution Foundation) 構築（担当: Antigravity）
+- **目的**: Pluginの実行計画 (Execution Plan) および実行エンジン (Execution Engine) の Foundation を構築し、決定論的な実行結果 (ExecutionResult) 生成パイプラインを確立する。
+- **実装内容**:
+  - **回避策の適用**: 標準ライブラリ `platform` との衝突を避けるため、新規ディレクトリ/パッケージを `plugin_platform` として追加。
+  - **Phase 30 (Execution Plan)**: [execution_context.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/execution/execution_context.py), [execution_step.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/execution/execution_step.py), [execution_plan.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/execution/execution_plan.py), [execution_builder.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/execution/execution_builder.py) の実装。決定論的タイムスタンプの取得、Trace ID 整合性アサーション、依存関係順のソートを行い、生成のみに特化したBuilderを構築。
+  - **Phase 31 (Execution Engine)**: [execution_result.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/execution/execution_result.py), [execution_executor.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/execution/execution_executor.py), [execution_engine.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/execution/execution_engine.py) の実装。実時間計測を一切行わない `duration: 0.0` 固定による決定論的かつダミーのPlugin順次実行制御を確立。
+  - **CLI (`cie.py`) の拡張**: `execution` および `execution-run` サブコマンドを追加。シリアライズされた `execution_plan.json` および `execution_result.json` の出力をCLI側の責務として担当。これらを `JSON_ARTIFACTS` (全20個) に追加し、verify / doctor の合格を確認。
+- **検証テスト**: `python3 tools/cie.py verify` および `doctor` での完全合格（Count: 20/20, Health: GOOD）を確認。
+- **変更ファイル**: `plugin_platform/` 内のモジュール、[cie.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie.py), [HANDOVER.md](file:///Volumes/SSD_DATA/posting-map-system/HANDOVER.md)
 
 ### 【2026-06-27 セッション】CIE Phase 14 & 15 (Rollback / Orchestrator) 構築（担当: Antigravity）
 - **目的**: パッチ適用の逆順シミュレーションを行うロールバックエンジンを構築し、全15ビルダーを依存関係順に一括実行するオーケストレータを実装してCIE基盤（Foundation）を完結させる。

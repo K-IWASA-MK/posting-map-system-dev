@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -26,11 +26,12 @@ JSON_ARTIFACTS = [
     "plugins/registry.json",
     "plugins/dependency.json",
     "plugins/scheduler.json",
-    "plugins/execution_plan.json"
+    "plugins/execution_plan.json",
+    "plugins/execution_result.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase30"
+PLATFORM_VERSION = "Phase31"
 
 def run_build(args):
     """
@@ -481,6 +482,110 @@ def run_execution(args):
         print(f"Error: Failed to write execution_plan.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_execution_run(args):
+    """
+    execution-run サブコマンド: ExecutionEngine を起動し、ExecutionResult を生成して保存する。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.execution import ExecutionContext, ExecutionPlan, ExecutionStep, ExecutionEngine
+    except ImportError as e:
+        print(f"Error: Failed to import execution module: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    plan_path = os.path.join(script_dir, "plugins", "execution_plan.json")
+    if not os.path.exists(plan_path):
+        print(f"Error: Execution plan not found at {plan_path}. Please run 'execution' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(plan_path, "r", encoding="utf-8") as f:
+            plan_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load execution plan: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    # JSONデータから ExecutionPlan オブジェクトを復元
+    steps = []
+    for s_data in plan_data.get("steps", []):
+        step = ExecutionStep(
+            plugin_id=s_data.get("plugin_id"),
+            version=s_data.get("version"),
+            parameters=s_data.get("parameters"),
+            dependencies=s_data.get("dependencies"),
+            timeout=s_data.get("timeout"),
+            retry=s_data.get("retry"),
+            enabled=s_data.get("enabled"),
+            execution_id=s_data.get("id"),
+            trace=s_data.get("trace")
+        )
+        steps.append(step)
+        
+    plan = ExecutionPlan(
+        plan_id=plan_data.get("plan_id"),
+        steps=steps,
+        created_at=plan_data.get("created_at"),
+        trigger=plan_data.get("trigger"),
+        metadata=plan_data.get("metadata")
+    )
+    
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    timestamp = configuration.get("timestamp", "2026-06-28T00:00:00Z")
+    session_id = configuration.get("session_id", "session_cie_default")
+    workspace = configuration.get("workspace", parent_dir)
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = ExecutionContext(
+        session_id=session_id,
+        workspace=workspace,
+        configuration=configuration,
+        variables=variables,
+        environment=environment,
+        timestamp=timestamp
+    )
+    
+    try:
+        result = ExecutionEngine.execute(plan, context)
+    except AssertionError as e:
+        print(f"Assertion Error during execution run: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "execution_result.json")
+    
+    if args.dry_run:
+        print("Plugin Execution Run (Dry Run)")
+        print(f"Execution ID: {result.execution_id}")
+        print(f"Plan ID: {result.plan_id}")
+        print(f"Status: {result.status.upper()}")
+        print(f"Duration: {result.duration}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(result.to_dict(), f, indent=2, ensure_ascii=False)
+        print("Plugin Execution Result successfully written to execution_result.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write execution_result.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -501,6 +606,8 @@ Available commands:
   lifecycle Map plugins to lifecycle states.
   dependency Map plugins to dependency resolution.
   scheduler  Map plugins to execution schedule.
+  execution  Generate plugin execution plan.
+  execution-run Run plugin execution plan.
         """
     )
     
@@ -562,6 +669,10 @@ Available commands:
     execution_parser = subparsers.add_parser("execution", help="Generate plugin execution plan")
     execution_parser.add_argument("--dry-run", action="store_true", help="Perform an execution dry-run without writing plan")
     
+    # execution-run コマンドパーサー
+    execution_run_parser = subparsers.add_parser("execution-run", help="Run plugin execution plan")
+    execution_run_parser.add_argument("--dry-run", action="store_true", help="Perform an execution run dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -601,6 +712,8 @@ Available commands:
         run_scheduler(args)
     elif args.command == "execution":
         run_execution(args)
+    elif args.command == "execution-run":
+        run_execution_run(args)
     else:
         # Invalid Command
         parser.print_help()

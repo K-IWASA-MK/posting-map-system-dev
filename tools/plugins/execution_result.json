@@ -1,0 +1,32 @@
+{
+  "execution_id": "execution_run:session_cie_default",
+  "plan_id": "plan:session_cie_default",
+  "status": "success",
+  "started_at": "2026-06-28T00:00:00Z",
+  "finished_at": "2026-06-28T00:00:00Z",
+  "duration": 0.0,
+  "plugin_results": [
+    {
+      "plugin_id": "plugin:example",
+      "execution_id": "execution:0001",
+      "status": "success",
+      "duration": 0.0,
+      "trace": {
+        "registry": "plugin:example",
+        "runtime": "runtime:0001",
+        "lifecycle": "lifecycle:0001",
+        "dependency": "dependency:0001",
+        "scheduler": "scheduler:0001",
+        "execution": "execution:0001"
+      }
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "steps_processed": 1,
+    "steps_succeeded": 1,
+    "steps_skipped": 0,
+    "steps_failed": 0
+  },
+  "trace_id": "trace:session_cie_default"
+}
