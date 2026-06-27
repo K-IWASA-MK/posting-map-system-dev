@@ -1,0 +1,3817 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-27T07:14:41.644114Z",
+    "scanner": "rollback_engine_builder"
+  },
+  "rollback_tasks": [
+    {
+      "id": "rollback:0112",
+      "apply": "apply:0112",
+      "patch": "patch:0112",
+      "execution": "exec:0112",
+      "target": "func:updateStats",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 1,
+      "trace": {
+        "candidate": "candidate:0112",
+        "plan": "plan:0112",
+        "execution": "exec:0112"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0112",
+        "plan": "plan:0112",
+        "execution": "exec:0112",
+        "patch": "patch:0112",
+        "apply": "apply:0112",
+        "rollback": "rollback:0112"
+      }
+    },
+    {
+      "id": "rollback:0111",
+      "apply": "apply:0111",
+      "patch": "patch:0111",
+      "execution": "exec:0111",
+      "target": "func:updateRecord",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 2,
+      "trace": {
+        "candidate": "candidate:0111",
+        "plan": "plan:0111",
+        "execution": "exec:0111"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0111",
+        "plan": "plan:0111",
+        "execution": "exec:0111",
+        "patch": "patch:0111",
+        "apply": "apply:0111",
+        "rollback": "rollback:0111"
+      }
+    },
+    {
+      "id": "rollback:0110",
+      "apply": "apply:0110",
+      "patch": "patch:0043",
+      "execution": "exec:0043",
+      "target": "func:updateQueueStatus",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 3,
+      "trace": {
+        "candidate": "candidate:0043",
+        "plan": "plan:0043",
+        "execution": "exec:0043"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0043",
+        "plan": "plan:0043",
+        "execution": "exec:0043",
+        "patch": "patch:0043",
+        "apply": "apply:0110",
+        "rollback": "rollback:0110"
+      }
+    },
+    {
+      "id": "rollback:0109",
+      "apply": "apply:0109",
+      "patch": "patch:0110",
+      "execution": "exec:0110",
+      "target": "func:tryRegisterAdmin",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 4,
+      "trace": {
+        "candidate": "candidate:0110",
+        "plan": "plan:0110",
+        "execution": "exec:0110"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0110",
+        "plan": "plan:0110",
+        "execution": "exec:0110",
+        "patch": "patch:0110",
+        "apply": "apply:0109",
+        "rollback": "rollback:0109"
+      }
+    },
+    {
+      "id": "rollback:0108",
+      "apply": "apply:0108",
+      "patch": "patch:0042",
+      "execution": "exec:0042",
+      "target": "func:tryRegisterAdmin",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 5,
+      "trace": {
+        "candidate": "candidate:0042",
+        "plan": "plan:0042",
+        "execution": "exec:0042"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0042",
+        "plan": "plan:0042",
+        "execution": "exec:0042",
+        "patch": "patch:0042",
+        "apply": "apply:0108",
+        "rollback": "rollback:0108"
+      }
+    },
+    {
+      "id": "rollback:0107",
+      "apply": "apply:0107",
+      "patch": "patch:0109",
+      "execution": "exec:0109",
+      "target": "func:toggleNavTier",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 6,
+      "trace": {
+        "candidate": "candidate:0109",
+        "plan": "plan:0109",
+        "execution": "exec:0109"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0109",
+        "plan": "plan:0109",
+        "execution": "exec:0109",
+        "patch": "patch:0109",
+        "apply": "apply:0107",
+        "rollback": "rollback:0107"
+      }
+    },
+    {
+      "id": "rollback:0106",
+      "apply": "apply:0106",
+      "patch": "patch:0108",
+      "execution": "exec:0108",
+      "target": "func:toggleDone",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 7,
+      "trace": {
+        "candidate": "candidate:0108",
+        "plan": "plan:0108",
+        "execution": "exec:0108"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0108",
+        "plan": "plan:0108",
+        "execution": "exec:0108",
+        "patch": "patch:0108",
+        "apply": "apply:0106",
+        "rollback": "rollback:0106"
+      }
+    },
+    {
+      "id": "rollback:0105",
+      "apply": "apply:0105",
+      "patch": "patch:0041",
+      "execution": "exec:0041",
+      "target": "func:toggleDone",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 8,
+      "trace": {
+        "candidate": "candidate:0041",
+        "plan": "plan:0041",
+        "execution": "exec:0041"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0041",
+        "plan": "plan:0041",
+        "execution": "exec:0041",
+        "patch": "patch:0041",
+        "apply": "apply:0105",
+        "rollback": "rollback:0105"
+      }
+    },
+    {
+      "id": "rollback:0104",
+      "apply": "apply:0104",
+      "patch": "patch:0107",
+      "execution": "exec:0107",
+      "target": "func:toFullWidthKana",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 9,
+      "trace": {
+        "candidate": "candidate:0107",
+        "plan": "plan:0107",
+        "execution": "exec:0107"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0107",
+        "plan": "plan:0107",
+        "execution": "exec:0107",
+        "patch": "patch:0107",
+        "apply": "apply:0104",
+        "rollback": "rollback:0104"
+      }
+    },
+    {
+      "id": "rollback:0103",
+      "apply": "apply:0103",
+      "patch": "patch:0106",
+      "execution": "exec:0106",
+      "target": "func:then",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 10,
+      "trace": {
+        "candidate": "candidate:0106",
+        "plan": "plan:0106",
+        "execution": "exec:0106"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0106",
+        "plan": "plan:0106",
+        "execution": "exec:0106",
+        "patch": "patch:0106",
+        "apply": "apply:0103",
+        "rollback": "rollback:0103"
+      }
+    },
+    {
+      "id": "rollback:0102",
+      "apply": "apply:0102",
+      "patch": "patch:0040",
+      "execution": "exec:0040",
+      "target": "func:syncOfflineQueue",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 11,
+      "trace": {
+        "candidate": "candidate:0040",
+        "plan": "plan:0040",
+        "execution": "exec:0040"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0040",
+        "plan": "plan:0040",
+        "execution": "exec:0040",
+        "patch": "patch:0040",
+        "apply": "apply:0102",
+        "rollback": "rollback:0102"
+      }
+    },
+    {
+      "id": "rollback:0101",
+      "apply": "apply:0101",
+      "patch": "patch:0053",
+      "execution": "exec:0053",
+      "target": "func:switchPage",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 12,
+      "trace": {
+        "candidate": "candidate:0053",
+        "plan": "plan:0053",
+        "execution": "exec:0053"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0053",
+        "plan": "plan:0053",
+        "execution": "exec:0053",
+        "patch": "patch:0053",
+        "apply": "apply:0101",
+        "rollback": "rollback:0101"
+      }
+    },
+    {
+      "id": "rollback:0100",
+      "apply": "apply:0100",
+      "patch": "patch:0105",
+      "execution": "exec:0105",
+      "target": "func:submitFlyerStock",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 13,
+      "trace": {
+        "candidate": "candidate:0105",
+        "plan": "plan:0105",
+        "execution": "exec:0105"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0105",
+        "plan": "plan:0105",
+        "execution": "exec:0105",
+        "patch": "patch:0105",
+        "apply": "apply:0100",
+        "rollback": "rollback:0100"
+      }
+    },
+    {
+      "id": "rollback:0099",
+      "apply": "apply:0099",
+      "patch": "patch:0039",
+      "execution": "exec:0039",
+      "target": "func:submitFlyerStock",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 14,
+      "trace": {
+        "candidate": "candidate:0039",
+        "plan": "plan:0039",
+        "execution": "exec:0039"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0039",
+        "plan": "plan:0039",
+        "execution": "exec:0039",
+        "patch": "patch:0039",
+        "apply": "apply:0099",
+        "rollback": "rollback:0099"
+      }
+    },
+    {
+      "id": "rollback:0098",
+      "apply": "apply:0098",
+      "patch": "patch:0038",
+      "execution": "exec:0038",
+      "target": "func:startAdmin",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 15,
+      "trace": {
+        "candidate": "candidate:0038",
+        "plan": "plan:0038",
+        "execution": "exec:0038"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0038",
+        "plan": "plan:0038",
+        "execution": "exec:0038",
+        "patch": "patch:0038",
+        "apply": "apply:0098",
+        "rollback": "rollback:0098"
+      }
+    },
+    {
+      "id": "rollback:0097",
+      "apply": "apply:0097",
+      "patch": "patch:0104",
+      "execution": "exec:0104",
+      "target": "func:simulateBatch",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 16,
+      "trace": {
+        "candidate": "candidate:0104",
+        "plan": "plan:0104",
+        "execution": "exec:0104"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0104",
+        "plan": "plan:0104",
+        "execution": "exec:0104",
+        "patch": "patch:0104",
+        "apply": "apply:0097",
+        "rollback": "rollback:0097"
+      }
+    },
+    {
+      "id": "rollback:0096",
+      "apply": "apply:0096",
+      "patch": "patch:0037",
+      "execution": "exec:0037",
+      "target": "func:simulateBatch",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 17,
+      "trace": {
+        "candidate": "candidate:0037",
+        "plan": "plan:0037",
+        "execution": "exec:0037"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0037",
+        "plan": "plan:0037",
+        "execution": "exec:0037",
+        "patch": "patch:0037",
+        "apply": "apply:0096",
+        "rollback": "rollback:0096"
+      }
+    },
+    {
+      "id": "rollback:0095",
+      "apply": "apply:0095",
+      "patch": "patch:0103",
+      "execution": "exec:0103",
+      "target": "func:showModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 18,
+      "trace": {
+        "candidate": "candidate:0103",
+        "plan": "plan:0103",
+        "execution": "exec:0103"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0103",
+        "plan": "plan:0103",
+        "execution": "exec:0103",
+        "patch": "patch:0103",
+        "apply": "apply:0095",
+        "rollback": "rollback:0095"
+      }
+    },
+    {
+      "id": "rollback:0094",
+      "apply": "apply:0094",
+      "patch": "patch:0052",
+      "execution": "exec:0052",
+      "target": "func:showModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 19,
+      "trace": {
+        "candidate": "candidate:0052",
+        "plan": "plan:0052",
+        "execution": "exec:0052"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0052",
+        "plan": "plan:0052",
+        "execution": "exec:0052",
+        "patch": "patch:0052",
+        "apply": "apply:0094",
+        "rollback": "rollback:0094"
+      }
+    },
+    {
+      "id": "rollback:0093",
+      "apply": "apply:0093",
+      "patch": "patch:0102",
+      "execution": "exec:0102",
+      "target": "func:setApiStatus",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 20,
+      "trace": {
+        "candidate": "candidate:0102",
+        "plan": "plan:0102",
+        "execution": "exec:0102"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0102",
+        "plan": "plan:0102",
+        "execution": "exec:0102",
+        "patch": "patch:0102",
+        "apply": "apply:0093",
+        "rollback": "rollback:0093"
+      }
+    },
+    {
+      "id": "rollback:0092",
+      "apply": "apply:0092",
+      "patch": "patch:0101",
+      "execution": "exec:0101",
+      "target": "func:sendLineContact",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 21,
+      "trace": {
+        "candidate": "candidate:0101",
+        "plan": "plan:0101",
+        "execution": "exec:0101"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0101",
+        "plan": "plan:0101",
+        "execution": "exec:0101",
+        "patch": "patch:0101",
+        "apply": "apply:0092",
+        "rollback": "rollback:0092"
+      }
+    },
+    {
+      "id": "rollback:0091",
+      "apply": "apply:0091",
+      "patch": "patch:0100",
+      "execution": "exec:0100",
+      "target": "func:sendDispatchMessage",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 22,
+      "trace": {
+        "candidate": "candidate:0100",
+        "plan": "plan:0100",
+        "execution": "exec:0100"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0100",
+        "plan": "plan:0100",
+        "execution": "exec:0100",
+        "patch": "patch:0100",
+        "apply": "apply:0091",
+        "rollback": "rollback:0091"
+      }
+    },
+    {
+      "id": "rollback:0090",
+      "apply": "apply:0090",
+      "patch": "patch:0036",
+      "execution": "exec:0036",
+      "target": "func:sendDispatchMessage",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 23,
+      "trace": {
+        "candidate": "candidate:0036",
+        "plan": "plan:0036",
+        "execution": "exec:0036"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0036",
+        "plan": "plan:0036",
+        "execution": "exec:0036",
+        "patch": "patch:0036",
+        "apply": "apply:0090",
+        "rollback": "rollback:0090"
+      }
+    },
+    {
+      "id": "rollback:0089",
+      "apply": "apply:0089",
+      "patch": "patch:0099",
+      "execution": "exec:0099",
+      "target": "func:selectCity",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 24,
+      "trace": {
+        "candidate": "candidate:0099",
+        "plan": "plan:0099",
+        "execution": "exec:0099"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0099",
+        "plan": "plan:0099",
+        "execution": "exec:0099",
+        "patch": "patch:0099",
+        "apply": "apply:0089",
+        "rollback": "rollback:0089"
+      }
+    },
+    {
+      "id": "rollback:0088",
+      "apply": "apply:0088",
+      "patch": "patch:0035",
+      "execution": "exec:0035",
+      "target": "func:selectCity",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 25,
+      "trace": {
+        "candidate": "candidate:0035",
+        "plan": "plan:0035",
+        "execution": "exec:0035"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0035",
+        "plan": "plan:0035",
+        "execution": "exec:0035",
+        "patch": "patch:0035",
+        "apply": "apply:0088",
+        "rollback": "rollback:0088"
+      }
+    },
+    {
+      "id": "rollback:0087",
+      "apply": "apply:0087",
+      "patch": "patch:0098",
+      "execution": "exec:0098",
+      "target": "func:scheduleRetry",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 26,
+      "trace": {
+        "candidate": "candidate:0098",
+        "plan": "plan:0098",
+        "execution": "exec:0098"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0098",
+        "plan": "plan:0098",
+        "execution": "exec:0098",
+        "patch": "patch:0098",
+        "apply": "apply:0087",
+        "rollback": "rollback:0087"
+      }
+    },
+    {
+      "id": "rollback:0086",
+      "apply": "apply:0086",
+      "patch": "patch:0034",
+      "execution": "exec:0034",
+      "target": "func:saveToOfflineQueue",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 27,
+      "trace": {
+        "candidate": "candidate:0034",
+        "plan": "plan:0034",
+        "execution": "exec:0034"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0034",
+        "plan": "plan:0034",
+        "execution": "exec:0034",
+        "patch": "patch:0034",
+        "apply": "apply:0086",
+        "rollback": "rollback:0086"
+      }
+    },
+    {
+      "id": "rollback:0085",
+      "apply": "apply:0085",
+      "patch": "patch:0033",
+      "execution": "exec:0033",
+      "target": "func:saveProfile",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 28,
+      "trace": {
+        "candidate": "candidate:0033",
+        "plan": "plan:0033",
+        "execution": "exec:0033"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0033",
+        "plan": "plan:0033",
+        "execution": "exec:0033",
+        "patch": "patch:0033",
+        "apply": "apply:0085",
+        "rollback": "rollback:0085"
+      }
+    },
+    {
+      "id": "rollback:0084",
+      "apply": "apply:0084",
+      "patch": "patch:0032",
+      "execution": "exec:0032",
+      "target": "func:safeInitApp",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 29,
+      "trace": {
+        "candidate": "candidate:0032",
+        "plan": "plan:0032",
+        "execution": "exec:0032"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0032",
+        "plan": "plan:0032",
+        "execution": "exec:0032",
+        "patch": "patch:0032",
+        "apply": "apply:0084",
+        "rollback": "rollback:0084"
+      }
+    },
+    {
+      "id": "rollback:0083",
+      "apply": "apply:0083",
+      "patch": "patch:0097",
+      "execution": "exec:0097",
+      "target": "func:runCommand",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 30,
+      "trace": {
+        "candidate": "candidate:0097",
+        "plan": "plan:0097",
+        "execution": "exec:0097"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0097",
+        "plan": "plan:0097",
+        "execution": "exec:0097",
+        "patch": "patch:0097",
+        "apply": "apply:0083",
+        "rollback": "rollback:0083"
+      }
+    },
+    {
+      "id": "rollback:0082",
+      "apply": "apply:0082",
+      "patch": "patch:0031",
+      "execution": "exec:0031",
+      "target": "func:runCommand",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 31,
+      "trace": {
+        "candidate": "candidate:0031",
+        "plan": "plan:0031",
+        "execution": "exec:0031"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0031",
+        "plan": "plan:0031",
+        "execution": "exec:0031",
+        "patch": "patch:0031",
+        "apply": "apply:0082",
+        "rollback": "rollback:0082"
+      }
+    },
+    {
+      "id": "rollback:0081",
+      "apply": "apply:0081",
+      "patch": "patch:0096",
+      "execution": "exec:0096",
+      "target": "func:resolveRequest",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 32,
+      "trace": {
+        "candidate": "candidate:0096",
+        "plan": "plan:0096",
+        "execution": "exec:0096"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0096",
+        "plan": "plan:0096",
+        "execution": "exec:0096",
+        "patch": "patch:0096",
+        "apply": "apply:0081",
+        "rollback": "rollback:0081"
+      }
+    },
+    {
+      "id": "rollback:0080",
+      "apply": "apply:0080",
+      "patch": "patch:0030",
+      "execution": "exec:0030",
+      "target": "func:resolveRequest",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 33,
+      "trace": {
+        "candidate": "candidate:0030",
+        "plan": "plan:0030",
+        "execution": "exec:0030"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0030",
+        "plan": "plan:0030",
+        "execution": "exec:0030",
+        "patch": "patch:0030",
+        "apply": "apply:0080",
+        "rollback": "rollback:0080"
+      }
+    },
+    {
+      "id": "rollback:0079",
+      "apply": "apply:0079",
+      "patch": "patch:0029",
+      "execution": "exec:0029",
+      "target": "func:renderStorageList",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 34,
+      "trace": {
+        "candidate": "candidate:0029",
+        "plan": "plan:0029",
+        "execution": "exec:0029"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0029",
+        "plan": "plan:0029",
+        "execution": "exec:0029",
+        "patch": "patch:0029",
+        "apply": "apply:0079",
+        "rollback": "rollback:0079"
+      }
+    },
+    {
+      "id": "rollback:0078",
+      "apply": "apply:0078",
+      "patch": "patch:0051",
+      "execution": "exec:0051",
+      "target": "func:renderDetailModalContent",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 35,
+      "trace": {
+        "candidate": "candidate:0051",
+        "plan": "plan:0051",
+        "execution": "exec:0051"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0051",
+        "plan": "plan:0051",
+        "execution": "exec:0051",
+        "patch": "patch:0051",
+        "apply": "apply:0078",
+        "rollback": "rollback:0078"
+      }
+    },
+    {
+      "id": "rollback:0077",
+      "apply": "apply:0077",
+      "patch": "patch:0050",
+      "execution": "exec:0050",
+      "target": "func:renderDetailList",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 36,
+      "trace": {
+        "candidate": "candidate:0050",
+        "plan": "plan:0050",
+        "execution": "exec:0050"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0050",
+        "plan": "plan:0050",
+        "execution": "exec:0050",
+        "patch": "patch:0050",
+        "apply": "apply:0077",
+        "rollback": "rollback:0077"
+      }
+    },
+    {
+      "id": "rollback:0076",
+      "apply": "apply:0076",
+      "patch": "patch:0095",
+      "execution": "exec:0095",
+      "target": "func:removePressed",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 37,
+      "trace": {
+        "candidate": "candidate:0095",
+        "plan": "plan:0095",
+        "execution": "exec:0095"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0095",
+        "plan": "plan:0095",
+        "execution": "exec:0095",
+        "patch": "patch:0095",
+        "apply": "apply:0076",
+        "rollback": "rollback:0076"
+      }
+    },
+    {
+      "id": "rollback:0075",
+      "apply": "apply:0075",
+      "patch": "patch:0028",
+      "execution": "exec:0028",
+      "target": "func:removePressed",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 38,
+      "trace": {
+        "candidate": "candidate:0028",
+        "plan": "plan:0028",
+        "execution": "exec:0028"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0028",
+        "plan": "plan:0028",
+        "execution": "exec:0028",
+        "patch": "patch:0028",
+        "apply": "apply:0075",
+        "rollback": "rollback:0075"
+      }
+    },
+    {
+      "id": "rollback:0074",
+      "apply": "apply:0074",
+      "patch": "patch:0057",
+      "execution": "exec:0057",
+      "target": "func:processQueue",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 39,
+      "trace": {
+        "candidate": "candidate:0057",
+        "plan": "plan:0057",
+        "execution": "exec:0057"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0057",
+        "plan": "plan:0057",
+        "execution": "exec:0057",
+        "patch": "patch:0057",
+        "apply": "apply:0074",
+        "rollback": "rollback:0074"
+      }
+    },
+    {
+      "id": "rollback:0073",
+      "apply": "apply:0073",
+      "patch": "patch:0094",
+      "execution": "exec:0094",
+      "target": "func:pressNum",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 40,
+      "trace": {
+        "candidate": "candidate:0094",
+        "plan": "plan:0094",
+        "execution": "exec:0094"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0094",
+        "plan": "plan:0094",
+        "execution": "exec:0094",
+        "patch": "patch:0094",
+        "apply": "apply:0073",
+        "rollback": "rollback:0073"
+      }
+    },
+    {
+      "id": "rollback:0072",
+      "apply": "apply:0072",
+      "patch": "patch:0027",
+      "execution": "exec:0027",
+      "target": "func:pressNum",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 41,
+      "trace": {
+        "candidate": "candidate:0027",
+        "plan": "plan:0027",
+        "execution": "exec:0027"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0027",
+        "plan": "plan:0027",
+        "execution": "exec:0027",
+        "patch": "patch:0027",
+        "apply": "apply:0072",
+        "rollback": "rollback:0072"
+      }
+    },
+    {
+      "id": "rollback:0071",
+      "apply": "apply:0071",
+      "patch": "patch:0093",
+      "execution": "exec:0093",
+      "target": "func:prefetchRanking",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 42,
+      "trace": {
+        "candidate": "candidate:0093",
+        "plan": "plan:0093",
+        "execution": "exec:0093"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0093",
+        "plan": "plan:0093",
+        "execution": "exec:0093",
+        "patch": "patch:0093",
+        "apply": "apply:0071",
+        "rollback": "rollback:0071"
+      }
+    },
+    {
+      "id": "rollback:0070",
+      "apply": "apply:0070",
+      "patch": "patch:0026",
+      "execution": "exec:0026",
+      "target": "func:openTransferRequestDialog",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 43,
+      "trace": {
+        "candidate": "candidate:0026",
+        "plan": "plan:0026",
+        "execution": "exec:0026"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0026",
+        "plan": "plan:0026",
+        "execution": "exec:0026",
+        "patch": "patch:0026",
+        "apply": "apply:0070",
+        "rollback": "rollback:0070"
+      }
+    },
+    {
+      "id": "rollback:0069",
+      "apply": "apply:0069",
+      "patch": "patch:0092",
+      "execution": "exec:0092",
+      "target": "func:openPointDetailModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 44,
+      "trace": {
+        "candidate": "candidate:0092",
+        "plan": "plan:0092",
+        "execution": "exec:0092"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0092",
+        "plan": "plan:0092",
+        "execution": "exec:0092",
+        "patch": "patch:0092",
+        "apply": "apply:0069",
+        "rollback": "rollback:0069"
+      }
+    },
+    {
+      "id": "rollback:0068",
+      "apply": "apply:0068",
+      "patch": "patch:0025",
+      "execution": "exec:0025",
+      "target": "func:openPointDetailModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 45,
+      "trace": {
+        "candidate": "candidate:0025",
+        "plan": "plan:0025",
+        "execution": "exec:0025"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0025",
+        "plan": "plan:0025",
+        "execution": "exec:0025",
+        "patch": "patch:0025",
+        "apply": "apply:0068",
+        "rollback": "rollback:0068"
+      }
+    },
+    {
+      "id": "rollback:0067",
+      "apply": "apply:0067",
+      "patch": "patch:0091",
+      "execution": "exec:0091",
+      "target": "func:openNumpad",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 46,
+      "trace": {
+        "candidate": "candidate:0091",
+        "plan": "plan:0091",
+        "execution": "exec:0091"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0091",
+        "plan": "plan:0091",
+        "execution": "exec:0091",
+        "patch": "patch:0091",
+        "apply": "apply:0067",
+        "rollback": "rollback:0067"
+      }
+    },
+    {
+      "id": "rollback:0066",
+      "apply": "apply:0066",
+      "patch": "patch:0090",
+      "execution": "exec:0090",
+      "target": "func:openLineChat",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 47,
+      "trace": {
+        "candidate": "candidate:0090",
+        "plan": "plan:0090",
+        "execution": "exec:0090"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0090",
+        "plan": "plan:0090",
+        "execution": "exec:0090",
+        "patch": "patch:0090",
+        "apply": "apply:0066",
+        "rollback": "rollback:0066"
+      }
+    },
+    {
+      "id": "rollback:0065",
+      "apply": "apply:0065",
+      "patch": "patch:0024",
+      "execution": "exec:0024",
+      "target": "func:openLineChat",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 48,
+      "trace": {
+        "candidate": "candidate:0024",
+        "plan": "plan:0024",
+        "execution": "exec:0024"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0024",
+        "plan": "plan:0024",
+        "execution": "exec:0024",
+        "patch": "patch:0024",
+        "apply": "apply:0065",
+        "rollback": "rollback:0065"
+      }
+    },
+    {
+      "id": "rollback:0064",
+      "apply": "apply:0064",
+      "patch": "patch:0089",
+      "execution": "exec:0089",
+      "target": "func:openIdInfoModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 49,
+      "trace": {
+        "candidate": "candidate:0089",
+        "plan": "plan:0089",
+        "execution": "exec:0089"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0089",
+        "plan": "plan:0089",
+        "execution": "exec:0089",
+        "patch": "patch:0089",
+        "apply": "apply:0064",
+        "rollback": "rollback:0064"
+      }
+    },
+    {
+      "id": "rollback:0063",
+      "apply": "apply:0063",
+      "patch": "patch:0023",
+      "execution": "exec:0023",
+      "target": "func:openIdInfoModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 50,
+      "trace": {
+        "candidate": "candidate:0023",
+        "plan": "plan:0023",
+        "execution": "exec:0023"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0023",
+        "plan": "plan:0023",
+        "execution": "exec:0023",
+        "patch": "patch:0023",
+        "apply": "apply:0063",
+        "rollback": "rollback:0063"
+      }
+    },
+    {
+      "id": "rollback:0062",
+      "apply": "apply:0062",
+      "patch": "patch:0088",
+      "execution": "exec:0088",
+      "target": "func:openDetail",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 51,
+      "trace": {
+        "candidate": "candidate:0088",
+        "plan": "plan:0088",
+        "execution": "exec:0088"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0088",
+        "plan": "plan:0088",
+        "execution": "exec:0088",
+        "patch": "patch:0088",
+        "apply": "apply:0062",
+        "rollback": "rollback:0062"
+      }
+    },
+    {
+      "id": "rollback:0061",
+      "apply": "apply:0061",
+      "patch": "patch:0087",
+      "execution": "exec:0087",
+      "target": "func:openAreaDetail",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 52,
+      "trace": {
+        "candidate": "candidate:0087",
+        "plan": "plan:0087",
+        "execution": "exec:0087"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0087",
+        "plan": "plan:0087",
+        "execution": "exec:0087",
+        "patch": "patch:0087",
+        "apply": "apply:0061",
+        "rollback": "rollback:0061"
+      }
+    },
+    {
+      "id": "rollback:0060",
+      "apply": "apply:0060",
+      "patch": "patch:0022",
+      "execution": "exec:0022",
+      "target": "func:openAreaDetail",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 53,
+      "trace": {
+        "candidate": "candidate:0022",
+        "plan": "plan:0022",
+        "execution": "exec:0022"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0022",
+        "plan": "plan:0022",
+        "execution": "exec:0022",
+        "patch": "patch:0022",
+        "apply": "apply:0060",
+        "rollback": "rollback:0060"
+      }
+    },
+    {
+      "id": "rollback:0059",
+      "apply": "apply:0059",
+      "patch": "patch:0086",
+      "execution": "exec:0086",
+      "target": "func:onunhandledrejection",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 54,
+      "trace": {
+        "candidate": "candidate:0086",
+        "plan": "plan:0086",
+        "execution": "exec:0086"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0086",
+        "plan": "plan:0086",
+        "execution": "exec:0086",
+        "patch": "patch:0086",
+        "apply": "apply:0059",
+        "rollback": "rollback:0059"
+      }
+    },
+    {
+      "id": "rollback:0058",
+      "apply": "apply:0058",
+      "patch": "patch:0021",
+      "execution": "exec:0021",
+      "target": "func:onunhandledrejection",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 55,
+      "trace": {
+        "candidate": "candidate:0021",
+        "plan": "plan:0021",
+        "execution": "exec:0021"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0021",
+        "plan": "plan:0021",
+        "execution": "exec:0021",
+        "patch": "patch:0021",
+        "apply": "apply:0058",
+        "rollback": "rollback:0058"
+      }
+    },
+    {
+      "id": "rollback:0057",
+      "apply": "apply:0057",
+      "patch": "patch:0085",
+      "execution": "exec:0085",
+      "target": "func:onerror",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 56,
+      "trace": {
+        "candidate": "candidate:0085",
+        "plan": "plan:0085",
+        "execution": "exec:0085"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0085",
+        "plan": "plan:0085",
+        "execution": "exec:0085",
+        "patch": "patch:0085",
+        "apply": "apply:0057",
+        "rollback": "rollback:0057"
+      }
+    },
+    {
+      "id": "rollback:0056",
+      "apply": "apply:0056",
+      "patch": "patch:0049",
+      "execution": "exec:0049",
+      "target": "func:onerror",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 57,
+      "trace": {
+        "candidate": "candidate:0049",
+        "plan": "plan:0049",
+        "execution": "exec:0049"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0049",
+        "plan": "plan:0049",
+        "execution": "exec:0049",
+        "patch": "patch:0049",
+        "apply": "apply:0056",
+        "rollback": "rollback:0056"
+      }
+    },
+    {
+      "id": "rollback:0055",
+      "apply": "apply:0055",
+      "patch": "patch:0084",
+      "execution": "exec:0084",
+      "target": "func:onFileChange",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 58,
+      "trace": {
+        "candidate": "candidate:0084",
+        "plan": "plan:0084",
+        "execution": "exec:0084"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0084",
+        "plan": "plan:0084",
+        "execution": "exec:0084",
+        "patch": "patch:0084",
+        "apply": "apply:0055",
+        "rollback": "rollback:0055"
+      }
+    },
+    {
+      "id": "rollback:0054",
+      "apply": "apply:0054",
+      "patch": "patch:0083",
+      "execution": "exec:0083",
+      "target": "func:map",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 59,
+      "trace": {
+        "candidate": "candidate:0083",
+        "plan": "plan:0083",
+        "execution": "exec:0083"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0083",
+        "plan": "plan:0083",
+        "execution": "exec:0083",
+        "patch": "patch:0083",
+        "apply": "apply:0054",
+        "rollback": "rollback:0054"
+      }
+    },
+    {
+      "id": "rollback:0053",
+      "apply": "apply:0053",
+      "patch": "patch:0056",
+      "execution": "exec:0056",
+      "target": "func:map",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 60,
+      "trace": {
+        "candidate": "candidate:0056",
+        "plan": "plan:0056",
+        "execution": "exec:0056"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0056",
+        "plan": "plan:0056",
+        "execution": "exec:0056",
+        "patch": "patch:0056",
+        "apply": "apply:0053",
+        "rollback": "rollback:0053"
+      }
+    },
+    {
+      "id": "rollback:0052",
+      "apply": "apply:0052",
+      "patch": "patch:0048",
+      "execution": "exec:0048",
+      "target": "func:map",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 61,
+      "trace": {
+        "candidate": "candidate:0048",
+        "plan": "plan:0048",
+        "execution": "exec:0048"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0048",
+        "plan": "plan:0048",
+        "execution": "exec:0048",
+        "patch": "patch:0048",
+        "apply": "apply:0052",
+        "rollback": "rollback:0052"
+      }
+    },
+    {
+      "id": "rollback:0051",
+      "apply": "apply:0051",
+      "patch": "patch:0047",
+      "execution": "exec:0047",
+      "target": "func:logDebug",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 62,
+      "trace": {
+        "candidate": "candidate:0047",
+        "plan": "plan:0047",
+        "execution": "exec:0047"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0047",
+        "plan": "plan:0047",
+        "execution": "exec:0047",
+        "patch": "patch:0047",
+        "apply": "apply:0051",
+        "rollback": "rollback:0051"
+      }
+    },
+    {
+      "id": "rollback:0050",
+      "apply": "apply:0050",
+      "patch": "patch:0020",
+      "execution": "exec:0020",
+      "target": "func:loadStrategy",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 63,
+      "trace": {
+        "candidate": "candidate:0020",
+        "plan": "plan:0020",
+        "execution": "exec:0020"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0020",
+        "plan": "plan:0020",
+        "execution": "exec:0020",
+        "patch": "patch:0020",
+        "apply": "apply:0050",
+        "rollback": "rollback:0050"
+      }
+    },
+    {
+      "id": "rollback:0049",
+      "apply": "apply:0049",
+      "patch": "patch:0019",
+      "execution": "exec:0019",
+      "target": "func:loadPrediction",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 64,
+      "trace": {
+        "candidate": "candidate:0019",
+        "plan": "plan:0019",
+        "execution": "exec:0019"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0019",
+        "plan": "plan:0019",
+        "execution": "exec:0019",
+        "patch": "patch:0019",
+        "apply": "apply:0049",
+        "rollback": "rollback:0049"
+      }
+    },
+    {
+      "id": "rollback:0048",
+      "apply": "apply:0048",
+      "patch": "patch:0018",
+      "execution": "exec:0018",
+      "target": "func:loadHeatmap",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 65,
+      "trace": {
+        "candidate": "candidate:0018",
+        "plan": "plan:0018",
+        "execution": "exec:0018"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0018",
+        "plan": "plan:0018",
+        "execution": "exec:0018",
+        "patch": "patch:0018",
+        "apply": "apply:0048",
+        "rollback": "rollback:0048"
+      }
+    },
+    {
+      "id": "rollback:0047",
+      "apply": "apply:0047",
+      "patch": "patch:0055",
+      "execution": "exec:0055",
+      "target": "func:loadData",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 66,
+      "trace": {
+        "candidate": "candidate:0055",
+        "plan": "plan:0055",
+        "execution": "exec:0055"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0055",
+        "plan": "plan:0055",
+        "execution": "exec:0055",
+        "patch": "patch:0055",
+        "apply": "apply:0047",
+        "rollback": "rollback:0047"
+      }
+    },
+    {
+      "id": "rollback:0046",
+      "apply": "apply:0046",
+      "patch": "patch:0082",
+      "execution": "exec:0082",
+      "target": "func:isHtmlRequest",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 67,
+      "trace": {
+        "candidate": "candidate:0082",
+        "plan": "plan:0082",
+        "execution": "exec:0082"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0082",
+        "plan": "plan:0082",
+        "execution": "exec:0082",
+        "patch": "patch:0082",
+        "apply": "apply:0046",
+        "rollback": "rollback:0046"
+      }
+    },
+    {
+      "id": "rollback:0045",
+      "apply": "apply:0045",
+      "patch": "patch:0017",
+      "execution": "exec:0017",
+      "target": "func:isHtmlRequest",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 68,
+      "trace": {
+        "candidate": "candidate:0017",
+        "plan": "plan:0017",
+        "execution": "exec:0017"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0017",
+        "plan": "plan:0017",
+        "execution": "exec:0017",
+        "patch": "patch:0017",
+        "apply": "apply:0045",
+        "rollback": "rollback:0045"
+      }
+    },
+    {
+      "id": "rollback:0044",
+      "apply": "apply:0044",
+      "patch": "patch:0081",
+      "execution": "exec:0081",
+      "target": "func:getRowStatus",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 69,
+      "trace": {
+        "candidate": "candidate:0081",
+        "plan": "plan:0081",
+        "execution": "exec:0081"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0081",
+        "plan": "plan:0081",
+        "execution": "exec:0081",
+        "patch": "patch:0081",
+        "apply": "apply:0044",
+        "rollback": "rollback:0044"
+      }
+    },
+    {
+      "id": "rollback:0043",
+      "apply": "apply:0043",
+      "patch": "patch:0016",
+      "execution": "exec:0016",
+      "target": "func:getRowStatus",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 70,
+      "trace": {
+        "candidate": "candidate:0016",
+        "plan": "plan:0016",
+        "execution": "exec:0016"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0016",
+        "plan": "plan:0016",
+        "execution": "exec:0016",
+        "patch": "patch:0016",
+        "apply": "apply:0043",
+        "rollback": "rollback:0043"
+      }
+    },
+    {
+      "id": "rollback:0042",
+      "apply": "apply:0042",
+      "patch": "patch:0015",
+      "execution": "exec:0015",
+      "target": "func:getQueueStats",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 71,
+      "trace": {
+        "candidate": "candidate:0015",
+        "plan": "plan:0015",
+        "execution": "exec:0015"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0015",
+        "plan": "plan:0015",
+        "execution": "exec:0015",
+        "patch": "patch:0015",
+        "apply": "apply:0042",
+        "rollback": "rollback:0042"
+      }
+    },
+    {
+      "id": "rollback:0041",
+      "apply": "apply:0041",
+      "patch": "patch:0080",
+      "execution": "exec:0080",
+      "target": "func:getGPSLocation",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 72,
+      "trace": {
+        "candidate": "candidate:0080",
+        "plan": "plan:0080",
+        "execution": "exec:0080"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0080",
+        "plan": "plan:0080",
+        "execution": "exec:0080",
+        "patch": "patch:0080",
+        "apply": "apply:0041",
+        "rollback": "rollback:0041"
+      }
+    },
+    {
+      "id": "rollback:0040",
+      "apply": "apply:0040",
+      "patch": "patch:0079",
+      "execution": "exec:0079",
+      "target": "func:getCleanAddress",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 73,
+      "trace": {
+        "candidate": "candidate:0079",
+        "plan": "plan:0079",
+        "execution": "exec:0079"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0079",
+        "plan": "plan:0079",
+        "execution": "exec:0079",
+        "patch": "patch:0079",
+        "apply": "apply:0040",
+        "rollback": "rollback:0040"
+      }
+    },
+    {
+      "id": "rollback:0039",
+      "apply": "apply:0039",
+      "patch": "patch:0078",
+      "execution": "exec:0078",
+      "target": "func:getCityName",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 74,
+      "trace": {
+        "candidate": "candidate:0078",
+        "plan": "plan:0078",
+        "execution": "exec:0078"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0078",
+        "plan": "plan:0078",
+        "execution": "exec:0078",
+        "patch": "patch:0078",
+        "apply": "apply:0039",
+        "rollback": "rollback:0039"
+      }
+    },
+    {
+      "id": "rollback:0038",
+      "apply": "apply:0038",
+      "patch": "patch:0014",
+      "execution": "exec:0014",
+      "target": "func:formatCompletedAt",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 75,
+      "trace": {
+        "candidate": "candidate:0014",
+        "plan": "plan:0014",
+        "execution": "exec:0014"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0014",
+        "plan": "plan:0014",
+        "execution": "exec:0014",
+        "patch": "patch:0014",
+        "apply": "apply:0038",
+        "rollback": "rollback:0038"
+      }
+    },
+    {
+      "id": "rollback:0037",
+      "apply": "apply:0037",
+      "patch": "patch:0077",
+      "execution": "exec:0077",
+      "target": "func:extractDistrictAddresses",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 76,
+      "trace": {
+        "candidate": "candidate:0077",
+        "plan": "plan:0077",
+        "execution": "exec:0077"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0077",
+        "plan": "plan:0077",
+        "execution": "exec:0077",
+        "patch": "patch:0077",
+        "apply": "apply:0037",
+        "rollback": "rollback:0037"
+      }
+    },
+    {
+      "id": "rollback:0036",
+      "apply": "apply:0036",
+      "patch": "patch:0013",
+      "execution": "exec:0013",
+      "target": "func:extractDistrictAddresses",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 77,
+      "trace": {
+        "candidate": "candidate:0013",
+        "plan": "plan:0013",
+        "execution": "exec:0013"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0013",
+        "plan": "plan:0013",
+        "execution": "exec:0013",
+        "patch": "patch:0013",
+        "apply": "apply:0036",
+        "rollback": "rollback:0036"
+      }
+    },
+    {
+      "id": "rollback:0035",
+      "apply": "apply:0035",
+      "patch": "patch:0076",
+      "execution": "exec:0076",
+      "target": "func:extractCityName",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 78,
+      "trace": {
+        "candidate": "candidate:0076",
+        "plan": "plan:0076",
+        "execution": "exec:0076"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0076",
+        "plan": "plan:0076",
+        "execution": "exec:0076",
+        "patch": "patch:0076",
+        "apply": "apply:0035",
+        "rollback": "rollback:0035"
+      }
+    },
+    {
+      "id": "rollback:0034",
+      "apply": "apply:0034",
+      "patch": "patch:0075",
+      "execution": "exec:0075",
+      "target": "func:dispatchLineRequest",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 79,
+      "trace": {
+        "candidate": "candidate:0075",
+        "plan": "plan:0075",
+        "execution": "exec:0075"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0075",
+        "plan": "plan:0075",
+        "execution": "exec:0075",
+        "patch": "patch:0075",
+        "apply": "apply:0034",
+        "rollback": "rollback:0034"
+      }
+    },
+    {
+      "id": "rollback:0033",
+      "apply": "apply:0033",
+      "patch": "patch:0012",
+      "execution": "exec:0012",
+      "target": "func:dispatchLineRequest",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 80,
+      "trace": {
+        "candidate": "candidate:0012",
+        "plan": "plan:0012",
+        "execution": "exec:0012"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0012",
+        "plan": "plan:0012",
+        "execution": "exec:0012",
+        "patch": "patch:0012",
+        "apply": "apply:0033",
+        "rollback": "rollback:0033"
+      }
+    },
+    {
+      "id": "rollback:0032",
+      "apply": "apply:0032",
+      "patch": "patch:0074",
+      "execution": "exec:0074",
+      "target": "func:contactHolder",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 81,
+      "trace": {
+        "candidate": "candidate:0074",
+        "plan": "plan:0074",
+        "execution": "exec:0074"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0074",
+        "plan": "plan:0074",
+        "execution": "exec:0074",
+        "patch": "patch:0074",
+        "apply": "apply:0032",
+        "rollback": "rollback:0032"
+      }
+    },
+    {
+      "id": "rollback:0031",
+      "apply": "apply:0031",
+      "patch": "patch:0011",
+      "execution": "exec:0011",
+      "target": "func:contactHolder",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 82,
+      "trace": {
+        "candidate": "candidate:0011",
+        "plan": "plan:0011",
+        "execution": "exec:0011"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0011",
+        "plan": "plan:0011",
+        "execution": "exec:0011",
+        "patch": "patch:0011",
+        "apply": "apply:0031",
+        "rollback": "rollback:0031"
+      }
+    },
+    {
+      "id": "rollback:0030",
+      "apply": "apply:0030",
+      "patch": "patch:0073",
+      "execution": "exec:0073",
+      "target": "func:compressImage",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 83,
+      "trace": {
+        "candidate": "candidate:0073",
+        "plan": "plan:0073",
+        "execution": "exec:0073"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0073",
+        "plan": "plan:0073",
+        "execution": "exec:0073",
+        "patch": "patch:0073",
+        "apply": "apply:0030",
+        "rollback": "rollback:0030"
+      }
+    },
+    {
+      "id": "rollback:0029",
+      "apply": "apply:0029",
+      "patch": "patch:0010",
+      "execution": "exec:0010",
+      "target": "func:closeTransferRequestDialog",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 84,
+      "trace": {
+        "candidate": "candidate:0010",
+        "plan": "plan:0010",
+        "execution": "exec:0010"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0010",
+        "plan": "plan:0010",
+        "execution": "exec:0010",
+        "patch": "patch:0010",
+        "apply": "apply:0029",
+        "rollback": "rollback:0029"
+      }
+    },
+    {
+      "id": "rollback:0028",
+      "apply": "apply:0028",
+      "patch": "patch:0072",
+      "execution": "exec:0072",
+      "target": "func:closeNumpad",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 85,
+      "trace": {
+        "candidate": "candidate:0072",
+        "plan": "plan:0072",
+        "execution": "exec:0072"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0072",
+        "plan": "plan:0072",
+        "execution": "exec:0072",
+        "patch": "patch:0072",
+        "apply": "apply:0028",
+        "rollback": "rollback:0028"
+      }
+    },
+    {
+      "id": "rollback:0027",
+      "apply": "apply:0027",
+      "patch": "patch:0071",
+      "execution": "exec:0071",
+      "target": "func:closeModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 86,
+      "trace": {
+        "candidate": "candidate:0071",
+        "plan": "plan:0071",
+        "execution": "exec:0071"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0071",
+        "plan": "plan:0071",
+        "execution": "exec:0071",
+        "patch": "patch:0071",
+        "apply": "apply:0027",
+        "rollback": "rollback:0027"
+      }
+    },
+    {
+      "id": "rollback:0026",
+      "apply": "apply:0026",
+      "patch": "patch:0009",
+      "execution": "exec:0009",
+      "target": "func:closeModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 87,
+      "trace": {
+        "candidate": "candidate:0009",
+        "plan": "plan:0009",
+        "execution": "exec:0009"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0009",
+        "plan": "plan:0009",
+        "execution": "exec:0009",
+        "patch": "patch:0009",
+        "apply": "apply:0026",
+        "rollback": "rollback:0026"
+      }
+    },
+    {
+      "id": "rollback:0025",
+      "apply": "apply:0025",
+      "patch": "patch:0070",
+      "execution": "exec:0070",
+      "target": "func:closeIdInfoModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 88,
+      "trace": {
+        "candidate": "candidate:0070",
+        "plan": "plan:0070",
+        "execution": "exec:0070"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0070",
+        "plan": "plan:0070",
+        "execution": "exec:0070",
+        "patch": "patch:0070",
+        "apply": "apply:0025",
+        "rollback": "rollback:0025"
+      }
+    },
+    {
+      "id": "rollback:0024",
+      "apply": "apply:0024",
+      "patch": "patch:0008",
+      "execution": "exec:0008",
+      "target": "func:closeIdInfoModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 89,
+      "trace": {
+        "candidate": "candidate:0008",
+        "plan": "plan:0008",
+        "execution": "exec:0008"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0008",
+        "plan": "plan:0008",
+        "execution": "exec:0008",
+        "patch": "patch:0008",
+        "apply": "apply:0024",
+        "rollback": "rollback:0024"
+      }
+    },
+    {
+      "id": "rollback:0023",
+      "apply": "apply:0023",
+      "patch": "patch:0069",
+      "execution": "exec:0069",
+      "target": "func:closeDetailModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 90,
+      "trace": {
+        "candidate": "candidate:0069",
+        "plan": "plan:0069",
+        "execution": "exec:0069"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0069",
+        "plan": "plan:0069",
+        "execution": "exec:0069",
+        "patch": "patch:0069",
+        "apply": "apply:0023",
+        "rollback": "rollback:0023"
+      }
+    },
+    {
+      "id": "rollback:0022",
+      "apply": "apply:0022",
+      "patch": "patch:0007",
+      "execution": "exec:0007",
+      "target": "func:closeDetailModal",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 91,
+      "trace": {
+        "candidate": "candidate:0007",
+        "plan": "plan:0007",
+        "execution": "exec:0007"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0007",
+        "plan": "plan:0007",
+        "execution": "exec:0007",
+        "patch": "patch:0007",
+        "apply": "apply:0022",
+        "rollback": "rollback:0022"
+      }
+    },
+    {
+      "id": "rollback:0021",
+      "apply": "apply:0021",
+      "patch": "patch:0068",
+      "execution": "exec:0068",
+      "target": "func:cleanNameInput",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 92,
+      "trace": {
+        "candidate": "candidate:0068",
+        "plan": "plan:0068",
+        "execution": "exec:0068"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0068",
+        "plan": "plan:0068",
+        "execution": "exec:0068",
+        "patch": "patch:0068",
+        "apply": "apply:0021",
+        "rollback": "rollback:0021"
+      }
+    },
+    {
+      "id": "rollback:0020",
+      "apply": "apply:0020",
+      "patch": "patch:0067",
+      "execution": "exec:0067",
+      "target": "func:capturePhoto",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 93,
+      "trace": {
+        "candidate": "candidate:0067",
+        "plan": "plan:0067",
+        "execution": "exec:0067"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0067",
+        "plan": "plan:0067",
+        "execution": "exec:0067",
+        "patch": "patch:0067",
+        "apply": "apply:0020",
+        "rollback": "rollback:0020"
+      }
+    },
+    {
+      "id": "rollback:0019",
+      "apply": "apply:0019",
+      "patch": "patch:0066",
+      "execution": "exec:0066",
+      "target": "func:callApiPost",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 94,
+      "trace": {
+        "candidate": "candidate:0066",
+        "plan": "plan:0066",
+        "execution": "exec:0066"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0066",
+        "plan": "plan:0066",
+        "execution": "exec:0066",
+        "patch": "patch:0066",
+        "apply": "apply:0019",
+        "rollback": "rollback:0019"
+      }
+    },
+    {
+      "id": "rollback:0018",
+      "apply": "apply:0018",
+      "patch": "patch:0046",
+      "execution": "exec:0046",
+      "target": "func:callApiPost",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 95,
+      "trace": {
+        "candidate": "candidate:0046",
+        "plan": "plan:0046",
+        "execution": "exec:0046"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0046",
+        "plan": "plan:0046",
+        "execution": "exec:0046",
+        "patch": "patch:0046",
+        "apply": "apply:0018",
+        "rollback": "rollback:0018"
+      }
+    },
+    {
+      "id": "rollback:0017",
+      "apply": "apply:0017",
+      "patch": "patch:0065",
+      "execution": "exec:0065",
+      "target": "func:callApi",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 96,
+      "trace": {
+        "candidate": "candidate:0065",
+        "plan": "plan:0065",
+        "execution": "exec:0065"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0065",
+        "plan": "plan:0065",
+        "execution": "exec:0065",
+        "patch": "patch:0065",
+        "apply": "apply:0017",
+        "rollback": "rollback:0017"
+      }
+    },
+    {
+      "id": "rollback:0016",
+      "apply": "apply:0016",
+      "patch": "patch:0054",
+      "execution": "exec:0054",
+      "target": "func:callApi",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 97,
+      "trace": {
+        "candidate": "candidate:0054",
+        "plan": "plan:0054",
+        "execution": "exec:0054"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0054",
+        "plan": "plan:0054",
+        "execution": "exec:0054",
+        "patch": "patch:0054",
+        "apply": "apply:0016",
+        "rollback": "rollback:0016"
+      }
+    },
+    {
+      "id": "rollback:0015",
+      "apply": "apply:0015",
+      "patch": "patch:0045",
+      "execution": "exec:0045",
+      "target": "func:callApi",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 98,
+      "trace": {
+        "candidate": "candidate:0045",
+        "plan": "plan:0045",
+        "execution": "exec:0045"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0045",
+        "plan": "plan:0045",
+        "execution": "exec:0045",
+        "patch": "patch:0045",
+        "apply": "apply:0015",
+        "rollback": "rollback:0015"
+      }
+    },
+    {
+      "id": "rollback:0014",
+      "apply": "apply:0014",
+      "patch": "patch:0064",
+      "execution": "exec:0064",
+      "target": "func:blobToBase64",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 99,
+      "trace": {
+        "candidate": "candidate:0064",
+        "plan": "plan:0064",
+        "execution": "exec:0064"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0064",
+        "plan": "plan:0064",
+        "execution": "exec:0064",
+        "patch": "patch:0064",
+        "apply": "apply:0014",
+        "rollback": "rollback:0014"
+      }
+    },
+    {
+      "id": "rollback:0013",
+      "apply": "apply:0013",
+      "patch": "patch:0063",
+      "execution": "exec:0063",
+      "target": "func:backToTier1",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 100,
+      "trace": {
+        "candidate": "candidate:0063",
+        "plan": "plan:0063",
+        "execution": "exec:0063"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0063",
+        "plan": "plan:0063",
+        "execution": "exec:0063",
+        "patch": "patch:0063",
+        "apply": "apply:0013",
+        "rollback": "rollback:0013"
+      }
+    },
+    {
+      "id": "rollback:0012",
+      "apply": "apply:0012",
+      "patch": "patch:0006",
+      "execution": "exec:0006",
+      "target": "func:backToTier1",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 101,
+      "trace": {
+        "candidate": "candidate:0006",
+        "plan": "plan:0006",
+        "execution": "exec:0006"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0006",
+        "plan": "plan:0006",
+        "execution": "exec:0006",
+        "patch": "patch:0006",
+        "apply": "apply:0012",
+        "rollback": "rollback:0012"
+      }
+    },
+    {
+      "id": "rollback:0011",
+      "apply": "apply:0011",
+      "patch": "patch:0062",
+      "execution": "exec:0062",
+      "target": "func:backToCityList",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 102,
+      "trace": {
+        "candidate": "candidate:0062",
+        "plan": "plan:0062",
+        "execution": "exec:0062"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0062",
+        "plan": "plan:0062",
+        "execution": "exec:0062",
+        "patch": "patch:0062",
+        "apply": "apply:0011",
+        "rollback": "rollback:0011"
+      }
+    },
+    {
+      "id": "rollback:0010",
+      "apply": "apply:0010",
+      "patch": "patch:0005",
+      "execution": "exec:0005",
+      "target": "func:backToCityList",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 103,
+      "trace": {
+        "candidate": "candidate:0005",
+        "plan": "plan:0005",
+        "execution": "exec:0005"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0005",
+        "plan": "plan:0005",
+        "execution": "exec:0005",
+        "patch": "patch:0005",
+        "apply": "apply:0010",
+        "rollback": "rollback:0010"
+      }
+    },
+    {
+      "id": "rollback:0009",
+      "apply": "apply:0009",
+      "patch": "patch:0061",
+      "execution": "exec:0061",
+      "target": "func:applyOptimisticCheck",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 104,
+      "trace": {
+        "candidate": "candidate:0061",
+        "plan": "plan:0061",
+        "execution": "exec:0061"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0061",
+        "plan": "plan:0061",
+        "execution": "exec:0061",
+        "patch": "patch:0061",
+        "apply": "apply:0009",
+        "rollback": "rollback:0009"
+      }
+    },
+    {
+      "id": "rollback:0008",
+      "apply": "apply:0008",
+      "patch": "patch:0004",
+      "execution": "exec:0004",
+      "target": "func:applyOptimisticCheck",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 105,
+      "trace": {
+        "candidate": "candidate:0004",
+        "plan": "plan:0004",
+        "execution": "exec:0004"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0004",
+        "plan": "plan:0004",
+        "execution": "exec:0004",
+        "patch": "patch:0004",
+        "apply": "apply:0008",
+        "rollback": "rollback:0008"
+      }
+    },
+    {
+      "id": "rollback:0007",
+      "apply": "apply:0007",
+      "patch": "patch:0060",
+      "execution": "exec:0060",
+      "target": "func:addPhotoToDetail",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 106,
+      "trace": {
+        "candidate": "candidate:0060",
+        "plan": "plan:0060",
+        "execution": "exec:0060"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0060",
+        "plan": "plan:0060",
+        "execution": "exec:0060",
+        "patch": "patch:0060",
+        "apply": "apply:0007",
+        "rollback": "rollback:0007"
+      }
+    },
+    {
+      "id": "rollback:0006",
+      "apply": "apply:0006",
+      "patch": "patch:0003",
+      "execution": "exec:0003",
+      "target": "func:addPhotoToDetail",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 107,
+      "trace": {
+        "candidate": "candidate:0003",
+        "plan": "plan:0003",
+        "execution": "exec:0003"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0003",
+        "plan": "plan:0003",
+        "execution": "exec:0003",
+        "patch": "patch:0003",
+        "apply": "apply:0006",
+        "rollback": "rollback:0006"
+      }
+    },
+    {
+      "id": "rollback:0005",
+      "apply": "apply:0005",
+      "patch": "patch:0044",
+      "execution": "exec:0044",
+      "target": "func:addLog",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 108,
+      "trace": {
+        "candidate": "candidate:0044",
+        "plan": "plan:0044",
+        "execution": "exec:0044"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0044",
+        "plan": "plan:0044",
+        "execution": "exec:0044",
+        "patch": "patch:0044",
+        "apply": "apply:0005",
+        "rollback": "rollback:0005"
+      }
+    },
+    {
+      "id": "rollback:0004",
+      "apply": "apply:0004",
+      "patch": "patch:0059",
+      "execution": "exec:0059",
+      "target": "func:_executeCommand",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 109,
+      "trace": {
+        "candidate": "candidate:0059",
+        "plan": "plan:0059",
+        "execution": "exec:0059"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0059",
+        "plan": "plan:0059",
+        "execution": "exec:0059",
+        "patch": "patch:0059",
+        "apply": "apply:0004",
+        "rollback": "rollback:0004"
+      }
+    },
+    {
+      "id": "rollback:0003",
+      "apply": "apply:0003",
+      "patch": "patch:0002",
+      "execution": "exec:0002",
+      "target": "func:_apiLog",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 110,
+      "trace": {
+        "candidate": "candidate:0002",
+        "plan": "plan:0002",
+        "execution": "exec:0002"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0002",
+        "plan": "plan:0002",
+        "execution": "exec:0002",
+        "patch": "patch:0002",
+        "apply": "apply:0003",
+        "rollback": "rollback:0003"
+      }
+    },
+    {
+      "id": "rollback:0002",
+      "apply": "apply:0002",
+      "patch": "patch:0058",
+      "execution": "exec:0058",
+      "target": "func:$",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 111,
+      "trace": {
+        "candidate": "candidate:0058",
+        "plan": "plan:0058",
+        "execution": "exec:0058"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0058",
+        "plan": "plan:0058",
+        "execution": "exec:0058",
+        "patch": "patch:0058",
+        "apply": "apply:0002",
+        "rollback": "rollback:0002"
+      }
+    },
+    {
+      "id": "rollback:0001",
+      "apply": "apply:0001",
+      "patch": "patch:0001",
+      "execution": "exec:0001",
+      "target": "func:$",
+      "rollback_version": 1,
+      "status": "simulated",
+      "simulation_only": true,
+      "approval_required": true,
+      "rollback_available": true,
+      "validation_result": "passed",
+      "validation_summary": {
+        "trace": "passed",
+        "dependency": "passed",
+        "rollback": "passed"
+      },
+      "warnings": [],
+      "conflicts": [],
+      "rollback_order": 112,
+      "trace": {
+        "candidate": "candidate:0001",
+        "plan": "plan:0001",
+        "execution": "exec:0001"
+      },
+      "lifecycle": {
+        "candidate": "candidate:0001",
+        "plan": "plan:0001",
+        "execution": "exec:0001",
+        "patch": "patch:0001",
+        "apply": "apply:0001",
+        "rollback": "rollback:0001"
+      }
+    }
+  ]
+}

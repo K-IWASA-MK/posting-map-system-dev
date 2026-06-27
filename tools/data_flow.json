@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T22:11:44.677439Z",
+    "generated_at": "2026-06-27T07:14:41.471905Z",
     "scanner": "data_flow_builder"
   },
   "flows": {
@@ -9,7 +9,7 @@
       "id": "flow:$",
       "flow_type": "function",
       "function": "func:$",
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "incoming": [],
       "outgoing": [],
       "route": [],
@@ -100,7 +100,7 @@
       "id": "flow:addPhotoToDetail",
       "flow_type": "function",
       "function": "func:addPhotoToDetail",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [
         "func:blobToBase64",
@@ -126,9 +126,7 @@
       "flow_type": "function",
       "function": "func:applyOptimisticCheck",
       "file": "active/mobile/app.js",
-      "incoming": [
-        "func:updateRecord"
-      ],
+      "incoming": [],
       "outgoing": [],
       "route": [],
       "node_links": {
@@ -146,7 +144,7 @@
       "id": "flow:backToCityList",
       "flow_type": "function",
       "function": "func:backToCityList",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [
         "func:renderAreas"
@@ -220,7 +218,7 @@
       "id": "flow:callApi",
       "flow_type": "function",
       "function": "func:callApi",
-      "file": "active/mobile/app.js",
+      "file": "shared/api.js",
       "incoming": [
         "func:dispatchLineRequest",
         "func:loadDashboardData",
@@ -237,7 +235,6 @@
         "func:safeInitApp",
         "func:saveProfile",
         "func:selectCity",
-        "func:startApp",
         "func:switchPage"
       ],
       "outgoing": [],
@@ -257,17 +254,14 @@
       "id": "flow:callApiPost",
       "flow_type": "function",
       "function": "func:callApiPost",
-      "file": "active/mobile/app.js",
+      "file": "shared/api.js",
       "incoming": [
         "func:_executeCommand",
-        "func:openTransferRequestDialog",
         "func:processQueue",
         "func:resolveRequest",
-        "func:safeInitApp",
         "func:submitFlyerStock",
         "func:syncOfflineQueue",
-        "func:tryRegisterAdmin",
-        "func:updateRecord"
+        "func:tryRegisterAdmin"
       ],
       "outgoing": [],
       "route": [],
@@ -286,7 +280,7 @@
       "id": "flow:capturePhoto",
       "flow_type": "function",
       "function": "func:capturePhoto",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:addPhotoToDetail",
         "func:pressNum"
@@ -311,7 +305,7 @@
       "id": "flow:cleanNameInput",
       "flow_type": "function",
       "function": "func:cleanNameInput",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:saveProfile"
       ],
@@ -332,7 +326,7 @@
       "id": "flow:closeDetailModal",
       "flow_type": "function",
       "function": "func:closeDetailModal",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [],
       "outgoing": [],
       "route": [],
@@ -351,7 +345,7 @@
       "id": "flow:closeIdInfoModal",
       "flow_type": "function",
       "function": "func:closeIdInfoModal",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [],
       "route": [],
@@ -389,7 +383,7 @@
       "id": "flow:closeNumpad",
       "flow_type": "function",
       "function": "func:closeNumpad",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:pressNum"
       ],
@@ -410,7 +404,7 @@
       "id": "flow:closeTransferRequestDialog",
       "flow_type": "function",
       "function": "func:closeTransferRequestDialog",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [],
       "route": [],
@@ -429,7 +423,7 @@
       "id": "flow:compressImage",
       "flow_type": "function",
       "function": "func:compressImage",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:capturePhoto",
         "func:onFileChange"
@@ -614,7 +608,7 @@
       "id": "flow:formatCompletedAt",
       "flow_type": "function",
       "function": "func:formatCompletedAt",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [],
       "outgoing": [],
       "route": [],
@@ -633,12 +627,11 @@
       "id": "flow:getCityName",
       "flow_type": "function",
       "function": "func:getCityName",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:navigateToSiblingArea",
         "func:renderAreas",
-        "func:renderDetailList",
-        "func:switchPage"
+        "func:renderDetailList"
       ],
       "outgoing": [],
       "route": [],
@@ -657,7 +650,7 @@
       "id": "flow:getCleanAddress",
       "flow_type": "function",
       "function": "func:getCleanAddress",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:renderDetailModalContent"
       ],
@@ -704,7 +697,7 @@
       "id": "flow:getGPSLocation",
       "flow_type": "function",
       "function": "func:getGPSLocation",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:pressNum"
       ],
@@ -865,12 +858,11 @@
       "id": "flow:loadData",
       "flow_type": "function",
       "function": "func:loadData",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:processQueue",
         "func:startApp",
-        "func:syncOfflineQueue",
-        "func:updateRecord"
+        "func:syncOfflineQueue"
       ],
       "outgoing": [
         "func:callApi",
@@ -880,7 +872,6 @@
         "func:setLoadingProgress",
         "func:setSyncStatus",
         "func:switchPage",
-        "func:syncOfflineQueue",
         "func:updateStats"
       ],
       "route": [
@@ -905,6 +896,7 @@
       "function": "func:loadFlyerStock",
       "file": "legacy/admin-app/manager.js",
       "incoming": [
+        "func:submitFlyerStock",
         "func:switchAdminTab"
       ],
       "outgoing": [
@@ -1089,7 +1081,7 @@
       "id": "flow:logDebug",
       "flow_type": "function",
       "function": "func:logDebug",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:_apiLog",
         "func:loadData",
@@ -1097,8 +1089,7 @@
         "func:onunhandledrejection",
         "func:prefetchRanking",
         "func:safeInitApp",
-        "func:saveProfile",
-        "func:startApp"
+        "func:saveProfile"
       ],
       "outgoing": [],
       "route": [],
@@ -1117,7 +1108,7 @@
       "id": "flow:map",
       "flow_type": "function",
       "function": "func:map",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:drawMap",
         "func:extractDistrictAddresses",
@@ -1148,7 +1139,7 @@
       "id": "flow:navigateToAreaTab",
       "flow_type": "function",
       "function": "func:navigateToAreaTab",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:backToTier1"
       ],
@@ -1177,7 +1168,7 @@
       "id": "flow:navigateToSiblingArea",
       "flow_type": "function",
       "function": "func:navigateToSiblingArea",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [],
       "outgoing": [
         "func:getCityName",
@@ -1203,7 +1194,7 @@
       "id": "flow:onFileChange",
       "flow_type": "function",
       "function": "func:onFileChange",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:capturePhoto"
       ],
@@ -1226,7 +1217,7 @@
       "id": "flow:onerror",
       "flow_type": "function",
       "function": "func:onerror",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:blobToBase64",
         "func:compressImage",
@@ -1256,7 +1247,7 @@
       "id": "flow:onunhandledrejection",
       "flow_type": "function",
       "function": "func:onunhandledrejection",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [
         "func:logDebug"
@@ -1298,7 +1289,7 @@
       "id": "flow:openDetail",
       "flow_type": "function",
       "function": "func:openDetail",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:navigateToSiblingArea"
       ],
@@ -1327,7 +1318,7 @@
       "id": "flow:openIdInfoModal",
       "flow_type": "function",
       "function": "func:openIdInfoModal",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [],
       "route": [],
@@ -1365,7 +1356,7 @@
       "id": "flow:openNumpad",
       "flow_type": "function",
       "function": "func:openNumpad",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:toggleDone"
       ],
@@ -1386,7 +1377,7 @@
       "id": "flow:openPointDetailModal",
       "flow_type": "function",
       "function": "func:openPointDetailModal",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [],
       "outgoing": [
         "func:renderDetailModalContent"
@@ -1407,11 +1398,9 @@
       "id": "flow:openTransferRequestDialog",
       "flow_type": "function",
       "function": "func:openTransferRequestDialog",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
-      "outgoing": [
-        "func:callApiPost"
-      ],
+      "outgoing": [],
       "route": [],
       "node_links": {
         "knowledge": "func:openTransferRequestDialog",
@@ -1428,7 +1417,7 @@
       "id": "flow:prefetchRanking",
       "flow_type": "function",
       "function": "func:prefetchRanking",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:loadData"
       ],
@@ -1454,7 +1443,7 @@
       "id": "flow:pressNum",
       "flow_type": "function",
       "function": "func:pressNum",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [
         "func:blobToBase64",
@@ -1512,7 +1501,7 @@
       "id": "flow:removePressed",
       "flow_type": "function",
       "function": "func:removePressed",
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "incoming": [],
       "outgoing": [],
       "route": [],
@@ -1531,7 +1520,7 @@
       "id": "flow:renderAreas",
       "flow_type": "function",
       "function": "func:renderAreas",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:backToCityList",
         "func:loadData",
@@ -1557,7 +1546,7 @@
       "id": "flow:renderDetailList",
       "flow_type": "function",
       "function": "func:renderDetailList",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:addPhotoToDetail",
         "func:openDetail",
@@ -1587,7 +1576,7 @@
       "id": "flow:renderDetailModalContent",
       "flow_type": "function",
       "function": "func:renderDetailModalContent",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:addPhotoToDetail",
         "func:openPointDetailModal",
@@ -1615,11 +1604,10 @@
       "id": "flow:renderRanking",
       "flow_type": "function",
       "function": "func:renderRanking",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:prefetchRanking",
-        "func:switchPage",
-        "func:then"
+        "func:switchPage"
       ],
       "outgoing": [
         "func:map"
@@ -1640,7 +1628,7 @@
       "id": "flow:renderSettings",
       "flow_type": "function",
       "function": "func:renderSettings",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:switchPage"
       ],
@@ -1662,9 +1650,7 @@
       "flow_type": "function",
       "function": "func:renderStorageList",
       "file": "active/mobile/render.js",
-      "incoming": [
-        "func:switchPage"
-      ],
+      "incoming": [],
       "outgoing": [
         "func:map"
       ],
@@ -1752,11 +1738,10 @@
       "id": "flow:safeInitApp",
       "flow_type": "function",
       "function": "func:safeInitApp",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [
         "func:callApi",
-        "func:callApiPost",
         "func:logDebug",
         "func:setLoadingProgress",
         "func:startApp"
@@ -1798,7 +1783,7 @@
       "id": "flow:saveProfile",
       "flow_type": "function",
       "function": "func:saveProfile",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [],
       "outgoing": [
         "func:callApi",
@@ -1827,9 +1812,7 @@
       "flow_type": "function",
       "function": "func:saveToOfflineQueue",
       "file": "active/mobile/app.js",
-      "incoming": [
-        "func:updateRecord"
-      ],
+      "incoming": [],
       "outgoing": [
         "func:setSyncStatus"
       ],
@@ -1872,7 +1855,7 @@
       "id": "flow:selectCity",
       "flow_type": "function",
       "function": "func:selectCity",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [],
       "outgoing": [
         "func:callApi",
@@ -1914,7 +1897,7 @@
       "id": "flow:sendLineContact",
       "flow_type": "function",
       "function": "func:sendLineContact",
-      "file": "active/mobile/render.js",
+      "file": "legacy/admin-app/manager.js",
       "incoming": [
         "func:loadFlyerStock"
       ],
@@ -1956,7 +1939,7 @@
       "id": "flow:setLoadingProgress",
       "flow_type": "function",
       "function": "func:setLoadingProgress",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:loadData",
         "func:safeInitApp"
@@ -1978,7 +1961,7 @@
       "id": "flow:setSyncStatus",
       "flow_type": "function",
       "function": "func:setSyncStatus",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:loadData",
         "func:saveToOfflineQueue",
@@ -2094,14 +2077,12 @@
       "id": "flow:startApp",
       "flow_type": "function",
       "function": "func:startApp",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:safeInitApp"
       ],
       "outgoing": [
-        "func:callApi",
-        "func:loadData",
-        "func:logDebug"
+        "func:loadData"
       ],
       "route": [],
       "node_links": {
@@ -2119,10 +2100,11 @@
       "id": "flow:submitFlyerStock",
       "flow_type": "function",
       "function": "func:submitFlyerStock",
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "incoming": [],
       "outgoing": [
-        "func:callApiPost"
+        "func:callApiPost",
+        "func:loadFlyerStock"
       ],
       "route": [],
       "node_links": {
@@ -2168,21 +2150,18 @@
       "id": "flow:switchPage",
       "flow_type": "function",
       "function": "func:switchPage",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:backToTier1",
         "func:loadData",
         "func:navigateToAreaTab",
         "func:openDetail",
-        "func:saveProfile",
-        "func:toggleNavTier"
+        "func:saveProfile"
       ],
       "outgoing": [
         "func:callApi",
-        "func:getCityName",
         "func:renderRanking",
         "func:renderSettings",
-        "func:renderStorageList",
         "func:then"
       ],
       "route": [
@@ -2205,7 +2184,7 @@
       "id": "flow:syncBadge",
       "flow_type": "function",
       "function": "func:syncBadge",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [
         "func:renderDetailList"
       ],
@@ -2227,9 +2206,7 @@
       "flow_type": "function",
       "function": "func:syncOfflineQueue",
       "file": "active/mobile/app.js",
-      "incoming": [
-        "func:loadData"
-      ],
+      "incoming": [],
       "outgoing": [
         "func:callApiPost",
         "func:loadData",
@@ -2251,16 +2228,14 @@
       "id": "flow:then",
       "flow_type": "function",
       "function": "func:then",
-      "file": "active/mobile/app.js",
+      "file": "service-worker.js",
       "incoming": [
         "func:prefetchRanking",
         "func:selectCity",
         "func:switchPage",
         "func:tryRegisterAdmin"
       ],
-      "outgoing": [
-        "func:renderRanking"
-      ],
+      "outgoing": [],
       "route": [],
       "node_links": {
         "knowledge": "func:then",
@@ -2298,7 +2273,7 @@
       "id": "flow:toggleDone",
       "flow_type": "function",
       "function": "func:toggleDone",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "incoming": [],
       "outgoing": [
         "func:openNumpad",
@@ -2322,21 +2297,15 @@
       "id": "flow:toggleNavTier",
       "flow_type": "function",
       "function": "func:toggleNavTier",
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "incoming": [
         "func:backToTier1"
       ],
-      "outgoing": [
-        "func:switchPage"
-      ],
-      "route": [
-        "route:switchPage"
-      ],
+      "outgoing": [],
+      "route": [],
       "node_links": {
         "knowledge": "func:toggleNavTier",
-        "route": [
-          "route:switchPage"
-        ]
+        "route": []
       },
       "future": {
         "runtime": [],
@@ -2349,7 +2318,7 @@
       "id": "flow:triggerUISyncRefresh",
       "flow_type": "function",
       "function": "func:triggerUISyncRefresh",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:updateUISyncStatus"
       ],
@@ -2444,16 +2413,12 @@
       "id": "flow:updateRecord",
       "flow_type": "function",
       "function": "func:updateRecord",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:toggleDone"
       ],
       "outgoing": [
-        "func:applyOptimisticCheck",
-        "func:callApiPost",
-        "func:enqueueSync",
-        "func:loadData",
-        "func:saveToOfflineQueue"
+        "func:enqueueSync"
       ],
       "route": [],
       "node_links": {
@@ -2471,7 +2436,7 @@
       "id": "flow:updateStats",
       "flow_type": "function",
       "function": "func:updateStats",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "incoming": [
         "func:loadData"
       ],

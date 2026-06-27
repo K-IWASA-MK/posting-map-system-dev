@@ -731,3 +731,186 @@ Execution Plan
 * Simulation Only を維持する。
 
 * Apply はシミュレーション結果のみ保持する。
+
+---
+
+### 17. Rollback Engine Rules
+
+* Rollback Simulation は
+  tools/patch_rollback_plan.json
+  で管理する。
+
+* Rollback Engine は
+  Patch Plan
+  Patch Apply Plan
+  のみを利用して生成する。
+
+* Repository の再解析は禁止する。
+
+* コード編集は禁止する。
+
+* Git操作は禁止する。
+
+* Simulation Only を維持する。
+
+* Rollback は Apply の逆順で生成する。
+
+---
+
+### 18. CIE Orchestrator Rules
+
+* Code Intelligence Engine 全体は
+  tools/cie_orchestrator.py
+  をエントリーポイントとする。
+
+* Builder は Orchestrator から順番に実行する。
+
+* Builder 同士が互いを直接呼び出してはならない。
+
+* Orchestrator は Builder のみを呼び出す。
+
+* Repository の解析は禁止する。
+
+* Builder の責務変更は禁止する。
+
+---
+
+### 19. CLI Rules
+
+* CIEの操作は
+  tools/cie.py
+  を公式入口とする。
+
+* Builderの直接実行は禁止しないが、
+  通常運用ではCLI経由を推奨する。
+
+* CLIからRepository解析は禁止。
+
+* CLIはBuilderを呼び出すだけとする。
+
+---
+
+### 20. Report Engine Rules
+
+* Repository Report は
+  tools/report_engine.py
+  のみが生成する。
+
+* Repository の再解析は禁止する。
+
+* Report Engine は
+  既存 Graph
+  Analysis
+  Pipeline
+  のみを参照する。
+
+* 新しい解析は禁止する。
+
+---
+
+### 21. Dashboard Rules
+
+* Dashboard は
+  既存JSON成果物のみ
+  を表示する Presentation Layer とする。
+
+* Repository の再解析は禁止する。
+
+* Builder の実行は禁止する.
+
+* Dashboard から Repository を変更してはならない。
+
+---
+
+### 22. API Rules
+
+* API は
+  既存JSON成果物のみ
+  を提供する Read Only Layer とする。
+
+* Repository の再解析は禁止する。
+
+* Builder の実行は禁止する。
+
+* Repository を変更してはならない。
+
+* POST, PUT, PATCH, DELETE は禁止する。
+
+* GET のみ許可する。
+
+---
+
+### 23. VS Code Extension Rules
+
+* VS Code Extension は
+  CLI
+  API
+  のみを利用する。
+
+* Repository の再解析は禁止する。
+
+* Builder の直接実行は禁止する。
+
+* Repository の変更は禁止する。
+
+* Extension は Presentation Layer とする。
+
+---
+
+### 24. GitHub Actions Rules
+
+* GitHub Actions は
+  tools/cie.py
+  のみを利用する。
+
+* Builder の直接起動は禁止する。
+
+* Repository の再解析は禁止する。
+
+* Workflow は
+  Verify
+  Doctor
+  Report
+  のみを実行する。
+
+* GitHub Actions は
+  Read Only
+  CI Layer
+  として動作する。
+
+---
+
+### 25. Metrics Engine Rules
+
+* Metrics Engine は
+  既存 JSON
+  のみを利用する。
+
+* Builder を起動してはならない。
+
+* Repository を再解析してはならない。
+
+* Repository を変更してはならない。
+
+* Metrics は
+  Read Only
+  Analytics Layer
+  として動作する。
+
+---
+
+### 26. Export Engine Rules
+
+* Export Engine は既存成果物(JSON)のみを利用する。
+
+* Repository の再解析は禁止する。
+
+* Builder の起動は禁止する。
+
+* Export は Read Only とする.
+
+* 出力先は exports/ または指定された出力先のみとする。
+
+* Repository 内の既存ファイルを書き換えてはならない。
+
+* Export は Presentation Layer として扱う。

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T22:26:33.698494Z",
+    "generated_at": "2026-06-27T07:14:41.569824Z",
     "scanner": "execution_engine_builder"
   },
   "execution": [
@@ -58,8 +58,22 @@
     {
       "id": "exec:0004",
       "plan": "plan:0004",
-      "target": "func:backToCityList",
+      "target": "func:applyOptimisticCheck",
       "execution_order": 4,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0005",
+      "plan": "plan:0005",
+      "target": "func:backToCityList",
+      "execution_order": 5,
       "dependencies": [
         "func:renderAreas"
       ],
@@ -72,10 +86,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0005",
-      "plan": "plan:0005",
+      "id": "exec:0006",
+      "plan": "plan:0006",
       "target": "func:backToTier1",
-      "execution_order": 5,
+      "execution_order": 6,
       "dependencies": [
         "func:navigateToAreaTab",
         "func:switchPage",
@@ -90,23 +104,9 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0006",
-      "plan": "plan:0006",
-      "target": "func:closeDetailModal",
-      "execution_order": 6,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
       "id": "exec:0007",
       "plan": "plan:0007",
-      "target": "func:closeIdInfoModal",
+      "target": "func:closeDetailModal",
       "execution_order": 7,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -120,7 +120,7 @@
     {
       "id": "exec:0008",
       "plan": "plan:0008",
-      "target": "func:closeModal",
+      "target": "func:closeIdInfoModal",
       "execution_order": 8,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -134,7 +134,7 @@
     {
       "id": "exec:0009",
       "plan": "plan:0009",
-      "target": "func:closeTransferRequestDialog",
+      "target": "func:closeModal",
       "execution_order": 9,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -148,7 +148,7 @@
     {
       "id": "exec:0010",
       "plan": "plan:0010",
-      "target": "func:contactHolder",
+      "target": "func:closeTransferRequestDialog",
       "execution_order": 10,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -162,8 +162,22 @@
     {
       "id": "exec:0011",
       "plan": "plan:0011",
-      "target": "func:dispatchLineRequest",
+      "target": "func:contactHolder",
       "execution_order": 11,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0012",
+      "plan": "plan:0012",
+      "target": "func:dispatchLineRequest",
+      "execution_order": 12,
       "dependencies": [
         "func:callApi",
         "func:showModal"
@@ -177,10 +191,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0012",
-      "plan": "plan:0012",
+      "id": "exec:0013",
+      "plan": "plan:0013",
       "target": "func:extractDistrictAddresses",
-      "execution_order": 12,
+      "execution_order": 13,
       "dependencies": [
         "func:extractCityName",
         "func:map",
@@ -195,10 +209,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0013",
-      "plan": "plan:0013",
+      "id": "exec:0014",
+      "plan": "plan:0014",
       "target": "func:formatCompletedAt",
-      "execution_order": 13,
+      "execution_order": 14,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -209,10 +223,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0014",
-      "plan": "plan:0014",
+      "id": "exec:0015",
+      "plan": "plan:0015",
       "target": "func:getQueueStats",
-      "execution_order": 14,
+      "execution_order": 15,
       "dependencies": [
         "func:getQueue",
         "func:map"
@@ -226,10 +240,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0015",
-      "plan": "plan:0015",
+      "id": "exec:0016",
+      "plan": "plan:0016",
       "target": "func:getRowStatus",
-      "execution_order": 15,
+      "execution_order": 16,
       "dependencies": [
         "func:getQueue"
       ],
@@ -242,27 +256,11 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0016",
-      "plan": "plan:0016",
-      "target": "func:isHtmlRequest",
-      "execution_order": 16,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
       "id": "exec:0017",
       "plan": "plan:0017",
-      "target": "func:loadHeatmap",
+      "target": "func:isHtmlRequest",
       "execution_order": 17,
-      "dependencies": [
-        "func:callApi"
-      ],
+      "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -274,7 +272,7 @@
     {
       "id": "exec:0018",
       "plan": "plan:0018",
-      "target": "func:loadPrediction",
+      "target": "func:loadHeatmap",
       "execution_order": 18,
       "dependencies": [
         "func:callApi"
@@ -290,7 +288,7 @@
     {
       "id": "exec:0019",
       "plan": "plan:0019",
-      "target": "func:loadStrategy",
+      "target": "func:loadPrediction",
       "execution_order": 19,
       "dependencies": [
         "func:callApi"
@@ -306,10 +304,10 @@
     {
       "id": "exec:0020",
       "plan": "plan:0020",
-      "target": "func:onunhandledrejection",
+      "target": "func:loadStrategy",
       "execution_order": 20,
       "dependencies": [
-        "func:logDebug"
+        "func:callApi"
       ],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -322,10 +320,10 @@
     {
       "id": "exec:0021",
       "plan": "plan:0021",
-      "target": "func:openAreaDetail",
+      "target": "func:onunhandledrejection",
       "execution_order": 21,
       "dependencies": [
-        "func:showModal"
+        "func:logDebug"
       ],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -338,9 +336,11 @@
     {
       "id": "exec:0022",
       "plan": "plan:0022",
-      "target": "func:openIdInfoModal",
+      "target": "func:openAreaDetail",
       "execution_order": 22,
-      "dependencies": [],
+      "dependencies": [
+        "func:showModal"
+      ],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -352,7 +352,7 @@
     {
       "id": "exec:0023",
       "plan": "plan:0023",
-      "target": "func:openLineChat",
+      "target": "func:openIdInfoModal",
       "execution_order": 23,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -366,8 +366,22 @@
     {
       "id": "exec:0024",
       "plan": "plan:0024",
-      "target": "func:openPointDetailModal",
+      "target": "func:openLineChat",
       "execution_order": 24,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0025",
+      "plan": "plan:0025",
+      "target": "func:openPointDetailModal",
+      "execution_order": 25,
       "dependencies": [
         "func:renderDetailModalContent"
       ],
@@ -380,13 +394,11 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0025",
-      "plan": "plan:0025",
+      "id": "exec:0026",
+      "plan": "plan:0026",
       "target": "func:openTransferRequestDialog",
-      "execution_order": 25,
-      "dependencies": [
-        "func:callApiPost"
-      ],
+      "execution_order": 26,
+      "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -396,10 +408,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0026",
-      "plan": "plan:0026",
+      "id": "exec:0027",
+      "plan": "plan:0027",
       "target": "func:pressNum",
-      "execution_order": 26,
+      "execution_order": 27,
       "dependencies": [
         "func:blobToBase64",
         "func:capturePhoto",
@@ -418,10 +430,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0027",
-      "plan": "plan:0027",
+      "id": "exec:0028",
+      "plan": "plan:0028",
       "target": "func:removePressed",
-      "execution_order": 27,
+      "execution_order": 28,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -432,10 +444,26 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0028",
-      "plan": "plan:0028",
+      "id": "exec:0029",
+      "plan": "plan:0029",
+      "target": "func:renderStorageList",
+      "execution_order": 29,
+      "dependencies": [
+        "func:map"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0030",
+      "plan": "plan:0030",
       "target": "func:resolveRequest",
-      "execution_order": 28,
+      "execution_order": 30,
       "dependencies": [
         "func:addLog",
         "func:callApiPost",
@@ -450,10 +478,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0029",
-      "plan": "plan:0029",
+      "id": "exec:0031",
+      "plan": "plan:0031",
       "target": "func:runCommand",
-      "execution_order": 29,
+      "execution_order": 31,
       "dependencies": [
         "func:_executeCommand",
         "func:showModal"
@@ -467,13 +495,12 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0030",
-      "plan": "plan:0030",
+      "id": "exec:0032",
+      "plan": "plan:0032",
       "target": "func:safeInitApp",
-      "execution_order": 30,
+      "execution_order": 32,
       "dependencies": [
         "func:callApi",
-        "func:callApiPost",
         "func:logDebug",
         "func:setLoadingProgress",
         "func:startApp"
@@ -487,10 +514,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0031",
-      "plan": "plan:0031",
+      "id": "exec:0033",
+      "plan": "plan:0033",
       "target": "func:saveProfile",
-      "execution_order": 31,
+      "execution_order": 33,
       "dependencies": [
         "func:callApi",
         "func:cleanNameInput",
@@ -506,10 +533,26 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0032",
-      "plan": "plan:0032",
+      "id": "exec:0034",
+      "plan": "plan:0034",
+      "target": "func:saveToOfflineQueue",
+      "execution_order": 34,
+      "dependencies": [
+        "func:setSyncStatus"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0035",
+      "plan": "plan:0035",
       "target": "func:selectCity",
-      "execution_order": 32,
+      "execution_order": 35,
       "dependencies": [
         "func:callApi",
         "func:renderAreas",
@@ -524,10 +567,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0033",
-      "plan": "plan:0033",
+      "id": "exec:0036",
+      "plan": "plan:0036",
       "target": "func:sendDispatchMessage",
-      "execution_order": 33,
+      "execution_order": 36,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -538,10 +581,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0034",
-      "plan": "plan:0034",
+      "id": "exec:0037",
+      "plan": "plan:0037",
       "target": "func:simulateBatch",
-      "execution_order": 34,
+      "execution_order": 37,
       "dependencies": [
         "func:extractCityName"
       ],
@@ -554,10 +597,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0035",
-      "plan": "plan:0035",
+      "id": "exec:0038",
+      "plan": "plan:0038",
       "target": "func:startAdmin",
-      "execution_order": 35,
+      "execution_order": 38,
       "dependencies": [
         "func:loadDashboardData",
         "func:restoreDashboardCache"
@@ -571,12 +614,13 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0036",
-      "plan": "plan:0036",
+      "id": "exec:0039",
+      "plan": "plan:0039",
       "target": "func:submitFlyerStock",
-      "execution_order": 36,
+      "execution_order": 39,
       "dependencies": [
-        "func:callApiPost"
+        "func:callApiPost",
+        "func:loadFlyerStock"
       ],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -587,10 +631,28 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0037",
-      "plan": "plan:0037",
+      "id": "exec:0040",
+      "plan": "plan:0040",
+      "target": "func:syncOfflineQueue",
+      "execution_order": 40,
+      "dependencies": [
+        "func:callApiPost",
+        "func:loadData",
+        "func:setSyncStatus"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0041",
+      "plan": "plan:0041",
       "target": "func:toggleDone",
-      "execution_order": 37,
+      "execution_order": 41,
       "dependencies": [
         "func:openNumpad",
         "func:renderDetailList",
@@ -606,10 +668,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0038",
-      "plan": "plan:0038",
+      "id": "exec:0042",
+      "plan": "plan:0042",
       "target": "func:tryRegisterAdmin",
-      "execution_order": 38,
+      "execution_order": 42,
       "dependencies": [
         "func:addLog",
         "func:callApiPost",
@@ -624,10 +686,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0039",
-      "plan": "plan:0039",
+      "id": "exec:0043",
+      "plan": "plan:0043",
       "target": "func:updateQueueStatus",
-      "execution_order": 39,
+      "execution_order": 43,
       "dependencies": [
         "func:updateQueueItem"
       ],
@@ -640,65 +702,9 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0040",
-      "plan": "plan:0040",
-      "target": "func:addLog",
-      "execution_order": 40,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0041",
-      "plan": "plan:0041",
-      "target": "func:callApi",
-      "execution_order": 41,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0042",
-      "plan": "plan:0042",
-      "target": "func:callApiPost",
-      "execution_order": 42,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0043",
-      "plan": "plan:0043",
-      "target": "func:logDebug",
-      "execution_order": 43,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
       "id": "exec:0044",
       "plan": "plan:0044",
-      "target": "func:map",
+      "target": "func:addLog",
       "execution_order": 44,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -712,8 +718,64 @@
     {
       "id": "exec:0045",
       "plan": "plan:0045",
-      "target": "func:onerror",
+      "target": "func:callApi",
       "execution_order": 45,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0046",
+      "plan": "plan:0046",
+      "target": "func:callApiPost",
+      "execution_order": 46,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0047",
+      "plan": "plan:0047",
+      "target": "func:logDebug",
+      "execution_order": 47,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0048",
+      "plan": "plan:0048",
+      "target": "func:map",
+      "execution_order": 48,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0049",
+      "plan": "plan:0049",
+      "target": "func:onerror",
+      "execution_order": 49,
       "dependencies": [
         "func:logDebug"
       ],
@@ -726,10 +788,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0046",
-      "plan": "plan:0046",
+      "id": "exec:0050",
+      "plan": "plan:0050",
       "target": "func:renderDetailList",
-      "execution_order": 46,
+      "execution_order": 50,
       "dependencies": [
         "func:getCityName",
         "func:map",
@@ -744,10 +806,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0047",
-      "plan": "plan:0047",
+      "id": "exec:0051",
+      "plan": "plan:0051",
       "target": "func:renderDetailModalContent",
-      "execution_order": 47,
+      "execution_order": 51,
       "dependencies": [
         "func:getCleanAddress"
       ],
@@ -760,82 +822,9 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0048",
-      "plan": "plan:0048",
-      "target": "func:showModal",
-      "execution_order": 48,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0049",
-      "plan": "plan:0049",
-      "target": "func:switchPage",
-      "execution_order": 49,
-      "dependencies": [
-        "func:callApi",
-        "func:getCityName",
-        "func:renderRanking",
-        "func:renderSettings",
-        "func:renderStorageList",
-        "func:then"
-      ],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0050",
-      "plan": "plan:0050",
-      "target": "func:callApi",
-      "execution_order": 50,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0051",
-      "plan": "plan:0051",
-      "target": "func:loadData",
-      "execution_order": 51,
-      "dependencies": [
-        "func:callApi",
-        "func:logDebug",
-        "func:prefetchRanking",
-        "func:renderAreas",
-        "func:setLoadingProgress",
-        "func:setSyncStatus",
-        "func:switchPage",
-        "func:syncOfflineQueue",
-        "func:updateStats"
-      ],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
       "id": "exec:0052",
       "plan": "plan:0052",
-      "target": "func:map",
+      "target": "func:showModal",
       "execution_order": 52,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -849,8 +838,78 @@
     {
       "id": "exec:0053",
       "plan": "plan:0053",
-      "target": "func:processQueue",
+      "target": "func:switchPage",
       "execution_order": 53,
+      "dependencies": [
+        "func:callApi",
+        "func:renderRanking",
+        "func:renderSettings",
+        "func:then"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0054",
+      "plan": "plan:0054",
+      "target": "func:callApi",
+      "execution_order": 54,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0055",
+      "plan": "plan:0055",
+      "target": "func:loadData",
+      "execution_order": 55,
+      "dependencies": [
+        "func:callApi",
+        "func:logDebug",
+        "func:prefetchRanking",
+        "func:renderAreas",
+        "func:setLoadingProgress",
+        "func:setSyncStatus",
+        "func:switchPage",
+        "func:updateStats"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0056",
+      "plan": "plan:0056",
+      "target": "func:map",
+      "execution_order": 56,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0057",
+      "plan": "plan:0057",
+      "target": "func:processQueue",
+      "execution_order": 57,
       "dependencies": [
         "func:callApiPost",
         "func:dequeueSync",
@@ -871,31 +930,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0054",
-      "plan": "plan:0054",
-      "target": "func:switchPage",
-      "execution_order": 54,
-      "dependencies": [
-        "func:callApi",
-        "func:getCityName",
-        "func:renderRanking",
-        "func:renderSettings",
-        "func:renderStorageList",
-        "func:then"
-      ],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0055",
-      "plan": "plan:0055",
+      "id": "exec:0058",
+      "plan": "plan:0058",
       "target": "func:$",
-      "execution_order": 55,
+      "execution_order": 58,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -906,10 +944,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0056",
-      "plan": "plan:0056",
+      "id": "exec:0059",
+      "plan": "plan:0059",
       "target": "func:_executeCommand",
-      "execution_order": 56,
+      "execution_order": 59,
       "dependencies": [
         "func:addLog",
         "func:callApiPost",
@@ -925,10 +963,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0057",
-      "plan": "plan:0057",
+      "id": "exec:0060",
+      "plan": "plan:0060",
       "target": "func:addPhotoToDetail",
-      "execution_order": 57,
+      "execution_order": 60,
       "dependencies": [
         "func:blobToBase64",
         "func:capturePhoto",
@@ -945,10 +983,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0058",
-      "plan": "plan:0058",
+      "id": "exec:0061",
+      "plan": "plan:0061",
       "target": "func:applyOptimisticCheck",
-      "execution_order": 58,
+      "execution_order": 61,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -959,10 +997,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0059",
-      "plan": "plan:0059",
+      "id": "exec:0062",
+      "plan": "plan:0062",
       "target": "func:backToCityList",
-      "execution_order": 59,
+      "execution_order": 62,
       "dependencies": [
         "func:renderAreas"
       ],
@@ -975,10 +1013,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0060",
-      "plan": "plan:0060",
+      "id": "exec:0063",
+      "plan": "plan:0063",
       "target": "func:backToTier1",
-      "execution_order": 60,
+      "execution_order": 63,
       "dependencies": [
         "func:navigateToAreaTab",
         "func:switchPage",
@@ -993,10 +1031,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0061",
-      "plan": "plan:0061",
+      "id": "exec:0064",
+      "plan": "plan:0064",
       "target": "func:blobToBase64",
-      "execution_order": 61,
+      "execution_order": 64,
       "dependencies": [
         "func:onerror"
       ],
@@ -1009,54 +1047,9 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0062",
-      "plan": "plan:0062",
-      "target": "func:callApi",
-      "execution_order": 62,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0063",
-      "plan": "plan:0063",
-      "target": "func:callApiPost",
-      "execution_order": 63,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0064",
-      "plan": "plan:0064",
-      "target": "func:capturePhoto",
-      "execution_order": 64,
-      "dependencies": [
-        "func:compressImage",
-        "func:onFileChange"
-      ],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
       "id": "exec:0065",
       "plan": "plan:0065",
-      "target": "func:cleanNameInput",
+      "target": "func:callApi",
       "execution_order": 65,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -1070,7 +1063,7 @@
     {
       "id": "exec:0066",
       "plan": "plan:0066",
-      "target": "func:closeDetailModal",
+      "target": "func:callApiPost",
       "execution_order": 66,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -1084,9 +1077,12 @@
     {
       "id": "exec:0067",
       "plan": "plan:0067",
-      "target": "func:closeIdInfoModal",
+      "target": "func:capturePhoto",
       "execution_order": 67,
-      "dependencies": [],
+      "dependencies": [
+        "func:compressImage",
+        "func:onFileChange"
+      ],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -1098,7 +1094,7 @@
     {
       "id": "exec:0068",
       "plan": "plan:0068",
-      "target": "func:closeModal",
+      "target": "func:cleanNameInput",
       "execution_order": 68,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -1112,7 +1108,7 @@
     {
       "id": "exec:0069",
       "plan": "plan:0069",
-      "target": "func:closeNumpad",
+      "target": "func:closeDetailModal",
       "execution_order": 69,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -1126,11 +1122,9 @@
     {
       "id": "exec:0070",
       "plan": "plan:0070",
-      "target": "func:compressImage",
+      "target": "func:closeIdInfoModal",
       "execution_order": 70,
-      "dependencies": [
-        "func:onerror"
-      ],
+      "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -1142,7 +1136,7 @@
     {
       "id": "exec:0071",
       "plan": "plan:0071",
-      "target": "func:contactHolder",
+      "target": "func:closeModal",
       "execution_order": 71,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -1156,8 +1150,52 @@
     {
       "id": "exec:0072",
       "plan": "plan:0072",
-      "target": "func:dispatchLineRequest",
+      "target": "func:closeNumpad",
       "execution_order": 72,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0073",
+      "plan": "plan:0073",
+      "target": "func:compressImage",
+      "execution_order": 73,
+      "dependencies": [
+        "func:onerror"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0074",
+      "plan": "plan:0074",
+      "target": "func:contactHolder",
+      "execution_order": 74,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0075",
+      "plan": "plan:0075",
+      "target": "func:dispatchLineRequest",
+      "execution_order": 75,
       "dependencies": [
         "func:callApi",
         "func:showModal"
@@ -1171,10 +1209,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0073",
-      "plan": "plan:0073",
+      "id": "exec:0076",
+      "plan": "plan:0076",
       "target": "func:extractCityName",
-      "execution_order": 73,
+      "execution_order": 76,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -1185,10 +1223,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0074",
-      "plan": "plan:0074",
+      "id": "exec:0077",
+      "plan": "plan:0077",
       "target": "func:extractDistrictAddresses",
-      "execution_order": 74,
+      "execution_order": 77,
       "dependencies": [
         "func:extractCityName",
         "func:map",
@@ -1203,55 +1241,11 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0075",
-      "plan": "plan:0075",
-      "target": "func:getCityName",
-      "execution_order": 75,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0076",
-      "plan": "plan:0076",
-      "target": "func:getCleanAddress",
-      "execution_order": 76,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0077",
-      "plan": "plan:0077",
-      "target": "func:getGPSLocation",
-      "execution_order": 77,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
       "id": "exec:0078",
       "plan": "plan:0078",
-      "target": "func:getRowStatus",
+      "target": "func:getCityName",
       "execution_order": 78,
-      "dependencies": [
-        "func:getQueue"
-      ],
+      "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -1263,7 +1257,7 @@
     {
       "id": "exec:0079",
       "plan": "plan:0079",
-      "target": "func:isHtmlRequest",
+      "target": "func:getCleanAddress",
       "execution_order": 79,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -1277,7 +1271,7 @@
     {
       "id": "exec:0080",
       "plan": "plan:0080",
-      "target": "func:map",
+      "target": "func:getGPSLocation",
       "execution_order": 80,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -1291,10 +1285,10 @@
     {
       "id": "exec:0081",
       "plan": "plan:0081",
-      "target": "func:onFileChange",
+      "target": "func:getRowStatus",
       "execution_order": 81,
       "dependencies": [
-        "func:compressImage"
+        "func:getQueue"
       ],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -1307,11 +1301,9 @@
     {
       "id": "exec:0082",
       "plan": "plan:0082",
-      "target": "func:onerror",
+      "target": "func:isHtmlRequest",
       "execution_order": 82,
-      "dependencies": [
-        "func:logDebug"
-      ],
+      "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -1323,11 +1315,9 @@
     {
       "id": "exec:0083",
       "plan": "plan:0083",
-      "target": "func:onunhandledrejection",
+      "target": "func:map",
       "execution_order": 83,
-      "dependencies": [
-        "func:logDebug"
-      ],
+      "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -1339,10 +1329,10 @@
     {
       "id": "exec:0084",
       "plan": "plan:0084",
-      "target": "func:openAreaDetail",
+      "target": "func:onFileChange",
       "execution_order": 84,
       "dependencies": [
-        "func:showModal"
+        "func:compressImage"
       ],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -1355,8 +1345,56 @@
     {
       "id": "exec:0085",
       "plan": "plan:0085",
-      "target": "func:openDetail",
+      "target": "func:onerror",
       "execution_order": 85,
+      "dependencies": [
+        "func:logDebug"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0086",
+      "plan": "plan:0086",
+      "target": "func:onunhandledrejection",
+      "execution_order": 86,
+      "dependencies": [
+        "func:logDebug"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0087",
+      "plan": "plan:0087",
+      "target": "func:openAreaDetail",
+      "execution_order": 87,
+      "dependencies": [
+        "func:showModal"
+      ],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0088",
+      "plan": "plan:0088",
+      "target": "func:openDetail",
+      "execution_order": 88,
       "dependencies": [
         "func:callApi",
         "func:renderDetailList",
@@ -1371,52 +1409,52 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0086",
-      "plan": "plan:0086",
-      "target": "func:openIdInfoModal",
-      "execution_order": 86,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0087",
-      "plan": "plan:0087",
-      "target": "func:openLineChat",
-      "execution_order": 87,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0088",
-      "plan": "plan:0088",
-      "target": "func:openNumpad",
-      "execution_order": 88,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
       "id": "exec:0089",
       "plan": "plan:0089",
-      "target": "func:openPointDetailModal",
+      "target": "func:openIdInfoModal",
       "execution_order": 89,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0090",
+      "plan": "plan:0090",
+      "target": "func:openLineChat",
+      "execution_order": 90,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0091",
+      "plan": "plan:0091",
+      "target": "func:openNumpad",
+      "execution_order": 91,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0092",
+      "plan": "plan:0092",
+      "target": "func:openPointDetailModal",
+      "execution_order": 92,
       "dependencies": [
         "func:renderDetailModalContent"
       ],
@@ -1429,10 +1467,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0090",
-      "plan": "plan:0090",
+      "id": "exec:0093",
+      "plan": "plan:0093",
       "target": "func:prefetchRanking",
-      "execution_order": 90,
+      "execution_order": 93,
       "dependencies": [
         "func:callApi",
         "func:logDebug",
@@ -1448,10 +1486,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0091",
-      "plan": "plan:0091",
+      "id": "exec:0094",
+      "plan": "plan:0094",
       "target": "func:pressNum",
-      "execution_order": 91,
+      "execution_order": 94,
       "dependencies": [
         "func:blobToBase64",
         "func:capturePhoto",
@@ -1470,10 +1508,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0092",
-      "plan": "plan:0092",
+      "id": "exec:0095",
+      "plan": "plan:0095",
       "target": "func:removePressed",
-      "execution_order": 92,
+      "execution_order": 95,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -1484,10 +1522,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0093",
-      "plan": "plan:0093",
+      "id": "exec:0096",
+      "plan": "plan:0096",
       "target": "func:resolveRequest",
-      "execution_order": 93,
+      "execution_order": 96,
       "dependencies": [
         "func:addLog",
         "func:callApiPost",
@@ -1502,10 +1540,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0094",
-      "plan": "plan:0094",
+      "id": "exec:0097",
+      "plan": "plan:0097",
       "target": "func:runCommand",
-      "execution_order": 94,
+      "execution_order": 97,
       "dependencies": [
         "func:_executeCommand",
         "func:showModal"
@@ -1519,10 +1557,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0095",
-      "plan": "plan:0095",
+      "id": "exec:0098",
+      "plan": "plan:0098",
       "target": "func:scheduleRetry",
-      "execution_order": 95,
+      "execution_order": 98,
       "dependencies": [
         "func:updateQueueItem"
       ],
@@ -1535,10 +1573,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0096",
-      "plan": "plan:0096",
+      "id": "exec:0099",
+      "plan": "plan:0099",
       "target": "func:selectCity",
-      "execution_order": 96,
+      "execution_order": 99,
       "dependencies": [
         "func:callApi",
         "func:renderAreas",
@@ -1553,51 +1591,9 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0097",
-      "plan": "plan:0097",
-      "target": "func:sendDispatchMessage",
-      "execution_order": 97,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0098",
-      "plan": "plan:0098",
-      "target": "func:sendLineContact",
-      "execution_order": 98,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0099",
-      "plan": "plan:0099",
-      "target": "func:setApiStatus",
-      "execution_order": 99,
-      "dependencies": [],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
       "id": "exec:0100",
       "plan": "plan:0100",
-      "target": "func:showModal",
+      "target": "func:sendDispatchMessage",
       "execution_order": 100,
       "dependencies": [],
       "dependency_status": "resolved",
@@ -1611,8 +1607,50 @@
     {
       "id": "exec:0101",
       "plan": "plan:0101",
-      "target": "func:simulateBatch",
+      "target": "func:sendLineContact",
       "execution_order": 101,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0102",
+      "plan": "plan:0102",
+      "target": "func:setApiStatus",
+      "execution_order": 102,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0103",
+      "plan": "plan:0103",
+      "target": "func:showModal",
+      "execution_order": 103,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0104",
+      "plan": "plan:0104",
+      "target": "func:simulateBatch",
+      "execution_order": 104,
       "dependencies": [
         "func:extractCityName"
       ],
@@ -1625,12 +1663,13 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0102",
-      "plan": "plan:0102",
+      "id": "exec:0105",
+      "plan": "plan:0105",
       "target": "func:submitFlyerStock",
-      "execution_order": 102,
+      "execution_order": 105,
       "dependencies": [
-        "func:callApiPost"
+        "func:callApiPost",
+        "func:loadFlyerStock"
       ],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -1641,26 +1680,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0103",
-      "plan": "plan:0103",
+      "id": "exec:0106",
+      "plan": "plan:0106",
       "target": "func:then",
-      "execution_order": 103,
-      "dependencies": [
-        "func:renderRanking"
-      ],
-      "dependency_status": "resolved",
-      "execution_status": "ready",
-      "approval_required": true,
-      "simulation_only": true,
-      "execution_group": 1,
-      "executable": true,
-      "simulation_result": "pending"
-    },
-    {
-      "id": "exec:0104",
-      "plan": "plan:0104",
-      "target": "func:toFullWidthKana",
-      "execution_order": 104,
+      "execution_order": 106,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -1671,10 +1694,24 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0105",
-      "plan": "plan:0105",
+      "id": "exec:0107",
+      "plan": "plan:0107",
+      "target": "func:toFullWidthKana",
+      "execution_order": 107,
+      "dependencies": [],
+      "dependency_status": "resolved",
+      "execution_status": "ready",
+      "approval_required": true,
+      "simulation_only": true,
+      "execution_group": 1,
+      "executable": true,
+      "simulation_result": "pending"
+    },
+    {
+      "id": "exec:0108",
+      "plan": "plan:0108",
       "target": "func:toggleDone",
-      "execution_order": 105,
+      "execution_order": 108,
       "dependencies": [
         "func:openNumpad",
         "func:renderDetailList",
@@ -1690,13 +1727,11 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0106",
-      "plan": "plan:0106",
+      "id": "exec:0109",
+      "plan": "plan:0109",
       "target": "func:toggleNavTier",
-      "execution_order": 106,
-      "dependencies": [
-        "func:switchPage"
-      ],
+      "execution_order": 109,
+      "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",
       "approval_required": true,
@@ -1706,10 +1741,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0107",
-      "plan": "plan:0107",
+      "id": "exec:0110",
+      "plan": "plan:0110",
       "target": "func:tryRegisterAdmin",
-      "execution_order": 107,
+      "execution_order": 110,
       "dependencies": [
         "func:addLog",
         "func:callApiPost",
@@ -1724,16 +1759,12 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0108",
-      "plan": "plan:0108",
+      "id": "exec:0111",
+      "plan": "plan:0111",
       "target": "func:updateRecord",
-      "execution_order": 108,
+      "execution_order": 111,
       "dependencies": [
-        "func:applyOptimisticCheck",
-        "func:callApiPost",
-        "func:enqueueSync",
-        "func:loadData",
-        "func:saveToOfflineQueue"
+        "func:enqueueSync"
       ],
       "dependency_status": "resolved",
       "execution_status": "ready",
@@ -1744,10 +1775,10 @@
       "simulation_result": "pending"
     },
     {
-      "id": "exec:0109",
-      "plan": "plan:0109",
+      "id": "exec:0112",
+      "plan": "plan:0112",
       "target": "func:updateStats",
-      "execution_order": 109,
+      "execution_order": 112,
       "dependencies": [],
       "dependency_status": "resolved",
       "execution_status": "ready",

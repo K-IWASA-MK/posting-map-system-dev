@@ -1,21 +1,17 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T21:52:29.189093Z",
+    "generated_at": "2026-06-27T07:14:41.400419Z",
     "scanner": "knowledge_graph_builder"
   },
   "functions": {
     "$": {
       "id": "func:$",
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "calls": [],
       "called_by": [],
-      "html": [
-        "active/mobile/index.html"
-      ],
-      "assets": [
-        "active/mobile/style.css"
-      ],
+      "html": [],
+      "assets": [],
       "relations": {
         "calls": true,
         "called_by": true,
@@ -106,7 +102,7 @@
     },
     "addPhotoToDetail": {
       "id": "func:addPhotoToDetail",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "blobToBase64",
         "capturePhoto",
@@ -116,7 +112,8 @@
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -138,9 +135,7 @@
       "id": "func:applyOptimisticCheck",
       "file": "active/mobile/app.js",
       "calls": [],
-      "called_by": [
-        "updateRecord"
-      ],
+      "called_by": [],
       "html": [
         "active/mobile/index.html"
       ],
@@ -162,13 +157,14 @@
     },
     "backToCityList": {
       "id": "func:backToCityList",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "renderAreas"
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -245,7 +241,7 @@
     },
     "callApi": {
       "id": "func:callApi",
-      "file": "active/mobile/app.js",
+      "file": "shared/api.js",
       "calls": [],
       "called_by": [
         "dispatchLineRequest",
@@ -263,15 +259,10 @@
         "safeInitApp",
         "saveProfile",
         "selectCity",
-        "startApp",
         "switchPage"
       ],
-      "html": [
-        "active/mobile/index.html"
-      ],
-      "assets": [
-        "active/mobile/style.css"
-      ],
+      "html": [],
+      "assets": [],
       "relations": {
         "calls": true,
         "called_by": true,
@@ -287,25 +278,18 @@
     },
     "callApiPost": {
       "id": "func:callApiPost",
-      "file": "active/mobile/app.js",
+      "file": "shared/api.js",
       "calls": [],
       "called_by": [
         "_executeCommand",
-        "openTransferRequestDialog",
         "processQueue",
         "resolveRequest",
-        "safeInitApp",
         "submitFlyerStock",
         "syncOfflineQueue",
-        "tryRegisterAdmin",
-        "updateRecord"
+        "tryRegisterAdmin"
       ],
-      "html": [
-        "active/mobile/index.html"
-      ],
-      "assets": [
-        "active/mobile/style.css"
-      ],
+      "html": [],
+      "assets": [],
       "relations": {
         "calls": true,
         "called_by": true,
@@ -321,7 +305,7 @@
     },
     "capturePhoto": {
       "id": "func:capturePhoto",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "compressImage",
         "onFileChange"
@@ -331,7 +315,8 @@
         "pressNum"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -351,13 +336,14 @@
     },
     "cleanNameInput": {
       "id": "func:cleanNameInput",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [
         "saveProfile"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -377,11 +363,12 @@
     },
     "closeDetailModal": {
       "id": "func:closeDetailModal",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -401,11 +388,12 @@
     },
     "closeIdInfoModal": {
       "id": "func:closeIdInfoModal",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -445,13 +433,14 @@
     },
     "closeNumpad": {
       "id": "func:closeNumpad",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [
         "pressNum"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -471,11 +460,12 @@
     },
     "closeTransferRequestDialog": {
       "id": "func:closeTransferRequestDialog",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -495,7 +485,7 @@
     },
     "compressImage": {
       "id": "func:compressImage",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "onerror"
       ],
@@ -504,7 +494,8 @@
         "onFileChange"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -700,11 +691,12 @@
     },
     "formatCompletedAt": {
       "id": "func:formatCompletedAt",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -724,16 +716,16 @@
     },
     "getCityName": {
       "id": "func:getCityName",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [],
       "called_by": [
         "navigateToSiblingArea",
         "renderAreas",
-        "renderDetailList",
-        "switchPage"
+        "renderDetailList"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -753,13 +745,14 @@
     },
     "getCleanAddress": {
       "id": "func:getCleanAddress",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [],
       "called_by": [
         "renderDetailModalContent"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -810,13 +803,14 @@
     },
     "getGPSLocation": {
       "id": "func:getGPSLocation",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [
         "pressNum"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -994,7 +988,7 @@
     },
     "loadData": {
       "id": "func:loadData",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
         "logDebug",
@@ -1003,17 +997,16 @@
         "setLoadingProgress",
         "setSyncStatus",
         "switchPage",
-        "syncOfflineQueue",
         "updateStats"
       ],
       "called_by": [
         "processQueue",
         "startApp",
-        "syncOfflineQueue",
-        "updateRecord"
+        "syncOfflineQueue"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1040,6 +1033,7 @@
         "sendLineContact"
       ],
       "called_by": [
+        "submitFlyerStock",
         "switchAdminTab"
       ],
       "html": [],
@@ -1239,7 +1233,7 @@
     },
     "logDebug": {
       "id": "func:logDebug",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [
         "_apiLog",
@@ -1248,11 +1242,11 @@
         "onunhandledrejection",
         "prefetchRanking",
         "safeInitApp",
-        "saveProfile",
-        "startApp"
+        "saveProfile"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1272,7 +1266,7 @@
     },
     "map": {
       "id": "func:map",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [],
       "called_by": [
         "drawMap",
@@ -1288,7 +1282,8 @@
         "renderStorageList"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1308,7 +1303,7 @@
     },
     "navigateToAreaTab": {
       "id": "func:navigateToAreaTab",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "switchPage"
       ],
@@ -1316,7 +1311,8 @@
         "backToTier1"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1336,14 +1332,15 @@
     },
     "navigateToSiblingArea": {
       "id": "func:navigateToSiblingArea",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "getCityName",
         "openDetail"
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1363,7 +1360,7 @@
     },
     "onFileChange": {
       "id": "func:onFileChange",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "compressImage"
       ],
@@ -1371,7 +1368,8 @@
         "capturePhoto"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1391,7 +1389,7 @@
     },
     "onerror": {
       "id": "func:onerror",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "logDebug"
       ],
@@ -1406,7 +1404,8 @@
         "updateQueueItem"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1426,13 +1425,14 @@
     },
     "onunhandledrejection": {
       "id": "func:onunhandledrejection",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "logDebug"
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1474,7 +1474,7 @@
     },
     "openDetail": {
       "id": "func:openDetail",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "callApi",
         "renderDetailList",
@@ -1484,7 +1484,8 @@
         "navigateToSiblingArea"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1504,11 +1505,12 @@
     },
     "openIdInfoModal": {
       "id": "func:openIdInfoModal",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1548,13 +1550,14 @@
     },
     "openNumpad": {
       "id": "func:openNumpad",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [
         "toggleDone"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1574,13 +1577,14 @@
     },
     "openPointDetailModal": {
       "id": "func:openPointDetailModal",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "renderDetailModalContent"
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1600,13 +1604,12 @@
     },
     "openTransferRequestDialog": {
       "id": "func:openTransferRequestDialog",
-      "file": "active/mobile/app.js",
-      "calls": [
-        "callApiPost"
-      ],
+      "file": "field/app.js",
+      "calls": [],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1626,7 +1629,7 @@
     },
     "prefetchRanking": {
       "id": "func:prefetchRanking",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
         "logDebug",
@@ -1637,7 +1640,8 @@
         "loadData"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1657,7 +1661,7 @@
     },
     "pressNum": {
       "id": "func:pressNum",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "blobToBase64",
         "capturePhoto",
@@ -1669,7 +1673,8 @@
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1725,15 +1730,11 @@
     },
     "removePressed": {
       "id": "func:removePressed",
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "calls": [],
       "called_by": [],
-      "html": [
-        "active/mobile/index.html"
-      ],
-      "assets": [
-        "active/mobile/style.css"
-      ],
+      "html": [],
+      "assets": [],
       "relations": {
         "calls": true,
         "called_by": true,
@@ -1749,7 +1750,7 @@
     },
     "renderAreas": {
       "id": "func:renderAreas",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "getCityName",
         "map"
@@ -1760,7 +1761,8 @@
         "selectCity"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1780,7 +1782,7 @@
     },
     "renderDetailList": {
       "id": "func:renderDetailList",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "getCityName",
         "map",
@@ -1795,7 +1797,8 @@
         "triggerUISyncRefresh"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1815,7 +1818,7 @@
     },
     "renderDetailModalContent": {
       "id": "func:renderDetailModalContent",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "getCleanAddress"
       ],
@@ -1828,7 +1831,8 @@
         "triggerUISyncRefresh"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1848,17 +1852,17 @@
     },
     "renderRanking": {
       "id": "func:renderRanking",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "map"
       ],
       "called_by": [
         "prefetchRanking",
-        "switchPage",
-        "then"
+        "switchPage"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1878,13 +1882,14 @@
     },
     "renderSettings": {
       "id": "func:renderSettings",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [],
       "called_by": [
         "switchPage"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -1908,9 +1913,7 @@
       "calls": [
         "map"
       ],
-      "called_by": [
-        "switchPage"
-      ],
+      "called_by": [],
       "html": [
         "active/mobile/index.html"
       ],
@@ -2003,17 +2006,17 @@
     },
     "safeInitApp": {
       "id": "func:safeInitApp",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
-        "callApiPost",
         "logDebug",
         "setLoadingProgress",
         "startApp"
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2055,7 +2058,7 @@
     },
     "saveProfile": {
       "id": "func:saveProfile",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
         "cleanNameInput",
@@ -2064,7 +2067,8 @@
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2088,9 +2092,7 @@
       "calls": [
         "setSyncStatus"
       ],
-      "called_by": [
-        "updateRecord"
-      ],
+      "called_by": [],
       "html": [
         "active/mobile/index.html"
       ],
@@ -2140,7 +2142,7 @@
     },
     "selectCity": {
       "id": "func:selectCity",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "callApi",
         "renderAreas",
@@ -2148,7 +2150,8 @@
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2188,17 +2191,13 @@
     },
     "sendLineContact": {
       "id": "func:sendLineContact",
-      "file": "active/mobile/render.js",
+      "file": "legacy/admin-app/manager.js",
       "calls": [],
       "called_by": [
         "loadFlyerStock"
       ],
-      "html": [
-        "active/mobile/index.html"
-      ],
-      "assets": [
-        "active/mobile/style.css"
-      ],
+      "html": [],
+      "assets": [],
       "relations": {
         "calls": true,
         "called_by": true,
@@ -2236,14 +2235,15 @@
     },
     "setLoadingProgress": {
       "id": "func:setLoadingProgress",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [
         "loadData",
         "safeInitApp"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2263,7 +2263,7 @@
     },
     "setSyncStatus": {
       "id": "func:setSyncStatus",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [
         "loadData",
@@ -2271,7 +2271,8 @@
         "syncOfflineQueue"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2384,17 +2385,16 @@
     },
     "startApp": {
       "id": "func:startApp",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
-        "callApi",
-        "loadData",
-        "logDebug"
+        "loadData"
       ],
       "called_by": [
         "safeInitApp"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2414,17 +2414,14 @@
     },
     "submitFlyerStock": {
       "id": "func:submitFlyerStock",
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "calls": [
-        "callApiPost"
+        "callApiPost",
+        "loadFlyerStock"
       ],
       "called_by": [],
-      "html": [
-        "active/mobile/index.html"
-      ],
-      "assets": [
-        "active/mobile/style.css"
-      ],
+      "html": [],
+      "assets": [],
       "relations": {
         "calls": true,
         "called_by": true,
@@ -2465,13 +2462,11 @@
     },
     "switchPage": {
       "id": "func:switchPage",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
-        "getCityName",
         "renderRanking",
         "renderSettings",
-        "renderStorageList",
         "then"
       ],
       "called_by": [
@@ -2479,11 +2474,11 @@
         "loadData",
         "navigateToAreaTab",
         "openDetail",
-        "saveProfile",
-        "toggleNavTier"
+        "saveProfile"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2503,13 +2498,14 @@
     },
     "syncBadge": {
       "id": "func:syncBadge",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [],
       "called_by": [
         "renderDetailList"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2535,9 +2531,7 @@
         "loadData",
         "setSyncStatus"
       ],
-      "called_by": [
-        "loadData"
-      ],
+      "called_by": [],
       "html": [
         "active/mobile/index.html"
       ],
@@ -2559,22 +2553,16 @@
     },
     "then": {
       "id": "func:then",
-      "file": "active/mobile/app.js",
-      "calls": [
-        "renderRanking"
-      ],
+      "file": "service-worker.js",
+      "calls": [],
       "called_by": [
         "prefetchRanking",
         "selectCity",
         "switchPage",
         "tryRegisterAdmin"
       ],
-      "html": [
-        "active/mobile/index.html"
-      ],
-      "assets": [
-        "active/mobile/style.css"
-      ],
+      "html": [],
+      "assets": [],
       "relations": {
         "calls": true,
         "called_by": true,
@@ -2612,7 +2600,7 @@
     },
     "toggleDone": {
       "id": "func:toggleDone",
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "openNumpad",
         "renderDetailList",
@@ -2621,7 +2609,8 @@
       ],
       "called_by": [],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2641,19 +2630,13 @@
     },
     "toggleNavTier": {
       "id": "func:toggleNavTier",
-      "file": "active/mobile/app.js",
-      "calls": [
-        "switchPage"
-      ],
+      "file": "legacy/admin-app/manager.js",
+      "calls": [],
       "called_by": [
         "backToTier1"
       ],
-      "html": [
-        "active/mobile/index.html"
-      ],
-      "assets": [
-        "active/mobile/style.css"
-      ],
+      "html": [],
+      "assets": [],
       "relations": {
         "calls": true,
         "called_by": true,
@@ -2669,7 +2652,7 @@
     },
     "triggerUISyncRefresh": {
       "id": "func:triggerUISyncRefresh",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "getQueue",
         "renderDetailList",
@@ -2679,7 +2662,8 @@
         "updateUISyncStatus"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2780,19 +2764,16 @@
     },
     "updateRecord": {
       "id": "func:updateRecord",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
-        "applyOptimisticCheck",
-        "callApiPost",
-        "enqueueSync",
-        "loadData",
-        "saveToOfflineQueue"
+        "enqueueSync"
       ],
       "called_by": [
         "toggleDone"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -2812,13 +2793,14 @@
     },
     "updateStats": {
       "id": "func:updateStats",
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [],
       "called_by": [
         "loadData"
       ],
       "html": [
-        "active/mobile/index.html"
+        "field/index.html",
+        "service-worker.js"
       ],
       "assets": [
         "active/mobile/style.css"

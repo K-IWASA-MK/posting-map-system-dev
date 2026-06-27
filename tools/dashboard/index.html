@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIE Platform Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header premium-glass">
+            <div class="header-left">
+                <div class="logo-glow"></div>
+                <h1>CIE Platform Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="meta-item">
+                    <span class="meta-label">CIE Version</span>
+                    <span class="meta-value">2.2.0-alpha.0</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Platform Phase</span>
+                    <span class="meta-value">Phase21</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Dashboard Version</span>
+                    <span class="meta-value">1</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Generated At</span>
+                    <span class="meta-value" id="generated-at">-</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Grid Layout -->
+        <main class="dashboard-grid">
+            
+            <!-- Health Panel -->
+            <section class="grid-card double premium-glass header-glow">
+                <div class="card-header">
+                    <h2>Overall Health Status</h2>
+                </div>
+                <div class="health-body">
+                    <div class="health-indicator">
+                        <div class="status-light" id="status-light"></div>
+                        <div class="health-text">
+                            <span class="health-label">Status</span>
+                            <span class="health-status" id="health-status">LOADING</span>
+                        </div>
+                    </div>
+                    <div class="health-rating">
+                        <span class="rating-label">Overall Health</span>
+                        <span class="rating-stars" id="rating-stars">★★★★★</span>
+                    </div>
+                    <div class="pipeline-integrity-badge">
+                        <span class="badge-label">Pipeline Integrity</span>
+                        <span class="badge-status" id="pipeline-integrity">PENDING</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Repository Summary -->
+            <section class="grid-card premium-glass">
+                <div class="card-header">
+                    <h2>Repository Summary</h2>
+                </div>
+                <div class="summary-list">
+                    <div class="summary-item">
+                        <span class="item-name">JS Files</span>
+                        <span class="item-val" id="sum-js-files">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-name">HTML Files</span>
+                        <span class="item-val" id="sum-html-files">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-name">Functions</span>
+                        <span class="item-val" id="sum-functions">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-name">Routes</span>
+                        <span class="item-val" id="sum-routes">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="item-name">Assets</span>
+                        <span class="item-val" id="sum-assets">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Semantic Distribution -->
+            <section class="grid-card premium-glass">
+                <div class="card-header">
+                    <h2>Semantic Distribution</h2>
+                </div>
+                <div class="chart-container" id="semantic-chart">
+                    <!-- Dynamic chart elements here -->
+                    <div class="loading-spinner">Loading...</div>
+                </div>
+            </section>
+
+            <!-- Static Analysis -->
+            <section class="grid-card premium-glass">
+                <div class="card-header">
+                    <h2>Static Analysis</h2>
+                </div>
+                <div class="analysis-list">
+                    <div class="analysis-item warning">
+                        <span class="item-name">Unused Functions</span>
+                        <span class="item-val" id="ana-unused">-</span>
+                    </div>
+                    <div class="analysis-item warning">
+                        <span class="item-name">High Impact Functions</span>
+                        <span class="item-val" id="ana-high-impact">-</span>
+                    </div>
+                    <div class="analysis-item info">
+                        <span class="item-name">Hub Functions</span>
+                        <span class="item-val" id="ana-hubs">-</span>
+                    </div>
+                    <div class="analysis-item info">
+                        <span class="item-name">Orphan Routes</span>
+                        <span class="item-val" id="ana-orphans">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Execution Pipeline Flow -->
+            <section class="grid-card double premium-glass">
+                <div class="card-header">
+                    <h2>Execution Pipeline</h2>
+                </div>
+                <div class="pipeline-flow">
+                    <div class="flow-step">
+                        <span class="step-num" id="pipe-candidates">-</span>
+                        <span class="step-label">Candidates</span>
+                    </div>
+                    <div class="flow-arrow">➔</div>
+                    <div class="flow-step">
+                        <span class="step-num" id="pipe-plans">-</span>
+                        <span class="step-label">Plans</span>
+                    </div>
+                    <div class="flow-arrow">➔</div>
+                    <div class="flow-step">
+                        <span class="step-num" id="pipe-execs">-</span>
+                        <span class="step-label">Execution</span>
+                    </div>
+                    <div class="flow-arrow">➔</div>
+                    <div class="flow-step">
+                        <span class="step-num" id="pipe-patches">-</span>
+                        <span class="step-label">Patches</span>
+                    </div>
+                    <div class="flow-arrow">➔</div>
+                    <div class="flow-step">
+                        <span class="step-num" id="pipe-apply">-</span>
+                        <span class="step-label">Apply</span>
+                    </div>
+                    <div class="flow-arrow">➔</div>
+                    <div class="flow-step">
+                        <span class="step-num" id="pipe-rollback">-</span>
+                        <span class="step-label">Rollback</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Future Extensions (Coming Soon) -->
+            <section class="grid-card premium-glass coming-soon">
+                <div class="card-header">
+                    <h2>Metrics</h2>
+                </div>
+                <div class="cs-body">
+                    <span class="cs-badge">Coming Soon</span>
+                </div>
+            </section>
+
+            <section class="grid-card premium-glass coming-soon">
+                <div class="card-header">
+                    <h2>Runtime</h2>
+                </div>
+                <div class="cs-body">
+                    <span class="cs-badge">Coming Soon</span>
+                </div>
+            </section>
+
+            <section class="grid-card premium-glass coming-soon">
+                <div class="card-header">
+                    <h2>AI Assistant</h2>
+                </div>
+                <div class="cs-body">
+                    <span class="cs-badge">Coming Soon</span>
+                </div>
+            </section>
+
+            <section class="grid-card premium-glass coming-soon">
+                <div class="card-header">
+                    <h2>Git Integration</h2>
+                </div>
+                <div class="cs-body">
+                    <span class="cs-badge">Coming Soon</span>
+                </div>
+            </section>
+
+        </main>
+        
+        <!-- Footer Info -->
+        <footer class="dashboard-footer">
+            <p>OPERATIONAL ENVIRONMENT / SECURITY: ENFORCED</p>
+        </footer>
+    </div>
+
+    <!-- JS Scripts -->
+    <script src="dashboard.js"></script>
+</body>
+</html>

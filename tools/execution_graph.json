@@ -1,12 +1,12 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T21:38:16.253478Z",
+    "generated_at": "2026-06-27T07:14:41.327758Z",
     "scanner": "execution_graph_scanner"
   },
   "functions": {
     "$": {
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "calls": []
     },
     "_apiLog": {
@@ -29,7 +29,7 @@
       "calls": []
     },
     "addPhotoToDetail": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "blobToBase64",
         "capturePhoto",
@@ -43,7 +43,7 @@
       "calls": []
     },
     "backToCityList": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "renderAreas"
       ]
@@ -63,30 +63,30 @@
       ]
     },
     "callApi": {
-      "file": "active/mobile/app.js",
+      "file": "shared/api.js",
       "calls": []
     },
     "callApiPost": {
-      "file": "active/mobile/app.js",
+      "file": "shared/api.js",
       "calls": []
     },
     "capturePhoto": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "compressImage",
         "onFileChange"
       ]
     },
     "cleanNameInput": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "closeDetailModal": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": []
     },
     "closeIdInfoModal": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "closeModal": {
@@ -94,15 +94,15 @@
       "calls": []
     },
     "closeNumpad": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "closeTransferRequestDialog": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "compressImage": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "onerror"
       ]
@@ -152,15 +152,15 @@
       ]
     },
     "formatCompletedAt": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": []
     },
     "getCityName": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": []
     },
     "getCleanAddress": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": []
     },
     "getDB": {
@@ -170,7 +170,7 @@
       ]
     },
     "getGPSLocation": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "getQueue": {
@@ -214,7 +214,7 @@
       ]
     },
     "loadData": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
         "logDebug",
@@ -223,7 +223,6 @@
         "setLoadingProgress",
         "setSyncStatus",
         "switchPage",
-        "syncOfflineQueue",
         "updateStats"
       ]
     },
@@ -283,40 +282,40 @@
       ]
     },
     "logDebug": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "map": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": []
     },
     "navigateToAreaTab": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "switchPage"
       ]
     },
     "navigateToSiblingArea": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "getCityName",
         "openDetail"
       ]
     },
     "onFileChange": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "compressImage"
       ]
     },
     "onerror": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "logDebug"
       ]
     },
     "onunhandledrejection": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "logDebug"
       ]
@@ -328,7 +327,7 @@
       ]
     },
     "openDetail": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "callApi",
         "renderDetailList",
@@ -336,7 +335,7 @@
       ]
     },
     "openIdInfoModal": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "openLineChat": {
@@ -344,23 +343,21 @@
       "calls": []
     },
     "openNumpad": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "openPointDetailModal": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "renderDetailModalContent"
       ]
     },
     "openTransferRequestDialog": {
-      "file": "active/mobile/app.js",
-      "calls": [
-        "callApiPost"
-      ]
+      "file": "field/app.js",
+      "calls": []
     },
     "prefetchRanking": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
         "logDebug",
@@ -369,7 +366,7 @@
       ]
     },
     "pressNum": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "blobToBase64",
         "capturePhoto",
@@ -395,18 +392,18 @@
       ]
     },
     "removePressed": {
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "calls": []
     },
     "renderAreas": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "getCityName",
         "map"
       ]
     },
     "renderDetailList": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "getCityName",
         "map",
@@ -414,19 +411,19 @@
       ]
     },
     "renderDetailModalContent": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "getCleanAddress"
       ]
     },
     "renderRanking": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "map"
       ]
     },
     "renderSettings": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": []
     },
     "renderStorageList": {
@@ -457,10 +454,9 @@
       ]
     },
     "safeInitApp": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
-        "callApiPost",
         "logDebug",
         "setLoadingProgress",
         "startApp"
@@ -471,7 +467,7 @@
       "calls": []
     },
     "saveProfile": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
         "cleanNameInput",
@@ -492,7 +488,7 @@
       ]
     },
     "selectCity": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "callApi",
         "renderAreas",
@@ -504,7 +500,7 @@
       "calls": []
     },
     "sendLineContact": {
-      "file": "active/mobile/render.js",
+      "file": "legacy/admin-app/manager.js",
       "calls": []
     },
     "setApiStatus": {
@@ -512,11 +508,11 @@
       "calls": []
     },
     "setLoadingProgress": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "setSyncStatus": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "showModal": {
@@ -543,17 +539,16 @@
       ]
     },
     "startApp": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
-        "callApi",
-        "loadData",
-        "logDebug"
+        "loadData"
       ]
     },
     "submitFlyerStock": {
-      "file": "active/mobile/app.js",
+      "file": "legacy/admin-app/manager.js",
       "calls": [
-        "callApiPost"
+        "callApiPost",
+        "loadFlyerStock"
       ]
     },
     "switchAdminTab": {
@@ -566,18 +561,16 @@
       ]
     },
     "switchPage": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "callApi",
-        "getCityName",
         "renderRanking",
         "renderSettings",
-        "renderStorageList",
         "then"
       ]
     },
     "syncBadge": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": []
     },
     "syncOfflineQueue": {
@@ -589,17 +582,15 @@
       ]
     },
     "then": {
-      "file": "active/mobile/app.js",
-      "calls": [
-        "renderRanking"
-      ]
+      "file": "service-worker.js",
+      "calls": []
     },
     "toFullWidthKana": {
       "file": "test_backend.js",
       "calls": []
     },
     "toggleDone": {
-      "file": "active/mobile/render.js",
+      "file": "field/render.js",
       "calls": [
         "openNumpad",
         "renderDetailList",
@@ -608,13 +599,11 @@
       ]
     },
     "toggleNavTier": {
-      "file": "active/mobile/app.js",
-      "calls": [
-        "switchPage"
-      ]
+      "file": "legacy/admin-app/manager.js",
+      "calls": []
     },
     "triggerUISyncRefresh": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
         "getQueue",
         "renderDetailList",
@@ -643,17 +632,13 @@
       ]
     },
     "updateRecord": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": [
-        "applyOptimisticCheck",
-        "callApiPost",
-        "enqueueSync",
-        "loadData",
-        "saveToOfflineQueue"
+        "enqueueSync"
       ]
     },
     "updateStats": {
-      "file": "active/mobile/app.js",
+      "file": "field/app.js",
       "calls": []
     },
     "updateUISyncStatus": {

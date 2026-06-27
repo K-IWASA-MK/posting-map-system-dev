@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T21:48:43.853430Z",
+    "generated_at": "2026-06-27T07:14:41.377080Z",
     "scanner": "repository_index_builder"
   },
   "files": {
@@ -79,49 +79,13 @@
         "execution_graph": true
       },
       "functions": [
-        "$",
-        "addPhotoToDetail",
         "applyOptimisticCheck",
-        "backToCityList",
         "backToTier1",
-        "callApi",
-        "callApiPost",
-        "capturePhoto",
-        "cleanNameInput",
-        "closeIdInfoModal",
-        "closeNumpad",
-        "closeTransferRequestDialog",
-        "compressImage",
-        "getGPSLocation",
-        "loadData",
         "loadHeatmap",
         "loadPrediction",
         "loadStrategy",
-        "logDebug",
-        "navigateToAreaTab",
-        "onFileChange",
-        "onerror",
-        "onunhandledrejection",
-        "openIdInfoModal",
-        "openNumpad",
-        "openTransferRequestDialog",
-        "prefetchRanking",
-        "pressNum",
-        "removePressed",
-        "safeInitApp",
-        "saveProfile",
         "saveToOfflineQueue",
-        "setLoadingProgress",
-        "setSyncStatus",
-        "startApp",
-        "submitFlyerStock",
-        "switchPage",
-        "syncOfflineQueue",
-        "then",
-        "toggleNavTier",
-        "triggerUISyncRefresh",
-        "updateRecord",
-        "updateStats"
+        "syncOfflineQueue"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -166,24 +130,7 @@
         "execution_graph": true
       },
       "functions": [
-        "closeDetailModal",
-        "formatCompletedAt",
-        "getCityName",
-        "getCleanAddress",
-        "map",
-        "navigateToSiblingArea",
-        "openDetail",
-        "openPointDetailModal",
-        "renderAreas",
-        "renderDetailList",
-        "renderDetailModalContent",
-        "renderRanking",
-        "renderSettings",
-        "renderStorageList",
-        "selectCity",
-        "sendLineContact",
-        "syncBadge",
-        "toggleDone"
+        "renderStorageList"
       ],
       "assets": [
         "active/mobile/style.css"
@@ -215,9 +162,41 @@
     "field/app.js": {
       "type": "javascript",
       "sources": {
-        "asset_graph": true
+        "asset_graph": true,
+        "call_graph": true,
+        "execution_graph": true
       },
-      "functions": [],
+      "functions": [
+        "addPhotoToDetail",
+        "backToCityList",
+        "capturePhoto",
+        "cleanNameInput",
+        "closeIdInfoModal",
+        "closeNumpad",
+        "closeTransferRequestDialog",
+        "compressImage",
+        "getGPSLocation",
+        "loadData",
+        "logDebug",
+        "navigateToAreaTab",
+        "onFileChange",
+        "onerror",
+        "onunhandledrejection",
+        "openIdInfoModal",
+        "openNumpad",
+        "openTransferRequestDialog",
+        "prefetchRanking",
+        "pressNum",
+        "safeInitApp",
+        "saveProfile",
+        "setLoadingProgress",
+        "setSyncStatus",
+        "startApp",
+        "switchPage",
+        "triggerUISyncRefresh",
+        "updateRecord",
+        "updateStats"
+      ],
       "assets": [
         "active/mobile/style.css"
       ],
@@ -271,9 +250,28 @@
     "field/render.js": {
       "type": "javascript",
       "sources": {
-        "asset_graph": true
+        "asset_graph": true,
+        "call_graph": true,
+        "execution_graph": true
       },
-      "functions": [],
+      "functions": [
+        "closeDetailModal",
+        "formatCompletedAt",
+        "getCityName",
+        "getCleanAddress",
+        "map",
+        "navigateToSiblingArea",
+        "openDetail",
+        "openPointDetailModal",
+        "renderAreas",
+        "renderDetailList",
+        "renderDetailModalContent",
+        "renderRanking",
+        "renderSettings",
+        "selectCity",
+        "syncBadge",
+        "toggleDone"
+      ],
       "assets": [
         "active/mobile/style.css"
       ],
@@ -299,6 +297,7 @@
         "execution_graph": true
       },
       "functions": [
+        "$",
         "_executeCommand",
         "addLog",
         "closeModal",
@@ -314,16 +313,20 @@
         "loadTransferRequests",
         "openAreaDetail",
         "openLineChat",
+        "removePressed",
         "resolveRequest",
         "restoreDashboardCache",
         "runCommand",
         "saveDashboardCache",
         "sendDispatchMessage",
+        "sendLineContact",
         "setApiStatus",
         "showModal",
         "showPendingPageModal",
         "startAdmin",
+        "submitFlyerStock",
         "switchAdminTab",
+        "toggleNavTier",
         "tryRegisterAdmin"
       ],
       "assets": [],
@@ -347,7 +350,8 @@
         "execution_graph": true
       },
       "functions": [
-        "isHtmlRequest"
+        "isHtmlRequest",
+        "then"
       ],
       "assets": [],
       "html": []
@@ -359,7 +363,9 @@
         "execution_graph": true
       },
       "functions": [
-        "_apiLog"
+        "_apiLog",
+        "callApi",
+        "callApiPost"
       ],
       "assets": [],
       "html": []

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CIE Platform Report</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #1C1C1E;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --accent-blue: #2563eb;
+            --accent-green: #22c55e;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .card {
+            border-radius: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        h1, h2 {
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        h1 { font-size: 2rem; color: var(--accent-blue); }
+        h2 { font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        td { color: var(--text-secondary); }
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .score { font-size: 2rem; font-weight: 800; color: var(--accent-blue); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>CIE Platform Report</h1>
+            <p style="color: var(--text-muted)">Export ID: export:0001 / Generated At: 2026-06-27T07:43:55.101063Z</p>
+        </div>
+
+        <div class="card">
+            <h2>Overall Health</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted)">REPOSITORY HEALTH SCORE</div>
+                    <div class="score">85.2 <span style="font-size: 1rem; color: var(--text-muted)">/ 100</span></div>
+                </div>
+                <div>
+                    <span class="badge">GRADE: B 🔵</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Repository Summary</h2>
+            <table>
+                <thead>
+                    <tr><th>Metric</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Functions</td><td>105</td></tr>
+                    <tr><td>Routes</td><td>5</td></tr>
+                    <tr><td>Assets</td><td>5</td></tr>
+                    <tr><td>HTML Files</td><td>17</td></tr>
+                    <tr><td>JS Files</td><td>0</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Semantic Summary</h2>
+            <p>Unknown Ratio: <strong>52.4%</strong></p>
+            <table>
+                <thead>
+                    <tr><th>Category</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Initialization</td><td>4</td></tr><tr><td>Navigation</td><td>5</td></tr><tr><td>Rendering</td><td>8</td></tr><tr><td>Storage</td><td>16</td></tr><tr><td>Authentication</td><td>0</td></tr><tr><td>Synchronization</td><td>11</td></tr><tr><td>Configuration</td><td>0</td></tr><tr><td>Utility</td><td>6</td></tr><tr><td>Unknown</td><td>55</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Static Analysis</h2>
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Unused Functions</td><td>43</td></tr>
+                    <tr><td>High Impact Functions</td><td>10</td></tr>
+                    <tr><td>Hub Functions</td><td>4</td></tr>
+                    <tr><td>Orphan Routes</td><td>0</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Execution Pipeline</h2>
+            <p>Pipeline Integrity: <strong>PASS</strong></p>
+            <table>
+                <thead>
+                    <tr><th>Phase</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Candidates</td><td>112</td></tr>
+                    <tr><td>Plans</td><td>112</td></tr>
+                    <tr><td>Execution</td><td>112</td></tr>
+                    <tr><td>Patches</td><td>112</td></tr>
+                    <tr><td>Apply</td><td>112</td></tr>
+                    <tr><td>Rollback</td><td>112</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

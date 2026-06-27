@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T22:20:09.713201Z",
+    "generated_at": "2026-06-27T07:14:41.520704Z",
     "scanner": "refactor_candidate_builder"
   },
   "candidates": [
@@ -46,6 +46,19 @@
     },
     {
       "id": "candidate:0004",
+      "target": "func:applyOptimisticCheck",
+      "candidate_type": "remove_candidate",
+      "source_analysis": "analysis:unused:applyOptimisticCheck",
+      "priority": "medium",
+      "confidence": 1.0,
+      "status": "pending",
+      "recommendation": "manual_review",
+      "execution_mode": "manual",
+      "blocking": false,
+      "rationale": "No incoming references detected."
+    },
+    {
+      "id": "candidate:0005",
       "target": "func:backToCityList",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:backToCityList",
@@ -58,7 +71,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0005",
+      "id": "candidate:0006",
       "target": "func:backToTier1",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:backToTier1",
@@ -71,7 +84,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0006",
+      "id": "candidate:0007",
       "target": "func:closeDetailModal",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:closeDetailModal",
@@ -84,7 +97,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0007",
+      "id": "candidate:0008",
       "target": "func:closeIdInfoModal",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:closeIdInfoModal",
@@ -97,7 +110,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0008",
+      "id": "candidate:0009",
       "target": "func:closeModal",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:closeModal",
@@ -110,7 +123,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0009",
+      "id": "candidate:0010",
       "target": "func:closeTransferRequestDialog",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:closeTransferRequestDialog",
@@ -123,7 +136,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0010",
+      "id": "candidate:0011",
       "target": "func:contactHolder",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:contactHolder",
@@ -136,7 +149,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0011",
+      "id": "candidate:0012",
       "target": "func:dispatchLineRequest",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:dispatchLineRequest",
@@ -149,7 +162,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0012",
+      "id": "candidate:0013",
       "target": "func:extractDistrictAddresses",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:extractDistrictAddresses",
@@ -162,7 +175,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0013",
+      "id": "candidate:0014",
       "target": "func:formatCompletedAt",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:formatCompletedAt",
@@ -175,7 +188,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0014",
+      "id": "candidate:0015",
       "target": "func:getQueueStats",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:getQueueStats",
@@ -188,7 +201,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0015",
+      "id": "candidate:0016",
       "target": "func:getRowStatus",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:getRowStatus",
@@ -201,7 +214,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0016",
+      "id": "candidate:0017",
       "target": "func:isHtmlRequest",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:isHtmlRequest",
@@ -214,7 +227,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0017",
+      "id": "candidate:0018",
       "target": "func:loadHeatmap",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:loadHeatmap",
@@ -227,7 +240,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0018",
+      "id": "candidate:0019",
       "target": "func:loadPrediction",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:loadPrediction",
@@ -240,7 +253,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0019",
+      "id": "candidate:0020",
       "target": "func:loadStrategy",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:loadStrategy",
@@ -253,7 +266,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0020",
+      "id": "candidate:0021",
       "target": "func:onunhandledrejection",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:onunhandledrejection",
@@ -266,7 +279,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0021",
+      "id": "candidate:0022",
       "target": "func:openAreaDetail",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:openAreaDetail",
@@ -279,7 +292,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0022",
+      "id": "candidate:0023",
       "target": "func:openIdInfoModal",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:openIdInfoModal",
@@ -292,7 +305,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0023",
+      "id": "candidate:0024",
       "target": "func:openLineChat",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:openLineChat",
@@ -305,7 +318,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0024",
+      "id": "candidate:0025",
       "target": "func:openPointDetailModal",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:openPointDetailModal",
@@ -318,7 +331,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0025",
+      "id": "candidate:0026",
       "target": "func:openTransferRequestDialog",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:openTransferRequestDialog",
@@ -331,7 +344,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0026",
+      "id": "candidate:0027",
       "target": "func:pressNum",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:pressNum",
@@ -344,7 +357,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0027",
+      "id": "candidate:0028",
       "target": "func:removePressed",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:removePressed",
@@ -357,7 +370,20 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0028",
+      "id": "candidate:0029",
+      "target": "func:renderStorageList",
+      "candidate_type": "remove_candidate",
+      "source_analysis": "analysis:unused:renderStorageList",
+      "priority": "medium",
+      "confidence": 1.0,
+      "status": "pending",
+      "recommendation": "manual_review",
+      "execution_mode": "manual",
+      "blocking": false,
+      "rationale": "No incoming references detected."
+    },
+    {
+      "id": "candidate:0030",
       "target": "func:resolveRequest",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:resolveRequest",
@@ -370,7 +396,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0029",
+      "id": "candidate:0031",
       "target": "func:runCommand",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:runCommand",
@@ -383,7 +409,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0030",
+      "id": "candidate:0032",
       "target": "func:safeInitApp",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:safeInitApp",
@@ -396,7 +422,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0031",
+      "id": "candidate:0033",
       "target": "func:saveProfile",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:saveProfile",
@@ -409,7 +435,20 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0032",
+      "id": "candidate:0034",
+      "target": "func:saveToOfflineQueue",
+      "candidate_type": "remove_candidate",
+      "source_analysis": "analysis:unused:saveToOfflineQueue",
+      "priority": "medium",
+      "confidence": 1.0,
+      "status": "pending",
+      "recommendation": "manual_review",
+      "execution_mode": "manual",
+      "blocking": false,
+      "rationale": "No incoming references detected."
+    },
+    {
+      "id": "candidate:0035",
       "target": "func:selectCity",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:selectCity",
@@ -422,7 +461,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0033",
+      "id": "candidate:0036",
       "target": "func:sendDispatchMessage",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:sendDispatchMessage",
@@ -435,7 +474,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0034",
+      "id": "candidate:0037",
       "target": "func:simulateBatch",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:simulateBatch",
@@ -448,7 +487,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0035",
+      "id": "candidate:0038",
       "target": "func:startAdmin",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:startAdmin",
@@ -461,7 +500,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0036",
+      "id": "candidate:0039",
       "target": "func:submitFlyerStock",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:submitFlyerStock",
@@ -474,7 +513,20 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0037",
+      "id": "candidate:0040",
+      "target": "func:syncOfflineQueue",
+      "candidate_type": "remove_candidate",
+      "source_analysis": "analysis:unused:syncOfflineQueue",
+      "priority": "medium",
+      "confidence": 1.0,
+      "status": "pending",
+      "recommendation": "manual_review",
+      "execution_mode": "manual",
+      "blocking": false,
+      "rationale": "No incoming references detected."
+    },
+    {
+      "id": "candidate:0041",
       "target": "func:toggleDone",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:toggleDone",
@@ -487,7 +539,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0038",
+      "id": "candidate:0042",
       "target": "func:tryRegisterAdmin",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:tryRegisterAdmin",
@@ -500,7 +552,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0039",
+      "id": "candidate:0043",
       "target": "func:updateQueueStatus",
       "candidate_type": "remove_candidate",
       "source_analysis": "analysis:unused:updateQueueStatus",
@@ -513,7 +565,7 @@
       "rationale": "No incoming references detected."
     },
     {
-      "id": "candidate:0040",
+      "id": "candidate:0044",
       "target": "func:addLog",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:addLog",
@@ -526,7 +578,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0041",
+      "id": "candidate:0045",
       "target": "func:callApi",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:callApi",
@@ -539,7 +591,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0042",
+      "id": "candidate:0046",
       "target": "func:callApiPost",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:callApiPost",
@@ -552,7 +604,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0043",
+      "id": "candidate:0047",
       "target": "func:logDebug",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:logDebug",
@@ -565,7 +617,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0044",
+      "id": "candidate:0048",
       "target": "func:map",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:map",
@@ -578,7 +630,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0045",
+      "id": "candidate:0049",
       "target": "func:onerror",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:onerror",
@@ -591,7 +643,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0046",
+      "id": "candidate:0050",
       "target": "func:renderDetailList",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:renderDetailList",
@@ -604,7 +656,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0047",
+      "id": "candidate:0051",
       "target": "func:renderDetailModalContent",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:renderDetailModalContent",
@@ -617,7 +669,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0048",
+      "id": "candidate:0052",
       "target": "func:showModal",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:showModal",
@@ -630,7 +682,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0049",
+      "id": "candidate:0053",
       "target": "func:switchPage",
       "candidate_type": "review_candidate",
       "source_analysis": "analysis:high_impact:switchPage",
@@ -643,7 +695,7 @@
       "rationale": "High incoming reference count (>= 5) detected."
     },
     {
-      "id": "candidate:0050",
+      "id": "candidate:0054",
       "target": "func:callApi",
       "candidate_type": "split_candidate",
       "source_analysis": "analysis:hub:callApi",
@@ -656,7 +708,7 @@
       "rationale": "High data flow interaction count (incoming + outgoing >= 10) detected."
     },
     {
-      "id": "candidate:0051",
+      "id": "candidate:0055",
       "target": "func:loadData",
       "candidate_type": "split_candidate",
       "source_analysis": "analysis:hub:loadData",
@@ -669,7 +721,7 @@
       "rationale": "High data flow interaction count (incoming + outgoing >= 10) detected."
     },
     {
-      "id": "candidate:0052",
+      "id": "candidate:0056",
       "target": "func:map",
       "candidate_type": "split_candidate",
       "source_analysis": "analysis:hub:map",
@@ -682,7 +734,7 @@
       "rationale": "High data flow interaction count (incoming + outgoing >= 10) detected."
     },
     {
-      "id": "candidate:0053",
+      "id": "candidate:0057",
       "target": "func:processQueue",
       "candidate_type": "split_candidate",
       "source_analysis": "analysis:hub:processQueue",
@@ -695,20 +747,7 @@
       "rationale": "High data flow interaction count (incoming + outgoing >= 10) detected."
     },
     {
-      "id": "candidate:0054",
-      "target": "func:switchPage",
-      "candidate_type": "split_candidate",
-      "source_analysis": "analysis:hub:switchPage",
-      "priority": "high",
-      "confidence": 1.0,
-      "status": "pending",
-      "recommendation": "manual_review",
-      "execution_mode": "manual",
-      "blocking": false,
-      "rationale": "High data flow interaction count (incoming + outgoing >= 10) detected."
-    },
-    {
-      "id": "candidate:0055",
+      "id": "candidate:0058",
       "target": "func:$",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:$",
@@ -721,7 +760,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0056",
+      "id": "candidate:0059",
       "target": "func:_executeCommand",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:_executeCommand",
@@ -734,7 +773,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0057",
+      "id": "candidate:0060",
       "target": "func:addPhotoToDetail",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:addPhotoToDetail",
@@ -747,7 +786,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0058",
+      "id": "candidate:0061",
       "target": "func:applyOptimisticCheck",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:applyOptimisticCheck",
@@ -760,7 +799,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0059",
+      "id": "candidate:0062",
       "target": "func:backToCityList",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:backToCityList",
@@ -773,7 +812,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0060",
+      "id": "candidate:0063",
       "target": "func:backToTier1",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:backToTier1",
@@ -786,7 +825,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0061",
+      "id": "candidate:0064",
       "target": "func:blobToBase64",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:blobToBase64",
@@ -799,7 +838,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0062",
+      "id": "candidate:0065",
       "target": "func:callApi",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:callApi",
@@ -812,7 +851,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0063",
+      "id": "candidate:0066",
       "target": "func:callApiPost",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:callApiPost",
@@ -825,7 +864,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0064",
+      "id": "candidate:0067",
       "target": "func:capturePhoto",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:capturePhoto",
@@ -838,7 +877,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0065",
+      "id": "candidate:0068",
       "target": "func:cleanNameInput",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:cleanNameInput",
@@ -851,7 +890,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0066",
+      "id": "candidate:0069",
       "target": "func:closeDetailModal",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:closeDetailModal",
@@ -864,7 +903,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0067",
+      "id": "candidate:0070",
       "target": "func:closeIdInfoModal",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:closeIdInfoModal",
@@ -877,7 +916,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0068",
+      "id": "candidate:0071",
       "target": "func:closeModal",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:closeModal",
@@ -890,7 +929,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0069",
+      "id": "candidate:0072",
       "target": "func:closeNumpad",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:closeNumpad",
@@ -903,7 +942,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0070",
+      "id": "candidate:0073",
       "target": "func:compressImage",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:compressImage",
@@ -916,7 +955,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0071",
+      "id": "candidate:0074",
       "target": "func:contactHolder",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:contactHolder",
@@ -929,7 +968,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0072",
+      "id": "candidate:0075",
       "target": "func:dispatchLineRequest",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:dispatchLineRequest",
@@ -942,7 +981,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0073",
+      "id": "candidate:0076",
       "target": "func:extractCityName",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:extractCityName",
@@ -955,7 +994,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0074",
+      "id": "candidate:0077",
       "target": "func:extractDistrictAddresses",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:extractDistrictAddresses",
@@ -968,7 +1007,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0075",
+      "id": "candidate:0078",
       "target": "func:getCityName",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:getCityName",
@@ -981,7 +1020,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0076",
+      "id": "candidate:0079",
       "target": "func:getCleanAddress",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:getCleanAddress",
@@ -994,7 +1033,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0077",
+      "id": "candidate:0080",
       "target": "func:getGPSLocation",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:getGPSLocation",
@@ -1007,7 +1046,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0078",
+      "id": "candidate:0081",
       "target": "func:getRowStatus",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:getRowStatus",
@@ -1020,7 +1059,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0079",
+      "id": "candidate:0082",
       "target": "func:isHtmlRequest",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:isHtmlRequest",
@@ -1033,7 +1072,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0080",
+      "id": "candidate:0083",
       "target": "func:map",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:map",
@@ -1046,7 +1085,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0081",
+      "id": "candidate:0084",
       "target": "func:onFileChange",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:onFileChange",
@@ -1059,7 +1098,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0082",
+      "id": "candidate:0085",
       "target": "func:onerror",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:onerror",
@@ -1072,7 +1111,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0083",
+      "id": "candidate:0086",
       "target": "func:onunhandledrejection",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:onunhandledrejection",
@@ -1085,7 +1124,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0084",
+      "id": "candidate:0087",
       "target": "func:openAreaDetail",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:openAreaDetail",
@@ -1098,7 +1137,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0085",
+      "id": "candidate:0088",
       "target": "func:openDetail",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:openDetail",
@@ -1111,7 +1150,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0086",
+      "id": "candidate:0089",
       "target": "func:openIdInfoModal",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:openIdInfoModal",
@@ -1124,7 +1163,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0087",
+      "id": "candidate:0090",
       "target": "func:openLineChat",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:openLineChat",
@@ -1137,7 +1176,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0088",
+      "id": "candidate:0091",
       "target": "func:openNumpad",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:openNumpad",
@@ -1150,7 +1189,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0089",
+      "id": "candidate:0092",
       "target": "func:openPointDetailModal",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:openPointDetailModal",
@@ -1163,7 +1202,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0090",
+      "id": "candidate:0093",
       "target": "func:prefetchRanking",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:prefetchRanking",
@@ -1176,7 +1215,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0091",
+      "id": "candidate:0094",
       "target": "func:pressNum",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:pressNum",
@@ -1189,7 +1228,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0092",
+      "id": "candidate:0095",
       "target": "func:removePressed",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:removePressed",
@@ -1202,7 +1241,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0093",
+      "id": "candidate:0096",
       "target": "func:resolveRequest",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:resolveRequest",
@@ -1215,7 +1254,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0094",
+      "id": "candidate:0097",
       "target": "func:runCommand",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:runCommand",
@@ -1228,7 +1267,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0095",
+      "id": "candidate:0098",
       "target": "func:scheduleRetry",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:scheduleRetry",
@@ -1241,7 +1280,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0096",
+      "id": "candidate:0099",
       "target": "func:selectCity",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:selectCity",
@@ -1254,7 +1293,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0097",
+      "id": "candidate:0100",
       "target": "func:sendDispatchMessage",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:sendDispatchMessage",
@@ -1267,7 +1306,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0098",
+      "id": "candidate:0101",
       "target": "func:sendLineContact",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:sendLineContact",
@@ -1280,7 +1319,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0099",
+      "id": "candidate:0102",
       "target": "func:setApiStatus",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:setApiStatus",
@@ -1293,7 +1332,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0100",
+      "id": "candidate:0103",
       "target": "func:showModal",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:showModal",
@@ -1306,7 +1345,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0101",
+      "id": "candidate:0104",
       "target": "func:simulateBatch",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:simulateBatch",
@@ -1319,7 +1358,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0102",
+      "id": "candidate:0105",
       "target": "func:submitFlyerStock",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:submitFlyerStock",
@@ -1332,7 +1371,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0103",
+      "id": "candidate:0106",
       "target": "func:then",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:then",
@@ -1345,7 +1384,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0104",
+      "id": "candidate:0107",
       "target": "func:toFullWidthKana",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:toFullWidthKana",
@@ -1358,7 +1397,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0105",
+      "id": "candidate:0108",
       "target": "func:toggleDone",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:toggleDone",
@@ -1371,7 +1410,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0106",
+      "id": "candidate:0109",
       "target": "func:toggleNavTier",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:toggleNavTier",
@@ -1384,7 +1423,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0107",
+      "id": "candidate:0110",
       "target": "func:tryRegisterAdmin",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:tryRegisterAdmin",
@@ -1397,7 +1436,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0108",
+      "id": "candidate:0111",
       "target": "func:updateRecord",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:updateRecord",
@@ -1410,7 +1449,7 @@
       "rationale": "Semantic category is Unknown."
     },
     {
-      "id": "candidate:0109",
+      "id": "candidate:0112",
       "target": "func:updateStats",
       "candidate_type": "naming_candidate",
       "source_analysis": "semantic_layer:updateStats",

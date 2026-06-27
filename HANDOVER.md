@@ -2,28 +2,62 @@
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-27 CIE Phase 1〜13の構築を完了（JSONデータ、ビルダー、AGENTSルール等）  
-> **次回のテーマ**: 🧠 Code Intelligence Engine - Phase 14 (Rollback Engine Foundation) の実装  
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-27 CIE Phase 1〜15 (Rollback / Orchestrator Foundation) の構築を完了し、CIE基盤全体の統合を達成 ✅  
+> **次回のテーマ**: 🧠 Code Intelligence Engine Platform の構築（CIE CLI、ダッシュボード、GitHub Actions 統合など）
 
 ---
 
-## 🚀 次回タスク：Code Intelligence Engine - Phase 14 (Rollback Engine Foundation)
+## 🚀 Next Development Stage: Code Intelligence Engine Platform (Platform Phase)
 
-### 背景と目的
-CIE (Code Intelligence Engine) の各基盤モジュールが構築され、変更計画（Transformation）、実行シミュレーション（Execution）、パッチ記述（Patch）、および適用シミュレーション（Apply）のパイプラインが完成しました。
-次回は、適用されたパッチを安全に元の状態に差し戻すためのロールバックシミュレーションを行う **CIE Phase 14 (Rollback Engine Foundation)** を実装します。
-今回と同様、実際のファイル書き換えやコード編集は行わず、ロールバック可能順序の判定や一貫性検証を行い、シミュレーションされたロールバックタスク（Rollback Plan）を構造化データとして生成することのみを目的とします。
+### Platform Roadmap
+* **Phase 16**: CLI Foundation
+* **Phase 17**: Dashboard Foundation
+* **Phase 18**: GitHub Actions Foundation
+* **Phase 19**: AI Assistant Foundation
+* **Phase 20**: CIE Platform v1.0
 
-### 設計方針 (想定仕様)
-1. **静的解析ツール**: `tools/rollback_engine_builder.py` の新規作成。
-2. **データ入力**: `tools/patch_plan.json`, `tools/patch_apply_plan.json` を主なインプットとし、リポジトリの再解析は禁止。
-3. **データ出力**: `tools/patch_rollback_plan.json`
-4. **仕様要素**:
-   - 状態: `simulated` 固定
-   - モード: `simulation` 固定
-   - ロールバック検証結果: `validation_summary` (`dependency: passed`, `trace: passed`, `approval: passed` など)
-   - 採番: `rollback:0001` から欠番なしの連番
-   - 順序: パッチ適用順の「逆順」または依存関係を考慮した安全な順序
+### Platform Development Policy
+* **No new Builder should be added unless absolutely necessary.**
+* Future development should focus on:
+  - **CLI** (Developer Experience & CI/CD command tool)
+  - **Dashboard** (Repository Health Score & Visualizations)
+  - **GitHub Actions** (CI/CD integration & Automated code scanning)
+  - **AI Assistant** (Autonomous Agentic Refactoring interface)
+  - **Developer Experience** (Enhancing diagnostic loops and developer velocity)
+
+---
+
+## 💎 Milestone
+
+- **Tag**: `v2.2.0-alpha.0`
+- **Title**: `Code Intelligence Engine Foundation Complete`
+- **Status**:
+  - `Foundation Completed`
+  - `Platform Phase Started`
+
+---
+
+## 🛡️ Foundation Complete
+CIE (Code Intelligence Engine) の基盤（Foundation）構築シリーズはすべて完了し、Orchestrator による一括統制が確立されました。
+
+### Completed Components
+- [x] **Asset Version Manager**: 静的アセットキャッシュバスターおよび Service Worker 同期自動化
+- [x] **Asset Dependency Scanner**: HTML/SWとアセットの依存関係スキャナー (`asset_graph.json`)
+- [x] **Execution Graph**: JavaScript関数定義・呼び出し構造静的スキャナー (`execution_graph.json`)
+- [x] **Call Graph**: 逆方向関数呼び出し（Caller Index）解析器 (`call_graph_index.json`)
+- [x] **Repository Index**: ファイル別関数・アセットリポジトリ索引 (`repository_index.json`)
+- [x] **Knowledge Graph**: 各種スキャンデータを統合したセマンティックネットワーク (`knowledge_graph.json`)
+- [x] **Semantic Layer**: 関数の機能的・意味的属性分類 (`semantic_layer.json`)
+- [x] **Route Graph**: 画面遷移関係（Navigation系関数）の抽出・グラフ化 (`route_graph.json`)
+- [x] **Data Flow**: 関数間データ伝播・依存フロー抽出器 (`data_flow.json`)
+- [x] **Static Analysis**: 未使用・孤立・高影響・ハブ関数の静的抽出器 (`static_analysis.json`)
+- [x] **Refactor Candidate**: 静的解析結果に基づく改善候補マッピング (`refactor_candidates.json`)
+- [x] **Transformation Engine**: リファクタリング候補から具体的なコード変更計画の生成 (`transformation_plan.json`)
+- [x] **Execution Engine**: 変更計画の実行順序・ブロック競合解決シミュレーター (`execution_plan.json`)
+- [x] **Patch Generator**: 実行計画をプログラム化されたパッチデータへ変換 (`patch_plan.json`)
+- [x] **Patch Apply Engine**: パッチの適用シミュレーション・一貫性チェック (`patch_apply_plan.json`)
+- [x] **Rollback Engine**: 適用パッチを安全な逆順で差し戻すシミュレーター (`patch_rollback_plan.json`)
+- [x] **CIE Orchestrator**: 全15ビルダーの順次実行・エラー制御およびサマリー出力 (`cie_orchestrator.py`)
 
 ---
 
@@ -118,6 +152,15 @@ CIE (Code Intelligence Engine) の各基盤モジュールが構築され、変�
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-27 セッション】CIE Phase 14 & 15 (Rollback / Orchestrator) 構築（担当: Antigravity）
+- **目的**: パッチ適用の逆順シミュレーションを行うロールバックエンジンを構築し、全15ビルダーを依存関係順に一括実行するオーケストレータを実装してCIE基盤（Foundation）を完結させる。
+- **実装内容**:
+  - **Phase 14: Rollback Engine**: [rollback_engine_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/rollback_engine_builder.py) の作成。適用順の逆順でロールバックタスクをマッピングした [patch_rollback_plan.json](file:///Volumes/SSD_DATA/posting-map-system/tools/patch_rollback_plan.json) を生成。CandidateからRollbackまでを一貫追跡する `lifecycle` を導入。
+  - **Phase 15: CIE Orchestrator**: [cie_orchestrator.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie_orchestrator.py) の作成。全15ビルダーの定数マニフェスト、`--from` オプション、`--dry-run` オプション、エラー時の中断、実行時間を含むサマリー表示を実装。
+  - **AGENTS.md の更新**: 各ルールの明文化および追加。
+- **検証テスト**: すべてのテスト（Coverage, Reverse Order, Lifecycle, Order, Dry Run, Summary 等）をクリア。
+- **変更ファイル**: [rollback_engine_builder.py](file:///Volumes/SSD_DATA/posting-map-system/tools/rollback_engine_builder.py), [cie_orchestrator.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie_orchestrator.py), [AGENTS.md](file:///Volumes/SSD_DATA/posting-map-system/AGENTS.md)
 
 ### 【2026-06-26/27 セッション】CIE (Code Intelligence Engine) 基盤構築（Phase 6 〜 Phase 13）（担当: Antigravity）
 - **目的**: リポジトリ全体の静的関係、遷移図、データフロー、およびAI自動リファクタリング計画までのパイプラインを定義・インデックス化する。

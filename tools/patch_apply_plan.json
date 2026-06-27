@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T22:34:52.386154Z",
+    "generated_at": "2026-06-27T07:14:41.618422Z",
     "scanner": "patch_apply_engine_builder"
   },
   "apply_tasks": [
@@ -34,8 +34,8 @@
     },
     {
       "id": "apply:0002",
-      "patch": "patch:0055",
-      "execution": "exec:0055",
+      "patch": "patch:0058",
+      "execution": "exec:0058",
       "target": "func:$",
       "apply_version": 1,
       "status": "simulated",
@@ -46,11 +46,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0055",
+      "source_patch": "patch:0058",
       "trace": {
-        "candidate": "candidate:0055",
-        "plan": "plan:0055",
-        "execution": "exec:0055"
+        "candidate": "candidate:0058",
+        "plan": "plan:0058",
+        "execution": "exec:0058"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -88,8 +88,8 @@
     },
     {
       "id": "apply:0004",
-      "patch": "patch:0056",
-      "execution": "exec:0056",
+      "patch": "patch:0059",
+      "execution": "exec:0059",
       "target": "func:_executeCommand",
       "apply_version": 1,
       "status": "simulated",
@@ -100,11 +100,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0056",
+      "source_patch": "patch:0059",
       "trace": {
-        "candidate": "candidate:0056",
-        "plan": "plan:0056",
-        "execution": "exec:0056"
+        "candidate": "candidate:0059",
+        "plan": "plan:0059",
+        "execution": "exec:0059"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -115,8 +115,8 @@
     },
     {
       "id": "apply:0005",
-      "patch": "patch:0040",
-      "execution": "exec:0040",
+      "patch": "patch:0044",
+      "execution": "exec:0044",
       "target": "func:addLog",
       "apply_version": 1,
       "status": "simulated",
@@ -127,11 +127,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0040",
+      "source_patch": "patch:0044",
       "trace": {
-        "candidate": "candidate:0040",
-        "plan": "plan:0040",
-        "execution": "exec:0040"
+        "candidate": "candidate:0044",
+        "plan": "plan:0044",
+        "execution": "exec:0044"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -169,144 +169,9 @@
     },
     {
       "id": "apply:0007",
-      "patch": "patch:0057",
-      "execution": "exec:0057",
-      "target": "func:addPhotoToDetail",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0057",
-      "trace": {
-        "candidate": "candidate:0057",
-        "plan": "plan:0057",
-        "execution": "exec:0057"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0008",
-      "patch": "patch:0058",
-      "execution": "exec:0058",
-      "target": "func:applyOptimisticCheck",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0058",
-      "trace": {
-        "candidate": "candidate:0058",
-        "plan": "plan:0058",
-        "execution": "exec:0058"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0009",
-      "patch": "patch:0004",
-      "execution": "exec:0004",
-      "target": "func:backToCityList",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0004",
-      "trace": {
-        "candidate": "candidate:0004",
-        "plan": "plan:0004",
-        "execution": "exec:0004"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0010",
-      "patch": "patch:0059",
-      "execution": "exec:0059",
-      "target": "func:backToCityList",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0059",
-      "trace": {
-        "candidate": "candidate:0059",
-        "plan": "plan:0059",
-        "execution": "exec:0059"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0011",
-      "patch": "patch:0005",
-      "execution": "exec:0005",
-      "target": "func:backToTier1",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0005",
-      "trace": {
-        "candidate": "candidate:0005",
-        "plan": "plan:0005",
-        "execution": "exec:0005"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0012",
       "patch": "patch:0060",
       "execution": "exec:0060",
-      "target": "func:backToTier1",
+      "target": "func:addPhotoToDetail",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -330,10 +195,37 @@
       }
     },
     {
-      "id": "apply:0013",
+      "id": "apply:0008",
+      "patch": "patch:0004",
+      "execution": "exec:0004",
+      "target": "func:applyOptimisticCheck",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0004",
+      "trace": {
+        "candidate": "candidate:0004",
+        "plan": "plan:0004",
+        "execution": "exec:0004"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0009",
       "patch": "patch:0061",
       "execution": "exec:0061",
-      "target": "func:blobToBase64",
+      "target": "func:applyOptimisticCheck",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -357,10 +249,10 @@
       }
     },
     {
-      "id": "apply:0014",
-      "patch": "patch:0041",
-      "execution": "exec:0041",
-      "target": "func:callApi",
+      "id": "apply:0010",
+      "patch": "patch:0005",
+      "execution": "exec:0005",
+      "target": "func:backToCityList",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -370,11 +262,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0041",
+      "source_patch": "patch:0005",
       "trace": {
-        "candidate": "candidate:0041",
-        "plan": "plan:0041",
-        "execution": "exec:0041"
+        "candidate": "candidate:0005",
+        "plan": "plan:0005",
+        "execution": "exec:0005"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -384,37 +276,10 @@
       }
     },
     {
-      "id": "apply:0015",
-      "patch": "patch:0050",
-      "execution": "exec:0050",
-      "target": "func:callApi",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0050",
-      "trace": {
-        "candidate": "candidate:0050",
-        "plan": "plan:0050",
-        "execution": "exec:0050"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0016",
+      "id": "apply:0011",
       "patch": "patch:0062",
       "execution": "exec:0062",
-      "target": "func:callApi",
+      "target": "func:backToCityList",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -438,118 +303,10 @@
       }
     },
     {
-      "id": "apply:0017",
-      "patch": "patch:0042",
-      "execution": "exec:0042",
-      "target": "func:callApiPost",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0042",
-      "trace": {
-        "candidate": "candidate:0042",
-        "plan": "plan:0042",
-        "execution": "exec:0042"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0018",
-      "patch": "patch:0063",
-      "execution": "exec:0063",
-      "target": "func:callApiPost",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0063",
-      "trace": {
-        "candidate": "candidate:0063",
-        "plan": "plan:0063",
-        "execution": "exec:0063"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0019",
-      "patch": "patch:0064",
-      "execution": "exec:0064",
-      "target": "func:capturePhoto",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0064",
-      "trace": {
-        "candidate": "candidate:0064",
-        "plan": "plan:0064",
-        "execution": "exec:0064"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0020",
-      "patch": "patch:0065",
-      "execution": "exec:0065",
-      "target": "func:cleanNameInput",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0065",
-      "trace": {
-        "candidate": "candidate:0065",
-        "plan": "plan:0065",
-        "execution": "exec:0065"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0021",
+      "id": "apply:0012",
       "patch": "patch:0006",
       "execution": "exec:0006",
-      "target": "func:closeDetailModal",
+      "target": "func:backToTier1",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -573,10 +330,172 @@
       }
     },
     {
-      "id": "apply:0022",
+      "id": "apply:0013",
+      "patch": "patch:0063",
+      "execution": "exec:0063",
+      "target": "func:backToTier1",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0063",
+      "trace": {
+        "candidate": "candidate:0063",
+        "plan": "plan:0063",
+        "execution": "exec:0063"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0014",
+      "patch": "patch:0064",
+      "execution": "exec:0064",
+      "target": "func:blobToBase64",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0064",
+      "trace": {
+        "candidate": "candidate:0064",
+        "plan": "plan:0064",
+        "execution": "exec:0064"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0015",
+      "patch": "patch:0045",
+      "execution": "exec:0045",
+      "target": "func:callApi",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0045",
+      "trace": {
+        "candidate": "candidate:0045",
+        "plan": "plan:0045",
+        "execution": "exec:0045"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0016",
+      "patch": "patch:0054",
+      "execution": "exec:0054",
+      "target": "func:callApi",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0054",
+      "trace": {
+        "candidate": "candidate:0054",
+        "plan": "plan:0054",
+        "execution": "exec:0054"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0017",
+      "patch": "patch:0065",
+      "execution": "exec:0065",
+      "target": "func:callApi",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0065",
+      "trace": {
+        "candidate": "candidate:0065",
+        "plan": "plan:0065",
+        "execution": "exec:0065"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0018",
+      "patch": "patch:0046",
+      "execution": "exec:0046",
+      "target": "func:callApiPost",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0046",
+      "trace": {
+        "candidate": "candidate:0046",
+        "plan": "plan:0046",
+        "execution": "exec:0046"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0019",
       "patch": "patch:0066",
       "execution": "exec:0066",
-      "target": "func:closeDetailModal",
+      "target": "func:callApiPost",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -600,37 +519,10 @@
       }
     },
     {
-      "id": "apply:0023",
-      "patch": "patch:0007",
-      "execution": "exec:0007",
-      "target": "func:closeIdInfoModal",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0007",
-      "trace": {
-        "candidate": "candidate:0007",
-        "plan": "plan:0007",
-        "execution": "exec:0007"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0024",
+      "id": "apply:0020",
       "patch": "patch:0067",
       "execution": "exec:0067",
-      "target": "func:closeIdInfoModal",
+      "target": "func:capturePhoto",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -654,37 +546,10 @@
       }
     },
     {
-      "id": "apply:0025",
-      "patch": "patch:0008",
-      "execution": "exec:0008",
-      "target": "func:closeModal",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0008",
-      "trace": {
-        "candidate": "candidate:0008",
-        "plan": "plan:0008",
-        "execution": "exec:0008"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0026",
+      "id": "apply:0021",
       "patch": "patch:0068",
       "execution": "exec:0068",
-      "target": "func:closeModal",
+      "target": "func:cleanNameInput",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -708,10 +573,37 @@
       }
     },
     {
-      "id": "apply:0027",
+      "id": "apply:0022",
+      "patch": "patch:0007",
+      "execution": "exec:0007",
+      "target": "func:closeDetailModal",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0007",
+      "trace": {
+        "candidate": "candidate:0007",
+        "plan": "plan:0007",
+        "execution": "exec:0007"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0023",
       "patch": "patch:0069",
       "execution": "exec:0069",
-      "target": "func:closeNumpad",
+      "target": "func:closeDetailModal",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -735,10 +627,10 @@
       }
     },
     {
-      "id": "apply:0028",
-      "patch": "patch:0009",
-      "execution": "exec:0009",
-      "target": "func:closeTransferRequestDialog",
+      "id": "apply:0024",
+      "patch": "patch:0008",
+      "execution": "exec:0008",
+      "target": "func:closeIdInfoModal",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -748,11 +640,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0009",
+      "source_patch": "patch:0008",
       "trace": {
-        "candidate": "candidate:0009",
-        "plan": "plan:0009",
-        "execution": "exec:0009"
+        "candidate": "candidate:0008",
+        "plan": "plan:0008",
+        "execution": "exec:0008"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -762,10 +654,10 @@
       }
     },
     {
-      "id": "apply:0029",
+      "id": "apply:0025",
       "patch": "patch:0070",
       "execution": "exec:0070",
-      "target": "func:compressImage",
+      "target": "func:closeIdInfoModal",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -789,10 +681,10 @@
       }
     },
     {
-      "id": "apply:0030",
-      "patch": "patch:0010",
-      "execution": "exec:0010",
-      "target": "func:contactHolder",
+      "id": "apply:0026",
+      "patch": "patch:0009",
+      "execution": "exec:0009",
+      "target": "func:closeModal",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -802,11 +694,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0010",
+      "source_patch": "patch:0009",
       "trace": {
-        "candidate": "candidate:0010",
-        "plan": "plan:0010",
-        "execution": "exec:0010"
+        "candidate": "candidate:0009",
+        "plan": "plan:0009",
+        "execution": "exec:0009"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -816,10 +708,10 @@
       }
     },
     {
-      "id": "apply:0031",
+      "id": "apply:0027",
       "patch": "patch:0071",
       "execution": "exec:0071",
-      "target": "func:contactHolder",
+      "target": "func:closeModal",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -843,37 +735,10 @@
       }
     },
     {
-      "id": "apply:0032",
-      "patch": "patch:0011",
-      "execution": "exec:0011",
-      "target": "func:dispatchLineRequest",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0011",
-      "trace": {
-        "candidate": "candidate:0011",
-        "plan": "plan:0011",
-        "execution": "exec:0011"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0033",
+      "id": "apply:0028",
       "patch": "patch:0072",
       "execution": "exec:0072",
-      "target": "func:dispatchLineRequest",
+      "target": "func:closeNumpad",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -897,10 +762,37 @@
       }
     },
     {
-      "id": "apply:0034",
+      "id": "apply:0029",
+      "patch": "patch:0010",
+      "execution": "exec:0010",
+      "target": "func:closeTransferRequestDialog",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0010",
+      "trace": {
+        "candidate": "candidate:0010",
+        "plan": "plan:0010",
+        "execution": "exec:0010"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0030",
       "patch": "patch:0073",
       "execution": "exec:0073",
-      "target": "func:extractCityName",
+      "target": "func:compressImage",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -924,10 +816,10 @@
       }
     },
     {
-      "id": "apply:0035",
-      "patch": "patch:0012",
-      "execution": "exec:0012",
-      "target": "func:extractDistrictAddresses",
+      "id": "apply:0031",
+      "patch": "patch:0011",
+      "execution": "exec:0011",
+      "target": "func:contactHolder",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -937,11 +829,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0012",
+      "source_patch": "patch:0011",
       "trace": {
-        "candidate": "candidate:0012",
-        "plan": "plan:0012",
-        "execution": "exec:0012"
+        "candidate": "candidate:0011",
+        "plan": "plan:0011",
+        "execution": "exec:0011"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -951,10 +843,10 @@
       }
     },
     {
-      "id": "apply:0036",
+      "id": "apply:0032",
       "patch": "patch:0074",
       "execution": "exec:0074",
-      "target": "func:extractDistrictAddresses",
+      "target": "func:contactHolder",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -978,10 +870,10 @@
       }
     },
     {
-      "id": "apply:0037",
-      "patch": "patch:0013",
-      "execution": "exec:0013",
-      "target": "func:formatCompletedAt",
+      "id": "apply:0033",
+      "patch": "patch:0012",
+      "execution": "exec:0012",
+      "target": "func:dispatchLineRequest",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -991,11 +883,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0013",
+      "source_patch": "patch:0012",
       "trace": {
-        "candidate": "candidate:0013",
-        "plan": "plan:0013",
-        "execution": "exec:0013"
+        "candidate": "candidate:0012",
+        "plan": "plan:0012",
+        "execution": "exec:0012"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -1005,10 +897,10 @@
       }
     },
     {
-      "id": "apply:0038",
+      "id": "apply:0034",
       "patch": "patch:0075",
       "execution": "exec:0075",
-      "target": "func:getCityName",
+      "target": "func:dispatchLineRequest",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1032,10 +924,10 @@
       }
     },
     {
-      "id": "apply:0039",
+      "id": "apply:0035",
       "patch": "patch:0076",
       "execution": "exec:0076",
-      "target": "func:getCleanAddress",
+      "target": "func:extractCityName",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1059,10 +951,37 @@
       }
     },
     {
-      "id": "apply:0040",
+      "id": "apply:0036",
+      "patch": "patch:0013",
+      "execution": "exec:0013",
+      "target": "func:extractDistrictAddresses",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0013",
+      "trace": {
+        "candidate": "candidate:0013",
+        "plan": "plan:0013",
+        "execution": "exec:0013"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0037",
       "patch": "patch:0077",
       "execution": "exec:0077",
-      "target": "func:getGPSLocation",
+      "target": "func:extractDistrictAddresses",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1086,10 +1005,10 @@
       }
     },
     {
-      "id": "apply:0041",
+      "id": "apply:0038",
       "patch": "patch:0014",
       "execution": "exec:0014",
-      "target": "func:getQueueStats",
+      "target": "func:formatCompletedAt",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1113,10 +1032,91 @@
       }
     },
     {
+      "id": "apply:0039",
+      "patch": "patch:0078",
+      "execution": "exec:0078",
+      "target": "func:getCityName",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0078",
+      "trace": {
+        "candidate": "candidate:0078",
+        "plan": "plan:0078",
+        "execution": "exec:0078"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0040",
+      "patch": "patch:0079",
+      "execution": "exec:0079",
+      "target": "func:getCleanAddress",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0079",
+      "trace": {
+        "candidate": "candidate:0079",
+        "plan": "plan:0079",
+        "execution": "exec:0079"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0041",
+      "patch": "patch:0080",
+      "execution": "exec:0080",
+      "target": "func:getGPSLocation",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0080",
+      "trace": {
+        "candidate": "candidate:0080",
+        "plan": "plan:0080",
+        "execution": "exec:0080"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
       "id": "apply:0042",
       "patch": "patch:0015",
       "execution": "exec:0015",
-      "target": "func:getRowStatus",
+      "target": "func:getQueueStats",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1141,36 +1141,9 @@
     },
     {
       "id": "apply:0043",
-      "patch": "patch:0078",
-      "execution": "exec:0078",
-      "target": "func:getRowStatus",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0078",
-      "trace": {
-        "candidate": "candidate:0078",
-        "plan": "plan:0078",
-        "execution": "exec:0078"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0044",
       "patch": "patch:0016",
       "execution": "exec:0016",
-      "target": "func:isHtmlRequest",
+      "target": "func:getRowStatus",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1194,64 +1167,37 @@
       }
     },
     {
+      "id": "apply:0044",
+      "patch": "patch:0081",
+      "execution": "exec:0081",
+      "target": "func:getRowStatus",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0081",
+      "trace": {
+        "candidate": "candidate:0081",
+        "plan": "plan:0081",
+        "execution": "exec:0081"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
       "id": "apply:0045",
-      "patch": "patch:0079",
-      "execution": "exec:0079",
-      "target": "func:isHtmlRequest",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0079",
-      "trace": {
-        "candidate": "candidate:0079",
-        "plan": "plan:0079",
-        "execution": "exec:0079"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0046",
-      "patch": "patch:0051",
-      "execution": "exec:0051",
-      "target": "func:loadData",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0051",
-      "trace": {
-        "candidate": "candidate:0051",
-        "plan": "plan:0051",
-        "execution": "exec:0051"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0047",
       "patch": "patch:0017",
       "execution": "exec:0017",
-      "target": "func:loadHeatmap",
+      "target": "func:isHtmlRequest",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1275,10 +1221,64 @@
       }
     },
     {
+      "id": "apply:0046",
+      "patch": "patch:0082",
+      "execution": "exec:0082",
+      "target": "func:isHtmlRequest",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0082",
+      "trace": {
+        "candidate": "candidate:0082",
+        "plan": "plan:0082",
+        "execution": "exec:0082"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0047",
+      "patch": "patch:0055",
+      "execution": "exec:0055",
+      "target": "func:loadData",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0055",
+      "trace": {
+        "candidate": "candidate:0055",
+        "plan": "plan:0055",
+        "execution": "exec:0055"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
       "id": "apply:0048",
       "patch": "patch:0018",
       "execution": "exec:0018",
-      "target": "func:loadPrediction",
+      "target": "func:loadHeatmap",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1305,7 +1305,7 @@
       "id": "apply:0049",
       "patch": "patch:0019",
       "execution": "exec:0019",
-      "target": "func:loadStrategy",
+      "target": "func:loadPrediction",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1330,198 +1330,9 @@
     },
     {
       "id": "apply:0050",
-      "patch": "patch:0043",
-      "execution": "exec:0043",
-      "target": "func:logDebug",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0043",
-      "trace": {
-        "candidate": "candidate:0043",
-        "plan": "plan:0043",
-        "execution": "exec:0043"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0051",
-      "patch": "patch:0044",
-      "execution": "exec:0044",
-      "target": "func:map",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0044",
-      "trace": {
-        "candidate": "candidate:0044",
-        "plan": "plan:0044",
-        "execution": "exec:0044"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0052",
-      "patch": "patch:0052",
-      "execution": "exec:0052",
-      "target": "func:map",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0052",
-      "trace": {
-        "candidate": "candidate:0052",
-        "plan": "plan:0052",
-        "execution": "exec:0052"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0053",
-      "patch": "patch:0080",
-      "execution": "exec:0080",
-      "target": "func:map",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0080",
-      "trace": {
-        "candidate": "candidate:0080",
-        "plan": "plan:0080",
-        "execution": "exec:0080"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0054",
-      "patch": "patch:0081",
-      "execution": "exec:0081",
-      "target": "func:onFileChange",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0081",
-      "trace": {
-        "candidate": "candidate:0081",
-        "plan": "plan:0081",
-        "execution": "exec:0081"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0055",
-      "patch": "patch:0045",
-      "execution": "exec:0045",
-      "target": "func:onerror",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0045",
-      "trace": {
-        "candidate": "candidate:0045",
-        "plan": "plan:0045",
-        "execution": "exec:0045"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0056",
-      "patch": "patch:0082",
-      "execution": "exec:0082",
-      "target": "func:onerror",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0082",
-      "trace": {
-        "candidate": "candidate:0082",
-        "plan": "plan:0082",
-        "execution": "exec:0082"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0057",
       "patch": "patch:0020",
       "execution": "exec:0020",
-      "target": "func:onunhandledrejection",
+      "target": "func:loadStrategy",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -1545,523 +1356,10 @@
       }
     },
     {
-      "id": "apply:0058",
-      "patch": "patch:0083",
-      "execution": "exec:0083",
-      "target": "func:onunhandledrejection",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0083",
-      "trace": {
-        "candidate": "candidate:0083",
-        "plan": "plan:0083",
-        "execution": "exec:0083"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0059",
-      "patch": "patch:0021",
-      "execution": "exec:0021",
-      "target": "func:openAreaDetail",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0021",
-      "trace": {
-        "candidate": "candidate:0021",
-        "plan": "plan:0021",
-        "execution": "exec:0021"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0060",
-      "patch": "patch:0084",
-      "execution": "exec:0084",
-      "target": "func:openAreaDetail",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0084",
-      "trace": {
-        "candidate": "candidate:0084",
-        "plan": "plan:0084",
-        "execution": "exec:0084"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0061",
-      "patch": "patch:0085",
-      "execution": "exec:0085",
-      "target": "func:openDetail",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0085",
-      "trace": {
-        "candidate": "candidate:0085",
-        "plan": "plan:0085",
-        "execution": "exec:0085"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0062",
-      "patch": "patch:0022",
-      "execution": "exec:0022",
-      "target": "func:openIdInfoModal",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0022",
-      "trace": {
-        "candidate": "candidate:0022",
-        "plan": "plan:0022",
-        "execution": "exec:0022"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0063",
-      "patch": "patch:0086",
-      "execution": "exec:0086",
-      "target": "func:openIdInfoModal",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0086",
-      "trace": {
-        "candidate": "candidate:0086",
-        "plan": "plan:0086",
-        "execution": "exec:0086"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0064",
-      "patch": "patch:0023",
-      "execution": "exec:0023",
-      "target": "func:openLineChat",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0023",
-      "trace": {
-        "candidate": "candidate:0023",
-        "plan": "plan:0023",
-        "execution": "exec:0023"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0065",
-      "patch": "patch:0087",
-      "execution": "exec:0087",
-      "target": "func:openLineChat",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0087",
-      "trace": {
-        "candidate": "candidate:0087",
-        "plan": "plan:0087",
-        "execution": "exec:0087"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0066",
-      "patch": "patch:0088",
-      "execution": "exec:0088",
-      "target": "func:openNumpad",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0088",
-      "trace": {
-        "candidate": "candidate:0088",
-        "plan": "plan:0088",
-        "execution": "exec:0088"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0067",
-      "patch": "patch:0024",
-      "execution": "exec:0024",
-      "target": "func:openPointDetailModal",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0024",
-      "trace": {
-        "candidate": "candidate:0024",
-        "plan": "plan:0024",
-        "execution": "exec:0024"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0068",
-      "patch": "patch:0089",
-      "execution": "exec:0089",
-      "target": "func:openPointDetailModal",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0089",
-      "trace": {
-        "candidate": "candidate:0089",
-        "plan": "plan:0089",
-        "execution": "exec:0089"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0069",
-      "patch": "patch:0025",
-      "execution": "exec:0025",
-      "target": "func:openTransferRequestDialog",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0025",
-      "trace": {
-        "candidate": "candidate:0025",
-        "plan": "plan:0025",
-        "execution": "exec:0025"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0070",
-      "patch": "patch:0090",
-      "execution": "exec:0090",
-      "target": "func:prefetchRanking",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0090",
-      "trace": {
-        "candidate": "candidate:0090",
-        "plan": "plan:0090",
-        "execution": "exec:0090"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0071",
-      "patch": "patch:0026",
-      "execution": "exec:0026",
-      "target": "func:pressNum",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0026",
-      "trace": {
-        "candidate": "candidate:0026",
-        "plan": "plan:0026",
-        "execution": "exec:0026"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0072",
-      "patch": "patch:0091",
-      "execution": "exec:0091",
-      "target": "func:pressNum",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0091",
-      "trace": {
-        "candidate": "candidate:0091",
-        "plan": "plan:0091",
-        "execution": "exec:0091"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0073",
-      "patch": "patch:0053",
-      "execution": "exec:0053",
-      "target": "func:processQueue",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0053",
-      "trace": {
-        "candidate": "candidate:0053",
-        "plan": "plan:0053",
-        "execution": "exec:0053"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0074",
-      "patch": "patch:0027",
-      "execution": "exec:0027",
-      "target": "func:removePressed",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0027",
-      "trace": {
-        "candidate": "candidate:0027",
-        "plan": "plan:0027",
-        "execution": "exec:0027"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0075",
-      "patch": "patch:0092",
-      "execution": "exec:0092",
-      "target": "func:removePressed",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0092",
-      "trace": {
-        "candidate": "candidate:0092",
-        "plan": "plan:0092",
-        "execution": "exec:0092"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0076",
-      "patch": "patch:0046",
-      "execution": "exec:0046",
-      "target": "func:renderDetailList",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0046",
-      "trace": {
-        "candidate": "candidate:0046",
-        "plan": "plan:0046",
-        "execution": "exec:0046"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0077",
+      "id": "apply:0051",
       "patch": "patch:0047",
       "execution": "exec:0047",
-      "target": "func:renderDetailModalContent",
+      "target": "func:logDebug",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2085,361 +1383,10 @@
       }
     },
     {
-      "id": "apply:0078",
-      "patch": "patch:0028",
-      "execution": "exec:0028",
-      "target": "func:resolveRequest",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0028",
-      "trace": {
-        "candidate": "candidate:0028",
-        "plan": "plan:0028",
-        "execution": "exec:0028"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0079",
-      "patch": "patch:0093",
-      "execution": "exec:0093",
-      "target": "func:resolveRequest",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0093",
-      "trace": {
-        "candidate": "candidate:0093",
-        "plan": "plan:0093",
-        "execution": "exec:0093"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0080",
-      "patch": "patch:0029",
-      "execution": "exec:0029",
-      "target": "func:runCommand",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0029",
-      "trace": {
-        "candidate": "candidate:0029",
-        "plan": "plan:0029",
-        "execution": "exec:0029"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0081",
-      "patch": "patch:0094",
-      "execution": "exec:0094",
-      "target": "func:runCommand",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0094",
-      "trace": {
-        "candidate": "candidate:0094",
-        "plan": "plan:0094",
-        "execution": "exec:0094"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0082",
-      "patch": "patch:0030",
-      "execution": "exec:0030",
-      "target": "func:safeInitApp",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0030",
-      "trace": {
-        "candidate": "candidate:0030",
-        "plan": "plan:0030",
-        "execution": "exec:0030"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0083",
-      "patch": "patch:0031",
-      "execution": "exec:0031",
-      "target": "func:saveProfile",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0031",
-      "trace": {
-        "candidate": "candidate:0031",
-        "plan": "plan:0031",
-        "execution": "exec:0031"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0084",
-      "patch": "patch:0095",
-      "execution": "exec:0095",
-      "target": "func:scheduleRetry",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0095",
-      "trace": {
-        "candidate": "candidate:0095",
-        "plan": "plan:0095",
-        "execution": "exec:0095"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0085",
-      "patch": "patch:0032",
-      "execution": "exec:0032",
-      "target": "func:selectCity",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0032",
-      "trace": {
-        "candidate": "candidate:0032",
-        "plan": "plan:0032",
-        "execution": "exec:0032"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0086",
-      "patch": "patch:0096",
-      "execution": "exec:0096",
-      "target": "func:selectCity",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0096",
-      "trace": {
-        "candidate": "candidate:0096",
-        "plan": "plan:0096",
-        "execution": "exec:0096"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0087",
-      "patch": "patch:0033",
-      "execution": "exec:0033",
-      "target": "func:sendDispatchMessage",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0033",
-      "trace": {
-        "candidate": "candidate:0033",
-        "plan": "plan:0033",
-        "execution": "exec:0033"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0088",
-      "patch": "patch:0097",
-      "execution": "exec:0097",
-      "target": "func:sendDispatchMessage",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0097",
-      "trace": {
-        "candidate": "candidate:0097",
-        "plan": "plan:0097",
-        "execution": "exec:0097"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0089",
-      "patch": "patch:0098",
-      "execution": "exec:0098",
-      "target": "func:sendLineContact",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0098",
-      "trace": {
-        "candidate": "candidate:0098",
-        "plan": "plan:0098",
-        "execution": "exec:0098"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0090",
-      "patch": "patch:0099",
-      "execution": "exec:0099",
-      "target": "func:setApiStatus",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0099",
-      "trace": {
-        "candidate": "candidate:0099",
-        "plan": "plan:0099",
-        "execution": "exec:0099"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0091",
+      "id": "apply:0052",
       "patch": "patch:0048",
       "execution": "exec:0048",
-      "target": "func:showModal",
+      "target": "func:map",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2463,10 +1410,10 @@
       }
     },
     {
-      "id": "apply:0092",
-      "patch": "patch:0100",
-      "execution": "exec:0100",
-      "target": "func:showModal",
+      "id": "apply:0053",
+      "patch": "patch:0056",
+      "execution": "exec:0056",
+      "target": "func:map",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2476,11 +1423,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0100",
+      "source_patch": "patch:0056",
       "trace": {
-        "candidate": "candidate:0100",
-        "plan": "plan:0100",
-        "execution": "exec:0100"
+        "candidate": "candidate:0056",
+        "plan": "plan:0056",
+        "execution": "exec:0056"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -2490,10 +1437,10 @@
       }
     },
     {
-      "id": "apply:0093",
-      "patch": "patch:0034",
-      "execution": "exec:0034",
-      "target": "func:simulateBatch",
+      "id": "apply:0054",
+      "patch": "patch:0083",
+      "execution": "exec:0083",
+      "target": "func:map",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2503,11 +1450,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0034",
+      "source_patch": "patch:0083",
       "trace": {
-        "candidate": "candidate:0034",
-        "plan": "plan:0034",
-        "execution": "exec:0034"
+        "candidate": "candidate:0083",
+        "plan": "plan:0083",
+        "execution": "exec:0083"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -2517,10 +1464,10 @@
       }
     },
     {
-      "id": "apply:0094",
-      "patch": "patch:0101",
-      "execution": "exec:0101",
-      "target": "func:simulateBatch",
+      "id": "apply:0055",
+      "patch": "patch:0084",
+      "execution": "exec:0084",
+      "target": "func:onFileChange",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2530,11 +1477,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0101",
+      "source_patch": "patch:0084",
       "trace": {
-        "candidate": "candidate:0101",
-        "plan": "plan:0101",
-        "execution": "exec:0101"
+        "candidate": "candidate:0084",
+        "plan": "plan:0084",
+        "execution": "exec:0084"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -2544,91 +1491,10 @@
       }
     },
     {
-      "id": "apply:0095",
-      "patch": "patch:0035",
-      "execution": "exec:0035",
-      "target": "func:startAdmin",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0035",
-      "trace": {
-        "candidate": "candidate:0035",
-        "plan": "plan:0035",
-        "execution": "exec:0035"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0096",
-      "patch": "patch:0036",
-      "execution": "exec:0036",
-      "target": "func:submitFlyerStock",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0036",
-      "trace": {
-        "candidate": "candidate:0036",
-        "plan": "plan:0036",
-        "execution": "exec:0036"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0097",
-      "patch": "patch:0102",
-      "execution": "exec:0102",
-      "target": "func:submitFlyerStock",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0102",
-      "trace": {
-        "candidate": "candidate:0102",
-        "plan": "plan:0102",
-        "execution": "exec:0102"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0098",
+      "id": "apply:0056",
       "patch": "patch:0049",
       "execution": "exec:0049",
-      "target": "func:switchPage",
+      "target": "func:onerror",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2652,10 +1518,10 @@
       }
     },
     {
-      "id": "apply:0099",
-      "patch": "patch:0054",
-      "execution": "exec:0054",
-      "target": "func:switchPage",
+      "id": "apply:0057",
+      "patch": "patch:0085",
+      "execution": "exec:0085",
+      "target": "func:onerror",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2665,11 +1531,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0054",
+      "source_patch": "patch:0085",
       "trace": {
-        "candidate": "candidate:0054",
-        "plan": "plan:0054",
-        "execution": "exec:0054"
+        "candidate": "candidate:0085",
+        "plan": "plan:0085",
+        "execution": "exec:0085"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -2679,10 +1545,1009 @@
       }
     },
     {
-      "id": "apply:0100",
+      "id": "apply:0058",
+      "patch": "patch:0021",
+      "execution": "exec:0021",
+      "target": "func:onunhandledrejection",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0021",
+      "trace": {
+        "candidate": "candidate:0021",
+        "plan": "plan:0021",
+        "execution": "exec:0021"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0059",
+      "patch": "patch:0086",
+      "execution": "exec:0086",
+      "target": "func:onunhandledrejection",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0086",
+      "trace": {
+        "candidate": "candidate:0086",
+        "plan": "plan:0086",
+        "execution": "exec:0086"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0060",
+      "patch": "patch:0022",
+      "execution": "exec:0022",
+      "target": "func:openAreaDetail",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0022",
+      "trace": {
+        "candidate": "candidate:0022",
+        "plan": "plan:0022",
+        "execution": "exec:0022"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0061",
+      "patch": "patch:0087",
+      "execution": "exec:0087",
+      "target": "func:openAreaDetail",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0087",
+      "trace": {
+        "candidate": "candidate:0087",
+        "plan": "plan:0087",
+        "execution": "exec:0087"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0062",
+      "patch": "patch:0088",
+      "execution": "exec:0088",
+      "target": "func:openDetail",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0088",
+      "trace": {
+        "candidate": "candidate:0088",
+        "plan": "plan:0088",
+        "execution": "exec:0088"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0063",
+      "patch": "patch:0023",
+      "execution": "exec:0023",
+      "target": "func:openIdInfoModal",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0023",
+      "trace": {
+        "candidate": "candidate:0023",
+        "plan": "plan:0023",
+        "execution": "exec:0023"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0064",
+      "patch": "patch:0089",
+      "execution": "exec:0089",
+      "target": "func:openIdInfoModal",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0089",
+      "trace": {
+        "candidate": "candidate:0089",
+        "plan": "plan:0089",
+        "execution": "exec:0089"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0065",
+      "patch": "patch:0024",
+      "execution": "exec:0024",
+      "target": "func:openLineChat",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0024",
+      "trace": {
+        "candidate": "candidate:0024",
+        "plan": "plan:0024",
+        "execution": "exec:0024"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0066",
+      "patch": "patch:0090",
+      "execution": "exec:0090",
+      "target": "func:openLineChat",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0090",
+      "trace": {
+        "candidate": "candidate:0090",
+        "plan": "plan:0090",
+        "execution": "exec:0090"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0067",
+      "patch": "patch:0091",
+      "execution": "exec:0091",
+      "target": "func:openNumpad",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0091",
+      "trace": {
+        "candidate": "candidate:0091",
+        "plan": "plan:0091",
+        "execution": "exec:0091"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0068",
+      "patch": "patch:0025",
+      "execution": "exec:0025",
+      "target": "func:openPointDetailModal",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0025",
+      "trace": {
+        "candidate": "candidate:0025",
+        "plan": "plan:0025",
+        "execution": "exec:0025"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0069",
+      "patch": "patch:0092",
+      "execution": "exec:0092",
+      "target": "func:openPointDetailModal",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0092",
+      "trace": {
+        "candidate": "candidate:0092",
+        "plan": "plan:0092",
+        "execution": "exec:0092"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0070",
+      "patch": "patch:0026",
+      "execution": "exec:0026",
+      "target": "func:openTransferRequestDialog",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0026",
+      "trace": {
+        "candidate": "candidate:0026",
+        "plan": "plan:0026",
+        "execution": "exec:0026"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0071",
+      "patch": "patch:0093",
+      "execution": "exec:0093",
+      "target": "func:prefetchRanking",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0093",
+      "trace": {
+        "candidate": "candidate:0093",
+        "plan": "plan:0093",
+        "execution": "exec:0093"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0072",
+      "patch": "patch:0027",
+      "execution": "exec:0027",
+      "target": "func:pressNum",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0027",
+      "trace": {
+        "candidate": "candidate:0027",
+        "plan": "plan:0027",
+        "execution": "exec:0027"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0073",
+      "patch": "patch:0094",
+      "execution": "exec:0094",
+      "target": "func:pressNum",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0094",
+      "trace": {
+        "candidate": "candidate:0094",
+        "plan": "plan:0094",
+        "execution": "exec:0094"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0074",
+      "patch": "patch:0057",
+      "execution": "exec:0057",
+      "target": "func:processQueue",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0057",
+      "trace": {
+        "candidate": "candidate:0057",
+        "plan": "plan:0057",
+        "execution": "exec:0057"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0075",
+      "patch": "patch:0028",
+      "execution": "exec:0028",
+      "target": "func:removePressed",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0028",
+      "trace": {
+        "candidate": "candidate:0028",
+        "plan": "plan:0028",
+        "execution": "exec:0028"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0076",
+      "patch": "patch:0095",
+      "execution": "exec:0095",
+      "target": "func:removePressed",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0095",
+      "trace": {
+        "candidate": "candidate:0095",
+        "plan": "plan:0095",
+        "execution": "exec:0095"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0077",
+      "patch": "patch:0050",
+      "execution": "exec:0050",
+      "target": "func:renderDetailList",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0050",
+      "trace": {
+        "candidate": "candidate:0050",
+        "plan": "plan:0050",
+        "execution": "exec:0050"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0078",
+      "patch": "patch:0051",
+      "execution": "exec:0051",
+      "target": "func:renderDetailModalContent",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0051",
+      "trace": {
+        "candidate": "candidate:0051",
+        "plan": "plan:0051",
+        "execution": "exec:0051"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0079",
+      "patch": "patch:0029",
+      "execution": "exec:0029",
+      "target": "func:renderStorageList",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0029",
+      "trace": {
+        "candidate": "candidate:0029",
+        "plan": "plan:0029",
+        "execution": "exec:0029"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0080",
+      "patch": "patch:0030",
+      "execution": "exec:0030",
+      "target": "func:resolveRequest",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0030",
+      "trace": {
+        "candidate": "candidate:0030",
+        "plan": "plan:0030",
+        "execution": "exec:0030"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0081",
+      "patch": "patch:0096",
+      "execution": "exec:0096",
+      "target": "func:resolveRequest",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0096",
+      "trace": {
+        "candidate": "candidate:0096",
+        "plan": "plan:0096",
+        "execution": "exec:0096"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0082",
+      "patch": "patch:0031",
+      "execution": "exec:0031",
+      "target": "func:runCommand",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0031",
+      "trace": {
+        "candidate": "candidate:0031",
+        "plan": "plan:0031",
+        "execution": "exec:0031"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0083",
+      "patch": "patch:0097",
+      "execution": "exec:0097",
+      "target": "func:runCommand",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0097",
+      "trace": {
+        "candidate": "candidate:0097",
+        "plan": "plan:0097",
+        "execution": "exec:0097"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0084",
+      "patch": "patch:0032",
+      "execution": "exec:0032",
+      "target": "func:safeInitApp",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0032",
+      "trace": {
+        "candidate": "candidate:0032",
+        "plan": "plan:0032",
+        "execution": "exec:0032"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0085",
+      "patch": "patch:0033",
+      "execution": "exec:0033",
+      "target": "func:saveProfile",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0033",
+      "trace": {
+        "candidate": "candidate:0033",
+        "plan": "plan:0033",
+        "execution": "exec:0033"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0086",
+      "patch": "patch:0034",
+      "execution": "exec:0034",
+      "target": "func:saveToOfflineQueue",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0034",
+      "trace": {
+        "candidate": "candidate:0034",
+        "plan": "plan:0034",
+        "execution": "exec:0034"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0087",
+      "patch": "patch:0098",
+      "execution": "exec:0098",
+      "target": "func:scheduleRetry",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0098",
+      "trace": {
+        "candidate": "candidate:0098",
+        "plan": "plan:0098",
+        "execution": "exec:0098"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0088",
+      "patch": "patch:0035",
+      "execution": "exec:0035",
+      "target": "func:selectCity",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0035",
+      "trace": {
+        "candidate": "candidate:0035",
+        "plan": "plan:0035",
+        "execution": "exec:0035"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0089",
+      "patch": "patch:0099",
+      "execution": "exec:0099",
+      "target": "func:selectCity",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0099",
+      "trace": {
+        "candidate": "candidate:0099",
+        "plan": "plan:0099",
+        "execution": "exec:0099"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0090",
+      "patch": "patch:0036",
+      "execution": "exec:0036",
+      "target": "func:sendDispatchMessage",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0036",
+      "trace": {
+        "candidate": "candidate:0036",
+        "plan": "plan:0036",
+        "execution": "exec:0036"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0091",
+      "patch": "patch:0100",
+      "execution": "exec:0100",
+      "target": "func:sendDispatchMessage",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0100",
+      "trace": {
+        "candidate": "candidate:0100",
+        "plan": "plan:0100",
+        "execution": "exec:0100"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0092",
+      "patch": "patch:0101",
+      "execution": "exec:0101",
+      "target": "func:sendLineContact",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0101",
+      "trace": {
+        "candidate": "candidate:0101",
+        "plan": "plan:0101",
+        "execution": "exec:0101"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0093",
+      "patch": "patch:0102",
+      "execution": "exec:0102",
+      "target": "func:setApiStatus",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0102",
+      "trace": {
+        "candidate": "candidate:0102",
+        "plan": "plan:0102",
+        "execution": "exec:0102"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0094",
+      "patch": "patch:0052",
+      "execution": "exec:0052",
+      "target": "func:showModal",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0052",
+      "trace": {
+        "candidate": "candidate:0052",
+        "plan": "plan:0052",
+        "execution": "exec:0052"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0095",
       "patch": "patch:0103",
       "execution": "exec:0103",
-      "target": "func:then",
+      "target": "func:showModal",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2706,37 +2571,10 @@
       }
     },
     {
-      "id": "apply:0101",
-      "patch": "patch:0104",
-      "execution": "exec:0104",
-      "target": "func:toFullWidthKana",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0104",
-      "trace": {
-        "candidate": "candidate:0104",
-        "plan": "plan:0104",
-        "execution": "exec:0104"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0102",
+      "id": "apply:0096",
       "patch": "patch:0037",
       "execution": "exec:0037",
-      "target": "func:toggleDone",
+      "target": "func:simulateBatch",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2760,10 +2598,10 @@
       }
     },
     {
-      "id": "apply:0103",
-      "patch": "patch:0105",
-      "execution": "exec:0105",
-      "target": "func:toggleDone",
+      "id": "apply:0097",
+      "patch": "patch:0104",
+      "execution": "exec:0104",
+      "target": "func:simulateBatch",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2773,11 +2611,11 @@
       "approval_required": true,
       "conflicts": [],
       "warnings": [],
-      "source_patch": "patch:0105",
+      "source_patch": "patch:0104",
       "trace": {
-        "candidate": "candidate:0105",
-        "plan": "plan:0105",
-        "execution": "exec:0105"
+        "candidate": "candidate:0104",
+        "plan": "plan:0104",
+        "execution": "exec:0104"
       },
       "apply_mode": "simulation",
       "validation_summary": {
@@ -2787,37 +2625,10 @@
       }
     },
     {
-      "id": "apply:0104",
-      "patch": "patch:0106",
-      "execution": "exec:0106",
-      "target": "func:toggleNavTier",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0106",
-      "trace": {
-        "candidate": "candidate:0106",
-        "plan": "plan:0106",
-        "execution": "exec:0106"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0105",
+      "id": "apply:0098",
       "patch": "patch:0038",
       "execution": "exec:0038",
-      "target": "func:tryRegisterAdmin",
+      "target": "func:startAdmin",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2841,37 +2652,10 @@
       }
     },
     {
-      "id": "apply:0106",
-      "patch": "patch:0107",
-      "execution": "exec:0107",
-      "target": "func:tryRegisterAdmin",
-      "apply_version": 1,
-      "status": "simulated",
-      "validation_result": "passed",
-      "ready_for_apply": true,
-      "rollback_available": true,
-      "simulation_only": true,
-      "approval_required": true,
-      "conflicts": [],
-      "warnings": [],
-      "source_patch": "patch:0107",
-      "trace": {
-        "candidate": "candidate:0107",
-        "plan": "plan:0107",
-        "execution": "exec:0107"
-      },
-      "apply_mode": "simulation",
-      "validation_summary": {
-        "dependency": "passed",
-        "trace": "passed",
-        "approval": "passed"
-      }
-    },
-    {
-      "id": "apply:0107",
+      "id": "apply:0099",
       "patch": "patch:0039",
       "execution": "exec:0039",
-      "target": "func:updateQueueStatus",
+      "target": "func:submitFlyerStock",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2895,10 +2679,172 @@
       }
     },
     {
-      "id": "apply:0108",
+      "id": "apply:0100",
+      "patch": "patch:0105",
+      "execution": "exec:0105",
+      "target": "func:submitFlyerStock",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0105",
+      "trace": {
+        "candidate": "candidate:0105",
+        "plan": "plan:0105",
+        "execution": "exec:0105"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0101",
+      "patch": "patch:0053",
+      "execution": "exec:0053",
+      "target": "func:switchPage",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0053",
+      "trace": {
+        "candidate": "candidate:0053",
+        "plan": "plan:0053",
+        "execution": "exec:0053"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0102",
+      "patch": "patch:0040",
+      "execution": "exec:0040",
+      "target": "func:syncOfflineQueue",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0040",
+      "trace": {
+        "candidate": "candidate:0040",
+        "plan": "plan:0040",
+        "execution": "exec:0040"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0103",
+      "patch": "patch:0106",
+      "execution": "exec:0106",
+      "target": "func:then",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0106",
+      "trace": {
+        "candidate": "candidate:0106",
+        "plan": "plan:0106",
+        "execution": "exec:0106"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0104",
+      "patch": "patch:0107",
+      "execution": "exec:0107",
+      "target": "func:toFullWidthKana",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0107",
+      "trace": {
+        "candidate": "candidate:0107",
+        "plan": "plan:0107",
+        "execution": "exec:0107"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0105",
+      "patch": "patch:0041",
+      "execution": "exec:0041",
+      "target": "func:toggleDone",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0041",
+      "trace": {
+        "candidate": "candidate:0041",
+        "plan": "plan:0041",
+        "execution": "exec:0041"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0106",
       "patch": "patch:0108",
       "execution": "exec:0108",
-      "target": "func:updateRecord",
+      "target": "func:toggleDone",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2922,10 +2868,10 @@
       }
     },
     {
-      "id": "apply:0109",
+      "id": "apply:0107",
       "patch": "patch:0109",
       "execution": "exec:0109",
-      "target": "func:updateStats",
+      "target": "func:toggleNavTier",
       "apply_version": 1,
       "status": "simulated",
       "validation_result": "passed",
@@ -2940,6 +2886,141 @@
         "candidate": "candidate:0109",
         "plan": "plan:0109",
         "execution": "exec:0109"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0108",
+      "patch": "patch:0042",
+      "execution": "exec:0042",
+      "target": "func:tryRegisterAdmin",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0042",
+      "trace": {
+        "candidate": "candidate:0042",
+        "plan": "plan:0042",
+        "execution": "exec:0042"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0109",
+      "patch": "patch:0110",
+      "execution": "exec:0110",
+      "target": "func:tryRegisterAdmin",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0110",
+      "trace": {
+        "candidate": "candidate:0110",
+        "plan": "plan:0110",
+        "execution": "exec:0110"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0110",
+      "patch": "patch:0043",
+      "execution": "exec:0043",
+      "target": "func:updateQueueStatus",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0043",
+      "trace": {
+        "candidate": "candidate:0043",
+        "plan": "plan:0043",
+        "execution": "exec:0043"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0111",
+      "patch": "patch:0111",
+      "execution": "exec:0111",
+      "target": "func:updateRecord",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0111",
+      "trace": {
+        "candidate": "candidate:0111",
+        "plan": "plan:0111",
+        "execution": "exec:0111"
+      },
+      "apply_mode": "simulation",
+      "validation_summary": {
+        "dependency": "passed",
+        "trace": "passed",
+        "approval": "passed"
+      }
+    },
+    {
+      "id": "apply:0112",
+      "patch": "patch:0112",
+      "execution": "exec:0112",
+      "target": "func:updateStats",
+      "apply_version": 1,
+      "status": "simulated",
+      "validation_result": "passed",
+      "ready_for_apply": true,
+      "rollback_available": true,
+      "simulation_only": true,
+      "approval_required": true,
+      "conflicts": [],
+      "warnings": [],
+      "source_patch": "patch:0112",
+      "trace": {
+        "candidate": "candidate:0112",
+        "plan": "plan:0112",
+        "execution": "exec:0112"
       },
       "apply_mode": "simulation",
       "validation_summary": {

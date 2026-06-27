@@ -1,0 +1,52 @@
+{
+  "export_version": 1,
+  "export_id": "export:0001",
+  "generated_at": "2026-06-27T07:43:55.158094Z",
+  "format": "json",
+  "cie_version": "2.2.0-alpha.0",
+  "platform_phase": "Phase23",
+  "repository_summary": {
+    "functions": 105,
+    "routes": 5,
+    "assets": 5,
+    "files": {
+      "js": 0,
+      "html": 17
+    }
+  },
+  "semantic_summary": {
+    "distribution": {
+      "Initialization": 4,
+      "Navigation": 5,
+      "Rendering": 8,
+      "Storage": 16,
+      "Authentication": 0,
+      "Synchronization": 11,
+      "Configuration": 0,
+      "Utility": 6,
+      "Unknown": 55
+    },
+    "unknown_ratio": 52.4
+  },
+  "static_analysis": {
+    "unused_functions": 43,
+    "high_impact_functions": 10,
+    "hub_functions": 4,
+    "orphan_routes": 0
+  },
+  "pipeline_summary": {
+    "candidates": 112,
+    "plans": 112,
+    "execution": 112,
+    "patches": 112,
+    "apply": 112,
+    "rollback": 112,
+    "pipeline_integrity": "PASS"
+  },
+  "health_summary": {
+    "score": 85.2,
+    "grade": "B",
+    "color": "🔵",
+    "overall_health": "GOOD"
+  }
+}

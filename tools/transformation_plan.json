@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T22:23:05.048353Z",
+    "generated_at": "2026-06-27T07:14:41.545424Z",
     "scanner": "transformation_plan_builder"
   },
   "plans": [
@@ -79,6 +79,27 @@
     {
       "id": "plan:0004",
       "candidate": "candidate:0004",
+      "target": "func:applyOptimisticCheck",
+      "plan_type": "remove_function",
+      "priority": "medium",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Verify runtime references.",
+        "Verify route references.",
+        "Verify dependency graph.",
+        "Remove function.",
+        "Execute validation."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "high",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0005",
+      "candidate": "candidate:0005",
       "target": "func:backToCityList",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -100,8 +121,8 @@
       ]
     },
     {
-      "id": "plan:0005",
-      "candidate": "candidate:0005",
+      "id": "plan:0006",
+      "candidate": "candidate:0006",
       "target": "func:backToTier1",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -125,30 +146,9 @@
       ]
     },
     {
-      "id": "plan:0006",
-      "candidate": "candidate:0006",
-      "target": "func:closeDetailModal",
-      "plan_type": "remove_function",
-      "priority": "medium",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Verify runtime references.",
-        "Verify route references.",
-        "Verify dependency graph.",
-        "Remove function.",
-        "Execute validation."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "high",
-      "estimated_effort": "small",
-      "dependencies": []
-    },
-    {
       "id": "plan:0007",
       "candidate": "candidate:0007",
-      "target": "func:closeIdInfoModal",
+      "target": "func:closeDetailModal",
       "plan_type": "remove_function",
       "priority": "medium",
       "approval_required": true,
@@ -169,7 +169,7 @@
     {
       "id": "plan:0008",
       "candidate": "candidate:0008",
-      "target": "func:closeModal",
+      "target": "func:closeIdInfoModal",
       "plan_type": "remove_function",
       "priority": "medium",
       "approval_required": true,
@@ -190,7 +190,7 @@
     {
       "id": "plan:0009",
       "candidate": "candidate:0009",
-      "target": "func:closeTransferRequestDialog",
+      "target": "func:closeModal",
       "plan_type": "remove_function",
       "priority": "medium",
       "approval_required": true,
@@ -211,7 +211,7 @@
     {
       "id": "plan:0010",
       "candidate": "candidate:0010",
-      "target": "func:contactHolder",
+      "target": "func:closeTransferRequestDialog",
       "plan_type": "remove_function",
       "priority": "medium",
       "approval_required": true,
@@ -232,6 +232,27 @@
     {
       "id": "plan:0011",
       "candidate": "candidate:0011",
+      "target": "func:contactHolder",
+      "plan_type": "remove_function",
+      "priority": "medium",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Verify runtime references.",
+        "Verify route references.",
+        "Verify dependency graph.",
+        "Remove function.",
+        "Execute validation."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "high",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0012",
+      "candidate": "candidate:0012",
       "target": "func:dispatchLineRequest",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -254,8 +275,8 @@
       ]
     },
     {
-      "id": "plan:0012",
-      "candidate": "candidate:0012",
+      "id": "plan:0013",
+      "candidate": "candidate:0013",
       "target": "func:extractDistrictAddresses",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -279,8 +300,8 @@
       ]
     },
     {
-      "id": "plan:0013",
-      "candidate": "candidate:0013",
+      "id": "plan:0014",
+      "candidate": "candidate:0014",
       "target": "func:formatCompletedAt",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -300,8 +321,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0014",
-      "candidate": "candidate:0014",
+      "id": "plan:0015",
+      "candidate": "candidate:0015",
       "target": "func:getQueueStats",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -324,8 +345,8 @@
       ]
     },
     {
-      "id": "plan:0015",
-      "candidate": "candidate:0015",
+      "id": "plan:0016",
+      "candidate": "candidate:0016",
       "target": "func:getRowStatus",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -347,8 +368,8 @@
       ]
     },
     {
-      "id": "plan:0016",
-      "candidate": "candidate:0016",
+      "id": "plan:0017",
+      "candidate": "candidate:0017",
       "target": "func:isHtmlRequest",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -368,32 +389,9 @@
       "dependencies": []
     },
     {
-      "id": "plan:0017",
-      "candidate": "candidate:0017",
-      "target": "func:loadHeatmap",
-      "plan_type": "remove_function",
-      "priority": "medium",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Verify runtime references.",
-        "Verify route references.",
-        "Verify dependency graph.",
-        "Remove function.",
-        "Execute validation."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "high",
-      "estimated_effort": "small",
-      "dependencies": [
-        "func:callApi"
-      ]
-    },
-    {
       "id": "plan:0018",
       "candidate": "candidate:0018",
-      "target": "func:loadPrediction",
+      "target": "func:loadHeatmap",
       "plan_type": "remove_function",
       "priority": "medium",
       "approval_required": true,
@@ -416,7 +414,7 @@
     {
       "id": "plan:0019",
       "candidate": "candidate:0019",
-      "target": "func:loadStrategy",
+      "target": "func:loadPrediction",
       "plan_type": "remove_function",
       "priority": "medium",
       "approval_required": true,
@@ -439,6 +437,29 @@
     {
       "id": "plan:0020",
       "candidate": "candidate:0020",
+      "target": "func:loadStrategy",
+      "plan_type": "remove_function",
+      "priority": "medium",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Verify runtime references.",
+        "Verify route references.",
+        "Verify dependency graph.",
+        "Remove function.",
+        "Execute validation."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "high",
+      "estimated_effort": "small",
+      "dependencies": [
+        "func:callApi"
+      ]
+    },
+    {
+      "id": "plan:0021",
+      "candidate": "candidate:0021",
       "target": "func:onunhandledrejection",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -460,8 +481,8 @@
       ]
     },
     {
-      "id": "plan:0021",
-      "candidate": "candidate:0021",
+      "id": "plan:0022",
+      "candidate": "candidate:0022",
       "target": "func:openAreaDetail",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -483,30 +504,9 @@
       ]
     },
     {
-      "id": "plan:0022",
-      "candidate": "candidate:0022",
-      "target": "func:openIdInfoModal",
-      "plan_type": "remove_function",
-      "priority": "medium",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Verify runtime references.",
-        "Verify route references.",
-        "Verify dependency graph.",
-        "Remove function.",
-        "Execute validation."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "high",
-      "estimated_effort": "small",
-      "dependencies": []
-    },
-    {
       "id": "plan:0023",
       "candidate": "candidate:0023",
-      "target": "func:openLineChat",
+      "target": "func:openIdInfoModal",
       "plan_type": "remove_function",
       "priority": "medium",
       "approval_required": true,
@@ -527,6 +527,27 @@
     {
       "id": "plan:0024",
       "candidate": "candidate:0024",
+      "target": "func:openLineChat",
+      "plan_type": "remove_function",
+      "priority": "medium",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Verify runtime references.",
+        "Verify route references.",
+        "Verify dependency graph.",
+        "Remove function.",
+        "Execute validation."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "high",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0025",
+      "candidate": "candidate:0025",
       "target": "func:openPointDetailModal",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -548,8 +569,8 @@
       ]
     },
     {
-      "id": "plan:0025",
-      "candidate": "candidate:0025",
+      "id": "plan:0026",
+      "candidate": "candidate:0026",
       "target": "func:openTransferRequestDialog",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -566,13 +587,11 @@
       "plan_version": 1,
       "estimated_risk": "high",
       "estimated_effort": "small",
-      "dependencies": [
-        "func:callApiPost"
-      ]
+      "dependencies": []
     },
     {
-      "id": "plan:0026",
-      "candidate": "candidate:0026",
+      "id": "plan:0027",
+      "candidate": "candidate:0027",
       "target": "func:pressNum",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -600,8 +619,8 @@
       ]
     },
     {
-      "id": "plan:0027",
-      "candidate": "candidate:0027",
+      "id": "plan:0028",
+      "candidate": "candidate:0028",
       "target": "func:removePressed",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -621,8 +640,31 @@
       "dependencies": []
     },
     {
-      "id": "plan:0028",
-      "candidate": "candidate:0028",
+      "id": "plan:0029",
+      "candidate": "candidate:0029",
+      "target": "func:renderStorageList",
+      "plan_type": "remove_function",
+      "priority": "medium",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Verify runtime references.",
+        "Verify route references.",
+        "Verify dependency graph.",
+        "Remove function.",
+        "Execute validation."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "high",
+      "estimated_effort": "small",
+      "dependencies": [
+        "func:map"
+      ]
+    },
+    {
+      "id": "plan:0030",
+      "candidate": "candidate:0030",
       "target": "func:resolveRequest",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -646,8 +688,8 @@
       ]
     },
     {
-      "id": "plan:0029",
-      "candidate": "candidate:0029",
+      "id": "plan:0031",
+      "candidate": "candidate:0031",
       "target": "func:runCommand",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -670,8 +712,8 @@
       ]
     },
     {
-      "id": "plan:0030",
-      "candidate": "candidate:0030",
+      "id": "plan:0032",
+      "candidate": "candidate:0032",
       "target": "func:safeInitApp",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -690,15 +732,14 @@
       "estimated_effort": "small",
       "dependencies": [
         "func:callApi",
-        "func:callApiPost",
         "func:logDebug",
         "func:setLoadingProgress",
         "func:startApp"
       ]
     },
     {
-      "id": "plan:0031",
-      "candidate": "candidate:0031",
+      "id": "plan:0033",
+      "candidate": "candidate:0033",
       "target": "func:saveProfile",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -723,8 +764,31 @@
       ]
     },
     {
-      "id": "plan:0032",
-      "candidate": "candidate:0032",
+      "id": "plan:0034",
+      "candidate": "candidate:0034",
+      "target": "func:saveToOfflineQueue",
+      "plan_type": "remove_function",
+      "priority": "medium",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Verify runtime references.",
+        "Verify route references.",
+        "Verify dependency graph.",
+        "Remove function.",
+        "Execute validation."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "high",
+      "estimated_effort": "small",
+      "dependencies": [
+        "func:setSyncStatus"
+      ]
+    },
+    {
+      "id": "plan:0035",
+      "candidate": "candidate:0035",
       "target": "func:selectCity",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -748,8 +812,8 @@
       ]
     },
     {
-      "id": "plan:0033",
-      "candidate": "candidate:0033",
+      "id": "plan:0036",
+      "candidate": "candidate:0036",
       "target": "func:sendDispatchMessage",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -769,8 +833,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0034",
-      "candidate": "candidate:0034",
+      "id": "plan:0037",
+      "candidate": "candidate:0037",
       "target": "func:simulateBatch",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -792,8 +856,8 @@
       ]
     },
     {
-      "id": "plan:0035",
-      "candidate": "candidate:0035",
+      "id": "plan:0038",
+      "candidate": "candidate:0038",
       "target": "func:startAdmin",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -816,8 +880,8 @@
       ]
     },
     {
-      "id": "plan:0036",
-      "candidate": "candidate:0036",
+      "id": "plan:0039",
+      "candidate": "candidate:0039",
       "target": "func:submitFlyerStock",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -835,12 +899,38 @@
       "estimated_risk": "high",
       "estimated_effort": "small",
       "dependencies": [
-        "func:callApiPost"
+        "func:callApiPost",
+        "func:loadFlyerStock"
       ]
     },
     {
-      "id": "plan:0037",
-      "candidate": "candidate:0037",
+      "id": "plan:0040",
+      "candidate": "candidate:0040",
+      "target": "func:syncOfflineQueue",
+      "plan_type": "remove_function",
+      "priority": "medium",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Verify runtime references.",
+        "Verify route references.",
+        "Verify dependency graph.",
+        "Remove function.",
+        "Execute validation."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "high",
+      "estimated_effort": "small",
+      "dependencies": [
+        "func:callApiPost",
+        "func:loadData",
+        "func:setSyncStatus"
+      ]
+    },
+    {
+      "id": "plan:0041",
+      "candidate": "candidate:0041",
       "target": "func:toggleDone",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -865,8 +955,8 @@
       ]
     },
     {
-      "id": "plan:0038",
-      "candidate": "candidate:0038",
+      "id": "plan:0042",
+      "candidate": "candidate:0042",
       "target": "func:tryRegisterAdmin",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -890,8 +980,8 @@
       ]
     },
     {
-      "id": "plan:0039",
-      "candidate": "candidate:0039",
+      "id": "plan:0043",
+      "candidate": "candidate:0043",
       "target": "func:updateQueueStatus",
       "plan_type": "remove_function",
       "priority": "medium",
@@ -913,89 +1003,9 @@
       ]
     },
     {
-      "id": "plan:0040",
-      "candidate": "candidate:0040",
-      "target": "func:addLog",
-      "plan_type": "review_function",
-      "priority": "high",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review incoming references.",
-        "Review responsibilities.",
-        "Review coupling.",
-        "Decide whether refactor is required."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "medium",
-      "dependencies": []
-    },
-    {
-      "id": "plan:0041",
-      "candidate": "candidate:0041",
-      "target": "func:callApi",
-      "plan_type": "review_function",
-      "priority": "high",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review incoming references.",
-        "Review responsibilities.",
-        "Review coupling.",
-        "Decide whether refactor is required."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "medium",
-      "dependencies": []
-    },
-    {
-      "id": "plan:0042",
-      "candidate": "candidate:0042",
-      "target": "func:callApiPost",
-      "plan_type": "review_function",
-      "priority": "high",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review incoming references.",
-        "Review responsibilities.",
-        "Review coupling.",
-        "Decide whether refactor is required."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "medium",
-      "dependencies": []
-    },
-    {
-      "id": "plan:0043",
-      "candidate": "candidate:0043",
-      "target": "func:logDebug",
-      "plan_type": "review_function",
-      "priority": "high",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review incoming references.",
-        "Review responsibilities.",
-        "Review coupling.",
-        "Decide whether refactor is required."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "medium",
-      "dependencies": []
-    },
-    {
       "id": "plan:0044",
       "candidate": "candidate:0044",
-      "target": "func:map",
+      "target": "func:addLog",
       "plan_type": "review_function",
       "priority": "high",
       "approval_required": true,
@@ -1015,6 +1025,86 @@
     {
       "id": "plan:0045",
       "candidate": "candidate:0045",
+      "target": "func:callApi",
+      "plan_type": "review_function",
+      "priority": "high",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review incoming references.",
+        "Review responsibilities.",
+        "Review coupling.",
+        "Decide whether refactor is required."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "medium",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0046",
+      "candidate": "candidate:0046",
+      "target": "func:callApiPost",
+      "plan_type": "review_function",
+      "priority": "high",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review incoming references.",
+        "Review responsibilities.",
+        "Review coupling.",
+        "Decide whether refactor is required."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "medium",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0047",
+      "candidate": "candidate:0047",
+      "target": "func:logDebug",
+      "plan_type": "review_function",
+      "priority": "high",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review incoming references.",
+        "Review responsibilities.",
+        "Review coupling.",
+        "Decide whether refactor is required."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "medium",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0048",
+      "candidate": "candidate:0048",
+      "target": "func:map",
+      "plan_type": "review_function",
+      "priority": "high",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review incoming references.",
+        "Review responsibilities.",
+        "Review coupling.",
+        "Decide whether refactor is required."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "medium",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0049",
+      "candidate": "candidate:0049",
       "target": "func:onerror",
       "plan_type": "review_function",
       "priority": "high",
@@ -1035,8 +1125,8 @@
       ]
     },
     {
-      "id": "plan:0046",
-      "candidate": "candidate:0046",
+      "id": "plan:0050",
+      "candidate": "candidate:0050",
       "target": "func:renderDetailList",
       "plan_type": "review_function",
       "priority": "high",
@@ -1059,8 +1149,8 @@
       ]
     },
     {
-      "id": "plan:0047",
-      "candidate": "candidate:0047",
+      "id": "plan:0051",
+      "candidate": "candidate:0051",
       "target": "func:renderDetailModalContent",
       "plan_type": "review_function",
       "priority": "high",
@@ -1081,8 +1171,8 @@
       ]
     },
     {
-      "id": "plan:0048",
-      "candidate": "candidate:0048",
+      "id": "plan:0052",
+      "candidate": "candidate:0052",
       "target": "func:showModal",
       "plan_type": "review_function",
       "priority": "high",
@@ -1101,8 +1191,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0049",
-      "candidate": "candidate:0049",
+      "id": "plan:0053",
+      "candidate": "candidate:0053",
       "target": "func:switchPage",
       "plan_type": "review_function",
       "priority": "high",
@@ -1120,16 +1210,14 @@
       "estimated_effort": "medium",
       "dependencies": [
         "func:callApi",
-        "func:getCityName",
         "func:renderRanking",
         "func:renderSettings",
-        "func:renderStorageList",
         "func:then"
       ]
     },
     {
-      "id": "plan:0050",
-      "candidate": "candidate:0050",
+      "id": "plan:0054",
+      "candidate": "candidate:0054",
       "target": "func:callApi",
       "plan_type": "split_function",
       "priority": "high",
@@ -1149,8 +1237,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0051",
-      "candidate": "candidate:0051",
+      "id": "plan:0055",
+      "candidate": "candidate:0055",
       "target": "func:loadData",
       "plan_type": "split_function",
       "priority": "high",
@@ -1175,13 +1263,12 @@
         "func:setLoadingProgress",
         "func:setSyncStatus",
         "func:switchPage",
-        "func:syncOfflineQueue",
         "func:updateStats"
       ]
     },
     {
-      "id": "plan:0052",
-      "candidate": "candidate:0052",
+      "id": "plan:0056",
+      "candidate": "candidate:0056",
       "target": "func:map",
       "plan_type": "split_function",
       "priority": "high",
@@ -1201,8 +1288,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0053",
-      "candidate": "candidate:0053",
+      "id": "plan:0057",
+      "candidate": "candidate:0057",
       "target": "func:processQueue",
       "plan_type": "split_function",
       "priority": "high",
@@ -1232,36 +1319,8 @@
       ]
     },
     {
-      "id": "plan:0054",
-      "candidate": "candidate:0054",
-      "target": "func:switchPage",
-      "plan_type": "split_function",
-      "priority": "high",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review function size.",
-        "Identify logical responsibilities.",
-        "Define split boundary.",
-        "Prepare new function layout.",
-        "Validate dependency impact."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "high",
-      "estimated_effort": "large",
-      "dependencies": [
-        "func:callApi",
-        "func:getCityName",
-        "func:renderRanking",
-        "func:renderSettings",
-        "func:renderStorageList",
-        "func:then"
-      ]
-    },
-    {
-      "id": "plan:0055",
-      "candidate": "candidate:0055",
+      "id": "plan:0058",
+      "candidate": "candidate:0058",
       "target": "func:$",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1280,8 +1339,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0056",
-      "candidate": "candidate:0056",
+      "id": "plan:0059",
+      "candidate": "candidate:0059",
       "target": "func:_executeCommand",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1305,8 +1364,8 @@
       ]
     },
     {
-      "id": "plan:0057",
-      "candidate": "candidate:0057",
+      "id": "plan:0060",
+      "candidate": "candidate:0060",
       "target": "func:addPhotoToDetail",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1331,8 +1390,8 @@
       ]
     },
     {
-      "id": "plan:0058",
-      "candidate": "candidate:0058",
+      "id": "plan:0061",
+      "candidate": "candidate:0061",
       "target": "func:applyOptimisticCheck",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1351,8 +1410,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0059",
-      "candidate": "candidate:0059",
+      "id": "plan:0062",
+      "candidate": "candidate:0062",
       "target": "func:backToCityList",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1373,8 +1432,8 @@
       ]
     },
     {
-      "id": "plan:0060",
-      "candidate": "candidate:0060",
+      "id": "plan:0063",
+      "candidate": "candidate:0063",
       "target": "func:backToTier1",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1397,8 +1456,8 @@
       ]
     },
     {
-      "id": "plan:0061",
-      "candidate": "candidate:0061",
+      "id": "plan:0064",
+      "candidate": "candidate:0064",
       "target": "func:blobToBase64",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1419,8 +1478,8 @@
       ]
     },
     {
-      "id": "plan:0062",
-      "candidate": "candidate:0062",
+      "id": "plan:0065",
+      "candidate": "candidate:0065",
       "target": "func:callApi",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1439,8 +1498,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0063",
-      "candidate": "candidate:0063",
+      "id": "plan:0066",
+      "candidate": "candidate:0066",
       "target": "func:callApiPost",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1459,8 +1518,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0064",
-      "candidate": "candidate:0064",
+      "id": "plan:0067",
+      "candidate": "candidate:0067",
       "target": "func:capturePhoto",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1482,69 +1541,9 @@
       ]
     },
     {
-      "id": "plan:0065",
-      "candidate": "candidate:0065",
-      "target": "func:cleanNameInput",
-      "plan_type": "rename_function",
-      "priority": "low",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review semantic role.",
-        "Select appropriate naming.",
-        "Verify caller compatibility.",
-        "Schedule rename."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "small",
-      "dependencies": []
-    },
-    {
-      "id": "plan:0066",
-      "candidate": "candidate:0066",
-      "target": "func:closeDetailModal",
-      "plan_type": "rename_function",
-      "priority": "low",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review semantic role.",
-        "Select appropriate naming.",
-        "Verify caller compatibility.",
-        "Schedule rename."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "small",
-      "dependencies": []
-    },
-    {
-      "id": "plan:0067",
-      "candidate": "candidate:0067",
-      "target": "func:closeIdInfoModal",
-      "plan_type": "rename_function",
-      "priority": "low",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review semantic role.",
-        "Select appropriate naming.",
-        "Verify caller compatibility.",
-        "Schedule rename."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "small",
-      "dependencies": []
-    },
-    {
       "id": "plan:0068",
       "candidate": "candidate:0068",
-      "target": "func:closeModal",
+      "target": "func:cleanNameInput",
       "plan_type": "rename_function",
       "priority": "low",
       "approval_required": true,
@@ -1564,7 +1563,7 @@
     {
       "id": "plan:0069",
       "candidate": "candidate:0069",
-      "target": "func:closeNumpad",
+      "target": "func:closeDetailModal",
       "plan_type": "rename_function",
       "priority": "low",
       "approval_required": true,
@@ -1584,6 +1583,66 @@
     {
       "id": "plan:0070",
       "candidate": "candidate:0070",
+      "target": "func:closeIdInfoModal",
+      "plan_type": "rename_function",
+      "priority": "low",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review semantic role.",
+        "Select appropriate naming.",
+        "Verify caller compatibility.",
+        "Schedule rename."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0071",
+      "candidate": "candidate:0071",
+      "target": "func:closeModal",
+      "plan_type": "rename_function",
+      "priority": "low",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review semantic role.",
+        "Select appropriate naming.",
+        "Verify caller compatibility.",
+        "Schedule rename."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0072",
+      "candidate": "candidate:0072",
+      "target": "func:closeNumpad",
+      "plan_type": "rename_function",
+      "priority": "low",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review semantic role.",
+        "Select appropriate naming.",
+        "Verify caller compatibility.",
+        "Schedule rename."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0073",
+      "candidate": "candidate:0073",
       "target": "func:compressImage",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1604,8 +1663,8 @@
       ]
     },
     {
-      "id": "plan:0071",
-      "candidate": "candidate:0071",
+      "id": "plan:0074",
+      "candidate": "candidate:0074",
       "target": "func:contactHolder",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1624,8 +1683,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0072",
-      "candidate": "candidate:0072",
+      "id": "plan:0075",
+      "candidate": "candidate:0075",
       "target": "func:dispatchLineRequest",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1647,8 +1706,8 @@
       ]
     },
     {
-      "id": "plan:0073",
-      "candidate": "candidate:0073",
+      "id": "plan:0076",
+      "candidate": "candidate:0076",
       "target": "func:extractCityName",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1667,8 +1726,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0074",
-      "candidate": "candidate:0074",
+      "id": "plan:0077",
+      "candidate": "candidate:0077",
       "target": "func:extractDistrictAddresses",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1691,8 +1750,8 @@
       ]
     },
     {
-      "id": "plan:0075",
-      "candidate": "candidate:0075",
+      "id": "plan:0078",
+      "candidate": "candidate:0078",
       "target": "func:getCityName",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1711,8 +1770,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0076",
-      "candidate": "candidate:0076",
+      "id": "plan:0079",
+      "candidate": "candidate:0079",
       "target": "func:getCleanAddress",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1731,8 +1790,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0077",
-      "candidate": "candidate:0077",
+      "id": "plan:0080",
+      "candidate": "candidate:0080",
       "target": "func:getGPSLocation",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1751,8 +1810,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0078",
-      "candidate": "candidate:0078",
+      "id": "plan:0081",
+      "candidate": "candidate:0081",
       "target": "func:getRowStatus",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1773,8 +1832,8 @@
       ]
     },
     {
-      "id": "plan:0079",
-      "candidate": "candidate:0079",
+      "id": "plan:0082",
+      "candidate": "candidate:0082",
       "target": "func:isHtmlRequest",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1793,8 +1852,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0080",
-      "candidate": "candidate:0080",
+      "id": "plan:0083",
+      "candidate": "candidate:0083",
       "target": "func:map",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1813,8 +1872,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0081",
-      "candidate": "candidate:0081",
+      "id": "plan:0084",
+      "candidate": "candidate:0084",
       "target": "func:onFileChange",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1835,8 +1894,8 @@
       ]
     },
     {
-      "id": "plan:0082",
-      "candidate": "candidate:0082",
+      "id": "plan:0085",
+      "candidate": "candidate:0085",
       "target": "func:onerror",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1857,8 +1916,8 @@
       ]
     },
     {
-      "id": "plan:0083",
-      "candidate": "candidate:0083",
+      "id": "plan:0086",
+      "candidate": "candidate:0086",
       "target": "func:onunhandledrejection",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1879,8 +1938,8 @@
       ]
     },
     {
-      "id": "plan:0084",
-      "candidate": "candidate:0084",
+      "id": "plan:0087",
+      "candidate": "candidate:0087",
       "target": "func:openAreaDetail",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1901,8 +1960,8 @@
       ]
     },
     {
-      "id": "plan:0085",
-      "candidate": "candidate:0085",
+      "id": "plan:0088",
+      "candidate": "candidate:0088",
       "target": "func:openDetail",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1925,8 +1984,8 @@
       ]
     },
     {
-      "id": "plan:0086",
-      "candidate": "candidate:0086",
+      "id": "plan:0089",
+      "candidate": "candidate:0089",
       "target": "func:openIdInfoModal",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1945,8 +2004,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0087",
-      "candidate": "candidate:0087",
+      "id": "plan:0090",
+      "candidate": "candidate:0090",
       "target": "func:openLineChat",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1965,8 +2024,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0088",
-      "candidate": "candidate:0088",
+      "id": "plan:0091",
+      "candidate": "candidate:0091",
       "target": "func:openNumpad",
       "plan_type": "rename_function",
       "priority": "low",
@@ -1985,8 +2044,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0089",
-      "candidate": "candidate:0089",
+      "id": "plan:0092",
+      "candidate": "candidate:0092",
       "target": "func:openPointDetailModal",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2007,8 +2066,8 @@
       ]
     },
     {
-      "id": "plan:0090",
-      "candidate": "candidate:0090",
+      "id": "plan:0093",
+      "candidate": "candidate:0093",
       "target": "func:prefetchRanking",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2032,8 +2091,8 @@
       ]
     },
     {
-      "id": "plan:0091",
-      "candidate": "candidate:0091",
+      "id": "plan:0094",
+      "candidate": "candidate:0094",
       "target": "func:pressNum",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2060,8 +2119,8 @@
       ]
     },
     {
-      "id": "plan:0092",
-      "candidate": "candidate:0092",
+      "id": "plan:0095",
+      "candidate": "candidate:0095",
       "target": "func:removePressed",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2080,8 +2139,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0093",
-      "candidate": "candidate:0093",
+      "id": "plan:0096",
+      "candidate": "candidate:0096",
       "target": "func:resolveRequest",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2104,8 +2163,8 @@
       ]
     },
     {
-      "id": "plan:0094",
-      "candidate": "candidate:0094",
+      "id": "plan:0097",
+      "candidate": "candidate:0097",
       "target": "func:runCommand",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2127,8 +2186,8 @@
       ]
     },
     {
-      "id": "plan:0095",
-      "candidate": "candidate:0095",
+      "id": "plan:0098",
+      "candidate": "candidate:0098",
       "target": "func:scheduleRetry",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2149,8 +2208,8 @@
       ]
     },
     {
-      "id": "plan:0096",
-      "candidate": "candidate:0096",
+      "id": "plan:0099",
+      "candidate": "candidate:0099",
       "target": "func:selectCity",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2173,69 +2232,9 @@
       ]
     },
     {
-      "id": "plan:0097",
-      "candidate": "candidate:0097",
-      "target": "func:sendDispatchMessage",
-      "plan_type": "rename_function",
-      "priority": "low",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review semantic role.",
-        "Select appropriate naming.",
-        "Verify caller compatibility.",
-        "Schedule rename."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "small",
-      "dependencies": []
-    },
-    {
-      "id": "plan:0098",
-      "candidate": "candidate:0098",
-      "target": "func:sendLineContact",
-      "plan_type": "rename_function",
-      "priority": "low",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review semantic role.",
-        "Select appropriate naming.",
-        "Verify caller compatibility.",
-        "Schedule rename."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "small",
-      "dependencies": []
-    },
-    {
-      "id": "plan:0099",
-      "candidate": "candidate:0099",
-      "target": "func:setApiStatus",
-      "plan_type": "rename_function",
-      "priority": "low",
-      "approval_required": true,
-      "execution_mode": "manual",
-      "status": "planned",
-      "steps": [
-        "Review semantic role.",
-        "Select appropriate naming.",
-        "Verify caller compatibility.",
-        "Schedule rename."
-      ],
-      "plan_version": 1,
-      "estimated_risk": "medium",
-      "estimated_effort": "small",
-      "dependencies": []
-    },
-    {
       "id": "plan:0100",
       "candidate": "candidate:0100",
-      "target": "func:showModal",
+      "target": "func:sendDispatchMessage",
       "plan_type": "rename_function",
       "priority": "low",
       "approval_required": true,
@@ -2255,6 +2254,66 @@
     {
       "id": "plan:0101",
       "candidate": "candidate:0101",
+      "target": "func:sendLineContact",
+      "plan_type": "rename_function",
+      "priority": "low",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review semantic role.",
+        "Select appropriate naming.",
+        "Verify caller compatibility.",
+        "Schedule rename."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0102",
+      "candidate": "candidate:0102",
+      "target": "func:setApiStatus",
+      "plan_type": "rename_function",
+      "priority": "low",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review semantic role.",
+        "Select appropriate naming.",
+        "Verify caller compatibility.",
+        "Schedule rename."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0103",
+      "candidate": "candidate:0103",
+      "target": "func:showModal",
+      "plan_type": "rename_function",
+      "priority": "low",
+      "approval_required": true,
+      "execution_mode": "manual",
+      "status": "planned",
+      "steps": [
+        "Review semantic role.",
+        "Select appropriate naming.",
+        "Verify caller compatibility.",
+        "Schedule rename."
+      ],
+      "plan_version": 1,
+      "estimated_risk": "medium",
+      "estimated_effort": "small",
+      "dependencies": []
+    },
+    {
+      "id": "plan:0104",
+      "candidate": "candidate:0104",
       "target": "func:simulateBatch",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2275,8 +2334,8 @@
       ]
     },
     {
-      "id": "plan:0102",
-      "candidate": "candidate:0102",
+      "id": "plan:0105",
+      "candidate": "candidate:0105",
       "target": "func:submitFlyerStock",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2293,12 +2352,13 @@
       "estimated_risk": "medium",
       "estimated_effort": "small",
       "dependencies": [
-        "func:callApiPost"
+        "func:callApiPost",
+        "func:loadFlyerStock"
       ]
     },
     {
-      "id": "plan:0103",
-      "candidate": "candidate:0103",
+      "id": "plan:0106",
+      "candidate": "candidate:0106",
       "target": "func:then",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2314,13 +2374,11 @@
       "plan_version": 1,
       "estimated_risk": "medium",
       "estimated_effort": "small",
-      "dependencies": [
-        "func:renderRanking"
-      ]
+      "dependencies": []
     },
     {
-      "id": "plan:0104",
-      "candidate": "candidate:0104",
+      "id": "plan:0107",
+      "candidate": "candidate:0107",
       "target": "func:toFullWidthKana",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2339,8 +2397,8 @@
       "dependencies": []
     },
     {
-      "id": "plan:0105",
-      "candidate": "candidate:0105",
+      "id": "plan:0108",
+      "candidate": "candidate:0108",
       "target": "func:toggleDone",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2364,8 +2422,8 @@
       ]
     },
     {
-      "id": "plan:0106",
-      "candidate": "candidate:0106",
+      "id": "plan:0109",
+      "candidate": "candidate:0109",
       "target": "func:toggleNavTier",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2381,13 +2439,11 @@
       "plan_version": 1,
       "estimated_risk": "medium",
       "estimated_effort": "small",
-      "dependencies": [
-        "func:switchPage"
-      ]
+      "dependencies": []
     },
     {
-      "id": "plan:0107",
-      "candidate": "candidate:0107",
+      "id": "plan:0110",
+      "candidate": "candidate:0110",
       "target": "func:tryRegisterAdmin",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2410,8 +2466,8 @@
       ]
     },
     {
-      "id": "plan:0108",
-      "candidate": "candidate:0108",
+      "id": "plan:0111",
+      "candidate": "candidate:0111",
       "target": "func:updateRecord",
       "plan_type": "rename_function",
       "priority": "low",
@@ -2428,16 +2484,12 @@
       "estimated_risk": "medium",
       "estimated_effort": "small",
       "dependencies": [
-        "func:applyOptimisticCheck",
-        "func:callApiPost",
-        "func:enqueueSync",
-        "func:loadData",
-        "func:saveToOfflineQueue"
+        "func:enqueueSync"
       ]
     },
     {
-      "id": "plan:0109",
-      "candidate": "candidate:0109",
+      "id": "plan:0112",
+      "candidate": "candidate:0112",
       "target": "func:updateStats",
       "plan_type": "rename_function",
       "priority": "low",

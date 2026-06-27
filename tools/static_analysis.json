@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": 1,
-    "generated_at": "2026-06-26T22:16:01.061357Z",
+    "generated_at": "2026-06-27T07:14:41.496444Z",
     "scanner": "static_analysis_builder"
   },
   "analysis": {
@@ -33,6 +33,18 @@
       {
         "id": "analysis:unused:addPhotoToDetail",
         "target": "func:addPhotoToDetail",
+        "analysis_type": "unused_function",
+        "severity": "warning",
+        "confidence": 1.0,
+        "source_graph": [
+          "knowledge_graph",
+          "route_graph"
+        ],
+        "recommendation": "review"
+      },
+      {
+        "id": "analysis:unused:applyOptimisticCheck",
+        "target": "func:applyOptimisticCheck",
         "analysis_type": "unused_function",
         "severity": "warning",
         "confidence": 1.0,
@@ -331,6 +343,18 @@
         "recommendation": "review"
       },
       {
+        "id": "analysis:unused:renderStorageList",
+        "target": "func:renderStorageList",
+        "analysis_type": "unused_function",
+        "severity": "warning",
+        "confidence": 1.0,
+        "source_graph": [
+          "knowledge_graph",
+          "route_graph"
+        ],
+        "recommendation": "review"
+      },
+      {
         "id": "analysis:unused:resolveRequest",
         "target": "func:resolveRequest",
         "analysis_type": "unused_function",
@@ -369,6 +393,18 @@
       {
         "id": "analysis:unused:saveProfile",
         "target": "func:saveProfile",
+        "analysis_type": "unused_function",
+        "severity": "warning",
+        "confidence": 1.0,
+        "source_graph": [
+          "knowledge_graph",
+          "route_graph"
+        ],
+        "recommendation": "review"
+      },
+      {
+        "id": "analysis:unused:saveToOfflineQueue",
+        "target": "func:saveToOfflineQueue",
         "analysis_type": "unused_function",
         "severity": "warning",
         "confidence": 1.0,
@@ -429,6 +465,18 @@
       {
         "id": "analysis:unused:submitFlyerStock",
         "target": "func:submitFlyerStock",
+        "analysis_type": "unused_function",
+        "severity": "warning",
+        "confidence": 1.0,
+        "source_graph": [
+          "knowledge_graph",
+          "route_graph"
+        ],
+        "recommendation": "review"
+      },
+      {
+        "id": "analysis:unused:syncOfflineQueue",
+        "target": "func:syncOfflineQueue",
         "analysis_type": "unused_function",
         "severity": "warning",
         "confidence": 1.0,
@@ -625,17 +673,6 @@
       {
         "id": "analysis:hub:processQueue",
         "target": "func:processQueue",
-        "analysis_type": "hub_function",
-        "severity": "warning",
-        "confidence": 1.0,
-        "source_graph": [
-          "data_flow"
-        ],
-        "recommendation": "review"
-      },
-      {
-        "id": "analysis:hub:switchPage",
-        "target": "func:switchPage",
         "analysis_type": "hub_function",
         "severity": "warning",
         "confidence": 1.0,
