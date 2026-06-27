@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -30,11 +30,12 @@ JSON_ARTIFACTS = [
     "plugins/execution_result.json",
     "plugins/plugin_invocation.json",
     "plugins/runtime_invocation.json",
-    "plugins/runtime_dispatch.json"
+    "plugins/runtime_dispatch.json",
+    "plugins/runtime_factory.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase34"
+PLATFORM_VERSION = "Phase35"
 
 def run_build(args):
     """
@@ -957,6 +958,148 @@ def run_runtime_dispatch(args):
         print(f"Error: Failed to write runtime_dispatch.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_factory(args):
+    """
+    runtime-factory サブコマンド: RuntimeFactory を使用して runtime_factory.json を生成する。
+    注意: この runtime_dispatch.json から直接 RuntimeDescriptor を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_dispatcher import RuntimeDescriptor
+        from plugin_platform.plugin.runtime_factory import RuntimeDefinition, RuntimeProvider, RuntimeFactory
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_factory modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    dispatch_path = os.path.join(script_dir, "plugins", "runtime_dispatch.json")
+    if not os.path.exists(dispatch_path):
+        print(f"Error: Runtime dispatch result not found at {dispatch_path}. Please run 'runtime-dispatch' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(dispatch_path, "r", encoding="utf-8") as f:
+            dispatch_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime dispatch: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    dispatched = dispatch_data.get("dispatched_runtimes", [])
+    execution_id = dispatch_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    instances = []
+    
+    # 決定論的ソート
+    sorted_dispatched = sorted(dispatched, key=lambda x: (x.get("runtime_id", ""), x.get("trace_id", "")))
+    
+    # Provider初期化
+    provider = RuntimeProvider()
+    
+    provider.register(RuntimeDefinition(
+        runtime_id="stub_runtime",
+        runtime_type="stub",
+        version=1,
+        implementation="plugin_platform.plugin.runtime.stub.StubRuntime",
+        capabilities=["all"],
+        metadata={"description": "Standard CIE stub implementation"},
+        trace_id="init_stub"
+    ))
+    
+    provider.register(RuntimeDefinition(
+        runtime_id="default_runtime",
+        runtime_type="default",
+        version=1,
+        implementation="plugin_platform.plugin.runtime.default.DefaultRuntime",
+        capabilities=[],
+        metadata={"description": "Fallback default implementation"},
+        trace_id="init_default"
+    ))
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_factory_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, desc_data in enumerate(sorted_dispatched, 1):
+        runtime_id = desc_data.get("runtime_id")
+        runtime_type = desc_data.get("runtime_type")
+        version = desc_data.get("version", 1)
+        capabilities = desc_data.get("capabilities", [])
+        priority = desc_data.get("priority", 0)
+        metadata = desc_data.get("metadata", {})
+        trace_id = desc_data.get("trace_id")
+        
+        descriptor = RuntimeDescriptor(
+            runtime_id=runtime_id,
+            runtime_type=runtime_type,
+            version=version,
+            capabilities=capabilities,
+            priority=priority,
+            metadata=metadata,
+            trace_id=trace_id
+        )
+        
+        try:
+            instance = RuntimeFactory.create(descriptor, context, provider)
+            instances.append(instance.to_dict())
+        except AssertionError as e:
+            print(f"Assertion Error during runtime factory resolve: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_factory.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    factory_registry = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "instance_count": len(instances)
+        },
+        "instances": instances
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Factory (Dry Run)")
+        print(f"Instance Count: {len(instances)}")
+        for inst in instances:
+            print(f"- Instance: {inst.get('instance_id')} (Runtime: {inst.get('runtime_id')}, Status: {inst.get('status')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(factory_registry, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Factory successfully written to runtime_factory.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_factory.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -982,6 +1125,7 @@ Available commands:
   invocation Run plugin invocation simulation (stub).
   runtime-run Run plugin runtime invocation simulation (stub).
   runtime-dispatch Dispatch plugin runtimes.
+  runtime-factory Resolve plugin runtime instances.
         """
     )
     
@@ -1059,6 +1203,10 @@ Available commands:
     runtime_dispatch_parser = subparsers.add_parser("runtime-dispatch", help="Dispatch plugin runtimes")
     runtime_dispatch_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime dispatch dry-run without writing result")
     
+    # runtime-factory コマンドパーサー
+    runtime_factory_parser = subparsers.add_parser("runtime-factory", help="Resolve plugin runtime instances")
+    runtime_factory_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime factory dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -1106,6 +1254,8 @@ Available commands:
         run_runtime_run(args)
     elif args.command == "runtime-dispatch":
         run_runtime_dispatch(args)
+    elif args.command == "runtime-factory":
+        run_runtime_factory(args)
     else:
         # Invalid Command
         parser.print_help()

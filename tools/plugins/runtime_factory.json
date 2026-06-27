@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-28T00:00:00Z",
+    "execution_id": "execution_run:session_cie_default",
+    "instance_count": 1
+  },
+  "instances": [
+    {
+      "instance_id": "instance:stub_runtime",
+      "runtime_id": "stub_runtime",
+      "status": "resolved",
+      "configuration": {
+        "version": 1,
+        "schema": 1,
+        "cie_version": "2.2.0-alpha.0",
+        "platform_phase": "Phase24",
+        "theme": "dark",
+        "dashboard": {
+          "refresh_interval": 30
+        },
+        "api": {
+          "host": "127.0.0.1",
+          "port": 8080
+        },
+        "metrics": {
+          "score_max": 100,
+          "unused_penalty": 0.2,
+          "high_impact_penalty": 0.5,
+          "hub_penalty": 0.3,
+          "orphan_route_penalty": 2.0
+        },
+        "export": {
+          "default_format": "markdown",
+          "output_directory": "exports"
+        }
+      },
+      "metadata": {
+        "version": 1,
+        "resolved_by": "runtime_factory_stub",
+        "capabilities": [
+          "all"
+        ]
+      },
+      "trace_id": "execution:0001"
+    }
+  ]
+}
