@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -34,11 +34,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_factory.json",
     "plugins/runtime_session.json",
     "plugins/runtime_session_lifecycle.json",
-    "plugins/runtime_session_event.json"
+    "plugins/runtime_session_event.json",
+    "plugins/runtime_event_store.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase38"
+PLATFORM_VERSION = "Phase39"
 
 def run_build(args):
     """
@@ -1496,6 +1497,140 @@ def run_runtime_event(args):
         print(f"Error: Failed to write runtime_session_event.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_store(args):
+    """
+    runtime-event-store サブコマンド: EventStoreManager を使用して runtime_event_store.json を生成する。
+    注意: この runtime_session_event.json から直接 RuntimeSessionEvent を構成するデータフロー is、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_session_event import RuntimeSessionEvent
+        from plugin_platform.plugin.runtime_event_store import EventStoreDescriptor, EventStoreRegistry, EventStoreManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_store modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    event_path = os.path.join(script_dir, "plugins", "runtime_session_event.json")
+    if not os.path.exists(event_path):
+        print(f"Error: Runtime session event result not found at {event_path}. Please run 'runtime-event' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(event_path, "r", encoding="utf-8") as f:
+            event_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime session event: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    events_data = event_data.get("events", [])
+    execution_id = event_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    stores = []
+    
+    # 決定論的ソート
+    sorted_events = sorted(events_data, key=lambda x: (x.get("event_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventStoreRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_store_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, ev_data in enumerate(sorted_events, 1):
+        event_id = ev_data.get("event_id")
+        runtime_session_lifecycle = ev_data.get("runtime_session_lifecycle", {})
+        event_type = ev_data.get("event_type")
+        payload = ev_data.get("payload", {})
+        meta_ev = ev_data.get("metadata", {})
+        trace_id = ev_data.get("trace_id")
+        
+        # 暫定入力
+        event = RuntimeSessionEvent(
+            event_id=event_id,
+            runtime_session_lifecycle=runtime_session_lifecycle,
+            event_type=event_type,
+            payload=payload,
+            metadata=meta_ev,
+            trace_id=trace_id
+        )
+        
+        try:
+            store = EventStoreManager.create_store(event, context)
+            stores.append(store.to_dict())
+            
+            # EventStoreRegistry 登録検証
+            session_id = runtime_session_lifecycle.get("runtime_session", {}).get("session_id") if isinstance(runtime_session_lifecycle, dict) else None
+            lifecycle_id = runtime_session_lifecycle.get("lifecycle_id") if isinstance(runtime_session_lifecycle, dict) else None
+            descriptor = EventStoreDescriptor(
+                store_id=store.store_id,
+                event_id=event_id,
+                session_id=session_id,
+                lifecycle_id=lifecycle_id,
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event store create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_store.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    store_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "store_count": len(stores)
+        },
+        "stores": stores
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Store (Dry Run)")
+        print(f"Stores Count: {len(stores)}")
+        for st in stores:
+            print(f"- Store: {st.get('store_id')} (Type: {st.get('storage_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(store_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Store successfully written to runtime_event_store.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_store.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -1525,6 +1660,7 @@ Available commands:
   runtime-session Manage plugin runtime sessions.
   runtime-lifecycle Manage plugin runtime session lifecycles.
   runtime-event Manage plugin runtime session events.
+  runtime-event-store Manage plugin runtime session event store.
         """
     )
     
@@ -1618,6 +1754,10 @@ Available commands:
     runtime_event_parser = subparsers.add_parser("runtime-event", help="Manage plugin runtime session events")
     runtime_event_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event dry-run without writing result")
     
+    # runtime-event-store コマンドパーサー
+    runtime_event_store_parser = subparsers.add_parser("runtime-event-store", help="Manage plugin runtime session event store")
+    runtime_event_store_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event store dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -1673,6 +1813,8 @@ Available commands:
         run_runtime_lifecycle(args)
     elif args.command == "runtime-event":
         run_runtime_event(args)
+    elif args.command == "runtime-event-store":
+        run_runtime_event_store(args)
     else:
         # Invalid Command
         parser.print_help()
