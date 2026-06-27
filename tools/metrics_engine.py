@@ -22,8 +22,11 @@ JSON_ARTIFACTS = [
     "patch_rollback_plan.json"
 ]
 
-CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase22"
+import config_engine
+config_data = config_engine.load_config()
+
+CIE_VERSION = config_data.get("cie_version", "2.2.0-alpha.0")
+PLATFORM_VERSION = config_data.get("platform_phase", "Phase24")
 
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -136,7 +139,14 @@ def main():
     orphan_cnt = get_count("static_analysis.json", "analysis", "orphan_routes")
 
     # 4. Repository Health Score & Grade
-    score = 100.0 - (unused_cnt * 0.2) - (high_impact_cnt * 0.5) - (hub_cnt * 0.3) - (orphan_cnt * 2.0)
+    metrics_cfg = config_data.get("metrics", {})
+    score_max = metrics_cfg.get("score_max", 100.0)
+    unused_penalty = metrics_cfg.get("unused_penalty", 0.2)
+    high_impact_penalty = metrics_cfg.get("high_impact_penalty", 0.5)
+    hub_penalty = metrics_cfg.get("hub_penalty", 0.3)
+    orphan_route_penalty = metrics_cfg.get("orphan_route_penalty", 2.0)
+
+    score = score_max - (unused_cnt * unused_penalty) - (high_impact_cnt * high_impact_penalty) - (hub_cnt * hub_penalty) - (orphan_cnt * orphan_route_penalty)
     score = max(0.0, min(100.0, score))
 
     grade = "F"
@@ -207,6 +217,36 @@ def main():
     print(f"Score : {score:.1f}")
     print(f"Grade : {grade} {color}")
     print()
+
+    # Plugins Summary
+    plug_loaded = 0
+    plug_disabled = 0
+    plug_invalid = 0
+    registry_path = os.path.join(script_dir, "plugins", "registry.json")
+    if os.path.exists(registry_path):
+        try:
+            with open(registry_path, "r", encoding="utf-8") as f:
+                registry_data = json.load(f)
+            for p in registry_data.get("plugins", []):
+                st = p.get("status", "")
+                if st == "loaded":
+                    plug_loaded += 1
+                elif st == "disabled":
+                    plug_disabled += 1
+                elif st == "invalid":
+                    plug_invalid += 1
+        except Exception:
+            pass
+
+    print("----------------------------------")
+    print("Plugin Metrics")
+    print("----------------------------------")
+    print(f"Plugin Count : {plug_loaded + plug_disabled + plug_invalid}")
+    print(f"Enabled      : {plug_loaded}")
+    print(f"Disabled     : {plug_disabled}")
+    print(f"Invalid      : {plug_invalid}")
+    print()
+
     print("==================================")
     print("Overall Metrics Summary")
     print("==================================")

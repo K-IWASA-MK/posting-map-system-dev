@@ -4,10 +4,13 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from datetime import datetime, timezone
 
+import config_engine
+config_data = config_engine.load_config()
+
 # Constants Manifest
 API_VERSION = 1
-CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase21"
+CIE_VERSION = config_data.get("cie_version", "2.2.0-alpha.0")
+PLATFORM_VERSION = config_data.get("platform_phase", "Phase24")
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -97,6 +100,10 @@ class CIEApiHandler(BaseHTTPRequestHandler):
             self.handle_version()
         elif path == "/artifacts":
             self.handle_artifacts()
+        elif path == "/config":
+            self.handle_config()
+        elif path == "/plugins":
+            self.handle_plugins()
         else:
             self.send_error_json("Not Found", 404)
 
@@ -148,10 +155,48 @@ class CIEApiHandler(BaseHTTPRequestHandler):
                 "/pipeline",
                 "/metadata",
                 "/version",
-                "/artifacts"
+                "/artifacts",
+                "/config",
+                "/plugins"
             ]
         }
         self.send_json(response)
+
+    def handle_config(self):
+        try:
+            import config_engine
+            config = config_engine.load_config()
+            response = {
+                "api_version": API_VERSION,
+                "config": config
+            }
+            self.send_json(response)
+        except Exception:
+            self.send_error_json("Internal Server Error", 500)
+
+    def handle_plugins(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        registry_path = os.path.join(script_dir, "plugins", "registry.json")
+        
+        if not os.path.exists(registry_path):
+            self.send_json({
+                "api_version": API_VERSION,
+                "_meta": {
+                    "version": 1,
+                    "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    "scanner": "plugin_engine",
+                    "plugin_count": 0
+                },
+                "plugins": []
+            })
+            return
+            
+        try:
+            with open(registry_path, "r", encoding="utf-8") as f:
+                registry_data = json.load(f)
+            self.send_json(registry_data)
+        except Exception:
+            self.send_error_json("Internal Server Error", 500)
 
     def handle_version(self):
         response = {
@@ -343,8 +388,11 @@ class CIEApiHandler(BaseHTTPRequestHandler):
         self.send_json(response)
 
 def main():
-    host = "127.0.0.1"
-    port = 8080
+    import config_engine
+    config = config_engine.load_config()
+    api_config = config.get("api", {})
+    host = api_config.get("host", "127.0.0.1")
+    port = api_config.get("port", 8080)
     
     server = HTTPServer((host, port), CIEApiHandler)
     print("CIE API Server")

@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-27T07:59:47.731080Z",
+    "scanner": "plugin_engine",
+    "plugin_count": 1
+  },
+  "plugins": [
+    {
+      "id": "plugin:example",
+      "name": "Example Plugin",
+      "version": 1,
+      "type": "utility",
+      "enabled": true,
+      "status": "loaded"
+    }
+  ]
+}

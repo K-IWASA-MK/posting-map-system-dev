@@ -1,10 +1,10 @@
 {
   "export_version": 1,
   "export_id": "export:0001",
-  "generated_at": "2026-06-27T07:43:55.158094Z",
+  "generated_at": "2026-06-27T08:00:18.446900Z",
   "format": "json",
   "cie_version": "2.2.0-alpha.0",
-  "platform_phase": "Phase23",
+  "platform_phase": "Phase24",
   "repository_summary": {
     "functions": 105,
     "routes": 5,
@@ -48,5 +48,10 @@
     "grade": "B",
     "color": "🔵",
     "overall_health": "GOOD"
+  },
+  "plugins_summary": {
+    "loaded": 1,
+    "disabled": 0,
+    "invalid": 0
   }
 }

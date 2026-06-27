@@ -26,7 +26,13 @@ CIE_VERSION = "2.2.0-alpha.0"
 PLATFORM_VERSION = "Phase21"
 
 def main():
+    global CIE_VERSION, PLATFORM_VERSION
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(script_dir)
+    import config_engine
+    config = config_engine.load_config()
+    CIE_VERSION = config.get("cie_version", "2.2.0-alpha.0")
+    PLATFORM_VERSION = config.get("platform_phase", "Phase24")
     
     # 成果物の状態スキャン
     missing = []
@@ -275,6 +281,36 @@ def main():
     print()
     print(f"Pipeline Integrity : {pipeline_integrity}")
     print()
+
+    # Plugins Summary
+    plug_loaded = 0
+    plug_disabled = 0
+    plug_invalid = 0
+    registry_path = os.path.join(script_dir, "plugins", "registry.json")
+    if os.path.exists(registry_path):
+        try:
+            with open(registry_path, "r", encoding="utf-8") as f:
+                registry_data = json.load(f)
+            for p in registry_data.get("plugins", []):
+                st = p.get("status", "")
+                if st == "loaded":
+                    plug_loaded += 1
+                elif st == "disabled":
+                    plug_disabled += 1
+                elif st == "invalid":
+                    plug_invalid += 1
+        except Exception:
+            pass
+
+    print("----------------------------------")
+    print("Plugins")
+    print("----------------------------------")
+    print()
+    print(f"Loaded   : {plug_loaded}")
+    print(f"Disabled : {plug_disabled}")
+    print(f"Invalid  : {plug_invalid}")
+    print()
+
     print("==================================")
     print("Summary")
     print("==================================")

@@ -5,11 +5,14 @@ import argparse
 import time
 from datetime import datetime, timezone
 
+import config_engine
+config_data = config_engine.load_config()
+
 # Constants Manifest
 EXPORT_VERSION = 1
 EXPORT_ID = "export:0001"
-CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase23"
+CIE_VERSION = config_data.get("cie_version", "2.2.0-alpha.0")
+PLATFORM_VERSION = config_data.get("platform_phase", "Phase24")
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -46,7 +49,7 @@ def load_data(script_dir):
                 corrupted.append(filename)
     return data_store, missing, corrupted
 
-def compile_metrics(data_store, missing):
+def compile_metrics(data_store, missing, script_dir):
     # 1. Repository Metrics
     functions_cnt = len(data_store["execution_graph.json"].get("functions", {})) if "execution_graph.json" in data_store else 0
     routes_cnt = len(data_store["route_graph.json"].get("routes", {})) if "route_graph.json" in data_store else 0
@@ -125,6 +128,26 @@ def compile_metrics(data_store, missing):
         pipeline_integrity = "FAIL"
         overall_health = "WARNING"
 
+    # 6. Plugins Summary
+    plug_loaded = 0
+    plug_disabled = 0
+    plug_invalid = 0
+    registry_path = os.path.join(script_dir, "plugins", "registry.json")
+    if os.path.exists(registry_path):
+        try:
+            with open(registry_path, "r", encoding="utf-8") as f:
+                registry_data = json.load(f)
+            for p in registry_data.get("plugins", []):
+                st = p.get("status", "")
+                if st == "loaded":
+                    plug_loaded += 1
+                elif st == "disabled":
+                    plug_disabled += 1
+                elif st == "invalid":
+                    plug_invalid += 1
+        except Exception:
+            pass
+
     return {
         "repository_summary": {
             "functions": functions_cnt,
@@ -159,6 +182,11 @@ def compile_metrics(data_store, missing):
             "grade": grade,
             "color": color,
             "overall_health": overall_health
+        },
+        "plugins_summary": {
+            "loaded": plug_loaded,
+            "disabled": plug_disabled,
+            "invalid": plug_invalid
         }
     }
 
@@ -230,6 +258,15 @@ def export_markdown(metrics, meta, output_path):
 | **Patch Plans** | `{metrics["pipeline_summary"]["patches"]}` |
 | **Apply Tasks** | `{metrics["pipeline_summary"]["apply"]}` |
 | **Rollback Tasks** | `{metrics["pipeline_summary"]["rollback"]}` |
+
+---
+
+## Plugins Summary
+| Item | Count |
+| --- | --- |
+| **Loaded** | `{metrics["plugins_summary"]["loaded"]}` |
+| **Disabled** | `{metrics["plugins_summary"]["disabled"]}` |
+| **Invalid** | `{metrics["plugins_summary"]["invalid"]}` |
 """
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(md)
@@ -391,6 +428,20 @@ def export_html(metrics, meta, output_path):
                 </tbody>
             </table>
         </div>
+
+        <div class="card">
+            <h2>Plugins Summary</h2>
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Loaded</td><td>{metrics["plugins_summary"]["loaded"]}</td></tr>
+                    <tr><td>Disabled</td><td>{metrics["plugins_summary"]["disabled"]}</td></tr>
+                    <tr><td>Invalid</td><td>{metrics["plugins_summary"]["invalid"]}</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>
@@ -436,6 +487,9 @@ def export_csv(metrics, meta, output_path):
         ["Pipeline Summary", "Patches", metrics["pipeline_summary"]["patches"]],
         ["Pipeline Summary", "Apply", metrics["pipeline_summary"]["apply"]],
         ["Pipeline Summary", "Rollback", metrics["pipeline_summary"]["rollback"]],
+        ["Plugins Summary", "Loaded", metrics["plugins_summary"]["loaded"]],
+        ["Plugins Summary", "Disabled", metrics["plugins_summary"]["disabled"]],
+        ["Plugins Summary", "Invalid", metrics["plugins_summary"]["invalid"]],
     ])
     
     csv_content = ""
@@ -446,9 +500,16 @@ def export_csv(metrics, meta, output_path):
         f.write(csv_content)
 
 def main():
+    import config_engine
+    config = config_engine.load_config()
+    export_cfg = config.get("export", {})
+    
+    default_fmt = export_cfg.get("default_format", "markdown")
+    default_out = export_cfg.get("output_directory", "exports")
+
     parser = argparse.ArgumentParser(description="CIE Platform Export Engine")
-    parser.add_argument("--format", required=True, choices=["markdown", "html", "json", "csv"], help="Export format")
-    parser.add_argument("--output", default="exports", help="Output directory")
+    parser.add_argument("--format", default=default_fmt, choices=["markdown", "html", "json", "csv"], help="Export format")
+    parser.add_argument("--output", default=default_out, help="Output directory")
     args = parser.parse_args()
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -462,7 +523,7 @@ def main():
         print("Error: Corrupted JSON files detected.", file=sys.stderr)
         sys.exit(3)
         
-    metrics = compile_metrics(data_store, missing)
+    metrics = compile_metrics(data_store, missing, script_dir)
     
     # メタデータ
     now_utc = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")

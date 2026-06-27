@@ -6,8 +6,8 @@
 | **Export ID** | `export:0001` |
 | **Export Version** | `1` |
 | **CIE Version** | `2.2.0-alpha.0` |
-| **Platform Phase** | `Phase23` |
-| **Generated At** | `2026-06-27T07:43:55.041125Z` |
+| **Platform Phase** | `Phase24` |
+| **Generated At** | `2026-06-27T08:00:18.332554Z` |
 | **Format** | `Markdown` |
 
 ---
@@ -69,3 +69,12 @@
 | **Patch Plans** | `112` |
 | **Apply Tasks** | `112` |
 | **Rollback Tasks** | `112` |
+
+---
+
+## Plugins Summary
+| Item | Count |
+| --- | --- |
+| **Loaded** | `1` |
+| **Disabled** | `0` |
+| **Invalid** | `0` |

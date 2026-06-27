@@ -914,3 +914,41 @@ Execution Plan
 * Repository 内の既存ファイルを書き換えてはならない。
 
 * Export は Presentation Layer として扱う。
+
+---
+
+### 27. Configuration Engine Rules
+
+* Configuration Engine は
+  tools/config/cie.config.json
+  を唯一の設定ソースとする。
+
+* Repository の再解析は禁止する。
+
+* Builder の起動は禁止する。
+
+* Configuration は Read Only とする。
+
+* CLI・Dashboard・API・Metrics・Export は
+  Configuration Engine を経由して設定を取得する。
+
+* デフォルト設定の補完は許可するが、
+  Repository 内の既存ソースコードを書き換えてはならない。
+
+---
+
+### 28. Plugin System Rules
+
+* Plugin は tools/plugins/ 配下で管理する。
+
+* Core は Plugin を直接参照しない。
+
+* Plugin Engine が Registry を生成する.
+
+* Builder は Plugin を起動しない。
+
+* Repository の再解析は禁止。
+
+* Plugin のコード編集は禁止。
+
+* Plugin Registry を唯一の情報源とする。

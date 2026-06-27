@@ -18,7 +18,43 @@ const JSON_ARTIFACTS = [
     "patch_rollback_plan.json"
 ];
 
+let refreshTimer = null;
+
 async function initDashboard() {
+    // API 経由での設定取得
+    let config = {
+        cie_version: "2.2.0-alpha.0",
+        platform_phase: "Phase24",
+        theme: "dark",
+        dashboard: { refresh_interval: 30 },
+        api: { host: "127.0.0.1", port: 8080 }
+    };
+    
+    try {
+        const cfgResponse = await fetch("http://127.0.0.1:8080/config");
+        if (cfgResponse.ok) {
+            const cfgJson = await cfgResponse.json();
+            if (cfgJson && cfgJson.config) {
+                config = cfgJson.config;
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to fetch API config, using defaults.");
+    }
+    
+    // UIデバッグ要素の更新
+    document.getElementById("cfg-api-server").textContent = `${config.api?.host ?? "127.0.0.1"}:${config.api?.port ?? 8080}`;
+    document.getElementById("cfg-theme").textContent = config.theme ?? "dark";
+    document.getElementById("cfg-refresh").textContent = `${config.dashboard?.refresh_interval ?? 30}s`;
+    document.getElementById("meta-cie-version").textContent = config.cie_version ?? "2.2.0-alpha.0";
+    document.getElementById("meta-platform-phase").textContent = config.platform_phase ?? "Phase24";
+
+    // 自動更新タイマーのセット（初回のみ）
+    if (!refreshTimer) {
+        const interval = (config.dashboard?.refresh_interval ?? 30) * 1000;
+        refreshTimer = setInterval(initDashboard, interval);
+    }
+
     const dataStore = {};
     let missingCount = 0;
     let corruptedCount = 0;
@@ -195,7 +231,29 @@ async function initDashboard() {
     document.getElementById("pipe-execs").textContent = getSafeCount(execCnt);
     document.getElementById("pipe-patches").textContent = getSafeCount(patchCnt);
     document.getElementById("pipe-apply").textContent = getSafeCount(applyCnt);
-    document.getElementById("pipe-rollback").textContent = getSafeCount(rollbackCnt);
+    // 5. Plugins Summary
+    let plugLoaded = 0;
+    let plugDisabled = 0;
+    let plugInvalid = 0;
+    
+    try {
+        const plugResponse = await fetch("http://127.0.0.1:8080/plugins");
+        if (plugResponse.ok) {
+            const plugJson = await plugResponse.json();
+            const pluginsList = plugJson.plugins || [];
+            pluginsList.forEach(p => {
+                if (p.status === "loaded") plugLoaded++;
+                else if (p.status === "disabled") plugDisabled++;
+                else if (p.status === "invalid") plugInvalid++;
+            });
+        }
+    } catch (e) {
+        console.warn("Failed to fetch plugins from API, using fallback 0.");
+    }
+    
+    document.getElementById("plug-loaded").textContent = plugLoaded;
+    document.getElementById("plug-disabled").textContent = plugDisabled;
+    document.getElementById("plug-invalid").textContent = plugInvalid;
 }
 
 // ページロード時にイニシャライズ

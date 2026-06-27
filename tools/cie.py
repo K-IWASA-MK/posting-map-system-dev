@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -26,7 +26,7 @@ JSON_ARTIFACTS = [
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase23"
+PLATFORM_VERSION = "Phase25"
 
 def run_build(args):
     """
@@ -240,6 +240,61 @@ def run_export(args):
         print(f"Error: Export execution failed with code {e.returncode}.", file=sys.stderr)
         sys.exit(3)
 
+def run_config(args):
+    """
+    config サブコマンド: config_engine.py を介して設定のロードと整合性を検証する。
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(script_dir)
+    try:
+        import config_engine
+        
+        # アクションに応じた分岐
+        if args.action == "reset":
+            config = config_engine.reset_config()
+            print("Configuration reset to defaults.")
+            sys.exit(0)
+        
+        config, missing, patched = config_engine.validate_config()
+        
+        if args.action == "show":
+            print(json.dumps(config, indent=2, ensure_ascii=False))
+            sys.exit(0)
+            
+        # デフォルト（引数なし、または validate の場合）は診断要約を表示
+        print("Configuration Loaded")
+        print(f"Version      : {config.get('version', 1)}")
+        print(f"Platform     : {config.get('platform_phase', PLATFORM_VERSION)}")
+        print(f"Missing Keys : {missing}")
+        print(f"Patched Keys : {patched}")
+        print("Status       : PASS")
+        sys.exit(0)
+    except Exception as e:
+        print(f"Error: config: {e}", file=sys.stderr)
+        sys.exit(3)
+
+def run_plugin(args):
+    """
+    plugin サブコマンド: plugin_engine.py を起動し、プラグインをスキャンして registry を作成する。
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    plugin_path = os.path.join(script_dir, "plugin_engine.py")
+    
+    if not os.path.exists(plugin_path):
+        print(f"Error: Plugin engine not found at {plugin_path}", file=sys.stderr)
+        sys.exit(3)
+        
+    cmd = ["python3", plugin_path]
+    if args.dry_run:
+        cmd.append("--dry-run")
+        
+    try:
+        subprocess.run(cmd, check=True)
+        sys.exit(0)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Plugin scanning failed with code {e.returncode}.", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -254,6 +309,8 @@ Available commands:
   api      Launch the local read-only API server.
   metrics  Generate and display code quality and health metrics.
   export   Export metrics report in multiple formats.
+  config   Manage and validate platform configurations.
+  plugin   Scan plugins and generate registry.
         """
     )
     
@@ -287,6 +344,14 @@ Available commands:
     export_parser.add_argument("--format", required=True, choices=["markdown", "html", "json", "csv"], help="Export format")
     export_parser.add_argument("--output", help="Output directory")
     
+    # config コマンドパーサー
+    config_parser = subparsers.add_parser("config", help="Manage and validate platform configurations")
+    config_parser.add_argument("action", nargs="?", choices=["show", "validate", "reset"], help="Config action to perform")
+    
+    # plugin コマンドパーサー
+    plugin_parser = subparsers.add_parser("plugin", help="Scan plugins and generate registry")
+    plugin_parser.add_argument("--dry-run", action="store_true", help="Perform a scan dry-run without writing registry")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -312,6 +377,10 @@ Available commands:
         run_metrics(args)
     elif args.command == "export":
         run_export(args)
+    elif args.command == "config":
+        run_config(args)
+    elif args.command == "plugin":
+        run_plugin(args)
     else:
         # Invalid Command
         parser.print_help()

@@ -1,0 +1,9 @@
+{
+  "id": "plugin:example",
+  "name": "Example Plugin",
+  "version": 1,
+  "type": "utility",
+  "entry": "example.py",
+  "enabled": true,
+  "description": "Example CIE plugin."
+}
