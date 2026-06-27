@@ -167,6 +167,63 @@ def compile_metrics(data_store, missing, script_dir):
         except Exception:
             pass
 
+    # 8. Plugin Lifecycle Summary
+    life_ready = 0
+    life_idle = 0
+    life_disabled = 0
+    life_invalid = 0
+    lifecycle_path = os.path.join(script_dir, "plugins", "lifecycle.json")
+    if os.path.exists(lifecycle_path):
+        try:
+            with open(lifecycle_path, "r", encoding="utf-8") as f:
+                lifecycle_data = json.load(f)
+            life_ready = lifecycle_data.get("_meta", {}).get("ready_count", 0)
+            life_idle = lifecycle_data.get("_meta", {}).get("idle_count", 0)
+            life_disabled = lifecycle_data.get("_meta", {}).get("disabled_count", 0)
+            life_invalid = lifecycle_data.get("_meta", {}).get("invalid_count", 0)
+        except Exception:
+            pass
+
+    # 9. Plugin Dependency Summary
+    dep_count = 0
+    dep_resolved = 0
+    dep_circular = 0
+    dep_avg_deg = 0.0
+    dep_path = os.path.join(script_dir, "plugins", "dependency.json")
+    if os.path.exists(dep_path):
+        try:
+            with open(dep_path, "r", encoding="utf-8") as f:
+                dep_data = json.load(f)
+            dep_count = dep_data.get("_meta", {}).get("dependency_count", 0)
+            dep_resolved = dep_data.get("_meta", {}).get("resolved_count", 0)
+            dep_circular = dep_data.get("_meta", {}).get("circular_count", 0)
+            dep_list = dep_data.get("dependencies", [])
+            if dep_list:
+                total_reqs = sum(len(d.get("requires", [])) for d in dep_list)
+                dep_avg_deg = total_reqs / len(dep_list)
+        except Exception:
+            pass
+
+    # 10. Plugin Scheduler Summary
+    sched_count = 0
+    sched_ready = 0
+    sched_blocked = 0
+    sched_avg_queue = 0.0
+    sched_path = os.path.join(script_dir, "plugins", "scheduler.json")
+    if os.path.exists(sched_path):
+        try:
+            with open(sched_path, "r", encoding="utf-8") as f:
+                sched_data = json.load(f)
+            sched_count = sched_data.get("_meta", {}).get("scheduler_count", 0)
+            sched_ready = sched_data.get("_meta", {}).get("ready_count", 0)
+            sched_blocked = sched_data.get("_meta", {}).get("blocked_count", 0)
+            sched_list = sched_data.get("scheduler", [])
+            ready_scheds = [s for s in sched_list if s.get("status") == "ready"]
+            if ready_scheds:
+                sched_avg_queue = sum(s.get("queue_order", 0) for s in ready_scheds) / len(ready_scheds)
+        except Exception:
+            pass
+
     return {
         "repository_summary": {
             "functions": functions_cnt,
@@ -212,6 +269,24 @@ def compile_metrics(data_store, missing, script_dir):
             "ready": run_ready,
             "execution_allowed": run_exec,
             "disabled": run_disabled
+        },
+        "lifecycle_summary": {
+            "ready": life_ready,
+            "idle": life_idle,
+            "disabled": life_disabled,
+            "invalid": life_invalid
+        },
+        "dependency_summary": {
+            "dependency_count": dep_count,
+            "resolved": dep_resolved,
+            "circular": dep_circular,
+            "average_dependency": dep_avg_deg
+        },
+        "scheduler_summary": {
+            "scheduler_count": sched_count,
+            "ready": sched_ready,
+            "blocked": sched_blocked,
+            "average_queue": sched_avg_queue
         }
     }
 
@@ -302,6 +377,36 @@ def export_markdown(metrics, meta, output_path):
 | **Ready** | `{metrics["runtime_summary"]["ready"]}` |
 | **Execution Allowed** | `{metrics["runtime_summary"]["execution_allowed"]}` |
 | **Disabled** | `{metrics["runtime_summary"]["disabled"]}` |
+
+---
+
+## Plugin Lifecycle Summary
+| Item | Count |
+| --- | --- |
+| **Ready** | `{metrics["lifecycle_summary"]["ready"]}` |
+| **Idle** | `{metrics["lifecycle_summary"]["idle"]}` |
+| **Disabled** | `{metrics["lifecycle_summary"]["disabled"]}` |
+| **Invalid** | `{metrics["lifecycle_summary"]["invalid"]}` |
+
+---
+
+## Plugin Dependency Summary
+| Item | Count |
+| --- | --- |
+| **Dependencies** | `{metrics["dependency_summary"]["dependency_count"]}` |
+| **Resolved** | `{metrics["dependency_summary"]["resolved"]}` |
+| **Circular** | `{metrics["dependency_summary"]["circular"]}` |
+| **Average Dependency** | `{metrics["dependency_summary"]["average_dependency"]:.1f}` |
+
+---
+
+## Plugin Scheduler Summary
+| Item | Count |
+| --- | --- |
+| **Queue Count** | `{metrics["scheduler_summary"]["scheduler_count"]}` |
+| **Ready** | `{metrics["scheduler_summary"]["ready"]}` |
+| **Blocked** | `{metrics["scheduler_summary"]["blocked"]}` |
+| **Average Queue** | `{metrics["scheduler_summary"]["average_queue"]:.1f}` |
 """
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(md)
@@ -492,6 +597,51 @@ def export_html(metrics, meta, output_path):
                 </tbody>
             </table>
         </div>
+
+        <div class="card">
+            <h2>Plugin Lifecycle Summary</h2>
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ready</td><td>{metrics["lifecycle_summary"]["ready"]}</td></tr>
+                    <tr><td>Idle</td><td>{metrics["lifecycle_summary"]["idle"]}</td></tr>
+                    <tr><td>Disabled</td><td>{metrics["lifecycle_summary"]["disabled"]}</td></tr>
+                    <tr><td>Invalid</td><td>{metrics["lifecycle_summary"]["invalid"]}</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Plugin Dependency Summary</h2>
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Dependencies</td><td>{metrics["dependency_summary"]["dependency_count"]}</td></tr>
+                    <tr><td>Resolved</td><td>{metrics["dependency_summary"]["resolved"]}</td></tr>
+                    <tr><td>Circular</td><td>{metrics["dependency_summary"]["circular"]}</td></tr>
+                    <tr><td>Average Dependency</td><td>{metrics["dependency_summary"]["average_dependency"]:.1f}</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Plugin Scheduler Summary</h2>
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Queue Count</td><td>{metrics["scheduler_summary"]["scheduler_count"]}</td></tr>
+                    <tr><td>Ready</td><td>{metrics["scheduler_summary"]["ready"]}</td></tr>
+                    <tr><td>Blocked</td><td>{metrics["scheduler_summary"]["blocked"]}</td></tr>
+                    <tr><td>Average Queue</td><td>{metrics["scheduler_summary"]["average_queue"]:.1f}</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>
@@ -544,6 +694,18 @@ def export_csv(metrics, meta, output_path):
         ["Plugin Runtime Summary", "Ready", metrics["runtime_summary"]["ready"]],
         ["Plugin Runtime Summary", "Execution Allowed", metrics["runtime_summary"]["execution_allowed"]],
         ["Plugin Runtime Summary", "Disabled", metrics["runtime_summary"]["disabled"]],
+        ["Plugin Lifecycle Summary", "Ready", metrics["lifecycle_summary"]["ready"]],
+        ["Plugin Lifecycle Summary", "Idle", metrics["lifecycle_summary"]["idle"]],
+        ["Plugin Lifecycle Summary", "Disabled", metrics["lifecycle_summary"]["disabled"]],
+        ["Plugin Lifecycle Summary", "Invalid", metrics["lifecycle_summary"]["invalid"]],
+        ["Plugin Dependency Summary", "Dependencies", metrics["dependency_summary"]["dependency_count"]],
+        ["Plugin Dependency Summary", "Resolved", metrics["dependency_summary"]["resolved"]],
+        ["Plugin Dependency Summary", "Circular", metrics["dependency_summary"]["circular"]],
+        ["Plugin Dependency Summary", "Average Dependency", metrics["dependency_summary"]["average_dependency"]],
+        ["Plugin Scheduler Summary", "Queue Count", metrics["scheduler_summary"]["scheduler_count"]],
+        ["Plugin Scheduler Summary", "Ready", metrics["scheduler_summary"]["ready"]],
+        ["Plugin Scheduler Summary", "Blocked", metrics["scheduler_summary"]["blocked"]],
+        ["Plugin Scheduler Summary", "Average Queue", metrics["scheduler_summary"]["average_queue"]],
     ])
     
     csv_content = ""

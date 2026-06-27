@@ -7,7 +7,7 @@
 | **Export Version** | `1` |
 | **CIE Version** | `2.2.0-alpha.0` |
 | **Platform Phase** | `Phase24` |
-| **Generated At** | `2026-06-27T08:07:19.933213Z` |
+| **Generated At** | `2026-06-27T08:29:27.512411Z` |
 | **Format** | `Markdown` |
 
 ---
@@ -88,3 +88,33 @@
 | **Ready** | `1` |
 | **Execution Allowed** | `0` |
 | **Disabled** | `0` |
+
+---
+
+## Plugin Lifecycle Summary
+| Item | Count |
+| --- | --- |
+| **Ready** | `1` |
+| **Idle** | `0` |
+| **Disabled** | `0` |
+| **Invalid** | `0` |
+
+---
+
+## Plugin Dependency Summary
+| Item | Count |
+| --- | --- |
+| **Dependencies** | `1` |
+| **Resolved** | `1` |
+| **Circular** | `0` |
+| **Average Dependency** | `0.0` |
+
+---
+
+## Plugin Scheduler Summary
+| Item | Count |
+| --- | --- |
+| **Queue Count** | `1` |
+| **Ready** | `1` |
+| **Blocked** | `0` |
+| **Average Queue** | `1.0` |

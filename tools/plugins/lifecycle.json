@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-27T08:15:47.091713Z",
+    "scanner": "plugin_lifecycle",
+    "lifecycle_count": 1,
+    "ready_count": 1,
+    "idle_count": 0,
+    "disabled_count": 0,
+    "invalid_count": 0
+  },
+  "lifecycle": [
+    {
+      "id": "lifecycle:0001",
+      "runtime": "runtime:0001",
+      "plugin": "plugin:example",
+      "state": "ready",
+      "previous_state": "loaded",
+      "next_state": "idle",
+      "transition_allowed": true,
+      "execution_allowed": false,
+      "simulation_only": true,
+      "health": "good",
+      "lifecycle_version": 1,
+      "trace": {
+        "registry": "plugin:example",
+        "runtime": "runtime:0001",
+        "lifecycle": "lifecycle:0001"
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-27T08:28:57.468852Z",
+    "scanner": "plugin_scheduler",
+    "scheduler_count": 1,
+    "ready_count": 1,
+    "blocked_count": 0,
+    "invalid_count": 0
+  },
+  "scheduler": [
+    {
+      "id": "scheduler:0001",
+      "plugin": "plugin:example",
+      "runtime": "runtime:0001",
+      "lifecycle": "lifecycle:0001",
+      "dependency": "dependency:0001",
+      "queue_order": 1,
+      "priority": "normal",
+      "execution_group": 1,
+      "status": "ready",
+      "blocked": false,
+      "execution_allowed": false,
+      "simulation_only": true,
+      "scheduler_version": 1,
+      "health": "good",
+      "trace": {
+        "registry": "plugin:example",
+        "runtime": "runtime:0001",
+        "lifecycle": "lifecycle:0001",
+        "dependency": "dependency:0001",
+        "scheduler": "scheduler:0001"
+      }
+    }
+  ]
+}

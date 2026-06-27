@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -26,7 +26,7 @@ JSON_ARTIFACTS = [
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase26"
+PLATFORM_VERSION = "Phase29"
 
 def run_build(args):
     """
@@ -317,6 +317,72 @@ def run_runtime(args):
         print(f"Error: Runtime execution failed with code {e.returncode}.", file=sys.stderr)
         sys.exit(3)
 
+def run_lifecycle(args):
+    """
+    lifecycle サブコマンド: plugin_lifecycle.py を起動し、プラグインライフサイクルをスキャンして生成する。
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    lifecycle_path = os.path.join(script_dir, "plugin_lifecycle.py")
+    
+    if not os.path.exists(lifecycle_path):
+        print(f"Error: Lifecycle engine not found at {lifecycle_path}", file=sys.stderr)
+        sys.exit(3)
+        
+    cmd = ["python3", lifecycle_path]
+    if args.dry_run:
+        cmd.append("--dry-run")
+        
+    try:
+        subprocess.run(cmd, check=True)
+        sys.exit(0)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Lifecycle execution failed with code {e.returncode}.", file=sys.stderr)
+        sys.exit(3)
+
+def run_dependency(args):
+    """
+    dependency サブコマンド: plugin_dependency.py を起動し、依存解決をスキャンして生成する。
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    dep_path = os.path.join(script_dir, "plugin_dependency.py")
+    
+    if not os.path.exists(dep_path):
+        print(f"Error: Dependency engine not found at {dep_path}", file=sys.stderr)
+        sys.exit(3)
+        
+    cmd = ["python3", dep_path]
+    if args.dry_run:
+        cmd.append("--dry-run")
+        
+    try:
+        subprocess.run(cmd, check=True)
+        sys.exit(0)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Dependency execution failed with code {e.returncode}.", file=sys.stderr)
+        sys.exit(3)
+
+def run_scheduler(args):
+    """
+    scheduler サブコマンド: plugin_scheduler.py を起動し、スケジュールをスキャンして生成する。
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    sched_path = os.path.join(script_dir, "plugin_scheduler.py")
+    
+    if not os.path.exists(sched_path):
+        print(f"Error: Scheduler engine not found at {sched_path}", file=sys.stderr)
+        sys.exit(3)
+        
+    cmd = ["python3", sched_path]
+    if args.dry_run:
+        cmd.append("--dry-run")
+        
+    try:
+        subprocess.run(cmd, check=True)
+        sys.exit(0)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Scheduler execution failed with code {e.returncode}.", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -334,6 +400,9 @@ Available commands:
   config   Manage and validate platform configurations.
   plugin   Scan plugins and generate registry.
   runtime  Map plugins to runtime simulation.
+  lifecycle Map plugins to lifecycle states.
+  dependency Map plugins to dependency resolution.
+  scheduler  Map plugins to execution schedule.
         """
     )
     
@@ -379,6 +448,18 @@ Available commands:
     runtime_parser = subparsers.add_parser("runtime", help="Map plugins to runtime simulation")
     runtime_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime dry-run without writing registry")
     
+    # lifecycle コマンドパーサー
+    lifecycle_parser = subparsers.add_parser("lifecycle", help="Map plugins to lifecycle states")
+    lifecycle_parser.add_argument("--dry-run", action="store_true", help="Perform a lifecycle dry-run without writing registry")
+    
+    # dependency コマンドパーサー
+    dependency_parser = subparsers.add_parser("dependency", help="Map plugins to dependency resolution")
+    dependency_parser.add_argument("--dry-run", action="store_true", help="Perform a dependency dry-run without writing registry")
+    
+    # scheduler コマンドパーサー
+    scheduler_parser = subparsers.add_parser("scheduler", help="Map plugins to execution schedule")
+    scheduler_parser.add_argument("--dry-run", action="store_true", help="Perform a scheduler dry-run without writing registry")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -410,6 +491,12 @@ Available commands:
         run_plugin(args)
     elif args.command == "runtime":
         run_runtime(args)
+    elif args.command == "lifecycle":
+        run_lifecycle(args)
+    elif args.command == "dependency":
+        run_dependency(args)
+    elif args.command == "scheduler":
+        run_scheduler(args)
     else:
         # Invalid Command
         parser.print_help()

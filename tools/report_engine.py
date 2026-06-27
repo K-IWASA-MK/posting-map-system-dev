@@ -340,6 +340,95 @@ def main():
     print(f"Disabled          : {run_disabled}")
     print()
 
+    # Plugin Lifecycle Summary
+    life_ready = 0
+    life_idle = 0
+    life_disabled = 0
+    life_invalid = 0
+    lifecycle_path = os.path.join(script_dir, "plugins", "lifecycle.json")
+    if os.path.exists(lifecycle_path):
+        try:
+            with open(lifecycle_path, "r", encoding="utf-8") as f:
+                lifecycle_data = json.load(f)
+            life_ready = lifecycle_data.get("_meta", {}).get("ready_count", 0)
+            life_idle = lifecycle_data.get("_meta", {}).get("idle_count", 0)
+            life_disabled = lifecycle_data.get("_meta", {}).get("disabled_count", 0)
+            life_invalid = lifecycle_data.get("_meta", {}).get("invalid_count", 0)
+        except Exception:
+            pass
+
+    print("----------------------------------")
+    print("Plugin Lifecycle Summary")
+    print("----------------------------------")
+    print()
+    print(f"Ready    : {life_ready}")
+    print(f"Idle     : {life_idle}")
+    print(f"Disabled : {life_disabled}")
+    print(f"Invalid  : {life_invalid}")
+    print()
+
+    # Plugin Dependency Summary
+    dep_count = 0
+    dep_resolved = 0
+    dep_circular = 0
+    dep_avg_order = 0.0
+    dep_path = os.path.join(script_dir, "plugins", "dependency.json")
+    if os.path.exists(dep_path):
+        try:
+            with open(dep_path, "r", encoding="utf-8") as f:
+                dep_data = json.load(f)
+            dep_count = dep_data.get("_meta", {}).get("dependency_count", 0)
+            dep_resolved = dep_data.get("_meta", {}).get("resolved_count", 0)
+            dep_circular = dep_data.get("_meta", {}).get("circular_count", 0)
+            
+            dep_list = dep_data.get("dependencies", [])
+            resolved_deps = [d for d in dep_list if d.get("status") == "resolved"]
+            if resolved_deps:
+                dep_avg_order = sum(d.get("load_order", 0) for d in resolved_deps) / len(resolved_deps)
+        except Exception:
+            pass
+
+    print("----------------------------------")
+    print("Plugin Dependency Summary")
+    print("----------------------------------")
+    print()
+    print(f"Dependencies       : {dep_count}")
+    print(f"Resolved           : {dep_resolved}")
+    print(f"Circular           : {dep_circular}")
+    print(f"Average Load Order : {dep_avg_order:.1f}")
+    print()
+
+    # Plugin Scheduler Summary
+    sched_count = 0
+    sched_ready = 0
+    sched_blocked = 0
+    sched_avg_queue = 0.0
+    sched_path = os.path.join(script_dir, "plugins", "scheduler.json")
+    if os.path.exists(sched_path):
+        try:
+            with open(sched_path, "r", encoding="utf-8") as f:
+                sched_data = json.load(f)
+            sched_count = sched_data.get("_meta", {}).get("scheduler_count", 0)
+            sched_ready = sched_data.get("_meta", {}).get("ready_count", 0)
+            sched_blocked = sched_data.get("_meta", {}).get("blocked_count", 0)
+            
+            sched_list = sched_data.get("scheduler", [])
+            ready_scheds = [s for s in sched_list if s.get("status") == "ready"]
+            if ready_scheds:
+                sched_avg_queue = sum(s.get("queue_order", 0) for s in ready_scheds) / len(ready_scheds)
+        except Exception:
+            pass
+
+    print("----------------------------------")
+    print("Plugin Scheduler Summary")
+    print("----------------------------------")
+    print()
+    print(f"Queue Count   : {sched_count}")
+    print(f"Ready         : {sched_ready}")
+    print(f"Blocked       : {sched_blocked}")
+    print(f"Average Queue : {sched_avg_queue:.1f}")
+    print()
+
     print("==================================")
     print("Summary")
     print("==================================")

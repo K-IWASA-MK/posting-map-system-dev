@@ -970,3 +970,67 @@ Execution Plan
 * Runtime は execution_allowed=false を維持する。
 
 * Runtime は Simulation Layer とする。
+
+---
+
+### 30. Plugin Lifecycle Rules
+
+* Lifecycle は runtime.json のみを入力とする。
+
+* Plugin の実行は禁止する。
+
+* Builder 起動は禁止する。
+
+* Repository 再解析は禁止する。
+
+* Simulation Only を維持する。
+
+* lifecycle.json を唯一のLifecycle情報源とする。
+
+---
+
+### 31. Plugin Dependency Rules
+
+* dependency.json を唯一の Dependency Source とする。
+
+* lifecycle.json のみ利用する。
+
+* registry/runtime の再生成は禁止する。
+
+* Plugin の実行は禁止する。
+
+* Builder 起動は禁止する。
+
+* Repository 再解析は禁止する。
+
+* Read Only を維持する。
+
+* Simulation Only を維持する。
+
+* Dependency は決定論的に生成する。
+
+---
+
+### 32. Plugin Scheduler Rules
+
+* scheduler.json を唯一の Scheduler Source とする。
+
+* dependency.json のみ利用する。
+
+* Runtime 再生成は禁止する。
+
+* Lifecycle 再生成は禁止する。
+
+* Dependency 再生成は禁止する。
+
+* Plugin 実行は禁止する。
+
+* Builder 起動は禁止する。
+
+* Repository 再解析は禁止する。
+
+* Read Only を維持する。
+
+* Simulation Only を維持する。
+
+* Queue は決定論的に生成する。

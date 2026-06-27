@@ -106,6 +106,12 @@ class CIEApiHandler(BaseHTTPRequestHandler):
             self.handle_plugins()
         elif path == "/runtime":
             self.handle_runtime()
+        elif path == "/lifecycle":
+            self.handle_lifecycle()
+        elif path == "/dependency":
+            self.handle_dependency()
+        elif path == "/scheduler":
+            self.handle_scheduler()
         else:
             self.send_error_json("Not Found", 404)
 
@@ -160,7 +166,10 @@ class CIEApiHandler(BaseHTTPRequestHandler):
                 "/artifacts",
                 "/config",
                 "/plugins",
-                "/runtime"
+                "/runtime",
+                "/lifecycle",
+                "/dependency",
+                "/scheduler"
             ]
         }
         self.send_json(response)
@@ -174,6 +183,89 @@ class CIEApiHandler(BaseHTTPRequestHandler):
                 "config": config
             }
             self.send_json(response)
+        except Exception:
+            self.send_error_json("Internal Server Error", 500)
+
+    def handle_scheduler(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        sched_path = os.path.join(script_dir, "plugins", "scheduler.json")
+        
+        if not os.path.exists(sched_path):
+            self.send_json({
+                "api_version": API_VERSION,
+                "_meta": {
+                    "version": 1,
+                    "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    "scanner": "plugin_scheduler",
+                    "scheduler_count": 0,
+                    "ready_count": 0,
+                    "blocked_count": 0,
+                    "invalid_count": 0
+                },
+                "scheduler": []
+            })
+            return
+            
+        try:
+            with open(sched_path, "r", encoding="utf-8") as f:
+                sched_data = json.load(f)
+            self.send_json(sched_data)
+        except Exception:
+            self.send_error_json("Internal Server Error", 500)
+
+    def handle_dependency(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        dep_path = os.path.join(script_dir, "plugins", "dependency.json")
+        
+        if not os.path.exists(dep_path):
+            self.send_json({
+                "api_version": API_VERSION,
+                "_meta": {
+                    "version": 1,
+                    "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    "scanner": "plugin_dependency",
+                    "dependency_count": 0,
+                    "resolved_count": 0,
+                    "disabled_count": 0,
+                    "invalid_count": 0,
+                    "circular_count": 0
+                },
+                "dependencies": []
+            })
+            return
+            
+        try:
+            with open(dep_path, "r", encoding="utf-8") as f:
+                dep_data = json.load(f)
+            self.send_json(dep_data)
+        except Exception:
+            self.send_error_json("Internal Server Error", 500)
+
+    def handle_lifecycle(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        lifecycle_path = os.path.join(script_dir, "plugins", "lifecycle.json")
+        
+        if not os.path.exists(lifecycle_path):
+            self.send_json({
+                "api_version": API_VERSION,
+                "_meta": {
+                    "version": 1,
+                    "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    "scanner": "plugin_lifecycle",
+                    "lifecycle_count": 0,
+                    "ready_count": 0,
+                    "idle_count": 0,
+                    "disabled_count": 0,
+                    "invalid_count": 0
+                },
+                "lifecycle": []
+            })
+            return
+            
+        try:
+            with open(lifecycle_path, "r", encoding="utf-8") as f:
+                lifecycle_data = json.load(f)
+            self.send_json(lifecycle_data)
         except Exception:
             self.send_error_json("Internal Server Error", 500)
 

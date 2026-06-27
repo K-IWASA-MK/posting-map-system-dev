@@ -231,10 +231,20 @@ async function initDashboard() {
     document.getElementById("pipe-execs").textContent = getSafeCount(execCnt);
     document.getElementById("pipe-patches").textContent = getSafeCount(patchCnt);
     document.getElementById("pipe-apply").textContent = getSafeCount(applyCnt);
-    // 5. Plugins & Runtime Summary
+    // 5. Plugins & Lifecycle & Dependency & Scheduler Summary
     let plugLoaded = 0;
     let plugReady = 0;
-    let execAllowed = "Disabled";
+    let plugIdle = 0;
+    let plugDisabled = 0;
+    
+    let depResolved = 0;
+    let depCircular = 0;
+    let depMaxOrder = 0;
+
+    let schedQueue = 0;
+    let schedReady = 0;
+    let schedBlocked = 0;
+    let schedPriority = "NORMAL";
     
     try {
         const plugResponse = await fetch("http://127.0.0.1:8080/plugins");
@@ -248,21 +258,58 @@ async function initDashboard() {
     }
 
     try {
-        const runResponse = await fetch("http://127.0.0.1:8080/runtime");
-        if (runResponse.ok) {
-            const runJson = await runResponse.json();
-            const runtimeList = runJson.runtime || [];
-            plugReady = runtimeList.filter(r => r.status === "ready").length;
-            const anyAllowed = runtimeList.some(r => r.execution_allowed);
-            execAllowed = anyAllowed ? "Allowed" : "Disabled";
+        const lifeResponse = await fetch("http://127.0.0.1:8080/lifecycle");
+        if (lifeResponse.ok) {
+            const lifeJson = await lifeResponse.json();
+            const lifecycleList = lifeJson.lifecycle || [];
+            plugReady = lifecycleList.filter(l => l.state === "ready").length;
+            plugIdle = lifecycleList.filter(l => l.state === "idle").length;
+            plugDisabled = lifecycleList.filter(l => l.state === "disabled").length;
         }
     } catch (e) {
-        console.warn("Failed to fetch runtime from API.");
+        console.warn("Failed to fetch lifecycle from API.");
+    }
+
+    try {
+        const depResponse = await fetch("http://127.0.0.1:8080/dependency");
+        if (depResponse.ok) {
+            const depJson = await depResponse.json();
+            const depList = depJson.dependencies || [];
+            depResolved = depJson._meta?.resolved_count || depList.filter(d => d.status === "resolved").length;
+            depCircular = depJson._meta?.circular_count || depList.filter(d => d.circular).length;
+            depMaxOrder = depList.length > 0 ? Math.max(...depList.map(d => d.load_order || 0)) : 0;
+        }
+    } catch (e) {
+        console.warn("Failed to fetch dependency from API.");
+    }
+
+    try {
+        const schedResponse = await fetch("http://127.0.0.1:8080/scheduler");
+        if (schedResponse.ok) {
+            const schedJson = await schedResponse.json();
+            const schedList = schedJson.scheduler || [];
+            schedQueue = schedJson._meta?.scheduler_count || schedList.length;
+            schedReady = schedJson._meta?.ready_count || schedList.filter(s => s.status === "ready").length;
+            schedBlocked = schedJson._meta?.blocked_count || schedList.filter(s => s.blocked).length;
+            if (schedList.length > 0) {
+                schedPriority = schedList[0].priority ? schedList[0].priority.toUpperCase() : "NORMAL";
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to fetch scheduler from API.");
     }
     
     document.getElementById("plug-loaded").textContent = plugLoaded;
     document.getElementById("plug-ready").textContent = plugReady;
-    document.getElementById("plug-execution").textContent = execAllowed;
+    document.getElementById("plug-idle").textContent = plugIdle;
+    document.getElementById("plug-disabled").textContent = plugDisabled;
+    document.getElementById("plug-dep-resolved").textContent = depResolved;
+    document.getElementById("plug-dep-circular").textContent = depCircular > 0 ? "YES" : "NO";
+    document.getElementById("plug-dep-load-order").textContent = depMaxOrder;
+    document.getElementById("plug-sched-queue").textContent = schedQueue;
+    document.getElementById("plug-sched-ready").textContent = schedReady;
+    document.getElementById("plug-sched-blocked").textContent = schedBlocked;
+    document.getElementById("plug-sched-priority").textContent = schedPriority;
 }
 
 // ページロード時にイニシャライズ
