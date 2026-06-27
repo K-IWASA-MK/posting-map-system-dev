@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -31,11 +31,12 @@ JSON_ARTIFACTS = [
     "plugins/plugin_invocation.json",
     "plugins/runtime_invocation.json",
     "plugins/runtime_dispatch.json",
-    "plugins/runtime_factory.json"
+    "plugins/runtime_factory.json",
+    "plugins/runtime_session.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase35"
+PLATFORM_VERSION = "Phase36"
 
 def run_build(args):
     """
@@ -1100,6 +1101,138 @@ def run_runtime_factory(args):
         print(f"Error: Failed to write runtime_factory.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_session(args):
+    """
+    runtime-session サブコマンド: SessionManager を使用して runtime_session.json を生成する。
+    注意: この runtime_factory.json から直接 RuntimeInstance を構成するデータフロー is、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_factory import RuntimeInstance
+        from plugin_platform.plugin.runtime_session import SessionDescriptor, SessionRegistry, SessionManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_session modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    factory_path = os.path.join(script_dir, "plugins", "runtime_factory.json")
+    if not os.path.exists(factory_path):
+        print(f"Error: Runtime factory result not found at {factory_path}. Please run 'runtime-factory' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(factory_path, "r", encoding="utf-8") as f:
+            factory_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime factory: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    instances_data = factory_data.get("instances", [])
+    execution_id = factory_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    sessions = []
+    
+    # 決定論的ソート
+    sorted_instances = sorted(instances_data, key=lambda x: (x.get("instance_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = SessionRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_session_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, inst_data in enumerate(sorted_instances, 1):
+        instance_id = inst_data.get("instance_id")
+        runtime_id = inst_data.get("runtime_id")
+        status = inst_data.get("status")
+        config_inst = inst_data.get("configuration", {})
+        meta_inst = inst_data.get("metadata", {})
+        trace_id = inst_data.get("trace_id")
+        
+        # 暫定入力
+        instance = RuntimeInstance(
+            instance_id=instance_id,
+            runtime_id=runtime_id,
+            status=status,
+            configuration=config_inst,
+            metadata=meta_inst,
+            trace_id=trace_id
+        )
+        
+        try:
+            session = SessionManager.create_session(instance, context)
+            sessions.append(session.to_dict())
+            
+            # SessionRegistry 登録検証
+            descriptor = SessionDescriptor(
+                session_id=session.session_id,
+                instance_id=instance_id,
+                runtime_id=runtime_id,
+                status="initialized",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_session.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    session_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "session_count": len(sessions)
+        },
+        "sessions": sessions
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session (Dry Run)")
+        print(f"Sessions Count: {len(sessions)}")
+        for sess in sessions:
+            print(f"- Session: {sess.get('session_id')} (State: {sess.get('state')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(session_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session successfully written to runtime_session.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_session.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -1126,6 +1259,7 @@ Available commands:
   runtime-run Run plugin runtime invocation simulation (stub).
   runtime-dispatch Dispatch plugin runtimes.
   runtime-factory Resolve plugin runtime instances.
+  runtime-session Manage plugin runtime sessions.
         """
     )
     
@@ -1207,6 +1341,10 @@ Available commands:
     runtime_factory_parser = subparsers.add_parser("runtime-factory", help="Resolve plugin runtime instances")
     runtime_factory_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime factory dry-run without writing result")
     
+    # runtime-session コマンドパーサー
+    runtime_session_parser = subparsers.add_parser("runtime-session", help="Manage plugin runtime sessions")
+    runtime_session_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime session dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -1256,6 +1394,8 @@ Available commands:
         run_runtime_dispatch(args)
     elif args.command == "runtime-factory":
         run_runtime_factory(args)
+    elif args.command == "runtime-session":
+        run_runtime_session(args)
     else:
         # Invalid Command
         parser.print_help()
