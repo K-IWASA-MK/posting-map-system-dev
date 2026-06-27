@@ -2,8 +2,8 @@
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 36 (Plugin Runtime Session Foundation) の実装を完了し、セッション構築メタデータ構造を確立 ✅  
-> **次回のテーマ**: 🧠 CIE Phase 37 (Plugin Runtime Session Lifecycle Foundation) の構築およびテスト実装
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 37 (Plugin Runtime Session Lifecycle Foundation) の実装を完了し、セッション状態ライフサイクル構造を確立 ✅  
+> **次回のテーマ**: 🧠 CIE Phase 38 (Plugin Runtime Session Event Foundation) の構築およびテスト実装
 
 ---
 
@@ -31,7 +31,8 @@
 * **Phase 34**: Plugin Runtime Dispatcher Foundation [COMPLETED]
 * **Phase 35**: Plugin Runtime Factory Foundation [COMPLETED]
 * **Phase 36**: Plugin Runtime Session Foundation [COMPLETED]
-* **Phase 37**: Plugin Runtime Session Lifecycle Foundation
+* **Phase 37**: Plugin Runtime Session Lifecycle Foundation [COMPLETED]
+* **Phase 38**: Plugin Runtime Session Event Foundation
 
 ### Platform Development Policy
 * **No new Builder should be added unless absolutely necessary.**
@@ -46,11 +47,11 @@
 
 ## 💎 Milestone
 
-- **Tag**: `v2.9.0-alpha.0`
-- **Title**: `Plugin Runtime Session Foundation (Phase 36) Complete`
+- **Tag**: `v3.0.0-alpha.0`
+- **Title**: `Plugin Runtime Session Lifecycle Foundation (Phase 37) Complete`
 - **Status**:
-  - `Plugin Runtime Session Foundation Completed`
-  - `Phase 37 (Plugin Runtime Session Lifecycle) Started`
+  - `Plugin Runtime Session Lifecycle Foundation Completed`
+  - `Phase 38 (Plugin Runtime Session Event) Started`
 
 ---
 
@@ -169,6 +170,15 @@ CIE (Code Intelligence Engine) の基盤（Foundation）構築シリーズはす
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-28 セッション】CIE Phase 37 (Plugin Runtime Session Lifecycle Foundation) 構築（担当: Antigravity）
+- **目的**: Runtime Session のライフサイクルを管理する Runtime Session Lifecycle Layer の Foundation を実装し、ライフサイクル定義データ構造 (RuntimeSessionLifecycle, LifecycleDescriptor) とトレースID連鎖を確立する。
+- **実装内容**:
+  - **新パッケージ**: `plugin_platform/plugin/runtime_session_lifecycle/` パッケージを新設。
+  - **モジュールの実装**: [lifecycle_descriptor.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_session_lifecycle/lifecycle_descriptor.py), [runtime_session_lifecycle.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_session_lifecycle/runtime_session_lifecycle.py), [lifecycle_registry.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_session_lifecycle/lifecycle_registry.py), [lifecycle_manager.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_session_lifecycle/lifecycle_manager.py) の実装。トレースID整合性アサーションをクリアした上で、セッション ID から一意のライフサイクル ID を決定論的にマッピング・生成し、固定状態 "initialized" で保持する制御を確立。
+  - **CLI (`cie.py`) の拡張**: `runtime-lifecycle` サブコマンドを追加（既存の `lifecycle` コマンドとの衝突を回避）。`runtime_session.json` をテスト用の暫定入力として読み込み、各結果から Session を復元・Managerへ渡して `runtime_session_lifecycle.json` を生成する処理を実装。
+  - **verify & doctor の拡張**: `plugins/runtime_session_lifecycle.json` を検証対象 (全26個) に追加し、整合性合格を確認。
+- **変更ファイル**: `plugin_platform/plugin/runtime_session_lifecycle/` 内のモジュール、[cie.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie.py), [HANDOVER.md](file:///Volumes/SSD_DATA/posting-map-system/HANDOVER.md)
 
 ### 【2026-06-28 セッション】CIE Phase 36 (Plugin Runtime Session Foundation) 構築（担当: Antigravity）
 - **目的**: Runtime Factory が生成した RuntimeInstance を実行単位として管理する Runtime Session Layer の Foundation を実装し、セッションデータ構造 (RuntimeSession, SessionDescriptor) とトレースID連鎖を確立する。

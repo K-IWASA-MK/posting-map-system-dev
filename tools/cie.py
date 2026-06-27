@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -32,11 +32,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_invocation.json",
     "plugins/runtime_dispatch.json",
     "plugins/runtime_factory.json",
-    "plugins/runtime_session.json"
+    "plugins/runtime_session.json",
+    "plugins/runtime_session_lifecycle.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase36"
+PLATFORM_VERSION = "Phase37"
 
 def run_build(args):
     """
@@ -1233,6 +1234,138 @@ def run_runtime_session(args):
         print(f"Error: Failed to write runtime_session.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_lifecycle(args):
+    """
+    runtime-lifecycle サブコマンド: LifecycleManager を使用して runtime_session_lifecycle.json を生成する。
+    注意: この runtime_session.json から直接 RuntimeSession を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_session import RuntimeSession
+        from plugin_platform.plugin.runtime_session_lifecycle import LifecycleDescriptor, LifecycleRegistry, LifecycleManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_session_lifecycle modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    session_path = os.path.join(script_dir, "plugins", "runtime_session.json")
+    if not os.path.exists(session_path):
+        print(f"Error: Runtime session result not found at {session_path}. Please run 'runtime-session' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(session_path, "r", encoding="utf-8") as f:
+            session_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime session: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    sessions_data = session_data.get("sessions", [])
+    execution_id = session_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    lifecycles = []
+    
+    # 決定論的ソート
+    sorted_sessions = sorted(sessions_data, key=lambda x: (x.get("session_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = LifecycleRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_lifecycle_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, sess_data in enumerate(sorted_sessions, 1):
+        session_id = sess_data.get("session_id")
+        runtime_instance = sess_data.get("runtime_instance", {})
+        state = sess_data.get("state")
+        config_sess = sess_data.get("configuration", {})
+        meta_sess = sess_data.get("metadata", {})
+        trace_id = sess_data.get("trace_id")
+        
+        # 暫定入力
+        session = RuntimeSession(
+            session_id=session_id,
+            runtime_instance=runtime_instance,
+            state=state,
+            configuration=config_sess,
+            metadata=meta_sess,
+            trace_id=trace_id
+        )
+        
+        try:
+            lifecycle = LifecycleManager.create_lifecycle(session, context)
+            lifecycles.append(lifecycle.to_dict())
+            
+            # LifecycleRegistry 登録検証
+            descriptor = LifecycleDescriptor(
+                lifecycle_id=lifecycle.lifecycle_id,
+                session_id=session_id,
+                current_state="initialized",
+                allowed_states=["initialized", "running", "stopped", "terminated"],
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session lifecycle create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_session_lifecycle.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    lifecycle_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "lifecycle_count": len(lifecycles)
+        },
+        "lifecycles": lifecycles
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Lifecycle (Dry Run)")
+        print(f"Lifecycles Count: {len(lifecycles)}")
+        for lc in lifecycles:
+            print(f"- Lifecycle: {lc.get('lifecycle_id')} (State: {lc.get('state')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(lifecycle_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Lifecycle successfully written to runtime_session_lifecycle.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_session_lifecycle.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -1260,6 +1393,7 @@ Available commands:
   runtime-dispatch Dispatch plugin runtimes.
   runtime-factory Resolve plugin runtime instances.
   runtime-session Manage plugin runtime sessions.
+  runtime-lifecycle Manage plugin runtime session lifecycles.
         """
     )
     
@@ -1345,6 +1479,10 @@ Available commands:
     runtime_session_parser = subparsers.add_parser("runtime-session", help="Manage plugin runtime sessions")
     runtime_session_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime session dry-run without writing result")
     
+    # runtime-lifecycle コマンドパーサー
+    runtime_lifecycle_parser = subparsers.add_parser("runtime-lifecycle", help="Manage plugin runtime session lifecycles")
+    runtime_lifecycle_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime lifecycle dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -1396,6 +1534,8 @@ Available commands:
         run_runtime_factory(args)
     elif args.command == "runtime-session":
         run_runtime_session(args)
+    elif args.command == "runtime-lifecycle":
+        run_runtime_lifecycle(args)
     else:
         # Invalid Command
         parser.print_help()
