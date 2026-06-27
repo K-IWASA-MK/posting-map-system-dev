@@ -2,8 +2,8 @@
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 33 (Plugin Runtime Invocation Foundation) の実装を完了し、Runtime Adapter を介した実行アダプタ分離を確立 ✅  
-> **次回のテーマ**: 🧠 CIE Phase 34 (Plugin Local Executor / Invocation Staging) の構築およびテスト実装
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 34 (Plugin Runtime Dispatcher Foundation) の実装を完了し、要求に対する実行環境の適合解決を確立 ✅  
+> **次回のテーマ**: 🧠 CIE Phase 35 (Plugin Runtime Factory / Provider Foundation) の構築およびテスト実装
 
 ---
 
@@ -28,7 +28,8 @@
 * **Phase 31**: Plugin Execution Engine Foundation [COMPLETED]
 * **Phase 32**: Plugin Invocation Foundation [COMPLETED]
 * **Phase 33**: Plugin Runtime Invocation Foundation [COMPLETED]
-* **Phase 34**: Plugin Local Executor / Invocation Staging
+* **Phase 34**: Plugin Runtime Dispatcher Foundation [COMPLETED]
+* **Phase 35**: Plugin Runtime Factory / Provider Foundation
 
 ### Platform Development Policy
 * **No new Builder should be added unless absolutely necessary.**
@@ -43,11 +44,11 @@
 
 ## 💎 Milestone
 
-- **Tag**: `v2.6.0-alpha.0`
-- **Title**: `Plugin Runtime Invocation Foundation (Phase 33) Complete`
+- **Tag**: `v2.7.0-alpha.0`
+- **Title**: `Plugin Runtime Dispatcher Foundation (Phase 34) Complete`
 - **Status**:
-  - `Plugin Runtime Invocation Foundation Completed`
-  - `Phase 34 (Plugin Local Executor) Started`
+  - `Plugin Runtime Dispatcher Foundation Completed`
+  - `Phase 35 (Plugin Runtime Factory) Started`
 
 ---
 
@@ -166,6 +167,15 @@ CIE (Code Intelligence Engine) の基盤（Foundation）構築シリーズはす
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-28 セッション】CIE Phase 34 (Plugin Runtime Dispatcher Foundation) 構築（担当: Antigravity）
+- **目的**: Runtime Adapter と各 Runtime 実装を接続する Runtime Dispatcher Layer の Foundation を実装し、要求 (RuntimeRequest) に適した記述子 (RuntimeDescriptor) を決定論的に選択して Trace 連鎖を引き継ぐ基礎を確立する。
+- **実装内容**:
+  - **新パッケージ**: `plugin_platform/plugin/runtime_dispatcher/` パッケージを新設。
+  - **モジュールの実装**: [runtime_descriptor.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_dispatcher/runtime_descriptor.py), [runtime_registry.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_dispatcher/runtime_registry.py), [runtime_resolver.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_dispatcher/runtime_resolver.py), [runtime_dispatcher.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_dispatcher/runtime_dispatcher.py) の実装。Trace ID 整合性アサーションをクリアした上で、"Stub Runtime", "Default Runtime" を決定論的にマッチングし Trace_id を引き継いで解決する制御を確立。
+  - **CLI (`cie.py`) の拡張**: `runtime-dispatch` サブコマンドを追加。`runtime_invocation.json` をテスト用の暫定入力として読み込み、各結果から RuntimeRequest を構成・Dispatcherへ渡して `runtime_dispatch.json` を生成する処理を実装。
+  - **verify & doctor の拡張**: `plugins/runtime_dispatch.json` を検証対象 (全23個) に追加し、整合性合格を確認。
+- **変更ファイル**: `plugin_platform/plugin/runtime_dispatcher/` 内のモジュール、[cie.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie.py), [HANDOVER.md](file:///Volumes/SSD_DATA/posting-map-system/HANDOVER.md)
 
 ### 【2026-06-28 セッション】CIE Phase 33 (Plugin Runtime Invocation Foundation) 構築（担当: Antigravity）
 - **目的**: Invocation Layer と Plugin Runtime を接続する Runtime Adapter Layer の Foundation を実装し、要求 (RuntimeRequest) を応答 (RuntimeResponse) へと決定論的 Stub でマッピング・解決する基礎を確立する。
