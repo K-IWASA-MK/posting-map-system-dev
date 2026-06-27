@@ -148,6 +148,25 @@ def compile_metrics(data_store, missing, script_dir):
         except Exception:
             pass
 
+    # 7. Plugin Runtime Summary
+    run_loaded = 0
+    run_ready = 0
+    run_exec = 0
+    run_disabled = 0
+    runtime_path = os.path.join(script_dir, "plugins", "runtime.json")
+    if os.path.exists(runtime_path):
+        try:
+            with open(runtime_path, "r", encoding="utf-8") as f:
+                runtime_data = json.load(f)
+            run_ready = runtime_data.get("_meta", {}).get("ready_count", 0)
+            run_disabled = runtime_data.get("_meta", {}).get("disabled_count", 0)
+            run_loaded = run_ready
+            for r in runtime_data.get("runtime", []):
+                if r.get("execution_allowed", False):
+                    run_exec += 1
+        except Exception:
+            pass
+
     return {
         "repository_summary": {
             "functions": functions_cnt,
@@ -187,6 +206,12 @@ def compile_metrics(data_store, missing, script_dir):
             "loaded": plug_loaded,
             "disabled": plug_disabled,
             "invalid": plug_invalid
+        },
+        "runtime_summary": {
+            "loaded": run_loaded,
+            "ready": run_ready,
+            "execution_allowed": run_exec,
+            "disabled": run_disabled
         }
     }
 
@@ -267,6 +292,16 @@ def export_markdown(metrics, meta, output_path):
 | **Loaded** | `{metrics["plugins_summary"]["loaded"]}` |
 | **Disabled** | `{metrics["plugins_summary"]["disabled"]}` |
 | **Invalid** | `{metrics["plugins_summary"]["invalid"]}` |
+
+---
+
+## Plugin Runtime Summary
+| Item | Count |
+| --- | --- |
+| **Loaded** | `{metrics["runtime_summary"]["loaded"]}` |
+| **Ready** | `{metrics["runtime_summary"]["ready"]}` |
+| **Execution Allowed** | `{metrics["runtime_summary"]["execution_allowed"]}` |
+| **Disabled** | `{metrics["runtime_summary"]["disabled"]}` |
 """
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(md)
@@ -442,6 +477,21 @@ def export_html(metrics, meta, output_path):
                 </tbody>
             </table>
         </div>
+
+        <div class="card">
+            <h2>Plugin Runtime Summary</h2>
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Loaded</td><td>{metrics["runtime_summary"]["loaded"]}</td></tr>
+                    <tr><td>Ready</td><td>{metrics["runtime_summary"]["ready"]}</td></tr>
+                    <tr><td>Execution Allowed</td><td>{metrics["runtime_summary"]["execution_allowed"]}</td></tr>
+                    <tr><td>Disabled</td><td>{metrics["runtime_summary"]["disabled"]}</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>
@@ -490,6 +540,10 @@ def export_csv(metrics, meta, output_path):
         ["Plugins Summary", "Loaded", metrics["plugins_summary"]["loaded"]],
         ["Plugins Summary", "Disabled", metrics["plugins_summary"]["disabled"]],
         ["Plugins Summary", "Invalid", metrics["plugins_summary"]["invalid"]],
+        ["Plugin Runtime Summary", "Loaded", metrics["runtime_summary"]["loaded"]],
+        ["Plugin Runtime Summary", "Ready", metrics["runtime_summary"]["ready"]],
+        ["Plugin Runtime Summary", "Execution Allowed", metrics["runtime_summary"]["execution_allowed"]],
+        ["Plugin Runtime Summary", "Disabled", metrics["runtime_summary"]["disabled"]],
     ])
     
     csv_content = ""

@@ -7,7 +7,7 @@
 | **Export Version** | `1` |
 | **CIE Version** | `2.2.0-alpha.0` |
 | **Platform Phase** | `Phase24` |
-| **Generated At** | `2026-06-27T08:00:18.332554Z` |
+| **Generated At** | `2026-06-27T08:07:19.933213Z` |
 | **Format** | `Markdown` |
 
 ---
@@ -78,3 +78,13 @@
 | **Loaded** | `1` |
 | **Disabled** | `0` |
 | **Invalid** | `0` |
+
+---
+
+## Plugin Runtime Summary
+| Item | Count |
+| --- | --- |
+| **Loaded** | `1` |
+| **Ready** | `1` |
+| **Execution Allowed** | `0` |
+| **Disabled** | `0` |

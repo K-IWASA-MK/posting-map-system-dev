@@ -104,6 +104,8 @@ class CIEApiHandler(BaseHTTPRequestHandler):
             self.handle_config()
         elif path == "/plugins":
             self.handle_plugins()
+        elif path == "/runtime":
+            self.handle_runtime()
         else:
             self.send_error_json("Not Found", 404)
 
@@ -157,7 +159,8 @@ class CIEApiHandler(BaseHTTPRequestHandler):
                 "/version",
                 "/artifacts",
                 "/config",
-                "/plugins"
+                "/plugins",
+                "/runtime"
             ]
         }
         self.send_json(response)
@@ -171,6 +174,33 @@ class CIEApiHandler(BaseHTTPRequestHandler):
                 "config": config
             }
             self.send_json(response)
+        except Exception:
+            self.send_error_json("Internal Server Error", 500)
+
+    def handle_runtime(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        runtime_path = os.path.join(script_dir, "plugins", "runtime.json")
+        
+        if not os.path.exists(runtime_path):
+            self.send_json({
+                "api_version": API_VERSION,
+                "_meta": {
+                    "version": 1,
+                    "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                    "scanner": "plugin_runtime",
+                    "runtime_count": 0,
+                    "ready_count": 0,
+                    "disabled_count": 0,
+                    "invalid_count": 0
+                },
+                "runtime": []
+            })
+            return
+            
+        try:
+            with open(runtime_path, "r", encoding="utf-8") as f:
+                runtime_data = json.load(f)
+            self.send_json(runtime_data)
         except Exception:
             self.send_error_json("Internal Server Error", 500)
 

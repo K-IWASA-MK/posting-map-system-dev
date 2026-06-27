@@ -231,29 +231,38 @@ async function initDashboard() {
     document.getElementById("pipe-execs").textContent = getSafeCount(execCnt);
     document.getElementById("pipe-patches").textContent = getSafeCount(patchCnt);
     document.getElementById("pipe-apply").textContent = getSafeCount(applyCnt);
-    // 5. Plugins Summary
+    // 5. Plugins & Runtime Summary
     let plugLoaded = 0;
-    let plugDisabled = 0;
-    let plugInvalid = 0;
+    let plugReady = 0;
+    let execAllowed = "Disabled";
     
     try {
         const plugResponse = await fetch("http://127.0.0.1:8080/plugins");
         if (plugResponse.ok) {
             const plugJson = await plugResponse.json();
             const pluginsList = plugJson.plugins || [];
-            pluginsList.forEach(p => {
-                if (p.status === "loaded") plugLoaded++;
-                else if (p.status === "disabled") plugDisabled++;
-                else if (p.status === "invalid") plugInvalid++;
-            });
+            plugLoaded = pluginsList.filter(p => p.status === "loaded").length;
         }
     } catch (e) {
-        console.warn("Failed to fetch plugins from API, using fallback 0.");
+        console.warn("Failed to fetch plugins from API.");
+    }
+
+    try {
+        const runResponse = await fetch("http://127.0.0.1:8080/runtime");
+        if (runResponse.ok) {
+            const runJson = await runResponse.json();
+            const runtimeList = runJson.runtime || [];
+            plugReady = runtimeList.filter(r => r.status === "ready").length;
+            const anyAllowed = runtimeList.some(r => r.execution_allowed);
+            execAllowed = anyAllowed ? "Allowed" : "Disabled";
+        }
+    } catch (e) {
+        console.warn("Failed to fetch runtime from API.");
     }
     
     document.getElementById("plug-loaded").textContent = plugLoaded;
-    document.getElementById("plug-disabled").textContent = plugDisabled;
-    document.getElementById("plug-invalid").textContent = plugInvalid;
+    document.getElementById("plug-ready").textContent = plugReady;
+    document.getElementById("plug-execution").textContent = execAllowed;
 }
 
 // ページロード時にイニシャライズ

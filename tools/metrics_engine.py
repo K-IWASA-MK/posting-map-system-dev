@@ -247,6 +247,34 @@ def main():
     print(f"Invalid      : {plug_invalid}")
     print()
 
+    # Plugin Runtime Summary
+    run_loaded = 0
+    run_ready = 0
+    run_exec = 0
+    run_disabled = 0
+    runtime_path = os.path.join(script_dir, "plugins", "runtime.json")
+    if os.path.exists(runtime_path):
+        try:
+            with open(runtime_path, "r", encoding="utf-8") as f:
+                runtime_data = json.load(f)
+            run_ready = runtime_data.get("_meta", {}).get("ready_count", 0)
+            run_disabled = runtime_data.get("_meta", {}).get("disabled_count", 0)
+            run_loaded = run_ready
+            for r in runtime_data.get("runtime", []):
+                if r.get("execution_allowed", False):
+                    run_exec += 1
+        except Exception:
+            pass
+
+    print("----------------------------------")
+    print("Plugin Runtime Metrics")
+    print("----------------------------------")
+    print(f"Runtime Count     : {run_loaded + run_disabled}")
+    print(f"Ready             : {run_ready}")
+    print(f"Disabled          : {run_disabled}")
+    print(f"Execution Allowed : {run_exec}")
+    print()
+
     print("==================================")
     print("Overall Metrics Summary")
     print("==================================")

@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -26,7 +26,7 @@ JSON_ARTIFACTS = [
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase25"
+PLATFORM_VERSION = "Phase26"
 
 def run_build(args):
     """
@@ -295,6 +295,28 @@ def run_plugin(args):
         print(f"Error: Plugin scanning failed with code {e.returncode}.", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime(args):
+    """
+    runtime サブコマンド: plugin_runtime.py を起動し、プラグインランタイムをスキャンして生成する。
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    runtime_path = os.path.join(script_dir, "plugin_runtime.py")
+    
+    if not os.path.exists(runtime_path):
+        print(f"Error: Runtime engine not found at {runtime_path}", file=sys.stderr)
+        sys.exit(3)
+        
+    cmd = ["python3", runtime_path]
+    if args.dry_run:
+        cmd.append("--dry-run")
+        
+    try:
+        subprocess.run(cmd, check=True)
+        sys.exit(0)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Runtime execution failed with code {e.returncode}.", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -311,6 +333,7 @@ Available commands:
   export   Export metrics report in multiple formats.
   config   Manage and validate platform configurations.
   plugin   Scan plugins and generate registry.
+  runtime  Map plugins to runtime simulation.
         """
     )
     
@@ -352,6 +375,10 @@ Available commands:
     plugin_parser = subparsers.add_parser("plugin", help="Scan plugins and generate registry")
     plugin_parser.add_argument("--dry-run", action="store_true", help="Perform a scan dry-run without writing registry")
     
+    # runtime コマンドパーサー
+    runtime_parser = subparsers.add_parser("runtime", help="Map plugins to runtime simulation")
+    runtime_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime dry-run without writing registry")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -381,6 +408,8 @@ Available commands:
         run_config(args)
     elif args.command == "plugin":
         run_plugin(args)
+    elif args.command == "runtime":
+        run_runtime(args)
     else:
         # Invalid Command
         parser.print_help()

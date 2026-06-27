@@ -1,7 +1,7 @@
 {
   "export_version": 1,
   "export_id": "export:0001",
-  "generated_at": "2026-06-27T08:00:18.446900Z",
+  "generated_at": "2026-06-27T08:07:20.047258Z",
   "format": "json",
   "cie_version": "2.2.0-alpha.0",
   "platform_phase": "Phase24",
@@ -53,5 +53,11 @@
     "loaded": 1,
     "disabled": 0,
     "invalid": 0
+  },
+  "runtime_summary": {
+    "loaded": 1,
+    "ready": 1,
+    "execution_allowed": 0,
+    "disabled": 0
   }
 }

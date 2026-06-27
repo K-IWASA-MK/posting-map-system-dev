@@ -952,3 +952,21 @@ Execution Plan
 * Plugin のコード編集は禁止。
 
 * Plugin Registry を唯一の情報源とする。
+
+---
+
+### 29. Plugin Runtime Rules
+
+* Plugin Runtime は tools/plugins/runtime.json を唯一のRuntime情報源とする。
+
+* Runtime は registry.json のみから生成する。
+
+* Plugin の実行は禁止する。
+
+* Builder 起動は禁止する。
+
+* Repository の再解析は禁止する。
+
+* Runtime は execution_allowed=false を維持する。
+
+* Runtime は Simulation Layer とする。
