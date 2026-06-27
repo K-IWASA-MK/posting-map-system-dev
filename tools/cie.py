@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -28,11 +28,12 @@ JSON_ARTIFACTS = [
     "plugins/scheduler.json",
     "plugins/execution_plan.json",
     "plugins/execution_result.json",
-    "plugins/plugin_invocation.json"
+    "plugins/plugin_invocation.json",
+    "plugins/runtime_invocation.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase32"
+PLATFORM_VERSION = "Phase33"
 
 def run_build(args):
     """
@@ -690,6 +691,128 @@ def run_invocation(args):
         print(f"Error: Failed to write plugin_invocation.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_run(args):
+    """
+    runtime-run サブコマンド: RuntimeAdapter を使用して runtime_invocation.json を生成する。
+    注意: この plugin_invocation.json から直接 RuntimeRequest を構成するデータフローは、
+    将来的な Invocation Layer の完全な統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeRequest, RuntimeContext, RuntimeAdapter
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_adapter module: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    invocation_path = os.path.join(script_dir, "plugins", "plugin_invocation.json")
+    if not os.path.exists(invocation_path):
+        print(f"Error: Plugin invocation result not found at {invocation_path}. Please run 'invocation' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(invocation_path, "r", encoding="utf-8") as f:
+            invocation_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load plugin invocation result: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    invocations = invocation_data.get("invocations", [])
+    execution_id = invocation_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    responses = []
+    
+    # 決定論的ソート
+    sorted_invocations = sorted(invocations, key=lambda x: (x.get("plugin_id", ""), x.get("request_id", "")))
+    
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    for idx, inv in enumerate(sorted_invocations, 1):
+        plugin_id = inv.get("plugin_id")
+        trace_id = inv.get("trace_id")
+        
+        output_data = inv.get("output", {})
+        version = output_data.get("executed_version", 1)
+        parameters = output_data.get("parameters_received", {})
+        
+        request_id = f"r_request:{idx:04d}"
+        
+        request = RuntimeRequest(
+            request_id=request_id,
+            plugin_id=plugin_id,
+            version=version,
+            parameters=parameters,
+            execution_id=execution_id,
+            metadata={
+                "version": 1,
+                "source": "plugin_invocation_test_stub"
+            },
+            trace_id=trace_id
+        )
+        
+        context = RuntimeContext(
+            runtime_id=f"runtime:{idx:04d}",
+            configuration=configuration,
+            environment=environment,
+            variables=variables,
+            metadata={
+                "version": 1
+            }
+        )
+        
+        try:
+            response = RuntimeAdapter.execute(request, context)
+            responses.append(response.to_dict())
+        except AssertionError as e:
+            print(f"Assertion Error during runtime execution: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_invocation.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    runtime_registry = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "runtime_count": len(responses)
+        },
+        "runtime_invocations": responses
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Invocation (Dry Run)")
+        print(f"Runtime Invocations Count: {len(responses)}")
+        for resp in responses:
+            print(f"- Response: {resp.get('plugin_id')} (Status: {resp.get('status')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(runtime_registry, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Invocation successfully written to runtime_invocation.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_invocation.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -713,6 +836,7 @@ Available commands:
   execution  Generate plugin execution plan.
   execution-run Run plugin execution plan.
   invocation Run plugin invocation simulation (stub).
+  runtime-run Run plugin runtime invocation simulation (stub).
         """
     )
     
@@ -782,6 +906,10 @@ Available commands:
     invocation_parser = subparsers.add_parser("invocation", help="Run plugin invocation simulation (stub)")
     invocation_parser.add_argument("--dry-run", action="store_true", help="Perform an invocation dry-run without writing result")
     
+    # runtime-run コマンドパーサー
+    runtime_run_parser = subparsers.add_parser("runtime-run", help="Run plugin runtime invocation simulation (stub)")
+    runtime_run_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime run dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -825,6 +953,8 @@ Available commands:
         run_execution_run(args)
     elif args.command == "invocation":
         run_invocation(args)
+    elif args.command == "runtime-run":
+        run_runtime_run(args)
     else:
         # Invalid Command
         parser.print_help()

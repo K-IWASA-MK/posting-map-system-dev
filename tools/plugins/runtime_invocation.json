@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-28T00:00:00Z",
+    "execution_id": "execution_run:session_cie_default",
+    "runtime_count": 1
+  },
+  "runtime_invocations": [
+    {
+      "request_id": "r_request:0001",
+      "plugin_id": "plugin:example",
+      "status": "success",
+      "output": {
+        "message": "Plugin plugin:example processed by RuntimeAdapter (Stub).",
+        "runtime_id": "runtime:0001",
+        "version": 1,
+        "parameters_executed": {}
+      },
+      "metadata": {
+        "version": 1,
+        "adapter": "runtime_adapter_stub",
+        "environment": "development",
+        "duration": 0.0
+      },
+      "trace_id": "execution:0001"
+    }
+  ]
+}

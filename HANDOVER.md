@@ -2,8 +2,8 @@
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 32 (Plugin Invocation Foundation) の実装を完了し、レイヤー分離とDPOカプセル構造を確立 ✅  
-> **次回のテーマ**: 🧠 CIE Phase 33 (Plugin Sandbox / Execution Staging Integration) の構築およびテスト実装
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 33 (Plugin Runtime Invocation Foundation) の実装を完了し、Runtime Adapter を介した実行アダプタ分離を確立 ✅  
+> **次回のテーマ**: 🧠 CIE Phase 34 (Plugin Local Executor / Invocation Staging) の構築およびテスト実装
 
 ---
 
@@ -27,7 +27,8 @@
 * **Phase 30**: Plugin Execution Plan Foundation [COMPLETED]
 * **Phase 31**: Plugin Execution Engine Foundation [COMPLETED]
 * **Phase 32**: Plugin Invocation Foundation [COMPLETED]
-* **Phase 33**: Plugin Sandbox / Invocation Staging Integration
+* **Phase 33**: Plugin Runtime Invocation Foundation [COMPLETED]
+* **Phase 34**: Plugin Local Executor / Invocation Staging
 
 ### Platform Development Policy
 * **No new Builder should be added unless absolutely necessary.**
@@ -42,11 +43,11 @@
 
 ## 💎 Milestone
 
-- **Tag**: `v2.5.0-alpha.0`
-- **Title**: `Plugin Invocation Foundation (Phase 32) Complete`
+- **Tag**: `v2.6.0-alpha.0`
+- **Title**: `Plugin Runtime Invocation Foundation (Phase 33) Complete`
 - **Status**:
-  - `Plugin Invocation Foundation Completed`
-  - `Phase 33 (Plugin Sandbox) Started`
+  - `Plugin Runtime Invocation Foundation Completed`
+  - `Phase 34 (Plugin Local Executor) Started`
 
 ---
 
@@ -165,6 +166,15 @@ CIE (Code Intelligence Engine) の基盤（Foundation）構築シリーズはす
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-28 セッション】CIE Phase 33 (Plugin Runtime Invocation Foundation) 構築（担当: Antigravity）
+- **目的**: Invocation Layer と Plugin Runtime を接続する Runtime Adapter Layer の Foundation を実装し、要求 (RuntimeRequest) を応答 (RuntimeResponse) へと決定論的 Stub でマッピング・解決する基礎を確立する。
+- **実装内容**:
+  - **新パッケージ**: `plugin_platform/plugin/runtime_adapter/` パッケージを新設。
+  - **モジュールの実装**: [runtime_request.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_adapter/runtime_request.py), [runtime_response.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_adapter/runtime_response.py), [runtime_context.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_adapter/runtime_context.py), [runtime_adapter.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_adapter/runtime_adapter.py) の実装。Trace ID 整合性アサーションをクリアした上で、status "success" および決定論的 `duration: 0.0` の Stub 呼び出し変換制御を確立。
+  - **CLI (`cie.py`) の拡張**: 既存の `runtime` との衝突を避けるため、`runtime-run` サブコマンドを追加。`plugin_invocation.json` をテスト用の暫定入力として読み込み、各結果から RuntimeRequest を構成・アダプタへ渡して `runtime_invocation.json` を生成する処理を実装。
+  - **verify & doctor の拡張**: `plugins/runtime_invocation.json` を検証対象 (全22個) に追加し、整合性合格を確認。
+- **変更ファイル**: `plugin_platform/plugin/runtime_adapter/` 内のモジュール、[cie.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie.py), [HANDOVER.md](file:///Volumes/SSD_DATA/posting-map-system/HANDOVER.md)
 
 ### 【2026-06-28 セッション】CIE Phase 32 (Plugin Invocation Foundation) 構築（担当: Antigravity）
 - **目的**: Execution Engine と Plugin Runtime を接続する Invocation Layer の Foundation を実装し、呼び出し要求 (PluginRequest) から結果 (PluginResponse) への Stub 解決および Trace の引き継ぎを一連のデータ構造として確立する。
