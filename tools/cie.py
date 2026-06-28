@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -40,11 +40,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_index.json",
     "plugins/runtime_event_catalog.json",
     "plugins/runtime_event_metadata.json",
-    "plugins/runtime_event_analysis.json"
+    "plugins/runtime_event_analysis.json",
+    "plugins/runtime_event_replay.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase44"
+PLATFORM_VERSION = "Phase45"
 
 def run_build(args):
     """
@@ -2289,6 +2290,137 @@ def run_runtime_event_analysis(args):
         print(f"Error: Failed to write runtime_event_analysis.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_replay(args):
+    """
+    runtime-event-replay サブコマンド: EventReplayManager を使用して runtime_event_replay.json を生成する。
+    注意: この runtime_event_analysis.json から直接 RuntimeEventAnalysis を構成するデータフロー is、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_analyzer import RuntimeEventAnalysis
+        from plugin_platform.plugin.runtime_event_replay import EventReplayDescriptor, EventReplayRegistry, EventReplayManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_replay modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    analysis_path = os.path.join(script_dir, "plugins", "runtime_event_analysis.json")
+    if not os.path.exists(analysis_path):
+        print(f"Error: Runtime event analysis result not found at {analysis_path}. Please run 'runtime-event-analysis' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(analysis_path, "r", encoding="utf-8") as f:
+            analysis_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event analysis: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    analysis_records = analysis_data.get("analysis_records", [])
+    execution_id = analysis_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    replay_records = []
+    
+    # 決定論的ソート
+    sorted_analysis = sorted(analysis_records, key=lambda x: (x.get("analysis_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventReplayRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_replay_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, ana_data in enumerate(sorted_analysis, 1):
+        analysis_id = ana_data.get("analysis_id")
+        runtime_event_metadata = ana_data.get("runtime_event_metadata", {})
+        analysis_type = ana_data.get("analysis_type")
+        result = ana_data.get("result", {})
+        meta_ana = ana_data.get("metadata", {})
+        trace_id = ana_data.get("trace_id")
+        
+        # 暫定入力
+        analysis_obj = RuntimeEventAnalysis(
+            analysis_id=analysis_id,
+            runtime_event_metadata=runtime_event_metadata,
+            analysis_type=analysis_type,
+            result=result,
+            metadata=meta_ana,
+            trace_id=trace_id
+        )
+        
+        try:
+            replay_obj = EventReplayManager.create_replay(analysis_obj, context)
+            replay_records.append(replay_obj.to_dict())
+            
+            # EventReplayRegistry 登録検証
+            descriptor = EventReplayDescriptor(
+                replay_id=replay_obj.replay_id,
+                analysis_id=analysis_id,
+                replay_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event replay create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_replay.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    replay_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "replay_count": len(replay_records)
+        },
+        "replay_records": replay_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Replay (Dry Run)")
+        print(f"Replay Count: {len(replay_records)}")
+        for rec in replay_records:
+            print(f"- Replay: {rec.get('replay_id')} (Type: {rec.get('replay_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(replay_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Replay successfully written to runtime_event_replay.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_replay.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -2440,6 +2572,10 @@ Available commands:
     runtime_event_analysis_parser = subparsers.add_parser("runtime-event-analysis", help="Manage plugin runtime session event analysis")
     runtime_event_analysis_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event analysis dry-run without writing result")
     
+    # runtime-event-replay コマンドパーサー
+    runtime_event_replay_parser = subparsers.add_parser("runtime-event-replay", help="Manage plugin runtime session event replay")
+    runtime_event_replay_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event replay dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -2507,6 +2643,8 @@ Available commands:
         run_runtime_event_metadata(args)
     elif args.command == "runtime-event-analysis":
         run_runtime_event_analysis(args)
+    elif args.command == "runtime-event-replay":
+        run_runtime_event_replay(args)
     else:
         # Invalid Command
         parser.print_help()
