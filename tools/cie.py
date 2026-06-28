@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -45,11 +45,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_snapshot.json",
     "plugins/runtime_event_audit.json",
     "plugins/runtime_event_persistence.json",
-    "plugins/runtime_event_sync.json"
+    "plugins/runtime_event_sync.json",
+    "plugins/runtime_event_pipeline.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase49"
+PLATFORM_VERSION = "Phase50"
 
 def run_build(args):
     """
@@ -2949,6 +2950,137 @@ def run_runtime_event_sync(args):
         print(f"Error: Failed to write runtime_event_sync.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_pipeline(args):
+    """
+    runtime-event-pipeline サブコマンド: EventPipelineManager を使用して runtime_event_pipeline.json を生成する。
+    注意: この runtime_event_sync.json から直接 RuntimeEventSync を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_sync import RuntimeEventSync
+        from plugin_platform.plugin.runtime_event_pipeline import EventPipelineDescriptor, EventPipelineRegistry, EventPipelineManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_pipeline modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    sync_path = os.path.join(script_dir, "plugins", "runtime_event_sync.json")
+    if not os.path.exists(sync_path):
+        print(f"Error: Runtime event sync result not found at {sync_path}. Please run 'runtime-event-sync' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(sync_path, "r", encoding="utf-8") as f:
+            sync_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event sync: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    sync_records = sync_data.get("sync_records", [])
+    execution_id = sync_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    pipeline_records = []
+    
+    # 決定論的ソート
+    sorted_sync = sorted(sync_records, key=lambda x: (x.get("sync_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventPipelineRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_pipeline_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, syn_data in enumerate(sorted_sync, 1):
+        sync_id = syn_data.get("sync_id")
+        runtime_event_persistence = syn_data.get("runtime_event_persistence", {})
+        sync_type = syn_data.get("sync_type")
+        syn_sub_data = syn_data.get("sync_data", {})
+        meta_syn = syn_data.get("metadata", {})
+        trace_id = syn_data.get("trace_id")
+        
+        # 暫定入力
+        sync_obj = RuntimeEventSync(
+            sync_id=sync_id,
+            runtime_event_persistence=runtime_event_persistence,
+            sync_type=sync_type,
+            sync_data=syn_sub_data,
+            metadata=meta_syn,
+            trace_id=trace_id
+        )
+        
+        try:
+            pipeline_obj = EventPipelineManager.create_pipeline(sync_obj, context)
+            pipeline_records.append(pipeline_obj.to_dict())
+            
+            # EventPipelineRegistry 登録検証
+            descriptor = EventPipelineDescriptor(
+                pipeline_id=pipeline_obj.pipeline_id,
+                sync_id=sync_id,
+                pipeline_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event pipeline create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_pipeline.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    pipeline_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "pipeline_count": len(pipeline_records)
+        },
+        "pipeline_records": pipeline_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Pipeline (Dry Run)")
+        print(f"Pipeline Count: {len(pipeline_records)}")
+        for rec in pipeline_records:
+            print(f"- Pipeline: {rec.get('pipeline_id')} (Type: {rec.get('pipeline_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(pipeline_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Pipeline successfully written to runtime_event_pipeline.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_pipeline.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -3120,6 +3252,10 @@ Available commands:
     runtime_event_sync_parser = subparsers.add_parser("runtime-event-sync", help="Manage plugin runtime session event sync")
     runtime_event_sync_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event sync dry-run without writing result")
     
+    # runtime-event-pipeline コマンドパーサー
+    runtime_event_pipeline_parser = subparsers.add_parser("runtime-event-pipeline", help="Manage plugin runtime session event pipeline")
+    runtime_event_pipeline_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event pipeline dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -3197,6 +3333,8 @@ Available commands:
         run_runtime_event_persistence(args)
     elif args.command == "runtime-event-sync":
         run_runtime_event_sync(args)
+    elif args.command == "runtime-event-pipeline":
+        run_runtime_event_pipeline(args)
     else:
         # Invalid Command
         parser.print_help()
