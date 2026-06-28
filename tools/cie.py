@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -57,11 +57,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_listener.json",
     "plugins/runtime_event_pipeline_result.json",
     "plugins/runtime_event_execution_engine.json",
-    "plugins/runtime_event_execution_orchestrator.json"
+    "plugins/runtime_event_execution_orchestrator.json",
+    "plugins/runtime_event_execution_pipeline_run.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase61"
+PLATFORM_VERSION = "Phase62"
 
 def run_build(args):
     """
@@ -4462,6 +4463,107 @@ def run_runtime_event_execution_orchestrator(args):
         print(f"Error: Failed to write runtime_event_execution_orchestrator.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_pipeline_run(args):
+    """
+    runtime-event-execution-pipeline-run サブコマンド: EventExecutionPipelineRunManager を使用して
+    runtime_event_execution_pipeline_run.json を生成する。
+    注意: この runtime_event_execution_orchestrator.json から直接 RuntimeEventExecutionOrchestrator を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_execution_orchestrator import RuntimeEventExecutionOrchestrator
+        from plugin_platform.plugin.runtime_event_execution_pipeline_run import EventExecutionPipelineRunManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution pipeline run modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    orchestrator_path = os.path.join(script_dir, "plugins", "runtime_event_execution_orchestrator.json")
+    if not os.path.exists(orchestrator_path):
+        print(f"Error: Runtime event execution orchestrator result not found at {orchestrator_path}. Please run 'runtime-event-execution-orchestrator' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(orchestrator_path, "r", encoding="utf-8") as f:
+            orchestrator_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution orchestrator: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    orchestrator_rec = orchestrator_data.get("orchestrator_record", {})
+    execution_id = orchestrator_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 暫定的な復元
+    orchestrator_obj = RuntimeEventExecutionOrchestrator(
+        orchestrator_id=orchestrator_rec.get("orchestrator_id"),
+        runtime_event_execution_engine=orchestrator_rec.get("runtime_event_execution_engine", {}),
+        execution_flow=orchestrator_rec.get("execution_flow", {}),
+        metadata=orchestrator_rec.get("metadata", {}),
+        trace_id=orchestrator_rec.get("trace_id")
+    )
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_pipelinerun_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        pipeline_run_obj = EventExecutionPipelineRunManager.create_pipeline_run(orchestrator_obj, context)
+    except AssertionError as e:
+        print(f"Assertion Error during execution pipeline run create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_pipeline_run.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    pipeline_run_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "pipeline_run_record": pipeline_run_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Pipeline Run (Dry Run)")
+        print(f"Pipeline Run Execution ID: {pipeline_run_obj.pipeline_run_execution_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(pipeline_run_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Pipeline Run successfully written to runtime_event_execution_pipeline_run.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_pipeline_run.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -4681,6 +4783,10 @@ Available commands:
     runtime_event_execution_orchestrator_parser = subparsers.add_parser("runtime-event-execution-orchestrator", help="Manage plugin runtime session event execution orchestrator")
     runtime_event_execution_orchestrator_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution orchestrator result")
     
+    # runtime-event-execution-pipeline-run コマンドパーサー
+    runtime_event_execution_pipeline_run_parser = subparsers.add_parser("runtime-event-execution-pipeline-run", help="Manage plugin runtime session event execution pipeline run")
+    runtime_event_execution_pipeline_run_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution pipeline run result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -4782,6 +4888,8 @@ Available commands:
         run_runtime_event_execution_engine(args)
     elif args.command == "runtime-event-execution-orchestrator":
         run_runtime_event_execution_orchestrator(args)
+    elif args.command == "runtime-event-execution-pipeline-run":
+        run_runtime_event_execution_pipeline_run(args)
     else:
         # Invalid Command
         parser.print_help()
