@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -46,11 +46,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_audit.json",
     "plugins/runtime_event_persistence.json",
     "plugins/runtime_event_sync.json",
-    "plugins/runtime_event_pipeline.json"
+    "plugins/runtime_event_pipeline.json",
+    "plugins/runtime_event_stream.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase50"
+PLATFORM_VERSION = "Phase51"
 
 def run_build(args):
     """
@@ -3081,6 +3082,137 @@ def run_runtime_event_pipeline(args):
         print(f"Error: Failed to write runtime_event_pipeline.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_stream(args):
+    """
+    runtime-event-stream サブコマンド: EventStreamManager を使用して runtime_event_stream.json を生成する。
+    注意: この runtime_event_pipeline.json から直接 RuntimeEventPipeline を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_pipeline import RuntimeEventPipeline
+        from plugin_platform.plugin.runtime_event_stream import EventStreamDescriptor, EventStreamRegistry, EventStreamManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_stream modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    pipeline_path = os.path.join(script_dir, "plugins", "runtime_event_pipeline.json")
+    if not os.path.exists(pipeline_path):
+        print(f"Error: Runtime event pipeline result not found at {pipeline_path}. Please run 'runtime-event-pipeline' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(pipeline_path, "r", encoding="utf-8") as f:
+            pipeline_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event pipeline: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    pipeline_records = pipeline_data.get("pipeline_records", [])
+    execution_id = pipeline_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    stream_records = []
+    
+    # 決定論的ソート
+    sorted_pipeline = sorted(pipeline_records, key=lambda x: (x.get("pipeline_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventStreamRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_stream_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, pipe_data in enumerate(sorted_pipeline, 1):
+        pipeline_id = pipe_data.get("pipeline_id")
+        runtime_event_sync = pipe_data.get("runtime_event_sync", {})
+        pipeline_type = pipe_data.get("pipeline_type")
+        pipe_sub_data = pipe_data.get("pipeline_steps", [])
+        meta_pipe = pipe_data.get("metadata", {})
+        trace_id = pipe_data.get("trace_id")
+        
+        # 暫定入力
+        pipeline_obj = RuntimeEventPipeline(
+            pipeline_id=pipeline_id,
+            runtime_event_sync=runtime_event_sync,
+            pipeline_type=pipeline_type,
+            pipeline_steps=pipe_sub_data,
+            metadata=meta_pipe,
+            trace_id=trace_id
+        )
+        
+        try:
+            stream_obj = EventStreamManager.create_stream(pipeline_obj, context)
+            stream_records.append(stream_obj.to_dict())
+            
+            # EventStreamRegistry 登録検証
+            descriptor = EventStreamDescriptor(
+                stream_id=stream_obj.stream_id,
+                pipeline_id=pipeline_id,
+                stream_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event stream create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_stream.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    stream_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "stream_count": len(stream_records)
+        },
+        "stream_records": stream_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Stream (Dry Run)")
+        print(f"Stream Count: {len(stream_records)}")
+        for rec in stream_records:
+            print(f"- Stream: {rec.get('stream_id')} (Type: {rec.get('stream_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(stream_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Stream successfully written to runtime_event_stream.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_stream.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -3256,6 +3388,10 @@ Available commands:
     runtime_event_pipeline_parser = subparsers.add_parser("runtime-event-pipeline", help="Manage plugin runtime session event pipeline")
     runtime_event_pipeline_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event pipeline dry-run without writing result")
     
+    # runtime-event-stream コマンドパーサー
+    runtime_event_stream_parser = subparsers.add_parser("runtime-event-stream", help="Manage plugin runtime session event stream")
+    runtime_event_stream_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event stream dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -3335,6 +3471,8 @@ Available commands:
         run_runtime_event_sync(args)
     elif args.command == "runtime-event-pipeline":
         run_runtime_event_pipeline(args)
+    elif args.command == "runtime-event-stream":
+        run_runtime_event_stream(args)
     else:
         # Invalid Command
         parser.print_help()
