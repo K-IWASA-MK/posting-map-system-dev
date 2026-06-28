@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -52,11 +52,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_router.json",
     "plugins/runtime_event_endpoint.json",
     "plugins/runtime_event_handler.json",
-    "plugins/runtime_event_receiver.json"
+    "plugins/runtime_event_receiver.json",
+    "plugins/runtime_event_gateway.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase56"
+PLATFORM_VERSION = "Phase57"
 
 def run_build(args):
     """
@@ -3873,6 +3874,142 @@ def run_runtime_event_receiver(args):
         print(f"Error: Failed to write runtime_event_receiver.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_gateway(args):
+    """
+    runtime-event-gateway サブコマンド: EventGatewayManager を使用して runtime_event_gateway.json を生成する。
+    注意: この runtime_event_receiver.json から直接 RuntimeEventReceiver を構成するデータフロー is、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_receiver import RuntimeEventReceiver
+        from plugin_platform.plugin.runtime_event_gateway import EventGatewayDescriptor, EventGatewayRegistry, EventGatewayManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_gateway modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    receiver_path = os.path.join(script_dir, "plugins", "runtime_event_receiver.json")
+    if not os.path.exists(receiver_path):
+        print(f"Error: Runtime event receiver result not found at {receiver_path}. Please run 'runtime-event-receiver' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(receiver_path, "r", encoding="utf-8") as f:
+            receiver_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event receiver: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    receiver_records = receiver_data.get("receiver_records", [])
+    execution_id = receiver_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    gateway_records = []
+    
+    # 決定論的ソート
+    sorted_receiver = sorted(receiver_records, key=lambda x: (x.get("receiver_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventGatewayRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_gateway_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, rec_data in enumerate(sorted_receiver, 1):
+        receiver_id = rec_data.get("receiver_id")
+        runtime_event_handler = rec_data.get("runtime_event_handler", {})
+        receiver_type = rec_data.get("receiver_type")
+        rec_sub_data = rec_data.get("received_events", [])
+        meta_rec = rec_data.get("metadata", {})
+        trace_id = rec_data.get("trace_id")
+        
+        # 暫定入力
+        receiver_obj = RuntimeEventReceiver(
+            receiver_id=receiver_id,
+            runtime_event_handler=runtime_event_handler,
+            receiver_type=receiver_type,
+            received_events=rec_sub_data,
+            metadata=meta_rec,
+            trace_id=trace_id
+        )
+        
+        try:
+            gateway_obj = EventGatewayManager.create_gateway(receiver_obj, context)
+            gateway_records.append(gateway_obj.to_dict())
+            
+            # EventGatewayRegistry 登録検証
+            # event_id と plugin_id は Receiver ID や構成要素から決定論的に導出
+            event_id = f"event:{receiver_id.split(':')[-1]}"
+            plugin_id = f"plugin:{receiver_id.split(':')[-1]}"
+            
+            descriptor = EventGatewayDescriptor(
+                gateway_id=gateway_obj.gateway_id,
+                event_id=event_id,
+                plugin_id=plugin_id,
+                gateway_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event gateway create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_gateway.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    gateway_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "gateway_count": len(gateway_records)
+        },
+        "gateway_records": gateway_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Gateway (Dry Run)")
+        print(f"Gateway Count: {len(gateway_records)}")
+        for rec in gateway_records:
+            print(f"- Gateway: {rec.get('gateway_id')} (Type: {rec.get('gateway_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(gateway_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Gateway successfully written to runtime_event_gateway.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_gateway.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -4072,6 +4209,10 @@ Available commands:
     runtime_event_receiver_parser = subparsers.add_parser("runtime-event-receiver", help="Manage plugin runtime session event receiver")
     runtime_event_receiver_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event receiver dry-run without writing result")
     
+    # runtime-event-gateway コマンドパーサー
+    runtime_event_gateway_parser = subparsers.add_parser("runtime-event-gateway", help="Manage plugin runtime session event gateway")
+    runtime_event_gateway_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event gateway dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -4163,6 +4304,8 @@ Available commands:
         run_runtime_event_handler(args)
     elif args.command == "runtime-event-receiver":
         run_runtime_event_receiver(args)
+    elif args.command == "runtime-event-gateway":
+        run_runtime_event_gateway(args)
     else:
         # Invalid Command
         parser.print_help()
