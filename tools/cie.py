@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -68,11 +68,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_receiver_router.json",
     "plugins/runtime_event_execution_log_meaning.json",
     "plugins/runtime_event_execution_log_intent_graph.json",
-    "plugins/runtime_event_execution_log_planner.json"
+    "plugins/runtime_event_execution_log_planner.json",
+    "plugins/runtime_event_execution_log_engine.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase72"
+PLATFORM_VERSION = "Phase73"
 
 def run_build(args):
     """
@@ -5595,6 +5596,113 @@ def run_runtime_event_execution_log_planner(args):
         print(f"Error: Failed to write runtime_event_execution_log_planner.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_log_engine(args):
+    """
+    runtime-event-execution-log-engine サブコマンド: EventExecutionLogEngineSchedulerManager を使用して
+    runtime_event_execution_log_engine.json を生成する。
+    注意: この runtime_event_execution_log_planner.json から直接 RuntimeEventExecutionLogExecutionPlan を
+    復元するデータフローは、将来的な Planner / Optimizer Layer との完全な結合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_execution_log_planner import RuntimeEventExecutionLogExecutionPlan
+        from plugin_platform.plugin.runtime_event_execution_log_engine import EventExecutionLogEngineSchedulerManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution log engine modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    planner_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_planner.json")
+    if not os.path.exists(planner_path):
+        print(f"Error: Runtime event execution log planner result not found at {planner_path}. Please run 'runtime-event-execution-log-planner' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(planner_path, "r", encoding="utf-8") as f:
+            planner_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution log planner: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    planner_rec = planner_data.get("execution_plan_record", {})
+    execution_id = planner_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 暫定的な復元
+    # 注意: ここでの復元は、将来的な Planner / Optimizer Layer との完全結合を見据えた「暫定・テスト用入力」としての実装です。
+    execution_log_planner_obj = RuntimeEventExecutionLogExecutionPlan(
+        execution_plan_id=planner_rec.get("execution_plan_id"),
+        intent_graph_id=planner_rec.get("intent_graph_id"),
+        plan_id=planner_rec.get("plan_id"),
+        optimizer_id=planner_rec.get("optimizer_id"),
+        optimized_nodes=planner_rec.get("optimized_nodes", []),
+        optimized_edges=planner_rec.get("optimized_edges", []),
+        plan_state=planner_rec.get("plan_state"),
+        metadata=planner_rec.get("metadata", {}),
+        trace_id=planner_rec.get("trace_id"),
+        runtime_event_execution_log_intent_graph=planner_rec.get("runtime_event_execution_log_intent_graph", {})
+    )
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_executionlogengine_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        engine_execution_obj = EventExecutionLogEngineSchedulerManager.create_engine_execution(execution_log_planner_obj, context)
+    except AssertionError as e:
+        print(f"Assertion Error during execution log engine context create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_engine.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    engine_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "engine_record": engine_execution_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Log Engine Context (Dry Run)")
+        print(f"Engine ID: {engine_execution_obj.engine_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(engine_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Log Engine Context successfully written to runtime_event_execution_log_engine.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_log_engine.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -5858,6 +5966,10 @@ Available commands:
     runtime_event_execution_log_planner_parser = subparsers.add_parser("runtime-event-execution-log-planner", help="Manage plugin runtime session event execution log planner and optimizer")
     runtime_event_execution_log_planner_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log planner result")
     
+    # runtime-event-execution-log-engine コマンドパーサー
+    runtime_event_execution_log_engine_parser = subparsers.add_parser("runtime-event-execution-log-engine", help="Manage plugin runtime session event execution log execution engine and scheduler")
+    runtime_event_execution_log_engine_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log engine result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -5981,6 +6093,8 @@ Available commands:
         run_runtime_event_execution_log_intent_graph(args)
     elif args.command == "runtime-event-execution-log-planner":
         run_runtime_event_execution_log_planner(args)
+    elif args.command == "runtime-event-execution-log-engine":
+        run_runtime_event_execution_log_engine(args)
     else:
         # Invalid Command
         parser.print_help()
