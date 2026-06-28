@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -44,11 +44,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_replay.json",
     "plugins/runtime_event_snapshot.json",
     "plugins/runtime_event_audit.json",
-    "plugins/runtime_event_persistence.json"
+    "plugins/runtime_event_persistence.json",
+    "plugins/runtime_event_sync.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase48"
+PLATFORM_VERSION = "Phase49"
 
 def run_build(args):
     """
@@ -2817,6 +2818,137 @@ def run_runtime_event_persistence(args):
         print(f"Error: Failed to write runtime_event_persistence.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_sync(args):
+    """
+    runtime-event-sync サブコマンド: EventSyncManager を使用して runtime_event_sync.json を生成する。
+    注意: この runtime_event_persistence.json から直接 RuntimeEventPersistence を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_persistence import RuntimeEventPersistence
+        from plugin_platform.plugin.runtime_event_sync import EventSyncDescriptor, EventSyncRegistry, EventSyncManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_sync modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    persistence_path = os.path.join(script_dir, "plugins", "runtime_event_persistence.json")
+    if not os.path.exists(persistence_path):
+        print(f"Error: Runtime event persistence result not found at {persistence_path}. Please run 'runtime-event-persistence' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(persistence_path, "r", encoding="utf-8") as f:
+            persistence_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event persistence: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    persistence_records = persistence_data.get("persistence_records", [])
+    execution_id = persistence_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    sync_records = []
+    
+    # 決定論的ソート
+    sorted_persistence = sorted(persistence_records, key=lambda x: (x.get("persistence_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventSyncRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_sync_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, pers_data in enumerate(sorted_persistence, 1):
+        persistence_id = pers_data.get("persistence_id")
+        runtime_event_audit = pers_data.get("runtime_event_audit", {})
+        persistence_type = pers_data.get("persistence_type")
+        pers_sub_data = pers_data.get("persistence_data", {})
+        meta_pers = pers_data.get("metadata", {})
+        trace_id = pers_data.get("trace_id")
+        
+        # 暫定入力
+        persistence_obj = RuntimeEventPersistence(
+            persistence_id=persistence_id,
+            runtime_event_audit=runtime_event_audit,
+            persistence_type=persistence_type,
+            persistence_data=pers_sub_data,
+            metadata=meta_pers,
+            trace_id=trace_id
+        )
+        
+        try:
+            sync_obj = EventSyncManager.create_sync(persistence_obj, context)
+            sync_records.append(sync_obj.to_dict())
+            
+            # EventSyncRegistry 登録検証
+            descriptor = EventSyncDescriptor(
+                sync_id=sync_obj.sync_id,
+                persistence_id=persistence_id,
+                sync_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event sync create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_sync.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    sync_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "sync_count": len(sync_records)
+        },
+        "sync_records": sync_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Sync (Dry Run)")
+        print(f"Sync Count: {len(sync_records)}")
+        for rec in sync_records:
+            print(f"- Sync: {rec.get('sync_id')} (Type: {rec.get('sync_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(sync_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Sync successfully written to runtime_event_sync.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_sync.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -2984,6 +3116,10 @@ Available commands:
     runtime_event_persistence_parser = subparsers.add_parser("runtime-event-persistence", help="Manage plugin runtime session event persistence")
     runtime_event_persistence_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event persistence dry-run without writing result")
     
+    # runtime-event-sync コマンドパーサー
+    runtime_event_sync_parser = subparsers.add_parser("runtime-event-sync", help="Manage plugin runtime session event sync")
+    runtime_event_sync_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event sync dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -3059,6 +3195,8 @@ Available commands:
         run_runtime_event_audit(args)
     elif args.command == "runtime-event-persistence":
         run_runtime_event_persistence(args)
+    elif args.command == "runtime-event-sync":
+        run_runtime_event_sync(args)
     else:
         # Invalid Command
         parser.print_help()
