@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -42,11 +42,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_metadata.json",
     "plugins/runtime_event_analysis.json",
     "plugins/runtime_event_replay.json",
-    "plugins/runtime_event_snapshot.json"
+    "plugins/runtime_event_snapshot.json",
+    "plugins/runtime_event_audit.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase46"
+PLATFORM_VERSION = "Phase47"
 
 def run_build(args):
     """
@@ -2553,6 +2554,137 @@ def run_runtime_event_snapshot(args):
         print(f"Error: Failed to write runtime_event_snapshot.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_audit(args):
+    """
+    runtime-event-audit サブコマンド: EventAuditManager を使用して runtime_event_audit.json を生成する。
+    注意: この runtime_event_snapshot.json から直接 RuntimeEventSnapshot を構成するデータフロー is、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_snapshot import RuntimeEventSnapshot
+        from plugin_platform.plugin.runtime_event_audit import EventAuditDescriptor, EventAuditRegistry, EventAuditManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_audit modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    snapshot_path = os.path.join(script_dir, "plugins", "runtime_event_snapshot.json")
+    if not os.path.exists(snapshot_path):
+        print(f"Error: Runtime event snapshot result not found at {snapshot_path}. Please run 'runtime-event-snapshot' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(snapshot_path, "r", encoding="utf-8") as f:
+            snapshot_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event snapshot: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    snapshot_records = snapshot_data.get("snapshot_records", [])
+    execution_id = snapshot_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    audit_records = []
+    
+    # 決定論的ソート
+    sorted_snapshot = sorted(snapshot_records, key=lambda x: (x.get("snapshot_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventAuditRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_audit_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, snap_data in enumerate(sorted_snapshot, 1):
+        snapshot_id = snap_data.get("snapshot_id")
+        runtime_event_replay = snap_data.get("runtime_event_replay", {})
+        snapshot_type = snap_data.get("snapshot_type")
+        snap_sub_data = snap_data.get("snapshot_data", {})
+        meta_snap = snap_data.get("metadata", {})
+        trace_id = snap_data.get("trace_id")
+        
+        # 暫定入力
+        snapshot_obj = RuntimeEventSnapshot(
+            snapshot_id=snapshot_id,
+            runtime_event_replay=runtime_event_replay,
+            snapshot_type=snapshot_type,
+            snapshot_data=snap_sub_data,
+            metadata=meta_snap,
+            trace_id=trace_id
+        )
+        
+        try:
+            audit_obj = EventAuditManager.create_audit(snapshot_obj, context)
+            audit_records.append(audit_obj.to_dict())
+            
+            # EventAuditRegistry 登録検証
+            descriptor = EventAuditDescriptor(
+                audit_id=audit_obj.audit_id,
+                snapshot_id=snapshot_id,
+                audit_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event audit create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_audit.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    audit_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "audit_count": len(audit_records)
+        },
+        "audit_records": audit_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Audit (Dry Run)")
+        print(f"Audit Count: {len(audit_records)}")
+        for rec in audit_records:
+            print(f"- Audit: {rec.get('audit_id')} (Type: {rec.get('audit_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(audit_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Audit successfully written to runtime_event_audit.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_audit.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -2712,6 +2844,10 @@ Available commands:
     runtime_event_snapshot_parser = subparsers.add_parser("runtime-event-snapshot", help="Manage plugin runtime session event snapshot")
     runtime_event_snapshot_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event snapshot dry-run without writing result")
     
+    # runtime-event-audit コマンドパーサー
+    runtime_event_audit_parser = subparsers.add_parser("runtime-event-audit", help="Manage plugin runtime session event audit")
+    runtime_event_audit_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event audit dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -2783,6 +2919,8 @@ Available commands:
         run_runtime_event_replay(args)
     elif args.command == "runtime-event-snapshot":
         run_runtime_event_snapshot(args)
+    elif args.command == "runtime-event-audit":
+        run_runtime_event_audit(args)
     else:
         # Invalid Command
         parser.print_help()
