@@ -3129,12 +3129,29 @@
       "executor_id": "executor:controller:runtime:engine:execution_plan:plan:graph:meaning:receiver_context:boundary:routing:dispatch:persistence:execution_log:pipeline_execution:pipeline_run_execution:orchestrator:engine:pipeline_run:lifecycle:session:instance:stub_runtime",
       "controller_id": "controller:runtime:engine:execution_plan:plan:graph:meaning:receiver_context:boundary:routing:dispatch:persistence:execution_log:pipeline_execution:pipeline_run_execution:orchestrator:engine:pipeline_run:lifecycle:session:instance:stub_runtime",
       "lifecycle_state": "initialized",
-      "execution_cursor": 0,
+      "execution_cursor": "initialize_execution",
       "lifecycle_map": [
         "initialize_execution",
         "prepare_runtime",
         "activate_execution_path",
         "lock_execution_boundary"
+      ],
+      "state_transition_map": [
+        {
+          "from_state": "initialize_execution",
+          "to_state": "prepare_runtime",
+          "transition_type": "deterministic"
+        },
+        {
+          "from_state": "prepare_runtime",
+          "to_state": "activate_execution_path",
+          "transition_type": "deterministic"
+        },
+        {
+          "from_state": "activate_execution_path",
+          "to_state": "lock_execution_boundary",
+          "transition_type": "deterministic"
+        }
       ],
       "metadata": {
         "version": 1,
