@@ -2,8 +2,8 @@
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 40 (Plugin Runtime Event Query Foundation) の実装を完了し、セッションイベントクエリ構造を確立 ✅  
-> **次回のテーマ**: 🧠 CIE Phase 41 (Plugin Runtime Event Index Foundation) の構築およびテスト実装
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 41 (Plugin Runtime Event Index Foundation) の実装を完了し、セッションイベントインデックス構造を確立 ✅  
+> **次回のテーマ**: 🧠 CIE Phase 42 (Plugin Runtime Event Catalog Foundation) の構築およびテスト実装
 
 ---
 
@@ -35,7 +35,8 @@
 * **Phase 38**: Plugin Runtime Session Event Foundation [COMPLETED]
 * **Phase 39**: Plugin Runtime Event Store Foundation [COMPLETED]
 * **Phase 40**: Plugin Runtime Event Query Foundation [COMPLETED]
-* **Phase 41**: Plugin Runtime Event Index Foundation
+* **Phase 41**: Plugin Runtime Event Index Foundation [COMPLETED]
+* **Phase 42**: Plugin Runtime Event Catalog Foundation
 
 ### Platform Development Policy
 * **No new Builder should be added unless absolutely necessary.**
@@ -50,11 +51,11 @@
 
 ## 💎 Milestone
 
-- **Tag**: `v3.3.0-alpha.0`
-- **Title**: `Plugin Runtime Event Query Foundation (Phase 40) Complete`
+- **Tag**: `v3.4.0-alpha.0`
+- **Title**: `Plugin Runtime Event Index Foundation (Phase 41) Complete`
 - **Status**:
-  - `Plugin Runtime Event Query Foundation Completed`
-  - `Phase 41 (Plugin Runtime Event Index) Started`
+  - `Plugin Runtime Event Index Foundation Completed`
+  - `Phase 42 (Plugin Runtime Event Catalog) Started`
 
 ---
 
@@ -173,6 +174,15 @@ CIE (Code Intelligence Engine) の基盤（Foundation）構築シリーズはす
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-28 セッション】CIE Phase 41 (Plugin Runtime Event Index Foundation) 構築（担当: Antigravity）
+- **目的**: Runtime Event Query の結果を決定論的にインデックス化する Runtime Event Index Layer の Foundation を実装し、インデックス定義データ構造 (RuntimeEventIndex, EventIndexDescriptor) とトレースID連鎖を確立する。
+- **実装内容**:
+  - **新パッケージ**: `plugin_platform/plugin/runtime_event_index/` パッケージを新設。
+  - **モジュールの実装**: [event_index_descriptor.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_event_index/event_index_descriptor.py), [runtime_event_index.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_event_index/runtime_event_index.py), [event_index_registry.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_event_index/event_index_registry.py), [event_index_manager.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_event_index/event_index_manager.py) の実装。トレースID整合性アサーションをクリアした上で、クエリ ID から一意のインデックス ID を決定論的にマッピング・生成し、固定インデックス種別 "memory"、インデックスエントリーは空リスト `[]` で保持する制御を確立。
+  - **CLI (`cie.py`) の拡張**: `runtime-event-index` サブコマンドを追加。`runtime_event_query.json` をテスト用の暫定入力として読み込み、各結果から Query を復元・Managerへ渡して `runtime_event_index.json` を生成する処理を実装。
+  - **verify & doctor の拡張**: `plugins/runtime_event_index.json` を検証対象 (全30個) に追加し、整合性合格を確認。
+- **変更ファイル**: `plugin_platform/plugin/runtime_event_index/` 内のモジュール、[cie.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie.py), [HANDOVER.md](file:///Volumes/SSD_DATA/posting-map-system/HANDOVER.md)
 
 ### 【2026-06-28 セッション】CIE Phase 40 (Plugin Runtime Event Query Foundation) 構築（担当: Antigravity）
 - **目的**: Runtime Event Store に保持された Runtime Session Event を決定論的に検索・取得する Runtime Event Query Layer の Foundation を実装し、クエリ定義データ構造 (RuntimeEventQuery, EventQueryDescriptor) とトレースID連鎖を確立する。
