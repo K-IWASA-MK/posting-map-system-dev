@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -64,11 +64,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_persistence.json",
     "plugins/runtime_event_execution_log_dispatcher.json",
     "plugins/runtime_event_execution_log_routing.json",
-    "plugins/runtime_event_execution_log_endpoint_handler.json"
+    "plugins/runtime_event_execution_log_endpoint_handler.json",
+    "plugins/runtime_event_execution_log_receiver_router.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase68"
+PLATFORM_VERSION = "Phase69"
 
 def run_build(args):
     """
@@ -5179,6 +5180,110 @@ def run_runtime_event_execution_log_endpoint_handler(args):
         print(f"Error: Failed to write runtime_event_execution_log_endpoint_handler.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_log_receiver_router(args):
+    """
+    runtime-event-execution-log-receiver-router サブコマンド: EventExecutionLogReceiverRouterManager を使用して
+    runtime_event_execution_log_receiver_router.json を生成する。
+    注意: この runtime_event_execution_log_endpoint_handler.json から直接 RuntimeExecutionLogEndpointBoundary を
+    復元するデータフローは、将来的な Endpoint/Handler Layer との完全な結合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_execution_log_endpoint import RuntimeExecutionLogEndpointBoundary
+        from plugin_platform.plugin.runtime_event_execution_log_receiver import EventExecutionLogReceiverRouterManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution log receiver/router modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    boundary_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_endpoint_handler.json")
+    if not os.path.exists(boundary_path):
+        print(f"Error: Runtime event execution log endpoint/handler result not found at {boundary_path}. Please run 'runtime-event-execution-log-endpoint-handler' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(boundary_path, "r", encoding="utf-8") as f:
+            boundary_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution log endpoint/handler: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    boundary_rec = boundary_data.get("boundary_record", {})
+    execution_id = boundary_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 暫定的な復元
+    # 注意: ここでの復元は、将来的な Endpoint/Handler Layer との完全結合を見据えた「暫定・テスト用入力」としての実装です。
+    execution_log_boundary_obj = RuntimeExecutionLogEndpointBoundary(
+        execution_boundary_id=boundary_rec.get("execution_boundary_id"),
+        runtime_event_execution_log_routing=boundary_rec.get("runtime_event_execution_log_routing", {}),
+        runtime_event_execution_log_endpoint=boundary_rec.get("runtime_event_execution_log_endpoint", {}),
+        runtime_event_execution_log_handler=boundary_rec.get("runtime_event_execution_log_handler", {}),
+        boundary_state=boundary_rec.get("boundary_state"),
+        metadata=boundary_rec.get("metadata", {}),
+        trace_id=boundary_rec.get("trace_id")
+    )
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_executionlogreceiver_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        receiver_context_obj = EventExecutionLogReceiverRouterManager.create_receiver_context(execution_log_boundary_obj, context)
+    except AssertionError as e:
+        print(f"Assertion Error during execution log receiver/router context create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_receiver_router.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    receiver_router_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "receiver_router_record": receiver_context_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Log Receiver/Router Context (Dry Run)")
+        print(f"Receiver Context ID: {receiver_context_obj.receiver_context_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(receiver_router_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Log Receiver/Router Context successfully written to runtime_event_execution_log_receiver_router.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_log_receiver_router.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -5426,6 +5531,10 @@ Available commands:
     runtime_event_execution_log_endpoint_handler_parser = subparsers.add_parser("runtime-event-execution-log-endpoint-handler", help="Manage plugin runtime session event execution log endpoint and handler")
     runtime_event_execution_log_endpoint_handler_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log endpoint/handler result")
     
+    # runtime-event-execution-log-receiver-router コマンドパーサー
+    runtime_event_execution_log_receiver_router_parser = subparsers.add_parser("runtime-event-execution-log-receiver-router", help="Manage plugin runtime session event execution log receiver and router")
+    runtime_event_execution_log_receiver_router_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log receiver/router result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -5541,6 +5650,8 @@ Available commands:
         run_runtime_event_execution_log_routing(args)
     elif args.command == "runtime-event-execution-log-endpoint-handler":
         run_runtime_event_execution_log_endpoint_handler(args)
+    elif args.command == "runtime-event-execution-log-receiver-router":
+        run_runtime_event_execution_log_receiver_router(args)
     else:
         # Invalid Command
         parser.print_help()
