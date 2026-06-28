@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -55,11 +55,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_receiver.json",
     "plugins/runtime_event_gateway.json",
     "plugins/runtime_event_listener.json",
-    "plugins/runtime_event_pipeline_result.json"
+    "plugins/runtime_event_pipeline_result.json",
+    "plugins/runtime_event_execution_engine.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase59"
+PLATFORM_VERSION = "Phase60"
 
 def run_build(args):
     """
@@ -4255,6 +4256,109 @@ def run_runtime_event_pipeline_run(args):
         print(f"Error: Failed to write runtime_event_pipeline_result.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_engine(args):
+    """
+    runtime-event-execution-engine サブコマンド: EventExecutionEngineManager を使用して
+    runtime_event_execution_engine.json を生成する。
+    注意: この runtime_event_pipeline_result.json から直接 RuntimeEventPipelineResult を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_pipeline_integration import RuntimeEventPipelineResult
+        from plugin_platform.plugin.runtime_event_execution_engine import EventExecutionEngineManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution engine modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    result_path = os.path.join(script_dir, "plugins", "runtime_event_pipeline_result.json")
+    if not os.path.exists(result_path):
+        print(f"Error: Runtime event pipeline result not found at {result_path}. Please run 'runtime-event-pipeline-run' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(result_path, "r", encoding="utf-8") as f:
+            result_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event pipeline result: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    pipeline_res_data = result_data.get("pipeline_result", {})
+    execution_id = result_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 暫定的な復元
+    pipeline_result_obj = RuntimeEventPipelineResult(
+        pipeline_run_id=pipeline_res_data.get("pipeline_run_id"),
+        trace_id=pipeline_res_data.get("trace_id"),
+        runtime_session_event_id=pipeline_res_data.get("runtime_session_event_id"),
+        generated_ids=pipeline_res_data.get("generated_ids", {}),
+        validation_result=pipeline_res_data.get("validation_result", {}),
+        metadata=pipeline_res_data.get("metadata", {})
+    )
+    
+    # 設定 of ロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_engine_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        engine_obj = EventExecutionEngineManager.create_engine(pipeline_result_obj, context)
+    except AssertionError as e:
+        print(f"Assertion Error during execution engine create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_engine.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    engine_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "engine_record": engine_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Engine (Dry Run)")
+        print(f"Engine ID: {engine_obj.engine_id}")
+        print(f"Execution Plan ID: {engine_obj.execution_plan.execution_plan_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(engine_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Engine successfully written to runtime_event_execution_engine.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_engine.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -4466,6 +4570,10 @@ Available commands:
     runtime_event_pipeline_run_parser = subparsers.add_parser("runtime-event-pipeline-run", help="Run integration pipeline for all runtime event layers")
     runtime_event_pipeline_run_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing pipeline result")
     
+    # runtime-event-execution-engine コマンドパーサー
+    runtime_event_execution_engine_parser = subparsers.add_parser("runtime-event-execution-engine", help="Manage plugin runtime session event execution engine")
+    runtime_event_execution_engine_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution engine result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -4563,6 +4671,8 @@ Available commands:
         run_runtime_event_listener(args)
     elif args.command == "runtime-event-pipeline-run":
         run_runtime_event_pipeline_run(args)
+    elif args.command == "runtime-event-execution-engine":
+        run_runtime_event_execution_engine(args)
     else:
         # Invalid Command
         parser.print_help()
