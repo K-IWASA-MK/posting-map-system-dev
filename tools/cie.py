@@ -5819,7 +5819,7 @@ def run_runtime_event_execution_log_runtime(args):
     try:
         runtime_execution_obj = EventExecutionLogRuntimeManager.create_runtime_execution(execution_log_engine_obj, context)
     except AssertionError as e:
-        print(f"Assertion Error during execution log runtime context create: {e}", file=sys.stderr)
+        print(f"Assertion Error during execution log runtime create: {e}", file=sys.stderr)
         sys.exit(3)
         
     output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_runtime.json")
@@ -5835,14 +5835,14 @@ def run_runtime_event_execution_log_runtime(args):
     }
     
     if args.dry_run:
-        print("Plugin Runtime Session Event Execution Log Runtime Context (Dry Run)")
+        print("Plugin Runtime Session Event Execution Log Runtime Execution State Machine (Dry Run)")
         print(f"Runtime ID: {runtime_execution_obj.runtime_id}")
         sys.exit(0)
         
     try:
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(runtime_data, f, indent=2, ensure_ascii=False)
-        print("Plugin Runtime Session Event Execution Log Runtime Context successfully written to runtime_event_execution_log_runtime.json")
+        print("Plugin Runtime Session Event Execution Log Runtime Execution State Machine successfully written to runtime_event_execution_log_runtime.json")
         sys.exit(0)
     except IOError as e:
         print(f"Error: Failed to write runtime_event_execution_log_runtime.json: {e}", file=sys.stderr)
