@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -37,11 +37,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_session_event.json",
     "plugins/runtime_event_store.json",
     "plugins/runtime_event_query.json",
-    "plugins/runtime_event_index.json"
+    "plugins/runtime_event_index.json",
+    "plugins/runtime_event_catalog.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase41"
+PLATFORM_VERSION = "Phase42"
 
 def run_build(args):
     """
@@ -1893,6 +1894,137 @@ def run_runtime_event_index(args):
         print(f"Error: Failed to write runtime_event_index.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_catalog(args):
+    """
+    runtime-event-catalog サブコマンド: EventCatalogManager を使用して runtime_event_catalog.json を生成する。
+    注意: この runtime_event_index.json から直接 RuntimeEventIndex を構成するデータフロー is、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_index import RuntimeEventIndex
+        from plugin_platform.plugin.runtime_event_catalog import EventCatalogDescriptor, EventCatalogRegistry, EventCatalogManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_catalog modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    index_path = os.path.join(script_dir, "plugins", "runtime_event_index.json")
+    if not os.path.exists(index_path):
+        print(f"Error: Runtime event index result not found at {index_path}. Please run 'runtime-event-index' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(index_path, "r", encoding="utf-8") as f:
+            index_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event index: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    indexes_data = index_data.get("indexes", [])
+    execution_id = index_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    catalogs = []
+    
+    # 決定論的ソート
+    sorted_indexes = sorted(indexes_data, key=lambda x: (x.get("index_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventCatalogRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_catalog_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, idx_data in enumerate(sorted_indexes, 1):
+        index_id = idx_data.get("index_id")
+        runtime_event_query = idx_data.get("runtime_event_query", {})
+        index_type = idx_data.get("index_type")
+        entries = idx_data.get("entries", [])
+        meta_idx = idx_data.get("metadata", {})
+        trace_id = idx_data.get("trace_id")
+        
+        # 暫定入力
+        index = RuntimeEventIndex(
+            index_id=index_id,
+            runtime_event_query=runtime_event_query,
+            index_type=index_type,
+            entries=entries,
+            metadata=meta_idx,
+            trace_id=trace_id
+        )
+        
+        try:
+            catalog = EventCatalogManager.create_catalog(index, context)
+            catalogs.append(catalog.to_dict())
+            
+            # EventCatalogRegistry 登録検証
+            descriptor = EventCatalogDescriptor(
+                catalog_id=catalog.catalog_id,
+                index_id=index_id,
+                catalog_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event catalog create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_catalog.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    catalog_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "catalog_count": len(catalogs)
+        },
+        "catalogs": catalogs
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Catalog (Dry Run)")
+        print(f"Catalogs Count: {len(catalogs)}")
+        for cat in catalogs:
+            print(f"- Catalog: {cat.get('catalog_id')} (Type: {cat.get('catalog_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(catalog_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Catalog successfully written to runtime_event_catalog.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_catalog.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -1925,6 +2057,7 @@ Available commands:
   runtime-event-store Manage plugin runtime session event store.
   runtime-event-query Manage plugin runtime session event query.
   runtime-event-index Manage plugin runtime session event index.
+  runtime-event-catalog Manage plugin runtime session event catalog.
         """
     )
     
@@ -2030,6 +2163,10 @@ Available commands:
     runtime_event_index_parser = subparsers.add_parser("runtime-event-index", help="Manage plugin runtime session event index")
     runtime_event_index_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event index dry-run without writing result")
     
+    # runtime-event-catalog コマンドパーサー
+    runtime_event_catalog_parser = subparsers.add_parser("runtime-event-catalog", help="Manage plugin runtime session event catalog")
+    runtime_event_catalog_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event catalog dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -2091,6 +2228,8 @@ Available commands:
         run_runtime_event_query(args)
     elif args.command == "runtime-event-index":
         run_runtime_event_index(args)
+    elif args.command == "runtime-event-catalog":
+        run_runtime_event_catalog(args)
     else:
         # Invalid Command
         parser.print_help()
