@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -50,11 +50,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_stream.json",
     "plugins/runtime_event_dispatcher.json",
     "plugins/runtime_event_router.json",
-    "plugins/runtime_event_endpoint.json"
+    "plugins/runtime_event_endpoint.json",
+    "plugins/runtime_event_handler.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase54"
+PLATFORM_VERSION = "Phase55"
 
 def run_build(args):
     """
@@ -3609,6 +3610,137 @@ def run_runtime_event_endpoint(args):
         print(f"Error: Failed to write runtime_event_endpoint.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_handler(args):
+    """
+    runtime-event-handler サブコマンド: EventHandlerManager を使用して runtime_event_handler.json を生成する。
+    注意: この runtime_event_endpoint.json から直接 RuntimeEventEndpoint を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_endpoint import RuntimeEventEndpoint
+        from plugin_platform.plugin.runtime_event_handler import EventHandlerDescriptor, EventHandlerRegistry, EventHandlerManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_handler modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    endpoint_path = os.path.join(script_dir, "plugins", "runtime_event_endpoint.json")
+    if not os.path.exists(endpoint_path):
+        print(f"Error: Runtime event endpoint result not found at {endpoint_path}. Please run 'runtime-event-endpoint' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(endpoint_path, "r", encoding="utf-8") as f:
+            endpoint_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event endpoint: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    endpoint_records = endpoint_data.get("endpoint_records", [])
+    execution_id = endpoint_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    handler_records = []
+    
+    # 決定論的ソート
+    sorted_endpoint = sorted(endpoint_records, key=lambda x: (x.get("endpoint_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventHandlerRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_handler_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, endp_data in enumerate(sorted_endpoint, 1):
+        endpoint_id = endp_data.get("endpoint_id")
+        runtime_event_router = endp_data.get("runtime_event_router", {})
+        endpoint_type = endp_data.get("endpoint_type")
+        endp_sub_data = endp_data.get("endpoint_targets", [])
+        meta_endp = endp_data.get("metadata", {})
+        trace_id = endp_data.get("trace_id")
+        
+        # 暫定入力
+        endpoint_obj = RuntimeEventEndpoint(
+            endpoint_id=endpoint_id,
+            runtime_event_router=runtime_event_router,
+            endpoint_type=endpoint_type,
+            endpoint_targets=endp_sub_data,
+            metadata=meta_endp,
+            trace_id=trace_id
+        )
+        
+        try:
+            handler_obj = EventHandlerManager.create_handler(endpoint_obj, context)
+            handler_records.append(handler_obj.to_dict())
+            
+            # EventHandlerRegistry 登録検証
+            descriptor = EventHandlerDescriptor(
+                handler_id=handler_obj.handler_id,
+                endpoint_id=endpoint_id,
+                handler_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event handler create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_handler.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    handler_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "handler_count": len(handler_records)
+        },
+        "handler_records": handler_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Handler (Dry Run)")
+        print(f"Handler Count: {len(handler_records)}")
+        for rec in handler_records:
+            print(f"- Handler: {rec.get('handler_id')} (Type: {rec.get('handler_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(handler_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Handler successfully written to runtime_event_handler.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_handler.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -3800,6 +3932,10 @@ Available commands:
     runtime_event_endpoint_parser = subparsers.add_parser("runtime-event-endpoint", help="Manage plugin runtime session event endpoint")
     runtime_event_endpoint_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event endpoint dry-run without writing result")
     
+    # runtime-event-handler コマンドパーサー
+    runtime_event_handler_parser = subparsers.add_parser("runtime-event-handler", help="Manage plugin runtime session event handler")
+    runtime_event_handler_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event handler dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -3887,6 +4023,8 @@ Available commands:
         run_runtime_event_router(args)
     elif args.command == "runtime-event-endpoint":
         run_runtime_event_endpoint(args)
+    elif args.command == "runtime-event-handler":
+        run_runtime_event_handler(args)
     else:
         # Invalid Command
         parser.print_help()
