@@ -2,8 +2,8 @@
 
 次回の担当AIへ。以下のコンテキストを読み込み、これまでの開発履歴と現状を確認して作業を開始してください。
 
-> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 51 (Plugin Runtime Event Stream Foundation) の実装を完了し、セッションイベントストリーム構造を確立 ✅  
-> **次回のテーマ**: 🧠 CIE Phase 52 (Plugin Runtime Event Dispatcher Foundation) の構築およびテスト実装
+> **現担当AI**: Antigravity (Google DeepMind) — 2026-06-28 CIE Phase 52 (Plugin Runtime Event Dispatcher Foundation) の実装を完了し、セッションイベントディスパッチャ構造を確立 ✅  
+> **次回のテーマ**: 🧠 CIE Phase 53 (Plugin Runtime Event Router Foundation) の構築およびテスト実装
 
 ---
 
@@ -46,7 +46,8 @@
 * **Phase 49**: Plugin Runtime Event Sync Foundation [COMPLETED]
 * **Phase 50**: Plugin Runtime Event Pipeline Foundation [COMPLETED]
 * **Phase 51**: Plugin Runtime Event Stream Foundation [COMPLETED]
-* **Phase 52**: Plugin Runtime Event Dispatcher Foundation
+* **Phase 52**: Plugin Runtime Event Dispatcher Foundation [COMPLETED]
+* **Phase 53**: Plugin Runtime Event Router Foundation
 
 ### Platform Development Policy
 * **No new Builder should be added unless absolutely necessary.**
@@ -61,11 +62,11 @@
 
 ## 💎 Milestone
 
-- **Tag**: `v3.14.0-alpha.0`
-- **Title**: `Plugin Runtime Event Stream Foundation (Phase 51) Complete`
+- **Tag**: `v3.15.0-alpha.0`
+- **Title**: `Plugin Runtime Event Dispatcher Foundation (Phase 52) Complete`
 - **Status**:
-  - `Plugin Runtime Event Stream Foundation Completed`
-  - `Phase 52 (Plugin Runtime Event Dispatcher) Started`
+  - `Plugin Runtime Event Dispatcher Foundation Completed`
+  - `Phase 53 (Plugin Runtime Event Router) Started`
 
 ---
 
@@ -184,6 +185,15 @@ CIE (Code Intelligence Engine) の基盤（Foundation）構築シリーズはす
 ---
 
 ## 2. これまでに完了した重要な変更点（直近）
+
+### 【2026-06-28 セッション】CIE Phase 52 (Plugin Runtime Event Dispatcher Foundation) 構築（担当: Antigravity）
+- **目的**: Runtime Event Stream をもとに、Runtime Event を決定論的に各処理先へ振り分け・配送する Runtime Event Dispatcher Layer の Foundation を実装し、ディスパッチャ定義データ構造 (RuntimeEventDispatcher, EventDispatcherDescriptor) とトレースID連鎖を確立する。
+- **実装内容**:
+  - **新パッケージ**: `plugin_platform/plugin/runtime_event_dispatcher/` パッケージを新設。
+  - **モジュールの実装**: [event_dispatcher_descriptor.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_event_dispatcher/event_dispatcher_descriptor.py), [runtime_event_dispatcher.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_event_dispatcher/runtime_event_dispatcher.py), [event_dispatcher_registry.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_event_dispatcher/event_dispatcher_registry.py), [event_dispatcher_manager.py](file:///Volumes/SSD_DATA/posting-map-system/plugin_platform/plugin/runtime_event_dispatcher/event_dispatcher_manager.py) の実装。トレースID整合性アサーションをクリアした上で、ストリーム ID から一意のディスパッチャ ID を決定論的にマッピング・生成し、固定ディスパッチャ種別 "default"、配信ターゲットは空リスト `[]` で保持する制御を確立。
+  - **CLI (`cie.py`) の拡張**: `runtime-event-dispatcher` サブコマンドを追加。`runtime_event_stream.json` をテスト用の暫定入力として読み込み、各結果から Stream を復元・Managerへ渡して `runtime_event_dispatcher.json` を生成する処理を実装。
+  - **verify & doctor の拡張**: `plugins/runtime_event_dispatcher.json` を検証対象 (全41個) に追加し、整合性合格を確認。
+- **変更ファイル**: `plugin_platform/plugin/runtime_event_dispatcher/` 内のモジュール, [cie.py](file:///Volumes/SSD_DATA/posting-map-system/tools/cie.py), [HANDOVER.md](file:///Volumes/SSD_DATA/posting-map-system/HANDOVER.md)
 
 ### 【2026-06-28 セッション】CIE Phase 51 (Plugin Runtime Event Stream Foundation) 構築（担当: Antigravity）
 - **目的**: Runtime Event Pipeline をもとに、Runtime Event を決定論的なストリームとして接続・管理する Runtime Event Stream Layer の Foundation を実装し、ストリーム定義データ構造 (RuntimeEventStream, EventStreamDescriptor) とトレースID連鎖を確立する。
