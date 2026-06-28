@@ -1,0 +1,216 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-28T00:00:00Z",
+    "execution_id": "execution_run:session_cie_default",
+    "persistence_count": 1
+  },
+  "persistence_records": [
+    {
+      "persistence_id": "persistence:audit:snapshot:replay:analysis:metadata:catalog:index:query:store:event:lifecycle:session:instance:stub_runtime",
+      "runtime_event_audit": {
+        "audit_id": "audit:snapshot:replay:analysis:metadata:catalog:index:query:store:event:lifecycle:session:instance:stub_runtime",
+        "runtime_event_snapshot": {
+          "snapshot_id": "snapshot:replay:analysis:metadata:catalog:index:query:store:event:lifecycle:session:instance:stub_runtime",
+          "runtime_event_replay": {
+            "replay_id": "replay:analysis:metadata:catalog:index:query:store:event:lifecycle:session:instance:stub_runtime",
+            "runtime_event_analysis": {
+              "analysis_id": "analysis:metadata:catalog:index:query:store:event:lifecycle:session:instance:stub_runtime",
+              "runtime_event_metadata": {
+                "metadata_id": "metadata:catalog:index:query:store:event:lifecycle:session:instance:stub_runtime",
+                "runtime_event_catalog": {
+                  "catalog_id": "catalog:index:query:store:event:lifecycle:session:instance:stub_runtime",
+                  "runtime_event_index": {
+                    "index_id": "index:query:store:event:lifecycle:session:instance:stub_runtime",
+                    "runtime_event_query": {
+                      "query_id": "query:store:event:lifecycle:session:instance:stub_runtime",
+                      "runtime_event_store": {
+                        "store_id": "store:event:lifecycle:session:instance:stub_runtime",
+                        "runtime_session_event": {
+                          "event_id": "event:lifecycle:session:instance:stub_runtime",
+                          "runtime_session_lifecycle": {
+                            "lifecycle_id": "lifecycle:session:instance:stub_runtime",
+                            "runtime_session": {
+                              "session_id": "session:instance:stub_runtime",
+                              "runtime_instance": {
+                                "instance_id": "instance:stub_runtime",
+                                "runtime_id": "stub_runtime",
+                                "status": "resolved",
+                                "configuration": {
+                                  "version": 1,
+                                  "schema": 1,
+                                  "cie_version": "2.2.0-alpha.0",
+                                  "platform_phase": "Phase24",
+                                  "theme": "dark",
+                                  "dashboard": {
+                                    "refresh_interval": 30
+                                  },
+                                  "api": {
+                                    "host": "127.0.0.1",
+                                    "port": 8080
+                                  },
+                                  "metrics": {
+                                    "score_max": 100,
+                                    "unused_penalty": 0.2,
+                                    "high_impact_penalty": 0.5,
+                                    "hub_penalty": 0.3,
+                                    "orphan_route_penalty": 2.0
+                                  },
+                                  "export": {
+                                    "default_format": "markdown",
+                                    "output_directory": "exports"
+                                  }
+                                },
+                                "metadata": {
+                                  "version": 1,
+                                  "resolved_by": "runtime_factory_stub",
+                                  "capabilities": [
+                                    "all"
+                                  ]
+                                },
+                                "trace_id": "execution:0001"
+                              },
+                              "state": "initialized",
+                              "configuration": {
+                                "version": 1,
+                                "schema": 1,
+                                "cie_version": "2.2.0-alpha.0",
+                                "platform_phase": "Phase24",
+                                "theme": "dark",
+                                "dashboard": {
+                                  "refresh_interval": 30
+                                },
+                                "api": {
+                                  "host": "127.0.0.1",
+                                  "port": 8080
+                                },
+                                "metrics": {
+                                  "score_max": 100,
+                                  "unused_penalty": 0.2,
+                                  "high_impact_penalty": 0.5,
+                                  "hub_penalty": 0.3,
+                                  "orphan_route_penalty": 2.0
+                                },
+                                "export": {
+                                  "default_format": "markdown",
+                                  "output_directory": "exports"
+                                }
+                              },
+                              "metadata": {
+                                "version": 1,
+                                "manager": "session_manager_stub",
+                                "environment": "development"
+                              },
+                              "trace_id": "execution:0001"
+                            },
+                            "state": "initialized",
+                            "metadata": {
+                              "version": 1,
+                              "manager": "lifecycle_manager_stub",
+                              "environment": "development"
+                            },
+                            "trace_id": "execution:0001"
+                          },
+                          "event_type": "initialized",
+                          "payload": {
+                            "session_id": "session:instance:stub_runtime",
+                            "state": "initialized"
+                          },
+                          "metadata": {
+                            "version": 1,
+                            "manager": "event_manager_stub",
+                            "environment": "development"
+                          },
+                          "trace_id": "execution:0001"
+                        },
+                        "storage_type": "memory",
+                        "metadata": {
+                          "version": 1,
+                          "manager": "event_store_manager_stub",
+                          "environment": "development"
+                        },
+                        "trace_id": "execution:0001"
+                      },
+                      "query_type": "lookup",
+                      "result": [],
+                      "metadata": {
+                        "version": 1,
+                        "manager": "event_query_manager_stub",
+                        "environment": "development"
+                      },
+                      "trace_id": "execution:0001"
+                    },
+                    "index_type": "memory",
+                    "entries": [],
+                    "metadata": {
+                      "version": 1,
+                      "manager": "event_index_manager_stub",
+                      "environment": "development"
+                    },
+                    "trace_id": "execution:0001"
+                  },
+                  "catalog_type": "default",
+                  "entries": [],
+                  "metadata": {
+                    "version": 1,
+                    "manager": "event_catalog_manager_stub",
+                    "environment": "development"
+                  },
+                  "trace_id": "execution:0001"
+                },
+                "metadata_type": "default",
+                "attributes": {},
+                "metadata": {
+                  "version": 1,
+                  "manager": "event_metadata_manager_stub",
+                  "environment": "development"
+                },
+                "trace_id": "execution:0001"
+              },
+              "analysis_type": "default",
+              "result": {},
+              "metadata": {
+                "version": 1,
+                "manager": "event_analysis_manager_stub",
+                "environment": "development"
+              },
+              "trace_id": "execution:0001"
+            },
+            "replay_type": "default",
+            "replay_data": {},
+            "metadata": {
+              "version": 1,
+              "manager": "event_replay_manager_stub",
+              "environment": "development"
+            },
+            "trace_id": "execution:0001"
+          },
+          "snapshot_type": "default",
+          "snapshot_data": {},
+          "metadata": {
+            "version": 1,
+            "manager": "event_snapshot_manager_stub",
+            "environment": "development"
+          },
+          "trace_id": "execution:0001"
+        },
+        "audit_type": "default",
+        "audit_data": {},
+        "metadata": {
+          "version": 1,
+          "manager": "event_audit_manager_stub",
+          "environment": "development"
+        },
+        "trace_id": "execution:0001"
+      },
+      "persistence_type": "default",
+      "persistence_data": {},
+      "metadata": {
+        "version": 1,
+        "manager": "event_persistence_manager_stub",
+        "environment": "development"
+      },
+      "trace_id": "execution:0001"
+    }
+  ]
+}
