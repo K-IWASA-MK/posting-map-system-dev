@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -39,11 +39,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_query.json",
     "plugins/runtime_event_index.json",
     "plugins/runtime_event_catalog.json",
-    "plugins/runtime_event_metadata.json"
+    "plugins/runtime_event_metadata.json",
+    "plugins/runtime_event_analysis.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase43"
+PLATFORM_VERSION = "Phase44"
 
 def run_build(args):
     """
@@ -2157,6 +2158,137 @@ def run_runtime_event_metadata(args):
         print(f"Error: Failed to write runtime_event_metadata.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_analysis(args):
+    """
+    runtime-event-analysis サブコマンド: EventAnalysisManager を使用して runtime_event_analysis.json を生成する。
+    注意: この runtime_event_metadata.json から直接 RuntimeEventMetadata を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_metadata import RuntimeEventMetadata
+        from plugin_platform.plugin.runtime_event_analyzer import EventAnalysisDescriptor, EventAnalysisRegistry, EventAnalysisManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_analyzer modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    metadata_path = os.path.join(script_dir, "plugins", "runtime_event_metadata.json")
+    if not os.path.exists(metadata_path):
+        print(f"Error: Runtime event metadata result not found at {metadata_path}. Please run 'runtime-event-metadata' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(metadata_path, "r", encoding="utf-8") as f:
+            metadata_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event metadata: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    metadata_records = metadata_data.get("metadata_records", [])
+    execution_id = metadata_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    analysis_records = []
+    
+    # 決定論的ソート
+    sorted_metadata = sorted(metadata_records, key=lambda x: (x.get("metadata_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventAnalysisRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_analysis_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, meta_data in enumerate(sorted_metadata, 1):
+        metadata_id = meta_data.get("metadata_id")
+        runtime_event_catalog = meta_data.get("runtime_event_catalog", {})
+        metadata_type = meta_data.get("metadata_type")
+        attributes = meta_data.get("attributes", {})
+        meta_sub = meta_data.get("metadata", {})
+        trace_id = meta_data.get("trace_id")
+        
+        # 暫定入力
+        metadata_obj = RuntimeEventMetadata(
+            metadata_id=metadata_id,
+            runtime_event_catalog=runtime_event_catalog,
+            metadata_type=metadata_type,
+            attributes=attributes,
+            metadata=meta_sub,
+            trace_id=trace_id
+        )
+        
+        try:
+            analysis_obj = EventAnalysisManager.create_analysis(metadata_obj, context)
+            analysis_records.append(analysis_obj.to_dict())
+            
+            # EventAnalysisRegistry 登録検証
+            descriptor = EventAnalysisDescriptor(
+                analysis_id=analysis_obj.analysis_id,
+                metadata_id=metadata_id,
+                analysis_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event analysis create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_analysis.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    analysis_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "analysis_count": len(analysis_records)
+        },
+        "analysis_records": analysis_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Analysis (Dry Run)")
+        print(f"Analysis Count: {len(analysis_records)}")
+        for rec in analysis_records:
+            print(f"- Analysis: {rec.get('analysis_id')} (Type: {rec.get('analysis_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(analysis_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Analysis successfully written to runtime_event_analysis.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_analysis.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -2304,6 +2436,10 @@ Available commands:
     runtime_event_metadata_parser = subparsers.add_parser("runtime-event-metadata", help="Manage plugin runtime session event metadata")
     runtime_event_metadata_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event metadata dry-run without writing result")
     
+    # runtime-event-analysis コマンドパーサー
+    runtime_event_analysis_parser = subparsers.add_parser("runtime-event-analysis", help="Manage plugin runtime session event analysis")
+    runtime_event_analysis_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event analysis dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -2369,6 +2505,8 @@ Available commands:
         run_runtime_event_catalog(args)
     elif args.command == "runtime-event-metadata":
         run_runtime_event_metadata(args)
+    elif args.command == "runtime-event-analysis":
+        run_runtime_event_analysis(args)
     else:
         # Invalid Command
         parser.print_help()
