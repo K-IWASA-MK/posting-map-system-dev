@@ -1,0 +1,7 @@
+from .runtime_execution_log_meaning import RuntimeExecutionLogMeaning
+from .runtime_event_execution_log_meaning import RuntimeEventExecutionLogMeaning
+from .event_execution_log_meaning_integration_manager import EventExecutionLogMeaningIntegrationManager
+
+# エイリアスの定義
+RuntimeEventExecutionLogMeaningIntegrator = RuntimeEventExecutionLogMeaning
+RuntimeExecutionLogMeaningContext = RuntimeExecutionLogMeaning
