@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -63,11 +63,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log.json",
     "plugins/runtime_event_execution_log_persistence.json",
     "plugins/runtime_event_execution_log_dispatcher.json",
-    "plugins/runtime_event_execution_log_routing.json"
+    "plugins/runtime_event_execution_log_routing.json",
+    "plugins/runtime_event_execution_log_endpoint_handler.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase67"
+PLATFORM_VERSION = "Phase68"
 
 def run_build(args):
     """
@@ -5076,6 +5077,108 @@ def run_runtime_event_execution_log_routing(args):
         print(f"Error: Failed to write runtime_event_execution_log_routing.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_log_endpoint_handler(args):
+    """
+    runtime-event-execution-log-endpoint-handler サブコマンド: EventExecutionLogEndpointHandlerManager を使用して
+    runtime_event_execution_log_endpoint_handler.json を生成する。
+    注意: この runtime_event_execution_log_routing.json から直接 RuntimeEventExecutionLogRouting を
+    復元するデータフローは、将来的な Routing Layer との完全な結合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_execution_log_routing import RuntimeEventExecutionLogRouting
+        from plugin_platform.plugin.runtime_event_execution_log_endpoint import EventExecutionLogEndpointHandlerManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution log endpoint/handler modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    routing_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_routing.json")
+    if not os.path.exists(routing_path):
+        print(f"Error: Runtime event execution log routing result not found at {routing_path}. Please run 'runtime-event-execution-log-routing' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(routing_path, "r", encoding="utf-8") as f:
+            routing_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution log routing: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    routing_rec = routing_data.get("routing_record", {})
+    execution_id = routing_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 暫定的な復元
+    # 注意: ここでの復元は、将来的な Routing Layer との完全結合を見据えた「暫定・テスト用入力」としての実装です。
+    execution_log_routing_obj = RuntimeEventExecutionLogRouting(
+        routing_id=routing_rec.get("routing_id"),
+        runtime_event_execution_log_dispatcher=routing_rec.get("runtime_event_execution_log_dispatcher", {}),
+        routing=routing_rec.get("routing", {}),
+        metadata=routing_rec.get("metadata", {}),
+        trace_id=routing_rec.get("trace_id")
+    )
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_executionlogendpoint_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        boundary_obj = EventExecutionLogEndpointHandlerManager.create_boundary(execution_log_routing_obj, context)
+    except AssertionError as e:
+        print(f"Assertion Error during execution log endpoint/handler create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_endpoint_handler.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    boundary_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "boundary_record": boundary_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Log Endpoint/Handler Boundary (Dry Run)")
+        print(f"Boundary ID: {boundary_obj.execution_boundary_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(boundary_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Log Endpoint/Handler Boundary successfully written to runtime_event_execution_log_endpoint_handler.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_log_endpoint_handler.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -5319,6 +5422,10 @@ Available commands:
     runtime_event_execution_log_routing_parser = subparsers.add_parser("runtime-event-execution-log-routing", help="Manage plugin runtime session event execution log routing")
     runtime_event_execution_log_routing_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log routing result")
     
+    # runtime-event-execution-log-endpoint-handler コマンドパーサー
+    runtime_event_execution_log_endpoint_handler_parser = subparsers.add_parser("runtime-event-execution-log-endpoint-handler", help="Manage plugin runtime session event execution log endpoint and handler")
+    runtime_event_execution_log_endpoint_handler_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log endpoint/handler result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -5432,6 +5539,8 @@ Available commands:
         run_runtime_event_execution_log_dispatcher(args)
     elif args.command == "runtime-event-execution-log-routing":
         run_runtime_event_execution_log_routing(args)
+    elif args.command == "runtime-event-execution-log-endpoint-handler":
+        run_runtime_event_execution_log_endpoint_handler(args)
     else:
         # Invalid Command
         parser.print_help()
