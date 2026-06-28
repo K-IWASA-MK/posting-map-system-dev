@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -35,11 +35,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_session.json",
     "plugins/runtime_session_lifecycle.json",
     "plugins/runtime_session_event.json",
-    "plugins/runtime_event_store.json"
+    "plugins/runtime_event_store.json",
+    "plugins/runtime_event_query.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase39"
+PLATFORM_VERSION = "Phase40"
 
 def run_build(args):
     """
@@ -1631,6 +1632,135 @@ def run_runtime_event_store(args):
         print(f"Error: Failed to write runtime_event_store.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_query(args):
+    """
+    runtime-event-query サブコマンド: EventQueryManager を使用して runtime_event_query.json を生成する。
+    注意: この runtime_event_store.json から直接 RuntimeEventStore を構成するデータフロー is、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_store import RuntimeEventStore
+        from plugin_platform.plugin.runtime_event_query import EventQueryDescriptor, EventQueryRegistry, EventQueryManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_query modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    store_path = os.path.join(script_dir, "plugins", "runtime_event_store.json")
+    if not os.path.exists(store_path):
+        print(f"Error: Runtime event store result not found at {store_path}. Please run 'runtime-event-store' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(store_path, "r", encoding="utf-8") as f:
+            store_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event store: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    stores_data = store_data.get("stores", [])
+    execution_id = store_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    queries = []
+    
+    # 決定論的ソート
+    sorted_stores = sorted(stores_data, key=lambda x: (x.get("store_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventQueryRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_query_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, st_data in enumerate(sorted_stores, 1):
+        store_id = st_data.get("store_id")
+        runtime_session_event = st_data.get("runtime_session_event", {})
+        storage_type = st_data.get("storage_type")
+        meta_st = st_data.get("metadata", {})
+        trace_id = st_data.get("trace_id")
+        
+        # 暫定入力
+        store = RuntimeEventStore(
+            store_id=store_id,
+            runtime_session_event=runtime_session_event,
+            storage_type=storage_type,
+            metadata=meta_st,
+            trace_id=trace_id
+        )
+        
+        try:
+            query = EventQueryManager.create_query(store, context)
+            queries.append(query.to_dict())
+            
+            # EventQueryRegistry 登録検証
+            descriptor = EventQueryDescriptor(
+                query_id=query.query_id,
+                store_id=store_id,
+                query_type="lookup",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event query create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_query.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    query_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "query_count": len(queries)
+        },
+        "queries": queries
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Query (Dry Run)")
+        print(f"Queries Count: {len(queries)}")
+        for qr in queries:
+            print(f"- Query: {qr.get('query_id')} (Type: {qr.get('query_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(query_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Query successfully written to runtime_event_query.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_query.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -1661,6 +1791,7 @@ Available commands:
   runtime-lifecycle Manage plugin runtime session lifecycles.
   runtime-event Manage plugin runtime session events.
   runtime-event-store Manage plugin runtime session event store.
+  runtime-event-query Manage plugin runtime session event query.
         """
     )
     
@@ -1758,6 +1889,10 @@ Available commands:
     runtime_event_store_parser = subparsers.add_parser("runtime-event-store", help="Manage plugin runtime session event store")
     runtime_event_store_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event store dry-run without writing result")
     
+    # runtime-event-query コマンドパーサー
+    runtime_event_query_parser = subparsers.add_parser("runtime-event-query", help="Manage plugin runtime session event query")
+    runtime_event_query_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event query dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -1815,6 +1950,8 @@ Available commands:
         run_runtime_event(args)
     elif args.command == "runtime-event-store":
         run_runtime_event_store(args)
+    elif args.command == "runtime-event-query":
+        run_runtime_event_query(args)
     else:
         # Invalid Command
         parser.print_help()
