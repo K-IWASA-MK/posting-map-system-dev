@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -48,11 +48,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_sync.json",
     "plugins/runtime_event_pipeline.json",
     "plugins/runtime_event_stream.json",
-    "plugins/runtime_event_dispatcher.json"
+    "plugins/runtime_event_dispatcher.json",
+    "plugins/runtime_event_router.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase52"
+PLATFORM_VERSION = "Phase53"
 
 def run_build(args):
     """
@@ -3345,6 +3346,137 @@ def run_runtime_event_dispatcher(args):
         print(f"Error: Failed to write runtime_event_dispatcher.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_router(args):
+    """
+    runtime-event-router サブコマンド: EventRouterManager を使用して runtime_event_router.json を生成する。
+    注意: この runtime_event_dispatcher.json から直接 RuntimeEventDispatcher を構成するデータフローは、
+    将来的な各レイヤー統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_dispatcher import RuntimeEventDispatcher
+        from plugin_platform.plugin.runtime_event_router import EventRouterDescriptor, EventRouterRegistry, EventRouterManager
+    except ImportError as e:
+        print(f"Error: Failed to import runtime_event_router modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    dispatcher_path = os.path.join(script_dir, "plugins", "runtime_event_dispatcher.json")
+    if not os.path.exists(dispatcher_path):
+        print(f"Error: Runtime event dispatcher result not found at {dispatcher_path}. Please run 'runtime-event-dispatcher' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(dispatcher_path, "r", encoding="utf-8") as f:
+            dispatcher_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event dispatcher: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    dispatcher_records = dispatcher_data.get("dispatcher_records", [])
+    execution_id = dispatcher_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    router_records = []
+    
+    # 決定論的ソート
+    sorted_dispatcher = sorted(dispatcher_records, key=lambda x: (x.get("dispatcher_id", ""), x.get("trace_id", "")))
+    
+    # Registry初期化
+    registry = EventRouterRegistry()
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_router_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    for idx, disp_data in enumerate(sorted_dispatcher, 1):
+        dispatcher_id = disp_data.get("dispatcher_id")
+        runtime_event_stream = disp_data.get("runtime_event_stream", {})
+        dispatcher_type = disp_data.get("dispatcher_type")
+        disp_sub_data = disp_data.get("dispatch_targets", [])
+        meta_disp = disp_data.get("metadata", {})
+        trace_id = disp_data.get("trace_id")
+        
+        # 暫定入力
+        dispatcher_obj = RuntimeEventDispatcher(
+            dispatcher_id=dispatcher_id,
+            runtime_event_stream=runtime_event_stream,
+            dispatcher_type=dispatcher_type,
+            dispatch_targets=disp_sub_data,
+            metadata=meta_disp,
+            trace_id=trace_id
+        )
+        
+        try:
+            router_obj = EventRouterManager.create_router(dispatcher_obj, context)
+            router_records.append(router_obj.to_dict())
+            
+            # EventRouterRegistry 登録検証
+            descriptor = EventRouterDescriptor(
+                router_id=router_obj.router_id,
+                dispatcher_id=dispatcher_id,
+                router_type="default",
+                metadata={"registered_at": "2026-06-28T00:00:00Z"},
+                trace_id=trace_id
+            )
+            registry.register(descriptor)
+        except AssertionError as e:
+            print(f"Assertion Error during runtime session event router create: {e}", file=sys.stderr)
+            sys.exit(3)
+            
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_router.json")
+    
+    now_utc = "2026-06-28T00:00:00Z"
+    router_registry_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id,
+            "router_count": len(router_records)
+        },
+        "router_records": router_records
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Router (Dry Run)")
+        print(f"Router Count: {len(router_records)}")
+        for rec in router_records:
+            print(f"- Router: {rec.get('router_id')} (Type: {rec.get('router_type')})")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(router_registry_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Router successfully written to runtime_event_router.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_router.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -3528,6 +3660,10 @@ Available commands:
     runtime_event_dispatcher_parser = subparsers.add_parser("runtime-event-dispatcher", help="Manage plugin runtime session event dispatcher")
     runtime_event_dispatcher_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event dispatcher dry-run without writing result")
     
+    # runtime-event-router コマンドパーサー
+    runtime_event_router_parser = subparsers.add_parser("runtime-event-router", help="Manage plugin runtime session event router")
+    runtime_event_router_parser.add_argument("--dry-run", action="store_true", help="Perform a runtime event router dry-run without writing result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -3611,6 +3747,8 @@ Available commands:
         run_runtime_event_stream(args)
     elif args.command == "runtime-event-dispatcher":
         run_runtime_event_dispatcher(args)
+    elif args.command == "runtime-event-router":
+        run_runtime_event_router(args)
     else:
         # Invalid Command
         parser.print_help()
