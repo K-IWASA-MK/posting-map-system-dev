@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider", "runtime-event-execution-log-instance", "runtime-event-execution-log-session", "runtime-event-execution-log-environment", "runtime-event-execution-log-workspace", "runtime-event-execution-log-resource", "runtime-event-execution-log-registry"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider", "runtime-event-execution-log-instance", "runtime-event-execution-log-session", "runtime-event-execution-log-environment", "runtime-event-execution-log-workspace", "runtime-event-execution-log-resource", "runtime-event-execution-log-registry", "runtime-event-execution-log-repository"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -84,11 +84,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_environment.json",
     "plugins/runtime_event_execution_log_workspace.json",
     "plugins/runtime_event_execution_log_resource.json",
-    "plugins/runtime_event_execution_log_registry.json"
+    "plugins/runtime_event_execution_log_registry.json",
+    "plugins/runtime_event_execution_log_repository.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase88"
+PLATFORM_VERSION = "Phase89"
 
 def run_build(args):
     """
@@ -8042,6 +8043,125 @@ def run_runtime_event_execution_log_registry(args):
         print(f"Error: Failed to write runtime_event_execution_log_registry.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_log_repository(args):
+    """
+    runtime-event-execution-log-repository サブコマンド: EventExecutionLogRepositoryManager を使用して
+    runtime_event_execution_log_repository.json を生成する。
+    注意: この runtime_event_execution_log_registry.json から直接復元するデータフローは
+    将来的な Runtime Registry Layer との完全統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+        from plugin_platform.plugin.runtime_event_execution_log_registry import (
+            RuntimeEventExecutionLogRegistry,
+            RuntimeExecutionLogRegistry
+        )
+        from plugin_platform.plugin.runtime_event_execution_log_repository import EventExecutionLogRepositoryManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution log repository modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    registry_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_registry.json")
+    if not os.path.exists(registry_path):
+        print(f"Error: Registry event execution log result not found at {registry_path}. Please run 'runtime-event-execution-log-registry' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(registry_path, "r", encoding="utf-8") as f:
+            registry_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution log registry: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    registry_rec = registry_data.get("registry_record", {})
+    execution_id = registry_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計】
+    # 直近 of Registry DTO のみ復元し、下位は辞書(dict)のまま渡す。
+    registry_part = registry_rec.get("registry", {})
+    registry_obj = RuntimeExecutionLogRegistry(
+        registry_id=registry_part.get("registry_id"),
+        resource_id=registry_part.get("resource_id"),
+        runtime_type=registry_part.get("runtime_type"),
+        registry_type=registry_part.get("registry_type"),
+        registry_state=registry_part.get("registry_state"),
+        registry_version=registry_part.get("registry_version"),
+        registry_map=registry_part.get("registry_map", []),
+        metadata=registry_part.get("metadata", {}),
+        trace_id=registry_part.get("trace_id")
+    )
+    
+    execution_log_registry_obj = RuntimeEventExecutionLogRegistry(
+        registry_id=registry_rec.get("registry_id"),
+        runtime_event_execution_log_resource=registry_rec.get("runtime_event_execution_log_resource", {}),
+        registry=registry_obj,
+        metadata=registry_rec.get("metadata", {}),
+        trace_id=registry_rec.get("trace_id")
+    )
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment_name = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    # No Context Leak: 引数と型に RuntimeRuntime を使用
+    runtime_system = RuntimeRuntime(
+        runtime_id="system_executionlogrepository_runtime",
+        configuration=configuration,
+        environment=environment_name,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        repository_execution_obj = EventExecutionLogRepositoryManager.create_execution_repository(execution_log_registry_obj, runtime_system)
+    except AssertionError as e:
+        print(f"Assertion Error during execution log repository create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_repository.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    repository_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "repository_record": repository_execution_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Log Repository Execution (Dry Run)")
+        print(f"Repository ID: {repository_execution_obj.repository_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(repository_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Log Repository Execution successfully written to runtime_event_execution_log_repository.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_log_repository.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -8369,6 +8489,10 @@ Available commands:
     runtime_event_execution_log_registry_parser = subparsers.add_parser("runtime-event-execution-log-registry", help="Manage plugin runtime session event execution log execution registry")
     runtime_event_execution_log_registry_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log registry result")
     
+    # runtime-event-execution-log-repository コマンドパーサー
+    runtime_event_execution_log_repository_parser = subparsers.add_parser("runtime-event-execution-log-repository", help="Manage plugin runtime session event execution log execution repository")
+    runtime_event_execution_log_repository_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log repository result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -8524,6 +8648,8 @@ Available commands:
         run_runtime_event_execution_log_resource(args)
     elif args.command == "runtime-event-execution-log-registry":
         run_runtime_event_execution_log_registry(args)
+    elif args.command == "runtime-event-execution-log-repository":
+        run_runtime_event_execution_log_repository(args)
     else:
         # Invalid Command
         parser.print_help()
