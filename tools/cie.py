@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -75,11 +75,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_executor.json",
     "plugins/runtime_event_execution_log_activation.json",
     "plugins/runtime_event_execution_log_run.json",
-    "plugins/runtime_event_execution_log_dispatch.json"
+    "plugins/runtime_event_execution_log_dispatch.json",
+    "plugins/runtime_event_execution_log_adapter.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase79"
+PLATFORM_VERSION = "Phase80"
 
 def run_build(args):
     """
@@ -6937,6 +6938,150 @@ def run_runtime_event_execution_log_dispatch(args):
         print(f"Error: Failed to write runtime_event_execution_log_dispatch.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_log_adapter(args):
+    """
+    runtime-event-execution-log-adapter サブコマンド: EventExecutionLogAdapterManager を使用して
+    runtime_event_execution_log_adapter.json を生成する。
+    注意: この runtime_event_execution_log_dispatch.json から直接復元するデータフローは、
+    将来的な Dispatch Layer との完全統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_execution_log_run import (
+            RuntimeEventExecutionLogRun,
+            RuntimeExecutionLogRun
+        )
+        from plugin_platform.plugin.runtime_event_execution_log_dispatch import (
+            RuntimeEventExecutionLogDispatch,
+            RuntimeExecutionLogDispatch
+        )
+        from plugin_platform.plugin.runtime_event_execution_log_adapter import EventExecutionLogAdapterManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution log adapter modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    dispatch_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_dispatch.json")
+    if not os.path.exists(dispatch_path):
+        print(f"Error: Dispatch event execution log result not found at {dispatch_path}. Please run 'runtime-event-execution-log-dispatch' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(dispatch_path, "r", encoding="utf-8") as f:
+            dispatch_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution log dispatch: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    dispatch_rec = dispatch_data.get("dispatch_record", {})
+    execution_id = dispatch_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【推奨設計】前段の簡素化復元
+    # Managerが必要とする「Run」および「Actuator」オブジェクトだけを Python クラスとして復元し、
+    # それより下位の階層は JSON 辞書 (dict) のまま DTO に受け渡す。
+    run_rec = dispatch_rec.get("runtime_event_execution_log_run", {})
+    
+    run_part = run_rec.get("run", {})
+    run_obj = RuntimeExecutionLogRun(
+        run_id=run_part.get("run_id"),
+        activation_id=run_part.get("activation_id"),
+        run_state=run_part.get("run_state"),
+        run_map=run_part.get("run_map", []),
+        metadata=run_part.get("metadata", {}),
+        trace_id=run_part.get("trace_id")
+    )
+    
+    execution_log_run_obj = RuntimeEventExecutionLogRun(
+        run_id=run_rec.get("run_id"),
+        # 下位 (Activation層以下) は辞書のまま渡す
+        runtime_event_execution_log_activation=run_rec.get("runtime_event_execution_log_activation", {}),
+        run=run_obj,
+        metadata=run_rec.get("metadata", {}),
+        trace_id=run_rec.get("trace_id")
+    )
+    
+    dispatch_part = dispatch_rec.get("dispatch", {})
+    dispatch_obj = RuntimeExecutionLogDispatch(
+        dispatch_id=dispatch_part.get("dispatch_id"),
+        run_id=dispatch_part.get("run_id"),
+        actuator_id=dispatch_part.get("actuator_id"),
+        dispatch_version=dispatch_part.get("dispatch_version"),
+        dispatch_state=dispatch_part.get("dispatch_state"),
+        dispatch_target=dispatch_part.get("dispatch_target"),
+        dispatch_map=dispatch_part.get("dispatch_map", []),
+        metadata=dispatch_part.get("metadata", {}),
+        trace_id=dispatch_part.get("trace_id")
+    )
+    
+    execution_log_dispatch_obj = RuntimeEventExecutionLogDispatch(
+        dispatch_id=dispatch_rec.get("dispatch_id"),
+        runtime_event_execution_log_run=execution_log_run_obj,
+        dispatch=dispatch_obj,
+        metadata=dispatch_rec.get("metadata", {}),
+        trace_id=dispatch_rec.get("trace_id")
+    )
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_executionlogadapter_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        adapter_execution_obj = EventExecutionLogAdapterManager.create_execution_adapter(execution_log_dispatch_obj, context)
+    except AssertionError as e:
+        print(f"Assertion Error during execution log adapter create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_adapter.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    adapter_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "adapter_record": adapter_execution_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Log Adapter Execution (Dry Run)")
+        print(f"Adapter ID: {adapter_execution_obj.adapter_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(adapter_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Log Adapter Execution successfully written to runtime_event_execution_log_adapter.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_log_adapter.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -7228,6 +7373,10 @@ Available commands:
     runtime_event_execution_log_dispatch_parser = subparsers.add_parser("runtime-event-execution-log-dispatch", help="Manage plugin runtime session event execution log execution dispatch")
     runtime_event_execution_log_dispatch_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log dispatch result")
     
+    # runtime-event-execution-log-adapter コマンドパーサー
+    runtime_event_execution_log_adapter_parser = subparsers.add_parser("runtime-event-execution-log-adapter", help="Manage plugin runtime session event execution log execution adapter")
+    runtime_event_execution_log_adapter_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log adapter result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -7365,6 +7514,8 @@ Available commands:
         run_runtime_event_execution_log_run(args)
     elif args.command == "runtime-event-execution-log-dispatch":
         run_runtime_event_execution_log_dispatch(args)
+    elif args.command == "runtime-event-execution-log-adapter":
+        run_runtime_event_execution_log_adapter(args)
     else:
         # Invalid Command
         parser.print_help()
