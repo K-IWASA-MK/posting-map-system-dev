@@ -40,6 +40,20 @@ class RuntimeExecutionLogResource:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogResource":
+        return cls(
+            resource_id=data.get("resource_id"),
+            workspace_id=data.get("workspace_id"),
+            runtime_type=data.get("runtime_type"),
+            resource_type=data.get("resource_type"),
+            resource_state=data.get("resource_state"),
+            resource_version=data.get("resource_version"),
+            resource_map=data.get("resource_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogResource:
     def __init__(self, resource_id: str, runtime_event_execution_log_workspace: RuntimeEventExecutionLogWorkspace, resource: RuntimeExecutionLogResource, metadata: dict, trace_id: str):
         self.resource_id = resource_id
@@ -56,3 +70,14 @@ class RuntimeEventExecutionLogResource:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogResource":
+        return cls(
+            resource_id=data.get("resource_id"),
+            runtime_event_execution_log_workspace=data.get("runtime_event_execution_log_workspace", {}),
+            resource=RuntimeExecutionLogResource.from_dict(data.get("resource", {})) if isinstance(data.get("resource"), dict) else data.get("resource"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

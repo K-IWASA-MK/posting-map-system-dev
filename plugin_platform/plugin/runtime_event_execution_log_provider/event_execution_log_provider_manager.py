@@ -1,6 +1,6 @@
 from .runtime_execution_log_provider import RuntimeExecutionLogProvider, RuntimeEventExecutionLogProvider
 from plugin_platform.plugin.runtime_event_execution_log_bridge import RuntimeEventExecutionLogBridge
-from plugin_platform.plugin.runtime_adapter import RuntimeContext
+from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
 
 class EventExecutionLogProviderManager:
     """
@@ -15,7 +15,7 @@ class EventExecutionLogProviderManager:
     """
     
     @staticmethod
-    def create_execution_provider(bridge_execution: RuntimeEventExecutionLogBridge, context: RuntimeContext) -> RuntimeEventExecutionLogProvider:
+    def create_execution_provider(bridge_execution: RuntimeEventExecutionLogBridge, runtime: RuntimeRuntime) -> RuntimeEventExecutionLogProvider:
         # Trace ID および Bridge ID のアサーション検証
         assert bridge_execution.trace_id is not None, "bridge_execution trace_id must not be None"
         assert bridge_execution.bridge_id is not None, "bridge_execution bridge_id must not be None"
@@ -45,7 +45,7 @@ class EventExecutionLogProviderManager:
         metadata = {
             "version": 1,
             "manager": "event_execution_log_provider_manager_stub",
-            "environment": context.environment,
+            "environment": runtime.environment,
             "note": "Temporary test data flow structure for Phase 82 execution provider validation"
         }
         

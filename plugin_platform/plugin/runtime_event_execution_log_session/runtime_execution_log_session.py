@@ -39,6 +39,20 @@ class RuntimeExecutionLogSession:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogSession":
+        return cls(
+            session_id=data.get("session_id"),
+            instance_id=data.get("instance_id"),
+            runtime_type=data.get("runtime_type"),
+            session_type=data.get("session_type"),
+            session_state=data.get("session_state"),
+            session_version=data.get("session_version"),
+            session_map=data.get("session_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogSession:
     def __init__(self, session_id: str, runtime_event_execution_log_instance: RuntimeEventExecutionLogInstance, session: RuntimeExecutionLogSession, metadata: dict, trace_id: str):
         self.session_id = session_id
@@ -55,3 +69,14 @@ class RuntimeEventExecutionLogSession:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogSession":
+        return cls(
+            session_id=data.get("session_id"),
+            runtime_event_execution_log_instance=data.get("runtime_event_execution_log_instance", {}),
+            session=RuntimeExecutionLogSession.from_dict(data.get("session", {})) if isinstance(data.get("session"), dict) else data.get("session"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

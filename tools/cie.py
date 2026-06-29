@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider", "runtime-event-execution-log-instance", "runtime-event-execution-log-session", "runtime-event-execution-log-environment", "runtime-event-execution-log-workspace", "runtime-event-execution-log-resource", "runtime-event-execution-log-registry", "runtime-event-execution-log-repository"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider", "runtime-event-execution-log-instance", "runtime-event-execution-log-session", "runtime-event-execution-log-environment", "runtime-event-execution-log-workspace", "runtime-event-execution-log-resource", "runtime-event-execution-log-registry", "runtime-event-execution-log-repository", "audit-foundation"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -85,11 +85,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_workspace.json",
     "plugins/runtime_event_execution_log_resource.json",
     "plugins/runtime_event_execution_log_registry.json",
-    "plugins/runtime_event_execution_log_repository.json"
+    "plugins/runtime_event_execution_log_repository.json",
+    "plugins/foundation_audit.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase89"
+PLATFORM_VERSION = "Phase90"
 
 def run_build(args):
     """
@@ -8162,6 +8163,138 @@ def run_runtime_event_execution_log_repository(args):
         print(f"Error: Failed to write runtime_event_execution_log_repository.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_audit_foundation(args):
+    """
+    audit-foundation サブコマンド: CIE Platform 全体の
+    アーキテクチャ、DTO、Manager、CLI、ランタイム Blueprint、No Context Leak を監査します。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.audit import (
+            ArchitectureAudit,
+            DTOAudit,
+            ManagerAudit,
+            CLIAudit,
+            RuntimeFoundationAudit
+        )
+    except ImportError as e:
+        print(f"Error: Failed to import audit modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    plugin_dir = os.path.join(parent_dir, "plugin_platform", "plugin")
+    cli_filepath = os.path.join(script_dir, "cie.py")
+    
+    # 各監査の実行
+    arch_auditor = ArchitectureAudit(plugin_dir)
+    dto_auditor = DTOAudit(plugin_dir)
+    manager_auditor = ManagerAudit(plugin_dir)
+    cli_auditor = CLIAudit(cli_filepath)
+    rf_auditor = RuntimeFoundationAudit(plugin_dir)
+    
+    arch_res = arch_auditor.run_audit()
+    dto_res = dto_auditor.run_audit()
+    manager_res = manager_auditor.run_audit()
+    cli_res = cli_auditor.run_audit()
+    rf_res = rf_auditor.run_audit()
+    
+    # No Context Leak 監査の結果は rf_res に含まれているため、抽出する
+    # rf_res 内で "No Context Leak violation" というエラーメッセージがあるかどうかで判定
+    no_context_leak_status = "PASS"
+    no_context_leak_errors = []
+    for err in rf_res.get("errors", []):
+        if "No Context Leak" in err:
+            no_context_leak_status = "FAIL"
+            no_context_leak_errors.append(err)
+            
+    # 全体の合格判定
+    all_passed = (
+        arch_res["status"] == "PASS" and
+        dto_res["status"] == "PASS" and
+        manager_res["status"] == "PASS" and
+        cli_res["status"] == "PASS" and
+        rf_res["status"] == "PASS" and
+        no_context_leak_status == "PASS"
+    )
+    
+    overall_status = "PASS" if all_passed else "FAIL"
+    health_status = "GOOD" if all_passed else "POOR"
+    
+    summary = {
+        "architecture": arch_res["status"],
+        "dto": dto_res["status"],
+        "manager": manager_res["status"],
+        "cli": cli_res["status"],
+        "runtime_foundation": rf_res["status"],
+        "no_context_leak": no_context_leak_status,
+        "overall": overall_status,
+        "health": health_status,
+        "platform_version": "Phase90"
+    }
+    
+    audit_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": "2026-06-29T00:00:00Z"
+        },
+        "summary": summary,
+        "details": {
+            "architecture": arch_res,
+            "dto": dto_res,
+            "manager": manager_res,
+            "cli": cli_res,
+            "runtime_foundation": rf_res,
+            "no_context_leak": {
+                "status": no_context_leak_status,
+                "errors": no_context_leak_errors
+            }
+        }
+    }
+    
+    # ターミナルへの進捗表示
+    print("==========================================")
+    print("CIE Platform Foundation Architecture Audit")
+    print("==========================================")
+    print(f"Architecture Audit     : {summary['architecture']}")
+    print(f"DTO Audit              : {summary['dto']}")
+    print(f"Manager Audit          : {summary['manager']}")
+    print(f"CLI Audit              : {summary['cli']}")
+    print(f"Runtime Foundation Audit: {summary['runtime_foundation']}")
+    print(f"No Context Leak Audit  : {summary['no_context_leak']}")
+    print("------------------------------------------")
+    print(f"Overall Result         : {summary['overall']}")
+    print(f"Health Status          : {summary['health']}")
+    print("==========================================")
+    
+    if not all_passed:
+        print("Audit Errors Detected:", file=sys.stderr)
+        for res_name, res in [("Architecture", arch_res), ("DTO", dto_res), ("Manager", manager_res), ("CLI", cli_res), ("Runtime Foundation", rf_res), ("No Context Leak", {"errors": no_context_leak_errors})]:
+            if res.get("errors"):
+                print(f"\n[{res_name} Errors]:", file=sys.stderr)
+                for err in res["errors"]:
+                    print(f"  - {err}", file=sys.stderr)
+                    
+    output_path = os.path.join(script_dir, "plugins", "foundation_audit.json")
+    
+    if args.dry_run:
+        print("\nDry Run: Audit execution completed without writing JSON output.")
+        sys.exit(0 if all_passed else 3)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(audit_data, f, indent=2, ensure_ascii=False)
+        print(f"\nAudit results successfully written to foundation_audit.json")
+        sys.exit(0 if all_passed else 3)
+    except IOError as e:
+        print(f"Error: Failed to write foundation_audit.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -8493,6 +8626,10 @@ Available commands:
     runtime_event_execution_log_repository_parser = subparsers.add_parser("runtime-event-execution-log-repository", help="Manage plugin runtime session event execution log execution repository")
     runtime_event_execution_log_repository_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log repository result")
     
+    # audit-foundation コマンドパーサー
+    audit_foundation_parser = subparsers.add_parser("audit-foundation", help="Perform comprehensive CIE platform architecture and DTO/Manager validation")
+    audit_foundation_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing audit results to JSON")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -8650,6 +8787,8 @@ Available commands:
         run_runtime_event_execution_log_registry(args)
     elif args.command == "runtime-event-execution-log-repository":
         run_runtime_event_execution_log_repository(args)
+    elif args.command == "audit-foundation":
+        run_audit_foundation(args)
     else:
         # Invalid Command
         parser.print_help()

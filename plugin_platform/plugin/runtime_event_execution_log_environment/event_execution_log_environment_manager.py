@@ -1,6 +1,6 @@
 from .runtime_execution_log_environment import RuntimeExecutionLogEnvironment, RuntimeEventExecutionLogEnvironment
 from plugin_platform.plugin.runtime_event_execution_log_session import RuntimeEventExecutionLogSession
-from plugin_platform.plugin.runtime_adapter import RuntimeContext
+from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
 
 class EventExecutionLogEnvironmentManager:
     """
@@ -15,7 +15,7 @@ class EventExecutionLogEnvironmentManager:
     """
     
     @staticmethod
-    def create_execution_environment(session_execution: RuntimeEventExecutionLogSession, context: RuntimeContext) -> RuntimeEventExecutionLogEnvironment:
+    def create_execution_environment(session_execution: RuntimeEventExecutionLogSession, runtime: RuntimeRuntime) -> RuntimeEventExecutionLogEnvironment:
         # Trace ID および Session ID のアサーション検証
         assert session_execution.trace_id is not None, "session_execution trace_id must not be None"
         assert session_execution.session_id is not None, "session_execution session_id must not be None"
@@ -45,7 +45,7 @@ class EventExecutionLogEnvironmentManager:
         metadata = {
             "version": 1,
             "manager": "event_execution_log_environment_manager_stub",
-            "environment": context.environment,
+            "environment": runtime.environment,
             "note": "Temporary test data flow structure for Phase 85 execution environment validation"
         }
         

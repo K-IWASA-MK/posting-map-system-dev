@@ -37,6 +37,20 @@ class RuntimeExecutionLogInstance:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogInstance":
+        return cls(
+            instance_id=data.get("instance_id"),
+            provider_id=data.get("provider_id"),
+            runtime_type=data.get("runtime_type"),
+            instance_type=data.get("instance_type"),
+            instance_state=data.get("instance_state"),
+            instance_version=data.get("instance_version"),
+            instance_map=data.get("instance_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogInstance:
     def __init__(self, instance_id: str, runtime_event_execution_log_provider: RuntimeEventExecutionLogProvider, instance: RuntimeExecutionLogInstance, metadata: dict, trace_id: str):
         self.instance_id = instance_id
@@ -53,3 +67,14 @@ class RuntimeEventExecutionLogInstance:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogInstance":
+        return cls(
+            instance_id=data.get("instance_id"),
+            runtime_event_execution_log_provider=data.get("runtime_event_execution_log_provider", {}),
+            instance=RuntimeExecutionLogInstance.from_dict(data.get("instance", {})) if isinstance(data.get("instance"), dict) else data.get("instance"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

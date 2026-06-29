@@ -40,6 +40,20 @@ class RuntimeExecutionLogEnvironment:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogEnvironment":
+        return cls(
+            environment_id=data.get("environment_id"),
+            session_id=data.get("session_id"),
+            runtime_type=data.get("runtime_type"),
+            environment_type=data.get("environment_type"),
+            environment_state=data.get("environment_state"),
+            environment_version=data.get("environment_version"),
+            environment_map=data.get("environment_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogEnvironment:
     def __init__(self, environment_id: str, runtime_event_execution_log_session: RuntimeEventExecutionLogSession, environment: RuntimeExecutionLogEnvironment, metadata: dict, trace_id: str):
         self.environment_id = environment_id
@@ -56,3 +70,14 @@ class RuntimeEventExecutionLogEnvironment:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogEnvironment":
+        return cls(
+            environment_id=data.get("environment_id"),
+            runtime_event_execution_log_session=data.get("runtime_event_execution_log_session", {}),
+            environment=RuntimeExecutionLogEnvironment.from_dict(data.get("environment", {})) if isinstance(data.get("environment"), dict) else data.get("environment"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

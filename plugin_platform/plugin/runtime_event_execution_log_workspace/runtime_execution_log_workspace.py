@@ -39,6 +39,20 @@ class RuntimeExecutionLogWorkspace:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogWorkspace":
+        return cls(
+            workspace_id=data.get("workspace_id"),
+            environment_id=data.get("environment_id"),
+            runtime_type=data.get("runtime_type"),
+            workspace_type=data.get("workspace_type"),
+            workspace_state=data.get("workspace_state"),
+            workspace_version=data.get("workspace_version"),
+            workspace_map=data.get("workspace_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogWorkspace:
     def __init__(self, workspace_id: str, runtime_event_execution_log_environment: RuntimeEventExecutionLogEnvironment, workspace: RuntimeExecutionLogWorkspace, metadata: dict, trace_id: str):
         self.workspace_id = workspace_id
@@ -55,3 +69,14 @@ class RuntimeEventExecutionLogWorkspace:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogWorkspace":
+        return cls(
+            workspace_id=data.get("workspace_id"),
+            runtime_event_execution_log_environment=data.get("runtime_event_execution_log_environment", {}),
+            workspace=RuntimeExecutionLogWorkspace.from_dict(data.get("workspace", {})) if isinstance(data.get("workspace"), dict) else data.get("workspace"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

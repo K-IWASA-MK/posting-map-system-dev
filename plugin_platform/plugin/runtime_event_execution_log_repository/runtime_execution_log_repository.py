@@ -40,6 +40,20 @@ class RuntimeExecutionLogRepository:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogRepository":
+        return cls(
+            repository_id=data.get("repository_id"),
+            registry_id=data.get("registry_id"),
+            runtime_type=data.get("runtime_type"),
+            repository_type=data.get("repository_type"),
+            repository_state=data.get("repository_state"),
+            repository_version=data.get("repository_version"),
+            repository_map=data.get("repository_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogRepository:
     def __init__(self, repository_id: str, runtime_event_execution_log_registry: RuntimeEventExecutionLogRegistry, repository: RuntimeExecutionLogRepository, metadata: dict, trace_id: str):
         self.repository_id = repository_id
@@ -56,3 +70,14 @@ class RuntimeEventExecutionLogRepository:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogRepository":
+        return cls(
+            repository_id=data.get("repository_id"),
+            runtime_event_execution_log_registry=data.get("runtime_event_execution_log_registry", {}),
+            repository=RuntimeExecutionLogRepository.from_dict(data.get("repository", {})) if isinstance(data.get("repository"), dict) else data.get("repository"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

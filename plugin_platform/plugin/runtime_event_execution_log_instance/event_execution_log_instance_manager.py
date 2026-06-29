@@ -1,6 +1,6 @@
 from .runtime_execution_log_instance import RuntimeExecutionLogInstance, RuntimeEventExecutionLogInstance
 from plugin_platform.plugin.runtime_event_execution_log_provider import RuntimeEventExecutionLogProvider
-from plugin_platform.plugin.runtime_adapter import RuntimeContext
+from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
 
 class EventExecutionLogInstanceManager:
     """
@@ -15,7 +15,7 @@ class EventExecutionLogInstanceManager:
     """
     
     @staticmethod
-    def create_execution_instance(provider_execution: RuntimeEventExecutionLogProvider, context: RuntimeContext) -> RuntimeEventExecutionLogInstance:
+    def create_execution_instance(provider_execution: RuntimeEventExecutionLogProvider, runtime: RuntimeRuntime) -> RuntimeEventExecutionLogInstance:
         # Trace ID および Provider ID のアサーション検証
         assert provider_execution.trace_id is not None, "provider_execution trace_id must not be None"
         assert provider_execution.provider_id is not None, "provider_execution provider_id must not be None"
@@ -45,7 +45,7 @@ class EventExecutionLogInstanceManager:
         metadata = {
             "version": 1,
             "manager": "event_execution_log_instance_manager_stub",
-            "environment": context.environment,
+            "environment": runtime.environment,
             "note": "Temporary test data flow structure for Phase 83 execution instance validation"
         }
         

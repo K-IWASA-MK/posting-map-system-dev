@@ -40,6 +40,20 @@ class RuntimeExecutionLogRegistry:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogRegistry":
+        return cls(
+            registry_id=data.get("registry_id"),
+            resource_id=data.get("resource_id"),
+            runtime_type=data.get("runtime_type"),
+            registry_type=data.get("registry_type"),
+            registry_state=data.get("registry_state"),
+            registry_version=data.get("registry_version"),
+            registry_map=data.get("registry_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogRegistry:
     def __init__(self, registry_id: str, runtime_event_execution_log_resource: RuntimeEventExecutionLogResource, registry: RuntimeExecutionLogRegistry, metadata: dict, trace_id: str):
         self.registry_id = registry_id
@@ -56,3 +70,14 @@ class RuntimeEventExecutionLogRegistry:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogRegistry":
+        return cls(
+            registry_id=data.get("registry_id"),
+            runtime_event_execution_log_resource=data.get("runtime_event_execution_log_resource", {}),
+            registry=RuntimeExecutionLogRegistry.from_dict(data.get("registry", {})) if isinstance(data.get("registry"), dict) else data.get("registry"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

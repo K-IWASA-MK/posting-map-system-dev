@@ -1,6 +1,6 @@
 from .runtime_execution_log_session import RuntimeExecutionLogSession, RuntimeEventExecutionLogSession
 from plugin_platform.plugin.runtime_event_execution_log_instance import RuntimeEventExecutionLogInstance
-from plugin_platform.plugin.runtime_adapter import RuntimeContext
+from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
 
 class EventExecutionLogSessionManager:
     """
@@ -15,7 +15,7 @@ class EventExecutionLogSessionManager:
     """
     
     @staticmethod
-    def create_execution_session(instance_execution: RuntimeEventExecutionLogInstance, context: RuntimeContext) -> RuntimeEventExecutionLogSession:
+    def create_execution_session(instance_execution: RuntimeEventExecutionLogInstance, runtime: RuntimeRuntime) -> RuntimeEventExecutionLogSession:
         # Trace ID および Instance ID のアサーション検証
         assert instance_execution.trace_id is not None, "instance_execution trace_id must not be None"
         assert instance_execution.instance_id is not None, "instance_execution instance_id must not be None"
@@ -45,7 +45,7 @@ class EventExecutionLogSessionManager:
         metadata = {
             "version": 1,
             "manager": "event_execution_log_session_manager_stub",
-            "environment": context.environment,
+            "environment": runtime.environment,
             "note": "Temporary test data flow structure for Phase 84 execution session validation"
         }
         
