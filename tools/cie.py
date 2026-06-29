@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -77,11 +77,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_run.json",
     "plugins/runtime_event_execution_log_dispatch.json",
     "plugins/runtime_event_execution_log_adapter.json",
-    "plugins/runtime_event_execution_log_bridge.json"
+    "plugins/runtime_event_execution_log_bridge.json",
+    "plugins/runtime_event_execution_log_provider.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase81"
+PLATFORM_VERSION = "Phase82"
 
 def run_build(args):
     """
@@ -7202,6 +7203,126 @@ def run_runtime_event_execution_log_bridge(args):
         print(f"Error: Failed to write runtime_event_execution_log_bridge.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_log_provider(args):
+    """
+    runtime-event-execution-log-provider サブコマンド: EventExecutionLogProviderManager を使用して
+    runtime_event_execution_log_provider.json を生成する。
+    注意: この runtime_event_execution_log_bridge.json から直接復元するデータフローは、
+    将来的な Runtime Bridge Layer との完全統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter import RuntimeContext
+        from plugin_platform.plugin.runtime_event_execution_log_bridge import (
+            RuntimeEventExecutionLogBridge,
+            RuntimeExecutionLogBridge
+        )
+        from plugin_platform.plugin.runtime_event_execution_log_provider import EventExecutionLogProviderManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution log provider modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    bridge_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_bridge.json")
+    if not os.path.exists(bridge_path):
+        print(f"Error: Bridge event execution log result not found at {bridge_path}. Please run 'runtime-event-execution-log-bridge' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(bridge_path, "r", encoding="utf-8") as f:
+            bridge_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution log bridge: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    bridge_rec = bridge_data.get("bridge_record", {})
+    execution_id = bridge_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計】
+    # 直近の Bridge オブジェクトだけを Python クラスとして復元し、
+    # それより下位の階層（Adapter以下）は辞書のまま DTO に引き渡す。
+    bridge_part = bridge_rec.get("bridge", {})
+    bridge_obj = RuntimeExecutionLogBridge(
+        bridge_id=bridge_part.get("bridge_id"),
+        adapter_id=bridge_part.get("adapter_id"),
+        runtime_type=bridge_part.get("runtime_type"),
+        bridge_target=bridge_part.get("bridge_target"),
+        bridge_state=bridge_part.get("bridge_state"),
+        bridge_version=bridge_part.get("bridge_version"),
+        bridge_map=bridge_part.get("bridge_map", []),
+        metadata=bridge_part.get("metadata", {}),
+        trace_id=bridge_part.get("trace_id")
+    )
+    
+    execution_log_bridge_obj = RuntimeEventExecutionLogBridge(
+        bridge_id=bridge_rec.get("bridge_id"),
+        # 下位は辞書(dict)のまま引き渡す
+        runtime_event_execution_log_adapter=bridge_rec.get("runtime_event_execution_log_adapter", {}),
+        bridge=bridge_obj,
+        metadata=bridge_rec.get("metadata", {}),
+        trace_id=bridge_rec.get("trace_id")
+    )
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    context = RuntimeContext(
+        runtime_id="system_executionlogprovider_context",
+        configuration=configuration,
+        environment=environment,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        provider_execution_obj = EventExecutionLogProviderManager.create_execution_provider(execution_log_bridge_obj, context)
+    except AssertionError as e:
+        print(f"Assertion Error during execution log provider create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_provider.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    provider_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "provider_record": provider_execution_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Log Provider Execution (Dry Run)")
+        print(f"Provider ID: {provider_execution_obj.provider_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(provider_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Log Provider Execution successfully written to runtime_event_execution_log_provider.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_log_provider.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -7501,6 +7622,10 @@ Available commands:
     runtime_event_execution_log_bridge_parser = subparsers.add_parser("runtime-event-execution-log-bridge", help="Manage plugin runtime session event execution log execution bridge")
     runtime_event_execution_log_bridge_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log bridge result")
     
+    # runtime-event-execution-log-provider コマンドパーサー
+    runtime_event_execution_log_provider_parser = subparsers.add_parser("runtime-event-execution-log-provider", help="Manage plugin runtime session event execution log execution provider")
+    runtime_event_execution_log_provider_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log provider result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -7642,6 +7767,8 @@ Available commands:
         run_runtime_event_execution_log_adapter(args)
     elif args.command == "runtime-event-execution-log-bridge":
         run_runtime_event_execution_log_bridge(args)
+    elif args.command == "runtime-event-execution-log-provider":
+        run_runtime_event_execution_log_provider(args)
     else:
         # Invalid Command
         parser.print_help()
