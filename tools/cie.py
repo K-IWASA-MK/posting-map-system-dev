@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider", "runtime-event-execution-log-instance", "runtime-event-execution-log-session", "runtime-event-execution-log-environment"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider", "runtime-event-execution-log-instance", "runtime-event-execution-log-session", "runtime-event-execution-log-environment", "runtime-event-execution-log-workspace"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -81,11 +81,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_provider.json",
     "plugins/runtime_event_execution_log_instance.json",
     "plugins/runtime_event_execution_log_session.json",
-    "plugins/runtime_event_execution_log_environment.json"
+    "plugins/runtime_event_execution_log_environment.json",
+    "plugins/runtime_event_execution_log_workspace.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase85"
+PLATFORM_VERSION = "Phase86"
 
 def run_build(args):
     """
@@ -7682,6 +7683,125 @@ def run_runtime_event_execution_log_environment(args):
         print(f"Error: Failed to write runtime_event_execution_log_environment.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_log_workspace(args):
+    """
+    runtime-event-execution-log-workspace サブコマンド: EventExecutionLogWorkspaceManager を使用して
+    runtime_event_execution_log_workspace.json を生成する。
+    注意: この runtime_event_execution_log_environment.json から直接復元するデータフローは
+    将来的な Runtime Environment Layer との完全統合を見据えた「暫定・テスト用入力」としての実装です。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+        from plugin_platform.plugin.runtime_event_execution_log_environment import (
+            RuntimeEventExecutionLogEnvironment,
+            RuntimeExecutionLogEnvironment
+        )
+        from plugin_platform.plugin.runtime_event_execution_log_workspace import EventExecutionLogWorkspaceManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution log workspace modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    environment_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_environment.json")
+    if not os.path.exists(environment_path):
+        print(f"Error: Environment event execution log result not found at {environment_path}. Please run 'runtime-event-execution-log-environment' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(environment_path, "r", encoding="utf-8") as f:
+            environment_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution log environment: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    environment_rec = environment_data.get("environment_record", {})
+    execution_id = environment_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計】
+    # 直近 of Environment DTO のみ復元し、下位は辞書(dict)のまま渡す。
+    environment_part = environment_rec.get("environment", {})
+    environment_obj = RuntimeExecutionLogEnvironment(
+        environment_id=environment_part.get("environment_id"),
+        session_id=environment_part.get("session_id"),
+        runtime_type=environment_part.get("runtime_type"),
+        environment_type=environment_part.get("environment_type"),
+        environment_state=environment_part.get("environment_state"),
+        environment_version=environment_part.get("environment_version"),
+        environment_map=environment_part.get("environment_map", []),
+        metadata=environment_part.get("metadata", {}),
+        trace_id=environment_part.get("trace_id")
+    )
+    
+    execution_log_environment_obj = RuntimeEventExecutionLogEnvironment(
+        environment_id=environment_rec.get("environment_id"),
+        runtime_event_execution_log_session=environment_rec.get("runtime_event_execution_log_session", {}),
+        environment=environment_obj,
+        metadata=environment_rec.get("metadata", {}),
+        trace_id=environment_rec.get("trace_id")
+    )
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment_name = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    # No Context Leak: 引数と型に RuntimeRuntime を使用
+    runtime_system = RuntimeRuntime(
+        runtime_id="system_executionlogworkspace_runtime",
+        configuration=configuration,
+        environment=environment_name,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        workspace_execution_obj = EventExecutionLogWorkspaceManager.create_execution_workspace(execution_log_environment_obj, runtime_system)
+    except AssertionError as e:
+        print(f"Assertion Error during execution log workspace create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_workspace.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    workspace_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "workspace_record": workspace_execution_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Log Workspace Execution (Dry Run)")
+        print(f"Workspace ID: {workspace_execution_obj.workspace_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(workspace_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Log Workspace Execution successfully written to runtime_event_execution_log_workspace.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_log_workspace.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def main():
     parser = argparse.ArgumentParser(
         description="Code Intelligence Engine (CIE) Platform CLI",
@@ -7997,6 +8117,10 @@ Available commands:
     runtime_event_execution_log_environment_parser = subparsers.add_parser("runtime-event-execution-log-environment", help="Manage plugin runtime session event execution log execution environment")
     runtime_event_execution_log_environment_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log environment result")
     
+    # runtime-event-execution-log-workspace コマンドパーサー
+    runtime_event_execution_log_workspace_parser = subparsers.add_parser("runtime-event-execution-log-workspace", help="Manage plugin runtime session event execution log execution workspace")
+    runtime_event_execution_log_workspace_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log workspace result")
+    
     # 引数解析
     args = parser.parse_args()
     
@@ -8146,6 +8270,8 @@ Available commands:
         run_runtime_event_execution_log_session(args)
     elif args.command == "runtime-event-execution-log-environment":
         run_runtime_event_execution_log_environment(args)
+    elif args.command == "runtime-event-execution-log-workspace":
+        run_runtime_event_execution_log_workspace(args)
     else:
         # Invalid Command
         parser.print_help()
