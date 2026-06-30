@@ -493,4 +493,30 @@ def test_dto_serialization_roundtrip():
     assert ExecutionDescriptor.from_dict(descriptor_dto.to_dict()).to_dict() == descriptor_dto.to_dict()
     assert RuntimeEventExecutionDescriptor.from_dict(event_desc_dto.to_dict()).to_dict() == event_desc_dto.to_dict()
 
+    # Phase 93 Execution Blueprint DTO Round Trip Test
+    from plugin_platform.plugin.runtime_event_execution_blueprint import (
+        ExecutionBlueprint,
+        RuntimeEventExecutionBlueprint
+    )
+    blueprint_dto = ExecutionBlueprint(
+        descriptor_id="descriptor_123",
+        blueprint_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_bp_dto = RuntimeEventExecutionBlueprint(
+        blueprint_id="blueprint:descriptor_123",
+        descriptor_id="descriptor_123",
+        blueprint_type="default",
+        blueprint_state="blueprint_ready",
+        blueprint_version="v1",
+        blueprint_map=["resolve_blueprint", "prepare_blueprint", "validate_blueprint", "blueprint_ready"],
+        trace_id=trace_id,
+        blueprint=blueprint_dto,
+        metadata=metadata
+    )
+    assert ExecutionBlueprint.from_dict(blueprint_dto.to_dict()).to_dict() == blueprint_dto.to_dict()
+    assert RuntimeEventExecutionBlueprint.from_dict(event_bp_dto.to_dict()).to_dict() == event_bp_dto.to_dict()
+
+
 

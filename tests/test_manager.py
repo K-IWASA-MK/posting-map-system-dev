@@ -47,3 +47,62 @@ def test_session_manager_stateless_deterministic_no_mutation():
     assert instance.instance_id == "instance:test_runtime"
     assert instance.status == "resolved"
     assert context.environment == "test"
+
+def test_blueprint_manager_stateless_deterministic_no_mutation():
+    from plugin_platform.plugin.runtime_event_execution_descriptor import (
+        ExecutionDescriptor,
+        RuntimeEventExecutionDescriptor
+    )
+    from plugin_platform.plugin.runtime_event_execution_blueprint import BlueprintManager
+    from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    
+    trace_id = str(uuid.uuid4())
+    metadata = {"env": "test"}
+    
+    descriptor_dto = ExecutionDescriptor(
+        scope_id="scope_123",
+        descriptor_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_desc_dto = RuntimeEventExecutionDescriptor(
+        descriptor_id="descriptor:scope_123",
+        scope_id="scope_123",
+        descriptor_type="default",
+        descriptor_state="descriptor_ready",
+        descriptor_version="v1",
+        descriptor_map=["resolve_descriptor", "prepare_descriptor", "validate_descriptor", "descriptor_ready"],
+        trace_id=trace_id,
+        descriptor=descriptor_dto,
+        metadata=metadata
+    )
+    
+    runtime = RuntimeRuntime(
+        runtime_id="test_runtime",
+        configuration={},
+        environment="test",
+        variables={},
+        metadata=metadata
+    )
+    
+    # Act
+    bp1 = BlueprintManager.create_execution_blueprint(event_desc_dto, runtime)
+    bp2 = BlueprintManager.create_execution_blueprint(event_desc_dto, runtime)
+    
+    # Assert 1: Stateless & Deterministic
+    assert bp1 is not bp2
+    assert bp1.to_dict() == bp2.to_dict()
+    
+    # Assert 2: Input reference segregation
+    assert bp1 is not event_desc_dto
+    assert bp1 is not runtime
+    
+    # Assert 3: No mutation of inputs
+    assert event_desc_dto.descriptor_id == "descriptor:scope_123"
+    assert event_desc_dto.descriptor_state == "descriptor_ready"
+    assert runtime.environment == "test"
+    
+    # Assert 4: metadata copy
+    assert bp1.metadata == bp2.metadata
+    assert bp1.metadata is not bp2.metadata
+

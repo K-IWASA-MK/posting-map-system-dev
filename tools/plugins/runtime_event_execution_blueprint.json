@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-29T00:00:00Z",
+    "execution_id": "execution_run:session_cie_default"
+  },
+  "blueprint_record": {
+    "blueprint_id": "blueprint:descriptor:scope_repository:registry:resource:workspace:environment:session:instance:provider:bridge:adapter:dispatch:run:activation:executor:controller:runtime:engine:execution_plan:plan:graph:meaning:receiver_context:boundary:routing:dispatch:persistence:execution_log:pipeline_execution:pipeline_run_execution:orchestrator:engine:pipeline_run:lifecycle:session:instance:stub_runtime_execution:0001",
+    "descriptor_id": "descriptor:scope_repository:registry:resource:workspace:environment:session:instance:provider:bridge:adapter:dispatch:run:activation:executor:controller:runtime:engine:execution_plan:plan:graph:meaning:receiver_context:boundary:routing:dispatch:persistence:execution_log:pipeline_execution:pipeline_run_execution:orchestrator:engine:pipeline_run:lifecycle:session:instance:stub_runtime_execution:0001",
+    "blueprint_type": "default",
+    "blueprint_state": "blueprint_ready",
+    "blueprint_version": "v1",
+    "blueprint_map": [
+      "resolve_blueprint",
+      "prepare_blueprint",
+      "validate_blueprint",
+      "blueprint_ready"
+    ],
+    "trace_id": "execution:0001",
+    "blueprint": {
+      "descriptor_id": "descriptor:scope_repository:registry:resource:workspace:environment:session:instance:provider:bridge:adapter:dispatch:run:activation:executor:controller:runtime:engine:execution_plan:plan:graph:meaning:receiver_context:boundary:routing:dispatch:persistence:execution_log:pipeline_execution:pipeline_run_execution:orchestrator:engine:pipeline_run:lifecycle:session:instance:stub_runtime_execution:0001",
+      "blueprint_type": "default",
+      "trace_id": "execution:0001",
+      "metadata": {
+        "version": 1,
+        "manager": "blueprint_manager_stub",
+        "environment": "development",
+        "note": "Phase 93 execution blueprint validation metadata blueprint"
+      }
+    },
+    "metadata": {
+      "version": 1,
+      "manager": "blueprint_manager_stub",
+      "environment": "development",
+      "note": "Phase 93 execution blueprint validation metadata blueprint"
+    }
+  }
+}
