@@ -7,3 +7,13 @@ export * from "./knowledge/KnowledgeContext";
 export * from "./knowledge/KnowledgeEngine";
 export * from "./knowledge/KnowledgeRegistry";
 export * from "./knowledge/KnowledgeManager";
+
+export * from "./governance/GovernancePolicyStatus";
+export * from "./governance/GovernancePolicyType";
+export * from "./governance/GovernancePolicyMetadata";
+export * from "./governance/GovernancePolicyDefinition";
+export * from "./governance/GovernancePolicyDescriptor";
+export * from "./governance/GovernancePolicyContext";
+export * from "./governance/GovernancePolicyEngine";
+export * from "./governance/GovernancePolicyRegistry";
+export * from "./governance/GovernancePolicyManager";
