@@ -618,6 +618,31 @@ def test_dto_serialization_roundtrip():
     assert Flow.from_dict(flow_dto.to_dict()).to_dict() == flow_dto.to_dict()
     assert RuntimeExecutionFlow.from_dict(event_fl_dto.to_dict()).to_dict() == event_fl_dto.to_dict()
 
+    # Phase 98 Execution Orchestrator DTO Round Trip Test
+    from plugin_platform.plugin.runtime_execution_orchestrator import (
+        Orchestrator,
+        RuntimeExecutionOrchestrator
+    )
+    orchestrator_dto = Orchestrator(
+        flow_id="flow_123",
+        orchestrator_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_orch_dto = RuntimeExecutionOrchestrator(
+        orchestrator_id="orchestrator:flow_123",
+        flow_id="flow_123",
+        orchestrator_type="default",
+        orchestrator_state="orchestrator_ready",
+        orchestrator_version="v1",
+        orchestrator_map=["resolve_orchestrator", "prepare_orchestrator", "validate_orchestrator", "orchestrator_ready"],
+        trace_id=trace_id,
+        orchestrator_obj=orchestrator_dto,
+        metadata=metadata
+    )
+    assert Orchestrator.from_dict(orchestrator_dto.to_dict()).to_dict() == orchestrator_dto.to_dict()
+    assert RuntimeExecutionOrchestrator.from_dict(event_orch_dto.to_dict()).to_dict() == event_orch_dto.to_dict()
+
 
 
 

@@ -338,6 +338,64 @@ def test_runtime_execution_flow_manager_stateless_deterministic_no_mutation():
     assert flow1.metadata == flow2.metadata
     assert flow1.metadata is not flow2.metadata
 
+def test_runtime_execution_orchestrator_manager_stateless_deterministic_no_mutation():
+    from plugin_platform.plugin.runtime_execution_flow import (
+        Flow,
+        RuntimeExecutionFlow
+    )
+    from plugin_platform.plugin.runtime_execution_orchestrator import RuntimeExecutionOrchestratorManager
+    from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    
+    trace_id = str(uuid.uuid4())
+    metadata = {"env": "test"}
+    
+    flow_dto = Flow(
+        pipeline_id="pipeline_123",
+        flow_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_fl_dto = RuntimeExecutionFlow(
+        flow_id="flow:pipeline_123",
+        pipeline_id="pipeline_123",
+        flow_type="default",
+        flow_state="flow_ready",
+        flow_version="v1",
+        flow_map=["resolve_flow", "prepare_flow", "validate_flow", "flow_ready"],
+        trace_id=trace_id,
+        flow_obj=flow_dto,
+        metadata=metadata
+    )
+    
+    runtime = RuntimeRuntime(
+        runtime_id="test_runtime",
+        configuration={},
+        environment="test",
+        variables={},
+        metadata=metadata
+    )
+    
+    # Act
+    orch1 = RuntimeExecutionOrchestratorManager.create_execution_orchestrator(event_fl_dto, runtime)
+    orch2 = RuntimeExecutionOrchestratorManager.create_execution_orchestrator(event_fl_dto, runtime)
+    
+    # Assert 1: Stateless & Deterministic
+    assert orch1 is not orch2
+    assert orch1.to_dict() == orch2.to_dict()
+    
+    # Assert 2: Input reference segregation
+    assert orch1 is not event_fl_dto
+    assert orch1 is not runtime
+    
+    # Assert 3: No mutation of inputs
+    assert event_fl_dto.flow_id == "flow:pipeline_123"
+    assert event_fl_dto.flow_state == "flow_ready"
+    assert runtime.environment == "test"
+    
+    # Assert 4: metadata copy
+    assert orch1.metadata == orch2.metadata
+    assert orch1.metadata is not orch2.metadata
+
 
 
 

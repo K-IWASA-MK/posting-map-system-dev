@@ -93,11 +93,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_execution_runtime.json",
     "plugins/runtime_execution_pipeline.json",
     "plugins/runtime_execution_flow.json",
+    "plugins/runtime_execution_orchestrator.json",
     "plugins/foundation_audit.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase97"
+PLATFORM_VERSION = "Phase98"
 
 def run_build(args):
     """
@@ -8836,6 +8837,101 @@ def run_runtime_execution_flow(args):
         print(f"Error: Failed to write runtime_execution_flow.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_execution_orchestrator(args):
+    """
+    runtime-execution-orchestrator サブコマンド: RuntimeExecutionOrchestratorManager を使用して
+    runtime_execution_orchestrator.json を生成する。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_execution_flow import (
+            RuntimeExecutionFlow
+        )
+        from plugin_platform.plugin.runtime_execution_orchestrator import RuntimeExecutionOrchestratorManager
+        from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    except ImportError as e:
+        print(f"Error: Failed to import execution orchestrator modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    flow_path = os.path.join(script_dir, "plugins", "runtime_execution_flow.json")
+    if not os.path.exists(flow_path):
+        print(f"Error: Runtime event execution flow result not found at {flow_path}. Please run 'runtime-execution-flow' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(flow_path, "r", encoding="utf-8") as f:
+            flow_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution flow: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    flow_rec = flow_data.get("flow_record", {})
+    execution_id = flow_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計】
+    flow_obj = RuntimeExecutionFlow.from_dict(flow_rec)
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment_name = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    runtime_system = RuntimeRuntime(
+        runtime_id="system_executionorchestrator_runtime",
+        configuration=configuration,
+        environment=environment_name,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        orchestrator_obj = RuntimeExecutionOrchestratorManager.create_execution_orchestrator(flow_obj, runtime_system)
+    except AssertionError as e:
+        print(f"Assertion Error during execution orchestrator create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_execution_orchestrator.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    orchestrator_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "orchestrator_record": orchestrator_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Orchestrator (Dry Run)")
+        print(f"Orchestrator ID: {orchestrator_obj.orchestrator_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(orchestrator_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Orchestrator successfully written to runtime_execution_orchestrator.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_execution_orchestrator.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def run_audit_foundation(args):
     """
     audit-foundation サブコマンド: CIE Platform 全体の
@@ -9332,6 +9428,10 @@ Available commands:
     runtime_execution_flow_parser = subparsers.add_parser("runtime-execution-flow", help="Manage plugin runtime session event execution flow")
     runtime_execution_flow_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution flow result")
     
+    # runtime-execution-orchestrator コマンドパーサー
+    runtime_execution_orchestrator_parser = subparsers.add_parser("runtime-execution-orchestrator", help="Manage plugin runtime session event execution orchestrator")
+    runtime_execution_orchestrator_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution orchestrator result")
+    
     # audit-foundation コマンドパーサー
     audit_foundation_parser = subparsers.add_parser("audit-foundation", help="Perform comprehensive CIE platform architecture and DTO/Manager validation")
     audit_foundation_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing audit results to JSON")
@@ -9507,6 +9607,8 @@ Available commands:
         run_runtime_execution_pipeline(args)
     elif args.command == "runtime-execution-flow":
         run_runtime_execution_flow(args)
+    elif args.command == "runtime-execution-orchestrator":
+        run_runtime_execution_orchestrator(args)
     elif args.command == "audit-foundation":
         run_audit_foundation(args)
     else:
