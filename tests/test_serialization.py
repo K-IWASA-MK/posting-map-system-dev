@@ -443,3 +443,28 @@ def test_dto_serialization_roundtrip():
     assert RuntimeExecutionLogRuntime.from_dict(runtime_exec_log_dto.to_dict()).to_dict() == runtime_exec_log_dto.to_dict()
     assert RuntimeExecutionLogStateTransition.from_dict(transition_dto.to_dict()).to_dict() == transition_dto.to_dict()
     assert RuntimeEventExecutionLogRuntime.from_dict(event_runtime_dto.to_dict()).to_dict() == event_runtime_dto.to_dict()
+
+    # Phase 91 Execution Scope DTO Round Trip Test
+    from plugin_platform.plugin.runtime_event_execution_scope import (
+        ExecutionScopeDescriptor,
+        RuntimeEventExecutionScope
+    )
+    scope_desc_dto = ExecutionScopeDescriptor(
+        repository_id="repository_123",
+        runtime_type="plugin_runtime",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    scope_dto = RuntimeEventExecutionScope(
+        scope_id="scope_repository_123_trace_123",
+        scope_type="default",
+        scope_state="scope_ready",
+        scope_version="v1",
+        scope_map=["resolve_scope", "prepare_scope", "validate_scope", "scope_ready"],
+        trace_id=trace_id,
+        descriptor=scope_desc_dto,
+        metadata=metadata
+    )
+    assert ExecutionScopeDescriptor.from_dict(scope_desc_dto.to_dict()).to_dict() == scope_desc_dto.to_dict()
+    assert RuntimeEventExecutionScope.from_dict(scope_dto.to_dict()).to_dict() == scope_dto.to_dict()
+

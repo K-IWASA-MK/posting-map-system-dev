@@ -86,11 +86,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_resource.json",
     "plugins/runtime_event_execution_log_registry.json",
     "plugins/runtime_event_execution_log_repository.json",
+    "plugins/runtime_event_execution_scope.json",
     "plugins/foundation_audit.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase90"
+PLATFORM_VERSION = "Phase91"
 
 def run_build(args):
     """
@@ -8163,6 +8164,97 @@ def run_runtime_event_execution_log_repository(args):
         print(f"Error: Failed to write runtime_event_execution_log_repository.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_scope(args):
+    """
+    runtime-event-execution-scope サブコマンド: ExecutionScopeManager を使用して
+    runtime_event_execution_scope.json を生成する。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_event_execution_log_repository import (
+            RuntimeEventExecutionLogRepository
+        )
+        from plugin_platform.plugin.runtime_event_execution_scope import ExecutionScopeManager
+    except ImportError as e:
+        print(f"Error: Failed to import execution scope modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    repository_path = os.path.join(script_dir, "plugins", "runtime_event_execution_log_repository.json")
+    if not os.path.exists(repository_path):
+        print(f"Error: Repository event execution log result not found at {repository_path}. Please run 'runtime-event-execution-log-repository' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(repository_path, "r", encoding="utf-8") as f:
+            repository_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution log repository: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    repository_rec = repository_data.get("repository_record", {})
+    execution_id = repository_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計】
+    # RuntimeEventExecutionLogRepository までDTO復元し、それ以下は dict 保持
+    execution_log_repository_obj = RuntimeEventExecutionLogRepository.from_dict(repository_rec)
+    
+    repository_id = execution_log_repository_obj.repository_id
+    trace_id = execution_log_repository_obj.trace_id
+    
+    if execution_log_repository_obj.repository:
+        runtime_type = execution_log_repository_obj.repository.runtime_type
+    else:
+        runtime_type = "plugin_runtime"
+        
+    metadata = {
+        "environment": "development",
+        "note": "Phase 91 runtime event execution scope validation flow"
+    }
+    
+    try:
+        scope_obj = ExecutionScopeManager.create_execution_scope(
+            repository_id=repository_id,
+            runtime_type=runtime_type,
+            trace_id=trace_id,
+            metadata=metadata
+        )
+    except AssertionError as e:
+        print(f"Assertion Error during execution scope create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_scope.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    scope_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "scope_record": scope_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Scope (Dry Run)")
+        print(f"Scope ID: {scope_obj.scope_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(scope_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Scope successfully written to runtime_event_execution_scope.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_scope.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def run_audit_foundation(args):
     """
     audit-foundation サブコマンド: CIE Platform 全体の
@@ -8635,6 +8727,10 @@ Available commands:
     runtime_event_execution_log_repository_parser = subparsers.add_parser("runtime-event-execution-log-repository", help="Manage plugin runtime session event execution log execution repository")
     runtime_event_execution_log_repository_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution log repository result")
     
+    # runtime-event-execution-scope コマンドパーサー
+    runtime_event_execution_scope_parser = subparsers.add_parser("runtime-event-execution-scope", help="Manage plugin runtime session event execution scope")
+    runtime_event_execution_scope_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution scope result")
+    
     # audit-foundation コマンドパーサー
     audit_foundation_parser = subparsers.add_parser("audit-foundation", help="Perform comprehensive CIE platform architecture and DTO/Manager validation")
     audit_foundation_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing audit results to JSON")
@@ -8796,6 +8892,8 @@ Available commands:
         run_runtime_event_execution_log_registry(args)
     elif args.command == "runtime-event-execution-log-repository":
         run_runtime_event_execution_log_repository(args)
+    elif args.command == "runtime-event-execution-scope":
+        run_runtime_event_execution_scope(args)
     elif args.command == "audit-foundation":
         run_audit_foundation(args)
     else:
