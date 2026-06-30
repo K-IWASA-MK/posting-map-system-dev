@@ -1,0 +1,38 @@
+{
+  "_meta": {
+    "version": 1,
+    "generated_at": "2026-06-29T00:00:00Z",
+    "execution_id": "execution_run:session_cie_default"
+  },
+  "flow_record": {
+    "flow_id": "flow:pipeline:runtime:engine:blueprint:descriptor:scope_repository:registry:resource:workspace:environment:session:instance:provider:bridge:adapter:dispatch:run:activation:executor:controller:runtime:engine:execution_plan:plan:graph:meaning:receiver_context:boundary:routing:dispatch:persistence:execution_log:pipeline_execution:pipeline_run_execution:orchestrator:engine:pipeline_run:lifecycle:session:instance:stub_runtime_execution:0001",
+    "pipeline_id": "pipeline:runtime:engine:blueprint:descriptor:scope_repository:registry:resource:workspace:environment:session:instance:provider:bridge:adapter:dispatch:run:activation:executor:controller:runtime:engine:execution_plan:plan:graph:meaning:receiver_context:boundary:routing:dispatch:persistence:execution_log:pipeline_execution:pipeline_run_execution:orchestrator:engine:pipeline_run:lifecycle:session:instance:stub_runtime_execution:0001",
+    "flow_type": "default",
+    "flow_state": "flow_ready",
+    "flow_version": "v1",
+    "flow_map": [
+      "resolve_flow",
+      "prepare_flow",
+      "validate_flow",
+      "flow_ready"
+    ],
+    "trace_id": "execution:0001",
+    "flow": {
+      "pipeline_id": "pipeline:runtime:engine:blueprint:descriptor:scope_repository:registry:resource:workspace:environment:session:instance:provider:bridge:adapter:dispatch:run:activation:executor:controller:runtime:engine:execution_plan:plan:graph:meaning:receiver_context:boundary:routing:dispatch:persistence:execution_log:pipeline_execution:pipeline_run_execution:orchestrator:engine:pipeline_run:lifecycle:session:instance:stub_runtime_execution:0001",
+      "flow_type": "default",
+      "trace_id": "execution:0001",
+      "metadata": {
+        "version": 1,
+        "manager": "runtime_execution_flow_manager_stub",
+        "environment": "development",
+        "note": "Phase 97 execution flow validation metadata blueprint"
+      }
+    },
+    "metadata": {
+      "version": 1,
+      "manager": "runtime_execution_flow_manager_stub",
+      "environment": "development",
+      "note": "Phase 97 execution flow validation metadata blueprint"
+    }
+  }
+}

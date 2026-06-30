@@ -280,6 +280,64 @@ def test_runtime_execution_pipeline_manager_stateless_deterministic_no_mutation(
     assert pl1.metadata == pl2.metadata
     assert pl1.metadata is not pl2.metadata
 
+def test_runtime_execution_flow_manager_stateless_deterministic_no_mutation():
+    from plugin_platform.plugin.runtime_execution_pipeline import (
+        Pipeline,
+        RuntimeExecutionPipeline
+    )
+    from plugin_platform.plugin.runtime_execution_flow import RuntimeExecutionFlowManager
+    from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    
+    trace_id = str(uuid.uuid4())
+    metadata = {"env": "test"}
+    
+    pipeline_dto = Pipeline(
+        runtime_id="runtime_123",
+        pipeline_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_pl_dto = RuntimeExecutionPipeline(
+        pipeline_id="pipeline:runtime_123",
+        runtime_id="runtime_123",
+        pipeline_type="default",
+        pipeline_state="pipeline_ready",
+        pipeline_version="v1",
+        pipeline_map=["resolve_pipeline", "prepare_pipeline", "validate_pipeline", "pipeline_ready"],
+        trace_id=trace_id,
+        pipeline_obj=pipeline_dto,
+        metadata=metadata
+    )
+    
+    runtime = RuntimeRuntime(
+        runtime_id="test_runtime",
+        configuration={},
+        environment="test",
+        variables={},
+        metadata=metadata
+    )
+    
+    # Act
+    flow1 = RuntimeExecutionFlowManager.create_execution_flow(event_pl_dto, runtime)
+    flow2 = RuntimeExecutionFlowManager.create_execution_flow(event_pl_dto, runtime)
+    
+    # Assert 1: Stateless & Deterministic
+    assert flow1 is not flow2
+    assert flow1.to_dict() == flow2.to_dict()
+    
+    # Assert 2: Input reference segregation
+    assert flow1 is not event_pl_dto
+    assert flow1 is not runtime
+    
+    # Assert 3: No mutation of inputs
+    assert event_pl_dto.pipeline_id == "pipeline:runtime_123"
+    assert event_pl_dto.pipeline_state == "pipeline_ready"
+    assert runtime.environment == "test"
+    
+    # Assert 4: metadata copy
+    assert flow1.metadata == flow2.metadata
+    assert flow1.metadata is not flow2.metadata
+
 
 
 

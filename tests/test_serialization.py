@@ -593,6 +593,31 @@ def test_dto_serialization_roundtrip():
     assert Pipeline.from_dict(pipeline_dto.to_dict()).to_dict() == pipeline_dto.to_dict()
     assert RuntimeExecutionPipeline.from_dict(event_pl_dto.to_dict()).to_dict() == event_pl_dto.to_dict()
 
+    # Phase 97 Execution Flow DTO Round Trip Test
+    from plugin_platform.plugin.runtime_execution_flow import (
+        Flow,
+        RuntimeExecutionFlow
+    )
+    flow_dto = Flow(
+        pipeline_id="pipeline_123",
+        flow_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_fl_dto = RuntimeExecutionFlow(
+        flow_id="flow:pipeline_123",
+        pipeline_id="pipeline_123",
+        flow_type="default",
+        flow_state="flow_ready",
+        flow_version="v1",
+        flow_map=["resolve_flow", "prepare_flow", "validate_flow", "flow_ready"],
+        trace_id=trace_id,
+        flow_obj=flow_dto,
+        metadata=metadata
+    )
+    assert Flow.from_dict(flow_dto.to_dict()).to_dict() == flow_dto.to_dict()
+    assert RuntimeExecutionFlow.from_dict(event_fl_dto.to_dict()).to_dict() == event_fl_dto.to_dict()
+
 
 
 

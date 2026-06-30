@@ -92,11 +92,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_engine.json",
     "plugins/runtime_execution_runtime.json",
     "plugins/runtime_execution_pipeline.json",
+    "plugins/runtime_execution_flow.json",
     "plugins/foundation_audit.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase96"
+PLATFORM_VERSION = "Phase97"
 
 def run_build(args):
     """
@@ -8740,6 +8741,101 @@ def run_runtime_execution_pipeline(args):
         print(f"Error: Failed to write runtime_execution_pipeline.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_execution_flow(args):
+    """
+    runtime-execution-flow サブコマンド: RuntimeExecutionFlowManager を使用して
+    runtime_execution_flow.json を生成する。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_execution_pipeline import (
+            RuntimeExecutionPipeline
+        )
+        from plugin_platform.plugin.runtime_execution_flow import RuntimeExecutionFlowManager
+        from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    except ImportError as e:
+        print(f"Error: Failed to import execution flow modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    pipeline_path = os.path.join(script_dir, "plugins", "runtime_execution_pipeline.json")
+    if not os.path.exists(pipeline_path):
+        print(f"Error: Runtime event execution pipeline result not found at {pipeline_path}. Please run 'runtime-execution-pipeline' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(pipeline_path, "r", encoding="utf-8") as f:
+            pipeline_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution pipeline: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    pipeline_rec = pipeline_data.get("pipeline_record", {})
+    execution_id = pipeline_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計】
+    pipeline_obj = RuntimeExecutionPipeline.from_dict(pipeline_rec)
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment_name = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    runtime_system = RuntimeRuntime(
+        runtime_id="system_executionflow_runtime",
+        configuration=configuration,
+        environment=environment_name,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        flow_obj = RuntimeExecutionFlowManager.create_execution_flow(pipeline_obj, runtime_system)
+    except AssertionError as e:
+        print(f"Assertion Error during execution flow create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_execution_flow.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    flow_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "flow_record": flow_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Flow (Dry Run)")
+        print(f"Flow ID: {flow_obj.flow_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(flow_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Flow successfully written to runtime_execution_flow.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_execution_flow.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def run_audit_foundation(args):
     """
     audit-foundation サブコマンド: CIE Platform 全体の
@@ -9232,6 +9328,10 @@ Available commands:
     runtime_execution_pipeline_parser = subparsers.add_parser("runtime-execution-pipeline", help="Manage plugin runtime session event execution pipeline")
     runtime_execution_pipeline_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution pipeline result")
     
+    # runtime-execution-flow コマンドパーサー
+    runtime_execution_flow_parser = subparsers.add_parser("runtime-execution-flow", help="Manage plugin runtime session event execution flow")
+    runtime_execution_flow_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution flow result")
+    
     # audit-foundation コマンドパーサー
     audit_foundation_parser = subparsers.add_parser("audit-foundation", help="Perform comprehensive CIE platform architecture and DTO/Manager validation")
     audit_foundation_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing audit results to JSON")
@@ -9405,6 +9505,8 @@ Available commands:
         run_runtime_execution_runtime(args)
     elif args.command == "runtime-execution-pipeline":
         run_runtime_execution_pipeline(args)
+    elif args.command == "runtime-execution-flow":
+        run_runtime_execution_flow(args)
     elif args.command == "audit-foundation":
         run_audit_foundation(args)
     else:
