@@ -568,6 +568,32 @@ def test_dto_serialization_roundtrip():
     assert Runtime.from_dict(runtime_dto.to_dict()).to_dict() == runtime_dto.to_dict()
     assert RuntimeExecutionRuntime.from_dict(event_rt_dto.to_dict()).to_dict() == event_rt_dto.to_dict()
 
+    # Phase 96 Execution Pipeline DTO Round Trip Test
+    from plugin_platform.plugin.runtime_execution_pipeline import (
+        Pipeline,
+        RuntimeExecutionPipeline
+    )
+    pipeline_dto = Pipeline(
+        runtime_id="runtime_123",
+        pipeline_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_pl_dto = RuntimeExecutionPipeline(
+        pipeline_id="pipeline:runtime_123",
+        runtime_id="runtime_123",
+        pipeline_type="default",
+        pipeline_state="pipeline_ready",
+        pipeline_version="v1",
+        pipeline_map=["resolve_pipeline", "prepare_pipeline", "validate_pipeline", "pipeline_ready"],
+        trace_id=trace_id,
+        pipeline_obj=pipeline_dto,
+        metadata=metadata
+    )
+    assert Pipeline.from_dict(pipeline_dto.to_dict()).to_dict() == pipeline_dto.to_dict()
+    assert RuntimeExecutionPipeline.from_dict(event_pl_dto.to_dict()).to_dict() == event_pl_dto.to_dict()
+
+
 
 
 

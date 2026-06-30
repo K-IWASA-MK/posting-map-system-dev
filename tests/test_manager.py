@@ -222,5 +222,64 @@ def test_runtime_execution_runtime_manager_stateless_deterministic_no_mutation()
     assert rt1.metadata == rt2.metadata
     assert rt1.metadata is not rt2.metadata
 
+def test_runtime_execution_pipeline_manager_stateless_deterministic_no_mutation():
+    from plugin_platform.plugin.runtime_execution_runtime import (
+        Runtime,
+        RuntimeExecutionRuntime
+    )
+    from plugin_platform.plugin.runtime_execution_pipeline import RuntimeExecutionPipelineManager
+    from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    
+    trace_id = str(uuid.uuid4())
+    metadata = {"env": "test"}
+    
+    runtime_dto = Runtime(
+        engine_id="engine_123",
+        runtime_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_rt_dto = RuntimeExecutionRuntime(
+        runtime_id="runtime:engine_123",
+        engine_id="engine_123",
+        runtime_type="default",
+        runtime_state="runtime_ready",
+        runtime_version="v1",
+        runtime_map=["resolve_runtime", "prepare_runtime", "validate_runtime", "runtime_ready"],
+        trace_id=trace_id,
+        runtime_obj=runtime_dto,
+        metadata=metadata
+    )
+    
+    runtime = RuntimeRuntime(
+        runtime_id="test_runtime",
+        configuration={},
+        environment="test",
+        variables={},
+        metadata=metadata
+    )
+    
+    # Act
+    pl1 = RuntimeExecutionPipelineManager.create_execution_pipeline(event_rt_dto, runtime)
+    pl2 = RuntimeExecutionPipelineManager.create_execution_pipeline(event_rt_dto, runtime)
+    
+    # Assert 1: Stateless & Deterministic
+    assert pl1 is not pl2
+    assert pl1.to_dict() == pl2.to_dict()
+    
+    # Assert 2: Input reference segregation
+    assert pl1 is not event_rt_dto
+    assert pl1 is not runtime
+    
+    # Assert 3: No mutation of inputs
+    assert event_rt_dto.runtime_id == "runtime:engine_123"
+    assert event_rt_dto.runtime_state == "runtime_ready"
+    assert runtime.environment == "test"
+    
+    # Assert 4: metadata copy
+    assert pl1.metadata == pl2.metadata
+    assert pl1.metadata is not pl2.metadata
+
+
 
 
