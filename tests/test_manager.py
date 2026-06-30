@@ -454,6 +454,64 @@ def test_runtime_execution_controller_manager_stateless_deterministic_no_mutatio
     assert ctrl1.metadata == ctrl2.metadata
     assert ctrl1.metadata is not ctrl2.metadata
 
+def test_runtime_execution_milestone_audit_manager_stateless_deterministic_no_mutation():
+    from plugin_platform.plugin.runtime_execution_controller import (
+        Controller,
+        RuntimeExecutionController
+    )
+    from plugin_platform.plugin.runtime_execution_milestone_audit import RuntimeExecutionMilestoneAuditManager
+    from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    
+    trace_id = str(uuid.uuid4())
+    metadata = {"env": "test"}
+    
+    controller_dto = Controller(
+        orchestrator_id="orchestrator_123",
+        controller_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_ctrl_dto = RuntimeExecutionController(
+        controller_id="controller:orchestrator_123",
+        orchestrator_id="orchestrator_123",
+        controller_type="default",
+        controller_state="controller_ready",
+        controller_version="v1",
+        controller_map=["resolve_controller", "prepare_controller", "validate_controller", "controller_ready"],
+        trace_id=trace_id,
+        controller_obj=controller_dto,
+        metadata=metadata
+    )
+    
+    runtime = RuntimeRuntime(
+        runtime_id="test_runtime",
+        configuration={},
+        environment="test",
+        variables={},
+        metadata=metadata
+    )
+    
+    # Act
+    audit1 = RuntimeExecutionMilestoneAuditManager.create_milestone_audit(event_ctrl_dto, runtime)
+    audit2 = RuntimeExecutionMilestoneAuditManager.create_milestone_audit(event_ctrl_dto, runtime)
+    
+    # Assert 1: Stateless & Deterministic
+    assert audit1 is not audit2
+    assert audit1.to_dict() == audit2.to_dict()
+    
+    # Assert 2: Input reference segregation
+    assert audit1 is not event_ctrl_dto
+    assert audit1 is not runtime
+    
+    # Assert 3: No mutation of inputs
+    assert event_ctrl_dto.controller_id == "controller:orchestrator_123"
+    assert event_ctrl_dto.controller_state == "controller_ready"
+    assert runtime.environment == "test"
+    
+    # Assert 4: metadata copy
+    assert audit1.metadata == audit2.metadata
+    assert audit1.metadata is not audit2.metadata
+
 
 
 

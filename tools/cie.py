@@ -5,7 +5,7 @@ import subprocess
 import argparse
 
 # Constants Manifest
-COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider", "runtime-event-execution-log-instance", "runtime-event-execution-log-session", "runtime-event-execution-log-environment", "runtime-event-execution-log-workspace", "runtime-event-execution-log-resource", "runtime-event-execution-log-registry", "runtime-event-execution-log-repository", "audit-foundation"]
+COMMANDS = ["build", "verify", "doctor", "report", "dashboard", "api", "metrics", "export", "config", "plugin", "runtime", "lifecycle", "dependency", "scheduler", "execution", "execution-run", "invocation", "runtime-run", "runtime-dispatch", "runtime-factory", "runtime-session", "runtime-lifecycle", "runtime-event", "runtime-event-store", "runtime-event-query", "runtime-event-index", "runtime-event-catalog", "runtime-event-metadata", "runtime-event-analysis", "runtime-event-replay", "runtime-event-snapshot", "runtime-event-audit", "runtime-event-persistence", "runtime-event-sync", "runtime-event-pipeline", "runtime-event-stream", "runtime-event-dispatcher", "runtime-event-router", "runtime-event-endpoint", "runtime-event-handler", "runtime-event-receiver", "runtime-event-gateway", "runtime-event-listener", "runtime-event-pipeline-run", "runtime-event-execution-engine", "runtime-event-execution-orchestrator", "runtime-event-execution-pipeline-run", "runtime-event-execution-pipeline-execution", "runtime-event-execution-log", "runtime-event-execution-log-persistence", "runtime-event-execution-log-dispatcher", "runtime-event-execution-log-routing", "runtime-event-execution-log-endpoint-handler", "runtime-event-execution-log-receiver-router", "runtime-event-execution-log-meaning", "runtime-event-execution-log-intent-graph", "runtime-event-execution-log-planner", "runtime-event-execution-log-engine", "runtime-event-execution-log-runtime", "runtime-event-execution-log-controller", "runtime-event-execution-log-executor", "runtime-event-execution-log-activation", "runtime-event-execution-log-run", "runtime-event-execution-log-dispatch", "runtime-event-execution-log-adapter", "runtime-event-execution-log-bridge", "runtime-event-execution-log-provider", "runtime-event-execution-log-instance", "runtime-event-execution-log-session", "runtime-event-execution-log-environment", "runtime-event-execution-log-workspace", "runtime-event-execution-log-resource", "runtime-event-execution-log-registry", "runtime-event-execution-log-repository", "runtime-event-execution-scope", "runtime-event-execution-descriptor", "runtime-event-execution-blueprint", "runtime-event-execution-engine", "runtime-execution-runtime", "runtime-execution-pipeline", "runtime-execution-flow", "runtime-execution-orchestrator", "runtime-execution-controller", "runtime-execution-milestone-audit", "audit-foundation"]
 
 JSON_ARTIFACTS = [
     "asset_graph.json",
@@ -95,11 +95,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_execution_flow.json",
     "plugins/runtime_execution_orchestrator.json",
     "plugins/runtime_execution_controller.json",
+    "plugins/runtime_execution_milestone_audit.json",
     "plugins/foundation_audit.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase99"
+PLATFORM_VERSION = "Phase100"
 
 def run_build(args):
     """
@@ -9030,6 +9031,102 @@ def run_runtime_execution_controller(args):
         print(f"Error: Failed to write runtime_execution_controller.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_execution_milestone_audit(args):
+    """
+    runtime-execution-milestone-audit サブコマンド: RuntimeExecutionMilestoneAuditManager を使用して
+    runtime_execution_milestone_audit.json を生成する。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_execution_controller import (
+            RuntimeExecutionController
+        )
+        from plugin_platform.plugin.runtime_execution_milestone_audit import RuntimeExecutionMilestoneAuditManager
+        from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    except ImportError as e:
+        print(f"Error: Failed to import execution milestone audit modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    ctrl_path = os.path.join(script_dir, "plugins", "runtime_execution_controller.json")
+    if not os.path.exists(ctrl_path):
+        print(f"Error: Runtime event execution controller result not found at {ctrl_path}. Please run 'runtime-execution-controller' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(ctrl_path, "r", encoding="utf-8") as f:
+            ctrl_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution controller: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    ctrl_rec = ctrl_data.get("controller_record", {})
+    execution_id = ctrl_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計 & CLI復元ルール】
+    # RuntimeExecutionController のみ DTO復元対象とし、それ以外は完全に dict 固定。
+    ctrl_obj = RuntimeExecutionController.from_dict(ctrl_rec)
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment_name = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    runtime_system = RuntimeRuntime(
+        runtime_id="system_executionmilestoneaudit_runtime",
+        configuration=configuration,
+        environment=environment_name,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        audit_obj = RuntimeExecutionMilestoneAuditManager.create_milestone_audit(ctrl_obj, runtime_system)
+    except AssertionError as e:
+        print(f"Assertion Error during execution milestone audit create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_execution_milestone_audit.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    audit_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "audit_record": audit_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Milestone Audit (Dry Run)")
+        print(f"Milestone Audit ID: {audit_obj.audit_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(audit_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Milestone Audit successfully written to runtime_execution_milestone_audit.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_execution_milestone_audit.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def run_audit_foundation(args):
     """
     audit-foundation サブコマンド: CIE Platform 全体の
@@ -9109,7 +9206,7 @@ def run_audit_foundation(args):
         "serialization": serialization_summary_str,
         "overall": overall_status,
         "health": health_status,
-        "platform_version": "Phase90"
+        "platform_version": "Phase100"
     }
     
     audit_data = {
@@ -9534,6 +9631,10 @@ Available commands:
     runtime_execution_controller_parser = subparsers.add_parser("runtime-execution-controller", help="Manage plugin runtime session event execution controller")
     runtime_execution_controller_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution controller result")
     
+    # runtime-execution-milestone-audit コマンドパーサー
+    runtime_execution_milestone_audit_parser = subparsers.add_parser("runtime-execution-milestone-audit", help="Manage plugin runtime session event execution milestone audit")
+    runtime_execution_milestone_audit_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution milestone audit result")
+    
     # audit-foundation コマンドパーサー
     audit_foundation_parser = subparsers.add_parser("audit-foundation", help="Perform comprehensive CIE platform architecture and DTO/Manager validation")
     audit_foundation_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing audit results to JSON")
@@ -9713,6 +9814,8 @@ Available commands:
         run_runtime_execution_orchestrator(args)
     elif args.command == "runtime-execution-controller":
         run_runtime_execution_controller(args)
+    elif args.command == "runtime-execution-milestone-audit":
+        run_runtime_execution_milestone_audit(args)
     elif args.command == "audit-foundation":
         run_audit_foundation(args)
     else:

@@ -668,6 +668,32 @@ def test_dto_serialization_roundtrip():
     assert Controller.from_dict(controller_dto.to_dict()).to_dict() == controller_dto.to_dict()
     assert RuntimeExecutionController.from_dict(event_ctrl_dto.to_dict()).to_dict() == event_ctrl_dto.to_dict()
 
+    # Phase 100 Execution Milestone Audit DTO Round Trip Test
+    from plugin_platform.plugin.runtime_execution_milestone_audit import (
+        MilestoneAudit,
+        RuntimeExecutionMilestoneAudit
+    )
+    milestone_audit_dto = MilestoneAudit(
+        controller_id="controller_123",
+        audit_type="default",
+        audit_rules=["rule1"],
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_audit_dto = RuntimeExecutionMilestoneAudit(
+        audit_id="audit:controller_123",
+        controller_id="controller_123",
+        audit_type="default",
+        audit_state="audit_ready",
+        audit_version="v1",
+        audit_map=["resolve_audit", "prepare_audit", "validate_audit", "audit_ready"],
+        trace_id=trace_id,
+        audit_obj=milestone_audit_dto,
+        metadata=metadata
+    )
+    assert MilestoneAudit.from_dict(milestone_audit_dto.to_dict()).to_dict() == milestone_audit_dto.to_dict()
+    assert RuntimeExecutionMilestoneAudit.from_dict(event_audit_dto.to_dict()).to_dict() == event_audit_dto.to_dict()
+
 
 
 
