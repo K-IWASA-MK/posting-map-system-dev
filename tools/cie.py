@@ -89,11 +89,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_scope.json",
     "plugins/runtime_event_execution_descriptor.json",
     "plugins/runtime_event_execution_blueprint.json",
+    "plugins/runtime_event_execution_engine.json",
     "plugins/foundation_audit.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase93"
+PLATFORM_VERSION = "Phase94"
 
 def run_build(args):
     """
@@ -8449,6 +8450,102 @@ def run_runtime_event_execution_blueprint(args):
         print(f"Error: Failed to write runtime_event_execution_blueprint.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_engine(args):
+    """
+    runtime-event-execution-engine サブコマンド: EngineManager を使用して
+    runtime_event_execution_engine.json を生成する。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_event_execution_blueprint import (
+            RuntimeEventExecutionBlueprint
+        )
+        from plugin_platform.plugin.runtime_event_execution_engine import EngineManager
+        from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    except ImportError as e:
+        print(f"Error: Failed to import execution engine modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    blueprint_path = os.path.join(script_dir, "plugins", "runtime_event_execution_blueprint.json")
+    if not os.path.exists(blueprint_path):
+        print(f"Error: Blueprint event execution result not found at {blueprint_path}. Please run 'runtime-event-execution-blueprint' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(blueprint_path, "r", encoding="utf-8") as f:
+            blueprint_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution blueprint: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    blueprint_rec = blueprint_data.get("blueprint_record", {})
+    execution_id = blueprint_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計】
+    # RuntimeEventExecutionBlueprint までDTO復元し、下位は dict 保持
+    blueprint_obj = RuntimeEventExecutionBlueprint.from_dict(blueprint_rec)
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment_name = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    runtime_system = RuntimeRuntime(
+        runtime_id="system_executionengine_runtime",
+        configuration=configuration,
+        environment=environment_name,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        engine_obj = EngineManager.create_execution_engine(blueprint_obj, runtime_system)
+    except AssertionError as e:
+        print(f"Assertion Error during execution engine create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_engine.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    engine_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "engine_record": engine_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Engine (Dry Run)")
+        print(f"Engine ID: {engine_obj.engine_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(engine_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Engine successfully written to runtime_event_execution_engine.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_engine.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def run_audit_foundation(args):
     """
     audit-foundation サブコマンド: CIE Platform 全体の
@@ -8933,6 +9030,10 @@ Available commands:
     runtime_event_execution_blueprint_parser = subparsers.add_parser("runtime-event-execution-blueprint", help="Manage plugin runtime session event execution blueprint")
     runtime_event_execution_blueprint_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution blueprint result")
     
+    # runtime-event-execution-engine コマンドパーサー
+    runtime_event_execution_engine_parser = subparsers.add_parser("runtime-event-execution-engine", help="Manage plugin runtime session event execution engine")
+    runtime_event_execution_engine_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution engine result")
+    
     # audit-foundation コマンドパーサー
     audit_foundation_parser = subparsers.add_parser("audit-foundation", help="Perform comprehensive CIE platform architecture and DTO/Manager validation")
     audit_foundation_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing audit results to JSON")
@@ -9100,6 +9201,8 @@ Available commands:
         run_runtime_event_execution_descriptor(args)
     elif args.command == "runtime-event-execution-blueprint":
         run_runtime_event_execution_blueprint(args)
+    elif args.command == "runtime-event-execution-engine":
+        run_runtime_event_execution_engine(args)
     elif args.command == "audit-foundation":
         run_audit_foundation(args)
     else:

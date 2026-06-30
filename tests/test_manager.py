@@ -106,3 +106,62 @@ def test_blueprint_manager_stateless_deterministic_no_mutation():
     assert bp1.metadata == bp2.metadata
     assert bp1.metadata is not bp2.metadata
 
+def test_engine_manager_stateless_deterministic_no_mutation():
+    from plugin_platform.plugin.runtime_event_execution_blueprint import (
+        ExecutionBlueprint,
+        RuntimeEventExecutionBlueprint
+    )
+    from plugin_platform.plugin.runtime_event_execution_engine import EngineManager
+    from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    
+    trace_id = str(uuid.uuid4())
+    metadata = {"env": "test"}
+    
+    blueprint_dto = ExecutionBlueprint(
+        descriptor_id="descriptor_123",
+        blueprint_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_bp_dto = RuntimeEventExecutionBlueprint(
+        blueprint_id="blueprint:descriptor_123",
+        descriptor_id="descriptor_123",
+        blueprint_type="default",
+        blueprint_state="blueprint_ready",
+        blueprint_version="v1",
+        blueprint_map=["resolve_blueprint", "prepare_blueprint", "validate_blueprint", "blueprint_ready"],
+        trace_id=trace_id,
+        blueprint=blueprint_dto,
+        metadata=metadata
+    )
+    
+    runtime = RuntimeRuntime(
+        runtime_id="test_runtime",
+        configuration={},
+        environment="test",
+        variables={},
+        metadata=metadata
+    )
+    
+    # Act
+    eng1 = EngineManager.create_execution_engine(event_bp_dto, runtime)
+    eng2 = EngineManager.create_execution_engine(event_bp_dto, runtime)
+    
+    # Assert 1: Stateless & Deterministic
+    assert eng1 is not eng2
+    assert eng1.to_dict() == eng2.to_dict()
+    
+    # Assert 2: Input reference segregation
+    assert eng1 is not event_bp_dto
+    assert eng1 is not runtime
+    
+    # Assert 3: No mutation of inputs
+    assert event_bp_dto.blueprint_id == "blueprint:descriptor_123"
+    assert event_bp_dto.blueprint_state == "blueprint_ready"
+    assert runtime.environment == "test"
+    
+    # Assert 4: metadata copy
+    assert eng1.metadata == eng2.metadata
+    assert eng1.metadata is not eng2.metadata
+
+

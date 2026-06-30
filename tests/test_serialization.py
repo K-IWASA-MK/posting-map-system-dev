@@ -518,5 +518,31 @@ def test_dto_serialization_roundtrip():
     assert ExecutionBlueprint.from_dict(blueprint_dto.to_dict()).to_dict() == blueprint_dto.to_dict()
     assert RuntimeEventExecutionBlueprint.from_dict(event_bp_dto.to_dict()).to_dict() == event_bp_dto.to_dict()
 
+    # Phase 94 Execution Engine DTO Round Trip Test
+    from plugin_platform.plugin.runtime_event_execution_engine import (
+        Engine,
+        RuntimeEventExecutionEngine
+    )
+    engine_dto = Engine(
+        blueprint_id="blueprint_123",
+        engine_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_eng_dto = RuntimeEventExecutionEngine(
+        engine_id="engine:blueprint_123",
+        blueprint_id="blueprint_123",
+        engine_type="default",
+        engine_state="engine_ready",
+        engine_version="v1",
+        engine_map=["resolve_engine", "prepare_engine", "validate_engine", "engine_ready"],
+        trace_id=trace_id,
+        engine=engine_dto,
+        metadata=metadata
+    )
+    assert Engine.from_dict(engine_dto.to_dict()).to_dict() == engine_dto.to_dict()
+    assert RuntimeEventExecutionEngine.from_dict(event_eng_dto.to_dict()).to_dict() == event_eng_dto.to_dict()
+
+
 
 
