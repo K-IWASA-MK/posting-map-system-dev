@@ -1,0 +1,12 @@
+{
+  "name": "cie-knowledge-engine",
+  "version": "1.0.0",
+  "description": "CIE Knowledge Engine Foundation",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

@@ -43,3 +43,6 @@ implementation_plan.html
 .clasprc.json.local.bak
 .clasp.json.bak
 .env
+
+# Dependencies
+node_modules/
