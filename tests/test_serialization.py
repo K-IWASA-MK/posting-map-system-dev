@@ -468,3 +468,29 @@ def test_dto_serialization_roundtrip():
     assert ExecutionScopeDescriptor.from_dict(scope_desc_dto.to_dict()).to_dict() == scope_desc_dto.to_dict()
     assert RuntimeEventExecutionScope.from_dict(scope_dto.to_dict()).to_dict() == scope_dto.to_dict()
 
+    # Phase 92 Execution Descriptor DTO Round Trip Test
+    from plugin_platform.plugin.runtime_event_execution_descriptor import (
+        ExecutionDescriptor,
+        RuntimeEventExecutionDescriptor
+    )
+    descriptor_dto = ExecutionDescriptor(
+        scope_id="scope_123",
+        descriptor_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_desc_dto = RuntimeEventExecutionDescriptor(
+        descriptor_id="descriptor:scope_123",
+        scope_id="scope_123",
+        descriptor_type="default",
+        descriptor_state="descriptor_ready",
+        descriptor_version="v1",
+        descriptor_map=["resolve_descriptor", "prepare_descriptor", "validate_descriptor", "descriptor_ready"],
+        trace_id=trace_id,
+        descriptor=descriptor_dto,
+        metadata=metadata
+    )
+    assert ExecutionDescriptor.from_dict(descriptor_dto.to_dict()).to_dict() == descriptor_dto.to_dict()
+    assert RuntimeEventExecutionDescriptor.from_dict(event_desc_dto.to_dict()).to_dict() == event_desc_dto.to_dict()
+
+

@@ -87,11 +87,12 @@ JSON_ARTIFACTS = [
     "plugins/runtime_event_execution_log_registry.json",
     "plugins/runtime_event_execution_log_repository.json",
     "plugins/runtime_event_execution_scope.json",
+    "plugins/runtime_event_execution_descriptor.json",
     "plugins/foundation_audit.json"
 ]
 
 CIE_VERSION = "2.2.0-alpha.0"
-PLATFORM_VERSION = "Phase91"
+PLATFORM_VERSION = "Phase92"
 
 def run_build(args):
     """
@@ -8255,6 +8256,102 @@ def run_runtime_event_execution_scope(args):
         print(f"Error: Failed to write runtime_event_execution_scope.json: {e}", file=sys.stderr)
         sys.exit(3)
 
+def run_runtime_event_execution_descriptor(args):
+    """
+    runtime-event-execution-descriptor サブコマンド: ExecutionDescriptorManager を使用して
+    runtime_event_execution_descriptor.json を生成する。
+    """
+    import sys
+    import json
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        
+    try:
+        from plugin_platform.plugin.runtime_event_execution_scope import (
+            RuntimeEventExecutionScope
+        )
+        from plugin_platform.plugin.runtime_event_execution_descriptor import ExecutionDescriptorManager
+        from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    except ImportError as e:
+        print(f"Error: Failed to import execution descriptor modules: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    scope_path = os.path.join(script_dir, "plugins", "runtime_event_execution_scope.json")
+    if not os.path.exists(scope_path):
+        print(f"Error: Scope event execution result not found at {scope_path}. Please run 'runtime-event-execution-scope' first.", file=sys.stderr)
+        sys.exit(3)
+        
+    try:
+        with open(scope_path, "r", encoding="utf-8") as f:
+            scope_data = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error: Failed to load runtime event execution scope: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    scope_rec = scope_data.get("scope_record", {})
+    execution_id = scope_data.get("_meta", {}).get("execution_id", "session_cie_default")
+    
+    # 【簡素化復元設計】
+    # RuntimeEventExecutionScope までDTO復元し、下位は dict 保持
+    scope_obj = RuntimeEventExecutionScope.from_dict(scope_rec)
+    
+    # 設定のロード
+    configuration = {}
+    config_engine_path = os.path.join(script_dir, "config_engine.py")
+    if os.path.exists(config_engine_path):
+        try:
+            sys.path.append(script_dir)
+            import config_engine
+            configuration, _, _ = config_engine.validate_config()
+        except Exception:
+            pass
+            
+    environment_name = configuration.get("environment", "development")
+    variables = configuration.get("variables", {})
+    
+    runtime_system = RuntimeRuntime(
+        runtime_id="system_executiondescriptor_runtime",
+        configuration=configuration,
+        environment=environment_name,
+        variables=variables,
+        metadata={"version": 1}
+    )
+    
+    try:
+        descriptor_obj = ExecutionDescriptorManager.create_execution_descriptor(scope_obj, runtime_system)
+    except AssertionError as e:
+        print(f"Assertion Error during execution descriptor create: {e}", file=sys.stderr)
+        sys.exit(3)
+        
+    output_path = os.path.join(script_dir, "plugins", "runtime_event_execution_descriptor.json")
+    
+    now_utc = "2026-06-29T00:00:00Z"
+    descriptor_data = {
+        "_meta": {
+            "version": 1,
+            "generated_at": now_utc,
+            "execution_id": execution_id
+        },
+        "descriptor_record": descriptor_obj.to_dict()
+    }
+    
+    if args.dry_run:
+        print("Plugin Runtime Session Event Execution Descriptor (Dry Run)")
+        print(f"Descriptor ID: {descriptor_obj.descriptor_id}")
+        sys.exit(0)
+        
+    try:
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(descriptor_data, f, indent=2, ensure_ascii=False)
+        print("Plugin Runtime Session Event Execution Descriptor successfully written to runtime_event_execution_descriptor.json")
+        sys.exit(0)
+    except IOError as e:
+        print(f"Error: Failed to write runtime_event_execution_descriptor.json: {e}", file=sys.stderr)
+        sys.exit(3)
+
 def run_audit_foundation(args):
     """
     audit-foundation サブコマンド: CIE Platform 全体の
@@ -8731,6 +8828,10 @@ Available commands:
     runtime_event_execution_scope_parser = subparsers.add_parser("runtime-event-execution-scope", help="Manage plugin runtime session event execution scope")
     runtime_event_execution_scope_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution scope result")
     
+    # runtime-event-execution-descriptor コマンドパーサー
+    runtime_event_execution_descriptor_parser = subparsers.add_parser("runtime-event-execution-descriptor", help="Manage plugin runtime session event execution descriptor")
+    runtime_event_execution_descriptor_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution descriptor result")
+    
     # audit-foundation コマンドパーサー
     audit_foundation_parser = subparsers.add_parser("audit-foundation", help="Perform comprehensive CIE platform architecture and DTO/Manager validation")
     audit_foundation_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing audit results to JSON")
@@ -8894,6 +8995,8 @@ Available commands:
         run_runtime_event_execution_log_repository(args)
     elif args.command == "runtime-event-execution-scope":
         run_runtime_event_execution_scope(args)
+    elif args.command == "runtime-event-execution-descriptor":
+        run_runtime_event_execution_descriptor(args)
     elif args.command == "audit-foundation":
         run_audit_foundation(args)
     else:
