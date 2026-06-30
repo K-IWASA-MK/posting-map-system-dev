@@ -16,3 +16,15 @@ class EventGatewayDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventGatewayDescriptor":
+        return cls(
+            gateway_id=data.get("gateway_id"),
+            event_id=data.get("event_id"),
+            plugin_id=data.get("plugin_id"),
+            gateway_type=data.get("gateway_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

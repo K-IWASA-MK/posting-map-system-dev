@@ -23,3 +23,15 @@ class RuntimeExecutionLogActuator:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogActuator":
+        return cls(
+            actuator_id=data.get("actuator_id"),
+            run_id=data.get("run_id"),
+            actuator_state=data.get("actuator_state"),
+            actuator_map=data.get("actuator_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

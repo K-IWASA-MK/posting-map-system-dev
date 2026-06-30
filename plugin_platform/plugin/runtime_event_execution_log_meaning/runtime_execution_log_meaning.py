@@ -18,3 +18,16 @@ class RuntimeExecutionLogMeaning:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogMeaning":
+        return cls(
+            meaning_id=data.get("meaning_id"),
+            receiver_context_id=data.get("receiver_context_id"),
+            router_id=data.get("router_id"),
+            meaning_state=data.get("meaning_state"),
+            semantic_map=data.get("semantic_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

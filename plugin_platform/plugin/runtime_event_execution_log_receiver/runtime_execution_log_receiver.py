@@ -19,6 +19,17 @@ class RuntimeExecutionLogReceiver:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogReceiver":
+        return cls(
+            receiver_id=data.get("receiver_id"),
+            boundary_id=data.get("boundary_id"),
+            receiver_state=data.get("receiver_state"),
+            interpretation_map=data.get("interpretation_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogReceiver:
     def __init__(self, receiver_id: str, runtime_event_execution_log_endpoint_boundary: RuntimeExecutionLogEndpointBoundary, receiver: RuntimeExecutionLogReceiver, metadata: dict, trace_id: str):
         self.receiver_id = receiver_id
@@ -35,3 +46,21 @@ class RuntimeEventExecutionLogReceiver:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogReceiver":
+        boundary_data = data.get("runtime_event_execution_log_endpoint_boundary")
+        if isinstance(boundary_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_endpoint.runtime_execution_log_endpoint_handler import RuntimeExecutionLogEndpointBoundary
+            boundary_obj = RuntimeExecutionLogEndpointBoundary.from_dict(boundary_data)
+        else:
+            boundary_obj = boundary_data
+            
+        return cls(
+            receiver_id=data.get("receiver_id"),
+            runtime_event_execution_log_endpoint_boundary=boundary_obj,
+            receiver=RuntimeExecutionLogReceiver.from_dict(data.get("receiver", {})) if isinstance(data.get("receiver"), dict) else data.get("receiver"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

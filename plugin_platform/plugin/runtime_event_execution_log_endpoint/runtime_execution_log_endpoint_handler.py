@@ -23,5 +23,38 @@ class RuntimeExecutionLogEndpointBoundary:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogEndpointBoundary":
+        routing_data = data.get("runtime_event_execution_log_routing")
+        if isinstance(routing_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_routing.runtime_event_execution_log_routing import RuntimeEventExecutionLogRouting
+            routing_obj = RuntimeEventExecutionLogRouting.from_dict(routing_data)
+        else:
+            routing_obj = routing_data
+
+        endpoint_data = data.get("runtime_event_execution_log_endpoint")
+        if isinstance(endpoint_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_endpoint.runtime_execution_log_endpoint import RuntimeEventExecutionLogEndpoint
+            endpoint_obj = RuntimeEventExecutionLogEndpoint.from_dict(endpoint_data)
+        else:
+            endpoint_obj = endpoint_data
+
+        handler_data = data.get("runtime_event_execution_log_handler")
+        if isinstance(handler_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_endpoint.runtime_execution_log_handler import RuntimeEventExecutionLogHandler
+            handler_obj = RuntimeEventExecutionLogHandler.from_dict(handler_data)
+        else:
+            handler_obj = handler_data
+
+        return cls(
+            execution_boundary_id=data.get("execution_boundary_id"),
+            runtime_event_execution_log_routing=routing_obj,
+            runtime_event_execution_log_endpoint=endpoint_obj,
+            runtime_event_execution_log_handler=handler_obj,
+            boundary_state=data.get("boundary_state"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 # エイリアスの定義
 RuntimeExecutionLogEndpointHandler = RuntimeExecutionLogEndpointBoundary

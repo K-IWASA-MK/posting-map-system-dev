@@ -18,3 +18,22 @@ class RuntimeEventAudit:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventAudit":
+        snap_data = data.get("runtime_event_snapshot")
+        if isinstance(snap_data, dict):
+            from plugin_platform.plugin.runtime_event_snapshot.runtime_event_snapshot import RuntimeEventSnapshot
+            snap_obj = RuntimeEventSnapshot.from_dict(snap_data)
+        else:
+            snap_obj = snap_data
+            
+        return cls(
+            audit_id=data.get("audit_id"),
+            runtime_event_snapshot=snap_obj,
+            audit_type=data.get("audit_type"),
+            audit_data=data.get("audit_data", {}),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -16,3 +16,15 @@ class RuntimeExecutionLogIntentEdge:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogIntentEdge":
+        return cls(
+            edge_id=data.get("edge_id"),
+            source_node_id=data.get("source_node_id"),
+            target_node_id=data.get("target_node_id"),
+            dependency_type=data.get("dependency_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

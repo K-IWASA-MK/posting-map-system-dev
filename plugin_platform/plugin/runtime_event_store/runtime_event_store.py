@@ -16,3 +16,21 @@ class RuntimeEventStore:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventStore":
+        session_event_data = data.get("runtime_session_event")
+        if isinstance(session_event_data, dict):
+            from plugin_platform.plugin.runtime_session_event.runtime_session_event import RuntimeSessionEvent
+            session_event_obj = RuntimeSessionEvent.from_dict(session_event_data)
+        else:
+            session_event_obj = session_event_data
+            
+        return cls(
+            store_id=data.get("store_id"),
+            runtime_session_event=session_event_obj,
+            storage_type=data.get("storage_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -18,3 +18,22 @@ class RuntimeEventSnapshot:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventSnapshot":
+        replay_data = data.get("runtime_event_replay")
+        if isinstance(replay_data, dict):
+            from plugin_platform.plugin.runtime_event_replay.runtime_event_replay import RuntimeEventReplay
+            replay_obj = RuntimeEventReplay.from_dict(replay_data)
+        else:
+            replay_obj = replay_data
+            
+        return cls(
+            snapshot_id=data.get("snapshot_id"),
+            runtime_event_replay=replay_obj,
+            snapshot_type=data.get("snapshot_type"),
+            snapshot_data=data.get("snapshot_data", {}),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

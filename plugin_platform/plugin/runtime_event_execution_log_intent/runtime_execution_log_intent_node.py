@@ -16,3 +16,15 @@ class RuntimeExecutionLogIntentNode:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogIntentNode":
+        return cls(
+            node_id=data.get("node_id"),
+            node_type=data.get("node_type"),
+            action_name=data.get("action_name"),
+            node_state=data.get("node_state"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

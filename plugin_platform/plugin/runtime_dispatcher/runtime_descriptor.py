@@ -18,3 +18,16 @@ class RuntimeDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeDescriptor":
+        return cls(
+            runtime_id=data.get("runtime_id"),
+            runtime_type=data.get("runtime_type"),
+            version=data.get("version"),
+            capabilities=data.get("capabilities", []),
+            priority=data.get("priority"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

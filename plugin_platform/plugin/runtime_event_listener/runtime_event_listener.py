@@ -18,3 +18,22 @@ class RuntimeEventListener:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventListener":
+        gateway_data = data.get("runtime_event_gateway")
+        if isinstance(gateway_data, dict):
+            from plugin_platform.plugin.runtime_event_gateway.runtime_event_gateway import RuntimeEventGateway
+            gateway_obj = RuntimeEventGateway.from_dict(gateway_data)
+        else:
+            gateway_obj = gateway_data
+            
+        return cls(
+            listener_id=data.get("listener_id"),
+            runtime_event_gateway=gateway_obj,
+            listener_type=data.get("listener_type"),
+            listening_events=data.get("listening_events", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

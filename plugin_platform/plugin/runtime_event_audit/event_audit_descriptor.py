@@ -14,3 +14,14 @@ class EventAuditDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventAuditDescriptor":
+        return cls(
+            audit_id=data.get("audit_id"),
+            snapshot_id=data.get("snapshot_id"),
+            audit_type=data.get("audit_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

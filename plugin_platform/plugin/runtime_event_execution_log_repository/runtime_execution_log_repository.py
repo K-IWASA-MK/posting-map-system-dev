@@ -73,11 +73,18 @@ class RuntimeEventExecutionLogRepository:
 
     @classmethod
     def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogRepository":
+        registry_data = data.get("runtime_event_execution_log_registry")
+        if isinstance(registry_data, dict):
+            registry_obj = RuntimeEventExecutionLogRegistry.from_dict(registry_data)
+        else:
+            registry_obj = registry_data
+            
         return cls(
             repository_id=data.get("repository_id"),
-            runtime_event_execution_log_registry=data.get("runtime_event_execution_log_registry", {}),
+            runtime_event_execution_log_registry=registry_obj,
             repository=RuntimeExecutionLogRepository.from_dict(data.get("repository", {})) if isinstance(data.get("repository"), dict) else data.get("repository"),
             metadata=data.get("metadata", {}),
             trace_id=data.get("trace_id")
         )
+
 

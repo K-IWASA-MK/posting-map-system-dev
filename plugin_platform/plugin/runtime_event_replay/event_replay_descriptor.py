@@ -14,3 +14,14 @@ class EventReplayDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventReplayDescriptor":
+        return cls(
+            replay_id=data.get("replay_id"),
+            analysis_id=data.get("analysis_id"),
+            replay_type=data.get("replay_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

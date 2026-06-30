@@ -16,3 +16,22 @@ class RuntimeExecutionLogController:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogController":
+        runtime_data = data.get("runtime_execution_log_runtime")
+        if isinstance(runtime_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_runtime.runtime_execution_log_runtime import RuntimeExecutionLogRuntime
+            runtime_obj = RuntimeExecutionLogRuntime.from_dict(runtime_data)
+        else:
+            runtime_obj = runtime_data
+            
+        return cls(
+            controller_id=data.get("controller_id"),
+            runtime_execution_log_runtime=runtime_obj,
+            control_state=data.get("control_state"),
+            control_policy_map=data.get("control_policy_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

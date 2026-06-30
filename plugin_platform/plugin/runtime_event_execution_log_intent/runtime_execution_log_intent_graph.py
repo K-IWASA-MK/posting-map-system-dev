@@ -21,6 +21,27 @@ class RuntimeExecutionLogIntentGraph:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogIntentGraph":
+        from .runtime_execution_log_intent_node import RuntimeExecutionLogIntentNode
+        from .runtime_execution_log_intent_edge import RuntimeExecutionLogIntentEdge
+        
+        nodes_data = data.get("nodes", [])
+        nodes_list = [RuntimeExecutionLogIntentNode.from_dict(n) if isinstance(n, dict) else n for n in nodes_data]
+        
+        edges_data = data.get("edges", [])
+        edges_list = [RuntimeExecutionLogIntentEdge.from_dict(e) if isinstance(e, dict) else e for e in edges_data]
+        
+        return cls(
+            graph_id=data.get("graph_id"),
+            meaning_id=data.get("meaning_id"),
+            graph_state=data.get("graph_state"),
+            nodes=nodes_list,
+            edges=edges_list,
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogIntentGraph:
     def __init__(self, graph_id: str, runtime_event_execution_log_meaning: RuntimeEventExecutionLogMeaning, intent_graph: RuntimeExecutionLogIntentGraph, metadata: dict, trace_id: str):
         self.graph_id = graph_id
@@ -37,3 +58,21 @@ class RuntimeEventExecutionLogIntentGraph:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogIntentGraph":
+        meaning_data = data.get("runtime_event_execution_log_meaning")
+        if isinstance(meaning_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_meaning.runtime_event_execution_log_meaning import RuntimeEventExecutionLogMeaning
+            meaning_obj = RuntimeEventExecutionLogMeaning.from_dict(meaning_data)
+        else:
+            meaning_obj = meaning_data
+            
+        return cls(
+            graph_id=data.get("graph_id"),
+            runtime_event_execution_log_meaning=meaning_obj,
+            intent_graph=RuntimeExecutionLogIntentGraph.from_dict(data.get("intent_graph", {})) if isinstance(data.get("intent_graph"), dict) else data.get("intent_graph"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

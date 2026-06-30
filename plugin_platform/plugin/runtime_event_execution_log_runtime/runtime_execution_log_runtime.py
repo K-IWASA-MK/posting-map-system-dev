@@ -23,6 +23,19 @@ class RuntimeExecutionLogRuntime:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogRuntime":
+        return cls(
+            runtime_id=data.get("runtime_id"),
+            engine_id=data.get("engine_id"),
+            scheduler_id=data.get("scheduler_id"),
+            runtime_state=data.get("runtime_state"),
+            execution_cursor=data.get("execution_cursor"),
+            state_transition_map=data.get("state_transition_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogRuntime:
     def __init__(self, runtime_id: str, runtime_event_execution_log_engine: RuntimeEventExecutionLogExecutionEngine, runtime: RuntimeExecutionLogRuntime, metadata: dict, trace_id: str):
         self.runtime_id = runtime_id
@@ -39,3 +52,21 @@ class RuntimeEventExecutionLogRuntime:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogRuntime":
+        engine_data = data.get("runtime_event_execution_log_engine")
+        if isinstance(engine_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_engine.runtime_event_execution_log_engine import RuntimeEventExecutionLogExecutionEngine
+            engine_obj = RuntimeEventExecutionLogExecutionEngine.from_dict(engine_data)
+        else:
+            engine_obj = engine_data
+            
+        return cls(
+            runtime_id=data.get("runtime_id"),
+            runtime_event_execution_log_engine=engine_obj,
+            runtime=RuntimeExecutionLogRuntime.from_dict(data.get("runtime", {})) if isinstance(data.get("runtime"), dict) else data.get("runtime"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

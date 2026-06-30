@@ -18,3 +18,16 @@ class RuntimeRequest:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeRequest":
+        return cls(
+            request_id=data.get("request_id"),
+            plugin_id=data.get("plugin_id"),
+            version=data.get("version"),
+            parameters=data.get("parameters", {}),
+            execution_id=data.get("execution_id"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

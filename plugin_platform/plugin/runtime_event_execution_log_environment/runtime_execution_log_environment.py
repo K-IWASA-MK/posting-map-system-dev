@@ -73,11 +73,18 @@ class RuntimeEventExecutionLogEnvironment:
 
     @classmethod
     def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogEnvironment":
+        session_data = data.get("runtime_event_execution_log_session")
+        if isinstance(session_data, dict):
+            session_obj = RuntimeEventExecutionLogSession.from_dict(session_data)
+        else:
+            session_obj = session_data
+            
         return cls(
             environment_id=data.get("environment_id"),
-            runtime_event_execution_log_session=data.get("runtime_event_execution_log_session", {}),
+            runtime_event_execution_log_session=session_obj,
             environment=RuntimeExecutionLogEnvironment.from_dict(data.get("environment", {})) if isinstance(data.get("environment"), dict) else data.get("environment"),
             metadata=data.get("metadata", {}),
             trace_id=data.get("trace_id")
         )
+
 

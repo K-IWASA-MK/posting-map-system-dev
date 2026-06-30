@@ -16,3 +16,15 @@ class EventStoreDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventStoreDescriptor":
+        return cls(
+            store_id=data.get("store_id"),
+            event_id=data.get("event_id"),
+            session_id=data.get("session_id"),
+            lifecycle_id=data.get("lifecycle_id"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

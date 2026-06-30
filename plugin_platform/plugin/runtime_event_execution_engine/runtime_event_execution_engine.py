@@ -17,3 +17,22 @@ class RuntimeEventExecutionEngine:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionEngine":
+        result_data = data.get("runtime_event_pipeline_result")
+        if isinstance(result_data, dict):
+            # 後方互換性: もし RuntimeEventPipelineResult.from_dict が見つからない場合は、RuntimeEventPipelineResult 側をインポートして呼び出す
+            from plugin_platform.plugin.runtime_event_pipeline_integration.runtime_event_pipeline_result import RuntimeEventPipelineResult
+            result_obj = RuntimeEventPipelineResult.from_dict(result_data)
+        else:
+            result_obj = result_data
+            
+        return cls(
+            engine_id=data.get("engine_id"),
+            runtime_event_pipeline_result=result_obj,
+            execution_plan=RuntimeEventExecutionPlan.from_dict(data.get("execution_plan", {})) if isinstance(data.get("execution_plan"), dict) else data.get("execution_plan"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

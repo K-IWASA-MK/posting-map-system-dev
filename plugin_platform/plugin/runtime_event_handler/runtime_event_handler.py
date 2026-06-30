@@ -18,3 +18,22 @@ class RuntimeEventHandler:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventHandler":
+        endpoint_data = data.get("runtime_event_endpoint")
+        if isinstance(endpoint_data, dict):
+            from plugin_platform.plugin.runtime_event_endpoint.runtime_event_endpoint import RuntimeEventEndpoint
+            endpoint_obj = RuntimeEventEndpoint.from_dict(endpoint_data)
+        else:
+            endpoint_obj = endpoint_data
+            
+        return cls(
+            handler_id=data.get("handler_id"),
+            runtime_event_endpoint=endpoint_obj,
+            handler_type=data.get("handler_type"),
+            handler_actions=data.get("handler_actions", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

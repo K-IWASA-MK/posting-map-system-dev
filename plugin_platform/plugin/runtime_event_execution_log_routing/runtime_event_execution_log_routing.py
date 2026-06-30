@@ -17,3 +17,21 @@ class RuntimeEventExecutionLogRouting:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogRouting":
+        dispatcher_data = data.get("runtime_event_execution_log_dispatcher")
+        if isinstance(dispatcher_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_dispatcher.runtime_execution_log_dispatcher import RuntimeEventExecutionLogDispatcher
+            dispatcher_obj = RuntimeEventExecutionLogDispatcher.from_dict(dispatcher_data)
+        else:
+            dispatcher_obj = dispatcher_data
+            
+        return cls(
+            routing_id=data.get("routing_id"),
+            runtime_event_execution_log_dispatcher=dispatcher_obj,
+            routing=RuntimeExecutionLogRouting.from_dict(data.get("routing", {})) if isinstance(data.get("routing"), dict) else data.get("routing"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -70,11 +70,18 @@ class RuntimeEventExecutionLogInstance:
 
     @classmethod
     def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogInstance":
+        provider_data = data.get("runtime_event_execution_log_provider")
+        if isinstance(provider_data, dict):
+            provider_obj = RuntimeEventExecutionLogProvider.from_dict(provider_data)
+        else:
+            provider_obj = provider_data
+            
         return cls(
             instance_id=data.get("instance_id"),
-            runtime_event_execution_log_provider=data.get("runtime_event_execution_log_provider", {}),
+            runtime_event_execution_log_provider=provider_obj,
             instance=RuntimeExecutionLogInstance.from_dict(data.get("instance", {})) if isinstance(data.get("instance"), dict) else data.get("instance"),
             metadata=data.get("metadata", {}),
             trace_id=data.get("trace_id")
         )
+
 

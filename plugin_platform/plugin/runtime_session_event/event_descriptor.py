@@ -14,3 +14,14 @@ class EventDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventDescriptor":
+        return cls(
+            event_id=data.get("event_id"),
+            lifecycle_id=data.get("lifecycle_id"),
+            event_type=data.get("event_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

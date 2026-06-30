@@ -14,3 +14,14 @@ class EventEndpointDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventEndpointDescriptor":
+        return cls(
+            endpoint_id=data.get("endpoint_id"),
+            router_id=data.get("router_id"),
+            endpoint_type=data.get("endpoint_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -16,3 +16,15 @@ class RuntimeInstance:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeInstance":
+        return cls(
+            instance_id=data.get("instance_id"),
+            runtime_id=data.get("runtime_id"),
+            status=data.get("status"),
+            configuration=data.get("configuration", {}),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

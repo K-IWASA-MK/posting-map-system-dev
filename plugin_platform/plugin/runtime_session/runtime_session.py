@@ -18,3 +18,22 @@ class RuntimeSession:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeSession":
+        instance_data = data.get("runtime_instance")
+        if isinstance(instance_data, dict):
+            from plugin_platform.plugin.runtime_factory.runtime_instance import RuntimeInstance
+            instance_obj = RuntimeInstance.from_dict(instance_data)
+        else:
+            instance_obj = instance_data
+            
+        return cls(
+            session_id=data.get("session_id"),
+            runtime_instance=instance_obj,
+            state=data.get("state"),
+            configuration=data.get("configuration", {}),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

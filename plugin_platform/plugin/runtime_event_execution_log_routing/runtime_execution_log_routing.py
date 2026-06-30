@@ -16,3 +16,15 @@ class RuntimeExecutionLogRouting:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogRouting":
+        return cls(
+            routing_id=data.get("routing_id"),
+            dispatch_id=data.get("dispatch_id"),
+            routing_state=data.get("routing_state"),
+            routing_map=data.get("routing_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

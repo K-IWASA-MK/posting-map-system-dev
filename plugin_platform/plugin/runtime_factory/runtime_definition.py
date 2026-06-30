@@ -18,3 +18,16 @@ class RuntimeDefinition:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeDefinition":
+        return cls(
+            runtime_id=data.get("runtime_id"),
+            runtime_type=data.get("runtime_type"),
+            version=data.get("version"),
+            implementation=data.get("implementation"),
+            capabilities=data.get("capabilities", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -28,3 +28,17 @@ class RuntimeExecutionLogExecutor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogExecutor":
+        return cls(
+            executor_id=data.get("executor_id"),
+            controller_id=data.get("controller_id"),
+            lifecycle_state=data.get("lifecycle_state"),
+            execution_cursor=data.get("execution_cursor"),
+            lifecycle_map=data.get("lifecycle_map", []),
+            state_transition_map=data.get("state_transition_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

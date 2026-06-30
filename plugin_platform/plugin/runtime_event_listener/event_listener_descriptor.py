@@ -16,3 +16,15 @@ class EventListenerDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventListenerDescriptor":
+        return cls(
+            listener_id=data.get("listener_id"),
+            gateway_id=data.get("gateway_id"),
+            plugin_id=data.get("plugin_id"),
+            listener_type=data.get("listener_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

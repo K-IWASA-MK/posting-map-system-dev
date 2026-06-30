@@ -17,3 +17,20 @@ class RuntimeEventExecutionPipelineExecution:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionPipelineExecution":
+        run_data = data.get("runtime_event_execution_pipeline_run")
+        if isinstance(run_data, dict):
+            run_obj = RuntimeEventExecutionPipelineRun.from_dict(run_data)
+        else:
+            run_obj = run_data
+            
+        return cls(
+            pipeline_execution_id=data.get("pipeline_execution_id"),
+            runtime_event_execution_pipeline_run=run_obj,
+            pipeline_execution=RuntimeEventPipelineExecution.from_dict(data.get("pipeline_execution", {})) if isinstance(data.get("pipeline_execution"), dict) else data.get("pipeline_execution"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

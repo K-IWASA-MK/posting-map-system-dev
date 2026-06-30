@@ -16,3 +16,15 @@ class RuntimeResponse:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeResponse":
+        return cls(
+            request_id=data.get("request_id"),
+            plugin_id=data.get("plugin_id"),
+            status=data.get("status"),
+            output=data.get("output", {}),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

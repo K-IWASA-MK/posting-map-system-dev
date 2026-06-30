@@ -18,3 +18,22 @@ class RuntimeEventQuery:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventQuery":
+        store_data = data.get("runtime_event_store")
+        if isinstance(store_data, dict):
+            from plugin_platform.plugin.runtime_event_store.runtime_event_store import RuntimeEventStore
+            store_obj = RuntimeEventStore.from_dict(store_data)
+        else:
+            store_obj = store_data
+            
+        return cls(
+            query_id=data.get("query_id"),
+            runtime_event_store=store_obj,
+            query_type=data.get("query_type"),
+            result=data.get("result", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

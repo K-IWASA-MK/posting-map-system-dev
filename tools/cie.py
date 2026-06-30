@@ -8182,7 +8182,8 @@ def run_audit_foundation(args):
             DTOAudit,
             ManagerAudit,
             CLIAudit,
-            RuntimeFoundationAudit
+            RuntimeFoundationAudit,
+            SerializationAudit
         )
     except ImportError as e:
         print(f"Error: Failed to import audit modules: {e}", file=sys.stderr)
@@ -8197,12 +8198,14 @@ def run_audit_foundation(args):
     manager_auditor = ManagerAudit(plugin_dir)
     cli_auditor = CLIAudit(cli_filepath)
     rf_auditor = RuntimeFoundationAudit(plugin_dir)
+    serialization_auditor = SerializationAudit(plugin_dir)
     
     arch_res = arch_auditor.run_audit()
     dto_res = dto_auditor.run_audit()
     manager_res = manager_auditor.run_audit()
     cli_res = cli_auditor.run_audit()
     rf_res = rf_auditor.run_audit()
+    serialization_res = serialization_auditor.run_audit()
     
     # No Context Leak 監査の結果は rf_res に含まれているため、抽出する
     # rf_res 内で "No Context Leak violation" というエラーメッセージがあるかどうかで判定
@@ -8220,11 +8223,14 @@ def run_audit_foundation(args):
         manager_res["status"] == "PASS" and
         cli_res["status"] == "PASS" and
         rf_res["status"] == "PASS" and
-        no_context_leak_status == "PASS"
+        no_context_leak_status == "PASS" and
+        serialization_res["status"] == "PASS"
     )
     
     overall_status = "PASS" if all_passed else "FAIL"
     health_status = "GOOD" if all_passed else "POOR"
+    
+    serialization_summary_str = f"{serialization_res['status']} Checked DTO : {serialization_res['checked_dto_count']} Failed : {serialization_res['failed_dto_count']}"
     
     summary = {
         "architecture": arch_res["status"],
@@ -8233,6 +8239,7 @@ def run_audit_foundation(args):
         "cli": cli_res["status"],
         "runtime_foundation": rf_res["status"],
         "no_context_leak": no_context_leak_status,
+        "serialization": serialization_summary_str,
         "overall": overall_status,
         "health": health_status,
         "platform_version": "Phase90"
@@ -8253,7 +8260,8 @@ def run_audit_foundation(args):
             "no_context_leak": {
                 "status": no_context_leak_status,
                 "errors": no_context_leak_errors
-            }
+            },
+            "serialization": serialization_res
         }
     }
     
@@ -8267,6 +8275,7 @@ def run_audit_foundation(args):
     print(f"CLI Audit              : {summary['cli']}")
     print(f"Runtime Foundation Audit: {summary['runtime_foundation']}")
     print(f"No Context Leak Audit  : {summary['no_context_leak']}")
+    print(f"Serialization Audit    : {summary['serialization']}")
     print("------------------------------------------")
     print(f"Overall Result         : {summary['overall']}")
     print(f"Health Status          : {summary['health']}")
@@ -8274,7 +8283,7 @@ def run_audit_foundation(args):
     
     if not all_passed:
         print("Audit Errors Detected:", file=sys.stderr)
-        for res_name, res in [("Architecture", arch_res), ("DTO", dto_res), ("Manager", manager_res), ("CLI", cli_res), ("Runtime Foundation", rf_res), ("No Context Leak", {"errors": no_context_leak_errors})]:
+        for res_name, res in [("Architecture", arch_res), ("DTO", dto_res), ("Manager", manager_res), ("CLI", cli_res), ("Runtime Foundation", rf_res), ("No Context Leak", {"errors": no_context_leak_errors}), ("Serialization", serialization_res)]:
             if res.get("errors"):
                 print(f"\n[{res_name} Errors]:", file=sys.stderr)
                 for err in res["errors"]:

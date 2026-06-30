@@ -18,3 +18,22 @@ class RuntimeEventReceiver:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventReceiver":
+        handler_data = data.get("runtime_event_handler")
+        if isinstance(handler_data, dict):
+            from plugin_platform.plugin.runtime_event_handler.runtime_event_handler import RuntimeEventHandler
+            handler_obj = RuntimeEventHandler.from_dict(handler_data)
+        else:
+            handler_obj = handler_data
+            
+        return cls(
+            receiver_id=data.get("receiver_id"),
+            runtime_event_handler=handler_obj,
+            receiver_type=data.get("receiver_type"),
+            received_events=data.get("received_events", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -16,3 +16,15 @@ class RuntimeEventPipelineRun:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventPipelineRun":
+        return cls(
+            pipeline_run_execution_id=data.get("pipeline_run_execution_id"),
+            execution_flow_id=data.get("execution_flow_id"),
+            run_state=data.get("run_state"),
+            run_sequence=data.get("run_sequence", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

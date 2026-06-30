@@ -33,6 +33,19 @@ class RuntimeExecutionLogAdapter:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogAdapter":
+        return cls(
+            adapter_id=data.get("adapter_id"),
+            dispatch_id=data.get("dispatch_id"),
+            runtime_type=data.get("runtime_type"),
+            adapter_state=data.get("adapter_state"),
+            adapter_version=data.get("adapter_version"),
+            adapter_map=data.get("adapter_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogAdapter:
     def __init__(self, adapter_id: str, runtime_event_execution_log_dispatch: RuntimeEventExecutionLogDispatch, adapter: RuntimeExecutionLogAdapter, metadata: dict, trace_id: str):
         self.adapter_id = adapter_id
@@ -49,3 +62,21 @@ class RuntimeEventExecutionLogAdapter:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogAdapter":
+        dispatch_data = data.get("runtime_event_execution_log_dispatch")
+        if isinstance(dispatch_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_dispatch.runtime_execution_log_dispatch import RuntimeEventExecutionLogDispatch
+            dispatch_obj = RuntimeEventExecutionLogDispatch.from_dict(dispatch_data)
+        else:
+            dispatch_obj = dispatch_data
+            
+        return cls(
+            adapter_id=data.get("adapter_id"),
+            runtime_event_execution_log_dispatch=dispatch_obj,
+            adapter=RuntimeExecutionLogAdapter.from_dict(data.get("adapter", {})) if isinstance(data.get("adapter"), dict) else data.get("adapter"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

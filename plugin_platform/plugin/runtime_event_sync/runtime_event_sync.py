@@ -18,3 +18,22 @@ class RuntimeEventSync:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventSync":
+        persist_data = data.get("runtime_event_persistence")
+        if isinstance(persist_data, dict):
+            from plugin_platform.plugin.runtime_event_persistence.runtime_event_persistence import RuntimeEventPersistence
+            persist_obj = RuntimeEventPersistence.from_dict(persist_data)
+        else:
+            persist_obj = persist_data
+            
+        return cls(
+            sync_id=data.get("sync_id"),
+            runtime_event_persistence=persist_obj,
+            sync_type=data.get("sync_type"),
+            sync_data=data.get("sync_data", {}),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

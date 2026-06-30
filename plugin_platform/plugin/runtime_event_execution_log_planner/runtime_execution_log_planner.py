@@ -16,3 +16,15 @@ class RuntimeExecutionLogPlanner:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogPlanner":
+        return cls(
+            plan_id=data.get("plan_id"),
+            intent_graph_id=data.get("intent_graph_id"),
+            planner_state=data.get("planner_state"),
+            optimization_rules=data.get("optimization_rules", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

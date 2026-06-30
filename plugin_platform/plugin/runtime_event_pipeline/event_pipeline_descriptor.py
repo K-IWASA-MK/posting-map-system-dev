@@ -14,3 +14,14 @@ class EventPipelineDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventPipelineDescriptor":
+        return cls(
+            pipeline_id=data.get("pipeline_id"),
+            sync_id=data.get("sync_id"),
+            pipeline_type=data.get("pipeline_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -16,3 +16,15 @@ class RuntimeEventExecutionFlow:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionFlow":
+        return cls(
+            execution_flow_id=data.get("execution_flow_id"),
+            execution_plan_id=data.get("execution_plan_id"),
+            execution_state=data.get("execution_state"),
+            execution_sequence=data.get("execution_sequence", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

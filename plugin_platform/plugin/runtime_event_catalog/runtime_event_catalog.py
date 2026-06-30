@@ -18,3 +18,22 @@ class RuntimeEventCatalog:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventCatalog":
+        index_data = data.get("runtime_event_index")
+        if isinstance(index_data, dict):
+            from plugin_platform.plugin.runtime_event_index.runtime_event_index import RuntimeEventIndex
+            index_obj = RuntimeEventIndex.from_dict(index_data)
+        else:
+            index_obj = index_data
+            
+        return cls(
+            catalog_id=data.get("catalog_id"),
+            runtime_event_index=index_obj,
+            catalog_type=data.get("catalog_type"),
+            entries=data.get("entries", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

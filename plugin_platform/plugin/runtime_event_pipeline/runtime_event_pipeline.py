@@ -18,3 +18,22 @@ class RuntimeEventPipeline:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventPipeline":
+        sync_data = data.get("runtime_event_sync")
+        if isinstance(sync_data, dict):
+            from plugin_platform.plugin.runtime_event_sync.runtime_event_sync import RuntimeEventSync
+            sync_obj = RuntimeEventSync.from_dict(sync_data)
+        else:
+            sync_obj = sync_data
+            
+        return cls(
+            pipeline_id=data.get("pipeline_id"),
+            runtime_event_sync=sync_obj,
+            pipeline_type=data.get("pipeline_type"),
+            pipeline_steps=data.get("pipeline_steps", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

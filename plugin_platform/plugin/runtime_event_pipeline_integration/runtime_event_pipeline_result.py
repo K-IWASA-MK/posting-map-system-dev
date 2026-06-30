@@ -16,3 +16,15 @@ class RuntimeEventPipelineResult:
             "validation_result": self.validation_result,
             "metadata": self.metadata
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventPipelineResult":
+        return cls(
+            pipeline_run_id=data.get("pipeline_run_id"),
+            trace_id=data.get("trace_id"),
+            runtime_session_event_id=data.get("runtime_session_event_id"),
+            generated_ids=data.get("generated_ids", {}),
+            validation_result=data.get("validation_result", {}),
+            metadata=data.get("metadata", {})
+        )
+

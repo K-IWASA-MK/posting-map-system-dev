@@ -18,3 +18,22 @@ class RuntimeEventIndex:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventIndex":
+        query_data = data.get("runtime_event_query")
+        if isinstance(query_data, dict):
+            from plugin_platform.plugin.runtime_event_query.runtime_event_query import RuntimeEventQuery
+            query_obj = RuntimeEventQuery.from_dict(query_data)
+        else:
+            query_obj = query_data
+            
+        return cls(
+            index_id=data.get("index_id"),
+            runtime_event_query=query_obj,
+            index_type=data.get("index_type"),
+            entries=data.get("entries", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -14,3 +14,14 @@ class EventPersistenceDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventPersistenceDescriptor":
+        return cls(
+            persistence_id=data.get("persistence_id"),
+            audit_id=data.get("audit_id"),
+            persistence_type=data.get("persistence_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

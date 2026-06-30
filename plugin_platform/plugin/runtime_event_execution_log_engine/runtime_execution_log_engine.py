@@ -18,3 +18,16 @@ class RuntimeExecutionLogEngine:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogEngine":
+        return cls(
+            engine_id=data.get("engine_id"),
+            execution_plan_id=data.get("execution_plan_id"),
+            optimizer_id=data.get("optimizer_id"),
+            engine_state=data.get("engine_state"),
+            schedule_map=data.get("schedule_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

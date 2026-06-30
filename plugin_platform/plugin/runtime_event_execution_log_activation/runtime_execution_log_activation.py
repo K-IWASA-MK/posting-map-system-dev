@@ -28,6 +28,18 @@ class RuntimeExecutionLogActivation:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogActivation":
+        return cls(
+            activation_id=data.get("activation_id"),
+            executor_id=data.get("executor_id"),
+            activation_state=data.get("activation_state"),
+            activation_trigger=data.get("activation_trigger"),
+            activation_map=data.get("activation_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogActivation:
     def __init__(self, activation_id: str, runtime_event_execution_log_executor: RuntimeEventExecutionLogExecutor, activation: RuntimeExecutionLogActivation, metadata: dict, trace_id: str):
         self.activation_id = activation_id
@@ -44,3 +56,21 @@ class RuntimeEventExecutionLogActivation:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogActivation":
+        exec_data = data.get("runtime_event_execution_log_executor")
+        if isinstance(exec_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_executor.runtime_event_execution_log_executor import RuntimeEventExecutionLogExecutor
+            exec_obj = RuntimeEventExecutionLogExecutor.from_dict(exec_data)
+        else:
+            exec_obj = exec_data
+            
+        return cls(
+            activation_id=data.get("activation_id"),
+            runtime_event_execution_log_executor=exec_obj,
+            activation=RuntimeExecutionLogActivation.from_dict(data.get("activation", {})) if isinstance(data.get("activation"), dict) else data.get("activation"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

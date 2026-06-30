@@ -15,6 +15,16 @@ class RuntimeContext:
             "metadata": self.metadata
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeContext":
+        return cls(
+            runtime_id=data.get("runtime_id"),
+            configuration=data.get("configuration", {}),
+            environment=data.get("environment"),
+            variables=data.get("variables", {}),
+            metadata=data.get("metadata", {})
+        )
+
 class RuntimeRuntime:
     """
     RuntimeRuntime
@@ -35,4 +45,15 @@ class RuntimeRuntime:
             "variables": self.variables,
             "metadata": self.metadata
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeRuntime":
+        return cls(
+            runtime_id=data.get("runtime_id"),
+            configuration=data.get("configuration", {}),
+            environment=data.get("environment"),
+            variables=data.get("variables", {}),
+            metadata=data.get("metadata", {})
+        )
+
 

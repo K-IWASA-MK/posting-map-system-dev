@@ -16,3 +16,15 @@ class RuntimeExecutionLogScheduler:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogScheduler":
+        return cls(
+            scheduler_id=data.get("scheduler_id"),
+            engine_id=data.get("engine_id"),
+            execution_batches=data.get("execution_batches", []),
+            scheduler_state=data.get("scheduler_state"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

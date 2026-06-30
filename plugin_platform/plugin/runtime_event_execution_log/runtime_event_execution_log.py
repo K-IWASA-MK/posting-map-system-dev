@@ -17,3 +17,20 @@ class RuntimeEventExecutionLog:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLog":
+        pipe_exec_data = data.get("runtime_event_execution_pipeline_execution")
+        if isinstance(pipe_exec_data, dict):
+            pipe_exec_obj = RuntimeEventExecutionPipelineExecution.from_dict(pipe_exec_data)
+        else:
+            pipe_exec_obj = pipe_exec_data
+            
+        return cls(
+            execution_log_id=data.get("execution_log_id"),
+            runtime_event_execution_pipeline_execution=pipe_exec_obj,
+            execution_log=RuntimeExecutionLog.from_dict(data.get("execution_log", {})) if isinstance(data.get("execution_log"), dict) else data.get("execution_log"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

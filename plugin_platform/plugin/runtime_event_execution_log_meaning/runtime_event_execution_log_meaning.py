@@ -17,3 +17,21 @@ class RuntimeEventExecutionLogMeaning:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogMeaning":
+        receiver_router_data = data.get("runtime_event_execution_log_receiver_router")
+        if isinstance(receiver_router_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_receiver.runtime_execution_log_receiver_context import RuntimeExecutionLogReceiverContext
+            receiver_router_obj = RuntimeExecutionLogReceiverContext.from_dict(receiver_router_data)
+        else:
+            receiver_router_obj = receiver_router_data
+            
+        return cls(
+            meaning_id=data.get("meaning_id"),
+            runtime_event_execution_log_receiver_router=receiver_router_obj,
+            meaning=RuntimeExecutionLogMeaning.from_dict(data.get("meaning", {})) if isinstance(data.get("meaning"), dict) else data.get("meaning"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -18,3 +18,16 @@ class RuntimeExecutionLogOptimizer:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogOptimizer":
+        return cls(
+            optimizer_id=data.get("optimizer_id"),
+            plan_id=data.get("plan_id"),
+            cost_model=data.get("cost_model", {}),
+            priority_score=data.get("priority_score", {}),
+            optimization_state=data.get("optimization_state"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

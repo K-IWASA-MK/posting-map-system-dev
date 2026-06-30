@@ -14,3 +14,14 @@ class EventRouterDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventRouterDescriptor":
+        return cls(
+            router_id=data.get("router_id"),
+            dispatcher_id=data.get("dispatcher_id"),
+            router_type=data.get("router_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -16,3 +16,21 @@ class RuntimeSessionLifecycle:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeSessionLifecycle":
+        session_data = data.get("runtime_session")
+        if isinstance(session_data, dict):
+            from plugin_platform.plugin.runtime_session.runtime_session import RuntimeSession
+            session_obj = RuntimeSession.from_dict(session_data)
+        else:
+            session_obj = session_data
+            
+        return cls(
+            lifecycle_id=data.get("lifecycle_id"),
+            runtime_session=session_obj,
+            state=data.get("state"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

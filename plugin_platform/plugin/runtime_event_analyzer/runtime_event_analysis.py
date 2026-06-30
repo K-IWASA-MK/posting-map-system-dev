@@ -18,3 +18,22 @@ class RuntimeEventAnalysis:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventAnalysis":
+        meta_data = data.get("runtime_event_metadata")
+        if isinstance(meta_data, dict):
+            from plugin_platform.plugin.runtime_event_metadata.runtime_event_metadata import RuntimeEventMetadata
+            meta_obj = RuntimeEventMetadata.from_dict(meta_data)
+        else:
+            meta_obj = meta_data
+            
+        return cls(
+            analysis_id=data.get("analysis_id"),
+            runtime_event_metadata=meta_obj,
+            analysis_type=data.get("analysis_type"),
+            result=data.get("result", {}),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

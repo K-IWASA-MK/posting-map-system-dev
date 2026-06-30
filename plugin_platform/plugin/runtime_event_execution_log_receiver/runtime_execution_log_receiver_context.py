@@ -22,3 +22,37 @@ class RuntimeExecutionLogReceiverContext:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogReceiverContext":
+        boundary_data = data.get("runtime_event_execution_log_endpoint_boundary")
+        if isinstance(boundary_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_endpoint.runtime_execution_log_endpoint_handler import RuntimeExecutionLogEndpointBoundary
+            boundary_obj = RuntimeExecutionLogEndpointBoundary.from_dict(boundary_data)
+        else:
+            boundary_obj = boundary_data
+            
+        receiver_data = data.get("runtime_event_execution_log_receiver")
+        if isinstance(receiver_data, dict):
+            from .runtime_execution_log_receiver import RuntimeEventExecutionLogReceiver
+            receiver_obj = RuntimeEventExecutionLogReceiver.from_dict(receiver_data)
+        else:
+            receiver_obj = receiver_data
+            
+        router_data = data.get("runtime_event_execution_log_router")
+        if isinstance(router_data, dict):
+            from .runtime_execution_log_router import RuntimeEventExecutionLogRouter
+            router_obj = RuntimeEventExecutionLogRouter.from_dict(router_data)
+        else:
+            router_obj = router_data
+            
+        return cls(
+            receiver_context_id=data.get("receiver_context_id"),
+            runtime_event_execution_log_endpoint_boundary=boundary_obj,
+            runtime_event_execution_log_receiver=receiver_obj,
+            runtime_event_execution_log_router=router_obj,
+            interpretation_state=data.get("interpretation_state"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

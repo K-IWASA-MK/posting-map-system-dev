@@ -35,6 +35,20 @@ class RuntimeExecutionLogBridge:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogBridge":
+        return cls(
+            bridge_id=data.get("bridge_id"),
+            adapter_id=data.get("adapter_id"),
+            runtime_type=data.get("runtime_type"),
+            bridge_target=data.get("bridge_target"),
+            bridge_state=data.get("bridge_state"),
+            bridge_version=data.get("bridge_version"),
+            bridge_map=data.get("bridge_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogBridge:
     def __init__(self, bridge_id: str, runtime_event_execution_log_adapter: RuntimeEventExecutionLogAdapter, bridge: RuntimeExecutionLogBridge, metadata: dict, trace_id: str):
         self.bridge_id = bridge_id
@@ -51,3 +65,21 @@ class RuntimeEventExecutionLogBridge:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogBridge":
+        adapter_data = data.get("runtime_event_execution_log_adapter")
+        if isinstance(adapter_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_adapter.runtime_execution_log_adapter import RuntimeEventExecutionLogAdapter
+            adapter_obj = RuntimeEventExecutionLogAdapter.from_dict(adapter_data)
+        else:
+            adapter_obj = adapter_data
+            
+        return cls(
+            bridge_id=data.get("bridge_id"),
+            runtime_event_execution_log_adapter=adapter_obj,
+            bridge=RuntimeExecutionLogBridge.from_dict(data.get("bridge", {})) if isinstance(data.get("bridge"), dict) else data.get("bridge"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

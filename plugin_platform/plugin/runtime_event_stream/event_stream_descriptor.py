@@ -14,3 +14,14 @@ class EventStreamDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventStreamDescriptor":
+        return cls(
+            stream_id=data.get("stream_id"),
+            pipeline_id=data.get("pipeline_id"),
+            stream_type=data.get("stream_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

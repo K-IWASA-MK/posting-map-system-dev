@@ -20,3 +20,22 @@ class RuntimeEventExecutionLogExecutionEngine:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogExecutionEngine":
+        plan_data = data.get("runtime_event_execution_log_execution_plan")
+        if isinstance(plan_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_planner.runtime_execution_log_execution_plan import RuntimeEventExecutionLogExecutionPlan
+            plan_obj = RuntimeEventExecutionLogExecutionPlan.from_dict(plan_data)
+        else:
+            plan_obj = plan_data
+            
+        return cls(
+            engine_id=data.get("engine_id"),
+            runtime_event_execution_log_execution_plan=plan_obj,
+            engine=RuntimeExecutionLogEngine.from_dict(data.get("engine", {})) if isinstance(data.get("engine"), dict) else data.get("engine"),
+            scheduler=RuntimeExecutionLogScheduler.from_dict(data.get("scheduler", {})) if isinstance(data.get("scheduler"), dict) else data.get("scheduler"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

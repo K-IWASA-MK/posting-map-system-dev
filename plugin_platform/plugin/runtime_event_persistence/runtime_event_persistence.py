@@ -18,3 +18,22 @@ class RuntimeEventPersistence:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventPersistence":
+        audit_data = data.get("runtime_event_audit")
+        if isinstance(audit_data, dict):
+            from plugin_platform.plugin.runtime_event_audit.runtime_event_audit import RuntimeEventAudit
+            audit_obj = RuntimeEventAudit.from_dict(audit_data)
+        else:
+            audit_obj = audit_data
+            
+        return cls(
+            persistence_id=data.get("persistence_id"),
+            runtime_event_audit=audit_obj,
+            persistence_type=data.get("persistence_type"),
+            persistence_data=data.get("persistence_data", {}),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

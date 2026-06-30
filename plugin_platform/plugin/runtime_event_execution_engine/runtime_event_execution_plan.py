@@ -16,3 +16,15 @@ class RuntimeEventExecutionPlan:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionPlan":
+        return cls(
+            execution_plan_id=data.get("execution_plan_id"),
+            pipeline_run_id=data.get("pipeline_run_id"),
+            execution_state=data.get("execution_state"),
+            execution_steps=data.get("execution_steps", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

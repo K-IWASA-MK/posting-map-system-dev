@@ -10,6 +10,7 @@
     "cli": "PASS",
     "runtime_foundation": "PASS",
     "no_context_leak": "PASS",
+    "serialization": "PASS Checked DTO : 34 Failed : 0",
     "overall": "PASS",
     "health": "GOOD",
     "platform_version": "Phase90"
@@ -281,6 +282,12 @@
     "no_context_leak": {
       "status": "PASS",
       "errors": []
+    },
+    "serialization": {
+      "status": "PASS",
+      "errors": [],
+      "checked_dto_count": 34,
+      "failed_dto_count": 0
     }
   }
 }

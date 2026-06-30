@@ -16,3 +16,15 @@ class LifecycleDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "LifecycleDescriptor":
+        return cls(
+            lifecycle_id=data.get("lifecycle_id"),
+            session_id=data.get("session_id"),
+            current_state=data.get("current_state"),
+            allowed_states=data.get("allowed_states", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

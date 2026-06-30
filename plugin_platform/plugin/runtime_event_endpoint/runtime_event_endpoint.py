@@ -18,3 +18,22 @@ class RuntimeEventEndpoint:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventEndpoint":
+        router_data = data.get("runtime_event_router")
+        if isinstance(router_data, dict):
+            from plugin_platform.plugin.runtime_event_router.runtime_event_router import RuntimeEventRouter
+            router_obj = RuntimeEventRouter.from_dict(router_data)
+        else:
+            router_obj = router_data
+            
+        return cls(
+            endpoint_id=data.get("endpoint_id"),
+            runtime_event_router=router_obj,
+            endpoint_type=data.get("endpoint_type"),
+            endpoint_targets=data.get("endpoint_targets", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

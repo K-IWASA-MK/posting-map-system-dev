@@ -14,3 +14,14 @@ class EventQueryDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventQueryDescriptor":
+        return cls(
+            query_id=data.get("query_id"),
+            store_id=data.get("store_id"),
+            query_type=data.get("query_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

@@ -72,11 +72,18 @@ class RuntimeEventExecutionLogWorkspace:
 
     @classmethod
     def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogWorkspace":
+        env_data = data.get("runtime_event_execution_log_environment")
+        if isinstance(env_data, dict):
+            env_obj = RuntimeEventExecutionLogEnvironment.from_dict(env_data)
+        else:
+            env_obj = env_data
+            
         return cls(
             workspace_id=data.get("workspace_id"),
-            runtime_event_execution_log_environment=data.get("runtime_event_execution_log_environment", {}),
+            runtime_event_execution_log_environment=env_obj,
             workspace=RuntimeExecutionLogWorkspace.from_dict(data.get("workspace", {})) if isinstance(data.get("workspace"), dict) else data.get("workspace"),
             metadata=data.get("metadata", {}),
             trace_id=data.get("trace_id")
         )
+
 

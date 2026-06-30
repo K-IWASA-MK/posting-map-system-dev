@@ -19,6 +19,17 @@ class RuntimeExecutionLogEndpoint:
             "trace_id": self.trace_id
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogEndpoint":
+        return cls(
+            endpoint_id=data.get("endpoint_id"),
+            routing_id=data.get("routing_id"),
+            endpoint_state=data.get("endpoint_state"),
+            endpoint_map=data.get("endpoint_map", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
 class RuntimeEventExecutionLogEndpoint:
     def __init__(self, endpoint_id: str, runtime_event_execution_log_routing: RuntimeEventExecutionLogRouting, endpoint: RuntimeExecutionLogEndpoint, metadata: dict, trace_id: str):
         self.endpoint_id = endpoint_id
@@ -35,3 +46,21 @@ class RuntimeEventExecutionLogEndpoint:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventExecutionLogEndpoint":
+        routing_data = data.get("runtime_event_execution_log_routing")
+        if isinstance(routing_data, dict):
+            from plugin_platform.plugin.runtime_event_execution_log_routing.runtime_execution_log_routing import RuntimeEventExecutionLogRouting
+            routing_obj = RuntimeEventExecutionLogRouting.from_dict(routing_data)
+        else:
+            routing_obj = routing_data
+            
+        return cls(
+            endpoint_id=data.get("endpoint_id"),
+            runtime_event_execution_log_routing=routing_obj,
+            endpoint=RuntimeExecutionLogEndpoint.from_dict(data.get("endpoint", {})) if isinstance(data.get("endpoint"), dict) else data.get("endpoint"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

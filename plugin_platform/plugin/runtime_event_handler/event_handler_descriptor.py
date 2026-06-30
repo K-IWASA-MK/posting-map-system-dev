@@ -14,3 +14,14 @@ class EventHandlerDescriptor:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "EventHandlerDescriptor":
+        return cls(
+            handler_id=data.get("handler_id"),
+            endpoint_id=data.get("endpoint_id"),
+            handler_type=data.get("handler_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

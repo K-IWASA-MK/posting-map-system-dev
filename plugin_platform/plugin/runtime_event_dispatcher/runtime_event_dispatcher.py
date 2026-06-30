@@ -18,3 +18,22 @@ class RuntimeEventDispatcher:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeEventDispatcher":
+        stream_data = data.get("runtime_event_stream")
+        if isinstance(stream_data, dict):
+            from plugin_platform.plugin.runtime_event_stream.runtime_event_stream import RuntimeEventStream
+            stream_obj = RuntimeEventStream.from_dict(stream_data)
+        else:
+            stream_obj = stream_data
+            
+        return cls(
+            dispatcher_id=data.get("dispatcher_id"),
+            runtime_event_stream=stream_obj,
+            dispatcher_type=data.get("dispatcher_type"),
+            dispatch_targets=data.get("dispatch_targets", []),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+

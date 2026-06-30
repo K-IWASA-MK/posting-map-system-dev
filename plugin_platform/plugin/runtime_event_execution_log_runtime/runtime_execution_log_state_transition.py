@@ -18,3 +18,16 @@ class RuntimeExecutionLogStateTransition:
             "metadata": self.metadata,
             "trace_id": self.trace_id
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RuntimeExecutionLogStateTransition":
+        return cls(
+            transition_id=data.get("transition_id"),
+            runtime_id=data.get("runtime_id"),
+            from_state=data.get("from_state"),
+            to_state=data.get("to_state"),
+            transition_type=data.get("transition_type"),
+            metadata=data.get("metadata", {}),
+            trace_id=data.get("trace_id")
+        )
+
