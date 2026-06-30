@@ -543,6 +543,32 @@ def test_dto_serialization_roundtrip():
     assert Engine.from_dict(engine_dto.to_dict()).to_dict() == engine_dto.to_dict()
     assert RuntimeEventExecutionEngine.from_dict(event_eng_dto.to_dict()).to_dict() == event_eng_dto.to_dict()
 
+    # Phase 95 Execution Runtime DTO Round Trip Test
+    from plugin_platform.plugin.runtime_execution_runtime import (
+        Runtime,
+        RuntimeExecutionRuntime
+    )
+    runtime_dto = Runtime(
+        engine_id="engine_123",
+        runtime_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_rt_dto = RuntimeExecutionRuntime(
+        runtime_id="runtime:engine_123",
+        engine_id="engine_123",
+        runtime_type="default",
+        runtime_state="runtime_ready",
+        runtime_version="v1",
+        runtime_map=["resolve_runtime", "prepare_runtime", "validate_runtime", "runtime_ready"],
+        trace_id=trace_id,
+        runtime_obj=runtime_dto,
+        metadata=metadata
+    )
+    assert Runtime.from_dict(runtime_dto.to_dict()).to_dict() == runtime_dto.to_dict()
+    assert RuntimeExecutionRuntime.from_dict(event_rt_dto.to_dict()).to_dict() == event_rt_dto.to_dict()
+
+
 
 
 

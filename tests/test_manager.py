@@ -164,4 +164,63 @@ def test_engine_manager_stateless_deterministic_no_mutation():
     assert eng1.metadata == eng2.metadata
     assert eng1.metadata is not eng2.metadata
 
+def test_runtime_execution_runtime_manager_stateless_deterministic_no_mutation():
+    from plugin_platform.plugin.runtime_event_execution_engine import (
+        Engine,
+        RuntimeEventExecutionEngine
+    )
+    from plugin_platform.plugin.runtime_execution_runtime import RuntimeExecutionRuntimeManager
+    from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    
+    trace_id = str(uuid.uuid4())
+    metadata = {"env": "test"}
+    
+    engine_dto = Engine(
+        blueprint_id="blueprint_123",
+        engine_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_eng_dto = RuntimeEventExecutionEngine(
+        engine_id="engine:blueprint_123",
+        blueprint_id="blueprint_123",
+        engine_type="default",
+        engine_state="engine_ready",
+        engine_version="v1",
+        engine_map=["resolve_engine", "prepare_engine", "validate_engine", "engine_ready"],
+        trace_id=trace_id,
+        engine=engine_dto,
+        metadata=metadata
+    )
+    
+    runtime = RuntimeRuntime(
+        runtime_id="test_runtime",
+        configuration={},
+        environment="test",
+        variables={},
+        metadata=metadata
+    )
+    
+    # Act
+    rt1 = RuntimeExecutionRuntimeManager.create_execution_runtime(event_eng_dto, runtime)
+    rt2 = RuntimeExecutionRuntimeManager.create_execution_runtime(event_eng_dto, runtime)
+    
+    # Assert 1: Stateless & Deterministic
+    assert rt1 is not rt2
+    assert rt1.to_dict() == rt2.to_dict()
+    
+    # Assert 2: Input reference segregation
+    assert rt1 is not event_eng_dto
+    assert rt1 is not runtime
+    
+    # Assert 3: No mutation of inputs
+    assert event_eng_dto.engine_id == "engine:blueprint_123"
+    assert event_eng_dto.engine_state == "engine_ready"
+    assert runtime.environment == "test"
+    
+    # Assert 4: metadata copy
+    assert rt1.metadata == rt2.metadata
+    assert rt1.metadata is not rt2.metadata
+
+
 
