@@ -1,7 +1,7 @@
 # AIOS Development OS Specification (開発統制規範)
 
-Version: 1.0.0
-Phase: Phase 101 (Development OS Foundation)
+Version: 1.1.0
+Phase: Phase 104 (Incident Registry Foundation - Updated)
 Status: Approved
 
 ---
@@ -90,3 +90,14 @@ Status: Approved
 * [ ] `walkthrough.md` が最新の状態に更新されていること。
 * [ ] `git status` に未トラッキングの不要なファイルがなく、ワーキングツリーが完全にクリーンであること。
 * [ ] `git push` が規定のリモートリポジトリに対して成功していること。
+
+---
+
+## 9. Flash 計画書スキップルール適用ポリシー (Flash Bypass Rule Application Policy)
+
+* **基本ポリシー (Default Policy)**:
+  * プラットフォームの基盤開発フェーズ (Foundation Phases) においては、原則として実装計画書 (Implementation Plan) の作成・レビュー提出をデフォルト必須とします。
+* **適用要件 (Applicability Conditions)**:
+  * Flash 計画書スキップルールは、明示的に開発計画で許可されているか、または岩佐CEOから「計画書の作成をスキップしてよい」という旨の個別の許可を受けた場合にのみ適用することができます。
+  * スキップルールが適用された場合でも、実装前の内容合意および開始指示としての「GO」は依然として必須であり、未承認での自律的な実装、検証、およびコミット・プッシュ操作は一切禁止されます。
+  * 承認なきランタイム実装の開始は暴走（AI Runaway）とみなされ、直ちに `git reset --hard` によるロールバック対象となります。
