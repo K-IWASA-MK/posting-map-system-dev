@@ -643,6 +643,31 @@ def test_dto_serialization_roundtrip():
     assert Orchestrator.from_dict(orchestrator_dto.to_dict()).to_dict() == orchestrator_dto.to_dict()
     assert RuntimeExecutionOrchestrator.from_dict(event_orch_dto.to_dict()).to_dict() == event_orch_dto.to_dict()
 
+    # Phase 99 Execution Controller DTO Round Trip Test
+    from plugin_platform.plugin.runtime_execution_controller import (
+        Controller,
+        RuntimeExecutionController
+    )
+    controller_dto = Controller(
+        orchestrator_id="orchestrator_123",
+        controller_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_ctrl_dto = RuntimeExecutionController(
+        controller_id="controller:orchestrator_123",
+        orchestrator_id="orchestrator_123",
+        controller_type="default",
+        controller_state="controller_ready",
+        controller_version="v1",
+        controller_map=["resolve_controller", "prepare_controller", "validate_controller", "controller_ready"],
+        trace_id=trace_id,
+        controller_obj=controller_dto,
+        metadata=metadata
+    )
+    assert Controller.from_dict(controller_dto.to_dict()).to_dict() == controller_dto.to_dict()
+    assert RuntimeExecutionController.from_dict(event_ctrl_dto.to_dict()).to_dict() == event_ctrl_dto.to_dict()
+
 
 
 

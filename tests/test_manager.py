@@ -396,6 +396,64 @@ def test_runtime_execution_orchestrator_manager_stateless_deterministic_no_mutat
     assert orch1.metadata == orch2.metadata
     assert orch1.metadata is not orch2.metadata
 
+def test_runtime_execution_controller_manager_stateless_deterministic_no_mutation():
+    from plugin_platform.plugin.runtime_execution_orchestrator import (
+        Orchestrator,
+        RuntimeExecutionOrchestrator
+    )
+    from plugin_platform.plugin.runtime_execution_controller import RuntimeExecutionControllerManager
+    from plugin_platform.plugin.runtime_adapter.runtime_context import RuntimeRuntime
+    
+    trace_id = str(uuid.uuid4())
+    metadata = {"env": "test"}
+    
+    orchestrator_dto = Orchestrator(
+        flow_id="flow_123",
+        orchestrator_type="default",
+        trace_id=trace_id,
+        metadata=metadata
+    )
+    event_orch_dto = RuntimeExecutionOrchestrator(
+        orchestrator_id="orchestrator:flow_123",
+        flow_id="flow_123",
+        orchestrator_type="default",
+        orchestrator_state="orchestrator_ready",
+        orchestrator_version="v1",
+        orchestrator_map=["resolve_orchestrator", "prepare_orchestrator", "validate_orchestrator", "orchestrator_ready"],
+        trace_id=trace_id,
+        orchestrator_obj=orchestrator_dto,
+        metadata=metadata
+    )
+    
+    runtime = RuntimeRuntime(
+        runtime_id="test_runtime",
+        configuration={},
+        environment="test",
+        variables={},
+        metadata=metadata
+    )
+    
+    # Act
+    ctrl1 = RuntimeExecutionControllerManager.create_execution_controller(event_orch_dto, runtime)
+    ctrl2 = RuntimeExecutionControllerManager.create_execution_controller(event_orch_dto, runtime)
+    
+    # Assert 1: Stateless & Deterministic
+    assert ctrl1 is not ctrl2
+    assert ctrl1.to_dict() == ctrl2.to_dict()
+    
+    # Assert 2: Input reference segregation
+    assert ctrl1 is not event_orch_dto
+    assert ctrl1 is not runtime
+    
+    # Assert 3: No mutation of inputs
+    assert event_orch_dto.orchestrator_id == "orchestrator:flow_123"
+    assert event_orch_dto.orchestrator_state == "orchestrator_ready"
+    assert runtime.environment == "test"
+    
+    # Assert 4: metadata copy
+    assert ctrl1.metadata == ctrl2.metadata
+    assert ctrl1.metadata is not ctrl2.metadata
+
 
 
 
