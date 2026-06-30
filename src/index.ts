@@ -27,3 +27,10 @@ export * from "./review/AutonomousReviewRuntimeContext";
 export * from "./review/AutonomousReviewRuntimeEngine";
 export * from "./review/AutonomousReviewRuntimeRegistry";
 export * from "./review/AutonomousReviewRuntimeManager";
+
+export * from "./resume/ResumeScope";
+export * from "./resume/ResumeContext";
+export * from "./resume/ResumeScopeDefinition";
+export * from "./resume/ResumeScopeEngine";
+export * from "./resume/ResumeScopeRegistry";
+export * from "./resume/ResumeScopeManager";
