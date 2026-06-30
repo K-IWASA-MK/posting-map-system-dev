@@ -9224,10 +9224,6 @@ Available commands:
     runtime_event_execution_blueprint_parser = subparsers.add_parser("runtime-event-execution-blueprint", help="Manage plugin runtime session event execution blueprint")
     runtime_event_execution_blueprint_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution blueprint result")
     
-    # runtime-event-execution-engine コマンドパーサー
-    runtime_event_execution_engine_parser = subparsers.add_parser("runtime-event-execution-engine", help="Manage plugin runtime session event execution engine")
-    runtime_event_execution_engine_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution engine result")
-    
     # runtime-execution-runtime コマンドパーサー
     runtime_execution_runtime_parser = subparsers.add_parser("runtime-execution-runtime", help="Manage plugin runtime session event execution runtime")
     runtime_execution_runtime_parser.add_argument("--dry-run", action="store_true", help="Perform dry-run without writing execution runtime result")
