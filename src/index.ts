@@ -131,3 +131,10 @@ export * from "./systemkernel/SystemKernelEvent";
 export * from "./systemkernel/SystemKernelIntegrationEngine";
 export * from "./systemkernel/SystemKernelRegistry";
 export * from "./systemkernel/SystemKernelManager";
+
+export * from "./stabilization/StabilizationStatus";
+export * from "./stabilization/StabilizationType";
+export * from "./stabilization/FeedbackSignal";
+export * from "./stabilization/FeedbackStabilizationEngine";
+export * from "./stabilization/StabilizationRegistry";
+export * from "./stabilization/StabilizationManager";
