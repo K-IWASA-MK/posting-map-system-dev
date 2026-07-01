@@ -995,6 +995,13 @@ window.renderNewAreas = function() {
   const container = document.getElementById('new-area-list');
   if (!container) return;
 
+  // ⚠️ 二重描画防止チェック (同一状態の繰り返し描画によるDOM再生成を抑止)
+  const stateKey = JSON.stringify(citySummary) + '_' + JSON.stringify(areaSummary) + '_' + currentCity;
+  if (container.dataset.lastState === stateKey) {
+    return;
+  }
+  container.dataset.lastState = stateKey;
+
   if (!areaSummary || areaSummary.length === 0) {
     container.innerHTML = '<p class="text-center text-white/40 py-20 font-bold">データがありません。<br>一括作成を実行してください。</p>';
     return;
