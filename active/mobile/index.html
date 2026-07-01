@@ -112,7 +112,8 @@
 
   <!-- 3. MAIN APP -->
   <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-300 hidden">
-    <header class="safe-top px-6 pt-8 pb-4 flex items-center">
+    <div id="app-shell" class="flex flex-col h-full w-full">
+      <header class="safe-top px-6 pt-8 pb-4 flex items-center">
       <div style="background: #1C1C1E; border: 1px solid rgba(255,255,255,0.1);" class="px-6 py-3 rounded-full flex items-center justify-between text-xs font-black tracking-tight w-full">
         <div class="flex items-center gap-3">
           <span class="text-white/40">全体進捗</span>
@@ -129,7 +130,8 @@
     </header>
 
     <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-6 overscroll-y-contain">
-      <!-- AREAS PAGE -->
+      <div id="view-container" class="relative w-full h-full">
+        <!-- AREAS PAGE -->
       <section id="page-areas" class="page space-y-8">
         <div id="area-list" class="space-y-6"></div>
       </section>
@@ -222,6 +224,7 @@
           <!-- Group cards dynamically populated -->
         </div>
       </section>
+      </div> <!-- /#view-container -->
     </main>
 
     <!-- 下ナビ：iOSライクなガラス感に調整 -->
@@ -240,6 +243,7 @@
         <button data-page="back" onclick="backToTier1()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">↩️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">戻る</span></button>
       </div>
     </nav>
+    </div> <!-- /#app-shell -->
   </div>
 
   <!-- 4. CUSTOM NUMPAD MODAL -->
