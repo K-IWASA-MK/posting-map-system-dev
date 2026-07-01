@@ -1,4 +1,4 @@
-const CACHE_NAME = 'posting-map-cache-v20260701135745';
+const CACHE_NAME = 'posting-map-cache-v20260701140745';
 const ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const ASSETS = [
   './db.js',
   './app.js',
   './app.js?v=20260701130652',
-  './render.js?v=20260701135745',
+  './render.js?v=20260701140745',
   './manifest.json',
   './stock.html',
   './admin/index.html',

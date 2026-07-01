@@ -1154,3 +1154,90 @@ window.renderAreas = function() {
     window.renderNewAreas();
   }
 };
+
+window.renderNewDetailList = function(areaName) {
+  const container = document.getElementById('new-detail-list');
+  if (!container) return;
+
+  // ⚠️ 二重描画防止チェック (同一状態の繰り返し描画によるDOM再生成を抑止)
+  const stateKey = areaName + '_' + JSON.stringify(allPoints);
+  if (container.dataset.lastState === stateKey) {
+    return;
+  }
+  container.dataset.lastState = stateKey;
+
+  const cardsHtml = allPoints.map((p, i) => {
+    const statusDot   = p.isDone 
+      ? 'background-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6);' 
+      : 'background-color: rgba(255, 255, 255, 0.2);';
+    const statusText  = p.isDone ? '🔒 完了' : '未完了';
+    const statusColor = p.isDone ? 'color: #2563eb;' : 'color: rgba(255, 255, 255, 0.4);';
+
+    // 同期バッジ (要件8: PENDING↓SYNCING↓COMPLETE / RETRYING...)
+    const _s = p.syncStatus;
+    const syncBadge = (() => {
+      if (!_s) return '';
+      if (_s === 'SYNCING'  || _s === 'sending') return ` <span style="color:#2563eb;font-size:7px;font-weight:900;letter-spacing:0.1em">●</span>`;
+      if (_s === 'RETRY'    || _s === 'failed')  return ` <span style="color:#ef4444;font-size:7px;font-weight:900;letter-spacing:0.08em">RETRY</span>`;
+      if (_s === 'PENDING'  || _s === 'pending') return ` <span style="color:#f59e0b;font-size:7px;font-weight:900;letter-spacing:0.08em">⋯</span>`;
+      return '';
+    })();
+
+    // 3行目：配布員名（グリーンのバッジ枠で囲み、自然に中央揃えに）
+    const nameLineHtml = p.isDone && p.staffName
+      ? `
+        <div class="w-full flex justify-center mt-0.5">
+          <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); height: 22px; font-size: 10px; color: #10b981;" class="inline-flex items-center justify-center h-[22px] px-2.5 text-[10px] font-bold text-[#10b981] rounded-full tracking-wider">
+            ${p.staffName}
+          </div>
+        </div>`
+      : '';
+
+    // 完了済みカードはタップ無効（ロック状態）
+    const onclickAttr = p.isDone ? '' : `onclick="openPointDetailModal(${p.rowId})"`;
+    const cardClass = p.isDone
+      ? "new-premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center"
+      : "clickable-card new-premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center";
+
+    return `
+      <div class="${cardClass}" ${onclickAttr}>
+        <div class="w-full flex justify-center">
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); height: 26px; font-size: 12px; color: rgba(255, 255, 255, 0.9);" class="inline-flex items-center justify-center px-3 font-bold rounded-full tracking-wide truncate max-w-full">
+            🏠 ${getCleanAddress(p.address)}
+          </div>
+        </div>
+        <div style="${statusColor}" class="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 w-full">
+          <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
+          <span>${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}</span>
+        </div>
+        ${nameLineHtml}
+      </div>`;
+  }).join('');
+
+  const activeCity = currentCity || getCityName(areaName);
+  const cityAreas = areaSummary ? areaSummary.filter(s => getCityName(s.name) === activeCity) : [];
+  const currentIndex = cityAreas.findIndex(s => s.name === areaName);
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex !== -1 && currentIndex < cityAreas.length - 1;
+
+  const bottomNavHtml = `
+    <div class="flex items-center justify-between mt-8 pb-10 w-full gap-4">
+      <button onclick="navigateToSiblingArea(-1)" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold ${hasPrev ? '' : 'opacity-20 pointer-events-none'}" ${hasPrev ? '' : 'disabled'}>‹</button>
+      <button onclick="switchPage('areas')" class="flex-1 h-12 premium-glass-btn flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white/80">一覧に戻る</button>
+      <button onclick="navigateToSiblingArea(1)" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold ${hasNext ? '' : 'opacity-20 pointer-events-none'}" ${hasNext ? '' : 'disabled'}>›</button>
+    </div>
+  `;
+
+  container.innerHTML = `<div class="space-y-4">${cardsHtml}</div>` + bottomNavHtml;
+};
+
+// 既存 of renderDetailListをフックし、新UI (renderNewDetailList) をサイレントに並行実行する
+const _originalRenderDetailList = window.renderDetailList;
+window.renderDetailList = function(areaName) {
+  if (typeof _originalRenderDetailList === 'function') {
+    _originalRenderDetailList(areaName);
+  }
+  if (typeof window.renderNewDetailList === 'function') {
+    window.renderNewDetailList(areaName);
+  }
+};
