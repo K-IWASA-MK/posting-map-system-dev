@@ -1,0 +1,10 @@
+export enum ExecutionGraphNodeType {
+  KNOWLEDGE = "KNOWLEDGE",
+  GOVERNANCE = "GOVERNANCE",
+  REVIEW = "REVIEW",
+  SCOPE = "SCOPE",
+  EVENT = "EVENT",
+  EXECUTION = "EXECUTION",
+  API_SCHEMA = "API_SCHEMA",
+  SYSTEM = "SYSTEM"
+}

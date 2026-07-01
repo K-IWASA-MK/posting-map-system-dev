@@ -1,35 +1,34 @@
-# Walkthrough - Phase 129: API Schema Analyzer Foundation
+# Walkthrough - Phase 130: System-wide Execution Graph Engine Foundation
 
-CIE Platform Phase 129 (APIスキーマアナライザー構造定義) の実装と検証レポートです。
+CIE Platform Phase 130 (システム実行グラフ構造定義) の実装と検証レポートです。
 
 ---
 
 ## 🛠️ 実施した変更点
 
 ### 1. 仕様書の新規作成
-* **`docs/specifications/APISchemaAnalyzer.md`**
-  - AIOSが外部API仕様および内部インターフェース定義を構造データとして解釈するためのアーキテクチャ定義書を新規作成。
-  - `APISchemaType` (列挙型) および `APIEndpoint` の定義、ならびに OpenAPI/GraphQL に対する抽象化モデルとフローを仕様規定。
+* **`docs/specifications/SystemExecutionGraph.md`**
+  - AIOSの全構成要素（Knowledge, Governance, Review, Scope, Event, Execution, API Schema）を単一の有向非巡回グラフ (DAG) として表現するためのアーキテクチャ定義書を新規作成。
+  - ノードタイプ（`ExecutionGraphNodeType`）、エッジ関係、レイヤーマッピング、将来のAIプランニングエンジンとの統合モデルを仕様規定。
 
 ### 2. TypeScript 構造定義 (Blueprint) の作成
-`src/api/` 配下に以下のファイル群を新規作成しました。
-- **`APISchemaType.ts`**: 列挙型定義。
-- **`APISchema.ts`**: スキーマ定義構造 `APISchema` インターフェース定義。
-- **`APIEndpoint.ts`**: エンドポイント情報 `APIEndpoint` インターフェース定義。
-  - **【設計改善】** 将来のGraph構造解析を強化するため、ご指摘いただいた `responseSchemaVersion?: string` および `errorSchema?: Record<string, any>` を追記。
-- **`APISchemaAnalyzerContext.ts`**: コンテキスト情報 `APISchemaAnalyzerContext` インターフェース定義。
-- **`APISchemaAnalyzerEngine.ts`**: `IAPISchemaAnalyzerEngine` インターフェース、および具象クラス用の抽象クラス `BaseAPISchemaAnalyzerEngine` の定義（空実装）。
-- **`APISchemaRegistry.ts`**: スキーマ定義レジストリクラスの定義（空実装）。
-- **`APISchemaMapper.ts`**: スキーママッパーツールクラスの定義（空実装）。
-- **`APISchemaAnalyzerManager.ts`**: アナライザーマネージャクラスの定義（空実装）。
+`src/graph/` 配下に以下のファイル群を新規作成しました。
+- **`ExecutionGraphNodeType.ts`**: 列挙型定義。
+- **`ExecutionGraphNode.ts`**: グラフのノードを定義するインターフェース。
+- **`ExecutionGraphEdge.ts`**: グラフのエッジを定義するインターフェース。
+- **`ExecutionGraphContext.ts`**: グラフの構築環境を示すコンテキストインターフェース。
+- **`ExecutionGraphEngine.ts`**: `IExecutionGraphEngine` インターフェース、および具象クラス用の抽象クラス `BaseExecutionGraphEngine` の定義（空実装）。
+- **`ExecutionGraphRegistry.ts`**: ノードとエッジを管理するレジストリクラスの定義（空実装）。
+- **`ExecutionGraphAnalyzer.ts`**: 循環や依存を検出するアナライザークラスの定義（空実装）。
+- **`ExecutionGraphManager.ts`**: ライフサイクルマネージャクラスの定義（空実装）。
 
 ### 3. エクスポートの追加
 * **`src/index.ts`**
-  - 新規作成した `api/` 配下のすべての型・クラス定義を外部エクスポートする記述を追加。
+  - 新規作成した `graph/` 配下のすべての型・クラス定義を外部エクスポートする記述を追加。
 
 ---
 
-## 🔍 検製結果まとめ
+## 🔍 検証結果まとめ
 
 ### 1. ビルド検証 (`npm run build`)
 ```bash
@@ -67,6 +66,6 @@ tests/test_serialization.py .                                            [100%]
 ---
 
 ## 📦 Git コミット情報
-- **コミットメッセージ**: `CIE Phase 129: API Schema Analyzer Foundation`
-- **変更範囲**: `docs/specifications/APISchemaAnalyzer.md`, `src/api/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
+- **コミットメッセージ**: `CIE Phase 130: System-wide Execution Graph Engine Foundation`
+- **変更範囲**: `docs/specifications/SystemExecutionGraph.md`, `src/graph/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
 - **ツリー状態**: クリーン
