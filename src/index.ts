@@ -153,3 +153,9 @@ export * from "./selfoptimization/SelfOptimizingKernelEngine";
 export * from "./selfoptimization/KernelOptimizationRegistry";
 export * from "./selfoptimization/KernelOptimizationManager";
 
+export * from "./adaptive/KernelAdaptiveStatus";
+export * from "./adaptive/KernelAdaptiveType";
+export * from "./adaptive/EnvironmentVector";
+export * from "./adaptive/AdaptiveKernelEngine";
+export * from "./adaptive/AdaptiveRegistry";
+export * from "./adaptive/AdaptiveManager";

@@ -1,28 +1,28 @@
-# Walkthrough - Phase 141: Autonomous Self-Optimizing Kernel Loop
+# Walkthrough - Phase 142: Fully Autonomous Adaptive Kernel Loop
 
-CIE Platform Phase 141 (自己最適化カーネルループ構造定義) の実装と検証レポートです。
+CIE Platform Phase 142 (完全自律適応型カーネルループ構造定義) の実装と検証レポートです。
 
 ---
 
 ## 🛠️ 実施した変更点
 
 ### 1. 仕様書の新規作成
-* **`docs/specifications/SelfOptimizingKernelLoop.md`**
-  - カーネルがより良い状態を自律探索し続ける「自己改善ループ（Observe ─ Evaluate ─ Compare ─ Candidate ─ Select ─ Feedback）」のアーキテクチャ定義書を新規作成。
-  - 最適化スコアベクトル（OptimizationVector）、改善提案モデル、意思決定モデル、および実際の最適化適用や自動チューニングを実行しない「自己最適化ループ構造」のルール・契約境界を規定。
+* **`docs/specifications/FullyAutonomousAdaptiveKernelLoop.md`**
+  - 環境・負荷・構造変化に応じてOSの構造そのものを論理的に適合させるための「自己適応（Observe ─ Sense ─ Context Mapping ─ Structural Evaluation ─ Adaptation Decision ─ Simulation ─ Feedback）」のアーキテクチャ定義書を新規作成。
+  - 環境要因測定ベクトル（EnvironmentVector）、適応戦略（AdaptationStrategy: スケール、リバランス、リワイヤ、分離等）、適合決定モデル（AdaptationDecision）、および実際の構造変更を実行しない「自己適応ループ構造」のルール・契約境界を規定。
 
 ### 2. TypeScript 構造定義 (Blueprint) の作成
-競合回避のため、仕様書（5.5, 5.6）で指定された Registry / Manager クラスは衝突を避ける命名とし、`src/selfoptimization/` 配下に作成しました。
-- **`KernelOptimizationStatus.ts`**: 列挙型定義 (`IDLE`, `OBSERVING`, `EVALUATING`, `SIMULATING`, `SELECTING`, `APPLYING_MODEL`, `LEARNING`, `STABLE`)。
-- **`KernelOptimizationType.ts`**: 列挙型定義 (`LATENCY_OPTIMIZATION`, `THROUGHPUT_OPTIMIZATION`, `STABILITY_OPTIMIZATION`, `RESOURCE_OPTIMIZATION`, `GRAPH_OPTIMIZATION`, `EXECUTION_FLOW_OPTIMIZATION`, `GOVERNANCE_OPTIMIZATION`, `CROSS_LAYER_OPTIMIZATION`)。
-- **`OptimizationVector.ts`**: `OptimizationVector` インターフェース、`OptimizationCandidate` インターフェース、および `OptimizationDecision` 列挙型の定義。
-- **`SelfOptimizingKernelEngine.ts`**: `ISelfOptimizingKernelEngine` インターフェース、および抽象クラス `BaseSelfOptimizingKernelEngine` の定義（空実装）。
-- **`KernelOptimizationRegistry.ts`**: 改善提案のレジストリクラスの定義（競合回避のため `OptimizationRegistry` からリネーム、空実装）。
-- **`KernelOptimizationManager.ts`**: 最適化ループマネージャクラスの定義（競合回避のため `OptimizationManager` からリネーム、空実装）。
+`src/adaptive/` 配下に以下のファイル群を新規作成しました。
+- **`KernelAdaptiveStatus.ts`**: 列挙型定義 (`IDLE`, `SENSING`, `MAPPING`, `EVALUATING`, `DECIDING`, `SIMULATING`, `ADAPTING`, `STABLE`)。
+- **`KernelAdaptiveType.ts`**: 列挙型定義 (`STRUCTURAL_ADAPTATION`, `LOAD_ADAPTATION`, `GRAPH_RECONFIGURATION`, `EXECUTION_FLOW_ADAPTATION`, `GOVERNANCE_ADAPTATION`, `EVENT_TOPOLOGY_ADAPTATION`, `CROSS_LAYER_ADAPTATION`)。
+- **`EnvironmentVector.ts`**: `EnvironmentVector` インターフェース、`AdaptationStrategy` 列挙型、および `AdaptationDecision` 列挙型の定義。
+- **`AdaptiveKernelEngine.ts`**: `IAdaptiveKernelEngine` インターフェース、および抽象クラス `BaseAdaptiveKernelEngine` の定義（空実装）。
+- **`AdaptiveRegistry.ts`**: 適応履歴/コンテキストのレジストリクラスの定義（空実装）。
+- **`AdaptiveManager.ts`**: 自己適応マネージャクラスの定義（空実装）。
 
 ### 3. エクスポートの追加
 * **`src/index.ts`**
-  - 新規作成した `selfoptimization/` 配下のすべての定義を外部エクスポートする記述を追加。
+  - 新規作成した `adaptive/` 配下のすべての定義を外部エクスポートする記述を追加。
 
 ---
 
@@ -62,6 +62,6 @@ tests/test_serialization.py .                                            [100%]
 ---
 
 ## 📦 Git コミット情報
-- **コミットメッセージ**: `CIE Phase 141: Autonomous Self-Optimizing Kernel Loop`
-- **変更範囲**: `docs/specifications/SelfOptimizingKernelLoop.md`, `src/selfoptimization/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
+- **コミットメッセージ**: `CIE Phase 142: Fully Autonomous Adaptive Kernel Loop`
+- **変更範囲**: `docs/specifications/FullyAutonomousAdaptiveKernelLoop.md`, `src/adaptive/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
 - **ツリー状態**: クリーン
