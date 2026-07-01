@@ -986,3 +986,164 @@ window.sendLineContact = function(staffName, staffId, location, count) {
   const lineUrl = `https://line.me/R/share?text=${encodeURIComponent(text)}`;
   window.open(lineUrl, '_blank');
 };
+
+// =============================
+// Phase 2: 新UI 描画システム (Parallel Modern Rendering)
+// =============================
+
+window.renderNewAreas = function() {
+  const container = document.getElementById('new-area-list');
+  if (!container) return;
+
+  if (!areaSummary || areaSummary.length === 0) {
+    container.innerHTML = '<p class="text-center text-white/40 py-20 font-bold">データがありません。<br>一括作成を実行してください。</p>';
+    return;
+  }
+
+  if (currentCity === null) {
+    // 【第1層：市・自治体一覧画面 (新UI)】
+    const cities = citySummary;
+
+    const headerCardHtml = `
+      <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="new-premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">
+        <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+          <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+        </div>
+        <div class="text-lg font-black text-white tracking-tight">全体エリア (NEW)</div>
+      </div>
+    `;
+
+    const cityCardsHtml = cities.map(c => {
+      const pctColorClass = 'text-[#2563eb]';
+      const isCompleted = c.done === c.total && c.total > 0;
+      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
+      const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
+
+      let fontSizeClass = 'text-lg';
+      if (c.name.length > 12) fontSizeClass = 'text-xs';
+      else if (c.name.length > 8) fontSizeClass = 'text-sm';
+      else if (c.name.length > 5) fontSizeClass = 'text-base';
+
+      return `
+      <div class="clickable-card new-premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
+        <div class="w-full flex justify-center mb-1">
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="inline-flex items-center justify-center h-7 px-3 ${fontSizeClass} font-black text-white rounded-full tracking-tight">
+            <span class="text-xs mr-1 select-none">🏢</span>
+            <span>${c.name}</span>
+          </div>
+        </div>
+        <div class="text-sm ${pctColorClass}">${c.progress}%</div>
+        <div class="flex items-center justify-center w-full">
+          ${leftDummy}
+          <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
+            ${c.done}/ ${c.total}
+          </div>
+          ${rightLabel}
+        </div>
+      </div>`;
+    }).join('');
+
+    const bottomTopButtonHtml = `
+      <div class="flex items-center justify-center mt-8 pb-10">
+        <button onclick="$('content').scrollTo({top: 0, behavior: 'smooth'})" class="px-6 h-12 premium-glass-btn flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white/80">↑ トップに戻る</button>
+      </div>
+    `;
+
+    container.innerHTML = headerCardHtml + `<div class="space-y-6">${cityCardsHtml}</div>` + bottomTopButtonHtml;
+  } else {
+    // 【第2層：選択された市のエリアシート一覧画面 (新UI)】
+    const filteredAreas = areaSummary.filter(s => getCityName(s.name) === currentCity);
+
+    const backButtonHtml = `
+      <div class="flex items-center mb-6 h-12">
+        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+      </div>
+    `;
+
+    const areaCardsHtml = filteredAreas.map(s => {
+      const pctColorClass = 'text-[#2563eb]';
+      const isCompleted = s.done === s.total && s.total > 0;
+      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 8px; white-space: nowrap;" class="select-none text-xs font-sans">🔒</span>' : '';
+      const rightLabel = isCompleted ? '<span style="margin-left: 8px; white-space: nowrap;" class="font-sans text-xs opacity-90">🔒</span>' : '';
+      
+      let zipCode = '';
+      let cleanAddress = s.name;
+      
+      if (s.repAddress) {
+        const match = s.repAddress.match(/^〒(\d{3}-\d{4})\s*([\s\S]*)$/);
+        if (match) {
+          zipCode = match[1];
+          cleanAddress = match[2].trim().replace(/\r?\n/g, ' ');
+        } else {
+          cleanAddress = s.repAddress.replace(/\r?\n/g, ' ');
+        }
+      }
+
+      const zipBadgeHtml = zipCode 
+        ? `<div style="text-indent: 0.12em; letter-spacing: 0.12em; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2);" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono rounded-full mb-1">📮 〒${zipCode}</div>`
+        : '';
+
+      let fontSizeClass = 'text-base';
+      if (cleanAddress.length > 12) fontSizeClass = 'text-xs';
+      else if (cleanAddress.length > 8) fontSizeClass = 'text-sm';
+
+      const mapUrl = zipCode
+        ? `https://www.google.com/maps/search/?api=1&query=${zipCode}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress + ' 日本')}`;
+
+      const googleMapsButtonHtml = isCompleted
+        ? `<a style="background: rgba(37,99,235,0.02); border: 1px solid rgba(37,99,235,0.1); color: rgba(37,99,235,0.3); pointer-events: none; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;" class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none opacity-40">📮 〒${zipCode || '---'} → 🗺</a>`
+        : `<a href="${mapUrl}" target="_blank" style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.25); color: rgba(37,99,235,0.88); transition: transform 75ms ease-out; white-space: nowrap; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;" onpointerdown="this.style.transform='scale(0.94)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''" class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none">📮 〒${zipCode || '---'} → 🗺</a>`;
+
+      const actionButtonHtml = isCompleted
+        ? `<button style="background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.15); color: rgba(255,255,255,0.3); pointer-events: none;" class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none opacity-40">配布詳細へ →</button>`
+        : `<button ontouchstart="" onclick="openDetail('${s.name}')" style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out; white-space: nowrap;" onpointerdown="this.style.transform='scale(0.96)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''" class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none">配布詳細へ →</button>`;
+
+      return `
+      <div id="new-area-card-${s.name}" class="new-premium-glass py-5 px-6 flex items-center justify-center">
+        <div style="display: inline-flex; flex-direction: column; align-items: stretch; gap: 8px; text-align: center;">
+          ${googleMapsButtonHtml}
+          <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug" style="text-wrap: balance; padding: 4px 0;">
+            ${cleanAddress}
+          </div>
+          <div class="text-sm ${pctColorClass}">${s.progress}%</div>
+          <div class="flex items-center justify-center">
+            ${leftDummy}
+            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e; white-space: nowrap; flex-shrink: 0;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
+              ${s.done || 0}/ ${s.total || 0}
+            </div>
+            ${rightLabel}
+          </div>
+          ${actionButtonHtml}
+        </div>
+      </div>`;
+    }).join('');
+
+    const bottomNavHtml = filteredAreas.length > 3 ? `
+      <div class="flex items-center justify-between mt-8 pb-10 w-full gap-4">
+        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+        <button onclick="$('content').scrollTo({top: 0, behavior: 'smooth'})" class="flex-1 h-12 premium-glass-btn flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white/80">↑ トップに戻る</button>
+        <div class="w-12 h-12"></div>
+      </div>
+    ` : `
+      <div class="flex items-center justify-start mt-8 pb-10">
+        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+      </div>
+    `;
+
+    container.innerHTML = backButtonHtml + `<div class="space-y-6">${areaCardsHtml}</div>` + bottomNavHtml;
+  }
+};
+
+// 既存のrenderAreasをフックし、新UI (renderNewAreas) をサイレントに並行実行する
+const _originalRenderAreas = window.renderAreas;
+window.renderAreas = function() {
+  if (typeof _originalRenderAreas === 'function') {
+    _originalRenderAreas();
+  }
+  if (typeof window.renderNewAreas === 'function') {
+    window.renderNewAreas();
+  }
+};

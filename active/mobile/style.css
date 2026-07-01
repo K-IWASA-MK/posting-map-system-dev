@@ -347,3 +347,19 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px #1C1C1E inset !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Phase 2: Modern Premium Glass Style */
+.new-premium-glass {
+  border-radius: 28px;
+  background: #1C1C1E;
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.new-premium-glass:active {
+  transform: scale(0.98);
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.02);
+}
