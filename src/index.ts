@@ -52,4 +52,14 @@ export * from "./orchestrator/ExecutionOrchestratorEngine";
 export * from "./orchestrator/ExecutionRegistry";
 export * from "./orchestrator/ExecutionManager";
 
+export * from "./api/APISchemaType";
+export * from "./api/APISchema";
+export * from "./api/APIEndpoint";
+export * from "./api/APISchemaAnalyzerContext";
+export * from "./api/APISchemaAnalyzerEngine";
+export * from "./api/APISchemaRegistry";
+export * from "./api/APISchemaMapper";
+export * from "./api/APISchemaAnalyzerManager";
+
+
 
