@@ -70,6 +70,16 @@ export * from "./graph/ExecutionGraphRegistry";
 export * from "./graph/ExecutionGraphAnalyzer";
 export * from "./graph/ExecutionGraphManager";
 
+export * from "./planning/PlanningStatus";
+export * from "./planning/PlanningType";
+export * from "./planning/PlanStep";
+export * from "./planning/ExecutionPlan";
+export * from "./planning/PlanningContext";
+export * from "./planning/AutonomousAIPlanningEngine";
+export * from "./planning/PlanningRegistry";
+export * from "./planning/PlanningManager";
+
+
 
 
 

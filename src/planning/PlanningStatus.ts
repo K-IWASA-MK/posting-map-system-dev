@@ -1,0 +1,8 @@
+export enum PlanningStatus {
+  DRAFT = "DRAFT",
+  ANALYZING = "ANALYZING",
+  GENERATED = "GENERATED",
+  VALIDATED = "VALIDATED",
+  REJECTED = "REJECTED",
+  ARCHIVED = "ARCHIVED"
+}
