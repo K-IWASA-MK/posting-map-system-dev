@@ -1,0 +1,8 @@
+export enum ExecutionType {
+  TASK = "TASK",
+  WORKFLOW = "WORKFLOW",
+  REVIEW = "REVIEW",
+  POLICY_CHECK = "POLICY_CHECK",
+  SYSTEM = "SYSTEM",
+  EVENT_DRIVEN = "EVENT_DRIVEN"
+}

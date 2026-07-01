@@ -43,3 +43,13 @@ export * from "./eventbus/GovernanceEventBusEngine";
 export * from "./eventbus/GovernanceEventRegistry";
 export * from "./eventbus/GovernanceEventDispatcher";
 
+export * from "./orchestrator/ExecutionStatus";
+export * from "./orchestrator/ExecutionType";
+export * from "./orchestrator/ExecutionContext";
+export * from "./orchestrator/ExecutionMetadata";
+export * from "./orchestrator/ExecutionDefinition";
+export * from "./orchestrator/ExecutionOrchestratorEngine";
+export * from "./orchestrator/ExecutionRegistry";
+export * from "./orchestrator/ExecutionManager";
+
+

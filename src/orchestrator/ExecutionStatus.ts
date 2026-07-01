@@ -1,0 +1,9 @@
+export enum ExecutionStatus {
+  PENDING = "PENDING",
+  QUEUED = "QUEUED",
+  RUNNING = "RUNNING",
+  PAUSED = "PAUSED",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+  CANCELLED = "CANCELLED"
+}
