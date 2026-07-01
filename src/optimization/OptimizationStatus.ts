@@ -1,0 +1,8 @@
+export enum OptimizationStatus {
+  IDLE = "IDLE",
+  ANALYZING = "ANALYZING",
+  PLANNED = "PLANNED",
+  SIMULATED = "SIMULATED",
+  VALIDATED = "VALIDATED",
+  REJECTED = "REJECTED"
+}

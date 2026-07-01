@@ -94,3 +94,11 @@ export * from "./healing/HealingPlan";
 export * from "./healing/SelfHealingEngine";
 export * from "./healing/HealingRegistry";
 export * from "./healing/HealingManager";
+
+export * from "./optimization/OptimizationStatus";
+export * from "./optimization/OptimizationType";
+export * from "./optimization/OptimizationContext";
+export * from "./optimization/OptimizationPlan";
+export * from "./optimization/AutonomousOptimizationEngine";
+export * from "./optimization/OptimizationRegistry";
+export * from "./optimization/OptimizationManager";
