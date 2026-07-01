@@ -12,6 +12,26 @@
   <title>POSTING MAP</title>
   <style>.hidden { display: none !important; }</style>
   <script>
+    // 🚀 Service Workerのキャッシュ汚染を強制排除・クリーンアップする処理 (復旧優先)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister().then(() => {
+            console.log('[SW] Unregistered successfully to fix cache corruption.');
+          });
+        }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        for (let name of names) {
+          caches.delete(name).then(() => {
+            console.log('[Cache] Deleted cache:', name);
+          });
+        }
+      });
+    }
+
     // 「早期エラーハンドラ」: app.js 読み込み前のエラーを捕捉するために定義。
     // app.js が読み込まれると同内容で上書きされる（正常動作）。
     window.logDebug = function(msg) { console.log("[DEBUG]", msg); };
@@ -282,7 +302,7 @@
 
   <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
   <script defer src="./config.js?v=460"></script>
-  <script defer src="./db.js?v=443"></script>
+  <script defer src="./db.js?v=20260701131527"></script>
   <script defer src="./app.js?v=20260701130652"></script>
   <script defer src="./render.js?v=458"></script>
 </body>
