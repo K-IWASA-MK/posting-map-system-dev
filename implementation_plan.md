@@ -1,30 +1,30 @@
-# Implementation Plan - Phase137: Autonomous Governance Kernel Foundation
+# Implementation Plan - Phase138: Full Autonomous System Kernel Integration
 
 ## 1. Architecture Goal
-AI Development Platform (AIOS) において、Meta-Governance を実行可能なカーネル構造へ昇格させるための **Autonomous Governance Kernel Foundation** の構造・型・契約（Blueprint）を定義します。
-※ 本フェーズでは、実際のポリシー適用・評価実行、権限制御の強制適用、システム書き換え、意思決定処理そのものは一切行わず、カーネル構造・インターフェースの定義のみを行います。
+AIOS全体の統治構造・実行・進化などの全レイヤー（Kernel, Meta-Governance, Event, Execution, Graph, Planning, Audit, Healing, Optimization, Evolution）を「単一制御ループ」として接続する **System Kernel Integration Layer** の構造・型・契約（Blueprint）を定義します。
+※ 本フェーズでは、実際の同期処理、統合ランタイム制御、データフローの転送、ルーティング処理は一切行わず、全レイヤーを繋ぐインターフェース・統合制御バスの構造定義のみを行います。
 
 ---
 
 ## 2. Design Principles
 - **Blueprint Only**: 型、インターフェース、レジストリ、マネージャの構造定義に限定。
-- **No Ingress Execution**: リクエスト受付やルーティングの実際の処理は実装しない。
-- **No Policy Enforcement**: ランタイムでのポリシー強制適用は排除。
-- **No Permission Modifications**: 実システム権限に対する動的変更処理は記述しない。
-- **Stateless Architecture**: カーネルエンジン自体は動的状態を保持しない。
-- **Meta-Governance Constraint**: メタガバナンスルールに制約された実行カーネル構造。
+- **No Synchronization Runtime**: 実際の同期プロセスやスケジューラーは実装しない。
+- **No Real Orchestration**: 各レイヤーの動的な稼働制御処理は排除。
+- **No Data Flow Execution**: レイヤー間のシグナル／イベント配送処理は行わない。
+- **Stateless Architecture**: 統合カーネルレイヤー自体は動的状態を保持しない。
+- **Closed Loop System Pattern**: 全レイヤーが単一の同期フィードバックループに収まる構造。
 
 ---
 
 ## 3. Proposed Changes
 
-### [NEW] `docs/specifications/AutonomousGovernanceKernel.md`
-### [NEW] `src/kernel/KernelStatus.ts`
-### [NEW] `src/kernel/KernelType.ts`
-### [NEW] `src/kernel/GovernanceRequest.ts`
-### [NEW] `src/kernel/GovernanceKernelEngine.ts`
-### [NEW] `src/kernel/GovernanceKernelRegistry.ts`
-### [NEW] `src/kernel/GovernanceKernelManager.ts`
+### [NEW] `docs/specifications/FullSystemKernelIntegration.md`
+### [NEW] `src/systemkernel/KernelIntegrationStatus.ts`
+### [NEW] `src/systemkernel/KernelIntegrationType.ts`
+### [NEW] `src/systemkernel/SystemKernelEvent.ts`
+### [NEW] `src/systemkernel/SystemKernelIntegrationEngine.ts`
+### [NEW] `src/systemkernel/SystemKernelRegistry.ts`
+### [NEW] `src/systemkernel/SystemKernelManager.ts`
 ### [MODIFY] `src/index.ts`
 
 ---
@@ -38,7 +38,7 @@ AI Development Platform (AIOS) において、Meta-Governance を実行可能な
 
 ## 5. Definition of Done
 * [ ] 仕様書作成
-* [ ] src/kernel/* 作成
+* [ ] src/systemkernel/* 作成
 * [ ] index.ts 更新
 * [ ] ビルド PASS
 * [ ] CIE PASS

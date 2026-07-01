@@ -1,0 +1,9 @@
+export enum KernelIntegrationStatus {
+  IDLE = "IDLE",
+  INITIALIZING = "INITIALIZING",
+  SYNCING = "SYNCING",
+  STABILIZING = "STABILIZING",
+  ACTIVE = "ACTIVE",
+  DEGRADED = "DEGRADED",
+  FAILED = "FAILED"
+}

@@ -124,3 +124,10 @@ export * from "./kernel/GovernanceRequest";
 export * from "./kernel/GovernanceKernelEngine";
 export * from "./kernel/GovernanceKernelRegistry";
 export * from "./kernel/GovernanceKernelManager";
+
+export * from "./systemkernel/KernelIntegrationStatus";
+export * from "./systemkernel/KernelIntegrationType";
+export * from "./systemkernel/SystemKernelEvent";
+export * from "./systemkernel/SystemKernelIntegrationEngine";
+export * from "./systemkernel/SystemKernelRegistry";
+export * from "./systemkernel/SystemKernelManager";
