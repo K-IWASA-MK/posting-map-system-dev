@@ -1,29 +1,29 @@
-# Walkthrough - Phase 134: Autonomous Optimization Engine Foundation
+# Walkthrough - Phase 135: Self-Evolving AIOS Core Foundation
 
-CIE Platform Phase 134 (自律最適化エンジン構造定義) の実装と検証レポートです。
+CIE Platform Phase 135 (自己進化コア構造定義) の実装と検証レポートです。
 
 ---
 
 ## 🛠️ 実施した変更点
 
 ### 1. 仕様書の新規作成
-* **`docs/specifications/AutonomousOptimizationEngine.md`**
-  - 全レイヤーの出力を検証した監査結果や自己修復定義に基づき、システム全体の実行効率や計画品質などを改善するための最適化計画（OptimizationPlan）を構造化する設計定義書を新規作成。
-  - 最適化ライフサイクル、Graph 統合、および Audit/Healing レイヤーとの連携インターフェースを定義。
+* **`docs/specifications/SelfEvolvingAIOSCore.md`**
+  - AIOSの各レイヤーを動的に評価し、進化提案（EvolutionCandidate）や進化のシミュレーション（Simulation）を行うためのアーキテクチャ定義書を新規作成。
+  - レイヤー進化モデル、進化の制約システム、および実コードの書き換えを伴わない「進化設計」のルール・境界を規定。
 
 ### 2. TypeScript 構造定義 (Blueprint) の作成
-`src/optimization/` 配下に以下のファイル群を新規作成しました。
-- **`OptimizationStatus.ts`**: 列挙型定義 (`IDLE`, `ANALYZING`, `PLANNED`, `SIMULATED`, `VALIDATED`, `REJECTED`)。
-- **`OptimizationType.ts`**: 列挙型定義 (`PERFORMANCE`, `STRUCTURAL`, `EXECUTION_FLOW`, `PLANNING_EFFICIENCY`, `AUDIT_ACCURACY`, `HEALING_STABILITY`, `GRAPH_OPTIMIZATION`, `CROSS_LAYER_OPTIMIZATION`)。
-- **`OptimizationContext.ts`**: 最適化コンテキストインターフェース。
-- **`OptimizationPlan.ts`**: 最適化計画インターフェース。
-- **`AutonomousOptimizationEngine.ts`**: `IAutonomousOptimizationEngine` インターフェース、および抽象クラス `BaseAutonomousOptimizationEngine` の定義（空実装）。
-- **`OptimizationRegistry.ts`**: 最適化計画のレジストリクラスの定義（空実装）。
-- **`OptimizationManager.ts`**: ライフサイクルマネージャクラスの定義（空実装）。
+`src/evolution/` 配下に以下のファイル群を新規作成しました。
+- **`EvolutionStatus.ts`**: 列挙型定義 (`IDLE`, `ANALYZING`, `PLANNING`, `SIMULATED`, `VALIDATED`, `REJECTED`)。
+- **`EvolutionType.ts`**: 列挙型定義 (`STRUCTURAL`, `BEHAVIORAL`, `PERFORMANCE`, `GOVERNANCE`, `ARCHITECTURAL`, `CROSS_LAYER`)。
+- **`EvolutionCandidate.ts`**: 進化提案候補インターフェース。
+- **`EvolutionContext.ts`**: 進化コンテキストインターフェース。
+- **`SelfEvolvingEngine.ts`**: `ISelfEvolvingEngine` インターフェース、および抽象クラス `BaseSelfEvolvingEngine` の定義（空実装）。
+- **`EvolutionRegistry.ts`**: 進化候補のレジストリクラスの定義（空実装）。
+- **`EvolutionManager.ts`**: ライフサイクルマネージャクラスの定義（空実装）。
 
 ### 3. エクスポートの追加
 * **`src/index.ts`**
-  - 新規作成した `optimization/` 配下のすべての定義を外部エクスポートする記述を追加。
+  - 新規作成した `evolution/` 配下のすべての定義を外部エクスポートする記述を追加。
 
 ---
 
@@ -63,6 +63,6 @@ tests/test_serialization.py .                                            [100%]
 ---
 
 ## 📦 Git コミット情報
-- **コミットメッセージ**: `CIE Phase 134: Autonomous Optimization Engine Foundation`
-- **変更範囲**: `docs/specifications/AutonomousOptimizationEngine.md`, `src/optimization/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
+- **コミットメッセージ**: `CIE Phase 135: Self-Evolving AIOS Core Foundation`
+- **変更範囲**: `docs/specifications/SelfEvolvingAIOSCore.md`, `src/evolution/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
 - **ツリー状態**: クリーン

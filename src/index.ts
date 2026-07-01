@@ -102,3 +102,11 @@ export * from "./optimization/OptimizationPlan";
 export * from "./optimization/AutonomousOptimizationEngine";
 export * from "./optimization/OptimizationRegistry";
 export * from "./optimization/OptimizationManager";
+
+export * from "./evolution/EvolutionStatus";
+export * from "./evolution/EvolutionType";
+export * from "./evolution/EvolutionCandidate";
+export * from "./evolution/EvolutionContext";
+export * from "./evolution/SelfEvolvingEngine";
+export * from "./evolution/EvolutionRegistry";
+export * from "./evolution/EvolutionManager";

@@ -1,33 +1,31 @@
-# Implementation Plan - Phase134: Autonomous Optimization Engine Foundation
+# Implementation Plan - Phase135: Self-Evolving AIOS Core Foundation
 
 ## 1. Architecture Goal
-AI Development Platform (AIOS) において、Phase133までに構築された Audit, Healing, Planning, Execution, Graph, Event, Governance の全出力を対象に、システム全体を最適化するための **Autonomous Optimization Engine Foundation** の構造・型・契約（Blueprint）を定義します。
-本フェーズでは、実際の最適化アルゴリズム、AI推論、自動チューニングなどの実行処理は一切行わず、「最適化の構造と契約」のみを定義します。
+AI Development Platform (AIOS) において、「最適化するOS」から「自ら構造を変えるOS」への転換点となる **Self-Evolving AIOS Core Foundation** の構造・型・契約（Blueprint）を定義します。
+本フェーズでは、実際の自己改変（Self-modification）、自動コード生成、ランタイム書き換え、およびAI意思決定処理は一切行わず、進化モデルの設計（抽象層定義）のみを行います。
 
 ---
 
 ## 2. Design Principles
 - **Blueprint Only**: 型、インターフェース、レジストリ、マネージャの構造定義に限定。
-- **No Optimization Execution Logic**: 実際の最適化・チューニング・パフォーマンス向上の実行処理は行わない。
-- **No AI Tuning / Learning**: ML/AIベースの学習や動的なチューニングは排除。
-- **No Performance Computation**: 実際のパフォーマンス計測や計算ロジックは実装しない。
-- **Deterministic Optimization Model Definition**: 決定論的な最適化モデル構造のみ。
-- **Cross-Layer Optimization Design**: 全レイヤーを横断的に最適化できる抽象構造。
-- **Graph-Aware Optimization Abstraction**: System Execution Graph の最適化を表現する抽象。
-- **Stateless Architecture**: 最適化エンジン自体は動的状態を保持しない。
+- **No Self-Modification**: ランタイムやソースコードの自己改変ロジックは実装しない。
+- **No Automatic Code Generation**: コード生成やパッチ適用ロジックは排除。
+- **No AI Decision Execution**: 進化の可否判断におけるAI推論実行は行わない。
+- **Stateless Architecture**: 進化エンジン自体は動的状態を保持しない。
+- **Cross-Layer Evolution Model**: 各レイヤーの動的評価と構造候補定義。
+- **Safe Graph Simulation**: 直接の改変ではなくグラフスナップショット上でのシミュレーション設計。
 
 ---
 
 ## 3. Proposed Changes
 
-### [NEW] `docs/specifications/AutonomousOptimizationEngine.md`
-### [NEW] `src/optimization/OptimizationStatus.ts`
-### [NEW] `src/optimization/OptimizationType.ts`
-### [NEW] `src/optimization/OptimizationContext.ts`
-### [NEW] `src/optimization/OptimizationPlan.ts`
-### [NEW] `src/optimization/AutonomousOptimizationEngine.ts`
-### [NEW] `src/optimization/OptimizationRegistry.ts`
-### [NEW] `src/optimization/OptimizationManager.ts`
+### [NEW] `docs/specifications/SelfEvolvingAIOSCore.md`
+### [NEW] `src/evolution/EvolutionStatus.ts`
+### [NEW] `src/evolution/EvolutionType.ts`
+### [NEW] `src/evolution/EvolutionCandidate.ts`
+### [NEW] `src/evolution/SelfEvolvingEngine.ts`
+### [NEW] `src/evolution/EvolutionRegistry.ts`
+### [NEW] `src/evolution/EvolutionManager.ts`
 ### [MODIFY] `src/index.ts`
 
 ---
@@ -41,7 +39,7 @@ AI Development Platform (AIOS) において、Phase133までに構築された A
 
 ## 5. Definition of Done
 * [ ] 仕様書作成
-* [ ] src/optimization/* 作成
+* [ ] src/evolution/* 作成
 * [ ] index.ts 更新
 * [ ] ビルド PASS
 * [ ] CIE PASS
