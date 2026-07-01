@@ -1,29 +1,28 @@
-# Walkthrough - Phase 135: Self-Evolving AIOS Core Foundation
+# Walkthrough - Phase 136: Autonomous Meta-Governance Engine Foundation
 
-CIE Platform Phase 135 (自己進化コア構造定義) の実装と検証レポートです。
+CIE Platform Phase 136 (自律メタガバナンスエンジン構造定義) の実装と検証レポートです。
 
 ---
 
 ## 🛠️ 実施した変更点
 
 ### 1. 仕様書の新規作成
-* **`docs/specifications/SelfEvolvingAIOSCore.md`**
-  - AIOSの各レイヤーを動的に評価し、進化提案（EvolutionCandidate）や進化のシミュレーション（Simulation）を行うためのアーキテクチャ定義書を新規作成。
-  - レイヤー進化モデル、進化の制約システム、および実コードの書き換えを伴わない「進化設計」のルール・境界を規定。
+* **`docs/specifications/AutonomousMetaGovernanceEngine.md`**
+  - AIOSの最上位統治レイヤーとして、ポリシー・監査ルール・進化制約自体を定義・管理・競合解決するための「メタガバナンス（統治の統治）」アーキテクチャ定義書を新規作成。
+  - ルール衝突回避、権限委任モデル、および実際のルール書き換えを実行しない「統治構造」のルール・契約境界を規定。
 
 ### 2. TypeScript 構造定義 (Blueprint) の作成
-`src/evolution/` 配下に以下のファイル群を新規作成しました。
-- **`EvolutionStatus.ts`**: 列挙型定義 (`IDLE`, `ANALYZING`, `PLANNING`, `SIMULATED`, `VALIDATED`, `REJECTED`)。
-- **`EvolutionType.ts`**: 列挙型定義 (`STRUCTURAL`, `BEHAVIORAL`, `PERFORMANCE`, `GOVERNANCE`, `ARCHITECTURAL`, `CROSS_LAYER`)。
-- **`EvolutionCandidate.ts`**: 進化提案候補インターフェース。
-- **`EvolutionContext.ts`**: 進化コンテキストインターフェース。
-- **`SelfEvolvingEngine.ts`**: `ISelfEvolvingEngine` インターフェース、および抽象クラス `BaseSelfEvolvingEngine` の定義（空実装）。
-- **`EvolutionRegistry.ts`**: 進化候補のレジストリクラスの定義（空実装）。
-- **`EvolutionManager.ts`**: ライフサイクルマネージャクラスの定義（空実装）。
+`src/metagovernance/` 配下に以下のファイル群を新規作成しました。
+- **`MetaGovernanceStatus.ts`**: 列挙型定義 (`IDLE`, `EVALUATING`, `RESOLVING`, `APPLIED`, `CONFLICTED`, `REJECTED`)。
+- **`MetaGovernanceType.ts`**: 列挙型定義 (`POLICY_CONTROL`, `RULE_MANAGEMENT`, `CONFLICT_RESOLUTION`, `PERMISSION_CONTROL`, `SYSTEM_GOVERNANCE`, `CROSS_LAYER_GOVERNANCE`)。
+- **`MetaGovernancePolicy.ts`**: `MetaGovernancePolicy` インターフェース、`GovernanceDecision` インターフェース、および `MetaGovernanceContext` インターフェースの定義。
+- **`MetaGovernanceEngine.ts`**: `IMetaGovernanceEngine` インターフェース、および抽象クラス `BaseMetaGovernanceEngine` の定義（空実装）。
+- **`MetaGovernanceRegistry.ts`**: メタポリシーのレジストリクラスの定義（空実装）。
+- **`MetaGovernanceManager.ts`**: ライフサイクルマネージャクラスの定義（空実装）。
 
 ### 3. エクスポートの追加
 * **`src/index.ts`**
-  - 新規作成した `evolution/` 配下のすべての定義を外部エクスポートする記述を追加。
+  - 新規作成した `metagovernance/` 配下のすべての定義を外部エクスポートする記述を追加。
 
 ---
 
@@ -63,6 +62,6 @@ tests/test_serialization.py .                                            [100%]
 ---
 
 ## 📦 Git コミット情報
-- **コミットメッセージ**: `CIE Phase 135: Self-Evolving AIOS Core Foundation`
-- **変更範囲**: `docs/specifications/SelfEvolvingAIOSCore.md`, `src/evolution/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
+- **コミットメッセージ**: `CIE Phase 136: Autonomous Meta-Governance Engine Foundation`
+- **変更範囲**: `docs/specifications/AutonomousMetaGovernanceEngine.md`, `src/metagovernance/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
 - **ツリー状態**: クリーン

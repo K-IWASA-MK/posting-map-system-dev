@@ -110,3 +110,10 @@ export * from "./evolution/EvolutionContext";
 export * from "./evolution/SelfEvolvingEngine";
 export * from "./evolution/EvolutionRegistry";
 export * from "./evolution/EvolutionManager";
+
+export * from "./metagovernance/MetaGovernanceStatus";
+export * from "./metagovernance/MetaGovernanceType";
+export * from "./metagovernance/MetaGovernancePolicy";
+export * from "./metagovernance/MetaGovernanceEngine";
+export * from "./metagovernance/MetaGovernanceRegistry";
+export * from "./metagovernance/MetaGovernanceManager";

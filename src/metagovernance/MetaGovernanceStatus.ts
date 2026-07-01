@@ -1,0 +1,8 @@
+export enum MetaGovernanceStatus {
+  IDLE = "IDLE",
+  EVALUATING = "EVALUATING",
+  RESOLVING = "RESOLVING",
+  APPLIED = "APPLIED",
+  CONFLICTED = "CONFLICTED",
+  REJECTED = "REJECTED"
+}
