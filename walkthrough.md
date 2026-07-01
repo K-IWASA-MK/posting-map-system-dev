@@ -1,28 +1,28 @@
-# Walkthrough - Phase 136: Autonomous Meta-Governance Engine Foundation
+# Walkthrough - Phase 137: Autonomous Governance Kernel Foundation
 
-CIE Platform Phase 136 (自律メタガバナンスエンジン構造定義) の実装と検証レポートです。
+CIE Platform Phase 137 (自律ガバナンスカーネル構造定義) の実装と検証レポートです。
 
 ---
 
 ## 🛠️ 実施した変更点
 
 ### 1. 仕様書の新規作成
-* **`docs/specifications/AutonomousMetaGovernanceEngine.md`**
-  - AIOSの最上位統治レイヤーとして、ポリシー・監査ルール・進化制約自体を定義・管理・競合解決するための「メタガバナンス（統治の統治）」アーキテクチャ定義書を新規作成。
-  - ルール衝突回避、権限委任モデル、および実際のルール書き換えを実行しない「統治構造」のルール・契約境界を規定。
+* **`docs/specifications/AutonomousGovernanceKernel.md`**
+  - メタガバナンスポリシーに基づくリクエスト受付、ルーティング、衝突調停などを定義するガバナンスカーネル（統治実行中枢）のアーキテクチャ定義書を新規作成。
+  - カーネル状態遷移、Meta-Governance 連携、および実際の書き換えや権限強制操作を行わない「統治実行中枢構造」のルール・契約境界を規定。
 
 ### 2. TypeScript 構造定義 (Blueprint) の作成
-`src/metagovernance/` 配下に以下のファイル群を新規作成しました。
-- **`MetaGovernanceStatus.ts`**: 列挙型定義 (`IDLE`, `EVALUATING`, `RESOLVING`, `APPLIED`, `CONFLICTED`, `REJECTED`)。
-- **`MetaGovernanceType.ts`**: 列挙型定義 (`POLICY_CONTROL`, `RULE_MANAGEMENT`, `CONFLICT_RESOLUTION`, `PERMISSION_CONTROL`, `SYSTEM_GOVERNANCE`, `CROSS_LAYER_GOVERNANCE`)。
-- **`MetaGovernancePolicy.ts`**: `MetaGovernancePolicy` インターフェース、`GovernanceDecision` インターフェース、および `MetaGovernanceContext` インターフェースの定義。
-- **`MetaGovernanceEngine.ts`**: `IMetaGovernanceEngine` インターフェース、および抽象クラス `BaseMetaGovernanceEngine` の定義（空実装）。
-- **`MetaGovernanceRegistry.ts`**: メタポリシーのレジストリクラスの定義（空実装）。
-- **`MetaGovernanceManager.ts`**: ライフサイクルマネージャクラスの定義（空実装）。
+`src/kernel/` 配下に以下のファイル群を新規作成しました。
+- **`KernelStatus.ts`**: 列挙型定義 (`IDLE`, `RECEIVING`, `EVALUATING`, `ROUTING`, `RESOLVED`, `BLOCKED`)。
+- **`KernelType.ts`**: 列挙型定義 (`GOVERNANCE_REQUEST`, `POLICY_EVALUATION`, `META_ROUTING`, `CONSTRAINT_ENFORCEMENT`, `ARBITRATION`, `SYSTEM_CONTROL`)。
+- **`GovernanceRequest.ts`**: `GovernanceRequest` インターフェース、`GovernanceDecisionPacket` インターフェース、および `GovernanceKernelContext` インターフェースの定義。
+- **`GovernanceKernelEngine.ts`**: `IGovernanceKernelEngine` インターフェース、および抽象クラス `BaseGovernanceKernelEngine` の定義（空実装）。
+- **`GovernanceKernelRegistry.ts`**: 統治リクエストのレジストリクラスの定義（空実装）。
+- **`GovernanceKernelManager.ts`**: ライフサイクルマネージャクラスの定義（空実装）。
 
 ### 3. エクスポートの追加
 * **`src/index.ts`**
-  - 新規作成した `metagovernance/` 配下のすべての定義を外部エクスポートする記述を追加。
+  - 新規作成した `kernel/` 配下のすべての定義を外部エクスポートする記述を追加。
 
 ---
 
@@ -62,6 +62,6 @@ tests/test_serialization.py .                                            [100%]
 ---
 
 ## 📦 Git コミット情報
-- **コミットメッセージ**: `CIE Phase 136: Autonomous Meta-Governance Engine Foundation`
-- **変更範囲**: `docs/specifications/AutonomousMetaGovernanceEngine.md`, `src/metagovernance/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
+- **コミットメッセージ**: `CIE Phase 137: Autonomous Governance Kernel Foundation`
+- **変更範囲**: `docs/specifications/AutonomousGovernanceKernel.md`, `src/kernel/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
 - **ツリー状態**: クリーン

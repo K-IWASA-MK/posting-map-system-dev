@@ -1,30 +1,30 @@
-# Implementation Plan - Phase136: Autonomous Meta-Governance Engine Foundation
+# Implementation Plan - Phase137: Autonomous Governance Kernel Foundation
 
 ## 1. Architecture Goal
-AI Development Platform (AIOS) において、「ルールに従うOS」から「ルールそのものを統治するOS」への転換点となる **Autonomous Meta-Governance Engine Foundation** の構造・型・契約（Blueprint）を定義します。
-※ 本フェーズでは、実際のポリシー変更の実行、自動権限変更、AIによる意思決定、ルール書き換えの処理は一切行わず、統治構造の定義（抽象層定義）のみを行います。
+AI Development Platform (AIOS) において、Meta-Governance を実行可能なカーネル構造へ昇格させるための **Autonomous Governance Kernel Foundation** の構造・型・契約（Blueprint）を定義します。
+※ 本フェーズでは、実際のポリシー適用・評価実行、権限制御の強制適用、システム書き換え、意思決定処理そのものは一切行わず、カーネル構造・インターフェースの定義のみを行います。
 
 ---
 
 ## 2. Design Principles
 - **Blueprint Only**: 型、インターフェース、レジストリ、マネージャの構造定義に限定。
-- **No Rule Enforcement**: ランタイムにおけるポリシー強制ロジックは実装しない。
-- **No Permission Changes**: システム権限・認可ロールの動的書き換えは排除。
-- **No AI Decision Execution**: 競合解決やポリシー調整におけるAI推論実行は行わない。
-- **Stateless Architecture**: メタガバナンスエンジン自体は動的状態を保持しない。
-- **Meta-Level Policy Control**: ガバナンスポリシーや監査ルールを包括的に制御するメタレイヤー設計。
+- **No Ingress Execution**: リクエスト受付やルーティングの実際の処理は実装しない。
+- **No Policy Enforcement**: ランタイムでのポリシー強制適用は排除。
+- **No Permission Modifications**: 実システム権限に対する動的変更処理は記述しない。
+- **Stateless Architecture**: カーネルエンジン自体は動的状態を保持しない。
+- **Meta-Governance Constraint**: メタガバナンスルールに制約された実行カーネル構造。
 
 ---
 
 ## 3. Proposed Changes
 
-### [NEW] `docs/specifications/AutonomousMetaGovernanceEngine.md`
-### [NEW] `src/metagovernance/MetaGovernanceStatus.ts`
-### [NEW] `src/metagovernance/MetaGovernanceType.ts`
-### [NEW] `src/metagovernance/MetaGovernancePolicy.ts`
-### [NEW] `src/metagovernance/MetaGovernanceEngine.ts`
-### [NEW] `src/metagovernance/MetaGovernanceRegistry.ts`
-### [NEW] `src/metagovernance/MetaGovernanceManager.ts`
+### [NEW] `docs/specifications/AutonomousGovernanceKernel.md`
+### [NEW] `src/kernel/KernelStatus.ts`
+### [NEW] `src/kernel/KernelType.ts`
+### [NEW] `src/kernel/GovernanceRequest.ts`
+### [NEW] `src/kernel/GovernanceKernelEngine.ts`
+### [NEW] `src/kernel/GovernanceKernelRegistry.ts`
+### [NEW] `src/kernel/GovernanceKernelManager.ts`
 ### [MODIFY] `src/index.ts`
 
 ---
@@ -38,7 +38,7 @@ AI Development Platform (AIOS) において、「ルールに従うOS」から�
 
 ## 5. Definition of Done
 * [ ] 仕様書作成
-* [ ] src/metagovernance/* 作成
+* [ ] src/kernel/* 作成
 * [ ] index.ts 更新
 * [ ] ビルド PASS
 * [ ] CIE PASS

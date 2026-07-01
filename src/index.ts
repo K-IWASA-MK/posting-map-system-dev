@@ -117,3 +117,10 @@ export * from "./metagovernance/MetaGovernancePolicy";
 export * from "./metagovernance/MetaGovernanceEngine";
 export * from "./metagovernance/MetaGovernanceRegistry";
 export * from "./metagovernance/MetaGovernanceManager";
+
+export * from "./kernel/KernelStatus";
+export * from "./kernel/KernelType";
+export * from "./kernel/GovernanceRequest";
+export * from "./kernel/GovernanceKernelEngine";
+export * from "./kernel/GovernanceKernelRegistry";
+export * from "./kernel/GovernanceKernelManager";
