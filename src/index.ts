@@ -166,3 +166,10 @@ export * from "./auditgate/AuditSignal";
 export * from "./auditgate/AuditGateEngine";
 export * from "./auditgate/AuditGateRegistry";
 export * from "./auditgate/AuditGateManager";
+
+export * from "./safety/SafetyStatus";
+export * from "./safety/SafetyType";
+export * from "./safety/RewriteCandidate";
+export * from "./safety/RewriteSafetyEngine";
+export * from "./safety/SafetyRegistry";
+export * from "./safety/SafetyManager";
