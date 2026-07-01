@@ -145,3 +145,11 @@ export * from "./selfregulation/KernelLoadVector";
 export * from "./selfregulation/SelfRegulatingKernelEngine";
 export * from "./selfregulation/KernelRuntimeRegistry";
 export * from "./selfregulation/KernelRuntimeManager";
+
+export * from "./selfoptimization/KernelOptimizationStatus";
+export * from "./selfoptimization/KernelOptimizationType";
+export * from "./selfoptimization/OptimizationVector";
+export * from "./selfoptimization/SelfOptimizingKernelEngine";
+export * from "./selfoptimization/KernelOptimizationRegistry";
+export * from "./selfoptimization/KernelOptimizationManager";
+
