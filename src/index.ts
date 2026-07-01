@@ -159,3 +159,10 @@ export * from "./adaptive/EnvironmentVector";
 export * from "./adaptive/AdaptiveKernelEngine";
 export * from "./adaptive/AdaptiveRegistry";
 export * from "./adaptive/AdaptiveManager";
+
+export * from "./auditgate/AuditGateStatus";
+export * from "./auditgate/AuditGateType";
+export * from "./auditgate/AuditSignal";
+export * from "./auditgate/AuditGateEngine";
+export * from "./auditgate/AuditGateRegistry";
+export * from "./auditgate/AuditGateManager";
