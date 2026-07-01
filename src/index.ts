@@ -79,7 +79,11 @@ export * from "./planning/AutonomousAIPlanningEngine";
 export * from "./planning/PlanningRegistry";
 export * from "./planning/PlanningManager";
 
-
-
-
+export * from "./audit/AuditStatus";
+export * from "./audit/AuditType";
+export * from "./audit/AuditContext";
+export * from "./audit/AuditResult";
+export * from "./audit/AutonomousAuditEngine";
+export * from "./audit/AuditRegistry";
+export * from "./audit/AuditManager";
 

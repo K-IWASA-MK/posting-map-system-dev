@@ -1,0 +1,8 @@
+export enum AuditStatus {
+  PENDING = "PENDING",
+  RUNNING = "RUNNING",
+  PASSED = "PASSED",
+  FAILED = "FAILED",
+  WARNING = "WARNING",
+  SKIPPED = "SKIPPED"
+}
