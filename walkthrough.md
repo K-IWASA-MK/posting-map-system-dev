@@ -1,28 +1,28 @@
-# Walkthrough - Phase 139: Autonomous Kernel Feedback Stabilization Engine
+# Walkthrough - Phase 140: Autonomous Self-Regulating Kernel Runtime
 
-CIE Platform Phase 139 (自律カーネルフィードバック安定化エンジン構造定義) の実装と検証レポートです。
+CIE Platform Phase 140 (自己調整型カーネルランタイム構造定義) の実装と検証レポートです。
 
 ---
 
 ## 🛠️ 実施した変更点
 
 ### 1. 仕様書の新規作成
-* **`docs/specifications/AutonomousKernelFeedbackStabilization.md`**
-  - AIOSの全レイヤーを循環する閉ループにおいて発生しうる状態振動、イベント過負荷を抑え、定常状態へ収束させるためのフィードバック安定化アーキテクチャ定義書を新規作成。
-  - シグナル測定（measure）、安定化ベクトル（StabilityVector）、および実際の減衰や流量制御介入を行わない「安定化制御バス構造」のルール・契約境界を規定。
+* **`docs/specifications/SelfRegulatingKernelRuntime.md`**
+  - カーネルが自身にかかる負荷（CPU圧、イベント流量、キュー深度等）を自律検知し、流量制御や優先順位付けなどの自己調整（Self-Regulation）アクションを策定するアーキテクチャ定義書を新規作成。
+  - 自己調整ライフサイクル、カーネル負荷ベクトル（KernelLoadVector）、調整アクション、および実際の調整実行やリソースの動的操作を行わない「自己調整ランタイム構造」のルール・契約境界を規定。
 
 ### 2. TypeScript 構造定義 (Blueprint) の作成
-`src/stabilization/` 配下に以下のファイル群を新規作成しました。
-- **`StabilizationStatus.ts`**: 列挙型定義 (`IDLE`, `MONITORING`, `ANALYZING`, `CORRECTING`, `STABILIZING`, `STABLE`, `DEGRADED`)。
-- **`StabilizationType.ts`**: 列挙型定義 (`FEEDBACK_CONTROL`, `LOOP_DAMPING`, `EVENT_THROTTLING`, `GRAPH_STABILIZATION`, `KERNEL_BALANCING`, `GOVERNANCE_NORMALIZATION`, `EXECUTION_SMOOTHING`)。
-- **`FeedbackSignal.ts`**: `FeedbackSignal` インターフェース、`StabilityVector` インターフェース、および `StabilityState` 列挙型の定義。
-- **`FeedbackStabilizationEngine.ts`**: `IFeedbackStabilizationEngine` インターフェース、および抽象クラス `BaseFeedbackStabilizationEngine` の定義（空実装）。
-- **`StabilizationRegistry.ts`**: シグナル情報のレジストリクラスの定義（空実装）。
-- **`StabilizationManager.ts`**: 安定化ライフサイクルマネージャクラスの定義（空実装）。
+`src/selfregulation/` 配下に以下のファイル群を新規作成しました。
+- **`KernelRuntimeStatus.ts`**: 列挙型定義 (`IDLE`, `MONITORING`, `ANALYZING`, `REGULATING`, `STABILIZING`, `OPTIMIZED`, `OVERLOADED`, `CRITICAL`)。
+- **`KernelRuntimeType.ts`**: 列挙型定義 (`LOAD_BALANCING`, `EVENT_THROTTLING`, `EXECUTION_PRIORITIZATION`, `GRAPH_REBALANCING`, `GOVERNANCE_SMOOTHING`, `FEEDBACK_CONTROL`, `RESOURCE_OPTIMIZATION`)。
+- **`KernelLoadVector.ts`**: `KernelLoadVector` インターフェース、`RegulationAction` 列挙型、および `KernelStateProfile` 列挙型の定義。
+- **`SelfRegulatingKernelEngine.ts`**: `ISelfRegulatingKernelEngine` インターフェース、および抽象クラス `BaseSelfRegulatingKernelEngine` の定義（空実装）。
+- **`KernelRuntimeRegistry.ts`**: 負荷統計情報のレジストリクラスの定義（空実装）。
+- **`KernelRuntimeManager.ts`**: 自己調整ランタイムのマネージャクラスの定義（空実装）。
 
 ### 3. エクスポートの追加
 * **`src/index.ts`**
-  - 新規作成した `stabilization/` 配下のすべての定義を外部エクスポートする記述を追加。
+  - 新規作成した `selfregulation/` 配下のすべての定義を外部エクスポートする記述を追加。
 
 ---
 
@@ -62,6 +62,6 @@ tests/test_serialization.py .                                            [100%]
 ---
 
 ## 📦 Git コミット情報
-- **コミットメッセージ**: `CIE Phase 139: Autonomous Kernel Feedback Stabilization Engine`
-- **変更範囲**: `docs/specifications/AutonomousKernelFeedbackStabilization.md`, `src/stabilization/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
+- **コミットメッセージ**: `CIE Phase 140: Autonomous Self-Regulating Kernel Runtime`
+- **変更範囲**: `docs/specifications/SelfRegulatingKernelRuntime.md`, `src/selfregulation/*`, `src/index.ts`, `HANDOVER.md`, `walkthrough.md`, `task.md`
 - **ツリー状態**: クリーン

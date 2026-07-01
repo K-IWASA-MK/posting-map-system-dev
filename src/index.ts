@@ -138,3 +138,10 @@ export * from "./stabilization/FeedbackSignal";
 export * from "./stabilization/FeedbackStabilizationEngine";
 export * from "./stabilization/StabilizationRegistry";
 export * from "./stabilization/StabilizationManager";
+
+export * from "./selfregulation/KernelRuntimeStatus";
+export * from "./selfregulation/KernelRuntimeType";
+export * from "./selfregulation/KernelLoadVector";
+export * from "./selfregulation/SelfRegulatingKernelEngine";
+export * from "./selfregulation/KernelRuntimeRegistry";
+export * from "./selfregulation/KernelRuntimeManager";
