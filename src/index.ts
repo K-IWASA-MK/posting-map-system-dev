@@ -34,3 +34,12 @@ export * from "./resume/ResumeScopeDefinition";
 export * from "./resume/ResumeScopeEngine";
 export * from "./resume/ResumeScopeRegistry";
 export * from "./resume/ResumeScopeManager";
+
+export * from "./eventbus/GovernanceEventType";
+export * from "./eventbus/GovernanceEventPriority";
+export * from "./eventbus/GovernanceEvent";
+export * from "./eventbus/GovernanceEventContext";
+export * from "./eventbus/GovernanceEventBusEngine";
+export * from "./eventbus/GovernanceEventRegistry";
+export * from "./eventbus/GovernanceEventDispatcher";
+

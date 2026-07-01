@@ -1,22 +1,18 @@
-# タスクチェックリスト - Foundation Fix Pack v1
+# タスクチェックリスト - Phase127: Governance Event Bus Foundation
 
-- [x] ① Serialization Round Trip 修正 (段階的復元 & 後方互換対応)
-  - [x] 対象 DTO ファイルに `from_dict` を追加（Shallow Restoration）
-  - [x] 既存（Phase 81~90）の JSON 互換性を保証する後方互換設計 of 適用
-- [x] ② Unit Test の新設と実装 (`tests/test_serialization.py`)
-  - [x] `to_dict() == to_dict()` による全 DTO の Round Trip 検証テスト
-- [x] ③ Manager Test の実装 (`tests/test_manager.py`)
-  - [x] Stateless, Deterministic, `metadata.copy()`, Mutation なしを検証
-  - [x] `assert input is not output` による参照等価性排除の検証
-- [x] ④ Audit 強化 (`tools/cie.py` 拡張)
-  - [x] `audit-foundation` に `serialization` 項目を追加
-  - [x] 監査結果の出力・保存順序を規定通りに固定
-  - [x] `Checked DTO`, `Failed` 件数などの Summary を `foundation_audit.json` に出力
-- [x] ⑤ 動作検証の実行
-  - [x] `pytest tests/` の実行と PASS 確認
-  - [x] `python3 tools/cie.py verify`
-  - [x] `python3 tools/cie.py doctor`
-  - [x] `python3 tools/cie.py audit-foundation`
-- [x] ⑥ ドキュメント作成 & コミット
-  - [x] `walkthrough.md` に検証結果を反映
-  - [x] ローカル Git コミットの作成
+- [x] ① 仕様書 `docs/specifications/GovernanceEventBus.md` の新規作成
+- [x] ② `src/eventbus/` ディレクトリ配下の型・定義作成
+  - [x] `GovernanceEventType.ts` (列挙型)
+  - [x] `GovernanceEventPriority.ts` (列挙型)
+  - [x] `GovernanceEvent.ts` (インターフェース)
+  - [x] `GovernanceEventContext.ts` (インターフェース)
+- [x] ③ `src/eventbus/` ディレクトリ配下のエンジン・レジストリ・ディスパッチャ（空実装）作成
+  - [x] `GovernanceEventBusEngine.ts` (インターフェース & 抽象クラス)
+  - [x] `GovernanceEventRegistry.ts` (レジストリクラス)
+  - [x] `GovernanceEventDispatcher.ts` (ディスパッチャクラス)
+- [x] ④ `src/index.ts` の更新（エクスポートの追加）
+- [x] ⑤ ビルド検証 (`npm run build`) の PASS 確認
+- [x] ⑥ CIE 健全性検証 (`verify` および `doctor`) の PASS 確認
+- [x] ⑦ 既存テスト (`pytest`) の PASS 確認
+- [x] ⑧ `HANDOVER.md` の更新
+- [x] ⑨ Git コミット (`CIE Phase 127: Governance Event Bus Foundation`) の作成
