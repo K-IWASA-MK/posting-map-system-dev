@@ -87,3 +87,10 @@ export * from "./audit/AutonomousAuditEngine";
 export * from "./audit/AuditRegistry";
 export * from "./audit/AuditManager";
 
+export * from "./healing/HealingStatus";
+export * from "./healing/HealingType";
+export * from "./healing/HealingContext";
+export * from "./healing/HealingPlan";
+export * from "./healing/SelfHealingEngine";
+export * from "./healing/HealingRegistry";
+export * from "./healing/HealingManager";

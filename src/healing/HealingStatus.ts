@@ -1,0 +1,8 @@
+export enum HealingStatus {
+  IDLE = "IDLE",
+  DETECTING = "DETECTING",
+  ANALYZING = "ANALYZING",
+  PLANNED = "PLANNED",
+  REJECTED = "REJECTED",
+  READY = "READY"
+}
