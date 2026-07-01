@@ -840,7 +840,14 @@ window.addEventListener('offline', () => {
   setSyncStatus('offline');
 });
 
+let isPageTransitioning = false;
+
 async function switchPage(id, force = false) {
+  if (isPageTransitioning) {
+    console.warn("[switchPage] Blocked due to active transition.");
+    return;
+  }
+
   const pages = document.querySelectorAll('.page');
   const targetId = id === 'detail' ? 'page-detail' :
                    id === 'settings' ? 'page-settings' :
@@ -854,28 +861,33 @@ async function switchPage(id, force = false) {
   // すでにアクティブなら多重遷移を防ぐためスキップ
   if (!force && !target.classList.contains('hidden') && target.style.opacity === '1') return;
 
-  // エリア関連のページ切り替えであれば直前のページタイプを記憶
-  if (id === 'areas' || id === 'detail') {
-    lastAreaSubPage = id;
-  }
+  isPageTransitioning = true;
 
-  // 1. 現在表示されているページを上にスライドさせながらフェードアウト
-  const activePage = Array.from(pages).find(p => !p.classList.contains('hidden'));
-  if (activePage) {
-    const activeId = pageIdMap[activePage.id];
-    if (activeId) {
-      scrollPositions[activeId] = $('content').scrollTop;
+  try {
+    // エリア関連のページ切り替えであれば直前のページタイプを記憶
+    if (id === 'areas' || id === 'detail') {
+      lastAreaSubPage = id;
     }
-    activePage.style.opacity = '0';
-    activePage.style.transform = 'translateY(-12px)';
-    await new Promise(r => setTimeout(r, 200)); // アニメーション時間分待つ
-    activePage.classList.add('hidden');
-  } else {
+
+    // 1. 現在表示されているページを上にスライドさせながらフェードアウト
+    const activePage = Array.from(pages).find(p => !p.classList.contains('hidden'));
+    if (activePage) {
+      const activeId = pageIdMap[activePage.id];
+      if (activeId) {
+        scrollPositions[activeId] = $('content').scrollTop;
+      }
+      activePage.style.opacity = '0';
+      activePage.style.transform = 'translateY(-12px)';
+      await new Promise(r => setTimeout(r, 200)); // アニメーション時間分待つ
+    }
+
+    // すべてのページを確実にリセット（重複防止の最終防壁）
     pages.forEach(p => {
-      p.classList.add('hidden');
-      p.style.opacity = '0';
+      if (p.id !== targetId) {
+        p.classList.add('hidden');
+        p.style.opacity = '0';
+      }
     });
-  }
 
   // 2. ページに応じた処理・レンダリングを行う
   if (id === 'settings') renderSettings();
@@ -1047,18 +1059,21 @@ async function switchPage(id, force = false) {
     }
   });
 
-  // スクロール位置の復元
-  if (id === 'areas' && window.currentCityDetailAreaName) {
-    setTimeout(() => {
-      const cardEl = document.getElementById(`area-card-${window.currentCityDetailAreaName}`);
-      if (cardEl) {
-        cardEl.scrollIntoView({ block: 'center', behavior: 'auto' });
-      } else {
-        $('content').scrollTo(0, scrollPositions[id] || 0);
-      }
-    }, 50);
-  } else {
-    $('content').scrollTo(0, scrollPositions[id] || 0);
+    // スクロール位置の復元
+    if (id === 'areas' && window.currentCityDetailAreaName) {
+      setTimeout(() => {
+        const cardEl = document.getElementById(`area-card-${window.currentCityDetailAreaName}`);
+        if (cardEl) {
+          cardEl.scrollIntoView({ block: 'center', behavior: 'auto' });
+        } else {
+          $('content').scrollTo(0, scrollPositions[id] || 0);
+        }
+      }, 50);
+    } else {
+      $('content').scrollTo(0, scrollPositions[id] || 0);
+    }
+  } finally {
+    isPageTransitioning = false;
   }
 }
 
