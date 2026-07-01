@@ -161,7 +161,7 @@ input::placeholder { text-align: center; }
   height: 100dvh !important;
   z-index: 1000 !important;
   background-color: #000000 !important;
-  display: flex !important;
+  display: flex;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
