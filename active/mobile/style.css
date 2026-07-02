@@ -363,3 +363,18 @@ select:-webkit-autofill:focus {
   transform: scale(0.98);
   box-shadow: 0 0 20px rgba(37, 99, 235, 0.02);
 }
+
+/* DIAGNOSTIC CSS - REQUESTED BY USER */
+* {
+  outline: 1px solid red !important;
+}
+
+html, body, #app {
+  background: white !important;
+}
+
+#loading, #screen-gateway {
+  display: none !important;
+  opacity: 0 !important;
+  z-index: -1 !important;
+}
