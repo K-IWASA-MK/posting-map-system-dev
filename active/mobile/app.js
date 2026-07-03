@@ -1,5 +1,14 @@
 const $ = id => document.getElementById(id);
 
+// Phase 5: ID型正規化（Single Source of Truth）
+window.normalizeUserInfo = function(userInfo) {
+  if (!userInfo) return userInfo;
+  return {
+    ...userInfo,
+    id: userInfo.id == null ? "" : String(userInfo.id),
+  };
+};
+
 // デバッグログ出力関数 (本番用: コンソールのみ出力)
 window.logDebug = function(msg) {
   console.log("[DEBUG]", msg);
@@ -1259,7 +1268,7 @@ async function saveProfile() {
     logDebug(`saveProfile: API result: ${JSON.stringify(res)}`);
     if (res && res.success) {
       logDebug("saveProfile: success! storing user_info to localStorage");
-      localStorage.setItem('user_info', JSON.stringify({last, first, id: res.id}));
+      localStorage.setItem('user_info', JSON.stringify(window.normalizeUserInfo({last, first, id: res.id})));
       logDebug("saveProfile: switching to settings page");
       switchPage('settings', true);
       $('loading').classList.add('opacity-0');
@@ -1351,16 +1360,17 @@ async function safeInitApp() {
                 lineUserId: profile.userId,
                 picture: profile.pictureUrl
               };
-              localStorage.setItem('user_info', JSON.stringify(userInfo));
+              localStorage.setItem('user_info', JSON.stringify(window.normalizeUserInfo(userInfo)));
               logDebug("Registered! Staff ID: " + res.id);
             } else {
               throw new Error("GAS registration failed");
             }
           } else {
             // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
+            userInfo.first = userInfo.first || '';
             userInfo.lineUserId = profile.userId;
             userInfo.picture = profile.pictureUrl;
-            localStorage.setItem('user_info', JSON.stringify(userInfo));
+            localStorage.setItem('user_info', JSON.stringify(window.normalizeUserInfo(userInfo)));
             // D列にLINE_USER_IDが未設定の可能性があるためバックグラウンドで更新
             callApiPost('registerStaff', {
               lastName: userInfo.last,

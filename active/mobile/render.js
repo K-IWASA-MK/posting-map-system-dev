@@ -666,7 +666,8 @@ function toggleDone(areaName, rowId, checkbox) {
 }
 
 function renderSettings() {
-  const userInfo = JSON.parse(localStorage.getItem('user_info'));
+  let userInfo = JSON.parse(localStorage.getItem('user_info'));
+  userInfo = window.normalizeUserInfo(userInfo);
   const container = $('settings-content');
   
   if (!userInfo) {
@@ -709,7 +710,8 @@ function renderSettings() {
       </div>
     `;
 
-    const formattedId = userInfo.id ? userInfo.id.replace(/^[A-Za-z]+/, 'STAFF ID ') : '';
+    const id = String(userInfo.id ?? "");
+    const formattedId = id ? id.replace(/^[A-Za-z]+/, 'STAFF ID ') : '';
     const rawBranch = localStorage.getItem('branch_name') || '';
     const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : '';
 
@@ -931,14 +933,14 @@ function renderStorageList(stocks) {
     const rowsHtml = list.map(s => {
       return `
         <div class="stock-row flex flex-col pt-1 pb-4 border-b border-white/5 last:border-b-0 rounded-xl px-2 -mx-2 gap-2"
-          data-name="${(s.staffName||'').replace(/"/g,'&quot;')}"
-          data-id="${(s.staffId||'').replace(/"/g,'&quot;')}"
-          data-loc="${(s.location||'').replace(/"/g,'&quot;')}"
+          data-name="${String(s.staffName||'').replace(/"/g,'&quot;')}"
+          data-id="${String(s.staffId||'').replace(/"/g,'&quot;')}"
+          data-loc="${String(s.location||'').replace(/"/g,'&quot;')}"
           data-count="${s.count||0}">
           
           <!-- 1行目：左詰め（名前） -->
           <div class="w-full text-left">
-            <div class="text-sm font-black text-white truncate">${(s.staffName||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="text-sm font-black text-white truncate">${String(s.staffName||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
           </div>
           
           <!-- 2行目：中央揃え（枚数とLINEボタン） -->
@@ -958,7 +960,7 @@ function renderStorageList(stocks) {
           
           <!-- 3行目：右詰め（更新日時） -->
           <div class="w-full text-right">
-            <div class="text-[9px] text-white/40 font-mono truncate">UPDATE: ${(s.updatedAt||'---').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+            <div class="text-[9px] text-white/40 font-mono truncate">UPDATE: ${String(s.updatedAt||'---').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
           </div>
         </div>`;
     }).join('');
