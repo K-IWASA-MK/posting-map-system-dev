@@ -1024,17 +1024,12 @@ async function switchPage(id, force = false) {
     contentEl.style.overflowY = 'auto';
   }
 
-  // 4. 次のページを少し下から準備してフェードイン
-  target.style.opacity = '0';
-  target.style.transform = 'translateY(12px)';
-  target.classList.remove('hidden');
-  
-  // リフローを強制してアニメーションを適用
-  target.offsetHeight; 
-  
+  // 4. トランジションを無効化し、直接表示する（Phase 4-1）
+  target.style.transition = 'none';
   target.style.opacity = '1';
-  target.style.transform = 'translateY(0)';
-  
+  target.style.transform = 'none';
+  target.style.display = 'block';
+  target.classList.remove('hidden');
 
   // 下ナビのタブのアクティブ状態の不透明度とカラーを調整
   document.querySelectorAll('.nav-btn').forEach((b) => { 
