@@ -373,8 +373,3 @@ html, body, #app {
   background: white !important;
 }
 
-#loading, #screen-gateway {
-  display: none !important;
-  opacity: 0 !important;
-  z-index: -1 !important;
-}
