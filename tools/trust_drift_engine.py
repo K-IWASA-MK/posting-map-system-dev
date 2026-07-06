@@ -139,7 +139,47 @@ def compute_trust_graph_with_drift():
     except Exception as e:
         print(f"Error saving registry: {e}", file=sys.stderr)
         
+    # Dispatch event payload to Event Bus HTTP API with Retry layer
+    dispatch_event("TRUST_UPDATED", "trust_drift_engine", registry)
+    
     return registry
+
+def dispatch_event(event_type, source, payload):
+    import urllib.request
+    import uuid
+    import time
+    
+    events = load_events()
+    seq_id = len(events) + 1
+    
+    envelope = {
+        "eventId": f"EVT-{uuid.uuid4().hex[:16].upper()}",
+        "sequenceId": seq_id,
+        "timestamp": time.time(),
+        "source": source,
+        "type": event_type,
+        "payload": payload
+    }
+    
+    url = "http://localhost:8081/publish"
+    data = json.dumps(envelope).encode("utf-8")
+    
+    for attempt in range(1, 4):
+        try:
+            req = urllib.request.Request(
+                url, 
+                data=data, 
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=2.0) as response:
+                if response.status == 200:
+                    return True
+        except Exception as e:
+            # If server not running, sleep and retry
+            time.sleep(0.5)
+            
+    return False
 
 def main():
     parser = argparse.ArgumentParser(description="AIOS Trust Drift Engine (Deterministic Decay & Enforcement)")
