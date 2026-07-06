@@ -1,3 +1,19 @@
+# Release Notes - v4.14-boot-trust
+
+## 🚀 New Features & Enhancements
+
+### 1. Kernel Trust Bootstrap & Double-Embedded Golden Anchors (AIOS Phase 144)
+- **信頼の起源 (Root of Trust) の確立**:
+  - `aios_kernel_daemon.js` の SHA-256 不変ゴールデンハッシュ値を定義し、外部JSONではなくスクリプト内（Nodeデーモン、Pythonプロキシ、レビューエンジン）に二重ハードコード（Double-Embedded constants）で保持。AIによるハッシュ改ざんの攻撃面を完全に排除。
+- **ブートストラップ循環依存の解消 (Pre-Boot / Trusted Mode)**:
+  - 起動直後の **Pre-Trust Mode (Pre-Boot)** を実装。IPC（標準入出力）を完全にシャットアウトし、HMACセッション鍵もメモリ上に存在しない状態から開始。
+  - 自身のファイルハッシュ（ハッシュ埋め込み行のコメント部を除外した正規ハッシュ）を計算し、Embedded Root Hash と照合する Pre-Boot 整合性検証を実行。
+  - 検証が PASS した時点でのみ **Trusted Mode** へ状態遷移し、初めて HMAC セッションキーをロード・生成して IPC ポートをアンロック（ハッシュ不一致時は `exit 1` 強制停止）。
+- **最上位検証ゲート (Rule 019: Kernel Attestation)**:
+  - `architecture_reviewer.py` の静的検査開始時、一番最初にプロキシを介して `getKernelAttestation` を呼び出し、カーネルが整合性チェックをパスして `TRUSTED` であることをダブルチェックで検証する最上位強制ゲートを構築。
+
+---
+
 # Release Notes - v4.13-isolated-kernel
 
 ## 🚀 New Features & Enhancements
