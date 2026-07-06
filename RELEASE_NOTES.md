@@ -1,3 +1,21 @@
+# Release Notes - v4.6-workflow-engine
+
+## 🚀 New Features & Enhancements
+
+### 1. Workflow Engine Foundation 完成 (AIOS Phase 136)
+- **並列タスクルーティング制御 (`parallelGroups`)**:
+  - 先行の `TSK-0001` 完了後、依存する複数の並列タスク（`TSK-0002` と `TSK-0003`）を同時に活性化・アサインさせる並列グラフ解決機能を実装。
+- **Merge Gate (マージゲート) 機能**:
+  - 指定された全開発タスク（`TSK-0002`, `TSK-0003`）が完了するまで、最終リリースフェーズ（`TSK-0004`）のアサインをロックする不整合制御。ゲートにロック解除条件や理由を明示的に保持。
+- **Workflow Integrity Audit (不整合監査システム)**:
+  - `--audit` コマンドにより、閉路探索(DFS)を用いた循環依存（無限ループ）、デッドロック、タスクの欠落、マージゲート不整合を検出し、ビルドやプロジェクト実行前に未然に防ぐ品質ゲートを構築。
+- **Task State Machine (状態遷移マシン) の厳格化**:
+  - `TODO` ➔ `ASSIGNED` ➔ `IN_PROGRESS` ➔ `UNDER_REVIEW` ➔ `COMPLETED` 等の状態遷移ルールを定義。完了後のステータス逆行や不正ステップをガード。
+- **Orchestration Event History (監査イベントログ) の構築 (`tools/orchestrator_events.json`)**:
+  - 各レコードに `eventVersion: "1.0.0"` を持たせ、アサインやリトライ、フォールバック、ステータス変更の全遷移履歴をタイムスタンプ付きで記録。
+
+---
+
 # Release Notes - v4.5-ai-team-orchestration
 
 ## 🚀 New Features & Enhancements
