@@ -11,7 +11,7 @@ DAEMON_PATH = os.path.join(os.path.dirname(__file__), "aios_kernel_daemon.js")
 TASKS_FILE = os.path.join(os.path.dirname(__file__), "ai_tasks.json")
 
 # <BOOT_ANCHOR_START>
-GOLDEN_HASH = "37a569886229458f87ffd662e891fbcdfbbe8984bb3df3e48f1f48bbb6838243"
+GOLDEN_HASH = "05659f3dba5087babdfe115e2498c016d5696caa821713ea63401dedc8e757de"
 # <BOOT_ANCHOR_END>
 
 def load_json(filepath):

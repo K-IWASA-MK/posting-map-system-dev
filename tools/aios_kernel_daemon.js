@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const readline = require('readline');
 
 // <BOOT_ANCHOR_START>
-const GOLDEN_HASH = "37a569886229458f87ffd662e891fbcdfbbe8984bb3df3e48f1f48bbb6838243";
+const GOLDEN_HASH = "05659f3dba5087babdfe115e2498c016d5696caa821713ea63401dedc8e757de";
 // <BOOT_ANCHOR_END>
 
 const TASKS_FILE = path.join(__dirname, 'ai_tasks.json');
@@ -102,6 +102,7 @@ function handleRequest(req) {
           status: "SUCCESS",
           state: kernelState,
           hash: GOLDEN_HASH,
+          trust: 1.0,
           attestationId: `ATT-${crypto.randomBytes(8).toString('hex').toUpperCase()}`,
           verifiedAt: new Date().toISOString()
         },

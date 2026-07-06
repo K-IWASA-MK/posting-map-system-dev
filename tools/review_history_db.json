@@ -3393,5 +3393,243 @@
       }
     },
     "violations": []
+  },
+  {
+    "reviewId": "20260706031627",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T03:16:27.427345+00:00",
+    "summary": {
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706031628",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T03:16:28.402087+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706032108",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T03:21:08.748478+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 2,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0001. Expected hash 'db9ddcf677e44a90d7284ad93e0fb891c343f447758178796899cf9e3d9c790f' but got 'eee1d5323360a43e8bc012f9879d015f0334325f54a95a6c3e6f3c22922e20ef'."
+      },
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0002. Expected hash 'db9ddcf677e44a90d7284ad93e0fb891c343f447758178796899cf9e3d9c790f' but got 'eee1d5323360a43e8bc012f9879d015f0334325f54a95a6c3e6f3c22922e20ef'."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706032117",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T03:21:17.771454+00:00",
+    "summary": {
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 2,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0001. Expected hash 'db9ddcf677e44a90d7284ad93e0fb891c343f447758178796899cf9e3d9c790f' but got 'eee1d5323360a43e8bc012f9879d015f0334325f54a95a6c3e6f3c22922e20ef'."
+      },
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0002. Expected hash 'db9ddcf677e44a90d7284ad93e0fb891c343f447758178796899cf9e3d9c790f' but got 'eee1d5323360a43e8bc012f9879d015f0334325f54a95a6c3e6f3c22922e20ef'."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706032126",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T03:21:26.143080+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
   }
 ]

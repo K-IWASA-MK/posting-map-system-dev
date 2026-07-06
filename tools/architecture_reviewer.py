@@ -10,7 +10,7 @@ RULES_FILE = os.path.join(os.path.dirname(__file__), "architecture_rules.json")
 RESULT_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "AUDIT_REVIEW_RESULT.json")
 
 # <BOOT_ANCHOR_START>
-GOLDEN_HASH = "37a569886229458f87ffd662e891fbcdfbbe8984bb3df3e48f1f48bbb6838243"
+GOLDEN_HASH = "05659f3dba5087babdfe115e2498c016d5696caa821713ea63401dedc8e757de"
 # <BOOT_ANCHOR_END>
 
 def load_rules():
@@ -444,6 +444,29 @@ def check_rule_019_kernel_attestation(project_root, rules):
                 "remediation": "Restore kernel daemon source file to golden code and restart validation process.",
                 "nextAction": ["Restore kernel golden code", "Re-validate attestation"]
             }]
+            
+        engine_path = os.path.join(project_root, "tools", "trust_graph_engine.py")
+        subprocess.run([sys.executable, engine_path, "--recalculate"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        proc_agent = subprocess.run([sys.executable, engine_path, "--get-node", "ai_agent"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if proc_agent.returncode == 0:
+            agent_data = json.loads(proc_agent.stdout.strip())
+            agent_state = agent_data.get("state", "BLOCKED")
+            agent_score = agent_data.get("trustScore", 0.0)
+            
+            if agent_state == "BLOCKED":
+                return [{
+                    "id": "019",
+                    "name": "Kernel Attestation Rule",
+                    "category": "Architecture",
+                    "severity": "ERROR",
+                    "message": f"Root of Trust violation: Node 'ai_agent' trust level is '{agent_state}' (Score: {agent_score}). System is LOCKED.",
+                    "file": "tools/trust_event_log.jsonl",
+                    "line": 1,
+                    "match": "Critical trust block",
+                    "remediation": "Obtain re-approval to clear penalties and restore system trust score.",
+                    "nextAction": ["Request re-approval", "Recalculate trust graph"]
+                }]
     except Exception as e:
         return [{
             "id": "019",

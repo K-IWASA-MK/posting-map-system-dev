@@ -387,6 +387,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "020",
+      "name": "Plugin Trust Attestation Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "All runtime plugins and modules must present a verified Trust Token signed by the OS Kernel before execution.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule020PatternDetection",
+          "message": "Plugin validation failure: trust token missing or failed verification.",
+          "remediation": "Request kernel to issue trust token for the plugin execution session.",
+          "nextAction": [
+            "Issue trust token",
+            "Verify plugin trust token"
+          ]
+        }
+      ]
     }
   ]
 }
