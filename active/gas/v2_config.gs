@@ -44,17 +44,20 @@ const DEFAULT_STORE = {
     CHUNK_SIZE: 10,
     ROW_HEIGHT_STAFF: 60,
     DENOMINATOR_UNITS: 651,
-    DEFAULT_DISTRICT: "第2区",
+    DEFAULT_DISTRICT: "第3区",
     DEFAULT_PREFECTURE: "三重県",
+    DEFAULT_TENANT_ID: "MIE-03",
+    DEFAULT_BRANCH_ID: "MIE-03",
+    DEFAULT_BRANCH_NAME: "三重第3支部",
     
     // Phase 15: Strategic Engine Map
     DISTRICT_MAP: {
-      "MIE-02": [
+      "MIE-03": [
         // Placeholder blocks. Will be managed via PropertiesService in Production.
       ]
     }
   },
-  "MIE-02": {
+  "MIE-03": {
     // Override example for tenant
     MODE: "production"
   }

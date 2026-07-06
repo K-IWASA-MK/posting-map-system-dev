@@ -54,3 +54,42 @@
 * **タッチターゲットの大型化**: 配布員のスマートフォン片手操作を考慮し、ボタンやナビゲーションリンクはすべて十分な大きさ（最小 48px 以上）と余白を確保してください。
 * **セーフエリア (SafeArea) の確保**: iOS（Safari）やAndroid（Chrome）のツールバー、および端末上部のノッチ（凹み）部分にコンテンツが重ならないよう、適切なパディングを設定してください。
 * **3タップルール**: 配布員が現場で迷わず操作を完了できるよう、最も重要な操作（配布開始、配布報告など）は「3タップ以内」で完了できる導線設計を維持してください。
+
+---
+
+## 4. ダッシュボード共通グラフ・インタラクションルール (Dashboard Hover UX Rules)
+
+### 4.1 グラフのインタラクション基本要件
+ダッシュボード内のすべての可視化コンポーネント（折れ線・棒グラフ等）は、情報を詰め込まずにシンプルさを保つため、**Hover時のみ詳細を表示するオンデマンド型設計**とします。
+
+* **Hover Tooltip**: マウス位置の特定データ詳細のみをポップアップ表示。
+* **Hover Line**: 折れ線グラフにおける時間軸の位置を示す細い垂直ガイドラインを表示。
+* **Active Point Glow**: 選択されたデータポイントは、ブランドカラーである **`#EA5F08`** で発光させ、視覚的フィードバックを最大化します。
+
+### 4.2 ガラスツールチップ (Glass Tooltip) 実装指標
+ツールチップは黒背景を禁止し、以下のGlassmorphismスタイルに準拠させます。
+
+```css
+.glass-tooltip {
+  position: absolute;
+  z-index: 100;
+  padding: 12px 16px;
+  background: rgba(28, 28, 30, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+  color: #ffffff;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 250ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+```

@@ -216,7 +216,7 @@ async function startApp(profile = null) {
   $('loading').classList.remove('hidden');
   
   try {
-    const configRes = await callApi('getConfig', { tenantId: "MIE-02" });
+    const configRes = await callApi('getConfig', { tenantId: CONFIG.DEFAULT_TENANT_ID });
     if (configRes && configRes.success && configRes.config) {
       RUNTIME_CONFIG = configRes.config;
       logDebug("OS Config Loaded successfully.");
@@ -232,7 +232,7 @@ async function loadStrategy(branchId) {
   try {
     const res = await callApi("getStrategy", {
       branchId,
-      tenantId: "MIE-02" // For now hardcoded to current tenant, could be RUNTIME_CONFIG.TENANT_ID if we had it
+      tenantId: RUNTIME_CONFIG.TENANT_ID || CONFIG.DEFAULT_TENANT_ID
     });
     
     if (res && res.success) {
@@ -1580,7 +1580,7 @@ function openIdInfoModal(type, event) {
     // ライセンス表示時のみ、支部名を動的に差し替える
     if (type === 'license') {
       const rawBranch = localStorage.getItem('branch_name') || '';
-      const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : 'MIE-02 支部';
+      const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : (CONFIG.DEFAULT_BRANCH_NAME || 'MIE-03 支部');
       bodyText = bodyText.replace('__BRANCH_NAME__', displayBranch);
     }
     

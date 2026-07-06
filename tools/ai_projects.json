@@ -1,8 +1,8 @@
 {
-  "projectId": "PRJ-MIE02",
+  "projectId": "PRJ-MIE03",
   "projectVersion": "1.0.0",
   "projectSchemaVersion": "1.0.0",
-  "projectName": "Posting Map MIE-02 Launch",
+  "projectName": "Posting Map MIE-03 Launch",
   "git": {
     "provider": "GitHub",
     "authentication": {

@@ -537,10 +537,10 @@ function submitDistribution(data) {
     const event = {
       id: Utilities.getUuid(),
       timestamp: Date.now(),
-      tenantId: data.tenantId || "IWASA-HQ",
-      branchId: data.branchId || "MIE-02",
+      tenantId: data.tenantId || CONFIG.get("DEFAULT_TENANT_ID"),
+      branchId: data.branchId || CONFIG.get("DEFAULT_BRANCH_ID", data.tenantId),
       prefectureId: data.prefectureId || "MIE",
-      blockId: data.blockId || data.areaName, // システムID (e.g. MIE-02-YOK-001)
+      blockId: data.blockId || data.areaName, // システムID (e.g. MIE-03-YOK-001)
       userId: data.userId || data.staffId, // staffIdからのフォールバック互換性
       actionType: actType,
       count: actCount,
@@ -757,8 +757,8 @@ function updateRecordWithGPSPhoto(data) {
     const event = {
       id: Utilities.getUuid(),
       timestamp: Date.now(),
-      tenantId: data.tenantId || "IWASA-HQ",
-      branchId: data.branchId || "MIE-02",
+      tenantId: data.tenantId || CONFIG.get("DEFAULT_TENANT_ID"),
+      branchId: data.branchId || CONFIG.get("DEFAULT_BRANCH_ID", data.tenantId),
       prefectureId: data.prefectureId || "MIE",
       blockId: data.blockId || data.areaName,
       userId: data.userId || data.staffId,

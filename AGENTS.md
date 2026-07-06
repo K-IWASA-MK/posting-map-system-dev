@@ -170,7 +170,7 @@ POSTING MAP は：
 * **行動規範（最優先）**: 自動化、継続率、解約防止、契約安定性
 * **禁止事項**: 手動請求依存、契約曖昧化、地域競合販売
 * **実装基準（必須）**: Stripe連携、契約自動更新、支部別管理、地域独占管理
-* **契約単位**: `MIE-02 LICENSE`, `TOKYO-01 LICENSE`
+* **契約単位**: `MIE-03 LICENSE`, `TOKYO-01 LICENSE`
 
 ### 5. QA（品質保証）部 (`/agents/qa/AGENT.md`)
 * **役割**: 実機検証、デバッグ、ログ解析、エッジケース検証、UI崩れ検証
@@ -332,12 +332,12 @@ origin（area-management）は放置:
 posting-map-system/（コードは1つ・共通）
 ├── app.js / render.js（共通・触らない）
 └── clients/
-    ├── MIE-02/config.js   ← LIFF ID・GAS URL・エリア名
+    ├── MIE-03/config.js   ← LIFF ID・GAS URL・エリア名
     ├── TOKYO-01/config.js
     └── OSAKA-01/config.js
 ```
 
-- **MIE-02** が最初の本番案件（現在開発中）
+- **MIE-03** が最初の本番案件（現在開発中）
 - バグ修正は1回のプッシュで全クライアントに反映
 - 各クライアントは config.js の設定値のみ異なる
 
@@ -1154,7 +1154,7 @@ Execution Plan
      ──────────────────
      [組織名] Dashboard
      ```
-   - 例: `三重第2支部 Dashboard` / `三重県連 Dashboard` / `東海ブロック Dashboard` / `本部 Dashboard`
+   - 例: `三重第3支部 Dashboard` / `三重県連 Dashboard` / `東海ブロック Dashboard` / `本部 Dashboard`
 4. **Brand Philosophy (存在意義の可視化)**:
    - 本プロダクトは「誰が・どこで・何枚チラシを保有しているか」を可視化し、ボランティアが自発的に活動へ参加できる環境を提供するブランドである。
 5. **Absolute Rule (開発コードネームの排除)**:
@@ -1162,3 +1162,58 @@ Execution Plan
      - ❌ `H-App` / `Hアプリ` / `フィールド端末（H-App）`
      - ❌ `管理者アプリ` / `ADMIN PANEL`
    - 利用者向け名称は, すべて **`POSTING MAP`** または **`POSTING MAP Dashboard`** へ統一する。
+
+---
+
+### 39. POSTING MAP Dashboard UI/UX Specification (Design System Addendum)
+
+本項目は、POSTING MAP Dashboardにおけるインタラクションおよびグラフ表示に関する**追加のデザインシステム仕様（SSOT）**である。
+
+1. **Hover Tooltip (採用)**
+   - すべての折れ線グラフ・棒グラフはHover時のツールチップ表示に対応する。
+   - マウスカーソルを合わせたデータポイントのみ詳細データを表示し、通常時は数値を非表示にして画面をシンプルに保つ。
+   - **折れ線グラフ Hover時表示項目**:
+     - 日付 (例: `4/14`)
+     - 活動人数（例: `活動人数　　　30人`）
+     - 新規活動人数（例: `新規活動人数　8人`）
+     - 配布枚数（例: `配布枚数　　　1,250枚`）
+     - 保管者数（例: `保管者数　　　18人`）
+   - **棒グラフ Hover時表示項目**:
+     - 市町村名 (例: `鈴鹿市`)
+     - 保有枚数（例: `保有枚数　　1,250枚`）
+     - 保管者人数（例: `保管者　　　14人`）
+
+2. **Glass Tooltip (採用)**
+   - ツールチップ背景には純黒ではなく、Apple風の半透明 **Glassmorphic UI** を採用する。
+   - 仕様:
+     - 半透明背景 (Semi-transparent)
+     - 背景ブラー (Background Blur)
+     - 角丸 (Rounded Corners)
+     - 柔らかい陰影 (Soft Shadow)
+     - フェードイン・フェードアウトアニメーション (Fade Animation)
+     - 指向矢印 (Pointer Arrow付き)
+
+3. **Active Point Glow (採用)**
+   - Hoverした折れ線グラフのデータポイントは、ブランドカラー `#EA5F08` で発光・強調表示する。
+   - 仕様:
+     - Hover時のみ発光 (Glow)
+     - 半径の拡大 (Radius Expansion)
+     - 外側発光 (Outer Glow)
+     - 250ms アニメーション (Ease-out)
+     - カーソルが離れたら通常状態に滑らかに戻る。
+
+4. **Hover Line (採用)**
+   - Hover位置には細い垂直ガイドライン（Vertical Guide Line）を表示し、現在選択中の時間軸を視覚的に明示する。
+
+5. **Animation Rule (アニメーション規則)**
+   - Tooltip Fade In: `200ms〜250ms` (Ease-out)
+   - Tooltip Fade Out: `150ms` (Ease-in)
+   - Point Glow Transition: `250ms` (Ease-out)
+   - 描画やアニメーションはGPUによるハードウェア加速を優先し、一切カクつかないこと。
+
+6. **Dashboard Philosophy (ダッシュボード設計哲学)**
+   - Dashboardは「数値を凝視する画面」ではなく、「活動の流れや状況の変化を直感的に捉える画面」である。
+   - 数値情報はHoverアクションによって必要な時だけ表示し、通常時はグラフそのものを主役とする。
+
+7. **Absolute Rule (絶対ルール)**
+   - 今後追加されるすべてのグラフ（折れ線、棒、円、エリア分析）において、共通のHover UXおよび統一されたデザインのGlass Tooltipを適用し、ダッシュボード全体で一貫した操作感を維持する。

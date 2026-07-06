@@ -69,7 +69,7 @@ AIOSの検証レイヤーとして、以下のステップを自律的にルー�
 
 | フェーズ | 対象スコープ | 主なマイルストーン |
 |---|---|---|
-| **Phase 1** | POSTING MAP ＋ 支部Dashboard | 基本機能の完成と三重のファースト案件（MIE-02）適用 |
+| **Phase 1** | POSTING MAP ＋ 支部Dashboard | 基本機能の完成と三重のファースト案件（MIE-03）適用 |
 | **Phase 2** | LIFF品質向上 | 実機におけるネイティブ級UX・表示速度の極限化 |
 | **Phase 3** | AIOS Validation機能 | Validation OS（自動Chrome検証・自己修復）の実装 |
 | **Phase 4** | 県連Dashboard | 複数支部の集計およびデータ連携の構築 |

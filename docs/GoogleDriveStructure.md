@@ -39,7 +39,7 @@ Google Driveは単なる「ストレージ」ではなく、FIELD OPERATIONS PLA
 |---|---|---|
 | `MASTER` / `地域データ` / `郵便番号` / `マスタCSV` / `テンプレート` | `01_MASTER/` | 変更頻度の低い基礎データとして集約 |
 | `POSTING_MAP_SYSTEM` / `Apps Script` / `API` / `設定ファイル` / `AIOS関連` | `02_SYSTEM/` | system稼働に必要な構成定義 |
-| `POSTING MAP MIE-02 (DEV)` / 各支部データ | `03_BRANCH/` | `県 / 支部 / 単位` 構造へ再配置 |
+| `POSTING MAP MIE-03 (DEV)` / 各支部データ | `03_BRANCH/` | `県 / 支部 / 単位` 構造へ再配置 |
 | `POSTING_MAP_STORAGE` / 画像 / PDF / CSV / JSON / 動画 | `04_STORAGE/` | ユーザーアップロードデータ領域 |
 | 旧スプレッドシート / 手動バックアップ / エクスポートデータ | `05_BACKUP/` | バージョン管理およびバックアップ退避 |
 | ダッシュボード関連ファイル / 可視化データ / レポート | `06_DASHBOARD/` | 各種可視化システム連携用データ・構成 |
@@ -175,7 +175,7 @@ FIELD_OPERATIONS_PLATFORM/ (ID: 1FfcVEQjod--rZSucOPFJD2DJ58hV650_)
 ├── 02_SYSTEM/ (ID: 1VGNuHSJdpStp-7vsZk69yZjyXcb6Q1yY)    # システム連携設定・構成定義
 ├── 03_BRANCH/ (ID: 1EQQqWbtyF7iMd7Fk-WnUwWiAGB4MdIdN)    # 各支部の配布状況管理用スプレッドシート
 │   └── [Prefecture]/     # 例: MIE (三重県連)
-│       └── [Branch]/     # 例: MIE-02 (支部)
+│       └── [Branch]/     # 例: MIE-03 (支部)
 │           ├── DEV/      # 開発・検証用環境
 │           └── PROD/     # 本番用環境
 ├── 04_STORAGE/ (ID: 1FyM4wCIqWJovbcsMZ6h9JKFQxhgwciGb)    # ユーザーアップロードデータ（大容量メディア・ファイル）
