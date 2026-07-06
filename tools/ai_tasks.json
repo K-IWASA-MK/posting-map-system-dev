@@ -46,7 +46,7 @@
       "assignedAgent": "antigravity-ide-v1",
       "assignmentReason": null,
       "retryCount": 0,
-      "status": "UNDER_REVIEW",
+      "status": "IN_PROGRESS",
       "reviewId": null,
       "approval": {
         "approvalId": "APR-20260706045808",
@@ -57,14 +57,18 @@
         "approvedBy": "Human",
         "approvedAt": "2026-07-06T04:58:08.958873+00:00",
         "approvalHash": "5be062b97289e6ce5bba3fe974d0e75f2a45ee20a4b32bf61f9e8330ca5b6026",
-        "executionState": "AUTHORIZED",
+        "executionState": "RUNNING",
         "executionToken": "APR-20260706045808",
         "tokenExpiresAt": "2026-08-05T04:58:08.958877+00:00",
         "executionSession": {
-          "executionSessionId": null,
-          "executionStartedAt": null,
+          "executionSessionId": "SES-20260706045855",
+          "executionStartedAt": "2026-07-06T04:58:55.868741+00:00",
           "executionEndedAt": null,
-          "executionOwner": null
+          "executionOwner": {
+            "agentId": "antigravity-ide-v1",
+            "agentName": "Antigravity",
+            "sessionId": "SES-20260706045855"
+          }
         }
       }
     },

@@ -1,3 +1,18 @@
+# Release Notes - v4.21-auth-immutable
+
+## 🚀 New Features & Enhancements
+
+### 1. Immutable Authorization Context & Dynamic Lock Overlays
+- **認可コンテキストの一元化と凍結 (Object.freeze SSoAC)**:
+  - 認証されたユーザーの ID、ポリシーモード、信頼スコア、セッションメタデータを集約した `Authorization Context` を起動時に一元生成。
+  - `Object.freeze(authContext)` を適用し、クライアント側プログラムによる権限情報の不正上書き（権限昇格バグ・脆弱性）を物理的に遮断。更新時は新たな Context を freeze して参照置換（Immutability）。
+- **認証・認可接続状態ロック (Loading Guard & Access Denied Overlay)**:
+  - WebSocket による初期化イベントの受信（ポリシー解決）が完了するまで、画面全体をローディング状態で完全ロックする `loading-overlay` を実装。
+  - セッション接続喪失時（Event Bus 切断）にも `authContext` を破棄し、自動的にローディング状態で UI を即時封印する防御機構を統合。
+  - ポリシーが `BLOCKED` の場合、画面全体を巨大な赤色の「ACCESS DENIED」ロック画面で完全に覆う `blocked-overlay` を実装。
+
+---
+
 # Release Notes - v4.20-field-mvp
 
 ## 🚀 New Features & Enhancements
