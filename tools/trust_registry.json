@@ -3,24 +3,24 @@
     "nodeId": "kernel",
     "trustScore": 1.0,
     "state": "ACTIVE",
-    "lastVerifiedAt": "2026-07-06T03:21:26.066446+00:00"
+    "lastVerifiedAt": "2026-07-06T03:22:52.802620+00:00"
   },
   "reviewer": {
     "nodeId": "reviewer",
     "trustScore": 0.95,
     "state": "ACTIVE",
-    "lastVerifiedAt": "2026-07-06T03:21:26.066549+00:00"
+    "lastVerifiedAt": "2026-07-06T03:22:52.802722+00:00"
   },
   "plugin_runtime": {
     "nodeId": "plugin_runtime",
     "trustScore": 0.855,
     "state": "ACTIVE",
-    "lastVerifiedAt": "2026-07-06T03:21:26.066551+00:00"
+    "lastVerifiedAt": "2026-07-06T03:22:52.802724+00:00"
   },
   "ai_agent": {
     "nodeId": "ai_agent",
     "trustScore": 0.807,
     "state": "ACTIVE",
-    "lastVerifiedAt": "2026-07-06T03:21:26.066552+00:00"
+    "lastVerifiedAt": "2026-07-06T03:22:52.802724+00:00"
   }
 }

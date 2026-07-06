@@ -57,14 +57,18 @@
         "approvedBy": "Human",
         "approvedAt": "2026-07-06T03:21:25.926961+00:00",
         "approvalHash": "eee1d5323360a43e8bc012f9879d015f0334325f54a95a6c3e6f3c22922e20ef",
-        "executionState": "AUTHORIZED",
+        "executionState": "FINISHED",
         "executionToken": "APR-20260706032125",
         "tokenExpiresAt": "2026-08-05T03:21:25.926964+00:00",
         "executionSession": {
-          "executionSessionId": null,
-          "executionStartedAt": null,
-          "executionEndedAt": null,
-          "executionOwner": null
+          "executionSessionId": "SES-20260706032248",
+          "executionStartedAt": "2026-07-06T03:22:48.272231+00:00",
+          "executionEndedAt": "2026-07-06T03:23:13.946181+00:00",
+          "executionOwner": {
+            "agentId": "antigravity-ide-v1",
+            "agentName": "Antigravity",
+            "sessionId": "SES-20260706032248"
+          }
         }
       }
     },
