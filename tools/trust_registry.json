@@ -2,29 +2,29 @@
   "kernel": {
     "nodeId": "kernel",
     "baseTrust": 1.0,
-    "lastValidation": "2026-07-06T04:35:46.226613+00:00",
-    "driftScore": 0.788,
+    "lastValidation": "2026-07-06T04:36:13.195474+00:00",
+    "driftScore": 0.789,
     "state": "Restrict"
   },
   "reviewer": {
     "nodeId": "reviewer",
     "baseTrust": 0.95,
-    "lastValidation": "2026-07-06T04:35:47.824713+00:00",
-    "driftScore": 0.703,
+    "lastValidation": "2026-07-06T04:36:14.782148+00:00",
+    "driftScore": 0.704,
     "state": "Restrict"
   },
   "plugin_runtime": {
     "nodeId": "plugin_runtime",
     "baseTrust": 0.9,
-    "lastValidation": "2026-07-06T04:35:49.400267+00:00",
-    "driftScore": 0.738,
+    "lastValidation": "2026-07-06T04:36:16.358780+00:00",
+    "driftScore": 0.74,
     "state": "Restrict"
   },
   "ai_agent": {
     "nodeId": "ai_agent",
     "baseTrust": 0.85,
-    "lastValidation": "2026-07-06T04:35:50.990057+00:00",
-    "driftScore": 0.818,
+    "lastValidation": "2026-07-06T04:36:17.939214+00:00",
+    "driftScore": 0.819,
     "state": "ACTIVE"
   }
 }
