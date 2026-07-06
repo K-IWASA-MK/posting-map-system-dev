@@ -1,0 +1,148 @@
+{
+  "ruleVersion": "1.0.0",
+  "rules": [
+    {
+      "id": "001",
+      "name": "SSOT Rule",
+      "severity": "ERROR",
+      "description": "データのパース・カナ生成の重複・二重実装を禁止するルール",
+      "target_files": ["active/gas/v2_map.gs", "active/gas/v2_batch.gs"],
+      "forbidden_patterns": [
+        {
+          "pattern": "townKanaMap\\s*=\\s*",
+          "message": "townKanaMapの再生成（二重生成）は禁止されています。v2_extract.gsのメタデータのみを参照してください。"
+        },
+        {
+          "pattern": "Utilities\\.parseCsv",
+          "message": "CSVファイルの直接パースはv2_extract.gsにのみ閉じている必要があります。"
+        }
+      ]
+    },
+    {
+      "id": "002",
+      "name": "One Responsibility Rule",
+      "severity": "ERROR",
+      "description": "GAS（サーバー）側コードにブラウザ依存のオブジェクト（window/documentなど）が混入するのを防止するルール",
+      "target_files": ["active/gas/**/*.gs", "active/api/**/*.gs", "active/dashboard/**/*.gs"],
+      "forbidden_patterns": [
+        {
+          "pattern": "\\bwindow\\b",
+          "message": "GAS（サーバー）側で window オブジェクトを参照することはできません。"
+        },
+        {
+          "pattern": "\\bdocument\\b",
+          "message": "GAS（サーバー）側で document オブジェクトを参照することはできません。"
+        },
+        {
+          "pattern": "\\bnavigator\\b",
+          "message": "GAS（サーバー）側で navigator オブジェクトを参照することはできません。"
+        },
+        {
+          "pattern": "\\blocalStorage\\b",
+          "message": "GAS（サーバー）側で localStorage オブジェクトを参照することはできません。"
+        }
+      ]
+    },
+    {
+      "id": "003",
+      "name": "Foundation First Rule",
+      "severity": "WARNING",
+      "description": "データ定義やモデル設計を優先する原則",
+      "target_files": ["active/mobile/**/*.js"],
+      "forbidden_patterns": []
+    },
+    {
+      "id": "004",
+      "name": "No Duplicate Logic Rule",
+      "severity": "WARNING",
+      "description": "同一のユーティリティが重複定義されていないかチェックするルール",
+      "target_files": ["active/gas/**/*.gs"],
+      "forbidden_patterns": []
+    },
+    {
+      "id": "005",
+      "name": "Layer Separation Rule",
+      "severity": "ERROR",
+      "description": "OSの階層構造（API, UI, Audit）における逆方向の呼び出しを禁止するルール",
+      "target_files": ["active/gas/v2_kernel.gs"],
+      "forbidden_patterns": [
+        {
+          "pattern": "HtmlService",
+          "message": "イベントカーネル（v2_kernel.gs）からHtmlService（UIレンダリング）を呼び出すことはできません。"
+        }
+      ]
+    },
+    {
+      "id": "006",
+      "name": "Naming Rule",
+      "severity": "WARNING",
+      "description": "アプリやブランチ、変数名などの命名規則の検証",
+      "target_files": ["active/mobile/**/*.js"],
+      "forbidden_patterns": []
+    },
+    {
+      "id": "007",
+      "name": "Version Rule",
+      "severity": "ERROR",
+      "description": "APIレスポンス等に version が含まれているか検証するルール",
+      "target_files": ["active/gas/v2_map.gs"],
+      "forbidden_patterns": [
+        {
+          "pattern": "summary\\.push\\((?![\\s\\S]*?version\\s*:)",
+          "message": "areaSummary APIレスポンスオブジェクトに version プロパティが含まれていません。"
+        }
+      ]
+    },
+    {
+      "id": "008",
+      "name": "Backward Compatibility Rule",
+      "severity": "ERROR",
+      "description": "既存のAPIアクションが破壊的に変更・削除されていないか確認するルール",
+      "target_files": ["active/api/v2_api.gs"],
+      "required_patterns": [
+        {
+          "pattern": "case\\s+'getAppData':",
+          "message": "既存 of APIアクション 'getAppData' が破壊的に削除または変更されています。"
+        },
+        {
+          "pattern": "case\\s+'getRanking':",
+          "message": "既存 of APIアクション 'getRanking' が破壊的に削除または変更されています。"
+        },
+        {
+          "pattern": "case\\s+'getRoster':",
+          "message": "既存 of APIアクション 'getRoster' が破壊的に削除または変更されています。"
+        }
+      ]
+    },
+    {
+      "id": "009",
+      "name": "Read Only Rule",
+      "severity": "ERROR",
+      "description": "クライアント側で AreaSummary 等の読み取り専用メタデータの直接書き換えを禁止するルール",
+      "target_files": ["active/mobile/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "\\b(areaSummary|summary)\\[.*\\].*(done|total)\\s*=",
+          "message": "クライアント側で AreaSummary (done/total) を直接更新することは禁止されています。"
+        }
+      ]
+    },
+    {
+      "id": "010",
+      "name": "Governance Rule",
+      "severity": "ERROR",
+      "description": "ロックアカウントやシステムロックIDのバイパス・改ざんの禁止",
+      "target_files": ["active/gas/v2_kernel.gs"],
+      "required_patterns": [
+        {
+          "pattern": "ACTIVE_ACCOUNT\\s*:\\s*\"postingareamap@gmail\\.com\"",
+          "message": "SYSTEM_LOCKのアカウント設定が改ざんされています。"
+        },
+        {
+          "pattern": "ACTIVE_DRIVE_ROOT_ID\\s*:\\s*\"1FfcVEQjod--rZSucOPFJD2DJ58hV650_\"",
+          "message": "SYSTEM_LOCKのACTIVE_DRIVE_ROOT_ID設定が改ざんされています。"
+        }
+      ]
+    }
+  ]
+}

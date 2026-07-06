@@ -299,3 +299,4 @@ function getCoordsFromAddress(address) {
   }
   return null;
 }
+
