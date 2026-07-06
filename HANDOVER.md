@@ -84,3 +84,14 @@ Before starting development:
 10. Git Push (Subject to Review Policy)
 11. Completion Report (Verify Commit Hash, Verify/Doctor PASS, pytest PASS, HANDOVER updated, Push completed, Working Tree Clean)
 
+
+---
+
+## 7. Branding & Design System Consensus (ブランド設計確定)
+
+- **正式ブランド名**: `POSTING MAP` (スマートフォンWebアプリ / PC管理画面 `POSTING MAP Dashboard`)
+- **開発コードネームの排除**: `H-App` / `Hアプリ` / `管理者アプリ` などの開発ネームはユーザー向けには一切使用しない。
+- **保存先 (SSOT)**: 
+  - [docs/gpt-memory/BRANDING.md](file:///Volumes/SSD_DATA/posting-map-system/docs/gpt-memory/BRANDING.md)
+  - [AGENTS.md](file:///Volumes/SSD_DATA/posting-map-system/AGENTS.md)（Brand Identityセクション）
+- 今後のUI設計・営業資料・マニュアル・実装は本決定に厳密に従うこと。
