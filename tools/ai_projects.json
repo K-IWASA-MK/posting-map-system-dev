@@ -3,6 +3,14 @@
   "projectVersion": "1.0.0",
   "projectSchemaVersion": "1.0.0",
   "projectName": "Posting Map MIE-02 Launch",
+  "git": {
+    "authentication": {
+      "type": "SSH",
+      "provider": "GitHub",
+      "requiresGitHubApp": false,
+      "supportsPAT": true
+    }
+  },
   "status": "ROLLED_BACK",
   "currentMilestone": "MS-01",
   "milestones": [
