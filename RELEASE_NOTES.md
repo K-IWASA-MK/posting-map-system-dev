@@ -1,3 +1,19 @@
+# Release Notes - v4.16-trust-drift
+
+## 🚀 New Features & Enhancements
+
+### 1. Temporal Trust Drift Engine & Dynamic Decay Gates (AIOS Phase 146)
+- **時間依存型信頼劣化モデル (Temporal Trust Decay Model)**:
+  - 信頼スコアを静的スナップショットから、最終検証経過時間 `t` に依存する動的指数関数 `Trust(t) = BaseTrust * T_time * T_event * T_graph` へ変革する `trust_drift_engine.py` を実装。
+- **3層決定論的統合 (Deterministic Integration Formula)**:
+  - `T_time` (時間減衰因子: `e^(-λt)`), `T_event` (履歴ペナルティ: `0.2` or `1.0`), `T_graph` (構造的な親ノード減衰の引き継ぎ) の3つを、`Time ➔ Event ➔ Graph` の順にシングルパスでトポロジカル計算する決定論的エンジンを構築。
+- **下流ノードへの減衰増幅伝播 (Drift Propagation & Amplification)**:
+  - 親ノードの信頼低下が、下流のノード（Reviewer 1.1倍, Plugin 1.2倍, Agent 1.3倍）へドミノ倒しのように増幅して伝播されるセキュア設計を結合。
+- **時間切れ自動ロック (Stale validation Lock)**:
+  - `architecture_reviewer.py` の実行時、最終検証から一定時間放置され、AIエージェントのスコアが `Critical Drift (<0.3)` へ落ち込んでいる場合、Rule 021 に基づき即座にビルド・コミット処理全体を強制アボートする執行ゲートを統合。
+
+---
+
 # Release Notes - v4.15-trust-propagation
 
 ## 🚀 New Features & Enhancements
