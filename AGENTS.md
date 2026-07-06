@@ -1076,3 +1076,28 @@ Execution Plan
 5. **AIOSとの接続関係**:
    - AIOSは `Trust`, `Policy`, `Authorization`, `Event` データを供給する。
    - Dashboardはこれらを含めた現場データをリアルタイムに集計・表示する。
+
+---
+
+### 36. POSTING MAP Organization Tree 永続設計規約 (Immutable Organization Tree Rules)
+
+本項目は、POSTING MAPにおける組織ツリー構造および親子関係に関する**不変の固定仕様（永続ルール）**である。今後のすべての実装・追加機能提案・計画・設計は、この親子関係を前提としなければならない。
+
+1. **唯一の組織トポロジ (Single Source of Organization Tree)**:
+   - システム内のすべての組織関係および親子パスは、以下の階層トポロジのみで構成される。
+     ```
+     本部 (Headquarters)
+     └── ブロック (Block)
+         └── 県連 (Prefectural Association)
+             └── 支部 (Branch)
+                 └── 配布員 (Staff / Delivery Worker)
+     ```
+   - この親子パスを変更したり、新たな中間オブジェクトを追加することは禁止する。
+2. **組織トポロジの共通利用**:
+   - 本プラットフォームにおける以下のすべてのサブシステムは、本組織ツリーを唯一の共通構造として参照しなければならない。
+     - **Dashboardの集計（Aggregation）**: 支部から本部までの階層集計
+     - **権限管理（Authentication & Authorization）**: 所属グループや管轄範囲の決定
+     - **AIOS Policyの適用**: Drift スコアの減衰伝播や Block ゲート適用
+     - **レポート集計 (Report Engine)**: 支部別・県連別の KPI レポート生成
+3. **データ伝播の方向性**:
+   - 上流（本部・ブロック等）は下流のすべてのデータを集計・継承し、下流（支部・配布員等）は自身の Scope に限定された操作・閲覧権限のみを保持する。
