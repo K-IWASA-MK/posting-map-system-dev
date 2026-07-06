@@ -1,3 +1,22 @@
+# Release Notes - v4.7-project-os
+
+## 🚀 New Features & Enhancements
+
+### 1. Project OS Foundation 完成 (AIOS Phase 137)
+- **複数 Workflow 統合 & マイルストーン制御**:
+  - `ai_projects.json` にてマイルストーンを定義。複数のワークフローIDファイル（例: `WF-20260706-0001.json`、`WF-20260706-0002.json`）をマイルストーンに紐付けて包括的にライフサイクル制御。
+- **Project State Machine (状態遷移マシン)**:
+  - `PLANNING` ➔ `ACTIVE` ➔ `RELEASE_CANDIDATE` ➔ `RELEASED` ➔ `DEPLOYED` ➔ `ARCHIVED` 等のプロジェクトステート遷移と禁止逆行の整合性をガード。
+- **Release Pipeline Stage Auto-Promotion**:
+  - タスクおよび全ワークフローの進捗率を `--tick` で自動計算・集計（`summary` プロパティへ自動マージ）し、完了をトリガーにパイプラインステージを自動的に昇格。
+- **Project Integrity Audit (構成整合性監査)**:
+  - `--audit` により、指定されたマイルストーン/ワークフローファイルの有無、MilestoneID重複、不正ステージ進行などをビルド前に静的監査。
+- **Project-wide Rollback & Event Auditing**:
+  - 指定マイルストーンより先の進行度・アサインを一括で初期化するプロジェクトロールバック（`--rollback`）機能を実装。
+  - ロールバック実行履歴は `PROJECT_ROLLBACK` イベントとして `orchestrator_events.json` へ `eventVersion: "1.0.0"` で自動的に追跡ログ記録。
+
+---
+
 # Release Notes - v4.6-workflow-engine
 
 ## 🚀 New Features & Enhancements
