@@ -1,3 +1,18 @@
+# Release Notes - v4.15-trust-propagation
+
+## 🚀 New Features & Enhancements
+
+### 1. Stateless Trust Propagation Graph & Append-Only Event Logs (AIOS Phase 145)
+- **動的信頼伝播グラフ (Trust Propagation State Graph) の構築**:
+  - システム内の各コンポーネント（Kernel, Reviewer, Plugin, AI Agent）をノードとし、減衰係数を伴う有向非巡回グラフ（DAG）モデルに基づき動的信頼スコアを伝播計算するエンジン `trust_graph_engine.py` を実装。
+- **追加専用イベントログ (Append-Only Event Log) による SSOT 化**:
+  - `trust_event_log.jsonl` を不変の信頼源（SoT）として運用。状態変更イベント（`BOOT_SUCCESS`, `VALIDATION_FAILED`, `RE_APPROVE`）を時系列追記する仕組みへ変更。
+  - `trust_registry.json` は計算結果の読み取り専用キャッシュ（Derived State）に格下げし、改ざん脆弱性を解消。
+- **計算（Stateless Core）と執行（Enforcement）の分離**:
+  - 状態を持たない純粋関数としての `compute_trust_graph()` と、しきい値ポリシー（ACTIVE/Restrict/SANDBOX/BLOCKED）を適用する `enforce_trust_policy()` に分割。レビューエンジンは読み取り専用で結果を執行するのみとし、循環評価を完全に防止。
+
+---
+
 # Release Notes - v4.14-boot-trust
 
 ## 🚀 New Features & Enhancements
