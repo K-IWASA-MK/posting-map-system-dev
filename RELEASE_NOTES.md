@@ -1,3 +1,22 @@
+# Release Notes - v4.11-execution-gate
+
+## 🚀 New Features & Enhancements
+
+### 1. Execution Gate & Self-Constraint OS (AIOS Phase 141)
+- **AI 実行認可制御と Execution Token / Session の導入**:
+  - 承認（`--approve`）に連動して発行される `executionToken` に加え、実装の開始および終了を管理する `executionSession`（`executionSessionId`, `executionStartedAt`, `executionEndedAt`）を導入。
+  - セッションと実行主体エージェントを紐付ける **Execution Ownership (`executionOwner`)** 構造を構築。
+- **5段階実行ステートマシンの統合**:
+  - タスクの実行状態を `LOCKED` ➔ `AUTHORIZED` ➔ `RUNNING` ➔ `FINISHED` ➔ `EXPIRED` の5段階ステートとして厳密に制御。
+  - セッション開始（`--start-execution`）およびセッション終了（`--finish-execution`）コマンドを実装。
+- **Rule 013 (Execution Gate Rule) の保護対象拡張**:
+  - `RUNNING` 状態以外の全ステータスにおいて、ソースコードに加え、walkthrough、release notes、plan定義、監査結果などの「AIが生成するすべての成果物」の書き出し・Git操作を禁止。
+- **Rule 014 (Execution Token Validation) & Rule 015 (Single Active Execution)**:
+  - `Rule 014`: トークン欠落・不整合・期限切れ時の実装を完全にブロック。
+  - `Rule 015`: 1つのタスク（あるいはプロジェクト全体）で同時に `RUNNING` ステートになれるアクティブセッションを最大1つに制限し、競合時の実行開始要求を明確に拒否。
+
+---
+
 # Release Notes - v4.10-lifecycle-integration
 
 ## 🚀 New Features & Enhancements
