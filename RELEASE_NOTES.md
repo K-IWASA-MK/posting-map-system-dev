@@ -1,3 +1,21 @@
+# Release Notes - v4.5-ai-team-orchestration
+
+## 🚀 New Features & Enhancements
+
+### 1. AI Team Orchestrator Foundation 完成 (AIOS Phase 135)
+- **Agent Registry の独立化 (`tools/ai_agents.json`)**:
+  - AIモデルのアサイン可否、役割、および得意分野（`capabilities`：UI, GAS, Architecture 等）を管理する能力プロファイルを品質データと分離して定義。
+- **タスク依存関係制御 (`dependsOn`)**:
+  - 先行するタスクIDが `COMPLETED` になるまでアサインをロックする制約を追加。
+- **最適AIモデルの自動マッチングと選定理由 (`assignmentReason`)**:
+  - タスクの要求カテゴリに応じて適合するエージェントを自動選別し、さらに `ai_quality_report.json` 内で最もパフォーマンスが高いモデルをマッチング。アサイン理由を客観的メトリクスと共にログに記録。
+- **リトライ管理 (`retryCount`) とエージェントの自動スイッチ（フォールバック）**:
+  - レビューに3回以上連続で失敗した際、アサイン対象を他の適合エージェントに自動的に切り替えて警告を発生させるフォールバックシステムを実装。
+- **ハンドオーバー仕様のバージョン管理 (`handoverVersion: "1.0.0"`)**:
+  - レビュー失敗時の違反情報および self-healing 用の nextAction を引き渡す `tools/ai_handover.json` をバージョン管理付きで自動生成。
+
+---
+
 # Release Notes - v4.4-ai-continuous-improvement
 
 ## 🚀 New Features & Enhancements
