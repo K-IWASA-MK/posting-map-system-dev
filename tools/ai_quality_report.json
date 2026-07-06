@@ -1,0 +1,115 @@
+{
+  "timestamp": "2026-07-06T00:59:11.040868+00:00",
+  "totalReviewsAnalyzed": 4,
+  "agents": {
+    "flash-2.5-pro": {
+      "agentName": "Flash",
+      "agentRole": "Implementer",
+      "totalRuns": 2,
+      "successRate": 0.5,
+      "categories": {
+        "Database": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "Security": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "API": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "Architecture": {
+          "passRate": 0.5,
+          "errorsCount": 1,
+          "warningsCount": 0
+        },
+        "UI": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        }
+      },
+      "topViolations": [
+        {
+          "ruleId": "001",
+          "name": "SSOT Rule",
+          "count": 1,
+          "percentageOfTotalErrors": 1.0
+        }
+      ]
+    },
+    "gpt-4o": {
+      "agentName": "ChatGPT",
+      "agentRole": "Reviewer",
+      "totalRuns": 1,
+      "successRate": 1.0,
+      "categories": {
+        "Database": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "Architecture": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "UI": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "API": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "Security": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        }
+      },
+      "topViolations": []
+    },
+    "antigravity-ide-v1": {
+      "agentName": "Antigravity",
+      "agentRole": "Architect",
+      "totalRuns": 1,
+      "successRate": 1.0,
+      "categories": {
+        "Security": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "Architecture": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "API": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "UI": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        },
+        "Database": {
+          "passRate": 1.0,
+          "errorsCount": 0,
+          "warningsCount": 0
+        }
+      },
+      "topViolations": []
+    }
+  }
+}

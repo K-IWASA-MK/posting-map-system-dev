@@ -238,6 +238,47 @@ def main():
     except Exception as e:
         print(f"Error writing result file: {e}", file=sys.stderr)
 
+    # 4. Save to Review History DB (Phase 133)
+    HISTORY_FILE = os.path.join(os.path.dirname(__file__), "review_history_db.json")
+    try:
+        history = []
+        if os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                try:
+                    history = json.load(f)
+                    if not isinstance(history, list):
+                        history = []
+                except Exception:
+                    history = []
+        
+        history_entry = {
+            "reviewId": review_id,
+            "reviewEngineVersion": "1.1.0",
+            "ruleVersion": rule_version,
+            "agent": result["agent"],
+            "status": status,
+            "timestamp": result["timestamp"],
+            "summary": summary,
+            "violations": [
+                {
+                    "id": v["id"],
+                    "name": v["name"],
+                    "category": v["category"],
+                    "severity": v["severity"],
+                    "file": v["file"],
+                    "line": v["line"],
+                    "message": v["message"]
+                }
+                for v in all_violations
+            ]
+        }
+        history.append(history_entry)
+        
+        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(history, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"Error writing to history DB: {e}", file=sys.stderr)
+
     if all_violations:
         print(f"--- Architecture Review Results: {status} ---")
         for v in all_violations:

@@ -1,0 +1,172 @@
+[
+  {
+    "reviewId": "20260706005855",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "flash-2.5-pro",
+      "agentName": "Flash",
+      "agentRole": "Implementer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T00:58:55.363422+00:00",
+    "summary": {
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706005855",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "gpt-4o",
+      "agentName": "ChatGPT",
+      "agentRole": "Reviewer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T00:58:55.475990+00:00",
+    "summary": {
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706005855",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Architect"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T00:58:55.543075+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706005903",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "flash-2.5-pro",
+      "agentName": "Flash",
+      "agentRole": "Implementer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T00:59:03.538654+00:00",
+    "summary": {
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 1,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "001",
+        "name": "SSOT Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/gas/v2_map.gs",
+        "line": 304,
+        "message": "CSVファイルの直接パースはv2_extract.gsにのみ閉じている必要があります。 (Line: 'const data = Utilities.parseCsv(\"a,b,c\");')"
+      }
+    ]
+  }
+]
