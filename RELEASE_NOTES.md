@@ -1,3 +1,20 @@
+# Release Notes - v4.19-field-bridge
+
+## 🚀 New Features & Enhancements
+
+### 1. Secure Command Bridge & Validation Buffer integration (AIOS ➔ POSTING MAP Bridge Layer)
+- **Field Command API の設計・統一**:
+  - `ASSIGN_FLYER`, `CONFIRM_DISTRIBUTION`, `GPS_LOG`, `AREA_LOCK`, `USER_RESTRICT` 現場用実行命令スキーマを策定。
+  - 判断の起源を追跡・監査可能とする `"sourceEventId"` フィールドをコマンド内に義務付け。
+- **Command Validation Buffer Layer (安全窓バッファ)**:
+  - コマンド要求を受信した際、即時パブリッシュを行わずに 2.0秒間 Draft キューにプール（安全窓）。
+  - 待機時間が明けた時点で、最新の `compiled_policies.json` に基づき再バリデーション（Re-evaluation）を執行。
+  - 待機時間中に Drift 劣化やペナルティが発生して `BLOCKED` または書込み不可へ遷移していた場合、コマンドは実行されずに **バッファ上で自動抹殺（Discard）** される現場防衛レイヤーを統合。
+- **POSTING MAP Field Nodes 設計**:
+  - 地域、配布員、配布タスク等の現場エンティティを階層グラフ化する `tools/field_nodes.json` ノード定義データベースを配置。
+
+---
+
 # Release Notes - v4.18-monitoring-pro
 
 ## 🚀 New Features & Enhancements
