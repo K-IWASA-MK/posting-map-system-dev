@@ -1,3 +1,21 @@
+# Release Notes - v4.18-monitoring-pro
+
+## 🚀 New Features & Enhancements
+
+### 1. Reliable Event Bus & Stateless Projection Dashboard (AIOS Monitoring v3.1 Pro)
+- **Node.js WebSocket Event Bus サーバー (tools/aios_event_bus.js)**:
+  - 順序保証（sequenceId monotonic check）とパケット重複排除（eventId validation）を備えた WebSocket 高信頼配信ブローカーを構築。
+- **高信頼ディスパッチャ & リトライレイヤー (urllib-based retry logic)**:
+  - Python コアの各エンジンから、Event Envelope フォーマットでパケットを包み、最大3回のリトライ保証付きで Event Bus へ POST 送信するディスパッチャを実装。
+  - 送信メッセージの `sequenceId` は、SoT であるイベントログの行数と決定論的同期を図り、順序ズレを防ぐ設計を適用。
+- **完全ステートレス UI 投影 (Stateless DOM Projection)**:
+  - リアルタイム配信されたイベントペイロードから直接ビューを構築するバニラ JavaScript 描画（`UI_STATE = f(event_stream)`）に全面移行。キャッシュや UI 側での状態保持を排除。
+  - **Policy View**: コンパイル済みポリシー limits（write/exec/network）の許可・拒否をグリッドカード形式でリアルタイム可視化。
+  - **Drift Timeline View**: 状態変化イベントをタイムラインへスクロール出力。
+  - **Trust Graph Live View**: DAG トポロジカルマップを描画。各ノードの信頼スコアと Drift 減衰度合いをシームレスにビジュアル色変化（Active/Restrict/Sandbox/Blocked）で可視化。
+
+---
+
 # Release Notes - v4.17-governance-compiler
 
 ## 🚀 New Features & Enhancements
