@@ -1,3 +1,21 @@
+# Release Notes - v4.13-isolated-kernel
+
+## 🚀 New Features & Enhancements
+
+### 1. Physical OS Kernel Separation & IPC Sandbox Layer (AIOS Phase 143)
+- **カーネルプロセスの物理隔離 (Physical Separation)**:
+  - AI プロセス（Python/Gemini）から完全に隔離された独立の **Node.js カーネルデーモン (`aios_kernel_daemon.js`)** を新規実装。
+- **リプレイ対策付き Secure IPC 通信**:
+  - stdin/stdout パイプラインを介した JSON-RPC プロトコル。
+  - 各メッセージに `executionSessionId`, `timestamp`, およびランダムな `nonce` を付与し、タイムスタンプドリフト（10秒）の検証およびメモリ内 `nonce` 重複排除によりリプレイ攻撃を物理防止。
+- **暗号署名と問合せ型検証 (Kernel-Mediated Verification)**:
+  - 署名用 HMAC-SHA256 キーをデーモン側の隔離された一時シークレットファイル `.kernel_secret` 内にのみ保持。
+  - 静的レビュー時（`architecture_reviewer.py`）は、プロキシ経由で外部デーモンに `--verify-signature` 要求を送信し、署名の有効性を照合する問合せ型検証（秘密鍵の完全隔離）を実装。
+- **改ざん証明書の物理検知**:
+  - AIエージェント側で検証証明書の JSON を直接改ざんした場合に、署名検証エラーが発生してコミット・プッシュを完全アボートする振る舞いを実証。
+
+---
+
 # Release Notes - v4.12-logical-sandbox
 
 ## 🚀 New Features & Enhancements
