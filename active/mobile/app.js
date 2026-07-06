@@ -34,6 +34,8 @@ window.cityAreaCache = {};
 window.activeCityDetailsPromise = null;
 window.currentCityDetailsName = null;
 window.activeRankingPromise = null;
+window.areaSearchQuery = "";
+window.areaSelectedKanaRow = "";
 
 // ─── ローディングプログレスバー更新 ──────────────────────────────
 function setLoadingProgress(pct, label) {
@@ -1180,6 +1182,8 @@ function navigateToAreaTab() {
 // 2層目（エリア一覧）から1層目（市区町村一覧）へ戻る
 function backToCityList() {
   currentCity = null;
+  window.areaSearchQuery = "";
+  window.areaSelectedKanaRow = "";
   renderAreas();
   const contentEl = $('content');
   if (contentEl) contentEl.scrollTop = 0;

@@ -1,8 +1,1 @@
-**/**
-!**/*.js
-!**/*.gs
-!**/*.html
-!appsscript.json
-
-# Ignore mobile frontend files (which are hosted on Github Pages)
 mobile/**

@@ -395,6 +395,15 @@ function deleteAllAreaSheets() {
     if (!exclude.includes(s.getName())) ss.deleteSheet(s);
   });
   
+  // チラシ保管庫の中身を初期化 (ヘッダー2行目以降をクリア)
+  const storageSheet = ss.getSheetByName(CONFIG.get("SHEET_STORAGE"));
+  if (storageSheet) {
+    const storageLastRow = storageSheet.getLastRow();
+    if (storageLastRow >= 2) {
+      storageSheet.getRange(2, 1, storageLastRow - 1, storageSheet.getLastColumn()).clearContent();
+    }
+  }
+  
   createSystemCacheSheet();
   refreshAreaSummaryCache();
   

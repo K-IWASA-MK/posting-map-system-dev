@@ -42,14 +42,16 @@ function refreshAreaSummaryCache() {
   const lastRow = shadowSheet.getLastRow();
   let masterMap = {};
   if (lastRow >= 2) {
-    // 1回のAPI通信でマスターデータを取得 (A:エリア名, B:(廃止), C:合計数, D:代表住所)
-    const data = shadowSheet.getRange(2, 1, lastRow - 1, 4).getValues();
+    // 1回のAPI通信でマスターデータを取得 (A:エリア名, B:(廃止), C:合計数, D:代表住所, E:市町村カナ, F:町域カナ)
+    const data = shadowSheet.getRange(2, 1, lastRow - 1, 6).getValues();
     data.forEach((row) => {
       const name = row[0];
       const total = Number(row[2]) || 0;
       const repAddress = row[3] ? String(row[3]).trim() : "";
+      const cityKana = row[4] ? String(row[4]).trim() : "";
+      const townKana = row[5] ? String(row[5]).trim() : "";
       if (name) {
-        masterMap[name] = { total: total, repAddress: repAddress };
+        masterMap[name] = { total: total, repAddress: repAddress, cityKana: cityKana, townKana: townKana };
       }
     });
   }
@@ -78,12 +80,16 @@ function refreshAreaSummaryCache() {
     }
 
     summary.push({
+      version: 1,
+      // Future: areaId,
       name: name,
       done: done,
       total: master.total,
       repAddress: master.repAddress,
       lat: lat,
-      lng: lng
+      lng: lng,
+      cityKana: master.cityKana || "",
+      townKana: master.townKana || ""
     });
     
     totalDone += done;
@@ -105,12 +111,16 @@ function refreshAreaSummaryCache() {
         lng = coords.lng;
       }
       summary.push({
+        version: 1,
+        // Future: areaId,
         name: name,
         done: 0,
         total: master.total,
         repAddress: master.repAddress,
         lat: lat,
-        lng: lng
+        lng: lng,
+        cityKana: master.cityKana || "",
+        townKana: master.townKana || ""
       });
       totalPoints += master.total;
     }
@@ -126,6 +136,11 @@ function refreshAreaSummaryCache() {
   const cache = CacheService.getScriptCache();
   cache.put("AREA_SUMMARY_FAST_CACHE", jsonResult, 1800);
   PropertiesService.getScriptProperties().setProperty("AREA_SUMMARY_CACHE", jsonResult);
+
+  // API 生成完了監査
+  if (typeof auditDataIntegrity === 'function') {
+    auditDataIntegrity("API", result.summary);
+  }
 
   return result;
 }
@@ -144,7 +159,26 @@ function createSystemCacheSheet() {
   }
   
   sheet.clear();
-  sheet.getRange(1, 1, 1, 4).setValues([["エリア名", "完了数", "合計数", "代表住所"]]);
+  sheet.getRange(1, 1, 1, 6).setValues([["エリア名", "完了数", "合計数", "代表住所", "市町村カナ", "町域カナ"]]);
+
+  // __TEMP_ADDRESSES__ からカナ情報を取得し Map 化 (SSOT)
+  const tempSheet = ss.getSheetByName("__TEMP_ADDRESSES__");
+  const kanaMap = {};
+  if (tempSheet) {
+    const tempLastRow = tempSheet.getLastRow();
+    if (tempLastRow >= 2) {
+      // 2列目:住所, 3列目:市町村カナ, 4列目:町域カナ
+      const tempValues = tempSheet.getRange(2, 2, tempLastRow - 1, 3).getValues();
+      tempValues.forEach(row => {
+        const addr = row[0] ? String(row[0]).trim() : "";
+        const cityKana = row[1] ? String(row[1]).trim() : "";
+        const townKana = row[2] ? String(row[2]).trim() : "";
+        if (addr) {
+          kanaMap[addr] = { cityKana, townKana };
+        }
+      });
+    }
+  }
 
   const exclude = [
     CONFIG.get("SHEET_GUIDE"), CONFIG.get("SHEET_ROSTER"), CONFIG.get("SHEET_TEMPLATE"),
@@ -171,15 +205,31 @@ function createSystemCacheSheet() {
     }
     
     const escapedName = name.replace(/'/g, "''");
+    const kData = kanaMap[name] || { cityKana: "", townKana: "" };
+
     return [
       name,
       0, // Phase 13: 完了数はEventLogから集計するため、ここはダミー(0)とする
       `=COUNTA('${escapedName}'!A2:A)`, // マスター件数
-      repAddress
+      repAddress,
+      kData.cityKana,
+      kData.townKana
     ];
   });
 
-  sheet.getRange(2, 1, rows.length, 4).setValues(rows);
+  sheet.getRange(2, 1, rows.length, 6).setValues(rows);
+  
+  // CACHE 作成完了監査
+  const cacheData = rows.map(r => ({
+    name: r[0],
+    total: r[2],
+    repAddress: r[3],
+    cityKana: r[4],
+    townKana: r[5]
+  }));
+  if (typeof auditDataIntegrity === 'function') {
+    auditDataIntegrity("CACHE", cacheData);
+  }
 }
 
 /**

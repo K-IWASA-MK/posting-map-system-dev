@@ -19,35 +19,43 @@ function forceStartBatch() {
   ss.toast("住所データを抽出・ソート中...", "準備中", 5);
   const addresses = extractDistrictAddresses();
   
+  // EXTRACT 完了監査
+  if (typeof auditDataIntegrity === 'function') {
+    auditDataIntegrity("EXTRACT", addresses);
+  }
+  
   // デバッグ用トースト：抽出件数を画面に表示
   ss.toast(`【デバッグ】住所データを ${addresses.length} 件抽出しました。ソート中...`, "デバッグ", 10);
   
-  addresses.sort((a, b) => {
-    // 1. 市町村カナでソート（同一市町村のシート生成を連続させるため）
-    const comp = (a.cityKana || "").localeCompare(b.cityKana || "", 'ja');
-    if (comp !== 0) return comp;
-    
-    // 2. 郵便番号でソート（ハイフンを除去して比較）
-    const pA = (a.postalCode || "").replace(/-/g, "");
-    const pB = (b.postalCode || "").replace(/-/g, "");
-    const compPostal = pA.localeCompare(pB);
-    if (compPostal !== 0) return compPostal;
-    
-    // 3. 同じ郵便番号の中は住所（漢字）でソート
-    return a.address.localeCompare(b.address, 'ja');
-  });
 
+
+  /**
+   * Area Metadata Foundation (SSOT)
+   *
+   * cityKana
+   * townKana
+   * を生成・保持する唯一のマスタ。
+   *
+   * 他モジュールはこのデータを参照するのみ.
+   *
+   * DO NOT REGENERATE.
+   */
   let tempSheet = ss.getSheetByName("__TEMP_ADDRESSES__");
   if (!tempSheet) {
     tempSheet = ss.insertSheet("__TEMP_ADDRESSES__");
     tempSheet.hideSheet();
   }
   tempSheet.clear();
-  tempSheet.getRange(1, 1, 1, 2).setValues([["郵便番号", "住所"]]);
+  tempSheet.getRange(1, 1, 1, 4).setValues([["郵便番号", "住所", "市町村カナ", "町域カナ"]]);
   
   if (addresses.length > 0) {
-    const rows = addresses.map(addr => [addr.postalCode || "", addr.address]);
-    tempSheet.getRange(2, 1, rows.length, 2).setValues(rows);
+    const rows = addresses.map(addr => [
+      addr.postalCode || "",
+      addr.address,
+      addr.cityKana || "",
+      addr.townKana || ""
+    ]);
+    tempSheet.getRange(2, 1, rows.length, 4).setValues(rows);
   }
   SpreadsheetApp.flush();
   
@@ -171,6 +179,23 @@ function generateAreaSheetsBatch() {
   
   // 一時シートの削除
   const tempSheetToDelete = ss.getSheetByName("__TEMP_ADDRESSES__");
+  
+  // BATCH 完了監査 (一時シートの削除前にマスタの整合性チェック)
+  if (tempSheetToDelete) {
+    const tempLastRow = tempSheetToDelete.getLastRow();
+    if (tempLastRow >= 2) {
+      const batchData = tempSheetToDelete.getRange(2, 1, tempLastRow - 1, 4).getValues().map(r => ({
+        postalCode: r[0],
+        address: r[1],
+        cityKana: r[2],
+        townKana: r[3]
+      }));
+      if (typeof auditDataIntegrity === 'function') {
+        auditDataIntegrity("BATCH", batchData);
+      }
+    }
+  }
+  
   if (tempSheetToDelete) {
     try {
       ss.deleteSheet(tempSheetToDelete);

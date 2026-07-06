@@ -96,27 +96,65 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
       });
     }
   });
-  // 郵便番号データから「漢字の市町村名 ➔ カタカナの読み仮名」のマップを構築
+  // 郵便番号データから「漢字の市町村名 ➔ カタカナの読み仮名」および「漢字の町域名 ➔ カタカナの読み仮名」のマップを構築
   const cityKanaMap = {};
+  const townKanaMap = {};
   postalData.forEach(row => {
-    if (row && row[7] && row[4]) {
-      const cityKanji = row[7].toString().trim();
-      const cityKana = row[4].toString().trim();
-      if (cityKanji && cityKana && !cityKanaMap[cityKanji]) {
-        cityKanaMap[cityKanji] = toFullWidthKana(cityKana);
+    if (row) {
+      if (row[7] && row[4]) {
+        const cityKanji = row[7].toString().trim();
+        const cityKana = row[4].toString().trim();
+        if (cityKanji && cityKana && !cityKanaMap[cityKanji]) {
+          cityKanaMap[cityKanji] = toFullWidthKana(cityKana);
+        }
+      }
+      if (row[8] && row[5]) {
+        const townKanji = row[8].toString().trim().replace(/（.*?）/g, "").replace(/\(.*?\)/g, "");
+        const townKana = toFullWidthKana(row[5].toString().trim().replace(/（.*?）/g, "").replace(/\(.*?\)/g, ""));
+        if (townKanji && townKana && !townKanaMap[townKanji]) {
+          townKanaMap[townKanji] = townKana;
+        }
       }
     }
   });
 
-  return Array.from(addressMap, ([address, postalCode]) => {
+  const items = Array.from(addressMap, ([address, postalCode]) => {
     const city = extractCityName(address);
+    const cityIdx = address.indexOf(city);
+    const town = cityIdx !== -1 ? address.slice(cityIdx + city.length) : address;
+    
+    // 簡易的な前方一致でカナを特定
+    let townKana = town;
+    for (let k in townKanaMap) {
+      if (town.indexOf(k) === 0) {
+        townKana = town.replace(k, townKanaMap[k]);
+        break;
+      }
+    }
+
     return {
       postalCode,
       address,
       city,
-      cityKana: cityKanaMap[city] || ""
+      cityKana: cityKanaMap[city] || "",
+      townKana: townKana
     };
   });
+
+  // 五十音順ソート
+  items.sort((a, b) => {
+    const cityComp = a.cityKana.localeCompare(b.cityKana, 'ja');
+    if (cityComp !== 0) return cityComp;
+    return a.townKana.localeCompare(b.townKana, 'ja');
+  });
+
+  return items.map(item => ({
+    postalCode: item.postalCode,
+    address: item.address,
+    city: item.city,
+    cityKana: item.cityKana,
+    townKana: item.townKana
+  }));
 }
 
 function expandTownChome(baseCity, townRaw) {

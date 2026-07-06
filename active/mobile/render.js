@@ -42,6 +42,15 @@ function renderAreas() {
     // 【第1層：市・自治体一覧画面】
     const cities = citySummary;
 
+    // 各市町村ごとの配布エリア数を集計 (SSOTのエリアシート数)
+    const cityAreaCount = {};
+    if (Array.isArray(areaSummary)) {
+      areaSummary.forEach(s => {
+        const city = getCityName(s.name);
+        cityAreaCount[city] = (cityAreaCount[city] || 0) + 1;
+      });
+    }
+
     const headerCardHtml = `
       <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">
         <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
@@ -69,12 +78,13 @@ function renderAreas() {
         fontSizeClass = 'text-base';
       }
 
+      const areaCount = cityAreaCount[c.name] || 0;
       return `
       <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
         <div class="w-full flex justify-center mb-1">
           <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="inline-flex items-center justify-center h-7 px-3 ${fontSizeClass} font-black text-white rounded-full tracking-tight">
             <span class="text-xs mr-1 select-none">🏢</span>
-            <span>${c.name}</span>
+            <span>${c.name} (${areaCount})</span>
           </div>
         </div>
         <div class="text-sm ${pctColorClass}">${c.progress}%</div>
@@ -106,100 +116,41 @@ function renderAreas() {
       </div>
     `;
 
-    const areaCardsHtml = filteredAreas.map(s => {
-      const pctColorClass = 'text-[#2563eb]';
-      const isCompleted = s.done === s.total && s.total > 0;
-      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 8px; white-space: nowrap;" class="select-none text-xs font-sans">🔒</span>' : '';
-      const rightLabel = isCompleted ? '<span style="margin-left: 8px; white-space: nowrap;" class="font-sans text-xs opacity-90">🔒</span>' : '';
-      
-      // A2の代表住所を郵便番号と住所に分離して解析
-      let zipCode = '';
-      let cleanAddress = s.name;
-      
-      if (s.repAddress) {
-        const match = s.repAddress.match(/^〒(\d{3}-\d{4})\s*([\s\S]*)$/);
-        if (match) {
-          zipCode = match[1];
-          cleanAddress = match[2].trim().replace(/\r?\n/g, ' ');
-        } else {
-          cleanAddress = s.repAddress.replace(/\r?\n/g, ' ');
-        }
-      }
-
-      // 郵便番号バッジHTML（郵便番号が存在する場合のみ生成）
-      const zipBadgeHtml = zipCode 
-        ? `<div style="text-indent: 0.12em; letter-spacing: 0.12em; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2);" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono rounded-full mb-1">📮 〒${zipCode}</div>`
-        : '';
-
-      // 住所の文字数に応じてフォントサイズを自動調整（折り返し・はみ出し防止）
-      let fontSizeClass = 'text-base';
-      if (cleanAddress.length > 12) {
-        fontSizeClass = 'text-xs'; // 12文字超は小さめ (12px)
-      } else if (cleanAddress.length > 8) {
-        fontSizeClass = 'text-sm';  // 8〜12文字は中くらい (14px)
-      }
-
-      const mapUrl = zipCode
-        ? `https://www.google.com/maps/search/?api=1&query=${zipCode}`
-        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress + ' 日本')}`;
-
-      const googleMapsButtonHtml = isCompleted
-        ? `
-          <a style="background: rgba(37,99,235,0.02); border: 1px solid rgba(37,99,235,0.1); color: rgba(37,99,235,0.3); pointer-events: none; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;"
-            class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none opacity-40">
-            📮 〒${zipCode || '---'} → 🗺
-          </a>
-        `
-        : `
-          <a href="${mapUrl}" target="_blank"
-            style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.25); color: rgba(37,99,235,0.88); transition: transform 75ms ease-out; white-space: nowrap; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;"
-            onpointerdown="this.style.transform='scale(0.94)'"
-            onpointerup="this.style.transform=''"
-            onpointerleave="this.style.transform=''"
-            class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none">
-            📮 〒${zipCode || '---'} → 🗺
-          </a>
-        `;
-
-      const actionButtonHtml = isCompleted
-        ? `
-          <button style="background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.15); color: rgba(255,255,255,0.3); pointer-events: none;"
-            class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none opacity-40">
-            配布詳細へ →
-          </button>
-        `
-        : `
-          <button ontouchstart="" onclick="openDetail('${s.name}')"
-            style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out; white-space: nowrap;"
-            onpointerdown="this.style.transform='scale(0.96)'"
-            onpointerup="this.style.transform=''"
-            onpointerleave="this.style.transform=''"
-            class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none">
-            配布詳細へ →
-          </button>
-        `;
-
-      return `
-      <div id="area-card-${s.name}" class="premium-glass py-5 px-6 flex items-center justify-center">
-        <div style="display: inline-flex; flex-direction: column; align-items: stretch; gap: 8px; text-align: center;">
-          ${googleMapsButtonHtml}
-          <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug" style="text-wrap: balance; padding: 4px 0;">
-            ${cleanAddress}
-          </div>
-          <div class="text-sm ${pctColorClass}">${s.progress}%</div>
-          <div class="flex items-center justify-center">
-            ${leftDummy}
-            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e; white-space: nowrap; flex-shrink: 0;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
-              ${s.done || 0}/ ${s.total || 0}
-            </div>
-            ${rightLabel}
-          </div>
-          ${actionButtonHtml}
+    // 検索UIパネル (高級感のある漆黒 premium-glass)
+    const searchPanelHtml = `
+      <div class="premium-glass p-5 mb-6 flex flex-col gap-4">
+        <div class="flex items-center justify-between text-xs text-white/50 tracking-wider">
+          <span>SELECT AREA</span>
+          <span class="font-black text-[#2563eb]">${currentCity} (${filteredAreas.length})</span>
         </div>
-      </div>`;
-    }).join('');
+        
+        <div class="relative">
+          <input type="text" id="area-search-input" placeholder="🔍 エリア名・カナで検索..." 
+                 value="${window.areaSearchQuery || ''}"
+                 class="w-full h-11 px-4 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#2563eb] transition-all"
+                 oninput="onAreaSearchInput()">
+        </div>
 
-    // 2層目の最下部ナビゲーション（戻る ‹ / ↑ トップに戻る）
+        <div class="grid grid-cols-5 gap-1.5 text-center text-[11px] font-bold">
+          ${['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ'].map(k => {
+            const isActive = window.areaSelectedKanaRow === k;
+            const style = isActive 
+              ? 'background: rgba(37, 99, 235, 0.3); color: #fff; border-color: rgba(37, 99, 235, 0.5);' 
+              : 'background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.8); border-color: rgba(255, 255, 255, 0.05);';
+            return `<button onclick="filterByKana('${k}')" class="kana-btn h-8 rounded-lg border flex items-center justify-center transition-all" style="${style}">${k}</button>`;
+          }).join('')}
+        </div>
+        
+        <div class="flex justify-end">
+          <button onclick="filterByKana('clear')" class="px-3 h-6 rounded-md border border-white/5 bg-white/5 text-[9px] text-white/50 active:bg-white/10">すべて表示</button>
+        </div>
+      </div>
+    `;
+
+    // カードのコンテナプレースホルダー
+    const cardsContainerHtml = `<div id="area-cards-container" class="space-y-6"></div>`;
+
+    // 2層目の最下部ナビゲーション
     const bottomNavHtml = filteredAreas.length > 3 ? `
       <div class="flex items-center justify-between mt-8 pb-10 w-full gap-4">
         <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
@@ -212,12 +163,17 @@ function renderAreas() {
       </div>
     `;
 
-    $('area-list').innerHTML = backButtonHtml + `<div class="space-y-6">${areaCardsHtml}</div>` + bottomNavHtml;
+    $('area-list').innerHTML = backButtonHtml + searchPanelHtml + cardsContainerHtml + bottomNavHtml;
+    
+    // 初回絞り込み描画
+    renderFilteredAreaList(filteredAreas);
   }
 }
 
 function selectCity(cityName) {
   currentCity = cityName;
+  window.areaSearchQuery = "";
+  window.areaSelectedKanaRow = "";
   renderAreas();
   const contentEl = $('content');
   if (contentEl) contentEl.scrollTop = 0;
@@ -1243,3 +1199,153 @@ window.renderDetailList = function(areaName) {
     window.renderNewDetailList(areaName);
   }
 };
+
+// 🔤 五十音インデックス行の判定
+function getKanaGroup(kana) {
+  if (!kana) return '';
+  const first = kana.trim().charAt(0);
+  
+  if (/[あ-おア-オ]/.test(first)) return 'あ';
+  if (/[か-こカ-コ]/.test(first)) return 'か';
+  if (/[さ-そサ-ソ]/.test(first)) return 'さ';
+  if (/[た-とタ-ト]/.test(first)) return 'た';
+  if (/[な-のナ-ノ]/.test(first)) return 'な';
+  if (/[は-ほハ-ホ]/.test(first)) return 'は';
+  if (/[ま-もマ-モ]/.test(first)) return 'ま';
+  if (/[や-よヤ-ヨ]/.test(first)) return 'や';
+  if (/[ら-ろラ-ロ]/.test(first)) return 'ら';
+  if (/[わ-んワ-ン]/.test(first)) return 'わ';
+  
+  return '';
+}
+
+// 🔍 検索入力イベント
+function onAreaSearchInput() {
+  const val = $('area-search-input').value;
+  window.areaSearchQuery = val;
+  
+  // 検索入力時は五十音ボタンのアクティブ状態をクリアする
+  if (val) {
+    document.querySelectorAll('.kana-btn').forEach(btn => {
+      btn.style.background = 'rgba(255, 255, 255, 0.05)';
+      btn.style.color = 'rgba(255, 255, 255, 0.8)';
+      btn.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+    });
+    window.areaSelectedKanaRow = "";
+  }
+  
+  const filteredAreas = areaSummary.filter(s => getCityName(s.name) === currentCity);
+  renderFilteredAreaList(filteredAreas);
+}
+
+// 🔤 五十音ボタンクリックイベント
+function filterByKana(kana) {
+  $('area-search-input').value = "";
+  window.areaSearchQuery = "";
+  
+  if (kana === 'clear') {
+    window.areaSelectedKanaRow = "";
+  } else {
+    window.areaSelectedKanaRow = kana;
+  }
+  
+  document.querySelectorAll('.kana-btn').forEach(btn => {
+    if (btn.textContent === kana) {
+      btn.style.background = 'rgba(37, 99, 235, 0.3)';
+      btn.style.color = '#fff';
+      btn.style.borderColor = 'rgba(37, 99, 235, 0.5)';
+    } else {
+      btn.style.background = 'rgba(255, 255, 255, 0.05)';
+      btn.style.color = 'rgba(255, 255, 255, 0.8)';
+      btn.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+    }
+  });
+  
+  const filteredAreas = areaSummary.filter(s => getCityName(s.name) === currentCity);
+  renderFilteredAreaList(filteredAreas);
+}
+
+// 📱 メモリ上の高速エリアフィルタリング＆描画
+function renderFilteredAreaList(filteredAreas) {
+  const query = (window.areaSearchQuery || "").trim().toLowerCase();
+  const selectedKana = window.areaSelectedKanaRow || "";
+  
+  let list = filteredAreas;
+  
+  if (query) {
+    list = list.filter(s => {
+      const nameMatch = s.name && s.name.toLowerCase().includes(query);
+      const kanaMatch = s.townKana && s.townKana.toLowerCase().includes(query);
+      return nameMatch || kanaMatch;
+    });
+  } else if (selectedKana) {
+    list = list.filter(s => {
+      return getKanaGroup(s.townKana) === selectedKana;
+    });
+  }
+  
+  if (list.length === 0) {
+    $('area-cards-container').innerHTML = '<p class="text-center text-white/40 py-16 font-bold text-xs tracking-wider">該当するエリアがありません。</p>';
+    return;
+  }
+  
+  const pctColorClass = 'text-[#2563eb]';
+  const areaCardsHtml = list.map(s => {
+    const isCompleted = s.done === s.total && s.total > 0;
+    const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 8px; white-space: nowrap;" class="select-none text-xs font-sans">🔒</span>' : '';
+    const rightLabel = isCompleted ? '<span style="margin-left: 8px; white-space: nowrap;" class="font-sans text-xs opacity-90">🔒</span>' : '';
+    
+    let zipCode = '';
+    let cleanAddress = s.name;
+    
+    if (s.repAddress) {
+      const match = s.repAddress.match(/^〒(\d{3}-\d{4})\s*([\s\S]*)$/);
+      if (match) {
+        zipCode = match[1];
+        cleanAddress = match[2].trim().replace(/\r?\n/g, ' ');
+      } else {
+        cleanAddress = s.repAddress.replace(/\r?\n/g, ' ');
+      }
+    }
+
+    const mapUrl = zipCode
+      ? `https://www.google.com/maps/search/?api=1&query=${zipCode}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress + ' 日本')}`;
+
+    const googleMapsButtonHtml = isCompleted
+      ? `<a style="background: rgba(37,99,235,0.02); border: 1px solid rgba(37,99,235,0.1); color: rgba(37,99,235,0.3); pointer-events: none; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;" class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none opacity-40">📮 〒${zipCode || '---'} → 🗺</a>`
+      : `<a href="${mapUrl}" target="_blank" style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.25); color: rgba(37,99,235,0.88); transition: transform 75ms ease-out; white-space: nowrap; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;" onpointerdown="this.style.transform='scale(0.94)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''" class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none">📮 〒${zipCode || '---'} → 🗺</a>`;
+
+    const actionButtonHtml = isCompleted
+      ? `<button style="background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.15); color: rgba(255,255,255,0.3); pointer-events: none;" class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none opacity-40">配布詳細へ →</button>`
+      : `<button ontouchstart="" onclick="openDetail('${s.name}')" style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out; white-space: nowrap;" onpointerdown="this.style.transform='scale(0.96)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''" class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none">配布詳細へ →</button>`;
+
+    let fontSizeClass = 'text-base';
+    if (cleanAddress.length > 12) {
+      fontSizeClass = 'text-xs';
+    } else if (cleanAddress.length > 8) {
+      fontSizeClass = 'text-sm';
+    }
+
+    return `
+    <div id="area-card-${s.name}" class="premium-glass py-5 px-6 flex items-center justify-center">
+      <div style="display: inline-flex; flex-direction: column; align-items: stretch; gap: 8px; text-align: center;">
+        ${googleMapsButtonHtml}
+        <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug" style="text-wrap: balance; padding: 4px 0;">
+          ${cleanAddress}
+        </div>
+        <div class="text-sm ${pctColorClass}">${s.progress}%</div>
+        <div class="flex items-center justify-center">
+          ${leftDummy}
+          <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e; white-space: nowrap; flex-shrink: 0;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
+            ${s.done || 0}/ ${s.total || 0}
+          </div>
+          ${rightLabel}
+        </div>
+        ${actionButtonHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  $('area-cards-container').innerHTML = areaCardsHtml;
+}
