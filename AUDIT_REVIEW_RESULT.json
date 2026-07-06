@@ -1,26 +1,16 @@
 {
-  "reviewId": "20260706005903",
+  "reviewId": "20260706005918",
   "reviewEngineVersion": "1.1.0",
   "ruleVersion": "1.1.0",
   "agent": {
-    "agentId": "flash-2.5-pro",
-    "agentName": "Flash",
-    "agentRole": "Implementer"
+    "agentId": "antigravity-ide-v1",
+    "agentName": "Antigravity",
+    "agentRole": "Developer"
   },
-  "status": "FAILED",
-  "timestamp": "2026-07-06T00:59:03.538654+00:00",
+  "status": "PASS",
+  "timestamp": "2026-07-06T00:59:18.869898+00:00",
   "summary": {
     "Architecture": {
-      "status": "FAILED",
-      "errors": 1,
-      "warnings": 0
-    },
-    "Database": {
-      "status": "PASS",
-      "errors": 0,
-      "warnings": 0
-    },
-    "API": {
       "status": "PASS",
       "errors": 0,
       "warnings": 0
@@ -30,27 +20,21 @@
       "errors": 0,
       "warnings": 0
     },
+    "Database": {
+      "status": "PASS",
+      "errors": 0,
+      "warnings": 0
+    },
     "Security": {
+      "status": "PASS",
+      "errors": 0,
+      "warnings": 0
+    },
+    "API": {
       "status": "PASS",
       "errors": 0,
       "warnings": 0
     }
   },
-  "violations": [
-    {
-      "id": "001",
-      "name": "SSOT Rule",
-      "category": "Architecture",
-      "severity": "ERROR",
-      "message": "CSVファイルの直接パースはv2_extract.gsにのみ閉じている必要があります。 (Line: 'const data = Utilities.parseCsv(\"a,b,c\");')",
-      "file": "active/gas/v2_map.gs",
-      "line": 304,
-      "match": "Utilities.parseCsv",
-      "remediation": "Do not call Utilities.parseCsv directly. SSOT parsing is delegated exclusively to v2_extract.gs.",
-      "nextAction": [
-        "Remove direct Utilities.parseCsv execution",
-        "Reference existing parsed metadata structures"
-      ]
-    }
-  ]
+  "violations": []
 }
