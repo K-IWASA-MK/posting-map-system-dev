@@ -1,3 +1,17 @@
+# Release Notes - v4.8-knowledge-os
+
+## 🚀 New Features & Enhancements
+
+### 1. Knowledge OS Foundation 完成 (AIOS Phase 138)
+- **Project Manifest 基盤の導入 (`tools/ai_project_manifest.json`)**:
+  - プロジェクトが依存している AIOS バージョン（`architectureVersion: "4.7"`, `minimumReviewVersion: "1.1.0"` など）の宣言的マニフェストファイルを新設。
+- **自律的エラー学習エンジン (`tools/knowledge_compiler.py`)**:
+  - 過去の全レビュー履歴から、繰り返し発生しているバグパターンのトリガーキー（正規表現等）と、解決テンプレート（`nextAction` などから自動構築）を自動コンパイルして `tools/knowledge_base.json` (知識データベース) へ動的蓄積。
+- **実装前アドバイザリーエンジン (`tools/knowledge_consultant.py`)**:
+  - 開発AIモデルが実装に入る直前に、過去にそのカテゴリで起こした違反傾向から、回避すべきナレッジと解決策テンプレートを事前にコンソール/JSONへ警告出力するコンサルティングシステムを構築。
+
+---
+
 # Release Notes - v4.7-project-os
 
 ## 🚀 New Features & Enhancements
