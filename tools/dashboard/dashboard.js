@@ -50,6 +50,9 @@ function connectWS() {
         } else if (type === "POLICY_COMPILED") {
           projectPolicies(payload);
           appendLogItem("POLICY_COMPILED", source, "Governance policy compilation rebuilt offline.");
+        } else if (type === "FIELD_EXECUTED") {
+          const { action, targetNode, commandId } = payload;
+          appendLogItem("FIELD_EXECUTED", source, `Executed CMD: ${action} on ${targetNode} (${commandId})`);
         }
       }
     } catch (e) {

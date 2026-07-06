@@ -1,0 +1,25 @@
+{
+  "nodes": {
+    "region_kuwana": {
+      "nodeId": "region_kuwana",
+      "type": "region_node",
+      "status": "ACTIVE",
+      "assignedUsers": ["S025"],
+      "trustScore": 1.0
+    },
+    "S025": {
+      "nodeId": "S025",
+      "type": "user_node",
+      "status": "ACTIVE",
+      "assignedAreas": ["kuwana_001"],
+      "trustScore": 0.81
+    },
+    "task_kuwana_001": {
+      "nodeId": "task_kuwana_001",
+      "type": "task_node",
+      "status": "PENDING",
+      "targetQuantity": 300,
+      "trustScore": 0.9
+    }
+  }
+}
