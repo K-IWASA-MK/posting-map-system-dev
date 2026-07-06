@@ -1,3 +1,20 @@
+# Release Notes - v4.17-governance-compiler
+
+## 🚀 New Features & Enhancements
+
+### 1. Governance Policy Compiler Layer & Offline Execution Separation (AIOS Phase 147)
+- **ポリシー・コンパイラ・コア (Governance Policy Compiler Core)**:
+  - 信頼スコア、経過時間劣化（Drift）、およびイベント履歴を入力として、実行時制約（AST）を規定した決定論的な Policy Object（`mode`, `limits: {write, exec, network}`）にコンパイルする `governance_compiler.py` を実装。
+- **決定論的ポリシーコンパイル規則 (Immutable Law mapping)**:
+  - スコアしきい値に対応した動作モード（FULL_ACCESS / LIMITED / SANDBOX / BLOCKED）のマッピングと、Drift/Penalty 発生時の BLOCKED 強制降格ルールを実装。
+- **コンパイルと執行の物理的２層分離 (Offline Compile & Runtime Read-Only Enforcement)**:
+  - 実行時に毎回コンパイルが走ることによる不安定さ（ポリシーの揺れ・順序依存）を防ぐため、コンパイル処理は非実行時（オフライン / バッチ）のみ実行とし、ポリシーキャッシュファイル `compiled_policies.json` を出力。
+  - 実行時ゲート `architecture_reviewer.py` はコンパイル処理を一切行わず、事前キャッシュされたポリシーをロードして検証するのみ（Read-only 執行）に設計制限。
+- **法秩序執行自動ロック (Law Enforcement Lock)**:
+  - 事前コンパイルされた `ai_agent` のポリシー制限が `limits.write = False` または `mode = BLOCKED` の状態で実行された場合、Rule 022 に基づき即座にビルド・コミット処理全体を強制アボート。
+
+---
+
 # Release Notes - v4.16-trust-drift
 
 ## 🚀 New Features & Enhancements
