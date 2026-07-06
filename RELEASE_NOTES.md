@@ -1,3 +1,19 @@
+# Release Notes - v4.12-logical-sandbox
+
+## 🚀 New Features & Enhancements
+
+### 1. Pre-Execution Validation Layer & Logical Sandbox (AIOS Phase 142)
+- **論理的カーネル分離 (Logical Kernel Separation) の導入**:
+  - AI プロセスの実行権限を剥離し、直接のコード編集を制限する論理隔離モデルを構築。
+  - AI エージェントの修正提案を評価する独立コンポーネント `aios_kernel.py` (Logical Kernel) を新規実装。
+- **実行前ゲート (Pre-Execution Validation Layer) と検証証明書の発行**:
+  - `--validate-proposal <taskId> --proposal <patchFile>` コマンドにより、カーネルは「判断（検証）のみを行い、物理的な書き込み（実行）は行わない」境界要件に従って検証を処理。
+  - すべての検証項目（`executionToken` や Rule 011〜017）をパスした場合に、署名付きの検証結果証明書 `proposal_validation_result.json` を発行する仕組みをプロトタイプ化。
+- **Rule 016 (Kernel Isolation) & Rule 017 (Sandbox Enforcement)**:
+  - 直接的なコード編集を禁止し、検証パス証明書を保持しないワーキングツリーの変更を物理ブロック。
+
+---
+
 # Release Notes - v4.11-execution-gate
 
 ## 🚀 New Features & Enhancements

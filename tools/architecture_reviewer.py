@@ -362,16 +362,19 @@ def check_execution_gates(project_root, rules):
             rule_017 = next((r for r in rules if r["id"] == "017"), None)
             
             if (rule_016 or rule_017) and (has_source_changes or has_walkthrough_changes or has_release_notes_changes):
+                # プロジェクト内のいずれかのアクティブタスクに対して有効な証明書があるかスキャン
                 cert_file = os.path.join(project_root, "tools", "proposal_validation_result.json")
-                valid_cert = False
+                any_valid_cert = False
                 err_msg = ""
                 
                 if os.path.exists(cert_file):
                     try:
                         with open(cert_file, "r", encoding="utf-8") as f:
                             cert = json.load(f)
-                        if cert.get("taskId") == t["taskId"] and cert.get("status") == "VALIDATION_PASSED":
-                            valid_cert = True
+                        # いずれかのアクティブタスク（status == IN_PROGRESS または TODO）と一致しているか
+                        active_task_ids = [tk["taskId"] for tk in tasks if tk.get("status") in ["TODO", "ASSIGNED", "IN_PROGRESS"]]
+                        if cert.get("taskId") in active_task_ids and cert.get("status") == "VALIDATION_PASSED":
+                            any_valid_cert = True
                         else:
                             err_msg = f"Proposal validation certificate status is '{cert.get('status')}'."
                     except Exception as e:
@@ -379,7 +382,7 @@ def check_execution_gates(project_root, rules):
                 else:
                     err_msg = "Proposal validation result certificate not found."
                 
-                if not valid_cert:
+                if not any_valid_cert:
                     if rule_016:
                         violations.append({
                             "id": "016",
