@@ -43,6 +43,7 @@ implementation_plan.html
 .clasprc.json.local.bak
 .clasp.json.bak
 .env
+tools/.kernel_secret
 
 # Dependencies
 node_modules/

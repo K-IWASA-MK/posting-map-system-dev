@@ -10,6 +10,10 @@ from datetime import datetime, timezone
 DAEMON_PATH = os.path.join(os.path.dirname(__file__), "aios_kernel_daemon.js")
 TASKS_FILE = os.path.join(os.path.dirname(__file__), "ai_tasks.json")
 
+# <BOOT_ANCHOR_START>
+GOLDEN_HASH = "37a569886229458f87ffd662e891fbcdfbbe8984bb3df3e48f1f48bbb6838243"
+# <BOOT_ANCHOR_END>
+
 def load_json(filepath):
     if os.path.exists(filepath):
         try:
@@ -35,7 +39,8 @@ def call_daemon(method, params):
         
         ready_sig = proc.stderr.readline().strip()
         if "AIOS Kernel Daemon Initialized." not in ready_sig:
-            print(f"Error initializing kernel daemon: {ready_sig}", file=sys.stderr)
+            err_log = ready_sig + "\n" + proc.stderr.read()
+            print(f"Error initializing kernel daemon: {err_log.strip()}", file=sys.stderr)
             proc.terminate()
             sys.exit(1)
             
@@ -111,11 +116,32 @@ def verify_signature_proxy(cert_path):
     result = call_daemon("verifySignature", params)
     return result.get("valid", False)
 
+def verify_kernel_proxy():
+    result = call_daemon("getKernelAttestation", {})
+    if not result:
+        print("Error: Failed to obtain attestation.", file=sys.stderr)
+        sys.exit(1)
+        
+    daemon_hash = result.get("hash")
+    daemon_state = result.get("state")
+    
+    if daemon_hash != GOLDEN_HASH:
+        print(f"Attestation Mismatch! Daemon hash '{daemon_hash}' differs from golden hash '{GOLDEN_HASH}'.", file=sys.stderr)
+        sys.exit(1)
+        
+    if daemon_state != "TRUSTED":
+        print(f"Daemon not in Trusted Mode! State is '{daemon_state}'", file=sys.stderr)
+        sys.exit(1)
+        
+    print(f"Kernel Attestation: SUCCESS (Trusted Mode active, Hash: {daemon_hash})")
+    sys.exit(0)
+
 def main():
     parser = argparse.ArgumentParser(description="AIOS Logical Kernel Proxy (IPC System Call Bridge)")
     parser.add_argument("--validate-proposal", metavar="TASK_ID", help="Validate a transformation proposal for task")
     parser.add_argument("--proposal", metavar="PATCH_FILE", help="Path to unified diff patch proposal file")
     parser.add_argument("--verify-signature", metavar="CERT_FILE", help="Verify cryptographic signature of validation certificate")
+    parser.add_argument("--verify-kernel", action="store_true", help="Perform Root Anchor attestation check on kernel daemon")
     
     args = parser.parse_args()
     
@@ -132,6 +158,8 @@ def main():
         else:
             print("Signature Verification: FAILED (Forged or invalid certificate!)", file=sys.stderr)
             sys.exit(1)
+    elif args.verify_kernel:
+        verify_kernel_proxy()
     else:
         parser.print_help()
 

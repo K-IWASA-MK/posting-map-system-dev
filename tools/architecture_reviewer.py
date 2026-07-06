@@ -9,6 +9,10 @@ from datetime import datetime, timezone
 RULES_FILE = os.path.join(os.path.dirname(__file__), "architecture_rules.json")
 RESULT_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "AUDIT_REVIEW_RESULT.json")
 
+# <BOOT_ANCHOR_START>
+GOLDEN_HASH = "37a569886229458f87ffd662e891fbcdfbbe8984bb3df3e48f1f48bbb6838243"
+# <BOOT_ANCHOR_END>
+
 def load_rules():
     with open(RULES_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -417,6 +421,44 @@ def check_execution_gates(project_root, rules):
 
     return violations
 
+def check_rule_019_kernel_attestation(project_root, rules):
+    rule_019 = next((r for r in rules if r["id"] == "019"), None)
+    if not rule_019:
+        return []
+
+    import subprocess
+    cmd = [sys.executable, os.path.join(project_root, "tools", "aios_kernel.py"), "--verify-kernel"]
+    try:
+        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if proc.returncode != 0:
+            err_msg = proc.stderr.strip() or proc.stdout.strip() or "Boot verification failure"
+            return [{
+                "id": "019",
+                "name": "Kernel Attestation Rule",
+                "category": "Architecture",
+                "severity": "ERROR",
+                "message": f"Security integrity violation: validation certificate missing verified cryptographic signature from isolated process kernel. {err_msg}",
+                "file": "tools/aios_kernel_daemon.js",
+                "line": 1,
+                "match": "Self attestation mismatch",
+                "remediation": "Restore kernel daemon source file to golden code and restart validation process.",
+                "nextAction": ["Restore kernel golden code", "Re-validate attestation"]
+            }]
+    except Exception as e:
+        return [{
+            "id": "019",
+            "name": "Kernel Attestation Rule",
+            "category": "Architecture",
+            "severity": "ERROR",
+            "message": f"Failed to execute kernel attestation check: {e}",
+            "file": "tools/aios_kernel.py",
+            "line": 1,
+            "match": "Subprocess execution error",
+            "remediation": "Check Python environment path and Node.js setup.",
+            "nextAction": ["Inspect daemon dependencies"]
+        }]
+    return []
+
 def check_rule_011_human_approval(project_root, rules):
     rule_011 = next((r for r in rules if r["id"] == "011"), None)
     if not rule_011:
@@ -513,6 +555,14 @@ def main():
                 target_files.append(rel)
     else:
         target_files = get_target_files_in_project(rules)
+
+    # 0.4. Validate Rule 019 (Kernel Attestation Check - Root of Trust)
+    attestation_violations = check_rule_019_kernel_attestation(project_root, rules)
+    if attestation_violations:
+        print("--- Architecture Review Results: FAILED (Root Trust Compromised) ---", file=sys.stderr)
+        for v in attestation_violations:
+            print(f"[ERROR] {v['name']} [{v['category']}]: {v['message']} in {v['file']}:{v['line']}", file=sys.stderr)
+        sys.exit(1)
 
     all_violations = []
     for rel_path in target_files:

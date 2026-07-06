@@ -4,13 +4,41 @@ const path = require('path');
 const crypto = require('crypto');
 const readline = require('readline');
 
+// <BOOT_ANCHOR_START>
+const GOLDEN_HASH = "37a569886229458f87ffd662e891fbcdfbbe8984bb3df3e48f1f48bbb6838243";
+// <BOOT_ANCHOR_END>
+
 const TASKS_FILE = path.join(__dirname, 'ai_tasks.json');
 const EVENTS_FILE = path.join(__dirname, 'orchestrator_events.json');
 const CERT_FILE = path.join(__dirname, 'proposal_validation_result.json');
 const SECRET_FILE = path.join(__dirname, '.kernel_secret');
 
-// Load or generate temporary execution session secret
-let hmacSecret;
+// Pre-Boot Verification Phase (Pre-Trust Mode)
+let hmacSecret = null;
+let kernelState = "PRE_BOOT";
+
+function selfVerify() {
+  const selfPath = __filename;
+  try {
+    const content = fs.readFileSync(selfPath, 'utf8');
+    const normalized = content.replace(/\/\/ <BOOT_ANCHOR_START>[\s\S]*?\/\/ <BOOT_ANCHOR_END>/, '');
+    const hash = crypto.createHash('sha256').update(normalized).digest('hex');
+    
+    if (hash !== GOLDEN_HASH) {
+      console.error(`Kernel Boot Attestation FAILED: Integrity compromised! Calculated: ${hash}, Expected: ${GOLDEN_HASH}`);
+      process.exit(1);
+    }
+  } catch (err) {
+    console.error("Kernel self-integrity verification error:", err.message);
+    process.exit(1);
+  }
+}
+
+selfVerify();
+
+// Trusted Mode Activation Phase
+kernelState = "TRUSTED";
+
 if (fs.existsSync(SECRET_FILE)) {
   try {
     hmacSecret = fs.readFileSync(SECRET_FILE, 'utf8').trim();
@@ -67,7 +95,19 @@ function handleRequest(req) {
   }
 
   try {
-    if (method === 'validateProposal') {
+    if (method === 'getKernelAttestation') {
+      return {
+        jsonrpc: '2.0',
+        result: {
+          status: "SUCCESS",
+          state: kernelState,
+          hash: GOLDEN_HASH,
+          attestationId: `ATT-${crypto.randomBytes(8).toString('hex').toUpperCase()}`,
+          verifiedAt: new Date().toISOString()
+        },
+        id
+      };
+    } else if (method === 'validateProposal') {
       const { taskId, proposalPath, timestamp, nonce, executionSessionId } = params;
 
       if (usedNonces.has(nonce)) {

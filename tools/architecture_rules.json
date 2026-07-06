@@ -368,6 +368,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "019",
+      "name": "Kernel Attestation Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "AIOS Review Engine MUST perform Kernel Attestation checks before evaluating rules. Untrusted or modified Kernel instances block execution immediately.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule019PatternDetection",
+          "message": "Root of Trust violation: kernel daemon signature or binary check failed validation.",
+          "remediation": "Restore kernel daemon source file to golden code and restart validation process.",
+          "nextAction": [
+            "Restore kernel golden code",
+            "Re-validate attestation"
+          ]
+        }
+      ]
     }
   ]
 }
