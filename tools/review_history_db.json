@@ -208,5 +208,175 @@
       }
     },
     "violations": []
+  },
+  {
+    "reviewId": "20260706010412",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:04:12.563103+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706010424",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:04:24.193031+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706010927",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "gpt-4o",
+      "agentName": "ChatGPT",
+      "agentRole": "Reviewer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T01:09:27.034807+00:00",
+    "summary": {
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 1,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "001",
+        "name": "SSOT Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/gas/v2_map.gs",
+        "line": 304,
+        "message": "CSVファイルの直接パースはv2_extract.gsにのみ閉じている必要があります。 (Line: 'const data = Utilities.parseCsv(\"a,b,c\");')"
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706011004",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Architect"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:10:04.850703+00:00",
+    "summary": {
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
   }
 ]
