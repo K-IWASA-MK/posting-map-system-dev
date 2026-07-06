@@ -304,6 +304,49 @@ def rollback_project(target_ms_id, reason):
         print(f"Error: Project state machine transition blocked Rollback from status '{old_status}' to '{new_status}'", file=sys.stderr)
         sys.exit(1)
 
+def approve_task(task_id, approved_by):
+    tasks_data = load_json(TASKS_FILE)
+    if not tasks_data:
+        print("Error: Task database not found.", file=sys.stderr)
+        sys.exit(1)
+        
+    tasks = tasks_data.get("tasks", [])
+    task_map = {t["taskId"]: t for t in tasks}
+    
+    if task_id not in task_map:
+        print(f"Error: Task ID '{task_id}' not found.", file=sys.stderr)
+        sys.exit(1)
+        
+    task = task_map[task_id]
+    
+    if "approval" not in task:
+        task["approval"] = {
+            "approvalVersion": "1.0.0",
+            "requiresApproval": True,
+            "approvalLevel": "NORMAL",
+            "isApproved": False,
+            "approvedBy": None,
+            "approvedAt": None
+        }
+        
+    task["approval"]["isApproved"] = True
+    task["approval"]["approvedBy"] = approved_by
+    task["approval"]["approvedAt"] = datetime.now(timezone.utc).isoformat()
+    
+    save_json(TASKS_FILE, tasks_data)
+    
+    log_event(
+        task_id=task_id,
+        event_type="APPROVAL_GRANTED",
+        agent_id="Orchestrator",
+        details={
+            "approvedBy": approved_by,
+            "msg": f"Implementation plan approved. Implementation authorized for task {task_id}."
+        }
+    )
+    print(f"Task {task_id} successfully approved by '{approved_by}'. Implementation authorized.")
+    print("Audit log recorded in orchestrator_events.json.")
+
 def main():
     parser = argparse.ArgumentParser(description="AIOS Project OS Manager")
     parser.add_argument("--status", action="store_true", help="Print project pipeline progress status")
@@ -311,6 +354,8 @@ def main():
     parser.add_argument("--audit", action="store_true", help="Run Project Integrity Audit")
     parser.add_argument("--rollback", metavar="MILESTONE_ID", help="Rollback project status to specified milestone")
     parser.add_argument("--reason", metavar="TEXT", default="Manual Rollback Triggered", help="Reason details for rollback logs")
+    parser.add_argument("--approve", metavar="TASK_ID", help="Approve task implementation gate")
+    parser.add_argument("--by", metavar="USERNAME", default="Human", help="Username of the approver")
     
     args = parser.parse_args()
     
@@ -322,6 +367,8 @@ def main():
         audit_project()
     elif args.rollback:
         rollback_project(args.rollback, args.reason)
+    elif args.approve:
+        approve_task(args.approve, args.by)
     else:
         parser.print_help()
 

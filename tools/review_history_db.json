@@ -618,5 +618,265 @@
       }
     },
     "violations": []
+  },
+  {
+    "reviewId": "20260706012804",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:28:04.339367+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706012818",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:28:18.994732+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706013720",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:37:20.074122+00:00",
+    "summary": {
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706014118",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T01:41:18.214367+00:00",
+    "summary": {
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 1,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "011",
+        "name": "Human Approval Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Implementation started on 'active/mobile/app.js' but associated Task TSK-0001 is NOT approved yet."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706014151",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T01:41:51.434026+00:00",
+    "summary": {
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 1,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "011",
+        "name": "Human Approval Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Implementation started on 'active/mobile/app.js' but associated Task TSK-0002 is NOT approved yet."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706014212",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:42:12.203526+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
   }
 ]

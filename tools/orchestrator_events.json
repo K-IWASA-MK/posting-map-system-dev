@@ -267,5 +267,58 @@
       "toMilestone": "MS-01",
       "reason": "UI layout bug in MS-02 rendering"
     }
+  },
+  {
+    "eventId": "EVT-20260706-0021",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:40:28.268837+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "from": "TODO",
+      "to": "ASSIGNED",
+      "msg": "Orchestrator matching completed"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0022",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "ASSIGNED",
+    "timestamp": "2026-07-06T01:40:28.269561+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "reason": {
+        "qualityScore": 100.0,
+        "categoryPassRate": 1.0,
+        "matchingCapability": "Architecture"
+      }
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0023",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "APPROVAL_GRANTED",
+    "timestamp": "2026-07-06T01:41:32.819777+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "approvedBy": "Human",
+      "msg": "Implementation plan approved. Implementation authorized for task TSK-0001."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0024",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:42:28.890736+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "from": "ASSIGNED",
+      "to": "IN_PROGRESS",
+      "msg": ""
+    }
   }
 ]

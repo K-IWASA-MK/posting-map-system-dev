@@ -6,11 +6,23 @@
       "description": "Design and implement the initial Area Metadata schemas and lock status parameters.",
       "category": "Architecture",
       "dependsOn": [],
-      "assignedAgent": null,
-      "assignmentReason": null,
+      "assignedAgent": "gpt-4o",
+      "assignmentReason": {
+        "qualityScore": 100.0,
+        "categoryPassRate": 1.0,
+        "matchingCapability": "Architecture"
+      },
       "retryCount": 0,
-      "status": "TODO",
-      "reviewId": null
+      "status": "IN_PROGRESS",
+      "reviewId": null,
+      "approval": {
+        "approvalVersion": "1.0.0",
+        "requiresApproval": true,
+        "approvalLevel": "NORMAL",
+        "isApproved": true,
+        "approvedBy": "Human",
+        "approvedAt": "2026-07-06T01:41:32.819308+00:00"
+      }
     },
     {
       "taskId": "TSK-0002",
@@ -23,8 +35,16 @@
       "assignedAgent": null,
       "assignmentReason": null,
       "retryCount": 0,
-      "status": "BLOCKED",
-      "reviewId": null
+      "status": "TODO",
+      "reviewId": null,
+      "approval": {
+        "approvalVersion": "1.0.0",
+        "requiresApproval": true,
+        "approvalLevel": "NORMAL",
+        "isApproved": false,
+        "approvedBy": null,
+        "approvedAt": null
+      }
     },
     {
       "taskId": "TSK-0003",
@@ -37,8 +57,16 @@
       "assignedAgent": null,
       "assignmentReason": null,
       "retryCount": 0,
-      "status": "BLOCKED",
-      "reviewId": null
+      "status": "TODO",
+      "reviewId": null,
+      "approval": {
+        "approvalVersion": "1.0.0",
+        "requiresApproval": true,
+        "approvalLevel": "NORMAL",
+        "isApproved": false,
+        "approvedBy": null,
+        "approvedAt": null
+      }
     },
     {
       "taskId": "TSK-0004",
@@ -53,7 +81,15 @@
       "assignmentReason": null,
       "retryCount": 0,
       "status": "BLOCKED",
-      "reviewId": null
+      "reviewId": null,
+      "approval": {
+        "approvalVersion": "1.0.0",
+        "requiresApproval": true,
+        "approvalLevel": "CRITICAL",
+        "isApproved": false,
+        "approvedBy": null,
+        "approvedAt": null
+      }
     },
     {
       "taskId": "TSK-0005",
@@ -67,7 +103,15 @@
       "assignmentReason": null,
       "retryCount": 0,
       "status": "BLOCKED",
-      "reviewId": null
+      "reviewId": null,
+      "approval": {
+        "approvalVersion": "1.0.0",
+        "requiresApproval": false,
+        "approvalLevel": "NONE",
+        "isApproved": false,
+        "approvedBy": null,
+        "approvedAt": null
+      }
     }
   ]
 }

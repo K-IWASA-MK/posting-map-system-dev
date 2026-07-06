@@ -216,6 +216,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "011",
+      "name": "Human Approval Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "Implementation SHALL NOT start before explicit human approval. Check that targets are authorized before coding.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule011PatternDetectionThatWeVerifyUsingDiffAndLinterCheck",
+          "message": "Task requires explicit human approval before implementing any source changes.",
+          "remediation": "Obtain human approval gate clearance by running the project manager approve command.",
+          "nextAction": [
+            "Request explicit manager authorization",
+            "Mark approval flag to true inside ai_tasks.json"
+          ]
+        }
+      ]
     }
   ]
 }

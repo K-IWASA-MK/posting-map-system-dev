@@ -63,6 +63,24 @@ def log_event(task_id, event_type, agent_id=None, details=None):
 
 def update_task_status(tasks_data, task, new_status, agent_id=None, details=None):
     old_status = task["status"]
+    
+    # Enforce Human Approval Gate (Phase 139)
+    if new_status == "IN_PROGRESS":
+        approval = task.get("approval", {})
+        req = approval.get("requiresApproval", True)
+        level = approval.get("approvalLevel", "NORMAL")
+        approved = approval.get("isApproved", False)
+        
+        if req and level != "NONE" and not approved:
+            print(f"Error: Blocked! Task {task['taskId']} requires explicit human approval before starting implementation.", file=sys.stderr)
+            sys.exit(1)
+            
+        if req and level == "CRITICAL" and not approved:
+            review = load_json(RESULT_FILE)
+            if review.get("status") != "PASS":
+                print(f"Error: Blocked! Critical task {task['taskId']} requires human approval AND PASS review before starting implementation.", file=sys.stderr)
+                sys.exit(1)
+
     if not validate_state_transition(old_status, new_status):
         print(f"Error: Invalid State Machine Transition! Cannot move task {task['taskId']} from status '{old_status}' to '{new_status}'.", file=sys.stderr)
         sys.exit(1)

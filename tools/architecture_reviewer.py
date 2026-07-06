@@ -138,6 +138,69 @@ def get_target_files_in_project(rules):
                 
     return target_files
 
+def check_rule_011_human_approval(project_root, rules):
+    rule_011 = next((r for r in rules if r["id"] == "011"), None)
+    if not rule_011:
+        return []
+
+    tasks_file = os.path.join(project_root, "tools", "ai_tasks.json")
+    if not os.path.exists(tasks_file):
+        return []
+
+    try:
+        with open(tasks_file, "r", encoding="utf-8") as f:
+            tasks_data = json.load(f)
+    except Exception:
+        return []
+
+    unapproved_tasks = []
+    for t in tasks_data.get("tasks", []):
+        app = t.get("approval", {})
+        req = app.get("requiresApproval", True)
+        approved = app.get("isApproved", False)
+        level = app.get("approvalLevel", "NORMAL")
+        
+        if req and not approved and level != "NONE" and t.get("status") in ["ASSIGNED", "IN_PROGRESS"]:
+            unapproved_tasks.append(t)
+
+    if not unapproved_tasks:
+        return []
+
+    import subprocess
+    changed_files = []
+    try:
+        out = subprocess.check_output(["git", "status", "--porcelain"], cwd=project_root).decode("utf-8")
+        for line in out.splitlines():
+            if len(line) > 3:
+                filepath = line[3:].strip()
+                if (filepath.startswith("active/") or filepath.startswith("field/")) and (filepath.endswith(".gs") or filepath.endswith(".js")):
+                    changed_files.append(filepath)
+    except Exception:
+        pass
+
+    if not changed_files:
+        return []
+
+    violations = []
+    for f in changed_files:
+        target_task = unapproved_tasks[0]
+        violations.append({
+            "id": "011",
+            "name": "Human Approval Rule",
+            "category": "Architecture",
+            "severity": "ERROR",
+            "message": f"Implementation started on '{f}' but associated Task {target_task['taskId']} is NOT approved yet.",
+            "file": f,
+            "line": 1,
+            "match": "Implementation without approval",
+            "remediation": "Please obtain human approval for task by running: python3 tools/ai_project_manager.py --approve " + target_task['taskId'],
+            "nextAction": [
+                "Stop editing files immediately",
+                "Execute approval command"
+            ]
+        })
+    return violations
+
 def main():
     # Arg Parser for Multi-Agent Tracking
     parser = argparse.ArgumentParser(description="AIOS Architecture Reviewer")
@@ -184,6 +247,10 @@ def main():
             all_violations.extend(violations)
         except Exception as e:
             print(f"Error reading file {rel_path}: {e}", file=sys.stderr)
+
+    # 0.5. Validate Rule 011 (Human Approval Gate Check)
+    approval_violations = check_rule_011_human_approval(project_root, rules)
+    all_violations.extend(approval_violations)
 
     # 1. Initialize Category-specific Summary
     categories = set(rule.get("category", "Architecture") for rule in rules)
