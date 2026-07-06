@@ -1,3 +1,19 @@
+# Release Notes - v4.4-ai-continuous-improvement
+
+## 🚀 New Features & Enhancements
+
+### 1. AI Continuous Improvement Foundation 完成 (AIOS Phase 134)
+- **構造化された Action Recommendations の自動生成**:
+  - ルール違反の発生傾向を分析し、重要度・ステータス（`OPEN`）・根拠（`basedOn`：件数やそのカテゴリの合格率）を定義した機械的に処理可能な修正アドバイスを動的に出力。
+- **Quality Score 構成要素の細分化**:
+  - スコア算出式（`Score = 100 - errorPenalty - warningPenalty`）を明確に定義し、計算の透明性と追跡性を保持。
+- **Trend Analysis (多層タイムウィンドウ)**:
+  - 短期（`last10`）、中期（`last30`）、および長期（`overall`）の合格率を分離して追跡し、品質トレンドの変遷を記録。
+- **Rule Heatmap (エラーヒートマップ) 可視化**:
+  - ルールID（001〜010）ごとの違反件数を集計し、コンソール上に `■` を使ったヒートマップグラフを出力するダッシュボード機能を統合。
+
+---
+
 # Release Notes - v4.2-multi-ai-review
 
 ## 🚀 New Features & Enhancements
