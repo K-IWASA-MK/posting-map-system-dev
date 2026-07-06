@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-07-06T01:27:56.683479+00:00",
+  "targetAgent": {
+    "agentId": "flash-2.5-pro",
+    "agentName": "Flash",
+    "role": "Implementer"
+  },
+  "targetCategory": "Architecture",
+  "advices": [
+    {
+      "knowledgeId": "KNW-0001",
+      "ruleId": "001",
+      "triggerKey": "townKanaMap\\s*=\\s*",
+      "description": "Rule 001 (SSOT Rule) direct violations. Details: CSVファイルの直接パースはv2_extract.gsにのみ閉じている必要があります。 (Line: 'const data = Utilities.parseCsv(\"a,b,c\");')",
+      "solution": "Remediation template: Check and comply with target design system rules.",
+      "priority": "LOW"
+    }
+  ]
+}
