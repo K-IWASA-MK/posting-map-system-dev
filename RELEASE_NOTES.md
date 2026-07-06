@@ -1,3 +1,19 @@
+# Release Notes - v4.20-field-mvp
+
+## 🚀 New Features & Enhancements
+
+### 1. POSTING MAP MVP Foundation (Field Worker H-App Interface)
+- **配布員アプリ (Hアプリ) MVP フレームワーク (field/index.html)**:
+  - 巨大タッチターゲット（片手操作・高齢層対応）を施した漆黒のプレミアムグラスモーフィズム UI を構築。
+  - ネットワークONLINE状態、アクティブポリシーモード、および自己の `trustScore` をヘッダーへリアルタイム同期投影。
+- **配布完了＆GPS位置報告シミュレーター (field/app.js)**:
+  - WebSocket による `INITIAL_STATE` および `FIELD_EXECUTED` (ASSIGN_FLYER) イベントの待ち受け。
+  - 受信したチラシ割り当て部数、対象エリア名、および元の sourceEventId 紐付けメタデータをカード形式で自動描画。
+- **現場への動的ポリシー執行**:
+  - `SANDBOX` または `BLOCKED` モードへポリシーがコンパイルされた場合、Hアプリ上の「配布完了報告 (Confirm Distribution)」ボタンを物理的に無効化（Disabled / グレースケール化）し、現場での不正な配布書き込みを自動防御。GPS送信は常に許可。
+
+---
+
 # Release Notes - v4.19-field-bridge
 
 ## 🚀 New Features & Enhancements
