@@ -406,6 +406,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "021",
+      "name": "Ledger Integrity & Drift Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "AIOS trust state is time-dependent. Stale validation or rapidly decaying trust graph indicators below Critical threshold will lock execution automatically.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule021PatternDetection",
+          "message": "Root of Trust violation: System is LOCKED due to stale trust drift decay or ledger integrity failure.",
+          "remediation": "Obtain re-approval to restore system trust score.",
+          "nextAction": [
+            "Request re-approval",
+            "Recalculate trust drift graph"
+          ]
+        }
+      ]
     }
   ]
 }
