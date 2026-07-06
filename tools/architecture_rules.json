@@ -235,6 +235,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "012",
+      "name": "Implementation Plan Hash Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "Implementation plan MUST NOT be modified after approval without re-approval. Check plan hash alignment.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule012PatternDetectionThatWeVerifyUsingHashMismatchCheck",
+          "message": "Approved Implementation plan has been modified after receiving human approval.",
+          "remediation": "Request explicit re-approval by running the project manager approve command again to sync plan hash.",
+          "nextAction": [
+            "Submit the plan modification for review",
+            "Re-approve and sync plan hash"
+          ]
+        }
+      ]
     }
   ]
 }

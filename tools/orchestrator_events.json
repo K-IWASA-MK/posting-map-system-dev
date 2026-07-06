@@ -320,5 +320,72 @@
       "to": "IN_PROGRESS",
       "msg": ""
     }
+  },
+  {
+    "eventId": "EVT-20260706-0025",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "APPROVAL_GRANTED",
+    "timestamp": "2026-07-06T01:46:19.111572+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "approvedBy": "Human",
+      "approvalId": "APR-20260706014619",
+      "approvalHash": "0db905bdf03fa89138c9f9d1d99fcda9180b7b73791fafd92331869065452eaf",
+      "msg": "Implementation plan approved. Implementation authorized for task TSK-0001."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0026",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "APPROVAL_GRANTED",
+    "timestamp": "2026-07-06T01:46:36.541613+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "approvedBy": "Human",
+      "approvalId": "APR-20260706014636",
+      "approvalHash": "bb618de4dd2b08409b5a4563b80cb38e4fbf3a79beb2e34444351a87121ebfe3",
+      "msg": "Implementation plan approved. Implementation authorized for task TSK-0001."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0027",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "APPROVAL_GRANTED",
+    "timestamp": "2026-07-06T01:46:43.430316+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "approvedBy": "Human",
+      "approvalId": "APR-20260706014643",
+      "approvalHash": "bb618de4dd2b08409b5a4563b80cb38e4fbf3a79beb2e34444351a87121ebfe3",
+      "msg": "Implementation plan approved. Implementation authorized for task TSK-0001."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0028",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "APPROVAL_EXPIRED",
+    "timestamp": "2026-07-06T01:46:55.832797+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "msg": "Human approval expired automatically after 5.0 seconds."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0029",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "APPROVAL_GRANTED",
+    "timestamp": "2026-07-06T01:47:08.722246+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "approvedBy": "Human",
+      "approvalId": "APR-20260706014708",
+      "approvalHash": "0db905bdf03fa89138c9f9d1d99fcda9180b7b73791fafd92331869065452eaf",
+      "msg": "Implementation plan approved. Implementation authorized for task TSK-0001."
+    }
   }
 ]

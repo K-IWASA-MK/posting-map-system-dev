@@ -16,12 +16,14 @@
       "status": "IN_PROGRESS",
       "reviewId": null,
       "approval": {
+        "approvalId": "APR-20260706014708",
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
         "isApproved": true,
         "approvedBy": "Human",
-        "approvedAt": "2026-07-06T01:41:32.819308+00:00"
+        "approvedAt": "2026-07-06T01:47:08.000000+00:00",
+        "approvalHash": "0db905bdf03fa89138c9f9d1d99fcda9180b7b73791fafd92331869065452eaf"
       }
     },
     {
@@ -38,12 +40,14 @@
       "status": "TODO",
       "reviewId": null,
       "approval": {
+        "approvalId": null,
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
         "isApproved": false,
         "approvedBy": null,
-        "approvedAt": null
+        "approvedAt": null,
+        "approvalHash": null
       }
     },
     {
@@ -60,12 +64,14 @@
       "status": "TODO",
       "reviewId": null,
       "approval": {
+        "approvalId": null,
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
         "isApproved": false,
         "approvedBy": null,
-        "approvedAt": null
+        "approvedAt": null,
+        "approvalHash": null
       }
     },
     {
@@ -83,12 +89,14 @@
       "status": "BLOCKED",
       "reviewId": null,
       "approval": {
+        "approvalId": null,
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "CRITICAL",
         "isApproved": false,
         "approvedBy": null,
-        "approvedAt": null
+        "approvedAt": null,
+        "approvalHash": null
       }
     },
     {
@@ -105,12 +113,14 @@
       "status": "BLOCKED",
       "reviewId": null,
       "approval": {
+        "approvalId": null,
         "approvalVersion": "1.0.0",
         "requiresApproval": false,
         "approvalLevel": "NONE",
         "isApproved": false,
         "approvedBy": null,
-        "approvedAt": null
+        "approvedAt": null,
+        "approvalHash": null
       }
     }
   ]

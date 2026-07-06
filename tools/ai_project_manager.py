@@ -114,7 +114,47 @@ def audit_project():
     else:
         print("\n--- Audit PASS: Project OS and Release Pipeline integrity verified. No violations found. ---")
 
+def check_approvals_expiration():
+    tasks_data = load_json(TASKS_FILE)
+    if not tasks_data:
+        return
+        
+    updated = False
+    tasks = tasks_data.get("tasks", [])
+    
+    for t in tasks:
+        app = t.get("approval", {})
+        approved = app.get("isApproved", False)
+        approved_at_str = app.get("approvedAt")
+        
+        if approved and approved_at_str:
+            try:
+                approved_at = datetime.fromisoformat(approved_at_str)
+                expire_seconds = float(os.environ.get("AIOS_TEST_EXPIRATION", 30 * 24 * 3600))
+                
+                delta = (datetime.now(timezone.utc) - approved_at).total_seconds()
+                if delta > expire_seconds:
+                    app["isApproved"] = False
+                    app["approvedBy"] = None
+                    app["approvedAt"] = None
+                    app["approvalHash"] = None
+                    print(f"Approval for Task {t['taskId']} has EXPIRED (Time delta: {delta:.1f}s > limit: {expire_seconds}s).")
+                    
+                    log_event(
+                        task_id=t["taskId"],
+                        event_type="APPROVAL_EXPIRED",
+                        agent_id="Orchestrator",
+                        details={"msg": f"Human approval expired automatically after {expire_seconds} seconds."}
+                    )
+                    updated = True
+            except Exception as e:
+                print(f"Error checking approval expiration: {e}", file=sys.stderr)
+                
+    if updated:
+        save_json(TASKS_FILE, tasks_data)
+
 def tick_project():
+    check_approvals_expiration()
     prj = load_json(PROJECTS_FILE)
     tasks_data = load_json(TASKS_FILE)
     tasks = tasks_data.get("tasks", [])
@@ -305,6 +345,7 @@ def rollback_project(target_ms_id, reason):
         sys.exit(1)
 
 def approve_task(task_id, approved_by):
+    import hashlib
     tasks_data = load_json(TASKS_FILE)
     if not tasks_data:
         print("Error: Task database not found.", file=sys.stderr)
@@ -319,19 +360,30 @@ def approve_task(task_id, approved_by):
         
     task = task_map[task_id]
     
-    if "approval" not in task:
-        task["approval"] = {
-            "approvalVersion": "1.0.0",
-            "requiresApproval": True,
-            "approvalLevel": "NORMAL",
-            "isApproved": False,
-            "approvedBy": None,
-            "approvedAt": None
-        }
+    approval_id = f"APR-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+    
+    # Compute SHA-256 Hash of implementation_plan.md
+    plan_path = "/Users/katsujiiwasa/.gemini/antigravity-ide/brain/f674d440-b2cb-402d-aa25-18b3c2df1f45/implementation_plan.md"
+    plan_hash = None
+    if os.path.exists(plan_path):
+        try:
+            hasher = hashlib.sha256()
+            with open(plan_path, "rb") as f:
+                hasher.update(f.read())
+            plan_hash = hasher.hexdigest()
+        except Exception as e:
+            print(f"Warning: Failed to compute plan hash: {e}")
         
-    task["approval"]["isApproved"] = True
-    task["approval"]["approvedBy"] = approved_by
-    task["approval"]["approvedAt"] = datetime.now(timezone.utc).isoformat()
+    task["approval"] = {
+        "approvalId": approval_id,
+        "approvalVersion": "1.0.0",
+        "requiresApproval": True,
+        "approvalLevel": task.get("approval", {}).get("approvalLevel", "NORMAL"),
+        "isApproved": True,
+        "approvedBy": approved_by,
+        "approvedAt": datetime.now(timezone.utc).isoformat(),
+        "approvalHash": plan_hash
+    }
     
     save_json(TASKS_FILE, tasks_data)
     
@@ -341,10 +393,12 @@ def approve_task(task_id, approved_by):
         agent_id="Orchestrator",
         details={
             "approvedBy": approved_by,
+            "approvalId": approval_id,
+            "approvalHash": plan_hash,
             "msg": f"Implementation plan approved. Implementation authorized for task {task_id}."
         }
     )
-    print(f"Task {task_id} successfully approved by '{approved_by}'. Implementation authorized.")
+    print(f"Task {task_id} successfully approved by '{approved_by}'. ID: {approval_id} | Hash: {plan_hash}")
     print("Audit log recorded in orchestrator_events.json.")
 
 def main():

@@ -75,6 +75,25 @@ def update_task_status(tasks_data, task, new_status, agent_id=None, details=None
             print(f"Error: Blocked! Task {task['taskId']} requires explicit human approval before starting implementation.", file=sys.stderr)
             sys.exit(1)
             
+        if approved:
+            approved_at_str = approval.get("approvedAt")
+            if approved_at_str:
+                try:
+                    approved_at = datetime.fromisoformat(approved_at_str)
+                    expire_seconds = float(os.environ.get("AIOS_TEST_EXPIRATION", 30 * 24 * 3600))
+                    delta = (datetime.now(timezone.utc) - approved_at).total_seconds()
+                    if delta > expire_seconds:
+                        # Auto expire approval
+                        approval["isApproved"] = False
+                        approval["approvedBy"] = None
+                        approval["approvedAt"] = None
+                        approval["approvalHash"] = None
+                        save_json(TASKS_FILE, tasks_data)
+                        print(f"Error: Blocked! Task {task['taskId']} human approval has EXPIRED. Please request re-approval.", file=sys.stderr)
+                        sys.exit(1)
+                except Exception as e:
+                    print(f"Warning: Failed to check expiration: {e}")
+            
         if req and level == "CRITICAL" and not approved:
             review = load_json(RESULT_FILE)
             if review.get("status") != "PASS":

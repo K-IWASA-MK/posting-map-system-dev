@@ -138,6 +138,71 @@ def get_target_files_in_project(rules):
                 
     return target_files
 
+import hashlib
+
+def calculate_file_hash(filepath):
+    if not os.path.exists(filepath):
+        return None
+    try:
+        hasher = hashlib.sha256()
+        with open(filepath, "rb") as f:
+            buf = f.read()
+            hasher.update(buf)
+        return hasher.hexdigest()
+    except Exception:
+        return None
+
+def check_rule_012_hash_lock(project_root, rules):
+    rule_012 = next((r for r in rules if r["id"] == "012"), None)
+    if not rule_012:
+        return []
+
+    tasks_file = os.path.join(project_root, "tools", "ai_tasks.json")
+    if not os.path.exists(tasks_file):
+        return []
+
+    try:
+        with open(tasks_file, "r", encoding="utf-8") as f:
+            tasks_data = json.load(f)
+    except Exception:
+        return []
+
+    approved_tasks = []
+    for t in tasks_data.get("tasks", []):
+        app = t.get("approval", {})
+        approved = app.get("isApproved", False)
+        app_hash = app.get("approvalHash")
+        if approved and app_hash and t.get("status") in ["ASSIGNED", "IN_PROGRESS", "UNDER_REVIEW"]:
+            approved_tasks.append((t, app_hash))
+
+    if not approved_tasks:
+        return []
+
+    plan_path = "/Users/katsujiiwasa/.gemini/antigravity-ide/brain/f674d440-b2cb-402d-aa25-18b3c2df1f45/implementation_plan.md"
+    current_hash = calculate_file_hash(plan_path)
+    if not current_hash:
+        return []
+
+    violations = []
+    for t, approved_hash in approved_tasks:
+        if current_hash != approved_hash:
+            violations.append({
+                "id": "012",
+                "name": "Implementation Plan Hash Rule",
+                "category": "Architecture",
+                "severity": "ERROR",
+                "message": f"Implementation plan has been modified after approval for Task {t['taskId']}. Expected hash '{approved_hash}' but got '{current_hash}'.",
+                "file": "implementation_plan.md",
+                "line": 1,
+                "match": "Plan hash mismatch",
+                "remediation": f"Obtain re-approval to sync plan hash: python3 tools/ai_project_manager.py --approve {t['taskId']}",
+                "nextAction": [
+                    "Do not proceed with implementation",
+                    "Run re-approval command to register new plan hash"
+                ]
+            })
+    return violations
+
 def check_rule_011_human_approval(project_root, rules):
     rule_011 = next((r for r in rules if r["id"] == "011"), None)
     if not rule_011:
@@ -251,6 +316,10 @@ def main():
     # 0.5. Validate Rule 011 (Human Approval Gate Check)
     approval_violations = check_rule_011_human_approval(project_root, rules)
     all_violations.extend(approval_violations)
+
+    # 0.6. Validate Rule 012 (Implementation Plan Hash Lock Check)
+    hash_violations = check_rule_012_hash_lock(project_root, rules)
+    all_violations.extend(hash_violations)
 
     # 1. Initialize Category-specific Summary
     categories = set(rule.get("category", "Architecture") for rule in rules)
