@@ -240,5 +240,32 @@
         "matchingCapability": "Testing"
       }
     }
+  },
+  {
+    "eventId": "EVT-20260706-0019",
+    "eventVersion": "1.0.0",
+    "taskId": "PRJ-MIE02",
+    "eventType": "PROJECT_STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:23:21.762786+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "from": "ACTIVE",
+      "to": "RELEASE_CANDIDATE",
+      "stage": "RELEASE_CANDIDATE"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0020",
+    "eventVersion": "1.0.0",
+    "taskId": "PRJ-MIE02",
+    "eventType": "PROJECT_ROLLBACK",
+    "timestamp": "2026-07-06T01:23:39.318222+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "projectId": "PRJ-MIE02",
+      "fromStatus": "RELEASE_CANDIDATE",
+      "toMilestone": "MS-01",
+      "reason": "UI layout bug in MS-02 rendering"
+    }
   }
 ]

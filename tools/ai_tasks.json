@@ -6,14 +6,10 @@
       "description": "Design and implement the initial Area Metadata schemas and lock status parameters.",
       "category": "Architecture",
       "dependsOn": [],
-      "assignedAgent": "gpt-4o",
-      "assignmentReason": {
-        "qualityScore": 100.0,
-        "categoryPassRate": 1.0,
-        "matchingCapability": "Architecture"
-      },
+      "assignedAgent": null,
+      "assignmentReason": null,
       "retryCount": 0,
-      "status": "COMPLETED",
+      "status": "TODO",
       "reviewId": null
     },
     {
@@ -24,14 +20,10 @@
       "dependsOn": [
         "TSK-0001"
       ],
-      "assignedAgent": "antigravity-ide-v1",
-      "assignmentReason": {
-        "qualityScore": 100.0,
-        "categoryPassRate": 1.0,
-        "matchingCapability": "API"
-      },
+      "assignedAgent": null,
+      "assignmentReason": null,
       "retryCount": 0,
-      "status": "COMPLETED",
+      "status": "BLOCKED",
       "reviewId": null
     },
     {
@@ -42,14 +34,10 @@
       "dependsOn": [
         "TSK-0001"
       ],
-      "assignedAgent": "flash-2.5-pro",
-      "assignmentReason": {
-        "qualityScore": 92.5,
-        "categoryPassRate": 1.0,
-        "matchingCapability": "UI"
-      },
+      "assignedAgent": null,
+      "assignmentReason": null,
       "retryCount": 0,
-      "status": "COMPLETED",
+      "status": "BLOCKED",
       "reviewId": null
     },
     {
@@ -61,14 +49,24 @@
         "TSK-0002",
         "TSK-0003"
       ],
-      "assignedAgent": "gpt-4o",
-      "assignmentReason": {
-        "qualityScore": 100.0,
-        "categoryPassRate": 1.0,
-        "matchingCapability": "Testing"
-      },
+      "assignedAgent": null,
+      "assignmentReason": null,
       "retryCount": 0,
-      "status": "ASSIGNED",
+      "status": "BLOCKED",
+      "reviewId": null
+    },
+    {
+      "taskId": "TSK-0005",
+      "title": "Production Deployment Release Hook",
+      "description": "Deploy finalized client configurations to MIE-02 remote parameters.",
+      "category": "API",
+      "dependsOn": [
+        "TSK-0004"
+      ],
+      "assignedAgent": null,
+      "assignmentReason": null,
+      "retryCount": 0,
+      "status": "BLOCKED",
       "reviewId": null
     }
   ]

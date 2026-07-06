@@ -1,0 +1,39 @@
+{
+  "projectId": "PRJ-MIE02",
+  "projectVersion": "1.0.0",
+  "projectSchemaVersion": "1.0.0",
+  "projectName": "Posting Map MIE-02 Launch",
+  "status": "ROLLED_BACK",
+  "currentMilestone": "MS-01",
+  "milestones": [
+    {
+      "milestoneId": "MS-01",
+      "name": "Database & API Foundation",
+      "workflowId": "WF-20260706-0001",
+      "status": "IN_PROGRESS"
+    },
+    {
+      "milestoneId": "MS-02",
+      "name": "UI & Production Release",
+      "workflowId": "WF-20260706-0002",
+      "status": "PENDING"
+    }
+  ],
+  "releasePipeline": {
+    "pipelineVersion": "1.0.0",
+    "stage": "ROLLED_BACK",
+    "gates": {
+      "workflowComplete": false,
+      "milestoneVerified": false,
+      "releaseCandidateCreated": false,
+      "productionApproved": false
+    }
+  },
+  "summary": {
+    "workflowCount": 2,
+    "completedWorkflows": 0,
+    "totalTasks": 5,
+    "completedTasks": 0,
+    "overallProgress": 0.0
+  }
+}

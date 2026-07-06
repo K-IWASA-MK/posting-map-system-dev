@@ -1,0 +1,12 @@
+{
+  "workflowId": "WF-20260706-0002",
+  "workflowVersion": "1.0.0",
+  "workflowSchemaVersion": "1.0.0",
+  "name": "UI & Production Release Workflow",
+  "status": "PENDING",
+  "tasks": [
+    "TSK-0005"
+  ],
+  "parallelGroups": [],
+  "mergeGate": null
+}
