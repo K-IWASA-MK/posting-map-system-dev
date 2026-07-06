@@ -1,0 +1,244 @@
+[
+  {
+    "eventId": "EVT-20260706-0001",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:15:41.781794+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "from": "TODO",
+      "to": "ASSIGNED",
+      "msg": "Orchestrator matching completed"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0002",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "ASSIGNED",
+    "timestamp": "2026-07-06T01:15:41.782023+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "reason": {
+        "qualityScore": 100.0,
+        "categoryPassRate": 1.0,
+        "matchingCapability": "Architecture"
+      }
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0003",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:07.232612+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "from": "ASSIGNED",
+      "to": "IN_PROGRESS",
+      "msg": "Auto transition to implementation"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0004",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:07.232926+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "from": "IN_PROGRESS",
+      "to": "UNDER_REVIEW",
+      "msg": "Auto transition to review"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0005",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:07.233154+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "from": "UNDER_REVIEW",
+      "to": "COMPLETED",
+      "msg": "Review status: PASS"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0006",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0002",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:17.621037+00:00",
+    "agentId": "antigravity-ide-v1",
+    "details": {
+      "from": "TODO",
+      "to": "ASSIGNED",
+      "msg": "Orchestrator matching completed"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0007",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0002",
+    "eventType": "ASSIGNED",
+    "timestamp": "2026-07-06T01:16:17.621319+00:00",
+    "agentId": "antigravity-ide-v1",
+    "details": {
+      "reason": {
+        "qualityScore": 100.0,
+        "categoryPassRate": 1.0,
+        "matchingCapability": "API"
+      }
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0008",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0003",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:17.621736+00:00",
+    "agentId": "flash-2.5-pro",
+    "details": {
+      "from": "TODO",
+      "to": "ASSIGNED",
+      "msg": "Orchestrator matching completed"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0009",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0003",
+    "eventType": "ASSIGNED",
+    "timestamp": "2026-07-06T01:16:17.621949+00:00",
+    "agentId": "flash-2.5-pro",
+    "details": {
+      "reason": {
+        "qualityScore": 92.5,
+        "categoryPassRate": 1.0,
+        "matchingCapability": "UI"
+      }
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0010",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0002",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:27.662628+00:00",
+    "agentId": "antigravity-ide-v1",
+    "details": {
+      "from": "ASSIGNED",
+      "to": "IN_PROGRESS",
+      "msg": "Auto transition to implementation"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0011",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0002",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:27.662929+00:00",
+    "agentId": "antigravity-ide-v1",
+    "details": {
+      "from": "IN_PROGRESS",
+      "to": "UNDER_REVIEW",
+      "msg": "Auto transition to review"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0012",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0002",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:27.663231+00:00",
+    "agentId": "antigravity-ide-v1",
+    "details": {
+      "from": "UNDER_REVIEW",
+      "to": "COMPLETED",
+      "msg": "Review status: PASS"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0013",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0003",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:37.550158+00:00",
+    "agentId": "flash-2.5-pro",
+    "details": {
+      "from": "ASSIGNED",
+      "to": "IN_PROGRESS",
+      "msg": "Auto transition to implementation"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0014",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0003",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:37.550558+00:00",
+    "agentId": "flash-2.5-pro",
+    "details": {
+      "from": "IN_PROGRESS",
+      "to": "UNDER_REVIEW",
+      "msg": "Auto transition to review"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0015",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0003",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:37.550871+00:00",
+    "agentId": "flash-2.5-pro",
+    "details": {
+      "from": "UNDER_REVIEW",
+      "to": "COMPLETED",
+      "msg": "Review status: PASS"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0016",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0004",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:37.582907+00:00",
+    "agentId": null,
+    "details": {
+      "from": "BLOCKED",
+      "to": "TODO",
+      "msg": "Merge Gate Unlocked"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0017",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0004",
+    "eventType": "STATUS_CHANGED",
+    "timestamp": "2026-07-06T01:16:37.584275+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "from": "TODO",
+      "to": "ASSIGNED",
+      "msg": "Orchestrator matching completed"
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0018",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0004",
+    "eventType": "ASSIGNED",
+    "timestamp": "2026-07-06T01:16:37.584615+00:00",
+    "agentId": "gpt-4o",
+    "details": {
+      "reason": {
+        "qualityScore": 100.0,
+        "categoryPassRate": 1.0,
+        "matchingCapability": "Testing"
+      }
+    }
+  }
+]

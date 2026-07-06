@@ -6,19 +6,36 @@
       "description": "Design and implement the initial Area Metadata schemas and lock status parameters.",
       "category": "Architecture",
       "dependsOn": [],
+      "assignedAgent": "gpt-4o",
+      "assignmentReason": {
+        "qualityScore": 100.0,
+        "categoryPassRate": 1.0,
+        "matchingCapability": "Architecture"
+      },
+      "retryCount": 0,
+      "status": "COMPLETED",
+      "reviewId": null
+    },
+    {
+      "taskId": "TSK-0002",
+      "title": "Build Area Search Backend Engine",
+      "description": "Expose fast memory caching for getAppData requests inside v2_map.gs.",
+      "category": "API",
+      "dependsOn": [
+        "TSK-0001"
+      ],
       "assignedAgent": "antigravity-ide-v1",
       "assignmentReason": {
         "qualityScore": 100.0,
         "categoryPassRate": 1.0,
-        "matchingCapability": "Architecture",
-        "fallbackFrom": "gpt-4o"
+        "matchingCapability": "API"
       },
       "retryCount": 0,
       "status": "COMPLETED",
-      "reviewId": "20260706010927"
+      "reviewId": null
     },
     {
-      "taskId": "TSK-0002",
+      "taskId": "TSK-0003",
       "title": "Build Area Search UI Panel",
       "description": "Create the H-app town list search bar and kana index matching interface.",
       "category": "UI",
@@ -32,21 +49,26 @@
         "matchingCapability": "UI"
       },
       "retryCount": 0,
-      "status": "ASSIGNED",
+      "status": "COMPLETED",
       "reviewId": null
     },
     {
-      "taskId": "TSK-0003",
-      "title": "Expose AreaSummary API Cache",
-      "description": "Integrate fast memory caching for getAppData requests inside v2_map.gs.",
-      "category": "API",
+      "taskId": "TSK-0004",
+      "title": "Integrate Verification testing",
+      "description": "Verify complete system functionality on target mobile browsers.",
+      "category": "Testing",
       "dependsOn": [
-        "TSK-0002"
+        "TSK-0002",
+        "TSK-0003"
       ],
-      "assignedAgent": null,
-      "assignmentReason": null,
+      "assignedAgent": "gpt-4o",
+      "assignmentReason": {
+        "qualityScore": 100.0,
+        "categoryPassRate": 1.0,
+        "matchingCapability": "Testing"
+      },
       "retryCount": 0,
-      "status": "TODO",
+      "status": "ASSIGNED",
       "reviewId": null
     }
   ]

@@ -11,14 +11,14 @@
       "agentId": "gpt-4o",
       "agentName": "ChatGPT",
       "role": "Reviewer",
-      "capabilities": ["Architecture", "Security", "CodeReview"],
+      "capabilities": ["Architecture", "Security", "CodeReview", "Testing"],
       "enabled": true
     },
     {
       "agentId": "antigravity-ide-v1",
       "agentName": "Antigravity",
       "role": "Architect",
-      "capabilities": ["Architecture", "SystemDesign", "Database", "API"],
+      "capabilities": ["Architecture", "SystemDesign", "Database", "API", "Testing"],
       "enabled": true
     }
   ]
