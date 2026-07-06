@@ -1,3 +1,23 @@
+# Release Notes - v4.2-multi-ai-review
+
+## 🚀 New Features & Enhancements
+
+### 1. Multi-AI Review Orchestration Foundation 完成 (AIOS Phase 132)
+- **エージェント識別メタデータの統合**: 
+  - 成果物を提出したAIモデルを特定・追跡するための構造体（`agentId`, `agentName`, `agentRole`）をレビュー結果に統合。
+- **3段階のレビュー検証ステータス**:
+  - レビューの検証結果を `PASS` (違反0), `PASS_WITH_WARNING` (警告のみ), `FAILED` (エラーあり) の3段階で正確に評価・記録する仕組みを構築。
+- **データカテゴリ集計とサマリー出力**:
+  - `Database`, `Architecture`, `Security`, `UI`, `API` などのカテゴリ別に、違反件数（Errors, Warnings）およびステータスを可視化するサマリー集計を自動化。
+- **AI向け構造化 `nextAction` および `remediation`**:
+  - 違反を検出した際、AIが自己修復できるように具体的な修正アクションを配列形式（`nextAction`）および人間向けの修正方針（`remediation`）として JSON 出力に統合。
+
+### 2. 外部 JSON Rule Engine 方式の採用
+- 各ルールを Python 内に直接ハードコードせず、`tools/architecture_rules.json` (v1.1.0) に完全外出し。
+- 今後のルール追加の際、Python エンジンを変更することなく JSON の設定変更のみで対応できる高い拡張性を担保。
+
+---
+
 # Release Notes - v4.1-audit-data-integrity
 
 ## 🚀 New Features & Enhancements
