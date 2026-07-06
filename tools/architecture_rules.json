@@ -1,51 +1,83 @@
 {
-  "ruleVersion": "1.0.0",
+  "ruleVersion": "1.1.0",
   "rules": [
     {
       "id": "001",
       "name": "SSOT Rule",
+      "category": "Architecture",
       "severity": "ERROR",
       "description": "データのパース・カナ生成の重複・二重実装を禁止するルール",
       "target_files": ["active/gas/v2_map.gs", "active/gas/v2_batch.gs"],
       "forbidden_patterns": [
         {
           "pattern": "townKanaMap\\s*=\\s*",
-          "message": "townKanaMapの再生成（二重生成）は禁止されています。v2_extract.gsのメタデータのみを参照してください。"
+          "message": "townKanaMapの再生成（二重生成）は禁止されています。v2_extract.gsのメタデータのみを参照してください。",
+          "remediation": "Do not duplicate townKana mapping structures. Instead, consume the unified metadata returned by v2_extract.gs.",
+          "nextAction": [
+            "Remove duplicate townKanaMap assignment",
+            "Refactor code to reference v2_extract.gs attributes"
+          ]
         },
         {
           "pattern": "Utilities\\.parseCsv",
-          "message": "CSVファイルの直接パースはv2_extract.gsにのみ閉じている必要があります。"
+          "message": "CSVファイルの直接パースはv2_extract.gsにのみ閉じている必要があります。",
+          "remediation": "Do not call Utilities.parseCsv directly. SSOT parsing is delegated exclusively to v2_extract.gs.",
+          "nextAction": [
+            "Remove direct Utilities.parseCsv execution",
+            "Reference existing parsed metadata structures"
+          ]
         }
       ]
     },
     {
       "id": "002",
       "name": "One Responsibility Rule",
+      "category": "Architecture",
       "severity": "ERROR",
       "description": "GAS（サーバー）側コードにブラウザ依存のオブジェクト（window/documentなど）が混入するのを防止するルール",
       "target_files": ["active/gas/**/*.gs", "active/api/**/*.gs", "active/dashboard/**/*.gs"],
       "forbidden_patterns": [
         {
           "pattern": "\\bwindow\\b",
-          "message": "GAS（サーバー）側で window オブジェクトを参照することはできません。"
+          "message": "GAS（サーバー）側で window オブジェクトを参照することはできません。",
+          "remediation": "Remove browser environment global 'window' references from server-side scripts.",
+          "nextAction": [
+            "Remove reference to global variable 'window'",
+            "Use server-safe parameters or options properties"
+          ]
         },
         {
           "pattern": "\\bdocument\\b",
-          "message": "GAS（サーバー）側で document オブジェクトを参照することはできません。"
+          "message": "GAS（サーバー）側で document オブジェクトを参照することはできません。",
+          "remediation": "Remove browser DOM global 'document' references from server-side scripts.",
+          "nextAction": [
+            "Remove reference to global variable 'document'",
+            "Inject or pass DOM dependencies strictly on the client-side"
+          ]
         },
         {
           "pattern": "\\bnavigator\\b",
-          "message": "GAS（サーバー）側で navigator オブジェクトを参照することはできません。"
+          "message": "GAS（サーバー）側で navigator オブジェクトを参照することはできません。",
+          "remediation": "Remove navigator global reference from server-side scripts.",
+          "nextAction": [
+            "Remove reference to global variable 'navigator'"
+          ]
         },
         {
           "pattern": "\\blocalStorage\\b",
-          "message": "GAS（サーバー）側で localStorage オブジェクトを参照することはできません。"
+          "message": "GAS（サーバー）側で localStorage オブジェクトを参照することはできません。",
+          "remediation": "Remove localStorage references from server-side scripts. Use CacheService or PropertiesService on GAS instead.",
+          "nextAction": [
+            "Remove reference to global variable 'localStorage'",
+            "Replace storage method with CacheService or PropertiesService"
+          ]
         }
       ]
     },
     {
       "id": "003",
       "name": "Foundation First Rule",
+      "category": "Architecture",
       "severity": "WARNING",
       "description": "データ定義やモデル設計を優先する原則",
       "target_files": ["active/mobile/**/*.js"],
@@ -54,6 +86,7 @@
     {
       "id": "004",
       "name": "No Duplicate Logic Rule",
+      "category": "Architecture",
       "severity": "WARNING",
       "description": "同一のユーティリティが重複定義されていないかチェックするルール",
       "target_files": ["active/gas/**/*.gs"],
@@ -62,19 +95,26 @@
     {
       "id": "005",
       "name": "Layer Separation Rule",
+      "category": "Architecture",
       "severity": "ERROR",
       "description": "OSの階層構造（API, UI, Audit）における逆方向の呼び出しを禁止するルール",
       "target_files": ["active/gas/v2_kernel.gs"],
       "forbidden_patterns": [
         {
           "pattern": "HtmlService",
-          "message": "イベントカーネル（v2_kernel.gs）からHtmlService（UIレンダリング）を呼び出すことはできません。"
+          "message": "イベントカーネル（v2_kernel.gs）からHtmlService（UIレンダリング）を呼び出すことはできません。",
+          "remediation": "Kernel must remain headless. Do not call HtmlService inside v2_kernel.gs.",
+          "nextAction": [
+            "Remove HtmlService invocation",
+            "Move HTML rendering logic to UI layer"
+          ]
         }
       ]
     },
     {
       "id": "006",
       "name": "Naming Rule",
+      "category": "UI",
       "severity": "WARNING",
       "description": "アプリやブランチ、変数名などの命名規則の検証",
       "target_files": ["active/mobile/**/*.js"],
@@ -83,64 +123,97 @@
     {
       "id": "007",
       "name": "Version Rule",
+      "category": "API",
       "severity": "ERROR",
       "description": "APIレスポンス等に version が含まれているか検証するルール",
       "target_files": ["active/gas/v2_map.gs"],
       "forbidden_patterns": [
         {
           "pattern": "summary\\.push\\((?![\\s\\S]*?version\\s*:)",
-          "message": "areaSummary APIレスポンスオブジェクトに version プロパティが含まれていません。"
+          "message": "areaSummary APIレスポンスオブジェクトに version プロパティが含まれていません。",
+          "remediation": "Include 'version' parameter in AreaSummary JSON responses.",
+          "nextAction": [
+            "Add 'version: 1' key-value pair to AreaSummary push structure"
+          ]
         }
       ]
     },
     {
       "id": "008",
       "name": "Backward Compatibility Rule",
+      "category": "API",
       "severity": "ERROR",
       "description": "既存のAPIアクションが破壊的に変更・削除されていないか確認するルール",
       "target_files": ["active/api/v2_api.gs"],
       "required_patterns": [
         {
           "pattern": "case\\s+'getAppData':",
-          "message": "既存 of APIアクション 'getAppData' が破壊的に削除または変更されています。"
+          "message": "既存 of APIアクション 'getAppData' が破壊的に削除または変更されています。",
+          "remediation": "Preserve support for 'getAppData' API action route.",
+          "nextAction": [
+            "Restore case 'getAppData' routing block inside doGet"
+          ]
         },
         {
           "pattern": "case\\s+'getRanking':",
-          "message": "既存 of APIアクション 'getRanking' が破壊的に削除または変更されています。"
+          "message": "既存 of APIアクション 'getRanking' が破壊的に削除または変更されています。",
+          "remediation": "Preserve support for 'getRanking' API action route.",
+          "nextAction": [
+            "Restore case 'getRanking' routing block inside doGet"
+          ]
         },
         {
           "pattern": "case\\s+'getRoster':",
-          "message": "既存 of APIアクション 'getRoster' が破壊的に削除または変更されています。"
+          "message": "既存 of APIアクション 'getRoster' が破壊的に削除または変更されています。",
+          "remediation": "Preserve support for 'getRoster' API action route.",
+          "nextAction": [
+            "Restore case 'getRoster' routing block inside doGet"
+          ]
         }
       ]
     },
     {
       "id": "009",
       "name": "Read Only Rule",
+      "category": "Database",
       "severity": "ERROR",
       "description": "クライアント側で AreaSummary 等の読み取り専用メタデータの直接書き換えを禁止するルール",
       "target_files": ["active/mobile/**/*.js"],
       "forbidden_patterns": [
         {
           "pattern": "\\b(areaSummary|summary)\\[.*\\].*(done|total)\\s*=",
-          "message": "クライアント側で AreaSummary (done/total) を直接更新することは禁止されています。"
+          "message": "クライアント側で AreaSummary (done/total) を直接更新することは禁止されています。",
+          "remediation": "Treat AreaSummary metadata as read-only. Mutate states exclusively on the backend via transaction event logs.",
+          "nextAction": [
+            "Remove direct assignment to summary elements",
+            "Refactor code to trigger backend update actions"
+          ]
         }
       ]
     },
     {
       "id": "010",
       "name": "Governance Rule",
+      "category": "Security",
       "severity": "ERROR",
       "description": "ロックアカウントやシステムロックIDのバイパス・改ざんの禁止",
       "target_files": ["active/gas/v2_kernel.gs"],
       "required_patterns": [
         {
           "pattern": "ACTIVE_ACCOUNT\\s*:\\s*\"postingareamap@gmail\\.com\"",
-          "message": "SYSTEM_LOCKのアカウント設定が改ざんされています。"
+          "message": "SYSTEM_LOCKのアカウント設定が改ざんされています。",
+          "remediation": "Restore SYSTEM_LOCK.ACTIVE_ACCOUNT value to 'postingareamap@gmail.com'.",
+          "nextAction": [
+            "Reset ACTIVE_ACCOUNT property value to 'postingareamap@gmail.com'"
+          ]
         },
         {
           "pattern": "ACTIVE_DRIVE_ROOT_ID\\s*:\\s*\"1FfcVEQjod--rZSucOPFJD2DJ58hV650_\"",
-          "message": "SYSTEM_LOCKのACTIVE_DRIVE_ROOT_ID設定が改ざんされています。"
+          "message": "SYSTEM_LOCKのACTIVE_DRIVE_ROOT_ID設定が改ざんされています。",
+          "remediation": "Restore SYSTEM_LOCK.ACTIVE_DRIVE_ROOT_ID value to '1FfcVEQjod--rZSucOPFJD2DJ58hV650_'.",
+          "nextAction": [
+            "Reset ACTIVE_DRIVE_ROOT_ID property value to '1FfcVEQjod--rZSucOPFJD2DJ58hV650_'"
+          ]
         }
       ]
     }

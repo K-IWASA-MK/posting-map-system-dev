@@ -3,7 +3,7 @@ import os
 import sys
 import json
 import re
-import fnmatch
+import argparse
 from datetime import datetime, timezone
 
 RULES_FILE = os.path.join(os.path.dirname(__file__), "architecture_rules.json")
@@ -47,12 +47,15 @@ def check_file(filepath, content, rules):
             
         rule_id = rule["id"]
         rule_name = rule["name"]
+        category = rule.get("category", "Architecture")
         severity = rule["severity"]
 
         # 1. Forbidden Patterns Check (Blacklist)
         for forbidden in rule.get("forbidden_patterns", []):
             pat = forbidden["pattern"]
             msg = forbidden["message"]
+            remediation = forbidden.get("remediation", "")
+            next_action = forbidden.get("nextAction", [])
             compiled_pat = re.compile(pat)
             
             if "[\\s\\S]" in pat or "\\n" in pat:
@@ -63,15 +66,17 @@ def check_file(filepath, content, rules):
                     violations.append({
                         "id": rule_id,
                         "name": rule_name,
+                        "category": category,
                         "severity": severity,
                         "message": msg,
                         "file": filepath,
                         "line": line_num,
-                        "match": match.group(0)[:100]
+                        "match": match.group(0)[:100],
+                        "remediation": remediation,
+                        "nextAction": next_action
                     })
             else:
                 for line_idx, line in enumerate(lines):
-                    # Ignore comments when checking server side scripts for window/document
                     trimmed_line = line.strip()
                     if trimmed_line.startswith("//") or trimmed_line.startswith("/*") or trimmed_line.startswith("*"):
                         continue
@@ -80,27 +85,35 @@ def check_file(filepath, content, rules):
                         violations.append({
                             "id": rule_id,
                             "name": rule_name,
+                            "category": category,
                             "severity": severity,
                             "message": f"{msg} (Line: '{trimmed_line}')",
                             "file": filepath,
                             "line": line_idx + 1,
-                            "match": match.group(0)
+                            "match": match.group(0),
+                            "remediation": remediation,
+                            "nextAction": next_action
                         })
 
         # 2. Required Patterns Check (Whitelist)
         for req in rule.get("required_patterns", []):
             pat = req["pattern"]
             msg = req["message"]
+            remediation = req.get("remediation", "")
+            next_action = req.get("nextAction", [])
             compiled_pat = re.compile(pat)
             if not compiled_pat.search(content):
                 violations.append({
                     "id": rule_id,
                     "name": rule_name,
+                    "category": category,
                     "severity": severity,
                     "message": msg,
                     "file": filepath,
                     "line": 1,
-                    "match": "MISSING_REQUIRED_PATTERN"
+                    "match": "MISSING_REQUIRED_PATTERN",
+                    "remediation": remediation,
+                    "nextAction": next_action
                 })
 
     return violations
@@ -126,6 +139,16 @@ def get_target_files_in_project(rules):
     return target_files
 
 def main():
+    # Arg Parser for Multi-Agent Tracking
+    parser = argparse.ArgumentParser(description="AIOS Architecture Reviewer")
+    parser.add_argument("files", nargs="*", help="Files to review (default: scan all)")
+    parser.add_argument("--agentId", default="antigravity-ide-v1", help="Agent Unique ID")
+    parser.add_argument("--agentName", default="Antigravity", help="Agent Human Name")
+    parser.add_argument("--agentRole", default="Developer", help="Agent Role in System")
+    
+    parsed_args, unknown_files = parser.parse_known_args()
+    input_files = parsed_args.files + unknown_files
+
     try:
         rules_data = load_rules()
         rules = rules_data.get("rules", [])
@@ -134,14 +157,18 @@ def main():
         print(f"Error loading rules: {e}", file=sys.stderr)
         sys.exit(1)
 
-    args = sys.argv[1:]
     project_root = os.path.dirname(os.path.dirname(__file__))
     
-    if args:
+    if input_files:
         target_files = []
-        for path in args:
-            rel = os.path.relpath(os.path.abspath(path), project_root).replace(os.sep, "/")
-            target_files.append(rel)
+        for path in input_files:
+            # Ignore flags passed mistakenly as files
+            if path.startswith("-"):
+                continue
+            abs_path = os.path.abspath(path)
+            if os.path.exists(abs_path):
+                rel = os.path.relpath(abs_path, project_root).replace(os.sep, "/")
+                target_files.append(rel)
     else:
         target_files = get_target_files_in_project(rules)
 
@@ -158,14 +185,50 @@ def main():
         except Exception as e:
             print(f"Error reading file {rel_path}: {e}", file=sys.stderr)
 
-    error_count = sum(1 for v in all_violations if v["severity"] == "ERROR")
-    status = "FAILED" if error_count > 0 else "PASS"
+    # 1. Initialize Category-specific Summary
+    categories = set(rule.get("category", "Architecture") for rule in rules)
+    summary = {}
+    for cat in categories:
+        summary[cat] = {
+            "status": "PASS",
+            "errors": 0,
+            "warnings": 0
+        }
+
+    # 2. Populate Category Counts and Violations
+    for v in all_violations:
+        cat = v["category"]
+        if v["severity"] == "ERROR":
+            summary[cat]["errors"] += 1
+            summary[cat]["status"] = "FAILED"
+        elif v["severity"] == "WARNING":
+            summary[cat]["warnings"] += 1
+
+    # 3. Determine Overall Status (PASS / PASS_WITH_WARNING / FAILED)
+    total_errors = sum(cat_info["errors"] for cat_info in summary.values())
+    total_warnings = sum(cat_info["warnings"] for cat_info in summary.values())
+    
+    if total_errors > 0:
+        status = "FAILED"
+    elif total_warnings > 0:
+        status = "PASS_WITH_WARNING"
+    else:
+        status = "PASS"
+
+    review_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 
     result = {
-        "reviewEngineVersion": "1.0.0",
+        "reviewId": review_id,
+        "reviewEngineVersion": "1.1.0",
         "ruleVersion": rule_version,
+        "agent": {
+            "agentId": parsed_args.agentId,
+            "agentName": parsed_args.agentName,
+            "agentRole": parsed_args.agentRole
+        },
         "status": status,
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        "summary": summary,
         "violations": all_violations
     }
 
@@ -179,7 +242,7 @@ def main():
         print(f"--- Architecture Review Results: {status} ---")
         for v in all_violations:
             badge = f"[{v['severity']}]"
-            print(f"{badge} Rule {v['id']} ({v['name']}): {v['message']} in {v['file']}:{v['line']}")
+            print(f"{badge} Rule {v['id']} ({v['name']}) [{v['category']}]: {v['message']} in {v['file']}:{v['line']}")
     else:
         print(f"--- Architecture Review: PASS (No violations found) ---")
 
