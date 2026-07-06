@@ -1,3 +1,18 @@
+# Release Notes - v4.10-lifecycle-integration
+
+## 🚀 New Features & Enhancements
+
+### 1. Implementation Plan Hash Lock & Lifecycle Integration (AIOS Phase 140)
+- **計画書ハッシュロックと Rule 012 の導入**:
+  - 承認時に、現在の計画書（`implementation_plan.md`）の SHA-256 ハッシュ値を自動計算し、タスクの `"approvalHash"` に記録。
+  - レビューエンジン `architecture_reviewer.py` に **Rule 012 (Implementation Plan Hash Rule)** を追加し、承認後の計画書の変更を静的エラーとして完全に検知・ブロック。
+- **一意の承認 ID (approvalId) の割り当て**:
+  - `python3 tools/ai_project_manager.py --approve` コマンドにより、一意のアプルーバル ID (`APR-<YYYYMMDD>-XXXX` 形式) を自動発行し、監査トレース能力を向上。
+- **承認有効期限自動チェック (Approval Expiration)**:
+  - 承認日時（`approvedAt`）から一定期間（デフォルト: 30日、環境変数により短縮可能）経過した承認を自動失効（`isApproved` を `false` に自動リセット）する時間監視ロジックを進行処理（`--tick` およびステータス遷移）へ統合。
+
+---
+
 # Release Notes - v4.9-approval-gate
 
 ## 🚀 New Features & Enhancements
