@@ -16,9 +16,52 @@ const btnGps = document.getElementById('btn-gps');
 let ws = null;
 let currentCommandId = null;
 let currentAreaId = null;
+let authContext = null;
+
+function rebuildAuthorizationContext(registry, policies) {
+  let trust = 0.850;
+  let mode = "BLOCKED";
+  let drift = "UNKNOWN";
+  
+  if (registry && registry.ai_agent) {
+    trust = registry.ai_agent.driftScore;
+  } else if (authContext) {
+    trust = authContext.trustScore;
+  }
+  
+  if (policies && policies.ai_agent) {
+    const policyCfg = policies.ai_agent.compiledPolicy || {};
+    mode = policyCfg.mode || "BLOCKED";
+    drift = policies.ai_agent.driftState || "UNKNOWN";
+  } else if (authContext) {
+    mode = authContext.policyMode;
+    drift = authContext.driftState;
+  }
+
+  // Create immutable context object (SSoAC)
+  const context = {
+    version: 1,
+    staffId: "S025",
+    lineUserId: "U_LINE_MOCK_S025_UUID",
+    policyMode: mode,
+    trustScore: trust,
+    driftState: drift,
+    sessionId: authContext ? authContext.sessionId : `SES-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
+    authenticatedAt: authContext ? authContext.authenticatedAt : new Date().toISOString(),
+    policyRevision: "v4.20"
+  };
+  
+  Object.freeze(context);
+  authContext = context;
+  
+  // Trigger UI update using context only
+  updateSecurityConstraints(authContext);
+}
 
 function connectWS() {
-  ws = new WebSocket('ws://localhost:8080');
+  const params = new URLSearchParams(window.location.search);
+  const wsUrl = params.get('ws') || 'ws://localhost:8080';
+  ws = new WebSocket(wsUrl);
 
   ws.onopen = () => {
     connInd.className = 'indicator online';
@@ -30,6 +73,12 @@ function connectWS() {
     connInd.className = 'indicator';
     connLbl.textContent = 'DISCONNECTED';
     console.log("H-App disconnected. Retrying...");
+    
+    // Clear context and lock UI upon connection loss (defense mechanism)
+    authContext = null;
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+    
     setTimeout(connectWS, 3000);
   };
 
@@ -40,8 +89,8 @@ function connectWS() {
       if (data.type === "INITIAL_STATE") {
         const { registry, policies, latestAssignment } = data.payload;
         
-        // Sync active trust & compiled policy constraints
-        updateSecurityConstraints(registry, policies);
+        // Sync context
+        rebuildAuthorizationContext(registry, policies);
         
         // Render current assignment if loaded
         if (latestAssignment) {
@@ -51,9 +100,9 @@ function connectWS() {
         const { type, payload } = data;
         
         if (type === "TRUST_UPDATED") {
-          updateSecurityConstraints(payload, null);
+          rebuildAuthorizationContext(payload, null);
         } else if (type === "POLICY_COMPILED") {
-          updateSecurityConstraints(null, payload);
+          rebuildAuthorizationContext(null, payload);
         } else if (type === "FIELD_EXECUTED" && payload.action === "ASSIGN_FLYER") {
           renderTask(payload);
         }
@@ -64,31 +113,39 @@ function connectWS() {
   };
 }
 
-function updateSecurityConstraints(registry, policies) {
+function updateSecurityConstraints(ctx) {
+  if (!ctx) return;
+  
   // 1. Sync trust score
-  if (registry && registry.ai_agent) {
-    trustVal.textContent = registry.ai_agent.driftScore.toFixed(3);
-  }
+  trustVal.textContent = ctx.trustScore.toFixed(3);
   
   // 2. Sync active sandbox limits
-  if (policies && policies.ai_agent) {
-    const { mode, limits } = policies.ai_agent.compiledPolicy || { mode: "BLOCKED", limits: {} };
-    
-    // Update badge styling
-    lawBadge.textContent = mode;
-    lawBadge.className = 'law-mode-badge';
-    
-    const modeStyle = `mode-${mode.toLowerCase().replace('_', '')}`;
-    lawBadge.classList.add(modeStyle);
-    
-    // Force write restriction execution on physical button
-    if (mode === "BLOCKED" || mode === "SANDBOX" || !limits.write) {
-      btnConfirm.disabled = true;
-      btnConfirm.textContent = "Distribution Blocked (SANDBOX)";
-    } else {
-      btnConfirm.disabled = false;
-      btnConfirm.textContent = "Confirm Flyer Distribution";
-    }
+  lawBadge.textContent = ctx.policyMode;
+  lawBadge.className = 'law-mode-badge';
+  
+  const modeStyle = `mode-${ctx.policyMode.toLowerCase().replace('_', '')}`;
+  lawBadge.classList.add(modeStyle);
+  
+  // Control overlays based on active mode
+  const loadingOverlay = document.getElementById('loading-overlay');
+  const blockedOverlay = document.getElementById('blocked-overlay');
+  
+  if (loadingOverlay) {
+    loadingOverlay.classList.add('hidden');
+  }
+  
+  if (ctx.policyMode === "BLOCKED") {
+    if (blockedOverlay) blockedOverlay.classList.remove('hidden');
+    btnConfirm.disabled = true;
+    btnConfirm.textContent = "Access Blocked";
+  } else if (ctx.policyMode === "SANDBOX") {
+    if (blockedOverlay) blockedOverlay.classList.add('hidden');
+    btnConfirm.disabled = true;
+    btnConfirm.textContent = "Distribution Blocked (SANDBOX)";
+  } else {
+    if (blockedOverlay) blockedOverlay.classList.add('hidden');
+    btnConfirm.disabled = false;
+    btnConfirm.textContent = "Confirm Flyer Distribution";
   }
 }
 
