@@ -1,3 +1,22 @@
+# Release Notes - v4.9-approval-gate
+
+## 🚀 New Features & Enhancements
+
+### 1. Human Approval Gate OS Foundation 完成 (AIOS Phase 139)
+- **構造化承認メタデータの適用 (`tools/ai_tasks.json`)**:
+  - 各タスクに `approvalVersion: "1.0.0"`, `requiresApproval`, `isApproved`, `approvedBy`, `approvedAt` を含む `approval` オブジェクトを新設。
+- **アプルーバルレベル (NONE / NORMAL / CRITICAL) の実装**:
+  - `NONE`: 承認をバイパスして実装進行可。
+  - `NORMAL`: 明示的な人間の承認（`isApproved == true`）を必須化。
+  - `CRITICAL`: 人間の承認に加え、自動レビュー結果（`AUDIT_REVIEW_RESULT.json`）が PASS であることを進行条件に指定。
+  - `ai_team_orchestrator.py` にて、`ASSIGNED` ➔ `IN_PROGRESS` への進行をこれら条件に基づき物理ロック。
+- **承認制御 CLI の導入 (`tools/ai_project_manager.py`)**:
+  - `python3 tools/ai_project_manager.py --approve <taskId> --by "Human"` を実装。承認実行により、監査ログ `APPROVAL_GRANTED` (eventVersion: "1.0.0") を `orchestrator_events.json` へ追跡記録。
+- **静的レビュー検証ルール Rule 011 (Human Approval Rule) の統合**:
+  - 未承認のタスクが存在する（コード編集が開始されているが、`isApproved == false`）場合に、`architecture_reviewer.py` およびプリコミットフック側で自動検知して `FAILED (ERROR)` ブロックする静的監査ガードを実装。
+
+---
+
 # Release Notes - v4.8-knowledge-os
 
 ## 🚀 New Features & Enhancements
