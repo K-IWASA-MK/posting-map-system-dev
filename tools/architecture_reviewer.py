@@ -357,6 +357,56 @@ def check_execution_gates(project_root, rules):
                         "nextAction": ["Request approval"]
                     })
 
+            # Rule 016 & Rule 017 validation (Sandbox logical isolation)
+            rule_016 = next((r for r in rules if r["id"] == "016"), None)
+            rule_017 = next((r for r in rules if r["id"] == "017"), None)
+            
+            if (rule_016 or rule_017) and (has_source_changes or has_walkthrough_changes or has_release_notes_changes):
+                cert_file = os.path.join(project_root, "tools", "proposal_validation_result.json")
+                valid_cert = False
+                err_msg = ""
+                
+                if os.path.exists(cert_file):
+                    try:
+                        with open(cert_file, "r", encoding="utf-8") as f:
+                            cert = json.load(f)
+                        if cert.get("taskId") == t["taskId"] and cert.get("status") == "VALIDATION_PASSED":
+                            valid_cert = True
+                        else:
+                            err_msg = f"Proposal validation certificate status is '{cert.get('status')}'."
+                    except Exception as e:
+                        err_msg = f"Failed to parse validation certificate: {e}"
+                else:
+                    err_msg = "Proposal validation result certificate not found."
+                
+                if not valid_cert:
+                    if rule_016:
+                        violations.append({
+                            "id": "016",
+                            "name": "Kernel Isolation Rule",
+                            "category": "Architecture",
+                            "severity": "ERROR",
+                            "message": f"Direct write violation for Task {t['taskId']}: AI modified files directly. {err_msg}",
+                            "file": changed_files[0],
+                            "line": 1,
+                            "match": "Direct file modification",
+                            "remediation": f"Submit Unified Diff patch and run: python3 tools/aios_kernel.py --validate-proposal {t['taskId']} --proposal <patchFile>",
+                            "nextAction": ["Submit transformation proposal"]
+                        })
+                    if rule_017:
+                        violations.append({
+                            "id": "017",
+                            "name": "Sandbox Enforcement Rule",
+                            "category": "Architecture",
+                            "severity": "ERROR",
+                            "message": f"Sandbox Lock: modification rejected. {err_msg}",
+                            "file": changed_files[0],
+                            "line": 1,
+                            "match": "Direct filesystem write",
+                            "remediation": f"Request logical kernel to validate proposal for task {t['taskId']}.",
+                            "nextAction": ["Obtain validation certificate"]
+                        })
+
     return violations
 
 def check_rule_011_human_approval(project_root, rules):

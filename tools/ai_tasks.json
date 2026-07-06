@@ -16,26 +16,22 @@
       "status": "UNDER_REVIEW",
       "reviewId": null,
       "approval": {
-        "approvalId": "APR-20260706015718",
+        "approvalId": "APR-20260706025735",
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
         "isApproved": true,
         "approvedBy": "Human",
-        "approvedAt": "2026-07-06T01:57:18.246624+00:00",
-        "approvalHash": "601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6",
-        "executionState": "FINISHED",
-        "executionToken": "APR-20260706015718",
-        "tokenExpiresAt": "2026-08-05T01:57:18.246628+00:00",
+        "approvedAt": "2026-07-06T02:57:35.067479+00:00",
+        "approvalHash": "63511235f086ccbac99e4aca6748aa81539cdc276c51e80695f7f4999144e0e6",
+        "executionState": "AUTHORIZED",
+        "executionToken": "APR-20260706025735",
+        "tokenExpiresAt": "2026-08-05T02:57:35.067482+00:00",
         "executionSession": {
-          "executionSessionId": "SES-20260706015812",
-          "executionStartedAt": "2026-07-06T01:58:12.522013+00:00",
-          "executionEndedAt": "2026-07-06T01:59:28.231742+00:00",
-          "executionOwner": {
-            "agentId": "chatgpt-4o",
-            "agentName": "ChatGPT",
-            "sessionId": "SES-20260706015812"
-          }
+          "executionSessionId": null,
+          "executionStartedAt": null,
+          "executionEndedAt": null,
+          "executionOwner": null
         }
       }
     },
@@ -47,32 +43,28 @@
       "dependsOn": [
         "TSK-0001"
       ],
-      "assignedAgent": "chatgpt-4o",
+      "assignedAgent": "antigravity-ide-v1",
       "assignmentReason": null,
       "retryCount": 0,
       "status": "IN_PROGRESS",
       "reviewId": null,
       "approval": {
-        "approvalId": "APR-20260706015919",
+        "approvalId": "APR-20260706025735",
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
         "isApproved": true,
         "approvedBy": "Human",
-        "approvedAt": "2026-07-06T01:59:19.340745+00:00",
-        "approvalHash": "601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6",
-        "executionState": "RUNNING",
-        "executionToken": "APR-20260706015919",
-        "tokenExpiresAt": "2026-08-05T01:59:19.340749+00:00",
+        "approvedAt": "2026-07-06T02:57:35.104859+00:00",
+        "approvalHash": "63511235f086ccbac99e4aca6748aa81539cdc276c51e80695f7f4999144e0e6",
+        "executionState": "AUTHORIZED",
+        "executionToken": "APR-20260706025735",
+        "tokenExpiresAt": "2026-08-05T02:57:35.104861+00:00",
         "executionSession": {
-          "executionSessionId": "SES-20260706015943",
-          "executionStartedAt": "2026-07-06T01:59:43.417430+00:00",
+          "executionSessionId": null,
+          "executionStartedAt": null,
           "executionEndedAt": null,
-          "executionOwner": {
-            "agentId": "chatgpt-4o",
-            "agentName": "ChatGPT",
-            "sessionId": "SES-20260706015943"
-          }
+          "executionOwner": null
         }
       }
     },

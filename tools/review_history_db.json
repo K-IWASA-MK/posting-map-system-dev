@@ -1412,5 +1412,319 @@
       }
     },
     "violations": []
+  },
+  {
+    "reviewId": "20260706024551",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T02:45:51.884994+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706024703",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T02:47:03.406755+00:00",
+    "summary": {
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706024704",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T02:47:04.249487+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706025705",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T02:57:05.856566+00:00",
+    "summary": {
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 5,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0001. Expected hash '601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6' but got '63511235f086ccbac99e4aca6748aa81539cdc276c51e80695f7f4999144e0e6'."
+      },
+      {
+        "id": "016",
+        "name": "Kernel Isolation Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Direct write violation for Task TSK-0002: AI modified files directly. Proposal validation result certificate not found."
+      },
+      {
+        "id": "017",
+        "name": "Sandbox Enforcement Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Sandbox Lock: modification rejected. Proposal validation result certificate not found."
+      },
+      {
+        "id": "016",
+        "name": "Kernel Isolation Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Direct write violation for Task TSK-0003: AI modified files directly. Proposal validation result certificate not found."
+      },
+      {
+        "id": "017",
+        "name": "Sandbox Enforcement Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Sandbox Lock: modification rejected. Proposal validation result certificate not found."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706025715",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T02:57:15.072810+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 3,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0001. Expected hash '601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6' but got '63511235f086ccbac99e4aca6748aa81539cdc276c51e80695f7f4999144e0e6'."
+      },
+      {
+        "id": "016",
+        "name": "Kernel Isolation Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Direct write violation for Task TSK-0003: AI modified files directly. Proposal validation certificate status is 'VALIDATION_PASSED'."
+      },
+      {
+        "id": "017",
+        "name": "Sandbox Enforcement Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Sandbox Lock: modification rejected. Proposal validation certificate status is 'VALIDATION_PASSED'."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706025739",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T02:57:39.493972+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
   }
 ]

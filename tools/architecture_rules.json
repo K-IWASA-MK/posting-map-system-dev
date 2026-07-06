@@ -311,6 +311,44 @@
           ]
         }
       ]
+    },
+    {
+      "id": "016",
+      "name": "Kernel Isolation Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "AI SHALL NOT write to source files directly. Any modification must go through the protected AIOS Kernel interface via Transformation Proposals.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule016PatternDetection",
+          "message": "Direct write violation: AI attempted to modify source code directly without Kernel mediation.",
+          "remediation": "Submit changes as a Transformation Proposal (Unified Diff) through the validation kernel.",
+          "nextAction": [
+            "Generate Unified Diff patch",
+            "Request kernel validation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "017",
+      "name": "Sandbox Enforcement Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "Any direct file write detected without Kernel validation blocks build and commits.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule017PatternDetection",
+          "message": "Sandbox lock active: direct filesystem manipulation is forbidden.",
+          "remediation": "Verify and obtain a signed proposal validation certificate from the kernel.",
+          "nextAction": [
+            "Obtain kernel validation certificate",
+            "Verify sandbox validation"
+          ]
+        }
+      ]
     }
   ]
 }
