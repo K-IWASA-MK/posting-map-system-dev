@@ -1,7 +1,7 @@
 {
   "kernel": {
     "nodeId": "kernel",
-    "trust": 0.786,
+    "trust": 0.788,
     "driftState": "Restrict",
     "compiledPolicy": {
       "mode": "LIMITED",
@@ -12,11 +12,11 @@
       }
     },
     "reason": "LIMITED EXECUTION MODE",
-    "compiledAt": "2026-07-06T05:31:12.971907+00:00"
+    "compiledAt": "2026-07-06T05:33:27.885065+00:00"
   },
   "reviewer": {
     "nodeId": "reviewer",
-    "trust": 0.7,
+    "trust": 0.702,
     "driftState": "Restrict",
     "compiledPolicy": {
       "mode": "LIMITED",
@@ -27,11 +27,11 @@
       }
     },
     "reason": "LIMITED EXECUTION MODE",
-    "compiledAt": "2026-07-06T05:31:12.972036+00:00"
+    "compiledAt": "2026-07-06T05:33:27.885180+00:00"
   },
   "plugin_runtime": {
     "nodeId": "plugin_runtime",
-    "trust": 0.735,
+    "trust": 0.737,
     "driftState": "Restrict",
     "compiledPolicy": {
       "mode": "LIMITED",
@@ -42,11 +42,11 @@
       }
     },
     "reason": "LIMITED EXECUTION MODE",
-    "compiledAt": "2026-07-06T05:31:12.972038+00:00"
+    "compiledAt": "2026-07-06T05:33:27.885182+00:00"
   },
   "ai_agent": {
     "nodeId": "ai_agent",
-    "trust": 0.814,
+    "trust": 0.817,
     "driftState": "ACTIVE",
     "compiledPolicy": {
       "mode": "FULL_ACCESS",
@@ -57,6 +57,6 @@
       }
     },
     "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T05:31:12.972040+00:00"
+    "compiledAt": "2026-07-06T05:33:27.885184+00:00"
   }
 }
