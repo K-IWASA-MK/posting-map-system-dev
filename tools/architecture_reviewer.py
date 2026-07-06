@@ -241,7 +241,7 @@ def check_execution_gates(project_root, rules):
             "nextAction": ["Call --finish-execution on the conflicting task"]
         })
 
-    # 2. Track modified files via git status
+    # 2. Track modified files via git status and unpushed commits
     import subprocess
     changed_files = []
     has_source_changes = False
@@ -250,28 +250,48 @@ def check_execution_gates(project_root, rules):
     has_plan_changes = False
     has_other_artifacts = False
     
+    unique_paths = set()
+    
     try:
         out = subprocess.check_output(["git", "status", "--porcelain"], cwd=project_root).decode("utf-8")
         for line in out.splitlines():
             if len(line) > 3:
-                filepath = line[3:].strip()
-                if (filepath.startswith("active/") or filepath.startswith("field/")) and (filepath.endswith(".gs") or filepath.endswith(".js")):
-                    changed_files.append(filepath)
-                    has_source_changes = True
-                elif filepath.endswith("walkthrough.md"):
-                    changed_files.append(filepath)
-                    has_walkthrough_changes = True
-                elif filepath.endswith("RELEASE_NOTES.md"):
-                    changed_files.append(filepath)
-                    has_release_notes_changes = True
-                elif filepath.endswith("implementation_plan.md") or filepath.endswith("task.md"):
-                    changed_files.append(filepath)
-                    has_plan_changes = True
-                elif filepath.endswith("knowledge_base.json") or filepath.endswith("audit_result.json") or filepath.endswith("handover.json"):
-                    changed_files.append(filepath)
-                    has_other_artifacts = True
+                unique_paths.add(line[3:].strip())
     except Exception:
         pass
+
+    try:
+        out_diff = subprocess.check_output(["git", "log", "@{u}..HEAD", "--name-only", "--format="], cwd=project_root).decode("utf-8")
+        for line in out_diff.splitlines():
+            path = line.strip()
+            if path:
+                unique_paths.add(path)
+    except Exception:
+        try:
+            out_diff = subprocess.check_output(["git", "log", "origin-dev/main..HEAD", "--name-only", "--format="], cwd=project_root).decode("utf-8")
+            for line in out_diff.splitlines():
+                path = line.strip()
+                if path:
+                    unique_paths.add(path)
+        except Exception:
+            pass
+
+    for filepath in unique_paths:
+        if (filepath.startswith("active/") or filepath.startswith("field/")) and (filepath.endswith(".gs") or filepath.endswith(".js")):
+            changed_files.append(filepath)
+            has_source_changes = True
+        elif filepath.endswith("walkthrough.md"):
+            changed_files.append(filepath)
+            has_walkthrough_changes = True
+        elif filepath.endswith("RELEASE_NOTES.md"):
+            changed_files.append(filepath)
+            has_release_notes_changes = True
+        elif filepath.endswith("implementation_plan.md") or filepath.endswith("task.md"):
+            changed_files.append(filepath)
+            has_plan_changes = True
+        elif filepath.endswith("knowledge_base.json") or filepath.endswith("audit_result.json") or filepath.endswith("handover.json"):
+            changed_files.append(filepath)
+            has_other_artifacts = True
 
     if not changed_files:
         return violations
