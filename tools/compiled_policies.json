@@ -12,7 +12,7 @@
       }
     },
     "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T03:40:50.329267+00:00"
+    "compiledAt": "2026-07-06T03:43:13.358408+00:00"
   },
   "reviewer": {
     "nodeId": "reviewer",
@@ -27,11 +27,11 @@
       }
     },
     "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T03:40:50.329456+00:00"
+    "compiledAt": "2026-07-06T03:43:13.358520+00:00"
   },
   "plugin_runtime": {
     "nodeId": "plugin_runtime",
-    "trust": 0.899,
+    "trust": 0.898,
     "driftState": "ACTIVE",
     "compiledPolicy": {
       "mode": "FULL_ACCESS",
@@ -42,7 +42,7 @@
       }
     },
     "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T03:40:50.329458+00:00"
+    "compiledAt": "2026-07-06T03:43:13.358522+00:00"
   },
   "ai_agent": {
     "nodeId": "ai_agent",
@@ -57,6 +57,6 @@
       }
     },
     "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T03:40:50.329460+00:00"
+    "compiledAt": "2026-07-06T03:43:13.358523+00:00"
   }
 }
