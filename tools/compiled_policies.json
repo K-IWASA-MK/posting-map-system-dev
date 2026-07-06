@@ -1,52 +1,52 @@
 {
   "kernel": {
     "nodeId": "kernel",
-    "trust": 0.991,
-    "driftState": "ACTIVE",
+    "trust": 0.785,
+    "driftState": "Restrict",
     "compiledPolicy": {
-      "mode": "FULL_ACCESS",
+      "mode": "LIMITED",
       "limits": {
-        "write": true,
+        "write": false,
         "exec": true,
         "network": true
       }
     },
-    "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T04:21:00.831560+00:00"
+    "reason": "LIMITED EXECUTION MODE",
+    "compiledAt": "2026-07-06T04:35:14.848088+00:00"
   },
   "reviewer": {
     "nodeId": "reviewer",
-    "trust": 0.945,
-    "driftState": "ACTIVE",
+    "trust": 0.697,
+    "driftState": "Restrict",
     "compiledPolicy": {
-      "mode": "FULL_ACCESS",
+      "mode": "LIMITED",
       "limits": {
-        "write": true,
+        "write": false,
         "exec": true,
         "network": true
       }
     },
-    "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T04:21:00.831680+00:00"
+    "reason": "LIMITED EXECUTION MODE",
+    "compiledAt": "2026-07-06T04:35:14.848218+00:00"
   },
   "plugin_runtime": {
     "nodeId": "plugin_runtime",
-    "trust": 0.898,
-    "driftState": "ACTIVE",
+    "trust": 0.73,
+    "driftState": "Restrict",
     "compiledPolicy": {
-      "mode": "FULL_ACCESS",
+      "mode": "LIMITED",
       "limits": {
-        "write": true,
+        "write": false,
         "exec": true,
         "network": true
       }
     },
-    "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T04:21:00.831682+00:00"
+    "reason": "LIMITED EXECUTION MODE",
+    "compiledAt": "2026-07-06T04:35:14.848220+00:00"
   },
   "ai_agent": {
     "nodeId": "ai_agent",
-    "trust": 0.85,
+    "trust": 0.811,
     "driftState": "ACTIVE",
     "compiledPolicy": {
       "mode": "FULL_ACCESS",
@@ -57,6 +57,6 @@
       }
     },
     "reason": "HIGH TRUST STABLE STATE",
-    "compiledAt": "2026-07-06T04:21:00.831683+00:00"
+    "compiledAt": "2026-07-06T04:35:14.848222+00:00"
   }
 }

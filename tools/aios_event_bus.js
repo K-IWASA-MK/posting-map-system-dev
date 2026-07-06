@@ -28,6 +28,8 @@ function broadcast(event) {
 function getInitialState() {
   let registry = {};
   let policies = {};
+  let latestAssignment = null;
+  const COMMANDS_FILE = path.join(__dirname, 'field_commands.jsonl');
   try {
     if (fs.existsSync(REGISTRY_FILE)) {
       registry = JSON.parse(fs.readFileSync(REGISTRY_FILE, 'utf8'));
@@ -35,12 +37,23 @@ function getInitialState() {
     if (fs.existsSync(POLICIES_FILE)) {
       policies = JSON.parse(fs.readFileSync(POLICIES_FILE, 'utf8'));
     }
+    if (fs.existsSync(COMMANDS_FILE)) {
+      const lines = fs.readFileSync(COMMANDS_FILE, 'utf8').trim().split('\n');
+      for (let i = lines.length - 1; i >= 0; i--) {
+        if (!lines[i]) continue;
+        const cmd = JSON.parse(lines[i]);
+        if (cmd.action === 'ASSIGN_FLYER') {
+          latestAssignment = cmd;
+          break;
+        }
+      }
+    }
   } catch (e) {
     console.error("Error reading initial states:", e.message);
   }
   return {
     type: "INITIAL_STATE",
-    payload: { registry, policies }
+    payload: { registry, policies, latestAssignment }
   };
 }
 
@@ -54,8 +67,18 @@ wss.on('connection', ws => {
   });
 });
 
-// Expose HTTP API for Python Publishers
+// Expose HTTP API for Python Publishers & Browser clients with CORS support
 const server = http.createServer((req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   if (req.method === 'POST' && req.url === '/publish') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
