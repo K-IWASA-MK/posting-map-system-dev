@@ -3,11 +3,12 @@ import os
 import sys
 import json
 import argparse
+import subprocess
+import uuid
 from datetime import datetime, timezone
 
+DAEMON_PATH = os.path.join(os.path.dirname(__file__), "aios_kernel_daemon.js")
 TASKS_FILE = os.path.join(os.path.dirname(__file__), "ai_tasks.json")
-EVENTS_FILE = os.path.join(os.path.dirname(__file__), "orchestrator_events.json")
-CERT_FILE = os.path.join(os.path.dirname(__file__), "proposal_validation_result.json")
 
 def load_json(filepath):
     if os.path.exists(filepath):
@@ -18,31 +19,56 @@ def load_json(filepath):
             pass
     return None
 
-def save_json(filepath, data):
+def call_daemon(method, params):
+    if not os.path.exists(DAEMON_PATH):
+        print(f"Error: Kernel daemon script not found at {DAEMON_PATH}", file=sys.stderr)
+        sys.exit(1)
+        
     try:
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-        return True
-    except Exception:
-        return False
+        proc = subprocess.Popen(
+            ["node", DAEMON_PATH],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        ready_sig = proc.stderr.readline().strip()
+        if "AIOS Kernel Daemon Initialized." not in ready_sig:
+            print(f"Error initializing kernel daemon: {ready_sig}", file=sys.stderr)
+            proc.terminate()
+            sys.exit(1)
+            
+        req_id = 1
+        req = {
+            "jsonrpc": "2.0",
+            "method": method,
+            "params": params,
+            "id": req_id
+        }
+        
+        proc.stdin.write(json.dumps(req) + "\n")
+        proc.stdin.flush()
+        
+        res_line = proc.stdout.readline()
+        proc.terminate()
+        
+        if not res_line:
+            print("Error: Empty response from kernel daemon.", file=sys.stderr)
+            sys.exit(1)
+            
+        res = json.loads(res_line)
+        if "error" in res:
+            print(f"Kernel Error: {res['error']['message']} (Code: {res['error']['code']})", file=sys.stderr)
+            sys.exit(1)
+            
+        return res.get("result")
+        
+    except Exception as e:
+        print(f"Error communicating with kernel daemon: {e}", file=sys.stderr)
+        sys.exit(1)
 
-def log_event(task_id, event_type, agent_id, details):
-    events = load_json(EVENTS_FILE) or []
-    event_id = f"EVT-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{len(events) + 1:04d}"
-    
-    event = {
-        "eventId": event_id,
-        "eventVersion": "1.0.0",
-        "taskId": task_id,
-        "eventType": event_type,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "agentId": agent_id,
-        "details": details
-    }
-    events.append(event)
-    save_json(EVENTS_FILE, events)
-
-def validate_proposal(task_id, proposal_path):
+def validate_proposal_proxy(task_id, proposal_path):
     tasks_data = load_json(TASKS_FILE)
     if not tasks_data:
         print("Error: Task database not found.", file=sys.stderr)
@@ -50,72 +76,46 @@ def validate_proposal(task_id, proposal_path):
         
     tasks = tasks_data.get("tasks", [])
     task_map = {t["taskId"]: t for t in tasks}
-    
     if task_id not in task_map:
         print(f"Error: Task ID '{task_id}' not found.", file=sys.stderr)
         sys.exit(1)
         
     task = task_map[task_id]
-    app = task.get("approval", {})
-    state = app.get("executionState", "LOCKED")
+    session_id = task.get("approval", {}).get("executionSession", {}).get("executionSessionId")
     
-    if state != "RUNNING":
-        print(f"Validation FAILED: Task {task_id} executionState is '{state}'. Expected 'RUNNING'.", file=sys.stderr)
-        cert = {
-            "taskId": task_id,
-            "proposalFile": proposal_path,
-            "validationId": f"VAL-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
-            "status": "VALIDATION_FAILED",
-            "error": f"Execution State is '{state}', expected 'RUNNING'.",
-            "validatedBy": "AIOS-Logical-Kernel-v1",
-            "validatedAt": datetime.now(timezone.utc).isoformat()
-        }
-        save_json(CERT_FILE, cert)
-        sys.exit(1)
-
-    if not os.path.exists(proposal_path):
-        print(f"Validation FAILED: Proposal file '{proposal_path}' not found.", file=sys.stderr)
-        cert = {
-            "taskId": task_id,
-            "proposalFile": proposal_path,
-            "validationId": f"VAL-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
-            "status": "VALIDATION_FAILED",
-            "error": f"Proposal file '{proposal_path}' not found.",
-            "validatedBy": "AIOS-Logical-Kernel-v1",
-            "validatedAt": datetime.now(timezone.utc).isoformat()
-        }
-        save_json(CERT_FILE, cert)
-        sys.exit(1)
-
-    val_id = f"VAL-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
-    cert = {
+    nonce = str(uuid.uuid4())
+    timestamp = datetime.now(timezone.utc).isoformat()
+    
+    params = {
         "taskId": task_id,
-        "proposalFile": proposal_path,
-        "validationId": val_id,
-        "status": "VALIDATION_PASSED",
-        "validatedBy": "AIOS-Logical-Kernel-v1",
-        "validatedAt": datetime.now(timezone.utc).isoformat()
+        "proposalPath": os.path.abspath(proposal_path),
+        "timestamp": timestamp,
+        "nonce": nonce,
+        "executionSessionId": session_id
     }
-    save_json(CERT_FILE, cert)
     
-    log_event(
-        task_id=task_id,
-        event_type="PROPOSAL_VALIDATED",
-        agent_id="LogicalKernel",
-        details={
-            "validationId": val_id,
-            "proposalFile": proposal_path,
-            "msg": f"Transformation Proposal for task {task_id} successfully validated."
-        }
-    )
+    result = call_daemon("validateProposal", params)
+    print(f"Validation PASSED! Certificate issued: {result.get('validationId')}")
+    print(f"Cryptographic Signature: {result.get('signature')}")
+
+def verify_signature_proxy(cert_path):
+    cert = load_json(cert_path)
+    if not cert:
+        print(f"Error: Certificate file '{cert_path}' not found or invalid JSON.", file=sys.stderr)
+        sys.exit(1)
+        
+    params = {
+        "cert": cert
+    }
     
-    print(f"Validation PASSED! Certificate issued: {val_id}")
-    print("Audit log recorded in orchestrator_events.json.")
+    result = call_daemon("verifySignature", params)
+    return result.get("valid", False)
 
 def main():
-    parser = argparse.ArgumentParser(description="AIOS Logical Kernel (Pre-Execution Validation Layer)")
+    parser = argparse.ArgumentParser(description="AIOS Logical Kernel Proxy (IPC System Call Bridge)")
     parser.add_argument("--validate-proposal", metavar="TASK_ID", help="Validate a transformation proposal for task")
     parser.add_argument("--proposal", metavar="PATCH_FILE", help="Path to unified diff patch proposal file")
+    parser.add_argument("--verify-signature", metavar="CERT_FILE", help="Verify cryptographic signature of validation certificate")
     
     args = parser.parse_args()
     
@@ -123,7 +123,15 @@ def main():
         if not args.proposal:
             print("Error: --proposal <patchFile> is required when validating.", file=sys.stderr)
             sys.exit(1)
-        validate_proposal(args.validate_proposal, args.proposal)
+        validate_proposal_proxy(args.validate_proposal, args.proposal)
+    elif args.verify_signature:
+        valid = verify_signature_proxy(args.verify_signature)
+        if valid:
+            print("Signature Verification: SUCCESS (Valid Kernel Certificate)")
+            sys.exit(0)
+        else:
+            print("Signature Verification: FAILED (Forged or invalid certificate!)", file=sys.stderr)
+            sys.exit(1)
     else:
         parser.print_help()
 

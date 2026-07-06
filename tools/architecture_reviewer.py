@@ -369,16 +369,21 @@ def check_execution_gates(project_root, rules):
                 
                 if os.path.exists(cert_file):
                     try:
-                        with open(cert_file, "r", encoding="utf-8") as f:
-                            cert = json.load(f)
-                        # いずれかのアクティブタスク（status == IN_PROGRESS または TODO）と一致しているか
-                        active_task_ids = [tk["taskId"] for tk in tasks if tk.get("status") in ["TODO", "ASSIGNED", "IN_PROGRESS"]]
-                        if cert.get("taskId") in active_task_ids and cert.get("status") == "VALIDATION_PASSED":
-                            any_valid_cert = True
+                        cmd = [sys.executable, os.path.join(project_root, "tools", "aios_kernel.py"), "--verify-signature", cert_file]
+                        proc_verify = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                        
+                        if proc_verify.returncode == 0:
+                            with open(cert_file, "r", encoding="utf-8") as f:
+                                cert = json.load(f)
+                            active_task_ids = [tk["taskId"] for tk in tasks if tk.get("status") in ["TODO", "ASSIGNED", "IN_PROGRESS"]]
+                            if cert.get("taskId") in active_task_ids and cert.get("status") == "VALIDATION_PASSED":
+                                any_valid_cert = True
+                            else:
+                                err_msg = f"Proposal validation certificate status is '{cert.get('status')}'."
                         else:
-                            err_msg = f"Proposal validation certificate status is '{cert.get('status')}'."
+                            err_msg = f"Cryptographic signature verification failed: {proc_verify.stderr.strip()}"
                     except Exception as e:
-                        err_msg = f"Failed to parse validation certificate: {e}"
+                        err_msg = f"Failed to verify proposal validation signature via daemon: {e}"
                 else:
                     err_msg = "Proposal validation result certificate not found."
                 

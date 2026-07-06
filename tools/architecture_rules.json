@@ -349,6 +349,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "018",
+      "name": "Process Separation Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "Kernel validation MUST be performed by an isolated external process. Handshake authentication and JSON-RPC signature required.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule018PatternDetection",
+          "message": "Security integrity violation: validation certificate missing verified cryptographic signature from isolated process kernel.",
+          "remediation": "Request isolated kernel daemon to validation proposal to generate verified signature.",
+          "nextAction": [
+            "Validate proposal with daemon",
+            "Verify cryptographic signature"
+          ]
+        }
+      ]
     }
   ]
 }
