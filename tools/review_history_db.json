@@ -1088,5 +1088,329 @@
       }
     },
     "violations": []
+  },
+  {
+    "reviewId": "20260706014735",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:47:35.138049+00:00",
+    "summary": {
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706014746",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:47:46.415112+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706015632",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T01:56:32.245625+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 4,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0001. Expected hash '0db905bdf03fa89138c9f9d1d99fcda9180b7b73791fafd92331869065452eaf' but got '601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6'."
+      },
+      {
+        "id": "013",
+        "name": "Execution Gate Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Task TSK-0001 is LOCKED. Only implementation_plan.md or task.md can be modified. Found modifications on source files or artifacts."
+      },
+      {
+        "id": "013",
+        "name": "Execution Gate Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Task TSK-0002 is LOCKED. Only implementation_plan.md or task.md can be modified. Found modifications on source files or artifacts."
+      },
+      {
+        "id": "013",
+        "name": "Execution Gate Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Task TSK-0003 is LOCKED. Only implementation_plan.md or task.md can be modified. Found modifications on source files or artifacts."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706015802",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T01:58:02.056468+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 3,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "013",
+        "name": "Execution Gate Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Task TSK-0001 executionState is 'AUTHORIZED'. Modification is forbidden."
+      },
+      {
+        "id": "013",
+        "name": "Execution Gate Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Task TSK-0002 is LOCKED. Only implementation_plan.md or task.md can be modified. Found modifications on source files or artifacts."
+      },
+      {
+        "id": "013",
+        "name": "Execution Gate Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Task TSK-0003 is LOCKED. Only implementation_plan.md or task.md can be modified. Found modifications on source files or artifacts."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706015817",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T01:58:17.343329+00:00",
+    "summary": {
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 2,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "013",
+        "name": "Execution Gate Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Task TSK-0002 is LOCKED. Only implementation_plan.md or task.md can be modified. Found modifications on source files or artifacts."
+      },
+      {
+        "id": "013",
+        "name": "Execution Gate Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "active/mobile/app.js",
+        "line": 1,
+        "message": "Task TSK-0003 is LOCKED. Only implementation_plan.md or task.md can be modified. Found modifications on source files or artifacts."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706015857",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T01:58:57.205023+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
   }
 ]

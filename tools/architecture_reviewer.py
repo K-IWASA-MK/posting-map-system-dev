@@ -203,6 +203,142 @@ def check_rule_012_hash_lock(project_root, rules):
             })
     return violations
 
+def check_execution_gates(project_root, rules):
+    rule_013 = next((r for r in rules if r["id"] == "013"), None)
+    rule_014 = next((r for r in rules if r["id"] == "014"), None)
+    rule_015 = next((r for r in rules if r["id"] == "015"), None)
+    
+    if not rule_013 and not rule_014 and not rule_015:
+        return []
+
+    tasks_file = os.path.join(project_root, "tools", "ai_tasks.json")
+    if not os.path.exists(tasks_file):
+        return []
+
+    try:
+        with open(tasks_file, "r", encoding="utf-8") as f:
+            tasks_data = json.load(f)
+    except Exception:
+        return []
+
+    tasks = tasks_data.get("tasks", [])
+    violations = []
+    
+    # 1. Concurrency Check (Rule 015)
+    running_tasks = [t for t in tasks if t.get("approval", {}).get("executionState") == "RUNNING"]
+    if len(running_tasks) > 1 and rule_015:
+        desc_list = [f"{t['taskId']} (Owner: {t.get('approval', {}).get('executionSession', {}).get('executionOwner', {}).get('agentName', 'Unknown')})" for t in running_tasks]
+        violations.append({
+            "id": "015",
+            "name": "Single Active Execution Rule",
+            "category": "Architecture",
+            "severity": "ERROR",
+            "message": f"Concurrency Collision: Multiple active execution sessions detected: {', '.join(desc_list)}.",
+            "file": "ai_tasks.json",
+            "line": 1,
+            "match": "Concurrent RUNNING sessions",
+            "remediation": "Close inactive sessions. Ensure only one task has executionState RUNNING.",
+            "nextAction": ["Call --finish-execution on the conflicting task"]
+        })
+
+    # 2. Track modified files via git status
+    import subprocess
+    changed_files = []
+    has_source_changes = False
+    has_walkthrough_changes = False
+    has_release_notes_changes = False
+    has_plan_changes = False
+    has_other_artifacts = False
+    
+    try:
+        out = subprocess.check_output(["git", "status", "--porcelain"], cwd=project_root).decode("utf-8")
+        for line in out.splitlines():
+            if len(line) > 3:
+                filepath = line[3:].strip()
+                if (filepath.startswith("active/") or filepath.startswith("field/")) and (filepath.endswith(".gs") or filepath.endswith(".js")):
+                    changed_files.append(filepath)
+                    has_source_changes = True
+                elif filepath.endswith("walkthrough.md"):
+                    changed_files.append(filepath)
+                    has_walkthrough_changes = True
+                elif filepath.endswith("RELEASE_NOTES.md"):
+                    changed_files.append(filepath)
+                    has_release_notes_changes = True
+                elif filepath.endswith("implementation_plan.md") or filepath.endswith("task.md"):
+                    changed_files.append(filepath)
+                    has_plan_changes = True
+                elif filepath.endswith("knowledge_base.json") or filepath.endswith("audit_result.json") or filepath.endswith("handover.json"):
+                    changed_files.append(filepath)
+                    has_other_artifacts = True
+    except Exception:
+        pass
+
+    if not changed_files:
+        return violations
+
+    for t in tasks:
+        if t.get("status") in ["TODO", "ASSIGNED", "IN_PROGRESS"]:
+            app = t.get("approval", {})
+            state = app.get("executionState", "LOCKED")
+            token = app.get("executionToken")
+            expires_str = app.get("tokenExpiresAt")
+            
+            # Rule 013 validation
+            if state != "RUNNING" and not running_tasks and rule_013:
+                blocked = False
+                msg = ""
+                if state == "LOCKED":
+                    if has_source_changes or has_walkthrough_changes or has_release_notes_changes or has_other_artifacts:
+                        blocked = True
+                        msg = f"Task {t['taskId']} is LOCKED. Only implementation_plan.md or task.md can be modified. Found modifications on source files or artifacts."
+                else:
+                    blocked = True
+                    msg = f"Task {t['taskId']} executionState is '{state}'. Modification is forbidden."
+
+                if blocked:
+                    violations.append({
+                        "id": "013",
+                        "name": "Execution Gate Rule",
+                        "category": "Architecture",
+                        "severity": "ERROR",
+                        "message": msg,
+                        "file": changed_files[0],
+                        "line": 1,
+                        "match": "Write forbidden without RUNNING state",
+                        "remediation": f"Start execution session to unlock task: python3 tools/ai_project_manager.py --start-execution {t['taskId']}",
+                        "nextAction": ["Start active execution session"]
+                    })
+
+            # Rule 014 validation
+            if state == "RUNNING" and rule_014:
+                expired = False
+                if expires_str:
+                    try:
+                        from datetime import datetime, timezone
+                        expire_seconds = float(os.environ.get("AIOS_TEST_EXPIRATION", 30 * 24 * 3600))
+                        approved_at = datetime.fromisoformat(app.get("approvedAt"))
+                        delta = (datetime.now(timezone.utc) - approved_at).total_seconds()
+                        if delta > expire_seconds:
+                            expired = True
+                    except Exception:
+                        pass
+                
+                if not token or expired:
+                    violations.append({
+                        "id": "014",
+                        "name": "Execution Token Validation Rule",
+                        "category": "Architecture",
+                        "severity": "ERROR",
+                        "message": f"Execution Token is missing or expired for Task {t['taskId']}.",
+                        "file": changed_files[0],
+                        "line": 1,
+                        "match": "Invalid execution token",
+                        "remediation": f"Obtain re-approval and active token: python3 tools/ai_project_manager.py --approve {t['taskId']}",
+                        "nextAction": ["Request approval"]
+                    })
+
+    return violations
+
 def check_rule_011_human_approval(project_root, rules):
     rule_011 = next((r for r in rules if r["id"] == "011"), None)
     if not rule_011:
@@ -320,6 +456,10 @@ def main():
     # 0.6. Validate Rule 012 (Implementation Plan Hash Lock Check)
     hash_violations = check_rule_012_hash_lock(project_root, rules)
     all_violations.extend(hash_violations)
+
+    # 0.7. Validate Execution Session and Locks (Rule 013, Rule 014, Rule 015)
+    execution_violations = check_execution_gates(project_root, rules)
+    all_violations.extend(execution_violations)
 
     # 1. Initialize Category-specific Summary
     categories = set(rule.get("category", "Architecture") for rule in rules)

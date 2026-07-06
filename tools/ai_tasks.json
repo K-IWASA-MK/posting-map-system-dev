@@ -6,24 +6,37 @@
       "description": "Design and implement the initial Area Metadata schemas and lock status parameters.",
       "category": "Architecture",
       "dependsOn": [],
-      "assignedAgent": "gpt-4o",
+      "assignedAgent": "chatgpt-4o",
       "assignmentReason": {
         "qualityScore": 100.0,
         "categoryPassRate": 1.0,
         "matchingCapability": "Architecture"
       },
       "retryCount": 0,
-      "status": "IN_PROGRESS",
+      "status": "UNDER_REVIEW",
       "reviewId": null,
       "approval": {
-        "approvalId": "APR-20260706014708",
+        "approvalId": "APR-20260706015718",
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
         "isApproved": true,
         "approvedBy": "Human",
-        "approvedAt": "2026-07-06T01:47:08.000000+00:00",
-        "approvalHash": "0db905bdf03fa89138c9f9d1d99fcda9180b7b73791fafd92331869065452eaf"
+        "approvedAt": "2026-07-06T01:57:18.246624+00:00",
+        "approvalHash": "601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6",
+        "executionState": "FINISHED",
+        "executionToken": "APR-20260706015718",
+        "tokenExpiresAt": "2026-08-05T01:57:18.246628+00:00",
+        "executionSession": {
+          "executionSessionId": "SES-20260706015812",
+          "executionStartedAt": "2026-07-06T01:58:12.522013+00:00",
+          "executionEndedAt": "2026-07-06T01:59:28.231742+00:00",
+          "executionOwner": {
+            "agentId": "chatgpt-4o",
+            "agentName": "ChatGPT",
+            "sessionId": "SES-20260706015812"
+          }
+        }
       }
     },
     {
@@ -34,20 +47,33 @@
       "dependsOn": [
         "TSK-0001"
       ],
-      "assignedAgent": null,
+      "assignedAgent": "chatgpt-4o",
       "assignmentReason": null,
       "retryCount": 0,
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "reviewId": null,
       "approval": {
-        "approvalId": null,
+        "approvalId": "APR-20260706015919",
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
-        "isApproved": false,
-        "approvedBy": null,
-        "approvedAt": null,
-        "approvalHash": null
+        "isApproved": true,
+        "approvedBy": "Human",
+        "approvedAt": "2026-07-06T01:59:19.340745+00:00",
+        "approvalHash": "601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6",
+        "executionState": "RUNNING",
+        "executionToken": "APR-20260706015919",
+        "tokenExpiresAt": "2026-08-05T01:59:19.340749+00:00",
+        "executionSession": {
+          "executionSessionId": "SES-20260706015943",
+          "executionStartedAt": "2026-07-06T01:59:43.417430+00:00",
+          "executionEndedAt": null,
+          "executionOwner": {
+            "agentId": "chatgpt-4o",
+            "agentName": "ChatGPT",
+            "sessionId": "SES-20260706015943"
+          }
+        }
       }
     },
     {

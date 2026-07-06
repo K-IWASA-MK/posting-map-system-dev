@@ -3,7 +3,7 @@ import os
 import sys
 import json
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 sys.path.append(os.path.dirname(__file__))
 from ai_team_orchestrator import load_json, save_json, log_event
@@ -138,7 +138,17 @@ def check_approvals_expiration():
                     app["approvedBy"] = None
                     app["approvedAt"] = None
                     app["approvalHash"] = None
-                    print(f"Approval for Task {t['taskId']} has EXPIRED (Time delta: {delta:.1f}s > limit: {expire_seconds}s).")
+                    app["executionState"] = "LOCKED"
+                    app["executionToken"] = None
+                    app["tokenExpiresAt"] = None
+                    app["executionSession"] = {
+                        "executionSessionId": None,
+                        "executionStartedAt": None,
+                        "executionEndedAt": None,
+                        "executionOwner": None
+                    }
+                    t["status"] = "ASSIGNED"
+                    print(f"Approval and authorization for Task {t['taskId']} has EXPIRED (Time delta: {delta:.1f}s > limit: {expire_seconds}s).")
                     
                     log_event(
                         task_id=t["taskId"],
@@ -382,7 +392,16 @@ def approve_task(task_id, approved_by):
         "isApproved": True,
         "approvedBy": approved_by,
         "approvedAt": datetime.now(timezone.utc).isoformat(),
-        "approvalHash": plan_hash
+        "approvalHash": plan_hash,
+        "executionState": "AUTHORIZED",
+        "executionToken": approval_id,
+        "tokenExpiresAt": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat(),
+        "executionSession": {
+            "executionSessionId": None,
+            "executionStartedAt": None,
+            "executionEndedAt": None,
+            "executionOwner": None
+        }
     }
     
     save_json(TASKS_FILE, tasks_data)
@@ -401,6 +420,113 @@ def approve_task(task_id, approved_by):
     print(f"Task {task_id} successfully approved by '{approved_by}'. ID: {approval_id} | Hash: {plan_hash}")
     print("Audit log recorded in orchestrator_events.json.")
 
+def start_execution(task_id, agent_id, agent_name):
+    tasks_data = load_json(TASKS_FILE)
+    if not tasks_data:
+        print("Error: Task database not found.", file=sys.stderr)
+        sys.exit(1)
+        
+    tasks = tasks_data.get("tasks", [])
+    task_map = {t["taskId"]: t for t in tasks}
+    
+    if task_id not in task_map:
+        print(f"Error: Task ID '{task_id}' not found.", file=sys.stderr)
+        sys.exit(1)
+        
+    task = task_map[task_id]
+    app = task.get("approval", {})
+    req = app.get("requiresApproval", True)
+    level = app.get("approvalLevel", "NORMAL")
+    approved = app.get("isApproved", False)
+    curr_state = app.get("executionState", "LOCKED")
+    
+    if req and level != "NONE" and not approved:
+        print(f"Error: Blocked! Task {task_id} requires human approval before starting execution.", file=sys.stderr)
+        sys.exit(1)
+        
+    if curr_state not in ["AUTHORIZED", "LOCKED"]:
+        print(f"Error: Blocked! Cannot start execution in state '{curr_state}'. Must be AUTHORIZED.", file=sys.stderr)
+        sys.exit(1)
+
+    for t in tasks:
+        t_app = t.get("approval", {})
+        if t_app.get("executionState") == "RUNNING" and t["taskId"] != task_id:
+            owner = t_app.get("executionSession", {}).get("executionOwner", {})
+            owner_name = owner.get("agentName", "Unknown")
+            active_ses = t_app.get("executionSession", {}).get("executionSessionId", "Unknown")
+            print(f"Error: Execution denied. Task {t['taskId']} is already owned by {owner_name} (Session: {active_ses}).", file=sys.stderr)
+            sys.exit(1)
+
+    session_id = f"SES-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+    app["executionState"] = "RUNNING"
+    app["executionSession"] = {
+        "executionSessionId": session_id,
+        "executionStartedAt": datetime.now(timezone.utc).isoformat(),
+        "executionEndedAt": None,
+        "executionOwner": {
+            "agentId": agent_id,
+            "agentName": agent_name,
+            "sessionId": session_id
+        }
+    }
+    
+    task["status"] = "IN_PROGRESS"
+    task["assignedAgent"] = agent_id
+    
+    save_json(TASKS_FILE, tasks_data)
+    
+    log_event(
+        task_id=task_id,
+        event_type="EXECUTION_STARTED",
+        agent_id=agent_id,
+        details={
+            "session": app["executionSession"],
+            "msg": f"Execution session {session_id} started by {agent_name} for task {task_id}."
+        }
+    )
+    print(f"Execution authorized! Session {session_id} started. Task {task_id} state set to RUNNING.")
+    print("Audit log recorded in orchestrator_events.json.")
+
+def finish_execution(task_id):
+    tasks_data = load_json(TASKS_FILE)
+    if not tasks_data:
+        print("Error: Task database not found.", file=sys.stderr)
+        sys.exit(1)
+        
+    tasks = tasks_data.get("tasks", [])
+    task_map = {t["taskId"]: t for t in tasks}
+    
+    if task_id not in task_map:
+        print(f"Error: Task ID '{task_id}' not found.", file=sys.stderr)
+        sys.exit(1)
+        
+    task = task_map[task_id]
+    app = task.get("approval", {})
+    curr_state = app.get("executionState", "LOCKED")
+    
+    if curr_state != "RUNNING":
+        print(f"Error: Blocked! Cannot finish execution. Current state is '{curr_state}', expected 'RUNNING'.", file=sys.stderr)
+        sys.exit(1)
+        
+    session = app.get("executionSession", {})
+    session["executionEndedAt"] = datetime.now(timezone.utc).isoformat()
+    app["executionState"] = "FINISHED"
+    task["status"] = "UNDER_REVIEW"
+    
+    save_json(TASKS_FILE, tasks_data)
+    
+    log_event(
+        task_id=task_id,
+        event_type="EXECUTION_FINISHED",
+        agent_id=session.get("executionOwner", {}).get("agentId"),
+        details={
+            "session": session,
+            "msg": f"Execution session finished for task {task_id}."
+        }
+    )
+    print(f"Execution session {session.get('executionSessionId')} finished. Task {task_id} state set to FINISHED.")
+    print("Audit log recorded in orchestrator_events.json.")
+
 def main():
     parser = argparse.ArgumentParser(description="AIOS Project OS Manager")
     parser.add_argument("--status", action="store_true", help="Print project pipeline progress status")
@@ -410,6 +536,10 @@ def main():
     parser.add_argument("--reason", metavar="TEXT", default="Manual Rollback Triggered", help="Reason details for rollback logs")
     parser.add_argument("--approve", metavar="TASK_ID", help="Approve task implementation gate")
     parser.add_argument("--by", metavar="USERNAME", default="Human", help="Username of the approver")
+    parser.add_argument("--start-execution", metavar="TASK_ID", help="Start execution session for task")
+    parser.add_argument("--finish-execution", metavar="TASK_ID", help="Finish execution session for task")
+    parser.add_argument("--agentId", default="antigravity-ide-v1", help="Agent Unique ID")
+    parser.add_argument("--agentName", default="Antigravity", help="Agent Human Name")
     
     args = parser.parse_args()
     
@@ -423,6 +553,10 @@ def main():
         rollback_project(args.rollback, args.reason)
     elif args.approve:
         approve_task(args.approve, args.by)
+    elif args.start_execution:
+        start_execution(args.start_execution, args.agentId, args.agentName)
+    elif args.finish_execution:
+        finish_execution(args.finish_execution)
     else:
         parser.print_help()
 

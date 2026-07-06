@@ -387,5 +387,96 @@
       "approvalHash": "0db905bdf03fa89138c9f9d1d99fcda9180b7b73791fafd92331869065452eaf",
       "msg": "Implementation plan approved. Implementation authorized for task TSK-0001."
     }
+  },
+  {
+    "eventId": "EVT-20260706-0030",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "APPROVAL_GRANTED",
+    "timestamp": "2026-07-06T01:57:18.247264+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "approvedBy": "Human",
+      "approvalId": "APR-20260706015718",
+      "approvalHash": "601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6",
+      "msg": "Implementation plan approved. Implementation authorized for task TSK-0001."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0031",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "EXECUTION_STARTED",
+    "timestamp": "2026-07-06T01:58:12.522376+00:00",
+    "agentId": "chatgpt-4o",
+    "details": {
+      "session": {
+        "executionSessionId": "SES-20260706015812",
+        "executionStartedAt": "2026-07-06T01:58:12.522013+00:00",
+        "executionEndedAt": null,
+        "executionOwner": {
+          "agentId": "chatgpt-4o",
+          "agentName": "ChatGPT",
+          "sessionId": "SES-20260706015812"
+        }
+      },
+      "msg": "Execution session SES-20260706015812 started by ChatGPT for task TSK-0001."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0032",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0002",
+    "eventType": "APPROVAL_GRANTED",
+    "timestamp": "2026-07-06T01:59:19.341314+00:00",
+    "agentId": "Orchestrator",
+    "details": {
+      "approvedBy": "Human",
+      "approvalId": "APR-20260706015919",
+      "approvalHash": "601b290ae327fc3ceed62704678a4ebcb73683c5528c07b49487f41fc792efd6",
+      "msg": "Implementation plan approved. Implementation authorized for task TSK-0002."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0033",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0001",
+    "eventType": "EXECUTION_FINISHED",
+    "timestamp": "2026-07-06T01:59:28.232245+00:00",
+    "agentId": "chatgpt-4o",
+    "details": {
+      "session": {
+        "executionSessionId": "SES-20260706015812",
+        "executionStartedAt": "2026-07-06T01:58:12.522013+00:00",
+        "executionEndedAt": "2026-07-06T01:59:28.231742+00:00",
+        "executionOwner": {
+          "agentId": "chatgpt-4o",
+          "agentName": "ChatGPT",
+          "sessionId": "SES-20260706015812"
+        }
+      },
+      "msg": "Execution session finished for task TSK-0001."
+    }
+  },
+  {
+    "eventId": "EVT-20260706-0034",
+    "eventVersion": "1.0.0",
+    "taskId": "TSK-0002",
+    "eventType": "EXECUTION_STARTED",
+    "timestamp": "2026-07-06T01:59:43.417781+00:00",
+    "agentId": "chatgpt-4o",
+    "details": {
+      "session": {
+        "executionSessionId": "SES-20260706015943",
+        "executionStartedAt": "2026-07-06T01:59:43.417430+00:00",
+        "executionEndedAt": null,
+        "executionOwner": {
+          "agentId": "chatgpt-4o",
+          "agentName": "ChatGPT",
+          "sessionId": "SES-20260706015943"
+        }
+      },
+      "msg": "Execution session SES-20260706015943 started by ChatGPT for task TSK-0002."
+    }
   }
 ]

@@ -254,6 +254,63 @@
           ]
         }
       ]
+    },
+    {
+      "id": "013",
+      "name": "Execution Gate Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "No implementation code, walkthrough, release notes, or git operations allowed unless executionState is RUNNING.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule013PatternDetection",
+          "message": "Execution is locked. No changes are authorized before starting an active execution session.",
+          "remediation": "Start an active execution session by running: python3 tools/ai_project_manager.py --start-execution <taskId>",
+          "nextAction": [
+            "Start execution session",
+            "Ensure status transitions to RUNNING"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "014",
+      "name": "Execution Token Validation Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "Implementation requires a valid, non-expired Execution Token. Block work if token is missing or expired.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule014PatternDetection",
+          "message": "Missing, mismatched, or expired Execution Token.",
+          "remediation": "Request plan approval and token issuance by running the approve command.",
+          "nextAction": [
+            "Approve implementation plan",
+            "Request execution token"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "015",
+      "name": "Single Active Execution Rule",
+      "category": "Architecture",
+      "severity": "ERROR",
+      "description": "Only one active execution session is allowed per task to prevent concurrency conflicts.",
+      "target_files": ["active/**/*.gs", "active/**/*.js"],
+      "forbidden_patterns": [
+        {
+          "pattern": "dummyTriggerForRule015PatternDetection",
+          "message": "Concurrency collision: another execution session is already active.",
+          "remediation": "Wait for the active session to finish, or terminate it before starting a new one.",
+          "nextAction": [
+            "Close the conflicting active session",
+            "Try execution start again"
+          ]
+        }
+      ]
     }
   ]
 }
