@@ -16,17 +16,17 @@
       "status": "UNDER_REVIEW",
       "reviewId": null,
       "approval": {
-        "approvalId": "APR-20260706032855",
+        "approvalId": "APR-20260706033958",
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
         "isApproved": true,
         "approvedBy": "Human",
-        "approvedAt": "2026-07-06T03:28:55.910714+00:00",
-        "approvalHash": "c55130ca4b869e6e6613dfdc00f51ed576f46834afbc01e8ca86227f448d0479",
+        "approvedAt": "2026-07-06T03:39:58.240451+00:00",
+        "approvalHash": "2a7b850781c33005127e95e8a59ab97bda7e884f26946a83f5987c1bb36ce536",
         "executionState": "AUTHORIZED",
-        "executionToken": "APR-20260706032855",
-        "tokenExpiresAt": "2026-08-05T03:28:55.910717+00:00",
+        "executionToken": "APR-20260706033958",
+        "tokenExpiresAt": "2026-08-05T03:39:58.240454+00:00",
         "executionSession": {
           "executionSessionId": null,
           "executionStartedAt": null,
@@ -49,26 +49,22 @@
       "status": "UNDER_REVIEW",
       "reviewId": null,
       "approval": {
-        "approvalId": "APR-20260706032855",
+        "approvalId": "APR-20260706033958",
         "approvalVersion": "1.0.0",
         "requiresApproval": true,
         "approvalLevel": "NORMAL",
         "isApproved": true,
         "approvedBy": "Human",
-        "approvedAt": "2026-07-06T03:28:55.952363+00:00",
-        "approvalHash": "c55130ca4b869e6e6613dfdc00f51ed576f46834afbc01e8ca86227f448d0479",
-        "executionState": "FINISHED",
-        "executionToken": "APR-20260706032855",
-        "tokenExpiresAt": "2026-08-05T03:28:55.952365+00:00",
+        "approvedAt": "2026-07-06T03:39:58.281713+00:00",
+        "approvalHash": "2a7b850781c33005127e95e8a59ab97bda7e884f26946a83f5987c1bb36ce536",
+        "executionState": "AUTHORIZED",
+        "executionToken": "APR-20260706033958",
+        "tokenExpiresAt": "2026-08-05T03:39:58.281716+00:00",
         "executionSession": {
-          "executionSessionId": "SES-20260706032916",
-          "executionStartedAt": "2026-07-06T03:29:16.247235+00:00",
-          "executionEndedAt": "2026-07-06T03:29:32.819807+00:00",
-          "executionOwner": {
-            "agentId": "antigravity-ide-v1",
-            "agentName": "Antigravity",
-            "sessionId": "SES-20260706032916"
-          }
+          "executionSessionId": null,
+          "executionStartedAt": null,
+          "executionEndedAt": null,
+          "executionOwner": null
         }
       }
     },

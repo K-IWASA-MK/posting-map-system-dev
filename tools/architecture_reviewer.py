@@ -445,27 +445,29 @@ def check_rule_019_kernel_attestation(project_root, rules):
                 "nextAction": ["Restore kernel golden code", "Re-validate attestation"]
             }]
             
-        engine_path = os.path.join(project_root, "tools", "trust_drift_engine.py")
-        subprocess.run([sys.executable, engine_path, "--recalculate"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        
-        proc_agent = subprocess.run([sys.executable, engine_path, "--get-node", "ai_agent"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        if proc_agent.returncode == 0:
-            agent_data = json.loads(proc_agent.stdout.strip())
-            agent_state = agent_data.get("state", "BLOCKED")
-            agent_score = agent_data.get("driftScore", 0.0)
+        policies_file = os.path.join(project_root, "tools", "compiled_policies.json")
+        if os.path.exists(policies_file):
+            with open(policies_file, "r", encoding="utf-8") as f:
+                policies = json.load(f)
             
-            if agent_state == "BLOCKED":
+            agent_data = policies.get("ai_agent", {})
+            policy = agent_data.get("compiledPolicy", {})
+            limits = policy.get("limits", {})
+            mode = policy.get("mode", "BLOCKED")
+            score = agent_data.get("trust", 0.0)
+            
+            if not limits.get("write", True) or mode == "BLOCKED":
                 return [{
-                    "id": "021",
-                    "name": "Ledger Integrity & Drift Rule",
+                    "id": "022",
+                    "name": "Law Enforcement Rule",
                     "category": "Architecture",
                     "severity": "ERROR",
-                    "message": f"Root of Trust violation: Node 'ai_agent' trust level is '{agent_state}' (Score: {agent_score}). System is LOCKED due to stale trust drift decay.",
-                    "file": "tools/trust_event_log.jsonl",
+                    "message": f"Root of Trust violation: Node 'ai_agent' write permissions are disabled under compiled policy. Mode: {mode} (Score: {score}). System is LOCKED.",
+                    "file": "tools/compiled_policies.json",
                     "line": 1,
-                    "match": "Critical trust block",
-                    "remediation": "Obtain re-approval to clear penalties and restore system trust score.",
-                    "nextAction": ["Request re-approval", "Recalculate trust drift graph"]
+                    "match": "Policy enforcement lock",
+                    "remediation": "Request offline compiler build after task re-approvals to compile new active policy rules.",
+                    "nextAction": ["Request re-approval", "Compile policies offline"]
                 }]
     except Exception as e:
         return [{

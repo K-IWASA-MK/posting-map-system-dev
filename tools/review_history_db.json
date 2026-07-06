@@ -4210,5 +4210,184 @@
       }
     },
     "violations": []
+  },
+  {
+    "reviewId": "20260706032946",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T03:29:46.604595+00:00",
+    "summary": {
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706032947",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T03:29:47.520460+00:00",
+    "summary": {
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
+  },
+  {
+    "reviewId": "20260706033949",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "FAILED",
+    "timestamp": "2026-07-06T03:39:49.898226+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "FAILED",
+        "errors": 2,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": [
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0001. Expected hash 'c55130ca4b869e6e6613dfdc00f51ed576f46834afbc01e8ca86227f448d0479' but got '2a7b850781c33005127e95e8a59ab97bda7e884f26946a83f5987c1bb36ce536'."
+      },
+      {
+        "id": "012",
+        "name": "Implementation Plan Hash Rule",
+        "category": "Architecture",
+        "severity": "ERROR",
+        "file": "implementation_plan.md",
+        "line": 1,
+        "message": "Implementation plan has been modified after approval for Task TSK-0002. Expected hash 'c55130ca4b869e6e6613dfdc00f51ed576f46834afbc01e8ca86227f448d0479' but got '2a7b850781c33005127e95e8a59ab97bda7e884f26946a83f5987c1bb36ce536'."
+      }
+    ]
+  },
+  {
+    "reviewId": "20260706033958",
+    "reviewEngineVersion": "1.1.0",
+    "ruleVersion": "1.1.0",
+    "agent": {
+      "agentId": "antigravity-ide-v1",
+      "agentName": "Antigravity",
+      "agentRole": "Developer"
+    },
+    "status": "PASS",
+    "timestamp": "2026-07-06T03:39:58.602696+00:00",
+    "summary": {
+      "Security": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Architecture": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "Database": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "API": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      },
+      "UI": {
+        "status": "PASS",
+        "errors": 0,
+        "warnings": 0
+      }
+    },
+    "violations": []
   }
 ]
