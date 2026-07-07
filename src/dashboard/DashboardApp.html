@@ -11,7 +11,19 @@
   <link rel="stylesheet" href="Dashboard.css">
 </head>
 <body>
+  <!-- Loading Panel Overlay -->
+  <div id="loading-panel" class="loading-overlay">
+    <div class="skeleton-spinner"></div>
+    <span>Loading AIOS Kernel Metrics...</span>
+  </div>
+
+  <!-- Error Panel Overlay -->
+  <div id="error-panel" class="error-overlay" style="display: none;"></div>
+
   <div class="app-container">
+    <!-- Warning Banner Component -->
+    <div id="warning-panel" class="warning-banner" style="display: none;"></div>
+
     <!-- Header Component (Slide Down) -->
     <header class="dashboard-header" data-motion="slide-down" data-delay="0">
       <div class="header-logo">
@@ -173,6 +185,7 @@
     </div>
   </div>
 
+  <script src="DashboardDataAdapter.js"></script>
   <script src="DashboardMotion.js"></script>
   <script src="Dashboard.js"></script>
 </body>

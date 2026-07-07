@@ -91,6 +91,14 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
   - `Billing Card` -> `MOCK_DASHBOARD_DATA.billing` を契約ステータス出力。
   - `Simulation Card` -> `MOCK_DASHBOARD_DATA.simulation` をテスト適合度出力。
 
+### データソース境界定義 (Dashboard Data Source Boundary)
+ダッシュボードプロトタイプにおける、開発検証時のオフラインモックと、将来的な本番接続の論理接続境界を定義する。
+- **MOCK データソースモード (Default)**:
+  - アダプター層（`DashboardDataAdapter.js`）は外部 API を一切叩かず、内部のモックデータを非同期でロードする。
+- **API データソースモード**:
+  - API 接続モードの切替時、アダプターは `GET /api/dashboard/summary` からのみデータを読み込み、スキーマアサーションを実行後に UI へ渡す。
+  - アダプターおよびダッシュボード内には、本番のカーネルや Spreadsheet の書き換えを引き起こす Write 接続（POST/PUT等）は一切露出・マッピングされない。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

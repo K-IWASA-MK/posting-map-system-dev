@@ -32,3 +32,12 @@
   - `MOCK_DASHBOARD_DATA` ロード完了 ──> HTML DOM 構築 ──> `DashboardMotion.js` 起動 ──> クラス付与 ──> CSS トランジション実行。
 - **隔離と安全の保障**:
   - アニメーション処理から、状態を変更するための `updateKernel()`, `approve()`, `delete()` などのビジネスロジックは一切呼び出されない。
+
+---
+
+## リアルデータ観測アーキテクチャ (Live Data Observer Architecture)
+ダッシュボードがモックから実 API データソース（`DATA_SOURCE = API`）へ切り替わった場合も、不変の Observer 性を維持するための設計構造。
+- **データフローの順序保証**:
+  - `GET /api/dashboard/summary` ──> `DashboardDataAdapter.js` による JSON 必須キーチェック ──> `Dashboard.js` への引き渡し ──> DOM レンダリング ──> `DashboardMotion.js` 起動。
+- **書き込み処理の禁止**:
+  - `DashboardDataAdapter` の定義内には、Stripe API、GAS への `POST`, `PUT`, `DELETE` リクエストや、Spreadsheet への直接アクセス機能は一切配置されない。
