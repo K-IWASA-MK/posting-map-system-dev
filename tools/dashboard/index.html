@@ -177,20 +177,19 @@
         <!-- KPI Card 1: Active Members -->
         <div style="border-color: rgba(217, 90, 16, 0.25); box-shadow: 0 0 30px rgba(217, 90, 16, 0.02), inset 0 0 0 1px rgba(217, 90, 16, 0.15);" 
              class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <!-- Unified Header: Japanese + English Subtitle -->
-          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2 flex-shrink-0">
+          <!-- Card Header Design System Unified -->
+          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
             <div>
               <h3 class="text-xs font-bold text-white tracking-tight">活動人数</h3>
-              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Active Count</p>
+              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Active Members</p>
             </div>
-            <!-- Muted status pill -->
             <div class="flex items-center gap-1.5 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
               <span class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
               <span class="text-[7px] font-bold text-green-400 tracking-widest font-mono">LIVE</span>
             </div>
           </div>
-          <!-- Right-aligned number -->
-          <div class="flex justify-end items-baseline gap-1 mt-3">
+          <!-- Right-aligned value -->
+          <div class="flex justify-end items-baseline gap-1 mt-2">
             <span id="kpi-active-members" class="text-5xl font-extrabold tracking-tight text-white font-mono">0</span>
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">人</span>
           </div>
@@ -198,19 +197,18 @@
 
         <!-- KPI Card 2: New Active Members -->
         <div class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <!-- Unified Header: Japanese + English Subtitle -->
-          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2 flex-shrink-0">
+          <!-- Card Header Design System Unified -->
+          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
             <div>
               <h3 class="text-xs font-bold text-white tracking-tight">新規活動人数</h3>
               <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">New Registrations</p>
             </div>
-            <!-- Muted status pill -->
             <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
               <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
               <span class="text-[7px] font-bold text-blue-400 tracking-widest font-mono">SYNC</span>
             </div>
           </div>
-          <div class="flex justify-end items-baseline gap-1 mt-3">
+          <div class="flex justify-end items-baseline gap-1 mt-2">
             <span id="kpi-new-members" class="text-4xl font-extrabold tracking-tight text-white font-mono">0</span>
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">人</span>
           </div>
@@ -218,19 +216,18 @@
 
         <!-- KPI Card 3: Custody count -->
         <div class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <!-- Unified Header: Japanese + English Subtitle -->
-          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2 flex-shrink-0">
+          <!-- Card Header Design System Unified -->
+          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
             <div>
               <h3 class="text-xs font-bold text-white tracking-tight">保有枚数</h3>
-              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Total Custody</p>
+              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Sheets in Custody</p>
             </div>
-            <!-- Muted status pill -->
             <div class="flex items-center gap-1.5 bg-brand/10 px-2 py-0.5 rounded-full border border-brand/20">
               <span class="w-1 h-1 bg-brand rounded-full"></span>
               <span class="text-[7px] font-bold text-brand tracking-widest font-mono">STOCK</span>
             </div>
           </div>
-          <div class="flex justify-end items-baseline gap-1 mt-3">
+          <div class="flex justify-end items-baseline gap-1 mt-2">
             <span id="kpi-sheets-count" class="text-4xl font-extrabold tracking-tight text-white font-mono">0</span>
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">枚</span>
           </div>
@@ -242,16 +239,21 @@
         
         <!-- Row 1: Activity Trend (col-span-9) & Activity Log (col-span-3) -->
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-200">
-          <!-- Activity Trend (col-span-9 - Expanded vertical spacing) -->
+          <!-- Activity Trend (col-span-9) -->
           <section class="col-span-9 premium-glass p-5 flex flex-col gap-2 overflow-hidden relative" id="chart-section">
-            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 flex-shrink-0 select-none">
+            <!-- Card Header Design System Unified -->
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-sm font-bold text-white tracking-tight">活動推移</h3>
-                <p class="text-[9px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Activity Flow Trend</p>
+                <h3 class="text-xs font-bold text-white tracking-tight">活動推移</h3>
+                <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Activity Flow Trend</p>
+              </div>
+              <div class="flex items-center gap-1.5 bg-brand/10 px-2 py-0.5 rounded-full border border-brand/20">
+                <span class="w-1 h-1 bg-brand rounded-full"></span>
+                <span class="text-[7px] font-bold text-brand tracking-widest font-mono">FLOW</span>
               </div>
             </div>
             
-            <!-- SVG Line Chart (Height expanded by utilizing padding reductions) -->
+            <!-- SVG Line Chart -->
             <div class="flex-1 w-full h-full relative" id="trend-chart-container">
               <svg class="w-full h-full" id="trend-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
                 <defs>
@@ -276,7 +278,7 @@
                 <circle id="hover-data-point" cx="-10" cy="-10" r="4.5" fill="#D95A10" stroke="#FFFFFF" stroke-width="1.5" style="display: none;"/>
               </svg>
               
-              <!-- Hover Tooltip (Softer Floating Glassmorphism) -->
+              <!-- Hover Tooltip -->
               <div id="chart-tooltip" style="background: rgba(22, 27, 34, 0.85); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4); transition: opacity 0.15s ease, transform 0.1s ease;" 
                    class="absolute hidden px-3 py-2 rounded-xl text-[10px] pointer-events-none select-none z-30">
                 <div class="text-white/40 font-mono" id="tooltip-time">10:00</div>
@@ -285,12 +287,17 @@
             </div>
           </section>
 
-          <!-- Activity Log (col-span-3 - Dedicated Timeline vertical alignment) -->
-          <section class="col-span-3 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
-            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 flex-shrink-0 select-none">
+          <!-- Activity Log (col-span-3) -->
+          <section class="col-span-3 premium-glass p-5 flex flex-col gap-2 overflow-hidden">
+            <!-- Card Header Design System Unified -->
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-sm font-bold text-white tracking-tight">活動ログ</h3>
-                <p class="text-[9px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Realtime stream</p>
+                <h3 class="text-xs font-bold text-white tracking-tight">活動ログ</h3>
+                <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Realtime Stream</p>
+              </div>
+              <div class="flex items-center gap-1.5 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+                <span class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-[7px] font-bold text-green-400 tracking-widest font-mono">LIVE</span>
               </div>
             </div>
             
@@ -306,15 +313,20 @@
 
         <!-- Row 2: Inventory Graph (col-span-8) & Turnout Panel (col-span-4) -->
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-300">
-          <!-- Inventory (col-span-8 - Interactive Hover Breathing Bars) -->
-          <section class="col-span-8 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
-            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 flex-shrink-0 select-none">
+          <!-- Inventory (col-span-8) -->
+          <section class="col-span-8 premium-glass p-5 flex flex-col gap-2 overflow-hidden">
+            <!-- Card Header Design System Unified -->
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-sm font-bold text-white tracking-tight">保管状況</h3>
-                <p class="text-[9px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Inventory Stock Level</p>
+                <h3 class="text-xs font-bold text-white tracking-tight">保管状況</h3>
+                <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Inventory Stock Level</p>
+              </div>
+              <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+                <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
+                <span class="text-[7px] font-bold text-blue-400 tracking-widest font-mono">SYNC</span>
               </div>
             </div>
-            <!-- SVG Bar Chart with Hover scale triggers -->
+            <!-- SVG Bar Chart -->
             <div class="flex-1 w-full h-full flex items-end justify-between px-6 pb-2">
               <div class="w-[8%] bg-brand/25 border border-brand/40 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/50 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 40%"></div>
               <div class="w-[8%] bg-brand/40 border border-brand/50 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/60 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 65%"></div>
@@ -326,15 +338,20 @@
             </div>
           </section>
 
-          <!-- Turnout Panel (col-span-4 - Percentage hierarchy focus) -->
-          <section class="col-span-4 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
-            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 flex-shrink-0 select-none">
+          <!-- Turnout Panel (col-span-4) -->
+          <section class="col-span-4 premium-glass p-5 flex flex-col gap-2 overflow-hidden">
+            <!-- Card Header Design System Unified -->
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-sm font-bold text-white tracking-tight">市別投票率</h3>
-                <p class="text-[9px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Turnout Progress</p>
+                <h3 class="text-xs font-bold text-white tracking-tight">市別投票率</h3>
+                <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Turnout Progress</p>
+              </div>
+              <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+                <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
+                <span class="text-[7px] font-bold text-blue-400 tracking-widest font-mono">TARGET</span>
               </div>
             </div>
-            <!-- Concrete progress bars with muted lines and highlighted numbers -->
+            <!-- Concrete progress bars -->
             <div class="flex-1 flex flex-col justify-center gap-3 overflow-y-auto custom-scrollbar pr-1">
               <div class="space-y-1 select-none">
                 <div class="flex justify-between items-baseline text-xs">
