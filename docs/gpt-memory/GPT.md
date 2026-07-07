@@ -144,10 +144,40 @@ CEO Review
 
 ---
 
-## Next Session
-
 AIOS Review Engine Sprint 開始
 
 テーマ
 
 「レビュー文化をAIOSへ実装する」
+
+---
+
+## AIOS Core Philosophy & Evolution
+
+### The Goal of AIOS
+- AIOSは「AIを賢くするシステム」ではない。
+- AIOSは**「プロダクトを育てる文化を再現するシステム」**である。
+
+### The Generation of AI Agent Development
+1. **第1世代: Code Generation**
+   - コードを書く、エラーを直す、機能を愚直に実装する。
+2. **第2世代: Engineering**
+   - 設計する、保守性を考える、SSOT（データと規則の単一ソース）を作る。
+3. **第3世代: Product Engineering (現在の位置)**
+   - レビューする、磨く、引き算する、ユーザーが毎日使いたくなる操作体験を作る。
+
+### Review Engine Concept & Principles
+AIOS Review Engine は、ボタンの左右をチェックする機械的な静的チェッカーではなく、プロダクト品質そのものを問い続ける。
+
+> "Good products are not created by adding features. They are refined through continuous review."
+> （良いプロダクトは、機能を増やして生まれるのではない。レビューを積み重ねることで磨かれていく。）
+
+#### Core Audit Questions
+- **Rule 0**: この変更はユーザーの行動を1秒速くしたか？
+- **Hierarchy**: 情報の階層は明確かつ快適か？
+- **Rhythm**: 均一さを排し、画面全体のレイアウトに強弱とリズムがあるか？
+- **AI Smell**: AI特有のテンプレート感・均等さが残っていないか？
+- **Identity**: この画面は「POSTING MAPらしさ（Mission Control）」を体現しているか？
+
+### Review as a Capital Asset (知的資産としてのレビュー)
+コードやデザインは書き直せるが、「なぜその余白を選んだのか」「なぜその文字にしたのか」「なぜ引き算したのか」という意志決定の意図（Contextual Decisions）こそが、他のAIや別セッションでも再利用できる最大の資産である。AIOSは、このレビュー資産を再利用可能な「オペレーティングシステム」として格納する役割を担う。
