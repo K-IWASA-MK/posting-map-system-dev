@@ -45,6 +45,17 @@ CLI実行は以下の単方向フローによってカーネルを制御し、�
 
 ---
 
+## シミュレーション用コマンド定義 (Simulation Commands)
+本オーケストレーターは、AIOS Kernel の接続整合性をテストするため、以下のシミュレーション専用コマンドをサポートする。
+
+- **simulate-kernel-flow (CMD-003)**:
+  - **Name**: `simulate-kernel-flow`
+  - **Target**: `Simulation Mock Layer`
+  - **引数**: 対象のシナリオID（例: `SCN-NORMAL-001` 等）。
+  - **ガードレール**: 本コマンド経由の実行においては、Mock Kernel のみが起動し、本番のカーネルデータ変更・最適化適用・課金決済処理などの本番 Kernel 側書き換え操作はシステムレベルで完全に遮断（禁止）される。
+
+---
+
 ## 将来拡張ポイント (Future Extensions)
 - **CI/CD 自動連携アダプター (CI/CD Git Hook Integration)**:
   GitHub Actions や GitLab CI のワークフローから、コミット差分やデプロイ要求をトリガーとして、自動的に AIOS CLI Orchestrator を呼び出し、リリース前の品質監査・ガバナンスポリシー審査を完全自動実行する連携層の追加。

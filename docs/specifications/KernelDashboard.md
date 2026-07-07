@@ -39,6 +39,7 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **ガバナンス情報**: `Governance` レイヤーが出力する `Governance Decision` & `Governance Audit`。
 - **課金・ライセンス情報**: `Billing` & `License` レイヤーから出力される `LicenseRecord` および `SubscriptionRecord` の不変情報。
 - **CLI実行・オーケストレーション情報**: `CLIOrchestrator` レイヤーから出力される `RunContext` および `CLIAuditRecord` の実行履歴。
+- **シミュレーション結果**: `IntegrationSimulation` レイヤーから出力される `SimulationResultRecord` および `SimulationAuditRecord` のログ履歴。
 
 ### 課金・ライセンス表示項目 (Billing & License Mappings)
 ダッシュボード上に「ライセンス・お支払い状況監視パネル」を表示する。表示項目はすべて読み取り専用（Read-Only）とし、契約変更や決済実行ボタンは一切排除する。
@@ -51,6 +52,13 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **Run Status**: 現在実行中の `Run ID`、処理進捗状況（ステータスが Running / Completed / Failed 等）、および実行ユーザー。
 - **Command Status**: 現在起動しているコマンド名（例: `run-pipeline`）および呼び出し引数。
 - **Error Status**: 実行に失敗したタスクのエラーコード、エラーメッセージ、および発生日時。
+
+### シミュレーション結果表示項目 (Simulation Results Mappings)
+ダッシュボード上に「統合接続シミュレーション監視パネル」を表示する。表示項目はすべて読み取り専用（Read-Only）とし、テストの強制実行や再開、およびモック結果の本番適用ボタンは一切排除する。
+- **Simulation Status**: 現在動いている、または直近に実行された `Simulation ID`、および稼働中のシナリオID。
+- **Scenario Result**: テスト結果の最終適否判定（ステータスが Passed / Failed / Warning）。
+- **Failed Layer**: 接続契約（Contract）の検証において、スキーマエラーや不整合を起こして不合格（Failed）となった模擬レイヤーの名前。
+- **Validation Result**: 契約仕様と検証内容の差分（未充足フィールド等）のログ表示。
 
 ---
 

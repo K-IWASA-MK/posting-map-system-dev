@@ -13,20 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS CLI Orchestrator Foundation [現在のフェーズ]
-* **目的**: パイプラインを安全に呼び出し状態管理する制御入口（Orchestration Layer）と、コマンド仕様（Command Model）、カーネル呼び出し定義、実行コンテキスト管理、追記のみ監査、および安全な中断再開（Resume Control）の基盤（Foundation）を構築する。
+### 現在のスプリント: AIOS Kernel Integration & Simulation Mock Foundation [現在のフェーズ]
+* **目的**: これまで構築したAIOS Kernel群を「接続契約・状態遷移・異常経路まで検証可能なOS基盤」へ進化させるため、Integration Simulation, Mock Kernel Model, Simulation Scenario, Simulation Result, Kernel Contract, Simulation Audit の基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: CLI Orchestrator, Command Model, Kernel Invocation, Run Context, CLI Audit, Resume Control)
-  - ✅ レビューパイプラインおよびガバナンスにおけるCLI経由の起動要求の接続・Bypass禁止の境界定義
-  - ✅ ダッシュボードおよび課金におけるCLI実行状態の表示専用マッピングと接続制限の定義
-  - ✅ CLI経由の権限昇格、ガバナンスバイパス、およびログ削除・課金直接操作を禁止するガードレール定義
+  - ✅ 仕様定義 (Specification: Integration Simulation, Mock Kernel Model, Simulation Scenario, Simulation Result, Kernel Contract, Simulation Audit)
+  - ✅ CLIおよびダッシュボードにおけるシミュレーションコマンド・結果マッピングの定義
+  - ✅ ガバナンスおよび課金におけるシミュレーション環境の論理隔離・Bypass禁止の定義
+  - ✅ 再開制御におけるシミュレーション再開の適用条件定義
 * **今回実装しないもの (対象外)**:
-  - ❌ コマンドラインからの実際のスクリプト・カーネル実行ロジックの実装 (CLI Executable Binaries)
-  - ❌ CLIOrchestrator自体に合否や課金等の判断ロジック（Decision Logic）を組み込むこと
-  - ❌ 中断再開時における無関係な過去データの自動的・無差別な探索処理 (Implicit Data Scraping)
+  - ❌ 本番のカーネルエンジンや実データ（Spreadsheetや外部Stripe接続等）を変更・更新する実コードの実装
+  - ❌ 模擬承認結果（MockApproved）を本番の実行可能メタデータに昇格・適用すること
+  - ❌ 模擬決済イベントを Stripe などの実決済情報に同期・影響させること
 
-### 次期フェーズ: AIOS 統合 ＆ ローカルシミュレータ (AIOS Kernel Integration & Simulation Mock)
-* **目的**: これまで策定した全設計モジュールをローカルの検証スクリプトにて結合し、コマンド・データフロー・イベント遷移が決定論的に機能するかを確認する実証用シミュレータの構築。
+### 次期フェーズ: AIOS 統合模擬環境の実装 (AIOS Kernel Integration Mock Implementation)
+* **目的**: 本スプリントで策定した仕様に基づいて、接続契約（Contract）やエラー・承認フローをローカルで模擬実行・自動テストする検証シミュレーターの実コード構築。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
@@ -44,7 +44,7 @@
 5. **リアルタイム活動ログ (Activity Log)**  
    * 完成条件: 時系列ログ表示。新着追加時に3秒間オレンジにGlow（発光）するエフェクト。
 6. **投票率パネル (Turnout)**  
-   * 完成条件: 市別投票率進捗バーの静かで美しい表示。
+   * 完成条件: 市別投票率進捗バー of 静かで美しい表示。
 7. **極限の微調整 (Polish)**  
    * 完成条件: 余白のミリピクセル調整、グラフ線の太さ、Tooltipの配置、Blur強度の磨き上げ。
 
