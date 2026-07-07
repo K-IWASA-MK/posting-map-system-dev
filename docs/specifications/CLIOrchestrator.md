@@ -69,6 +69,11 @@ CLI実行は以下の単方向フローによってカーネルを制御し、�
   - **Target**: `Simulation Hook Runner`
   - **ガードレール**: デプロイ前フック（`clasp-pre-deploy`）からトリガーされ、自動テスト結果からデプロイ可否（Allow / Block）を Exit コードで返却する。
 
+- **install-quality-hooks (CMD-007)**:
+  - **Name**: `install-quality-hooks`
+  - **Target**: `Hook Installation Script`
+  - **ガードレール**: 開発環境への Git 品質フック自動配置スクリプト（`install-hooks.sh`）を呼び出し、`.git/hooks/pre-commit` を生成する。品質検証を迂回（Bypass）するような設定の挿入はシステムレベルで厳密に禁止（排除）される。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

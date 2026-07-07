@@ -69,6 +69,9 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 
 ### フック品質ゲート表示項目 (Hook Quality Gate Mappings)
 ダッシュボード上に「開発フロー統合・フック品質ゲート監視パネル」を表示する。表示項目はすべて読み取り専用（Read-Only）とし、ダッシュボード内からのフック強制解除や再試行操作は一切排除する。
+- **Hook Installed Status**: 開発者のローカル環境における Git pre-commit フックのインストール状況（Installed / Missing）、およびインストール日時。
+- **Last Commit Gate**: 直近に実行された Git コミット時の検証結果（Passed / Blocked）。
+- **Last Deploy Gate**: 直近に実行された clasp デプロイ時の検証結果（Passed / Blocked）。
 - **Last Quality Gate**: 直近に実行されたフックの品質ゲート実行完了ステータス（Passed / Blocked）。
 - **Commit Check Status**: Git コミット検証の成否、フックID、および発生タイムスタンプ。
 - **Deploy Check Status**: デプロイ前検証（`clasp push` 前等）の成否、フックID、および発生タイムスタンプ。

@@ -27,7 +27,9 @@ class HookRunner {
       hookId,
       eventSource,
       commandName,
-      timestamp
+      timestamp,
+      environment: 'local-dev',
+      repository: 'posting-map-system'
     });
 
     console.log(`[Simulation Hook] 品質ゲート検証を開始します... Source: ${eventSource}`);
@@ -64,7 +66,9 @@ class HookRunner {
       commandName,
       gateResult,
       exitCode: gateExitCode,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      environment: 'local-dev',
+      repository: 'posting-map-system'
     });
 
     // 決定論的な結果コードを返し、Git/Deploy プロセスを Allow/Block 制御

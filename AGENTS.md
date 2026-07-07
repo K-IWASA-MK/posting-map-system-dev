@@ -217,6 +217,7 @@ POSTING MAP は：
 - **Simulation Core Principle**: Agentは禁止：Simulation結果の本番反映、Mock承認利用、Mock Billing利用、Simulation Audit改ざん。許可：Scenario実行、Result確認、Report生成。
 - **Local Simulation Test Core Principle**: Agent is forbidden to: bypass tests, conceal failures, falsify test results, perform auto-fixes. Allowed: execute tests, verify results, generate reports.
 - **Integration Core Principle**: Agent is forbidden to: bypass hooks, conceal failures, delete audit logs, falsify test results. Allowed: execute tests, verify results, wait for human judgment.
+- **Developer Integration Core Principle**: Agent is forbidden to: remove hooks, bypass quality gates, conceal failures, delete audit logs. Allowed: verify hooks, verify results, wait for human judgment.
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。

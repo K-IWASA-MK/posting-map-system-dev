@@ -15,11 +15,22 @@ Git のコミットフック（`pre-commit`）やデプロイ前検証フック�
 
 ### 1. フック起動イベント (Hook Trigger Events)
 - **対象**: フック（pre-commit または pre-deploy）が実行開始されたイベント。
-- **記録項目**: フックID（Hook ID）、起動イベント型（Commit/Deploy）、起動された元のコマンド名。
+- **記録項目**: 
+  - **Hook Event**: 起動された元のイベント名（`HookTriggered`）
+  - **Hook ID**: フック起動毎の一意の識別ID
+  - **Run ID**: テストスイートと紐付けるための一時・実行時Run ID
+  - **Environment**: フックが起動した実行環境名（例: `local-dev`）
+  - **Repository**: 対象リポジトリ名
+  - **Timestamp**: イベント発生のタイムスタンプ
 
 ### 2. 品質ゲート適合判定結果 (Quality Gate Result)
 - **対象**: 自動検証テストが完了し、Quality Gate が合否（Allow / Block）を判断したイベント。
-- **記録項目**: 総合合否結果（PASS/FAIL）、フックの終了 Exit Code（0 または 1）、タイムスタンプ、対応するテスト Run ID。
+- **記録項目**: 
+  - **Hook Event**: 終了イベント名（`HookCompleted`）
+  - **Result / gateResult**: 総合合否結果（Passed / Blocked）
+  - **exitCode**: フックの終了 Exit Code（0 または 1）
+  - **Run ID**: テスト結果レポートの Run ID
+  - **Timestamp**: 検証完了のタイムスタンプ
 
 ---
 
@@ -51,7 +62,9 @@ Git のコミットフック（`pre-commit`）やデプロイ前検証フック�
           "type": "string",
           "enum": ["Passed", "Blocked"]
         },
-        "exitCode": { "type": "integer" }
+        "exitCode": { "type": "integer" },
+        "environment": { "type": "string", "default": "local-dev" },
+        "repository": { "type": "string", "default": "posting-map-system" }
       }
     }
   },

@@ -13,30 +13,29 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Kernel Local Simulation Tests Integration Foundation [現在のフェーズ]
-* **目的**: 完成済みのローカルシミュレーションテスト環境を Git コミット操作（pre-commit）およびデプロイ操作（pre-deploy/clasp push）へ結合するため、品質ゲート検証フックスクリプト（`pre-commit-simulation.sh`, `pre-deploy-simulation.sh`）およびフック実行制御ランタイム（`hook_runner.js`）を `tools/hooks/` に新規実装・構築し、関連する仕様書の策定・更新を行う。
+### 現在のスプリント: AIOS Kernel Local Simulation Tests Integration Implementation [現在のフェーズ]
+* **目的**: 完成済みのフックランナーを実際のGitコミットフック（`.git/hooks/pre-commit`）および clasp デプロイ前検証プロセス（`deploy_with_quality_gate.sh`）へ実環境で適用し、自動品質ゲートを開発フローに強制接続して実稼働検証を行う。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (TestIntegration, CommitQualityGate, DeployQualityGate, HookExecutionAudit)
-  - ✅ Git コミットフックスクリプトの実装 (`pre-commit-simulation.sh`)
-  - ✅ claspデプロイフックスクリプトの実装 (`pre-deploy-simulation.sh`)
-  - ✅ フック制御ランタイムの実装 (`hook_runner.js`): Hook/Run ID を管理し Quality Gate 判定に基づき Exit コード（Allow/Block）を制御
-  - ✅ 既存テストランナー・レポーターのフック Run Context 対応 (`SimulationTestRunner.js`, `TestReporter.js`)
-  - ✅ フック監査イベント（HookTriggered, HookCompleted）の追記のみ（Append-Only）保存の実装 (`AuditWriter.js`)
-  - ✅ CLIおよびダッシュボードにおけるフックコマンド・フック状況表示の追加
+  - ✅ 新規仕様定義 (DeveloperQualityFlow, IntegrationVerification)
+  - ✅ Git コミット品質フックの `.git/hooks/pre-commit` への実登録
+  - ✅ 品質ゲート連動型デプロイ用ラッパースクリプトの実装 (`deploy_with_quality_gate.sh`)
+  - ✅ フック配置スクリプトの実装 (`install-hooks.sh`): フック配置、実行権限付与、配置監査記録
+  - ✅ フック監査ログの属性（Environment, Repository, gateResult等）拡張
+  - ✅ CLIおよびダッシュボードにおけるフックインストール、状況表示の追加
 * **今回実装しないもの (対象外)**:
-  - ❌ フック失敗（Exit Code != 0）時にそれを無視して強制合格させる bypass オプションの導入
-  - ❌ テスト結果データの改ざんや、不合格を隠蔽するフラグの追加
+  - ❌ 本番の AIOS カーネルロジック、実 Spreadsheet や実 Stripe 決済の直接的な呼び出し・書き換え
+  - ❌ フック失敗（Exit Code != 0）を隠蔽または回避する Skip パス（Bypass）の組み込み
   - ❌ 監査ログファイル（`simulation_audit.log`）の上書き（Update）や消去（Delete）処理の実装
 
-### 次期フェーズ: AIOS ローカルシミュレーションテスト統合 実装・適用 (AIOS Kernel Local Simulation Tests Integration Implementation)
-* **目的**: フックの実働試験、およびデプロイ境界自動アサーションの機能拡充と、本番自動化テスト環境での継続的デリバリー検証。
+### 次期フェーズ: AIOS Dashboard Skeleton Prototype Development
+* **目的**: 実際のGAS API接続を行わず、モックデータとCSSを活用してDashboardのHeader, Sidebar, Main Grid, 100vhレイアウト, Glass Cardsなどの「視線誘導・骨格」のUIデザインプロトタイプを構築・完了する。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
-* **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
+* **目的**: モックデータを用いてDashboardのアニメーション、および操作性のモックを完成させる。
 * **要件**: モックデータは、将来の実データ接続時に容易にJSON差し替えが行えるよう、**データ構造とUI描画ロジックを完全に分離（疎結合）**して設計する。
 
 #### 開発手順 (Implementation Order)
-1. **骨格 (Skeleton)**  
+1. **骨格 (Skeleton)** [次期フェーズ]
    * 完成条件: Header, Sidebar, Main Grid, 100vhレイアウト, Glass Cards of 基礎構造の作成。中身は空で良く、余白・高さ・視線誘導のみをレビュー対象とする。
 2. **アニメーションファースト (Motion First)**  
    * 完成条件: 画面読み込み時のFade, Slide, Glassトランジション、およびLIVEインジケーターのゆっくりとした呼吸アニメーション（Pulse）の実装。開いた瞬間の「気持ちよさ」を追求する。
