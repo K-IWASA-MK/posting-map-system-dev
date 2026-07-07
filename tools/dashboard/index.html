@@ -1,408 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIOS Monitoring v3.1 Pro - Law Execution Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-black: #000000;
-      --panel-bg: #1C1C1E;
-      --accent-blue: #2563eb;
-      --accent-green: #22c55e;
-      --accent-red: #ef4444;
-      --text-main: #ffffff;
-      --text-sub: rgba(255, 255, 255, 0.72);
-      --border-thin: rgba(255, 255, 255, 0.1);
-      --border-blue: rgba(37, 99, 235, 0.35);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg-black);
-      color: var(--text-main);
-      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      padding: 2rem;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-thin);
-    }
-
-    .title-area h1 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .title-area p {
-      font-size: 0.9rem;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin-top: 0.3rem;
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      background: var(--panel-bg);
-      border: 1px solid var(--border-thin);
-      padding: 0.6rem 1.2rem;
-      border-radius: 9999px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    .status-indicator {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: var(--accent-red);
-      box-shadow: 0 0 10px var(--accent-red);
-      transition: background-color 0.3s, box-shadow 0.3s;
-    }
-
-    .status-indicator.online {
-      background-color: var(--accent-green);
-      box-shadow: 0 0 10px var(--accent-green);
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1.2fr;
-      gap: 1.5rem;
-      align-items: start;
-    }
-
-    @media (max-width: 1200px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
+  <title>POSTING MAP 三重第3支部 Mission Control</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#EA5F08',
+              bg: '#0B0F14',
+              card: '#161B22',
+            }
+          },
+          fontFamily: {
+            sans: ['Outfit', 'Noto Sans JP', 'sans-serif'],
+          }
+        }
       }
     }
-
-    /* Premium glass cards styling */
-    .premium-glass {
-      border-radius: 28px;
-      background: var(--panel-bg);
-      box-shadow: 0 0 30px rgba(37, 99, 235, 0.03);
-      border: 1px solid var(--border-thin);
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      transition: border-color 0.3s, box-shadow 0.3s;
+  </script>
+  <style>
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
     }
-
-    .premium-glass.blue-glow {
-      border: 1px solid var(--border-blue);
-      box-shadow: 0 0 30px rgba(37, 99, 235, 0.08);
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
     }
-
-    .panel-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      margin-bottom: 0.5rem;
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
     }
-
-    .panel-icon-box {
-      font-size: 1.8rem;
-      background: rgba(37, 99, 235, 0.1);
-      padding: 0.5rem;
-      border-radius: 12px;
-      margin-bottom: 0.5rem;
-      color: var(--accent-blue);
-      border: 1px solid var(--border-blue);
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
     }
-
-    .panel-header h2 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-
-    .panel-header p {
-      font-size: 0.75rem;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-top: 0.2rem;
-    }
-
-    /* Trust Graph Visuals */
-    .graph-container {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      padding: 0.5rem;
-    }
-
-    .graph-node {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border-thin);
-      padding: 1.2rem;
-      border-radius: 20px;
-      position: relative;
-    }
-
-    .node-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .node-name {
-      font-weight: 600;
-      font-size: 1.05rem;
-    }
-
-    .node-sub {
-      font-size: 0.75rem;
-      color: var(--text-sub);
-    }
-
-    .node-score-badge {
-      font-size: 1.2rem;
-      font-weight: 800;
-      padding: 0.3rem 0.8rem;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-thin);
-    }
-
-    /* Node scoring colors */
-    .node-state-active { border-color: rgba(34, 197, 94, 0.3); }
-    .node-state-active .node-score-badge { color: var(--accent-green); }
     
-    .node-state-restrict { border-color: rgba(37, 99, 235, 0.3); }
-    .node-state-restrict .node-score-badge { color: var(--accent-blue); }
-
-    .node-state-sandbox { border-color: rgba(239, 68, 68, 0.3); }
-    .node-state-sandbox .node-score-badge { color: #f97316; }
-
-    .node-state-blocked { border-color: var(--accent-red); box-shadow: 0 0 15px rgba(239, 68, 68, 0.15); }
-    .node-state-blocked .node-score-badge { color: var(--accent-red); }
-
-    /* Edge weight link arrows */
-    .graph-edge {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 0.75rem;
-      color: var(--text-sub);
-      margin: -0.6rem 0;
-      position: relative;
-      z-index: 2;
-    }
-    .graph-edge::before {
-      content: "";
-      position: absolute;
-      width: 1px;
-      height: 25px;
-      background: linear-gradient(180deg, var(--border-thin), var(--border-blue));
-      left: 50%;
-      top: -12px;
-      z-index: -1;
-    }
-
-    /* Policy Limits Grid */
-    .policy-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border-thin);
+    .premium-glass {
       border-radius: 20px;
-      padding: 1.2rem;
-    }
-
-    .policy-node-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.8rem;
-      border-bottom: 1px solid var(--border-thin);
-      padding-bottom: 0.5rem;
-    }
-
-    .policy-mode {
-      font-size: 0.8rem;
-      font-weight: 700;
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-      text-transform: uppercase;
-    }
-
-    .mode-full { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
-    .mode-limited { background: rgba(37, 99, 235, 0.15); color: var(--accent-blue); }
-    .mode-sandbox { background: rgba(249, 115, 22, 0.15); color: #f97316; }
-    .mode-blocked { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
-
-    .limits-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.6rem;
-    }
-
-    .limit-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid var(--border-thin);
-      border-radius: 8px;
-      padding: 0.5rem;
-      font-size: 0.75rem;
-    }
-
-    .limit-value {
-      font-weight: 700;
-      margin-top: 0.2rem;
-    }
-
-    .limit-allowed { color: var(--accent-green); }
-    .limit-denied { color: var(--accent-red); }
-
-    /* Timeline log styles */
-    .timeline-log {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      max-height: 480px;
-      overflow-y: auto;
-      padding-right: 0.5rem;
-    }
-
-    .log-item {
-      display: flex;
-      flex-direction: column;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border-thin);
-      border-radius: 12px;
-      padding: 0.8rem 1rem;
-      font-size: 0.85rem;
-      animation: slideIn 0.3s ease-out;
-    }
-
-    .log-meta {
-      display: flex;
-      justify-content: space-between;
-      color: var(--text-sub);
-      font-size: 0.75rem;
-      margin-bottom: 0.3rem;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      background: #161B22;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 30px rgba(234, 95, 8, 0.01);
     }
   </style>
 </head>
-<body>
+<body class="bg-brand-bg text-white font-sans h-screen w-screen overflow-hidden select-none flex">
 
-  <header>
-    <div class="title-area">
-      <h1>AIOS Monitoring v3.1 Pro</h1>
-      <p>Compiled Governance Execution System / Observation Layer</p>
+  <!-- Left Sidebar (Sidebar Navigation) -->
+  <aside class="w-64 h-full bg-brand-card border-r border-[rgba(255,255,255,0.08)] flex flex-col p-6 flex-shrink-0">
+    <!-- Brand Title Area -->
+    <div class="mb-10 flex-shrink-0">
+      <h1 class="text-xs font-black text-brand tracking-widest uppercase">POSTING MAP</h1>
+      <h2 class="text-lg font-black text-white leading-none mt-1">三重第3支部</h2>
+      <p class="text-[9px] font-bold text-[rgba(255,255,255,0.4)] uppercase tracking-wider mt-1">Mission Control</p>
     </div>
-    <div class="status-badge">
-      <div id="ws-indicator" class="status-indicator"></div>
-      <span id="ws-status">DISCONNECTED</span>
-    </div>
-  </header>
+    
+    <!-- Navigation Links -->
+    <nav class="flex-1 space-y-2 overflow-y-auto hide-scrollbar">
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-white bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] transition-all">
+        <span class="text-base">📊</span> <span>ダッシュボード</span>
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[rgba(255,255,255,0.65)] hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <span class="text-base">📦</span> <span>保管者</span>
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[rgba(255,255,255,0.65)] hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <span class="text-base">🗺️</span> <span>エリア</span>
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[rgba(255,255,255,0.65)] hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <span class="text-base">📝</span> <span>活動ログ</span>
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[rgba(255,255,255,0.65)] hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <span class="text-base">📈</span> <span>活動分析</span>
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[rgba(255,255,255,0.65)] hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <span class="text-base">🗳️</span> <span>投票率</span>
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[rgba(255,255,255,0.65)] hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <span class="text-base">⚙️</span> <span>設定</span>
+      </a>
+    </nav>
+  </aside>
 
-  <main class="dashboard-grid">
-    <!-- Left: Trust Graph Live View -->
-    <section class="premium-glass blue-glow">
-      <div class="panel-header">
-        <div class="panel-icon-box">🕸</div>
-        <h2>Trust Graph</h2>
-        <p>Live Decay Topology Map</p>
+  <!-- Main Content Container -->
+  <div class="flex-1 flex flex-col p-8 overflow-hidden h-full">
+    <!-- Header -->
+    <header class="flex justify-between items-center py-4 border-b border-[rgba(255,255,255,0.08)] mb-6 flex-shrink-0 select-none">
+      <div class="flex items-center gap-3">
+        <!-- Live status indicator -->
+        <span class="inline-block w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></span>
+        <span class="text-xs font-bold text-white tracking-wider">最新データを同期しています</span>
+        <span id="sync-time" class="text-xs text-[rgba(255,255,255,0.4)] font-mono">10:42</span>
       </div>
+      <div class="flex items-center gap-4">
+        <button class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-[rgba(255,255,255,0.04)] text-white/70 hover:text-white transition-all">🔄</button>
+        <button class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-[rgba(255,255,255,0.04)] text-white/70 hover:text-white transition-all">🌙</button>
+        <button class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-[rgba(255,255,255,0.04)] text-white/70 hover:text-white transition-all">❓</button>
+      </div>
+    </header>
+
+    <!-- Content Grid Layout -->
+    <div class="flex-1 flex flex-col gap-6 overflow-hidden">
       
-      <div class="graph-container">
-        <!-- Node 1: Kernel -->
-        <div id="node-kernel" class="graph-node">
-          <div class="node-info">
-            <span class="node-name">Kernel</span>
-            <span class="node-sub">Root Trust Anchor</span>
+      <!-- KPI Cards Container (col-3 grid) -->
+      <div class="grid grid-cols-3 gap-6 flex-shrink-0">
+        <!-- KPI Card 1: Active Members -->
+        <div class="premium-glass p-6 min-h-[9rem] flex flex-col justify-between relative overflow-hidden select-none">
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+              <span class="text-base">👥</span>
+              <span class="text-xs font-bold text-[rgba(255,255,255,0.65)] uppercase tracking-wider">活動人数</span>
+            </div>
+            <span class="text-[9px] font-bold text-green-500 font-mono">--</span>
           </div>
-          <span class="node-score-badge">-</span>
-        </div>
-
-        <div class="graph-edge">▼ attenuation: 0.95</div>
-
-        <!-- Node 2: Reviewer -->
-        <div id="node-reviewer" class="graph-node">
-          <div class="node-info">
-            <span class="node-name">Reviewer</span>
-            <span class="node-sub">Stateless Static Analyzer</span>
+          <div class="my-2">
+            <span class="text-3xl font-extrabold tracking-tighter text-white font-mono">--</span>
+            <span class="text-xs font-bold text-[rgba(255,255,255,0.65)] ml-1">人</span>
           </div>
-          <span class="node-score-badge">-</span>
+          <!-- Sparkline empty placeholder -->
+          <div class="w-full h-6 opacity-20 bg-[rgba(255,255,255,0.02)] rounded-lg"></div>
         </div>
 
-        <div class="graph-edge">▼ attenuation: 0.85</div>
-
-        <!-- Node 3: AI Agent -->
-        <div id="node-ai_agent" class="graph-node">
-          <div class="node-info">
-            <span class="node-name">AI Agent</span>
-            <span class="node-sub">Autonomous Execution Logic</span>
+        <!-- KPI Card 2: New Active Members -->
+        <div class="premium-glass p-6 min-h-[9rem] flex flex-col justify-between relative overflow-hidden select-none">
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🌱</span>
+              <span class="text-xs font-bold text-[rgba(255,255,255,0.65)] uppercase tracking-wider">新規活動人数</span>
+            </div>
+            <span class="text-[9px] font-bold text-green-500 font-mono">--</span>
           </div>
-          <span class="node-score-badge">-</span>
+          <div class="my-2">
+            <span class="text-3xl font-extrabold tracking-tighter text-white font-mono">--</span>
+            <span class="text-xs font-bold text-[rgba(255,255,255,0.65)] ml-1">人</span>
+          </div>
+          <!-- Sparkline empty placeholder -->
+          <div class="w-full h-6 opacity-20 bg-[rgba(255,255,255,0.02)] rounded-lg"></div>
+        </div>
+
+        <!-- KPI Card 3: Custody count -->
+        <div class="premium-glass p-6 min-h-[9rem] flex flex-col justify-between relative overflow-hidden select-none">
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
+              <span class="text-base">📦</span>
+              <span class="text-xs font-bold text-[rgba(255,255,255,0.65)] uppercase tracking-wider">保有枚数</span>
+            </div>
+            <span class="text-[9px] font-bold text-red-500 font-mono">--</span>
+          </div>
+          <div class="my-2">
+            <span class="text-3xl font-extrabold tracking-tighter text-white font-mono">--</span>
+            <span class="text-xs font-bold text-[rgba(255,255,255,0.65)] ml-1">枚</span>
+          </div>
+          <!-- Sparkline empty placeholder -->
+          <div class="w-full h-6 opacity-20 bg-[rgba(255,255,255,0.02)] rounded-lg"></div>
         </div>
       </div>
-    </section>
 
-    <!-- Center: Drift Timeline View -->
-    <section class="premium-glass">
-      <div class="panel-header">
-        <div class="panel-icon-box">⏱</div>
-        <h2>Drift Timeline</h2>
-        <p>Event Ledger Stream (Stateless Projection)</p>
-      </div>
+      <!-- Main Visual Grid (Activity & Turnout etc.) -->
+      <div class="flex-1 grid grid-rows-2 gap-6 overflow-hidden">
+        
+        <!-- Row 1: Activity Trend (col-8) & Activity Log (col-4) -->
+        <div class="grid grid-cols-12 gap-6 overflow-hidden">
+          <!-- Activity Trend (col-span-8) -->
+          <section class="col-span-8 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
+              <div>
+                <h3 class="text-sm font-bold text-white tracking-tight">活動推移</h3>
+                <p class="text-[9px] font-bold text-[rgba(255,255,255,0.4)] tracking-wide uppercase mt-0.5">Activity Trend (Line Chart)</p>
+              </div>
+            </div>
+            <div class="flex-1 flex items-center justify-center bg-[rgba(255,255,255,0.01)] border border-[rgba(255,255,255,0.02)] rounded-2xl">
+              <span class="text-xs text-[rgba(255,255,255,0.3)] select-none">Activity Trend Graph Area</span>
+            </div>
+          </section>
 
-      <div id="timeline-log" class="timeline-log">
-        <div style="text-align: center; color: var(--text-sub); font-size: 0.9rem; padding: 2rem;">
-          Awaiting event stream data...
+          <!-- Activity Log (col-span-4) -->
+          <section class="col-span-4 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
+              <div>
+                <h3 class="text-sm font-bold text-white tracking-tight">活動ログ</h3>
+                <p class="text-[9px] font-bold text-[rgba(255,255,255,0.4)] tracking-wide uppercase mt-0.5">Activity Log (Realtime Stream)</p>
+              </div>
+            </div>
+            <div class="flex-1 flex flex-col gap-2 overflow-y-auto custom-scrollbar">
+              <div class="flex-1 flex items-center justify-center bg-[rgba(255,255,255,0.01)] border border-[rgba(255,255,255,0.02)] rounded-2xl min-h-[5rem]">
+                <span class="text-xs text-[rgba(255,255,255,0.3)] select-none">Realtime Activity Log</span>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
-    </section>
 
-    <!-- Right: Policy View -->
-    <section class="premium-glass blue-glow">
-      <div class="panel-header">
-        <div class="panel-icon-box">📜</div>
-        <h2>Policy Limits</h2>
-        <p>Compiled Precompiled Law AST</p>
-      </div>
+        <!-- Row 2: Inventory Graph (col-8) & Turnout Panel (col-4) -->
+        <div class="grid grid-cols-12 gap-6 overflow-hidden">
+          <!-- Inventory (col-span-8) -->
+          <section class="col-span-8 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
+              <div>
+                <h3 class="text-sm font-bold text-white tracking-tight">保管状況</h3>
+                <p class="text-[9px] font-bold text-[rgba(255,255,255,0.4)] tracking-wide uppercase mt-0.5">Inventory Custody Status (Bar Chart)</p>
+              </div>
+            </div>
+            <div class="flex-1 flex items-center justify-center bg-[rgba(255,255,255,0.01)] border border-[rgba(255,255,255,0.02)] rounded-2xl">
+              <span class="text-xs text-[rgba(255,255,255,0.3)] select-none">Inventory Custody Status Graph Area</span>
+            </div>
+          </section>
 
-      <div id="policy-container" style="display: flex; flex-direction: column; gap: 1rem;">
-        <!-- Policies will be compiled dynamically here -->
-        <div style="text-align: center; color: var(--text-sub); font-size: 0.9rem; padding: 2rem;">
-          Awaiting compiled policy registry...
+          <!-- Turnout (col-span-4) -->
+          <section class="col-span-4 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
+              <div>
+                <h3 class="text-sm font-bold text-white tracking-tight">市別投票率</h3>
+                <p class="text-[9px] font-bold text-[rgba(255,255,255,0.4)] tracking-wide uppercase mt-0.5">Target Turnout Progress</p>
+              </div>
+            </div>
+            <div class="flex-1 flex flex-col gap-3 overflow-y-auto custom-scrollbar justify-center">
+              <div class="flex-1 flex items-center justify-center bg-[rgba(255,255,255,0.01)] border border-[rgba(255,255,255,0.02)] rounded-2xl min-h-[5rem]">
+                <span class="text-xs text-[rgba(255,255,255,0.3)] select-none">Turnout Rate Panel</span>
+              </div>
+            </div>
+          </section>
         </div>
+
       </div>
-    </section>
-  </main>
+
+    </div>
+  </div>
 
   <script src="dashboard.js"></script>
 </body>
