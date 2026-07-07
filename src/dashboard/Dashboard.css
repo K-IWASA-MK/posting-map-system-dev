@@ -362,3 +362,6 @@ body {
   font-weight: 600;
   text-align: center;
 }
+
+/* Visual Components Common Styles */
+/* 警告: 各種コンポーネントで適用される共通 CSS クラス定義は、すべて本ファイルにて一元管理し、インライン重複を排除する。 */

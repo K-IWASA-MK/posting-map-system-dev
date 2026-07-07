@@ -50,3 +50,12 @@ Observer Dashboard 内を構成する各 UI エレメント（コンポーネン
   - `Rolling Number`: 画面描画開始から 600ms の時間で、数値メトリクス（スコアや件数）を現在の最終目標値までドラムロールカウントアップする。
 - **Status component**:
   - `Pulse Badge`: `Active` (緑) または `Idle` (青) のステータスバッジの周囲に、柔らかい波紋状 of 光彩アニメーション（Gentle/Slow Pulse）を無限ループ再生する。
+
+---
+
+## コンポーネント構造の独立分離 (Visual Component Architecture)
+ダッシュボードプロトタイプの発展に伴い、各カードおよび表示要素は `src/dashboard/components/` 配下の再利用可能な表示専用クラス群へリファクタリングされる。
+- **Props 受信と View 責務の分離**:
+  - `KPICard.js`, `StatusCard.js`, `MetricCard.js`, `KnowledgeCard.js`, `GovernanceCard.js`, `BillingCard.js`, `SimulationCard.js` は、一切の通信・計算ロジックを排除し、静的な Props 情報から HTML を返すのみとする。
+- **DashboardRenderer の仲介**:
+  - 各カードの DOM への配置および Props データのバインド・インサート処理は、`DashboardRenderer.js` が一括して制御し、チラつきのない段階的マウントを実現する。

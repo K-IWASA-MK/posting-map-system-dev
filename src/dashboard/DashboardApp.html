@@ -59,133 +59,24 @@
 
       <!-- Main Dashboard View -->
       <main class="dashboard-main">
-        <div class="dashboard-grid">
-          <!-- 1. Kernel Status Panel (Fade Up, Delay 150) -->
-          <section class="card premium-glass grid-col-2" data-motion="fade-up" data-delay="150">
-            <h2>Kernel Status</h2>
-            <div class="status-list" id="kernel-status-list">
-              <div class="status-item"><span>Execution</span><span class="badge badge-idle" id="ks-execution">-</span></div>
-              <div class="status-item"><span>Review</span><span class="badge badge-idle" id="ks-review">-</span></div>
-              <div class="status-item"><span>Quality</span><span class="badge badge-idle" id="ks-quality">-</span></div>
-              <div class="status-item"><span>Learning</span><span class="badge badge-idle" id="ks-learning">-</span></div>
-              <div class="status-item"><span>Governance</span><span class="badge badge-idle" id="ks-governance">-</span></div>
-              <div class="status-item"><span>Billing</span><span class="badge badge-idle" id="ks-billing">-</span></div>
-              <div class="status-item"><span>Simulation</span><span class="badge badge-idle" id="ks-simulation">-</span></div>
-            </div>
-          </section>
-
-          <!-- 2. Simulation Quality Gate Panel (Fade Up, Delay 200) -->
-          <section class="card premium-glass" data-motion="fade-up" data-delay="200">
-            <h2>Simulation Quality Gate</h2>
-            <div class="metrics-list">
-              <div class="metric-item">
-                <span class="label">Last Sim Result</span>
-                <span class="value" id="sim-last-result">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Quality Gate Result</span>
-                <span class="value accent-blue" id="sim-gate-result">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Scenario Status</span>
-                <span class="sub-text" id="sim-scenario-status">-</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- 3. Quality Panel (Fade Up, Delay 250) -->
-          <section class="card premium-glass" data-motion="fade-up" data-delay="250">
-            <h2>Quality Metrics</h2>
-            <div class="metrics-list">
-              <div class="metric-item">
-                <span class="label">Overall Score</span>
-                <span class="value accent-blue" id="quality-overall-score">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Review Result</span>
-                <span class="value" id="quality-review-result">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Self Review Result</span>
-                <span class="value" id="quality-self-result">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Improvement Delta</span>
-                <span class="sub-text" id="quality-delta">-</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- 4. Knowledge Panel (Fade Up, Delay 300) -->
-          <section class="card premium-glass" data-motion="fade-up" data-delay="300">
-            <h2>Knowledge Metrics</h2>
-            <div class="metrics-list">
-              <div class="metric-item">
-                <span class="label">Total Knowledge</span>
-                <span class="value" id="knowledge-total">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Official Count</span>
-                <span class="value accent-blue" id="knowledge-official">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Candidate Count</span>
-                <span class="value" id="knowledge-candidate">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Health Score</span>
-                <span class="sub-text accent-green" id="knowledge-health">-</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- 5. Governance Panel (Fade Up, Delay 350) -->
-          <section class="card premium-glass" data-motion="fade-up" data-delay="350">
-            <h2>Governance Metrics</h2>
-            <div class="metrics-list">
-              <div class="metric-item">
-                <span class="label">Pending Approval</span>
-                <span class="value" id="gov-pending">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Approved</span>
-                <span class="value accent-green" id="gov-approved">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Rejected</span>
-                <span class="value" id="gov-rejected">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Audit Count</span>
-                <span class="sub-text" id="gov-audit">-</span>
-              </div>
-            </div>
-          </section>
-
-          <!-- 6. Billing Panel (Fade Up, Delay 400) -->
-          <section class="card premium-glass" data-motion="fade-up" data-delay="400">
-            <h2>Billing Metrics</h2>
-            <div class="metrics-list">
-              <div class="metric-item">
-                <span class="label">License Status</span>
-                <span class="value accent-green" id="bill-license">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Subscription Status</span>
-                <span class="value" id="bill-subscription">-</span>
-              </div>
-              <div class="metric-item">
-                <span class="label">Payment Event Status</span>
-                <span class="sub-text" id="bill-payment">-</span>
-              </div>
-            </div>
-          </section>
-        </div>
+        <!-- Component Mount Container -->
+        <div id="dashboard-grid-container" class="dashboard-grid"></div>
       </main>
     </div>
   </div>
 
+  <!-- Component Scripts -->
+  <script src="components/KPICard.js"></script>
+  <script src="components/StatusCard.js"></script>
+  <script src="components/MetricCard.js"></script>
+  <script src="components/KnowledgeCard.js"></script>
+  <script src="components/GovernanceCard.js"></script>
+  <script src="components/BillingCard.js"></script>
+  <script src="components/SimulationCard.js"></script>
+
+  <!-- Control & Data Scripts -->
   <script src="DashboardDataAdapter.js"></script>
+  <script src="DashboardRenderer.js"></script>
   <script src="DashboardMotion.js"></script>
   <script src="Dashboard.js"></script>
 </body>

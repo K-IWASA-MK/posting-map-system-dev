@@ -99,6 +99,15 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
   - API 接続モードの切替時、アダプターは `GET /api/dashboard/summary` からのみデータを読み込み、スキーマアサーションを実行後に UI へ渡す。
   - アダプターおよびダッシュボード内には、本番のカーネルや Spreadsheet の書き換えを引き起こす Write 接続（POST/PUT等）は一切露出・マッピングされない。
 
+### コンポーネント・オブザーバー・マッピング (Component Observer Mapping)
+ダッシュボードコンポーネントがProps受信描画（Observer）として動作する際のマッピング構造。
+- **StatusCard** -> `data.kernelStatus` を受信し、`ks-execution`, `ks-review` 等のバッジ描画。
+- **MetricCard** -> `data.quality` を受信し、`quality-overall-score` などの主要品質メトリクスを描画。
+- **KnowledgeCard** -> `data.knowledge` を受信し、ナレッジ量および Health 率を描画。
+- **GovernanceCard** -> `data.governance` を受信し、承認履歴およびポリシー適合率を描画。
+- **BillingCard** -> `data.billing` を受信し、ライセンスの有効状況を描画。
+- **SimulationCard** -> `data.simulation` を受信し、テストゲート通過状況（PASS/FAIL）を描画。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

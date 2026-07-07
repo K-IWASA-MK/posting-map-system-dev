@@ -221,6 +221,7 @@ POSTING MAP は：
 - **Dashboard Observer Core Principle**: Agentは禁止：DashboardからKernel操作、Status変更、Approval実行、Billing操作、Data改変。許可：表示、観測、レポート確認。
 - **Dashboard Motion Core Principle**: Agentは禁止：Motionによる状態変更、MotionによるKernel操作、Motionによる自動判断、MotionによるBusiness Logic。許可：Animation、Transition、Visual Feedback。
 - **Dashboard Data Binding Core Principle**: Agentは禁止：DashboardからKernel操作、Write API、Billing変更、Governance変更、状態更新。許可：GET、JSON Mapping、表示。
+- **Dashboard Component Core Principle**: Agentは禁止：Component内API通信、Component内Kernel操作、Component内状態変更、Component内Business Logic。許可：Props Rendering、Visual Display、Animation。
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。

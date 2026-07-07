@@ -13,23 +13,22 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard KPI Data Binding Foundation [現在のフェーズ]
-* **目的**: モック表示から進め、本番接続と論理隔離された状態で AIOS Kernel の Output メトリクスを安全に読み取る「Read Only KPI Data Binding Layer（`DashboardDataAdapter.js`）」を構築する。API 接続エラー時のフォールバック処理や、スキーマ検証、および Loading/Error 状態表示を UI へ統合する。
+### 現在のスプリント: AIOS Dashboard KPI Visual Components Foundation [現在のフェーズ]
+* **目的**: ダッシュボードの各 KPI カードおよびステータス表示領域を、一切の通信・計算ロジックを持たず、純粋に Props（オブジェクト引数）を受け取って描画を完結させる再利用可能な「表示専用ビジュアルコンポーネント（components/）」群へリファクタリング・分離し、表示責務と論理境界を整理する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (DashboardDataBinding, DashboardDataAdapter, DashboardKPISchema)
-  - ✅ データアダプター実装 (`DashboardDataAdapter.js`): GETデータ取得、スキーマ検証、Normalize処理、モックフォールバック
-  - ✅ 観測制御 JS ロジック更新 (`Dashboard.js`): アダプター連動、Loading/Error/Warning/Last Updated状態表示、データロード後のモーション開始制御
-  - ✅ 状態表示 UI 統合 (`DashboardApp.html`): Loading overlay, Error overlay, Warning banner、DataAdapter スクリプトタグ追加
-  - ✅ 状態演出 CSS スタイル追加 (`Dashboard.css`): スピナーアニメーション、Error 表示、Warning banner スタイル
-  - ✅ 既存仕様（KernelDashboard.md, DashboardPrototype.md, IntegrationSimulation.md, AGENTS.md）の対応追加
+  - ✅ 新規仕様定義 (DashboardComponentArchitecture, KPICardSpecification, DashboardTheme)
+  - ✅ ビジュアルコンポーネント実装 (`src/dashboard/components/`): KPICard, StatusCard, MetricCard, KnowledgeCard, GovernanceCard, BillingCard, SimulationCard
+  - ✅ コンポーネント仲介レンダラー実装 (`DashboardRenderer.js`): 各コンポーネントの配置、Propsの受け渡し、DOM Mount 制御
+  - ✅ 観測制御 JS ロジック更新 (`Dashboard.js`): データのロード完了時にレンダラーを呼び出して一元描画する流れに刷新、ロード完了後にモーションをアタッチ
+  - ✅ 状態表示 UI 統合 (`DashboardApp.html`): マウントポイント `#dashboard-grid-container` への変更、コンポーネント JS スクリプトタグの追加
+  - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, DashboardPrototype.md, AGENTS.md）の対応追加
   - ✅ 現在のスプリント定義（PROJECT_SCOPE.md）の更新
 * **今回実装しないもの (対象外)**:
-  - ❌ `POST`, `PUT`, `PATCH`, `DELETE` メソッドを用いた、状態変更や Kernel トリガー操作等の書き込み通信
-  - ❌ ダッシュボード UI 上への Execute, Approve, Reject, Payment などの意思決定・操作用ボタンの配置
-  - ❌ ダッシュボード側での KPI 数値や総合判定ロジックの算出・書き換え
+  - ❌ コンポーネント内部からの `fetch`, `axios` 等の通信や、状態計算、Stripe, SpreadsheetApp への直接アクセス
+  - ❌ 操作をトリガーするボタン（Execute, Approve 等）や、フォーム入力、更新系アクションのダッシュボードへの追加
 
-### 次期フェーズ: AIOS Dashboard KPI Visual Components
-* **目的**: プロトタイプで作成した各パーツ（KPIカード、グラフ、サイドナビ等）を再利用可能な独立コンポーネントとして共通化・整理する。
+### 次期フェーズ: AIOS Dashboard KPI Data Binding Connection
+* **目的**: 各コンポーネントがProps受信で動作することを確認したダッシュボードに対して、本番のGAS（API）経由での読み取り専用 GET-JSON 取得の疎通と最終調整を行う。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: モックデータを用いてDashboardのアニメーション、および操作性のモックを完成させる。
@@ -40,8 +39,8 @@
    * ✅ 完成条件: Header, Sidebar, Main Grid, 100vhレイアウト, Glass Cards of 基礎構造の作成。中身は空で良く、余白・高さ・視線誘導のみをレビュー対象とする。
 2. **アニメーションファースト (Motion First)**  
    * ✅ 完成条件: 画面読み込み時のFade, Slide, Glassトランジション、およびLIVEインジケーターのゆっくりとした呼吸アニメーション（Pulse）の実装。開いた瞬間の「気持ちよさ」を追求する。
-3. **実績値表示 (KPI)** [次期フェーズ]
-   * 完成条件: 活動人数、新規活動人数、保有枚数を表示。KPI更新時のRolling Number（ドラムロールエフェクト）の実装。
+3. **実績値表示 (KPI)**  
+   * ✅ 完成条件: 活動人数、新規活動人数、保有枚数を表示。KPI更新時のRolling Number（ドラムロールエフェクト）の実装。
 4. **活動推移グラフ (Activity Trend - 主役)**  
    * 完成条件: SVGによる折れ線グラフの描画。Hover時のガイドライン（Hover Line）、アクティブデータポイントの発光（Point Glow: `#EA5F08`）、およびGlass Tooltipの実装。
 5. **リアルタイム活動ログ (Activity Log)**  
@@ -54,11 +53,6 @@
 * **開発モットー**:
   > **"Don't build a dashboard. Build the place people want to come back to every morning."**
   > (ダッシュボードを作るな。人々が毎朝戻ってきたくなる場所を作れ。)
-
-### 将来フェーズ (Future Dashboard Phases)
-* **フェーズ 2: UI Component化**: プロトタイプで作成した各パーツ（KPIカード、グラフ、サイドナビ等）を再利用可能な独立コンポーネントとして共通化・整理する。
-* **フェーズ 3: GAS Connection (JSON取得)**: バックエンド（GAS）と通信させ、ダッシュボード用の集計JSONを取得可能にする。
-* **フェーズ 4: リアルデータ反映 ＆ チューニング**: 完成したUIコンポーネントに実データを流し込み、アニメーションの滑らかさやパフォーマンスのチューニングを行う。
 
 ---
 

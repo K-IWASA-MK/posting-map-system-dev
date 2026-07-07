@@ -41,3 +41,5 @@
   - `GET /api/dashboard/summary` ──> `DashboardDataAdapter.js` による JSON 必須キーチェック ──> `Dashboard.js` への引き渡し ──> DOM レンダリング ──> `DashboardMotion.js` 起動。
 - **書き込み処理の禁止**:
   - `DashboardDataAdapter` の定義内には、Stripe API、GAS への `POST`, `PUT`, `DELETE` リクエストや、Spreadsheet への直接アクセス機能は一切配置されない。
+- **ビジュアルコンポーネントレイヤーの適用 (Visual Component Layer)**:
+  - コンポーネント群は、Props（入力値）を受け取って静的なマークアップ（HTML 文字列）を出力する表示専用オブジェクトとして完全に独立分離され、仲介レンダラー `DashboardRenderer.js` を介して一元描画される。

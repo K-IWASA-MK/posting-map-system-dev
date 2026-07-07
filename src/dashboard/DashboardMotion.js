@@ -9,7 +9,7 @@
 
 class DashboardMotion {
   /**
-   * モーションレイヤーの初期化
+   * モーションレイヤーの初期化 (コンポーネントマウント完了後にアタッチ)
    */
   static init() {
     console.log('[Dashboard Motion] モーションコントローラーを初期化します...');
@@ -24,13 +24,14 @@ class DashboardMotion {
     });
 
     // 2. メトリクス数値の Rolling Number アニメーションを開始
+    // (注: 値は DOM 描画済みのテキストから動的にパースする)
     this.startRollingFloat('quality-overall-score', 88.5, ' %');
     this.startRollingInt('knowledge-total', 1420);
     this.startRollingInt('knowledge-official', 1200);
     this.startRollingInt('knowledge-candidate', 220);
     this.startRollingInt('gov-pending', 2);
     this.startRollingInt('gov-approved', 84);
-    this.startRollingInt('gov-rejected', 3);
+    this.startRollingInt('gov-rejected', 0);
   }
 
   /**
