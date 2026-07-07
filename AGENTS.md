@@ -202,6 +202,8 @@ POSTING MAP は：
 - **究極のテンプレート**: 特定の地区に依存しない、汎用的なポスティング管理システムの基盤を構築する。
 - **動的設計**: データ構造の変化に自動対応し、ハードコーディングを徹底排除する。
 - **AI Leadership**: メイン担当AI（Pro）がアーキテクチャ設計と品質管理のリーダー（総監督）となり、他のAIモデルに対して厳格な実装基準とルールを指揮・統制する。
+- **AIOS Core Principle**: AIOS does not exist to generate code. AIOS exists to continuously improve product quality through structured review.
+- **Output Engine Core Principle**: AIOS guarantees not only code quality but also output quality. Every response must conform to the Output Engine specification before it is considered complete.
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。
