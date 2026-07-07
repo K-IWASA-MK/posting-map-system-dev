@@ -13,23 +13,22 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard KPI Data Binding Connection Foundation [現在のフェーズ]
-* **目的**: ダッシュボードのモック表示から、GAS GET-JSON API（KPI Provider）へ接続する「Read Only KPI Data Binding Connection Layer」へ移行する。GET-JSON 取得の API クライアント（`DashboardAPIClient.js`）を構築し、通信タイムアウトやデータ欠損に対する Mock フォールバック挙動、および UI 状態モデル（LIVE, MOCK, WARNING, OFFLINE）を統合する。
+### 現在のスプリント: AIOS Dashboard KPI Charts Components Foundation [現在のフェーズ]
+* **目的**: SVG による折れ線グラフ（活動推移）および時系列活動ログ（Activity Log）の表示専用ビジュアルコンポーネントを設計・構築し、Props の受信による一元的なマウントおよびドローイングモーションを統合する。コンポーネント内からの通信や予測計算は 100% 排除し、Observer を堅持する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (DashboardAPIConnection, GASKPIProvider, DashboardConnectionError)
-  - ✅ API クライアント実装 (`src/dashboard/DashboardAPIClient.js`): GET のみでの API 取得、Timeout 制限（5000ms）および通信中止
-  - ✅ データアダプター更新 (`src/dashboard/DashboardDataAdapter.js`): API クライアント経由へのデータ取得統合、レスポンス検証（Schema Validation）、補完（Normalize）、エラー時の警告・フォールバック
-  - ✅ 観測制御 JS ロジック更新 (`Dashboard.js`): `statusState`（LIVE, MOCK, WARNING, OFFLINE）に応じたヘッダーステータスバッジの点灯、およびモーション開始連携
-  - ✅ 状態表示 UI 統合 (`DashboardApp.html`): `DashboardAPIClient.js` のスクリプトタグ追加、ステータス文字「LIVE」のマウント
-  - ✅ スタイル定義追加 (`Dashboard.css`): WARNING（オレンジ）、OFFLINE（赤）の状態別バッジスタイル
-  - ✅ 既存仕様（KernelDashboard.md, DashboardDataBinding.md, AGENTS.md）の対応追加
-  - ✅ 現在のスプリント定義（PROJECT_SCOPE.md）の更新
+  - ✅ 新規仕様定義 (DashboardChartArchitecture, ActivityTrendCard, ActivityLogCard)
+  - ✅ ビジュアルコンポーネント実装 (`src/dashboard/components/`): ActivityTrendCard (SVG線画), ActivityLogCard (時系列リスト)
+  - ✅ レンダラー更新 (`DashboardRenderer.js`): グラフ・ログの Props マッピング追加および一括 DOM 挿入
+  - ✅ 状態表示 UI 統合 (`DashboardApp.html`): コンポーネント用スクリプトのインクルード
+  - ✅ スタイル定義追加 (`Dashboard.css`): SVG グリッド線、折れ線、データポイント、Glow 発光演出、およびログ Stagger フェードインの CSS
+  - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ `POST`, `PUT`, `PATCH`, `DELETE` 等の書き込みリクエスト
-  - ❌ ダッシュボード UI 上からの Kernel 設定変更、契約決済の変更、Approval または Execute 操作ボタンの追加
+  - ❌ グラフ内部でのトレンド予測・統計分析・将来予報などの計算ロジック
+  - ❌ ログコンポーネント側でのログ要素の追加・削除の動的制御
+  - ❌ 操作をトリガーするボタン（Execute, Approve 等）の追加、通信メソッド（POST/PUT等）の参照
 
-### 次期フェーズ: AIOS Dashboard KPI Charts Components
-* **目的**: SVG による折れ線グラフ（活動推移）、および新着リアルタイム活動ログなどのグラフ系ビジュアルコンポーネントの設計と構築。
+### 次期フェーズ: AIOS Dashboard Activity Log Auto-Scroll & Polling
+* **目的**: ダッシュボードの時系列活動ログにおける自動スクロール演出、およびポーリング（一定間隔でのAPI読み込み更新）の論理構造と安全な統合設計。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: モックデータを用いてDashboardのアニメーション、および操作性のモックを完成させる。
@@ -43,9 +42,9 @@
 3. **実績値表示 (KPI)**  
    * ✅ 完成条件: 活動人数、新規活動人数、保有枚数を表示。KPI更新時のRolling Number（ドラムロールエフェクト）の実装。
 4. **活動推移グラフ (Activity Trend - 主役)**  
-   * 完成条件: SVGによる折れ線グラフの描画。Hover時のガイドライン（Hover Line）、アクティブデータポイントの発光（Point Glow: `#EA5F08`）、およびGlass Tooltipの実装。
+   * ✅ 完成条件: SVGによる折れ線グラフの描画。Hover時のガイドライン（Hover Line）、アクティブデータポイントの発光（Point Glow: `#EA5F08`）、およびGlass Tooltipの実装。
 5. **リアルタイム活動ログ (Activity Log)**  
-   * 完成条件: 時系列ログ表示。新着追加時に3秒間オレンジにGlow（発光）するエフェクト。
+   * ✅ 完成条件: 時系列ログ表示。新着追加時に3秒間オレンジにGlow（発光）するエフェクト。
 6. **投票率パネル (Turnout)**  
    * 完成条件: 市別投票率進捗バー of 静かで美しい表示。
 7. **極限の微調整 (Polish)**  

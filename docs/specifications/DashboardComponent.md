@@ -59,3 +59,5 @@ Observer Dashboard 内を構成する各 UI エレメント（コンポーネン
   - `KPICard.js`, `StatusCard.js`, `MetricCard.js`, `KnowledgeCard.js`, `GovernanceCard.js`, `BillingCard.js`, `SimulationCard.js` は、一切の通信・計算ロジックを排除し、静的な Props 情報から HTML を返すのみとする。
 - **DashboardRenderer の仲介**:
   - 各カードの DOM への配置および Props データのバインド・インサート処理は、`DashboardRenderer.js` が一括して制御し、チラつきのない段階的マウントを実現する。
+- **グラフおよびログコンポーネント責任 (Chart & Log Visual Components)**:
+  - `ActivityTrendCard.js` (活動推移折れ線 SVG グラフ) および `ActivityLogCard.js` (システム活動ログ) は、時系列データやメッセージ配列を Props 受信し、静的に HTML/SVG を出力する責任のみを持つ。トレンドの予測計算や分析、およびログの動的追加・削除処理は行わない。

@@ -34,7 +34,7 @@ class DashboardObserver {
       updateTimeEl.innerText = new Date().toLocaleTimeString();
     }
 
-    // 4. レンダラー経由でのコンポーネント一元マウント (Props 伝播)
+    // 4. レンダラー経由でのコンポーネント一元マウント (Props 伝播: 各KPIカード + SVGグラフ + 活動ログ)
     window.DashboardRenderer.render(result.data);
 
     // 5. レンダリング完了後に初めてアニメーションを開始 (途中状態の表示防止)

@@ -14,7 +14,7 @@ class DashboardMotion {
   static init() {
     console.log('[Dashboard Motion] モーションコントローラーを初期化します...');
     
-    // 1. data-motion 要素を走査してフェード・スライドを実行
+    // 1. data-motion 要素を走査してフェード・スライドを実行 (Stagger 遅延対応)
     const elements = document.querySelectorAll('[data-motion]');
     elements.forEach(el => {
       const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
@@ -31,6 +31,22 @@ class DashboardMotion {
     this.startRollingInt('gov-pending', 2);
     this.startRollingInt('gov-approved', 84);
     this.startRollingInt('gov-rejected', 0);
+
+    // 3. SVG 折れ線グラフの Stroke Dash ドローイングアニメーション
+    const trendPath = document.querySelector('.trend-line');
+    if (trendPath) {
+      try {
+        const length = trendPath.getTotalLength();
+        trendPath.style.strokeDasharray = length;
+        trendPath.style.strokeDashoffset = length;
+        // リフロー強制 (描画トリガー)
+        trendPath.getBoundingClientRect();
+        trendPath.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)';
+        trendPath.style.strokeDashoffset = '0';
+      } catch (e) {
+        console.warn('[Dashboard Motion] SVG線画延長の取得に失敗しました。代替描画を行います:', e.message);
+      }
+    }
   }
 
   /**

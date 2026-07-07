@@ -69,6 +69,22 @@ class DashboardRenderer {
       delay: 400
     });
 
+    // 7. Activity Trend Card (SVGグラフ)
+    html += window.ActivityTrendCard.render({
+      trendData: data.trendData || [25, 38, 55, 48, 72, 88.5],
+      delay: 450
+    });
+
+    // 8. Activity Log Card (システム活動ログ)
+    html += window.ActivityLogCard.render({
+      logs: data.logs || [
+        { time: '22:45:10', module: 'Simulation', message: 'Local Simulation PASS' },
+        { time: '22:43:08', module: 'Quality', message: 'Regression audit PASS' },
+        { time: '22:40:01', module: 'Governance', message: 'Boundary protection check active' }
+      ],
+      delay: 500
+    });
+
     // 一括インサート (途中状態のチラつき防止)
     gridContainer.innerHTML = html;
   }
