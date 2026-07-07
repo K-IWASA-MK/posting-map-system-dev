@@ -13,19 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: Human Engineering Engine Foundation [現在のフェーズ]
-* **目的**: AIOS全体の品質評価基準として、人間（熟練エンジニア）の観点に基づくUI・UX評価基準を定義する Human Engineering Engine と、プロダクトのAI特有の不自然さ（AI Smell）を排除する検出定義の基盤（Foundation）を構築する。
+### 現在のスプリント: Quality Score Engine Foundation [現在のフェーズ]
+* **目的**: Review Engine, Architecture Review, Human Engineering Review, Design Review, UX Review, Runtime Review, AI Smell Review, Output Engine の検証結果を統合し、プロダクト品質を数値として定量管理・可視化するための基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Human Engineering, AI Smell, Product Review Rules)
-  - ✅ ルール定義 (Rule Definition: AI Smell Levels)
-  - ✅ レビューフローの更新 (Review Flow Update)
+  - ✅ 仕様定義 (Specification: Quality Score, Score Model, Score Schema, Priority, Confidence)
+  - ✅ スコアデータ構造定義 (Score Schema JSON Structure)
+  - ✅ レビュー統合フローの更新 (Review Pipeline Update)
 * **今回実装しないもの (対象外)**:
-  - ❌ AI自動判定 (Automated AI Detection)
-  - ❌ スコアリング (Scoring Engine Logic)
-  - ❌ 自動修正 (Auto Fix)
-  - ❌ HTML解析 (HTML/DOM Parsing)
+  - ❌ スコアの自動計算 (Score Calculation Logic)
+  - ❌ 比重の動的計算 (Weight Calculations)
+  - ❌ AI判定 / 自動改善 (AI Evaluation / Auto Fix)
+  - ❌ HTML/CSS解析 (Parsing)
+  - ❌ 品質ダッシュボード表示 (Dashboard Visualization)
 
-### 次期フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
+### 次期フェーズ: 自己改善エンジン (Self Review Engine)
+* **目的**: 開発エージェントが品質スコアと改善推奨（Recommendation）を受け取り、自動でコードの修正案を生成して再レビューにかける完全な自己改善品質ループを構築する。
+
+### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboardの全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
 * **要件**: モックデータは、将来の実データ接続時に容易にJSON差し替えが行えるよう、**データ構造とUI描画ロジックを完全に分離（疎結合）**して設計する。
 
@@ -49,7 +53,7 @@
   > **"Don't build a dashboard. Build the place people want to come back to every morning."**
   > (ダッシュボードを作るな。人々が毎朝戻ってきたくなる場所を作れ。)
 
-### 将来フェーズ (Future Phases)
+### 将来フェーズ (Future Dashboard Phases)
 * **フェーズ 2: UI Component化**: プロトタイプで作成した各パーツ（KPIカード、グラフ、サイドナビ等）を再利用可能な独立コンポーネントとして共通化・整理する。
 * **フェーズ 3: GAS Connection (JSON取得)**: バックエンド（GAS）と通信させ、ダッシュボード用の集計JSONを取得可能にする。
 * **フェーズ 4: リアルデータ反映 ＆ チューニング**: 完成したUIコンポーネントに実データを流し込み、アニメーションの滑らかさやパフォーマンスのチューニングを行う。
@@ -59,5 +63,3 @@
 > [!IMPORTANT]
 > **AIへの重要命令**:  
 > ダッシュボード開発フェーズにおいては、実データ（GAS）への接続コードは一切実装しないこと。すべてモックデータを用いて開発し、デザインシステム（DESIGN_SYSTEM.md）に定義された「滑らかなアニメーション」や「Glass Tooltip」などのUX体験の完成に全力を注ぐこと。
-
-
