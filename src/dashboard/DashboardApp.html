@@ -12,8 +12,8 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Header Component -->
-    <header class="dashboard-header">
+    <!-- Header Component (Slide Down) -->
+    <header class="dashboard-header" data-motion="slide-down" data-delay="0">
       <div class="header-logo">
         <h1>AIOS Kernel Dashboard</h1>
       </div>
@@ -25,8 +25,8 @@
     </header>
 
     <div class="body-container">
-      <!-- Sidebar Component (Read-Only Navigation) -->
-      <aside class="dashboard-sidebar">
+      <!-- Sidebar Component (Slide In Left) -->
+      <aside class="dashboard-sidebar" data-motion="slide-in-left" data-delay="100">
         <nav class="sidebar-nav">
           <ul>
             <li class="active">Dashboard</li>
@@ -48,8 +48,8 @@
       <!-- Main Dashboard View -->
       <main class="dashboard-main">
         <div class="dashboard-grid">
-          <!-- 1. Kernel Status Panel -->
-          <section class="card premium-glass grid-col-2">
+          <!-- 1. Kernel Status Panel (Fade Up, Delay 150) -->
+          <section class="card premium-glass grid-col-2" data-motion="fade-up" data-delay="150">
             <h2>Kernel Status</h2>
             <div class="status-list" id="kernel-status-list">
               <div class="status-item"><span>Execution</span><span class="badge badge-idle" id="ks-execution">-</span></div>
@@ -62,8 +62,8 @@
             </div>
           </section>
 
-          <!-- 2. Simulation Quality Gate Panel -->
-          <section class="card premium-glass">
+          <!-- 2. Simulation Quality Gate Panel (Fade Up, Delay 200) -->
+          <section class="card premium-glass" data-motion="fade-up" data-delay="200">
             <h2>Simulation Quality Gate</h2>
             <div class="metrics-list">
               <div class="metric-item">
@@ -81,8 +81,8 @@
             </div>
           </section>
 
-          <!-- 3. Quality Panel -->
-          <section class="card premium-glass">
+          <!-- 3. Quality Panel (Fade Up, Delay 250) -->
+          <section class="card premium-glass" data-motion="fade-up" data-delay="250">
             <h2>Quality Metrics</h2>
             <div class="metrics-list">
               <div class="metric-item">
@@ -104,8 +104,8 @@
             </div>
           </section>
 
-          <!-- 4. Knowledge Panel -->
-          <section class="card premium-glass">
+          <!-- 4. Knowledge Panel (Fade Up, Delay 300) -->
+          <section class="card premium-glass" data-motion="fade-up" data-delay="300">
             <h2>Knowledge Metrics</h2>
             <div class="metrics-list">
               <div class="metric-item">
@@ -127,8 +127,8 @@
             </div>
           </section>
 
-          <!-- 5. Governance Panel -->
-          <section class="card premium-glass">
+          <!-- 5. Governance Panel (Fade Up, Delay 350) -->
+          <section class="card premium-glass" data-motion="fade-up" data-delay="350">
             <h2>Governance Metrics</h2>
             <div class="metrics-list">
               <div class="metric-item">
@@ -150,8 +150,8 @@
             </div>
           </section>
 
-          <!-- 6. Billing Panel -->
-          <section class="card premium-glass">
+          <!-- 6. Billing Panel (Fade Up, Delay 400) -->
+          <section class="card premium-glass" data-motion="fade-up" data-delay="400">
             <h2>Billing Metrics</h2>
             <div class="metrics-list">
               <div class="metric-item">
@@ -173,6 +173,7 @@
     </div>
   </div>
 
+  <script src="DashboardMotion.js"></script>
   <script src="Dashboard.js"></script>
 </body>
 </html>

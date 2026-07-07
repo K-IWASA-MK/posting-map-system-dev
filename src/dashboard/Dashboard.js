@@ -120,4 +120,7 @@ class DashboardObserver {
 // ページロード完了時にレンダリングを実行
 window.addEventListener('DOMContentLoaded', () => {
   DashboardObserver.render(MOCK_DASHBOARD_DATA);
+  if (window.DashboardMotion) {
+    window.DashboardMotion.init();
+  }
 });

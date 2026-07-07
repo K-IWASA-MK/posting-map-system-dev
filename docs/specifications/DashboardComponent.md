@@ -35,3 +35,18 @@ Observer Dashboard 内を構成する各 UI エレメント（コンポーネン
   - **Billing Panel**: License, Subscription, Payment Event 状態。
 - **制約**:
   - 表示データはダッシュボード側で計算・改変せず、取得したモック JSON レコードをそのまま描画する。
+
+---
+
+## 各コンポーネントのモーション責任 (Component Motion Responsibility)
+各 UI コンポーネントが担当するモーションの動作・演出要件。
+- **Header component**:
+  - `Slide Down & Fade`: 初期ロード時に上部から下方向へ 500ms かけてスライドフェードインする。
+- **Sidebar component**:
+  - `Slide In Left & Hover`: 初期ロード時に左端から 500ms かけてスライドイン。メニュー項目へのマウスホバー時に左境界線のインジケーター（アクセント青）をハイライト表示する。
+- **Cards component**:
+  - `Fade Up & Staggered scale`: 各情報カードは、下部から上方向へ階段状の遅延（Staggered Delay: 50ms差）をもってフェードインし、同時にスケールを 98% から 100% へイージング拡大する。
+- **KPI component**:
+  - `Rolling Number`: 画面描画開始から 600ms の時間で、数値メトリクス（スコアや件数）を現在の最終目標値までドラムロールカウントアップする。
+- **Status component**:
+  - `Pulse Badge`: `Active` (緑) または `Idle` (青) のステータスバッジの周囲に、柔らかい波紋状 of 光彩アニメーション（Gentle/Slow Pulse）を無限ループ再生する。

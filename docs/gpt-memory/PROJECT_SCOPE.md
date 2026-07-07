@@ -13,23 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Skeleton Prototype Development [現在のフェーズ]
-* **目的**: 本番のGAS APIやStripe決済などの依存関係から完全に隔離された状態で、AIOSの動作を安全に監視する「100vh 骨格レイアウト」の Observer ダッシュボード UI プロトタイプ（`DashboardApp.html`, `Dashboard.css`, `Dashboard.js`）を `src/dashboard/` 配下に新規実装・構築する。
+### 現在のスプリント: AIOS Dashboard Motion & UX Styling Foundation [現在のフェーズ]
+* **目的**: 本番のGAS APIやStripe決済などの依存関係から完全に隔離された状態で、ダッシュボードの Skeletal UI に対してイージング効果（Fade, Slide, Pulse, Rolling Number）のモーションレイヤー（`DashboardMotion.js`）およびCSS定義を追加し、Observer ダッシュボードとしての視覚体験と可視性を向上させる。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (DashboardPrototype, DashboardComponent, MockDashboardData)
-  - ✅ Observer ダッシュボード HTML 骨格実装 (`DashboardApp.html`): 100vh, Header, Sidebar, Cards/Grid
-  - ✅ ダッシュボード CSS スタイル実装 (`Dashboard.css`): 純黒 #000000, 構成背景 #1C1C1E, 白枠, 青・緑のアクセント
-  - ✅ 観測専用 JS ロジック実装 (`Dashboard.js`): 静的モックデータの非同期ロードとUI要素マッピング
-  - ✅ 既存仕様（KernelDashboard.md, IntegrationSimulation.md, CLIOrchestrator.md）の対応追加
-  - ✅ 開発理念（AGENTS.md）への Dashboard Observer Core Principle 追加
+  - ✅ 新規仕様定義 (DashboardMotion, DashboardUX, MotionToken)
+  - ✅ モーションコントローラー実装 (`DashboardMotion.js`): アニメーション初期化、クラス付与、Rolling Number (数値カウントアップ表示演出)
+  - ✅ アニメーションスタイル定義追加 (`Dashboard.css`): transform/opacity による Fade/Slide トランジション、バッジ用 Pulse アニメーション、Glass Hover 効果
+  - ✅ 観測専用 JS ロジック更新 (`Dashboard.js`): ロード完了後に `DashboardMotion.init()` を呼び出しアニメーションを起動
+  - ✅ 既存仕様（DashboardPrototype.md, DashboardComponent.md, AGENTS.md）への Motion 設計・責任の追記
+  - ✅ 現在のスプリント定義（PROJECT_SCOPE.md）の更新
 * **今回実装しないもの (対象外)**:
-  - ❌ 本番 Spreadsheet / GAS API への接続や require / import 参照コードの組み込み
-  - ❌ Stripe 決済 API / SDK の直接アクセスや require / import 参照コードの組み込み
-  - ❌ カーネル実行や承認決定状態を書き換えるインタラクティブボタン（Execute, Approve, Reject, Delete 等）の配置
-  - ❌ ダッシュボード側での結果値や判定ロジックの算出・改変
+  - ❌ モーションコントローラー内からの fetch, axios 等の外部 API 通信や非同期データロード処理の追加
+  - ❌ アニメーション処理から Kernel 状態や意思決定を書き換えるビジネスロジックの呼び出し
+  - ❌ 操作をトリガーするボタン（Execute, Approve 等）のダッシュボード上への配置
+  - ❌ モーションの常時監視タイマーや requestAnimationFrame の無制限ループによる過剰なCPU負荷処理
 
-### 次期フェーズ: AIOS Dashboard Motion & UX Styling
-* **目的**: 実際のGAS API接続を行わず、モックデータを用いてDashboardの画面遷移時のFade/Slide/Glassトランジション、およびLIVEインジケーターのゆっくりとした呼吸アニメーション（Pulse）等のUXインタラクションを構築・完了する。
+### 次期フェーズ: AIOS Dashboard KPI Data Binding
+* **目的**: モックデータで動いていたダッシュボード表示層に対して、バックエンド（GAS）の読み取り専用 GET-JSON API（`getSummary()` 等）から実際の KPI や状態ステータスを取得してマッピングするデータバインディング層を構築する（書き込みAPIは引き続き遮断）。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: モックデータを用いてDashboardのアニメーション、および操作性のモックを完成させる。
@@ -39,7 +39,7 @@
 1. **骨格 (Skeleton)**  
    * ✅ 完成条件: Header, Sidebar, Main Grid, 100vhレイアウト, Glass Cards of 基礎構造の作成。中身は空で良く、余白・高さ・視線誘導のみをレビュー対象とする。
 2. **アニメーションファースト (Motion First)** [次期フェーズ]
-   * 完成条件: 画面読み込み時のFade, Slide, Glassトランジション、およびLIVEインジケーターのゆっくりとした呼吸アニメーション（Pulse）の実装。開いた瞬間の「気持ちよさ」を追求する。
+   * ✅ 完成条件: 画面読み込み時のFade, Slide, Glassトランジション、およびLIVEインジケーターのゆっくりとした呼吸アニメーション（Pulse）の実装。開いた瞬間の「気持ちよさ」を追求する。
 3. **実績値表示 (KPI)**  
    * 完成条件: 活動人数、新規活動人数、保有枚数を表示。KPI更新時のRolling Number（ドラムロールエフェクト）の実装。
 4. **活動推移グラフ (Activity Trend - 主役)**  
