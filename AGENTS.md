@@ -206,6 +206,7 @@ POSTING MAP は：
 - **Output Engine Core Principle**: AIOS guarantees not only code quality but also output quality. Every response must conform to the Output Engine specification before it is considered complete.
 - **Human Engineering Core Principle**: 機能を追加することより、毎日使いたくなる体験を優先する。AI臭を減らすことは、デザインではなく品質改善である。
 - **Quality Score Core Principle**: AIOSはレビュー結果を感覚で判断しない。品質は構造化されたスコアモデルによって評価される。スコアは評価ではなく、改善の優先順位を決定するために存在する。
+- **Self Review Core Principle**: AIOSはレビューで終わらない。レビュー結果を改善へ変換し、品質が向上するまで自律的に改善案を生成する。
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。

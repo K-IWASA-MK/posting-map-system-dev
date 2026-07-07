@@ -8,7 +8,8 @@ AIOS（品質保証オペレーティングシステム）における品質保�
 - 開発AIに対する機械的・論理的・構造的・UX的レビューの実行。
 - 検出された問題点に基づく具体的な改善提案の自動生成。
 - レビュー履歴の蓄積とナレッジベースへのフィードバック。
-- **品質スコアエンジン（Quality Score Engine）へのレビュー評価データの受け渡し。**
+- 品質スコアエンジン（Quality Score Engine）へのレビュー評価データの受け渡し。
+- **自己レビューエンジン（Self Review Engine）への品質改善要求および評価データの受け渡し。**
 
 ---
 
@@ -23,8 +24,9 @@ AIOS（品質保証オペレーティングシステム）における品質保�
 6. **Runtime Review (実行時)**: 実行時性能、通信構造、APIコール数の検証。
 7. **AI Smell Review (AI臭検出)**: AI特有の不自然さの検出レベルの判定。
 8. **Quality Score (品質スコアリング)**: 各評価データの集約、重み付け、総合スコアと改善優先順位（Priority）の算出。
-9. **Output Engine (出力制御)**: 品質スコアデータに基づいた出力フォーマット、日本語優先規律の適用。
-10. **PASS (合格)**
+9. **Self Review (自己レビュー)**: 品質スコアの解析、改善要否の判定（Improvement Decision）、および改善提案要求。
+10. **Output Engine (出力制御)**: 品質結果や改善履歴に基づいた出力フォーマット、日本語優先規律の適用。
+11. **PASS (合格)**
 
 ---
 
@@ -35,12 +37,17 @@ AIOS内のデータ連携は、以下の階層的な一方向フローを厳守�
 [各レビューレイヤー (検証実行)] ──(生データ)──> [Review Engine (集約)]
                                                          │
                                                          ▼
-[Output Engine (日本語化/出力)] <──(ScoreSchema JSON)── [Quality Score Engine (スコア算出/優先順位付)]
+                                            [Quality Score Engine]
+                                                         │
+                                                  (ScoreSchema JSON)
+                                                         ▼
+[Output Engine (日本語化/出力)] <──(提案/履歴)── [Self Review Engine (改善判定/履歴蓄積)]
 ```
 
-1. **Review Engine**: 各検証ステージを実行し、検出されたルール違反等の生ログを収集。
-2. **Quality Score Engine**: 生ログを解析し、カテゴリ別スコア、優先順位（Priority）、および信頼度（Confidence）を計算して `ScoreSchema` 準拠のJSONデータを生成。
-3. **Output Engine**: 品質スコアJSONデータを受信し、人間（岩佐CEO）がそのまま読める実績説明書や改善推奨テキストにフォーマット整形して出力。
+1. **Review Engine**: 各検証ステージを実行し、生ログを収集。
+2. **Quality Score Engine**: 生ログから `ScoreSchema` 準拠の品質スコアJSONデータを生成。
+3. **Self Review Engine**: 品質スコアを受け取り、改善要否の判断（Improvement Decision）を行い、改善タスクを生成して履歴に保存。
+4. **Output Engine**: 品質スコアおよび改善タスクデータを受信し、日本語化された最終報告フォーマットへ変換してユーザーに提示。
 
 ---
 
@@ -48,10 +55,10 @@ AIOS内のデータ連携は、以下の階層的な一方向フローを厳守�
 レビューは以下のライフサイクルに従って実行され、永続化される。
 1. **トリガー (Trigger)**: コードの変更（Commit/PR）または設計仕様の変更を検知して自動起動。
 2. **実行コンテキスト構築 (Context Creation)**: 変更差分（Diff）、依存関係マップ、過去のインシデント履歴からコンテキストを生成。
-3. **パイプライン実行 (Pipeline Execution)**: 各レビューレイヤーを順次、非同期または決定論的に実行。
-4. **品質スコアリング (Scoring)**: Quality Score Engine が評価結果から総合品質指数を算出。
-5. **フィードバック & 改善ループ (Improvement Loop)**: 却下（FAIL）された場合は改善提案を出力し、開発エージェントが再実装を実施。再レビューへ自動接続。
-6. **テレメトリー更新 (Telemetry & Knowledge)**: レビュー結果と教訓（Lesson Learned）をナレッジベースに記録。
+3. **パイプライン実行 (Pipeline Execution)**: 各レビューレイヤーを順次実行。
+4. **品質スコアリング (Scoring)**: Quality Score Engine が評価結果から品質スコアを算出。
+5. **自己レビュー・改善判定 (Self Review & Decision)**: Self Review Engine が改善要否を判定し、改善が必要な場合はループを再実行。
+6. **テレメトリー更新 (Telemetry & Knowledge)**: 改善履歴（Improvement History）と教訓（Lesson Learned）をナレッジベースに記録。
 
 ---
 
@@ -64,6 +71,6 @@ AIOS内のデータ連携は、以下の階層的な一方向フローを厳守�
 修正実行 (Auto Fix/Developer) ──> 再レビュー実行 (Re-review)
                                               │
                                               ▼
-                                       総合判定判定
+                                        総合判定判定
 ```
 改善提案書には、修正すべき対象ファイル、問題コード位置、違反したルールID、および具体的な修正コード例（Diff形式）を含まなければならない。

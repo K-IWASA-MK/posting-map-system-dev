@@ -17,7 +17,8 @@ flowchart TD
     UX -->|PASS / WARNING| Runtime[8. 実行時レビュー (Runtime Review)]
     Runtime -->|PASS / WARNING| AISmell[9. AI臭レビュー (AI Smell Review)]
     AISmell -->|PASS / WARNING| Score[10. 品質スコアリング (Quality Score)]
-    Score --> Output[11. 出力制御 (Output Engine)]
+    Score --> SelfReview[11. 自己レビュー (Self Review)]
+    SelfReview --> Output[12. 出力制御 (Output Engine)]
     
     %% FAIL時のルート
     Execution -->|FAIL| Imp[改善提案 (Improvement Proposal)]
@@ -30,7 +31,7 @@ flowchart TD
     AISmell -->|FAIL| Imp
     
     Imp --> Output
-    Output --> Done([12. 合格 (PASS) / ユーザー提示])
+    Output --> Done([13. 合格 (PASS) / ユーザー提示])
 ```
 
 ## 各ステージの定義
@@ -76,13 +77,18 @@ flowchart TD
 - **出力**: AI Smell Level（AI臭レベル判定結果）
 
 ### 9. 品質スコアリング (Quality Score)
-- **概要**: 収集したレビューデータを集約し、標準比重（Weight）に基づいて総合スコア（Overall Score）および優先順位（Priority: P0〜P3）を計算。`ScoreSchema` 準拠のJSONデータを生成。
+- **概要**: 収集したレビューデータを集約し、標準比重（Weight）に基づいて総合スコア（Overall Score）および優先順位（Priority）を計算。`ScoreSchema` 準拠のJSONデータを生成。
 - **入力**: 各レビューレイヤーの検証結果データ
 - **出力**: 品質スコアJSON (QualityScore JSON)
 
-### 10. 出力制御 (Output Engine)
-- **概要**: 品質スコアデータおよび改善提案を受け取り、Output Engine仕様に沿って「日本語化」「フォーマット統一」「1つのコードブロック化」してユーザーに提示する。
-- **入力**: 品質スコアJSONまたは改善提案書
+### 10. 自己レビュー (Self Review)
+- **概要**: 品質スコアに基づき改善方針判定（Improvement Decision）を行い、改善タスクを生成。改善完了基準または改善停止条件（Stop Rule）を満たしていない場合は、改善タスクを Improvement Engine へ送信し、再レビューへループ。
+- **入力**: 品質スコアJSON
+- **出力**: 改善決定判定、改善タスク（Improvement Proposal）または完了通知
+
+### 11. 出力制御 (Output Engine)
+- **概要**: 品質スコアデータおよび改善提案・履歴を受け取り、Output Engine仕様に沿って「日本語化」「フォーマット統一」「1つのコードブロック化」してユーザーに提示する。
+- **入力**: 品質スコアJSON、改善タスク、または改善履歴
 - **出力**: 最終提示テキスト（出力原則準拠）
 
 ---
