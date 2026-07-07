@@ -13,10 +13,11 @@ class SimulationRuntime {
   /**
    * シミュレーションの実行をトリガーする
    * @param {string} scenarioId 
+   * @param {string} [customSimulationId]
    * @returns {Promise<object>} SimulationResult
    */
-  static async run(scenarioId) {
-    const simulationId = `SIM-${Date.now()}`;
+  static async run(scenarioId, customSimulationId = null) {
+    const simulationId = customSimulationId || `SIM-${Date.now()}`;
     const startTime = new Date().toISOString();
 
     // 1. 監査開始イベントの追記 (Append-Only)

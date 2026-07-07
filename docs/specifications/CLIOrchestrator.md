@@ -54,6 +54,11 @@ CLI実行は以下の単方向フローによってカーネルを制御し、�
   - **引数**: 対象のシナリオID（例: `SCN-NORMAL-001` 等）。
   - **ガードレール**: 本コマンド経由の実行においては、Mock Kernel のみが起動し、本番のカーネルデータ変更・最適化適用・課金決済処理などの本番 Kernel 側書き換え操作はシステムレベルで完全に遮断（禁止）される。
 
+- **test-kernel-simulation (CMD-004)**:
+  - **Name**: `test-kernel-simulation`
+  - **Target**: `Local Simulation Test Runner`
+  - **ガードレール**: 本コマンド経由の実行においては、`SimulationTestRunner` による自動テスト（接続契約、シナリオ回帰、本番隔離アサーション）のみを実行し、本番のカーネルエンジンや実データ（Spreadsheet、Stripe等）は一切起動・干渉させない。また、テストの失敗を無視・隠蔽して強制的に合格（PASS）に書き換えるパラメータは一切持たない。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

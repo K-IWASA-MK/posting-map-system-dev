@@ -13,22 +13,22 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Kernel Integration Mock Implementation Foundation [現在のフェーズ]
-* **目的**: 仕様化済みのAIOS Kernel Integration Simulationをコードレベルで検証可能にするため、本番環境から完全に論理隔離された模擬実行ランタイム（Mock Runtime）、コントラクトバリデーター、および検証用シナリオのテスト実行エンジンを `src/simulation/` 配下に新規実装・作成する。
+### 現在のスプリント: AIOS Kernel Local Simulation Tests Foundation [現在のフェーズ]
+* **目的**: 既存のSimulation Runtimeを利用し、AIOS Kernel変更時の接続破壊・Schema不整合・境界違反を自動検出するローカルシミュレーションテストスイート（Test Runner, Regression Tests, Boundary Tests, Reporter）を `src/tests/simulation/` 配下に新規実装・構築し、関連する仕様書の策定・更新を行う。
 * **今回実装するもの (対象)**:
-  - ✅ 接続検証用シミュレーションランタイムの実装 (`SimulationRuntime.js`)
-  - ✅ 各カーネル（ExecutionからBillingまで）の模擬エンジン実装 (`MockKernel.js`)
-  - ✅ レイヤー接続契約バリデーターの実装 (`ContractValidator.js`)
-  - ✅ 検証用シナリオ（Normal, Error, Approval Flow 等）の実行エンジン実装 (`ScenarioRunner.js`)
-  - ✅ テスト判定結果および監査ログ書き込みの実装 (`ResultGenerator.js`, `AuditWriter.js`)
-  - ✅ CLIコマンド (`simulate-kernel-flow`) からの起動接続ハンドラー実装 (`SimulationHandler.js`)
+  - ✅ 新規仕様定義 (LocalSimulationTests, TestScenarioRegistry, ContractRegression, TestResultReport, QualityGate, TestAudit)
+  - ✅ テスト実行管理エンジンの実装 (`SimulationTestRunner.js`)
+  - ✅ 契約回帰テスト・シナリオ回帰テストの実装 (`ContractRegressionTest.js`, `ScenarioRegressionTest.js`)
+  - ✅ 本番干渉コードを検知する境界テストの実装 (`BoundaryTest.js`)
+  - ✅ テスト結果レポートの生成とCLI出力の実装 (`TestReporter.js`)
+  - ✅ CLIおよびダッシュボードにおけるテストコマンド・テスト状況表示の追加
 * **今回実装しないもの (対象外)**:
-  - ❌ 本番の AIOS カーネルコード、Spreadsheet接続、Stripe外部決済連携などの本番ロジック
-  - ❌ シミュレーション内の Mock 承認・模擬支払処理を本番データへ同期・昇格させること
-  - ❌ 追記のみ監査ログ（simulation_audit.log）の上書き（Update）や消去（Delete）処理の実装
+  - ❌ テスト不合格（FAIL）時に自動でソースコードやスキーマを修正する自動パッチ機能 (Auto Fix)
+  - ❌ テスト結果の判定をバイパスしたり、結果を改ざんするパラメータ・機能の導入
+  - ❌ 本フェーズにおける Git Hook への実結合（Git Hook 実装は将来拡張とし、本フェーズは仕様定義のみとする）
 
-### 次期フェーズ: AIOS カーネルローカルシミュレーションテスト (AIOS Kernel Local Simulation Tests)
-* **目的**: 本フェーズで構築した模擬実行環境をベースとして、シミュレーターを CI/CD に統合し、接続契約検証や早期終了エラーパス、保留承認の挙動を継続自動テストするテストスイートの構築。
+### 次期フェーズ: AIOS ローカルシミュレーションテスト統合 (AIOS Kernel Local Simulation Tests Integration)
+* **目的**: 本フェーズで構築したテストランナーを Git Hook や clasp push フックに結合し、コミット・デプロイ前の自動ゲートとして実働稼働させる検証。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
