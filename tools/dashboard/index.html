@@ -172,16 +172,24 @@
     <!-- Content Grid Layout -->
     <div class="flex-1 flex flex-col gap-6 overflow-hidden">
       
-      <!-- KPI Cards Container (Right-aligned, Sparklines removed for clean number hero) -->
+      <!-- KPI Cards Container (Symmetric headers, Right-aligned values) -->
       <div class="grid grid-cols-3 gap-6 flex-shrink-0 animate-entry-card delay-100">
-        <!-- KPI Card 1: Active Members (Focal Point Card: Glowing border and scale presence) -->
+        <!-- KPI Card 1: Active Members -->
         <div style="border-color: rgba(217, 90, 16, 0.25); box-shadow: 0 0 30px rgba(217, 90, 16, 0.02), inset 0 0 0 1px rgba(217, 90, 16, 0.15);" 
-             class="premium-glass p-5 min-h-[7rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <div class="flex justify-between items-center">
-            <span class="text-[10px] font-bold text-[rgba(255,255,255,0.5)] uppercase tracking-widest">活動人数</span>
-            <span class="text-[9px] font-bold text-green-500 font-mono">ONLINE</span>
+             class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
+          <!-- Unified Header: Japanese + English Subtitle -->
+          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2 flex-shrink-0">
+            <div>
+              <h3 class="text-xs font-bold text-white tracking-tight">活動人数</h3>
+              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Active Count</p>
+            </div>
+            <!-- Muted status pill -->
+            <div class="flex items-center gap-1.5 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+              <span class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
+              <span class="text-[7px] font-bold text-green-400 tracking-widest font-mono">LIVE</span>
+            </div>
           </div>
-          <!-- Right-aligned number (text-right) with clean baseline -->
+          <!-- Right-aligned number -->
           <div class="flex justify-end items-baseline gap-1 mt-3">
             <span id="kpi-active-members" class="text-5xl font-extrabold tracking-tight text-white font-mono">0</span>
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">人</span>
@@ -189,10 +197,18 @@
         </div>
 
         <!-- KPI Card 2: New Active Members -->
-        <div class="premium-glass p-5 min-h-[7rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <div class="flex justify-between items-center">
-            <span class="text-[10px] font-bold text-[rgba(255,255,255,0.4)] uppercase tracking-widest">新規活動人数</span>
-            <span class="text-[9px] font-bold text-green-500 font-mono">AUTHORIZED</span>
+        <div class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
+          <!-- Unified Header: Japanese + English Subtitle -->
+          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2 flex-shrink-0">
+            <div>
+              <h3 class="text-xs font-bold text-white tracking-tight">新規活動人数</h3>
+              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">New Registrations</p>
+            </div>
+            <!-- Muted status pill -->
+            <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+              <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
+              <span class="text-[7px] font-bold text-blue-400 tracking-widest font-mono">SYNC</span>
+            </div>
           </div>
           <div class="flex justify-end items-baseline gap-1 mt-3">
             <span id="kpi-new-members" class="text-4xl font-extrabold tracking-tight text-white font-mono">0</span>
@@ -201,10 +217,18 @@
         </div>
 
         <!-- KPI Card 3: Custody count -->
-        <div class="premium-glass p-5 min-h-[7rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <div class="flex justify-between items-center">
-            <span class="text-[10px] font-bold text-[rgba(255,255,255,0.4)] uppercase tracking-widest">保有枚数</span>
-            <span class="text-[9px] font-bold text-brand font-mono">STOCKED</span>
+        <div class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
+          <!-- Unified Header: Japanese + English Subtitle -->
+          <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2 flex-shrink-0">
+            <div>
+              <h3 class="text-xs font-bold text-white tracking-tight">保有枚数</h3>
+              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Total Custody</p>
+            </div>
+            <!-- Muted status pill -->
+            <div class="flex items-center gap-1.5 bg-brand/10 px-2 py-0.5 rounded-full border border-brand/20">
+              <span class="w-1 h-1 bg-brand rounded-full"></span>
+              <span class="text-[7px] font-bold text-brand tracking-widest font-mono">STOCK</span>
+            </div>
           </div>
           <div class="flex justify-end items-baseline gap-1 mt-3">
             <span id="kpi-sheets-count" class="text-4xl font-extrabold tracking-tight text-white font-mono">0</span>
@@ -220,7 +244,6 @@
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-200">
           <!-- Activity Trend (col-span-9 - Expanded vertical spacing) -->
           <section class="col-span-9 premium-glass p-5 flex flex-col gap-2 overflow-hidden relative" id="chart-section">
-            <!-- Title Design System Unified: Bold Japanese primary, muted uppercase English sub -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 flex-shrink-0 select-none">
               <div>
                 <h3 class="text-sm font-bold text-white tracking-tight">活動推移</h3>
@@ -264,7 +287,6 @@
 
           <!-- Activity Log (col-span-3 - Dedicated Timeline vertical alignment) -->
           <section class="col-span-3 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
-            <!-- Title Design System Unified: Bold Japanese primary, muted uppercase English sub -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 flex-shrink-0 select-none">
               <div>
                 <h3 class="text-sm font-bold text-white tracking-tight">活動ログ</h3>
@@ -286,7 +308,6 @@
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-300">
           <!-- Inventory (col-span-8 - Interactive Hover Breathing Bars) -->
           <section class="col-span-8 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
-            <!-- Title Design System Unified: Bold Japanese primary, muted uppercase English sub -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 flex-shrink-0 select-none">
               <div>
                 <h3 class="text-sm font-bold text-white tracking-tight">保管状況</h3>
@@ -307,7 +328,6 @@
 
           <!-- Turnout Panel (col-span-4 - Percentage hierarchy focus) -->
           <section class="col-span-4 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
-            <!-- Title Design System Unified: Bold Japanese primary, muted uppercase English sub -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 flex-shrink-0 select-none">
               <div>
                 <h3 class="text-sm font-bold text-white tracking-tight">市別投票率</h3>
