@@ -37,6 +37,16 @@ AIOS（品質保証オペレーティングシステム）において、テナ�
 
 ---
 
+## CLI Orchestrator に対する接続・操作制限 (CLI Integration & Restriction)
+課金エンジンは、外部のCLIOrchestratorからの呼び出し接続に対して、以下の通り厳格なアクセス制限を設ける。
+
+- **操作の禁止 (No Write Actions via CLI)**:
+  - CLIOrchestrator経由で、直接ライセンスのアクティブ化、有効期限の変更、サブスクリプションの解約、または決済テストの強制実行（Payment Trigger）などの書き込み・変更操作（Write Actions）を実行することをシステムレベルで完全に禁止する。
+- **参照のみの許可 (Read-Only Status Query)**:
+  - CLIからは、現在のライセンスステータス（Active / Suspended / Expired）や次回更新予定日の「状態参照（Read-Only Query）」のみが許可される。
+
+---
+
 ## 将来拡張ポイント (Future Extensions)
 - **ライセンス自動停止連動 (Access-Control Automated Suspend)**:
   未払い等の警告（Past Due）状態が一定期間（例: 14日間）継続した場合、人間工学や品質スコア、ダッシュボード等へのアクセス権限を自動的に制限する認可制御（Access Control）との統合。

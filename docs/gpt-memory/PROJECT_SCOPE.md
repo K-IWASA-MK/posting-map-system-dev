@@ -13,20 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: Billing & License Management Engine Foundation [現在のフェーズ]
-* **目的**: AIOSの利用における契約、ライセンス、サブスクリプション、利用権限、および外部決済結果の反映を行う契約・権利・状態管理レイヤー（Billing & License）と外部決済プロバイダー（Stripe等）連携の Adapter 境界、および追記のみ可能な課金監査の基盤（Foundation）を構築する。
+### 現在のスプリント: AIOS CLI Orchestrator Foundation [現在のフェーズ]
+* **目的**: パイプラインを安全に呼び出し状態管理する制御入口（Orchestration Layer）と、コマンド仕様（Command Model）、カーネル呼び出し定義、実行コンテキスト管理、追記のみ監査、および安全な中断再開（Resume Control）の基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Billing Engine, License Model, Subscription Model, Payment Event, Billing Audit, External Payment Adapter)
-  - ✅ ガバナンスにおける License Policy (地域独占等) との接続・境界定義
-  - ✅ ダッシュボードおよびレビューパイプラインにおける課金表示専用マッピングと Observer 接続定義
-  - ✅ AIによる自動決済、自動返金、直接契約変更操作を禁止するガードレール定義
+  - ✅ 仕様定義 (Specification: CLI Orchestrator, Command Model, Kernel Invocation, Run Context, CLI Audit, Resume Control)
+  - ✅ レビューパイプラインおよびガバナンスにおけるCLI経由の起動要求の接続・Bypass禁止の境界定義
+  - ✅ ダッシュボードおよび課金におけるCLI実行状態の表示専用マッピングと接続制限の定義
+  - ✅ CLI経由の権限昇格、ガバナンスバイパス、およびログ削除・課金直接操作を禁止するガードレール定義
 * **今回実装しないもの (対象外)**:
-  - ❌ AIOS内部からのStripe決済トランザクションの直接実行 (Payment Execution)
-  - ❌ AIの判断による自動返金・自動契約締結 (Automated Billing Decisions)
-  - ❌ 課金状態データベースの直接的な破壊・削除API (Direct DB Mutations)
+  - ❌ コマンドラインからの実際のスクリプト・カーネル実行ロジックの実装 (CLI Executable Binaries)
+  - ❌ CLIOrchestrator自体に合否や課金等の判断ロジック（Decision Logic）を組み込むこと
+  - ❌ 中断再開時における無関係な過去データの自動的・無差別な探索処理 (Implicit Data Scraping)
 
-### 次期フェーズ: AIOS Kernel CLI 統制オーケストレーター (Kernel CLI Orchestrator Foundation)
-* **目的**: ローカル開発用の CLI コマンドや `clasp` 統合と連携し、コミット時やデプロイ時に自律的に8つの Kernel レイヤーを実行・統制するコマンドライン・オーケストレーターの基盤設計。
+### 次期フェーズ: AIOS 統合 ＆ ローカルシミュレータ (AIOS Kernel Integration & Simulation Mock)
+* **目的**: これまで策定した全設計モジュールをローカルの検証スクリプトにて結合し、コマンド・データフロー・イベント遷移が決定論的に機能するかを確認する実証用シミュレータの構築。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。

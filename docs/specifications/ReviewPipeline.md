@@ -140,6 +140,17 @@ Visualization (UI表示・可視化)
 
 ---
 
+## CLIオーケストレーター接続 (CLI Orchestrator Integration)
+本レビューパイプラインは、CLIOrchestratorからの起動要求（`run-pipeline` コマンド等）を受け取る接続境界を持つ。
+
+- **接続境界**:
+  - **CLIOrchestratorの役割**: パイプラインを起動するためのコンテキスト生成、呼び出しパラメータの引渡し、および実行中 status の追跡。
+  - **パイプラインの役割**: 起動要求に従って処理を開始し、各ステージを順次実行。実行完了時に `Completed` / `Failed` のステータスと、最終出力（Output Payload）をCLI側へ返却。
+- **非介入原則**:
+  - CLIOrchestratorは、パイプラインを実行する入り口（Trigger）および状態監視の役割のみを持ち、パイプライン内部における個別の合否判定ロジック（Quality判定やルール評価）を書き換えたり、省略（Bypass）させたりすることは一切できない。
+
+---
+
 ## 判定マージおよび早期終了ポリシー (Early Termination)
 - **早期終了 (Early Termination)**:
   - いずれかのステージで `FAIL` が確定した場合、後続のレビューはスキップされ、即座に「改善提案 (Improvement Proposal)」ステージに遷移する。
