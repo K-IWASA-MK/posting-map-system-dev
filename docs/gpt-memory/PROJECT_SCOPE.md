@@ -13,22 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: Self Review Engine Foundation [現在のフェーズ]
-* **目的**: Review Engine, Quality Score Engineの評価結果に基づき、改善要否の判断（Improvement Decision）、改善提案の生成、改善履歴管理（Improvement History）、および改善停止（Stop Rule）を自律的に行う「自己改善品質ループ」の基盤（Foundation）を構築する。
+### 現在のスプリント: Self Improvement Engine Foundation [現在のフェーズ]
+* **目的**: 改善提案を具体的な計画に分解し、安全かつ検証可能なプロセスとして品質向上サイクルを実行するための改善計画立案、承認検証（Plan Approval）、改善戦略（Strategy）、検証モデル（Verification）、および実行モデル（Execution Model）の基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Self Review, Improvement Engine, Improvement History, Stop Rules)
-  - ✅ 改善履歴データモデル定義 (Improvement History Data Schema)
-  - ✅ レビュー＆改善パイプラインの更新 (Review Pipeline Update)
+  - ✅ 仕様定義 (Specification: Self Improvement, Improvement Planner, Strategy, Verification, Execution Model)
+  - ✅ 計画承認、リスク評価（Risk Assessment）およびロールバック（Rollback Strategy）仕様の定義
+  - ✅ 改善量（Delta）および改善指標（Improvement Metrics）定義
+  - ✅ レビューパイプラインの更新 (Review Pipeline Update)
 * **今回実装しないもの (対象外)**:
-  - ❌ AIによる自動コード修正 (Automated AI Code Fix)
-  - ❌ HTML/CSS/DOMの自動書き換え (DOM Manipulation)
+  - ❌ AI自動コード生成 (Automated AI Code Generation)
+  - ❌ HTML/CSSの自動書き換え (DOM Manipulation)
   - ❌ 自動コミット / 自動Push (Automated Version Control)
 
-### 次期フェーズ: 自己進化エンジン (Self Improvement Engine Foundation)
-* **目的**: 生成された改善提案（Improvement Proposal）を具体的な改善タスクおよび実行計画に落とし込み、複数改善案（A/B案）を生成・評価・選択して実行に移す自己進化プロセスの仕様化。
+### 次期フェーズ: 学習エンジン (Learning Engine Foundation)
+* **目的**: 改善履歴（Improvement History）、品質推移（Quality Trend）、品質スコア（Quality Score）、レビュー履歴を分析し、「改善結果から学び、次回はより良い改善を提案できる」自己進化ループの仕様化。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
-* **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboardの全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
+* **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
 * **要件**: モックデータは、将来の実データ接続時に容易にJSON差し替えが行えるよう、**データ構造とUI描画ロジックを完全に分離（疎結合）**して設計する。
 
 #### 開発手順 (Implementation Order)
