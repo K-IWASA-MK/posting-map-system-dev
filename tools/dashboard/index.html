@@ -47,6 +47,11 @@
       box-shadow: 0 0 30px rgba(217, 90, 16, 0.005);
     }
 
+    /* Premium typography glow anchor to prevent text from being lost in pure black background */
+    .brand-title-glow {
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.12), 0 0 2px rgba(255, 255, 255, 0.18);
+    }
+
     /* Keyframes for hardware-accelerated fluid entries */
     @keyframes fadeInSlideLeft {
       from {
@@ -105,7 +110,7 @@
 
   <!-- Left Sidebar (Categorized Structure) -->
   <aside class="w-60 h-full bg-brand-card border-r border-[rgba(255,255,255,0.06)] flex flex-col p-6 flex-shrink-0 animate-entry-sidebar">
-    <!-- Brand Title Area (Premium Brand Header with Spacing) -->
+    <!-- Brand Title Area -->
     <div class="mb-10 flex-shrink-0 select-none">
       <h1 class="text-[11px] font-black text-brand tracking-[0.2em] uppercase">POSTING MAP</h1>
       <div class="w-8 border-b border-brand/40 my-3"></div>
@@ -177,11 +182,11 @@
         <!-- KPI Card 1: Active Members -->
         <div style="border-color: rgba(217, 90, 16, 0.25); box-shadow: 0 0 30px rgba(217, 90, 16, 0.02), inset 0 0 0 1px rgba(217, 90, 16, 0.15);" 
              class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <!-- Card Header Design System Unified -->
+          <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
           <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
             <div>
-              <h3 class="text-xs font-bold text-white tracking-tight">活動人数</h3>
-              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Active Members</p>
+              <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">活動人数</h3>
+              <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Active Members</p>
             </div>
             <div class="flex items-center gap-1.5 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
               <span class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
@@ -197,11 +202,11 @@
 
         <!-- KPI Card 2: New Active Members -->
         <div class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <!-- Card Header Design System Unified -->
+          <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
           <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
             <div>
-              <h3 class="text-xs font-bold text-white tracking-tight">新規活動人数</h3>
-              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">New Registrations</p>
+              <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">新規活動人数</h3>
+              <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">New Registrations</p>
             </div>
             <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
               <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
@@ -216,11 +221,11 @@
 
         <!-- KPI Card 3: Custody count -->
         <div class="premium-glass p-5 min-h-[8.5rem] flex flex-col justify-between relative overflow-hidden select-none">
-          <!-- Card Header Design System Unified -->
+          <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
           <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
             <div>
-              <h3 class="text-xs font-bold text-white tracking-tight">保有枚数</h3>
-              <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Sheets in Custody</p>
+              <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">保有枚数</h3>
+              <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Sheets in Custody</p>
             </div>
             <div class="flex items-center gap-1.5 bg-brand/10 px-2 py-0.5 rounded-full border border-brand/20">
               <span class="w-1 h-1 bg-brand rounded-full"></span>
@@ -241,11 +246,11 @@
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-200">
           <!-- Activity Trend (col-span-9) -->
           <section class="col-span-9 premium-glass p-5 flex flex-col gap-2 overflow-hidden relative" id="chart-section">
-            <!-- Card Header Design System Unified -->
+            <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-xs font-bold text-white tracking-tight">活動推移</h3>
-                <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Activity Flow Trend</p>
+                <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">活動推移</h3>
+                <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Activity Flow Trend</p>
               </div>
               <div class="flex items-center gap-1.5 bg-brand/10 px-2 py-0.5 rounded-full border border-brand/20">
                 <span class="w-1 h-1 bg-brand rounded-full"></span>
@@ -287,13 +292,13 @@
             </div>
           </section>
 
-          <!-- Activity Log (col-span-3) -->
+          <!-- Today's Activity (col-span-3) -->
           <section class="col-span-3 premium-glass p-5 flex flex-col gap-2 overflow-hidden">
-            <!-- Card Header Design System Unified -->
+            <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-xs font-bold text-white tracking-tight">今日の活動</h3>
-                <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Today's Activity</p>
+                <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">今日の活動</h3>
+                <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Today's Activity</p>
               </div>
               <div class="flex items-center gap-1.5 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
                 <span class="w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
@@ -315,11 +320,11 @@
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-300">
           <!-- Inventory (col-span-8) -->
           <section class="col-span-8 premium-glass p-5 flex flex-col gap-2 overflow-hidden">
-            <!-- Card Header Design System Unified -->
+            <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-xs font-bold text-white tracking-tight">保管状況</h3>
-                <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Inventory Stock Level</p>
+                <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">保管状況</h3>
+                <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Inventory Stock Level</p>
               </div>
               <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
                 <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
@@ -340,11 +345,11 @@
 
           <!-- Turnout Panel (col-span-4) -->
           <section class="col-span-4 premium-glass p-5 flex flex-col gap-2 overflow-hidden">
-            <!-- Card Header Design System Unified -->
+            <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-xs font-bold text-white tracking-tight">市別投票率</h3>
-                <p class="text-[8px] font-bold text-white/30 tracking-[0.1em] uppercase mt-0.5">Turnout Progress</p>
+                <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">市別投票率</h3>
+                <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Turnout Progress</p>
               </div>
               <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
                 <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
