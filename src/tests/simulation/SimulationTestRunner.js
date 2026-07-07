@@ -14,10 +14,11 @@ const { AuditWriter } = require('../../simulation/AuditWriter');
 class SimulationTestRunner {
   /**
    * テストスイートを全実行する
+   * @param {string} [customRunId]
    * @returns {Promise<object>} TestResultReport
    */
-  static async runAll() {
-    const testRunId = `TST-RUN-${Date.now()}`;
+  static async runAll(customRunId = null) {
+    const testRunId = customRunId || `TST-RUN-${Date.now()}`;
     const startTime = new Date().toISOString();
 
     // 1. テスト開始監査記録 (Append-Only)

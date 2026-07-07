@@ -13,22 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Kernel Local Simulation Tests Foundation [現在のフェーズ]
-* **目的**: 既存のSimulation Runtimeを利用し、AIOS Kernel変更時の接続破壊・Schema不整合・境界違反を自動検出するローカルシミュレーションテストスイート（Test Runner, Regression Tests, Boundary Tests, Reporter）を `src/tests/simulation/` 配下に新規実装・構築し、関連する仕様書の策定・更新を行う。
+### 現在のスプリント: AIOS Kernel Local Simulation Tests Integration Foundation [現在のフェーズ]
+* **目的**: 完成済みのローカルシミュレーションテスト環境を Git コミット操作（pre-commit）およびデプロイ操作（pre-deploy/clasp push）へ結合するため、品質ゲート検証フックスクリプト（`pre-commit-simulation.sh`, `pre-deploy-simulation.sh`）およびフック実行制御ランタイム（`hook_runner.js`）を `tools/hooks/` に新規実装・構築し、関連する仕様書の策定・更新を行う。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (LocalSimulationTests, TestScenarioRegistry, ContractRegression, TestResultReport, QualityGate, TestAudit)
-  - ✅ テスト実行管理エンジンの実装 (`SimulationTestRunner.js`)
-  - ✅ 契約回帰テスト・シナリオ回帰テストの実装 (`ContractRegressionTest.js`, `ScenarioRegressionTest.js`)
-  - ✅ 本番干渉コードを検知する境界テストの実装 (`BoundaryTest.js`)
-  - ✅ テスト結果レポートの生成とCLI出力の実装 (`TestReporter.js`)
-  - ✅ CLIおよびダッシュボードにおけるテストコマンド・テスト状況表示の追加
+  - ✅ 新規仕様定義 (TestIntegration, CommitQualityGate, DeployQualityGate, HookExecutionAudit)
+  - ✅ Git コミットフックスクリプトの実装 (`pre-commit-simulation.sh`)
+  - ✅ claspデプロイフックスクリプトの実装 (`pre-deploy-simulation.sh`)
+  - ✅ フック制御ランタイムの実装 (`hook_runner.js`): Hook/Run ID を管理し Quality Gate 判定に基づき Exit コード（Allow/Block）を制御
+  - ✅ 既存テストランナー・レポーターのフック Run Context 対応 (`SimulationTestRunner.js`, `TestReporter.js`)
+  - ✅ フック監査イベント（HookTriggered, HookCompleted）の追記のみ（Append-Only）保存の実装 (`AuditWriter.js`)
+  - ✅ CLIおよびダッシュボードにおけるフックコマンド・フック状況表示の追加
 * **今回実装しないもの (対象外)**:
-  - ❌ テスト不合格（FAIL）時に自動でソースコードやスキーマを修正する自動パッチ機能 (Auto Fix)
-  - ❌ テスト結果の判定をバイパスしたり、結果を改ざんするパラメータ・機能の導入
-  - ❌ 本フェーズにおける Git Hook への実結合（Git Hook 実装は将来拡張とし、本フェーズは仕様定義のみとする）
+  - ❌ フック失敗（Exit Code != 0）時にそれを無視して強制合格させる bypass オプションの導入
+  - ❌ テスト結果データの改ざんや、不合格を隠蔽するフラグの追加
+  - ❌ 監査ログファイル（`simulation_audit.log`）の上書き（Update）や消去（Delete）処理の実装
 
-### 次期フェーズ: AIOS ローカルシミュレーションテスト統合 (AIOS Kernel Local Simulation Tests Integration)
-* **目的**: 本フェーズで構築したテストランナーを Git Hook や clasp push フックに結合し、コミット・デプロイ前の自動ゲートとして実働稼働させる検証。
+### 次期フェーズ: AIOS ローカルシミュレーションテスト統合 実装・適用 (AIOS Kernel Local Simulation Tests Integration Implementation)
+* **目的**: フックの実働試験、およびデプロイ境界自動アサーションの機能拡充と、本番自動化テスト環境での継続的デリバリー検証。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。

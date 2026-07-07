@@ -32,6 +32,7 @@ class TestReporter {
       }
     }
 
+    console.log(`QUALITY GATE: ${report.result === 'PASS' ? 'PASS' : 'BLOCKED'}`);
     console.log('==================================================\n');
   }
 }

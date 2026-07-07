@@ -67,6 +67,12 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **Failure Count**: テストスイート内で不合格（FAIL）となったテストケースの件数。
 - **Warning Count**: 契約バージョン警告など、警告（WARNING）が検知されたテストケースの件数。
 
+### フック品質ゲート表示項目 (Hook Quality Gate Mappings)
+ダッシュボード上に「開発フロー統合・フック品質ゲート監視パネル」を表示する。表示項目はすべて読み取り専用（Read-Only）とし、ダッシュボード内からのフック強制解除や再試行操作は一切排除する。
+- **Last Quality Gate**: 直近に実行されたフックの品質ゲート実行完了ステータス（Passed / Blocked）。
+- **Commit Check Status**: Git コミット検証の成否、フックID、および発生タイムスタンプ。
+- **Deploy Check Status**: デプロイ前検証（`clasp push` 前等）の成否、フックID、および発生タイムスタンプ。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

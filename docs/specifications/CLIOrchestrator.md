@@ -59,6 +59,16 @@ CLI実行は以下の単方向フローによってカーネルを制御し、�
   - **Target**: `Local Simulation Test Runner`
   - **ガードレール**: 本コマンド経由の実行においては、`SimulationTestRunner` による自動テスト（接続契約、シナリオ回帰、本番隔離アサーション）のみを実行し、本番のカーネルエンジンや実データ（Spreadsheet、Stripe等）は一切起動・干渉させない。また、テストの失敗を無視・隠蔽して強制的に合格（PASS）に書き換えるパラメータは一切持たない。
 
+- **run-quality-gate (CMD-005)**:
+  - **Name**: `run-quality-gate`
+  - **Target**: `Simulation Hook Runner`
+  - **ガードレール**: コミット前フック（`git-pre-commit`）からトリガーされ、自動テスト（`test-kernel-simulation`）の実行と Quality Gate 評価結果を取得。合否の Exit コードを返却してコミットを制御する。
+
+- **run-pre-deploy-check (CMD-006)**:
+  - **Name**: `run-pre-deploy-check`
+  - **Target**: `Simulation Hook Runner`
+  - **ガードレール**: デプロイ前フック（`clasp-pre-deploy`）からトリガーされ、自動テスト結果からデプロイ可否（Allow / Block）を Exit コードで返却する。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)
