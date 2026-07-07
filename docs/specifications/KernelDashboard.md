@@ -37,6 +37,13 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **品質情報**: `QualityScore` レイヤーが出力するスコア JSON。
 - **ナレッジ情報**: `KnowledgeOptimization` レイヤーが出力する `Optimization Report` (Health/Merge/Gap/Metrics)。
 - **ガバナンス情報**: `Governance` レイヤーが出力する `Governance Decision` & `Governance Audit`。
+- **課金・ライセンス情報**: `Billing` & `License` レイヤーから出力される `LicenseRecord` および `SubscriptionRecord` の不変情報。
+
+### 課金・ライセンス表示項目 (Billing & License Mappings)
+ダッシュボード上に「ライセンス・お支払い状況監視パネル」を表示する。表示項目はすべて読み取り専用（Read-Only）とし、契約変更や決済実行ボタンは一切排除する。
+- **License Status**: ライセンスの有効期限および現在の状態（Active / Suspended 等）。
+- **Subscription Status**: 次回請求更新予定日およびサブスクリプションの状態（Trial / Active / Past Due 等）。
+- **Billing History**: 過去の `PaymentEvent`（決済履歴）の一覧表示。
 
 ---
 

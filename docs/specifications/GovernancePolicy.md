@@ -26,6 +26,10 @@ AIOS（品質保証オペレーティングシステム）において、シス�
 ### 5. 変更ポリシー (Change Policy)
 - **概要**: 修正差分のリスク（Risk Assessment: Low/Medium/High）に応じた、人間承認（Approval Gate）の要否基準を定義。
 
+### 6. ライセンスポリシー (License Policy)
+- **概要**: 地域独占権限（独占契約地区外への配布マップ描画の禁止等）、利用期限チェック、およびブランチごとの操作・アクセス権限ポリシーを定義。
+- **適用例**: 「MIE-03 ライセンス保有ブランチは、三重県第3区以外のエリアデータを取得・描画するAPIを実行してはならない。」
+
 ---
 
 ## ポリシーライフサイクル (Policy Lifecycle)
@@ -62,7 +66,7 @@ AIOS（品質保証オペレーティングシステム）において、シス�
     },
     "category": {
       "type": "string",
-      "enum": ["Knowledge", "Quality", "Development", "Security", "Change"]
+      "enum": ["Knowledge", "Quality", "Development", "Security", "Change", "License"]
     },
     "scope": { "type": "string" },
     "effectiveDate": { "type": "string", "format": "date-time" },

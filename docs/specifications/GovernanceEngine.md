@@ -63,6 +63,17 @@ AIOSにおける統制と実行は、以下の順序に従って人間の制御�
 
 ---
 
+## ライセンスポリシーとの接続定義 (License Policy Integration)
+ガバナンスエンジンは、課金・ライセンス状態（Billing）と利用条件・権限（Governance）の責務分離を維持しつつ、ライセンスポリシー（License Policy）との接続を以下の要領で定義する。
+
+- **接続境界**:
+  - **Billing Engineの役割**: 契約状態（Subscription）およびライセンスステータス（Active / Suspended 等）の管理とアダプター経由の同期。
+  - **Governance Engineの役割**: 地域独占条件（Exclusive Scope）の検証、利用期限内の操作権限（Access Policy）、およびポリシー適合状況の監査判定。
+- **データ参照モデル**:
+  - ガバナンス判定処理は、ライセンス管理データベース（`LicenseRecord`）からライセンス状態およびScopeを読み取り、アクティブでないライセンス（Suspended / Expired）に対しては「利用拒否（Banned / Unauthorized）」の統制判定を自動適用する。
+
+---
+
 ## 将来拡張ポイント (Future Extensions)
 - **ポリシー適合シミュレータ (Policy Simulation Engine)**:
   ガバナンスポリシーやルールを新たに策定・変更した際、過去のすべての改善実績・ナレッジ最適化レポートに対してその新ポリシーを適用した場合に発生する「承認要求件数の増減」や「判定不適合率」を事前にシミュレーションする予測分析機能。

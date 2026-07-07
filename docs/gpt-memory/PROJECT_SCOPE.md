@@ -13,20 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Kernel Dashboard & Integration Mock Foundation [現在のフェーズ]
-* **目的**: 完成した AIOS Kernel レイヤーを横断的に観測し、状態（Status）、品質（Quality）、ナレッジ（Knowledge）、ガバナンス（Governance）、および承認・監査ログを人間が確認可能にするダッシュボード観測表示レイヤー（Observer）と、8つの Kernel モジュール間の接続整合性を検証・テストする統合モック（Integration Mock）の基盤（Foundation）を構築する。
+### 現在のスプリント: Billing & License Management Engine Foundation [現在のフェーズ]
+* **目的**: AIOSの利用における契約、ライセンス、サブスクリプション、利用権限、および外部決済結果の反映を行う契約・権利・状態管理レイヤー（Billing & License）と外部決済プロバイダー（Stripe等）連携の Adapter 境界、および追記のみ可能な課金監査の基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Kernel Dashboard, Status Model, Quality Display, Knowledge Display, Governance Display, Integration Mock)
-  - ✅ 各カーネル（Governance, Optimization）におけるダッシュボード参照用の Output 定義
-  - ✅ レビューパイプラインと Observer 観測通知の接続定義
-  - ✅ ダッシュボード内からの書き換え・承認操作等の介入行為を禁止するガードレール定義
+  - ✅ 仕様定義 (Specification: Billing Engine, License Model, Subscription Model, Payment Event, Billing Audit, External Payment Adapter)
+  - ✅ ガバナンスにおける License Policy (地域独占等) との接続・境界定義
+  - ✅ ダッシュボードおよびレビューパイプラインにおける課金表示専用マッピングと Observer 接続定義
+  - ✅ AIによる自動決済、自動返金、直接契約変更操作を禁止するガードレール定義
 * **今回実装しないもの (対象外)**:
-  - ❌ ダッシュボード内からの承認アクション実行 (Dashboard-driven Actions)
-  - ❌ ナレッジ、ポリシー、ルールのダッシュボードからの直接改変 (Direct Data Mutation)
-  - ❌ モック領域を超えた実ダッシュボードのUIコード・通信実装 (Production Frontend Code)
+  - ❌ AIOS内部からのStripe決済トランザクションの直接実行 (Payment Execution)
+  - ❌ AIの判断による自動返金・自動契約締結 (Automated Billing Decisions)
+  - ❌ 課金状態データベースの直接的な破壊・削除API (Direct DB Mutations)
 
-### 次期フェーズ: 課金・ライセンス管理エンジン (Billing Engine Foundation)
-* **目的**: Stripe 決済、支部ライセンス管理、および地域独占販売制御を統制するビジネス・課金管理エンジンの基盤設計と仕様化。
+### 次期フェーズ: AIOS Kernel CLI 統制オーケストレーター (Kernel CLI Orchestrator Foundation)
+* **目的**: ローカル開発用の CLI コマンドや `clasp` 統合と連携し、コミット時やデプロイ時に自律的に8つの Kernel レイヤーを実行・統制するコマンドライン・オーケストレーターの基盤設計。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
