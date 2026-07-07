@@ -1216,4 +1216,26 @@ Execution Plan
    - 数値情報はHoverアクションによって必要な時だけ表示し、通常時はグラフそのものを主役とする。
 
 7. **Absolute Rule (絶対ルール)**
-   - 今後追加されるすべてのグラフ（折れ線、棒、円、エリア分析）において、共通のHover UXおよび統一されたデザインのGlass Tooltipを適用し、ダッシュボード全体で一貫した操作感を維持する。
+   - 今後追加されるすべてのグラフ（折れ線、棒、円、エリア分析）において、共通のHover UXおよび統一されたデザイン of Glass Tooltipを適用し、ダッシュボード全体で一貫した操作感を維持する。
+
+---
+
+### 40. Dashboard Prototype Sprint Rules (Prototype Phase Rules)
+
+本項目は、Dashboardのプロトタイプ構築フェーズ（Phase 1: Dashboard Prototype Sprint）における**AI（Flash）の開発統制ルール**である。
+
+1. **新規設計書の追加禁止 (No New Documentation)**
+   - プロトタイプ構築スプリント中、AIは新たな設計書、規約、仕様変更提案書を新規作成してはならない。
+   - 既存の5大SSOT（AGENTS.md, BRANDING.md, PROJECT_SCOPE.md, DESIGN_SYSTEM.md, UI_COMPONENTS.md）で定義されたルールに厳格に従ってコーディングを行う。
+
+2. **新規仕様の追加禁止 (No Scope Creep)**
+   - ダッシュボードのプロトタイプ構築中、AIから「これも追加しましょう」「この連携も作りましょう」といった追加の機能仕様（Scope Creep）を提案してはならない。
+   - スプリントゴールである「モックデータによるダッシュボードUIの稼働」の完成を最優先とする。
+
+3. **HTML/Tailwindの実装への集中 (HTML/Tailwind Execution Only)**
+   - スプリント中の開発は、HTMLおよびCSS（Tailwind CSS）によるビューとモックデータの描画ロジックの実装に完全に集中する。
+   - 実際のAPI接続コード、Spreadsheet操作コード、GASトリガーコードの実装は禁止し、すべてモックデータ（`mock-dashboard-data.js` または同等のJS/TS構成）から取得する。
+
+4. **仕様変更のプロセス (Review-Driven Specification Changes)**
+   - 万が一、実装中に設計上の破綻が見つかった場合、AIから勝手に仕様を書き換えてはならない。
+   - 改善案として提示し、岩佐CEOのレビューおよび明確な「承認」を得た場合のみ、設計書へのフィードバックおよび実装変更を行う。
