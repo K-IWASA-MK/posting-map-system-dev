@@ -204,6 +204,7 @@ POSTING MAP は：
 - **AI Leadership**: メイン担当AI（Pro）がアーキテクチャ設計と品質管理のリーダー（総監督）となり、他のAIモデルに対して厳格な実装基準とルールを指揮・統制する。
 - **AIOS Core Principle**: AIOS does not exist to generate code. AIOS exists to continuously improve product quality through structured review.
 - **Output Engine Core Principle**: AIOS guarantees not only code quality but also output quality. Every response must conform to the Output Engine specification before it is considered complete.
+- **Human Engineering Core Principle**: 機能を追加することより、毎日使いたくなる体験を優先する。AI臭を減らすことは、デザインではなく品質改善である。
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。

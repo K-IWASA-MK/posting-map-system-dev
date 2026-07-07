@@ -13,22 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Review & Output Engine Foundation [現在のフェーズ]
-* **目的**: AIOSの品質保証機構である Review Engine と、すべての出力品質を統一する Output Engine の基盤（Foundation）を構築する。
+### 現在のスプリント: Human Engineering Engine Foundation [現在のフェーズ]
+* **目的**: AIOS全体の品質評価基準として、人間（熟練エンジニア）の観点に基づくUI・UX評価基準を定義する Human Engineering Engine と、プロダクトのAI特有の不自然さ（AI Smell）を排除する検出定義の基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification)
-  - ✅ ルール定義 (Rule Definition)
-  - ✅ レビュー＆出力フロー定義 (Review & Output Flow)
-  - ✅ エンジンアーキテクチャ定義 (Engine Architecture)
-  - ✅ 責務境界定義 (Responsibility Separation)
+  - ✅ 仕様定義 (Specification: Human Engineering, AI Smell, Product Review Rules)
+  - ✅ ルール定義 (Rule Definition: AI Smell Levels)
+  - ✅ レビューフローの更新 (Review Flow Update)
 * **今回実装しないもの (対象外)**:
-  - ❌ AST解析
-  - ❌ HTML解析
-  - ❌ CSS解析
-  - ❌ 自動修正
-  - ❌ Linter
-  - ❌ AI評価
-  - ❌ ビジュアル差分 (Visual Diff)
+  - ❌ AI自動判定 (Automated AI Detection)
+  - ❌ スコアリング (Scoring Engine Logic)
+  - ❌ 自動修正 (Auto Fix)
+  - ❌ HTML解析 (HTML/DOM Parsing)
 
 ### 次期フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboardの全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
