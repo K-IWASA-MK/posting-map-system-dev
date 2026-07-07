@@ -55,4 +55,18 @@ AIOS（品質保証オペレーティングシステム）のシミュレーシ�
   },
   "required": ["auditLogId", "simulationId", "timestamp", "eventType", "details"]
 }
+
+---
+
+## 実行時監査ログ形式 (Runtime Audit Format)
+シミュレーターの模擬実行時に実際に追記（Append-Only）保存されるイベントデータのレイアウト。
+
+- **ScenarioStarted**:
+  - シミュレーション開始時に記録。実行ユーザー、開始シナリオ名が含まれる。
+- **LayerSimulated / ExecutionFailed**:
+  - 各模擬レイヤー（Mock Kernel）が起動・応答を返した際、または品質不十分などの早期終了条件をシミュレートした際に発生するエラーを記録。
+- **ContractValidated**:
+  - 接続契約（Contract）に規定されたスキーマ検証チェックの完了および合否判定（Passed / Failed）の結果を記録。
+- **ScenarioEnded**:
+  - シナリオ処理完了（Passed / Failed）時に、最終適否判定および終了タイムスタンプを伴って記録。
 ```

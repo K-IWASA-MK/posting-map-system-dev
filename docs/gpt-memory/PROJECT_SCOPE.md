@@ -13,20 +13,22 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Kernel Integration & Simulation Mock Foundation [現在のフェーズ]
-* **目的**: これまで構築したAIOS Kernel群を「接続契約・状態遷移・異常経路まで検証可能なOS基盤」へ進化させるため、Integration Simulation, Mock Kernel Model, Simulation Scenario, Simulation Result, Kernel Contract, Simulation Audit の基盤（Foundation）を構築する。
+### 現在のスプリント: AIOS Kernel Integration Mock Implementation Foundation [現在のフェーズ]
+* **目的**: 仕様化済みのAIOS Kernel Integration Simulationをコードレベルで検証可能にするため、本番環境から完全に論理隔離された模擬実行ランタイム（Mock Runtime）、コントラクトバリデーター、および検証用シナリオのテスト実行エンジンを `src/simulation/` 配下に新規実装・作成する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Integration Simulation, Mock Kernel Model, Simulation Scenario, Simulation Result, Kernel Contract, Simulation Audit)
-  - ✅ CLIおよびダッシュボードにおけるシミュレーションコマンド・結果マッピングの定義
-  - ✅ ガバナンスおよび課金におけるシミュレーション環境の論理隔離・Bypass禁止の定義
-  - ✅ 再開制御におけるシミュレーション再開の適用条件定義
+  - ✅ 接続検証用シミュレーションランタイムの実装 (`SimulationRuntime.js`)
+  - ✅ 各カーネル（ExecutionからBillingまで）の模擬エンジン実装 (`MockKernel.js`)
+  - ✅ レイヤー接続契約バリデーターの実装 (`ContractValidator.js`)
+  - ✅ 検証用シナリオ（Normal, Error, Approval Flow 等）の実行エンジン実装 (`ScenarioRunner.js`)
+  - ✅ テスト判定結果および監査ログ書き込みの実装 (`ResultGenerator.js`, `AuditWriter.js`)
+  - ✅ CLIコマンド (`simulate-kernel-flow`) からの起動接続ハンドラー実装 (`SimulationHandler.js`)
 * **今回実装しないもの (対象外)**:
-  - ❌ 本番のカーネルエンジンや実データ（Spreadsheetや外部Stripe接続等）を変更・更新する実コードの実装
-  - ❌ 模擬承認結果（MockApproved）を本番の実行可能メタデータに昇格・適用すること
-  - ❌ 模擬決済イベントを Stripe などの実決済情報に同期・影響させること
+  - ❌ 本番の AIOS カーネルコード、Spreadsheet接続、Stripe外部決済連携などの本番ロジック
+  - ❌ シミュレーション内の Mock 承認・模擬支払処理を本番データへ同期・昇格させること
+  - ❌ 追記のみ監査ログ（simulation_audit.log）の上書き（Update）や消去（Delete）処理の実装
 
-### 次期フェーズ: AIOS 統合模擬環境の実装 (AIOS Kernel Integration Mock Implementation)
-* **目的**: 本スプリントで策定した仕様に基づいて、接続契約（Contract）やエラー・承認フローをローカルで模擬実行・自動テストする検証シミュレーターの実コード構築。
+### 次期フェーズ: AIOS カーネルローカルシミュレーションテスト (AIOS Kernel Local Simulation Tests)
+* **目的**: 本フェーズで構築した模擬実行環境をベースとして、シミュレーターを CI/CD に統合し、接続契約検証や早期終了エラーパス、保留承認の挙動を継続自動テストするテストスイートの構築。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
