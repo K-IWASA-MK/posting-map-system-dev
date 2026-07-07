@@ -21,7 +21,8 @@ flowchart TD
     SelfReview -->|AUTO_IMPROVE| SelfImprove[12. 自己改善 (Self Improvement)]
     SelfImprove --> Learn[13. 学習 (Learning)]
     Learn --> Opt[14. 知識最適化 (Knowledge Optimization)]
-    Opt --> Output[15. 出力制御 (Output Engine)]
+    Opt --> Gov[15. ガバナンス (Governance)]
+    Gov --> Output[16. 出力制御 (Output Engine)]
     
     SelfReview -->|BYPASS_PASS / ESCALATE| Learn
     
@@ -36,7 +37,7 @@ flowchart TD
     AISmell -->|FAIL| Imp
     
     Imp --> Output
-    Output --> Done([16. 合格 (PASS) / ユーザー提示])
+    Output --> Done([17. 合格 (PASS) / ユーザー提示])
 ```
 
 ## 各ステージの定義
@@ -106,9 +107,14 @@ flowchart TD
 - **入力**: 既存ナレッジリスト、学習結果、レビュー実績ログ
 - **出力**: 知識最適化レポート（Optimization Report）
 
-### 14. 出力制御 (Output Engine)
-- **概要**: 品質スコアデータ、改善提案・履歴・学習結果および知識最適化レポートを受け取り、Output Engine仕様に沿って「日本語化」「フォーマット統一」「1つのコードブロック化」してユーザーに提示する。
-- **入力**: 品質スコアJSON、改善タスク、学習・推薦履歴、知識最適化レポート
+### 14. ガバナンス (Governance)
+- **概要**: 提示された最適化レポートに基づき、ガバナンスポリシー・ルールの適合審査、人間承認ゲートによる保留制御、および不変の意思決定記録（Decision）・監査ログ（Audit）を管理。
+- **入力**: 知識最適化レポート、ポリシー定義、評価ルール
+- **出力**: 意思決定記録（Decision Record）、監査ログ（Audit Log）、実行許可状態
+
+### 15. 出力制御 (Output Engine)
+- **概要**: 品質スコアデータ、改善提案・履歴・学習結果および知識最適化レポート・ガバナンス結果を受け取り、Output Engine仕様に沿って「日本語化」「フォーマット統一」「1つのコードブロック化」してユーザーに提示する。
+- **入力**: 品質スコアJSON、改善タスク、学習・推薦履歴、知識最適化レポート、意思決定記録
 - **出力**: 最終提示テキスト（出力原則準拠）
 
 ---

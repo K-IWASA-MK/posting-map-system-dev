@@ -13,20 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: Knowledge Optimization Engine Foundation [現在のフェーズ]
-* **目的**: Learning Engine が蓄積した Knowledge を評価・整理・最適化し、Knowledge Base 全体の品質を維持するための、健全性評価（Health）、統合候補生成（Merge）、不足領域検出（Gap）、および統計指標（Metrics）の基盤（Foundation）を構築する。
+### 現在のスプリント: Governance Engine Foundation [現在のフェーズ]
+* **目的**: Knowledge Optimization Engine が生成する最適化レポートを入力として、AIOS全体の品質・知識・改善活動をポリシー・ルール・承認ゲート・監査履歴によって統制するガバナンスレイヤーの基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Knowledge Optimization, Health, Merge, Gap, Metrics)
-  - ✅ 最適化判定（Optimization Decision）および最適化レポート（Optimization Report）の定義
-  - ✅ ナレッジの自動削除・マージを禁止するガードレール定義
+  - ✅ 仕様定義 (Specification: Governance Engine, Policy, Rule, Approval Gate, Decision, Audit)
+  - ✅ 意思決定記録（Governance Decision Record）および追記のみ可能な監査ログ（Governance Audit Log）定義
+  - ✅ AI自動承認・ルール改変を禁止し人間承認（Human Control Point）を必須とするガードレール定義
   - ✅ レビューパイプラインの更新 (Review Pipeline Update)
 * **今回実装しないもの (対象外)**:
-  - ❌ 自動マージ・自動削除 (Automated Merging / Deletion)
-  - ❌ ナレッジの自動生成 (Automated Knowledge Generation)
-  - ❌ RAG / ベクトル検索連携 (Vector Search / Embedding)
+  - ❌ 自動マージ・自動修正 (Automated Execution)
+  - ❌ 自動承認 Fallback (Automated Approval Fallback)
+  - ❌ ナレッジ直接変更 (Direct Knowledge Mutation)
 
-### 次期フェーズ: ガバナンスエンジン (Governance Engine Foundation)
-* **目的**: 最適化レポート（Optimization Report）を活用し、複数プロジェクトやテナント横断でのルール適合、ガバナンス監査、および人間による承認プロセスのシステム統制機能の仕様化。
+### 次期フェーズ: AIOS Kernel 統合 ＆ ダッシュボード表示 (Kernel Integration & Dashboard UI)
+* **目的**: 構築されたAIOS Kernelレイヤー（Execution, Review, Quality, Self Review, Self Improvement, Learning, Optimization, Governance）を統合動作させ、意思決定記録や監査ログ、統計メトリクスを可視化する管理ダッシュボードの仕様化とモック開発。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。
@@ -34,7 +34,7 @@
 
 #### 開発手順 (Implementation Order)
 1. **骨格 (Skeleton)**  
-   * 完成条件: Header, Sidebar, Main Grid, 100vhレイアウト, Glass Cardsの基礎構造の作成。中身は空で良く、余白・高さ・視線誘導のみをレビュー対象とする。
+   * 完成条件: Header, Sidebar, Main Grid, 100vhレイアウト, Glass Cards of 基礎構造の作成。中身は空で良く、余白・高さ・視線誘導のみをレビュー対象とする。
 2. **アニメーションファースト (Motion First)**  
    * 完成条件: 画面読み込み時のFade, Slide, Glassトランジション、およびLIVEインジケーターのゆっくりとした呼吸アニメーション（Pulse）の実装。開いた瞬間の「気持ちよさ」を追求する。
 3. **実績値表示 (KPI)**  
