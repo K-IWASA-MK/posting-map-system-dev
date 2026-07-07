@@ -47,6 +47,16 @@ class DashboardMotion {
         console.warn('[Dashboard Motion] SVG線画延長の取得に失敗しました。代替描画を行います:', e.message);
       }
     }
+
+    // 4. 投票率プログレスバー (Turnout fill) のイージングメーター拡張
+    const turnoutFills = document.querySelectorAll('.turnout-fill');
+    turnoutFills.forEach(fill => {
+      const targetWidth = fill.getAttribute('data-target-width') || '0%';
+      // 強制リフローによるアニメーション同期
+      fill.getBoundingClientRect();
+      fill.style.transition = 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      fill.style.width = targetWidth;
+    });
   }
 
   /**

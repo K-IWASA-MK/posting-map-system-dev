@@ -61,3 +61,5 @@ Observer Dashboard 内を構成する各 UI エレメント（コンポーネン
   - 各カードの DOM への配置および Props データのバインド・インサート処理は、`DashboardRenderer.js` が一括して制御し、チラつきのない段階的マウントを実現する。
 - **グラフおよびログコンポーネント責任 (Chart & Log Visual Components)**:
   - `ActivityTrendCard.js` (活動推移折れ線 SVG グラフ) および `ActivityLogCard.js` (システム活動ログ) は、時系列データやメッセージ配列を Props 受信し、静的に HTML/SVG を出力する責任のみを持つ。トレンドの予測計算や分析、およびログの動的追加・削除処理は行わない。
+- **投票率コンポーネント責任 (Voter Turnout Visual Components)**:
+  - `TurnoutCard.js` (投票率カード) および `TurnoutProgressBar.js` (進捗バー) は、投票率・稼働状態・市区町村名を Props 受信し、メーター比率と数値を静的に HTML 描画する。勝敗表現や変動の予測・AI分析などは一切行わない。

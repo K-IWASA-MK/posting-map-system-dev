@@ -49,7 +49,16 @@ const MOCK_FALLBACK_DATA = {
     { time: '22:45:10', module: 'Simulation', message: 'Local Simulation PASS' },
     { time: '22:43:08', module: 'Quality', message: 'Regression audit PASS' },
     { time: '22:40:01', module: 'Governance', message: 'Boundary protection check active' }
-  ]
+  ],
+  turnout: {
+    overall: 54.2,
+    updatedAt: new Date().toISOString(),
+    cities: [
+      { city: "津市", turnoutRate: 52.8, status: "Stable" },
+      { city: "四日市市", turnoutRate: 55.4, status: "Active" },
+      { city: "伊勢市", turnoutRate: 53.0, status: "Stable" }
+    ]
+  }
 };
 
 class DashboardDataAdapter {
@@ -136,6 +145,7 @@ class DashboardDataAdapter {
     if (!data.governance || typeof data.governance.pendingApproval === 'undefined') return false;
     if (!data.billing || typeof data.billing.licenseStatus === 'undefined') return false;
     if (!data.simulation || typeof data.simulation.lastRun === 'undefined') return false;
+    if (!data.turnout || typeof data.turnout.overall === 'undefined') return false;
 
     return true;
   }
@@ -156,6 +166,7 @@ class DashboardDataAdapter {
     if (raw.simulation) Object.assign(base.simulation, raw.simulation);
     if (raw.trendData) base.trendData = raw.trendData;
     if (raw.logs) base.logs = raw.logs;
+    if (raw.turnout) Object.assign(base.turnout, raw.turnout);
 
     return base;
   }

@@ -131,6 +131,8 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
   - `DashboardPollingController` により 10000ms 間隔で GET 呼び出しを実行し、データ更新時に `DashboardEventBus` を介して描画レイヤーへ伝播。障害時は指数バックオフ再試行を適用する。
 - **自動スクロール・Glow 演出 (Log Auto-Scroll & Glow)**:
   - 新着ログ差分検知時、最上部に Prepend 挿入し、コンテナを最上部へ Smooth Scroll させるとともに、先頭要素に 3 秒間 Glow 光彩演出（`.new-log-glow`）を施す。
+- **TurnoutCard**:
+  - `data.turnout`（オブジェクト）を受信し、地区全体の平均投票率および `TurnoutProgressBar` を用いた市区町村別の投票率実績進捗バーを出力。
 
 ---
 

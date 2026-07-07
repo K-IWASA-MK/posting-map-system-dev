@@ -87,6 +87,13 @@ class DashboardRenderer {
       delay: 500
     });
 
+    // 9. Turnout Status Card (投票率進捗メーター)
+    html += window.TurnoutCard.render({
+      overall: data.turnout.overall,
+      cities: data.turnout.cities,
+      delay: 550
+    });
+
     // 一括インサート (途中状態のチラつき防止)
     gridContainer.innerHTML = html;
 

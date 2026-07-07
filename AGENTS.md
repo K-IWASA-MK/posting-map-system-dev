@@ -223,6 +223,7 @@ POSTING MAP は：
 - **Dashboard Data Binding Core Principle**: Agentは禁止：DashboardからKernel操作、Write API、Billing変更、Governance変更、状態更新。許可：GET、JSON Mapping、表示。
 - **Dashboard Component Core Principle**: Agentは禁止：Component内API通信、Component内Kernel操作、Component内状態変更、Component内Business Logic。許可：Props Rendering、Visual Display、Animation。
 - **Dashboard Connection Core Principle**: Agentは禁止：GET以外のAPI呼び出し、Stripe等の決済設定変更、SpreadsheetApp等の直接参照、自動復旧リトライの永続ループ（リトライ間隔制限および指数バックオフの未適用）。許可：GET、Response取得、Timeout処理、例外キャッチおよび警告状態遷移。
+- **Dashboard Turnout Component Core Principle**: Agentは禁止：投票率データの再計算、勝敗予測、当落見込み、AI分析、およびダッシュボードからの決済や Kernel 操作などの Write 操作全般。許可：受信した投票率データの HTML プログレスメーター表示、メーター拡張イージング。
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。

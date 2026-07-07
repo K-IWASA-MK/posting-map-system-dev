@@ -480,3 +480,94 @@ body {
   0% { background-color: rgba(234, 88, 12, 0.15); }
   100% { background-color: rgba(255, 255, 255, 0.02); }
 }
+
+/* Voter Turnout Card Styles */
+.turnout-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.turnout-overall {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.turnout-overall-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.turnout-overall-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #22c55e; /* 緑アクセント */
+  text-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+}
+
+.turnout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.turnout-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.turnout-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.city-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.turnout-rate-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #22c55e; /* 緑アクセント */
+  background-color: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.turnout-rate {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2563eb; /* 青アクセント */
+}
+
+.turnout-progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  position: relative;
+}
+
+.turnout-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+  width: 0%; /* 初期値、JSでtarget-widthへ拡張 */
+}
