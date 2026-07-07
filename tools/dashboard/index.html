@@ -12,7 +12,7 @@
         extend: {
           colors: {
             brand: {
-              DEFAULT: '#EA5F08',
+              DEFAULT: '#D95A10', /* Softer desaturated brand orange */
               bg: '#0B0F14',
               card: '#161B22',
             }
@@ -44,7 +44,7 @@
       border-radius: 20px;
       background: #161B22;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 0 30px rgba(234, 95, 8, 0.01);
+      box-shadow: 0 0 30px rgba(217, 90, 16, 0.01);
     }
 
     /* Keyframes for hardware-accelerated fluid entries */
@@ -103,51 +103,51 @@
 </head>
 <body class="bg-brand-bg text-white font-sans h-screen w-screen overflow-hidden select-none flex">
 
-  <!-- Left Sidebar (Categorized Structure for Rhythm and High Contrast) -->
+  <!-- Left Sidebar (Categorized with Brand "間" and Smaller Icons) -->
   <aside class="w-60 h-full bg-brand-card border-r border-[rgba(255,255,255,0.08)] flex flex-col p-6 flex-shrink-0 animate-entry-sidebar">
-    <!-- Brand Title Area -->
-    <div class="mb-8 flex-shrink-0">
-      <h1 class="text-[10px] font-black text-brand tracking-widest uppercase">POSTING MAP</h1>
-      <div class="w-full border-b border-[rgba(255,255,255,0.08)] my-2"></div>
-      <h2 class="text-xs font-black text-white/50 tracking-wider uppercase">MISSION CONTROL</h2>
-      <h3 class="text-lg font-black text-white mt-1">三重第3支部</h3>
+    <!-- Brand Title Area (Premium Brand Header with Spacing) -->
+    <div class="mb-10 flex-shrink-0 select-none">
+      <h1 class="text-[11px] font-black text-brand tracking-[0.2em] uppercase">POSTING MAP</h1>
+      <div class="w-8 border-b border-brand/40 my-3"></div>
+      <h2 class="text-[9px] font-bold text-white/30 tracking-[0.15em] uppercase">MISSION CONTROL</h2>
+      <h3 class="text-base font-bold text-white/80 mt-1.5 tracking-tight">三重第3支部</h3>
     </div>
     
     <!-- Navigation Links -->
     <nav class="flex-1 space-y-4 overflow-y-auto hide-scrollbar">
       <!-- Main Console -->
       <div class="space-y-1">
-        <div class="text-[9px] font-bold text-white/30 uppercase tracking-widest pl-2 mb-1">Main Console</div>
-        <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-[rgba(234,95,8,0.1)] border-l-2 border-brand transition-all">
-          <span class="text-base">📊</span> <span>ダッシュボード</span>
+        <div class="text-[9px] font-bold text-white/20 uppercase tracking-widest pl-2 mb-1">Main Console</div>
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[rgba(217,90,16,0.1)] border-l-2 border-brand transition-all">
+          <span class="text-xs">📊</span> <span>ダッシュボード</span>
         </a>
       </div>
 
       <!-- Database -->
       <div class="space-y-1">
-        <div class="text-[9px] font-bold text-white/30 uppercase tracking-widest pl-2 mb-1">Database</div>
+        <div class="text-[9px] font-bold text-white/20 uppercase tracking-widest pl-2 mb-1">Database</div>
         <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
-          <span class="text-sm">📦</span> <span>保管者一覧</span>
+          <span class="text-xs">📦</span> <span>保管者一覧</span>
         </a>
         <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
-          <span class="text-sm">🗺️</span> <span>配布エリア</span>
+          <span class="text-xs">🗺️</span> <span>配布エリア</span>
         </a>
         <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
-          <span class="text-sm">📝</span> <span>活動ログ</span>
+          <span class="text-xs">📝</span> <span>活動ログ</span>
         </a>
       </div>
 
       <!-- Analytics -->
       <div class="space-y-1">
-        <div class="text-[9px] font-bold text-white/30 uppercase tracking-widest pl-2 mb-1">Analytics</div>
+        <div class="text-[9px] font-bold text-white/20 uppercase tracking-widest pl-2 mb-1">Analytics</div>
         <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
-          <span class="text-sm">📈</span> <span>配布活動分析</span>
+          <span class="text-xs">📈</span> <span>配布活動分析</span>
         </a>
         <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
-          <span class="text-sm">🗳️</span> <span>投票率対比</span>
+          <span class="text-xs">🗳️</span> <span>投票率対比</span>
         </a>
         <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
-          <span class="text-sm">⚙️</span> <span>システム設定</span>
+          <span class="text-xs">⚙️</span> <span>システム設定</span>
         </a>
       </div>
     </nav>
@@ -155,7 +155,7 @@
 
   <!-- Main Content Container -->
   <div class="flex-1 flex flex-col p-8 overflow-hidden h-full">
-    <!-- Header (Quieter design) -->
+    <!-- Header (Thinner, Quieter presence) -->
     <header class="flex justify-between items-center py-2 border-b border-[rgba(255,255,255,0.06)] mb-4 flex-shrink-0 select-none text-[11px] animate-entry-card">
       <div class="flex items-center gap-2">
         <span class="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse-soft"></span>
@@ -172,7 +172,7 @@
     <!-- Content Grid Layout -->
     <div class="flex-1 flex flex-col gap-6 overflow-hidden">
       
-      <!-- KPI Cards Container (Hero Numbers layout, staggered entry delay-100) -->
+      <!-- KPI Cards Container (Staggered entry delay-100) -->
       <div class="grid grid-cols-3 gap-6 flex-shrink-0 animate-entry-card delay-100">
         <!-- KPI Card 1: Active Members -->
         <div class="premium-glass p-5 min-h-[8rem] flex flex-col justify-between relative overflow-hidden select-none">
@@ -180,7 +180,8 @@
             <span class="text-[10px] font-bold text-[rgba(255,255,255,0.4)] uppercase tracking-widest">活動人数</span>
             <span class="text-[9px] font-bold text-green-500 font-mono">ONLINE</span>
           </div>
-          <div class="flex items-baseline gap-1 mt-1">
+          <!-- Numbers shifted right by pl-3 (12px) for breathing margin -->
+          <div class="flex items-baseline gap-1 mt-1 pl-3">
             <span id="kpi-active-members" class="text-4xl font-extrabold tracking-tight text-white font-mono">0</span>
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">人</span>
           </div>
@@ -198,7 +199,7 @@
             <span class="text-[10px] font-bold text-[rgba(255,255,255,0.4)] uppercase tracking-widest">新規活動人数</span>
             <span class="text-[9px] font-bold text-green-500 font-mono">AUTHORIZED</span>
           </div>
-          <div class="flex items-baseline gap-1 mt-1">
+          <div class="flex items-baseline gap-1 mt-1 pl-3">
             <span id="kpi-new-members" class="text-4xl font-extrabold tracking-tight text-white font-mono">0</span>
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">人</span>
           </div>
@@ -216,14 +217,14 @@
             <span class="text-[10px] font-bold text-[rgba(255,255,255,0.4)] uppercase tracking-widest">保有枚数</span>
             <span class="text-[9px] font-bold text-brand font-mono">STOCKED</span>
           </div>
-          <div class="flex items-baseline gap-1 mt-1">
+          <div class="flex items-baseline gap-1 mt-1 pl-3">
             <span id="kpi-sheets-count" class="text-4xl font-extrabold tracking-tight text-white font-mono">0</span>
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">枚</span>
           </div>
           <!-- Sparkline Mini SVG -->
           <div class="w-full h-4 mt-2 opacity-50">
             <svg class="w-full h-full" viewBox="0 0 100 20" preserveAspectRatio="none">
-              <path d="M 0 5 Q 30 18, 60 10 T 100 2" fill="none" stroke="#EA5F08" stroke-width="1.5" stroke-linecap="round"></path>
+              <path d="M 0 5 Q 30 18, 60 10 T 100 2" fill="none" stroke="#D95A10" stroke-width="1.5" stroke-linecap="round"></path>
             </svg>
           </div>
         </div>
@@ -234,55 +235,70 @@
         
         <!-- Row 1: Activity Trend (col-span-9) & Activity Log (col-span-3) -->
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-200">
-          <!-- Activity Trend (col-span-9 - Broken Symmetry) -->
-          <section class="col-span-9 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
+          <!-- Activity Trend (col-span-9 - Flow and Interactive Tooltip) -->
+          <section class="col-span-9 premium-glass p-6 flex flex-col gap-4 overflow-hidden relative" id="chart-section">
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
               <div>
                 <h3 class="text-sm font-bold text-white tracking-tight">活動推移</h3>
                 <p class="text-[8px] font-bold text-[rgba(255,255,255,0.3)] tracking-wide uppercase mt-0.5">Activity Flow Trend</p>
               </div>
             </div>
-            <!-- Dummy SVG Line Chart representing real design skeleton -->
-            <div class="flex-1 w-full h-full relative">
-              <svg class="w-full h-full" viewBox="0 0 500 200" preserveAspectRatio="none">
+            
+            <!-- SVG Line Chart with Guideline and Tracker Circle -->
+            <div class="flex-1 w-full h-full relative" id="trend-chart-container">
+              <svg class="w-full h-full" id="trend-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="trend-gradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#EA5F08" stop-opacity="0.2"/>
-                    <stop offset="100%" stop-color="#EA5F08" stop-opacity="0"/>
+                    <stop offset="0%" stop-color="#D95A10" stop-opacity="0.15"/>
+                    <stop offset="100%" stop-color="#D95A10" stop-opacity="0"/>
                   </linearGradient>
                 </defs>
                 <!-- Grid Lines -->
-                <line x1="0" y1="50" x2="500" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-                <line x1="0" y1="100" x2="500" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-                <line x1="0" y1="150" x2="500" y2="150" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                <line x1="0" y1="50" x2="700" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                <line x1="0" y1="100" x2="700" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                <line x1="0" y1="150" x2="700" y2="150" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
                 
                 <!-- Shaded Area -->
-                <path d="M 0 200 L 0 170 Q 50 150, 100 160 T 200 120 T 300 80 T 400 95 T 500 40 L 500 200 Z" fill="url(#trend-gradient)"/>
+                <path id="trend-area-path" d="M 0 200 L 0 170 Q 100 130, 200 150 T 400 90 T 600 70 T 700 50 L 700 200 Z" fill="url(#trend-gradient)"/>
                 
                 <!-- Smooth Chart Line -->
-                <path d="M 0 170 Q 50 150, 100 160 T 200 120 T 300 80 T 400 95 T 500 40" fill="none" stroke="#EA5F08" stroke-width="2" stroke-linecap="round"/>
+                <path id="trend-line-path" d="M 0 170 Q 100 130, 200 150 T 400 90 T 600 70 T 700 50" fill="none" stroke="#D95A10" stroke-width="2" stroke-linecap="round"/>
+                
+                <!-- Hover Tracking Guideline -->
+                <line id="hover-guide-line" x1="-10" y1="0" x2="-10" y2="200" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3" style="display: none;"/>
+                <circle id="hover-data-point" cx="-10" cy="-10" r="5" fill="#D95A10" stroke="#FFFFFF" stroke-width="1.5" style="display: none;"/>
               </svg>
+              
+              <!-- Hover Tooltip (Glassmorphism design) -->
+              <div id="chart-tooltip" class="absolute hidden bg-[#161B22]/90 border border-white/10 px-3 py-2 rounded-xl text-[10px] pointer-events-none select-none shadow-2xl backdrop-blur-md z-30">
+                <div class="text-white/40 font-mono" id="tooltip-time">10:00</div>
+                <div class="font-bold text-white mt-0.5" id="tooltip-value">--人 活動中</div>
+              </div>
             </div>
           </section>
 
-          <!-- Activity Log (col-span-3 - Narrow column) -->
+          <!-- Activity Log (col-span-3 - Dedicated Timeline vertical alignment) -->
           <section class="col-span-3 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
               <div>
                 <h3 class="text-sm font-bold text-white tracking-tight">活動ログ</h3>
-                <p class="text-[8px] font-bold text-[rgba(255,255,255,0.3)] tracking-wide uppercase mt-0.5">Realtime activity</p>
+                <p class="text-[8px] font-bold text-[rgba(255,255,255,0.3)] tracking-wide uppercase mt-0.5">Realtime stream</p>
               </div>
             </div>
-            <!-- Log container driven by JS -->
-            <div id="log-stream-container" class="flex-1 flex flex-col gap-2 overflow-y-auto custom-scrollbar pr-1">
-              <!-- Dynamically populated -->
+            
+            <!-- Timeline stream with absolute vertical track line -->
+            <div class="relative flex-1 flex flex-col gap-4 overflow-hidden">
+              <div class="absolute left-[11px] top-2 bottom-2 border-l border-white/10 z-0"></div>
+              <div id="log-stream-container" class="flex-1 flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-1 relative z-10">
+                <!-- Dynamically populated -->
+              </div>
             </div>
           </section>
         </div>
 
         <!-- Row 2: Inventory Graph (col-span-8) & Turnout Panel (col-span-4) -->
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-300">
-          <!-- Inventory (col-span-8) -->
+          <!-- Inventory (col-span-8 - Interactive Hover Breathing Bars) -->
           <section class="col-span-8 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
               <div>
@@ -290,19 +306,19 @@
                 <p class="text-[8px] font-bold text-[rgba(255,255,255,0.3)] tracking-wide uppercase mt-0.5">Inventory Stock Level</p>
               </div>
             </div>
-            <!-- Dummy SVG Bar Chart representing real design skeleton -->
+            <!-- SVG Bar Chart with Hover scale triggers -->
             <div class="flex-1 w-full h-full flex items-end justify-between px-6 pb-2">
-              <div class="w-[8%] bg-brand/20 border border-brand/40 rounded-t-md transition-all duration-300 hover:bg-brand/40" style="height: 40%"></div>
-              <div class="w-[8%] bg-brand/35 border border-brand/50 rounded-t-md transition-all duration-300 hover:bg-brand/50" style="height: 65%"></div>
-              <div class="w-[8%] bg-brand/15 border border-brand/30 rounded-t-md transition-all duration-300 hover:bg-brand/35" style="height: 25%"></div>
-              <div class="w-[8%] bg-brand/50 border border-brand/70 rounded-t-md transition-all duration-300 hover:bg-brand/80" style="height: 85%"></div>
-              <div class="w-[8%] bg-brand/30 border border-brand/40 rounded-t-md transition-all duration-300 hover:bg-brand/55" style="height: 50%"></div>
-              <div class="w-[8%] bg-brand/20 border border-brand/40 rounded-t-md transition-all duration-300 hover:bg-brand/40" style="height: 35%"></div>
-              <div class="w-[8%] bg-[#22c55e]/30 border border-[#22c55e]/50 rounded-t-md transition-all duration-300 hover:bg-[#22c55e]/50" style="height: 70%"></div>
+              <div class="w-[8%] bg-brand/25 border border-brand/40 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/50 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 40%"></div>
+              <div class="w-[8%] bg-brand/40 border border-brand/50 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/60 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 65%"></div>
+              <div class="w-[8%] bg-brand/15 border border-brand/35 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/30 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 25%"></div>
+              <div class="w-[8%] bg-brand/50 border border-brand/70 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/70 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 85%"></div>
+              <div class="w-[8%] bg-brand/30 border border-brand/45 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/50 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 50%"></div>
+              <div class="w-[8%] bg-brand/20 border border-brand/40 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/40 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 35%"></div>
+              <div class="w-[8%] bg-[#22c55e]/25 border border-[#22c55e]/45 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-[#22c55e]/45 hover:shadow-[0_0_12px_rgba(34,197,94,0.3)] cursor-pointer" style="height: 70%"></div>
             </div>
           </section>
 
-          <!-- Turnout Panel (col-span-4 - Asymmetric column) -->
+          <!-- Turnout Panel (col-span-4) -->
           <section class="col-span-4 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
               <div>
@@ -310,9 +326,8 @@
                 <p class="text-[8px] font-bold text-[rgba(255,255,255,0.3)] tracking-wide uppercase mt-0.5">Turnout Progress</p>
               </div>
             </div>
-            <!-- Beautiful concrete progress bars -->
+            <!-- Concrete progress bars -->
             <div class="flex-1 flex flex-col justify-center gap-3 overflow-y-auto custom-scrollbar pr-1">
-              <!-- Item 1 -->
               <div class="space-y-1 select-none">
                 <div class="flex justify-between items-center text-[11px] font-bold">
                   <span class="text-white">鈴鹿市</span>
@@ -322,11 +337,10 @@
                   </div>
                 </div>
                 <div class="w-full h-1 bg-brand-bg rounded-full overflow-hidden">
-                  <div class="h-full bg-brand rounded-full transition-all duration-1000 shadow-[0_0_8px_#EA5F08]" style="width: 67.43%"></div>
+                  <div class="h-full bg-brand rounded-full transition-all duration-1000 shadow-[0_0_8px_#D95A10]" style="width: 67.43%"></div>
                 </div>
               </div>
               
-              <!-- Item 2 -->
               <div class="space-y-1 select-none">
                 <div class="flex justify-between items-center text-[11px] font-bold">
                   <span class="text-white">津市</span>
@@ -336,11 +350,10 @@
                   </div>
                 </div>
                 <div class="w-full h-1 bg-brand-bg rounded-full overflow-hidden">
-                  <div class="h-full bg-brand rounded-full transition-all duration-1000 shadow-[0_0_8px_#EA5F08]" style="width: 52.12%"></div>
+                  <div class="h-full bg-brand rounded-full transition-all duration-1000 shadow-[0_0_8px_#D95A10]" style="width: 52.12%"></div>
                 </div>
               </div>
 
-              <!-- Item 3 -->
               <div class="space-y-1 select-none">
                 <div class="flex justify-between items-center text-[11px] font-bold">
                   <span class="text-white">四日市市</span>

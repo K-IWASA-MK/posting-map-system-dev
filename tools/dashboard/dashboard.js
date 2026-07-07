@@ -1,4 +1,4 @@
-// POSTING MAP Mission Control JS Store - Sprint 1-3
+// POSTING MAP Mission Control JS Store - Sprint 1-4
 console.log("Mission Control Core Engine Initialized.");
 
 // Configuration defaults
@@ -15,7 +15,7 @@ const INITIAL_LOGS = [
   { time: "10:15", code: "S008", count: "1,000枚配布", area: "四日市市" }
 ];
 
-// Area pool for random log generation (to demonstrate "life")
+// Area pool for random log generation
 const AREA_POOL = ["鈴鹿市", "津市", "四日市市", "桑名市", "亀山市"];
 const DISTRIBUTOR_POOL = ["S005", "S014", "S022", "S031", "S009"];
 
@@ -53,59 +53,123 @@ function animateValue(id, start, end, duration) {
   }, Math.max(stepTime, 10));
 }
 
-// Function to generate new realtime logs
+// Function to generate new realtime logs with timeline structure
 function createLogElement(log, isNew = false) {
   const div = document.createElement("div");
-  div.className = `flex items-center justify-between p-3 bg-[#161B22] border border-[rgba(255,255,255,0.06)] rounded-xl select-none transition-all duration-500 transform translate-y-[-10px] opacity-0`;
+  div.className = `flex items-center justify-between pl-6 pr-3 py-2 bg-[#161B22]/30 border border-[rgba(255,255,255,0.04)] rounded-xl relative select-none transition-all duration-500 transform translate-y-[-10px] opacity-0 hover:bg-white/[0.01]`;
   
   if (isNew) {
-    // Brand glow color for 3 seconds for new items
-    div.style.borderColor = "#EA5F08";
-    div.style.boxShadow = "0 0 12px rgba(234, 95, 8, 0.15)";
+    // Brand glow border for 3 seconds for new items
+    div.style.borderColor = "rgba(217, 90, 16, 0.4)";
+    div.style.boxShadow = "0 0 10px rgba(217, 90, 16, 0.1)";
     setTimeout(() => {
-      div.style.borderColor = "rgba(255,255,255,0.06)";
+      div.style.borderColor = "rgba(255,255,255,0.04)";
       div.style.boxShadow = "none";
     }, 3000);
   }
 
   div.innerHTML = `
-    <div class="flex items-center gap-2">
+    <!-- Timeline Dot Overlaying Vertical Line -->
+    <div class="absolute left-[8px] top-1/2 -translate-y-1/2 w-2 h-2 bg-[#D95A10] border-2 border-[#161B22] rounded-full z-10 shadow-[0_0_6px_#D95A10]"></div>
+    
+    <div class="flex items-center gap-3">
       <span class="text-[9px] font-mono text-[rgba(255,255,255,0.3)]">${log.time}</span>
-      <span class="w-1.5 h-1.5 bg-[#EA5F08] rounded-full shadow-[0_0_6px_#EA5F08]"></span>
       <span class="text-[10px] font-bold text-white font-mono">${log.code}</span>
-      <span class="text-[10px] text-[rgba(255,255,255,0.6)]">${log.count}</span>
+      <span class="text-[10px] text-[rgba(255,255,255,0.65)]">${log.count}</span>
     </div>
-    <span class="text-[8px] font-bold text-[#EA5F08] bg-[rgba(234,95,8,0.1)] px-2 py-0.5 rounded-md">${log.area}</span>
+    <span class="text-[8px] font-bold text-[#D95A10] bg-[rgba(217,90,16,0.1)] px-2 py-0.5 rounded-md">${log.area}</span>
   `;
   return div;
 }
 
-// Initialize numbers and logs
+// Initialize interactive SVG chart mouse-move tracker
+function initChartInteraction() {
+  const trendContainer = document.getElementById("trend-chart-container");
+  const svg = document.getElementById("trend-svg");
+  const guideLine = document.getElementById("hover-guide-line");
+  const dataPoint = document.getElementById("hover-data-point");
+  const tooltip = document.getElementById("chart-tooltip");
+  const tooltipTime = document.getElementById("tooltip-time");
+  const tooltipValue = document.getElementById("tooltip-value");
+
+  if (trendContainer && svg && guideLine && dataPoint && tooltip) {
+    const linePath = document.getElementById("trend-line-path");
+    if (!linePath) return;
+    const pathLength = linePath.getTotalLength();
+
+    trendContainer.addEventListener("mousemove", (e) => {
+      const rect = svg.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      
+      // Calculate coordinates and path percentage
+      const pct = Math.max(0, Math.min(mouseX / rect.width, 1));
+      const targetLength = pct * pathLength;
+      
+      const pt = linePath.getPointAtLength(targetLength);
+      
+      // Position elements
+      guideLine.setAttribute("x1", pt.x);
+      guideLine.setAttribute("x2", pt.x);
+      dataPoint.setAttribute("cx", pt.x);
+      dataPoint.setAttribute("cy", pt.y);
+      
+      const tooltipX = pt.x * (rect.width / 700);
+      const tooltipY = pt.y * (rect.height / 200);
+      
+      tooltip.style.left = `${tooltipX + 15}px`;
+      tooltip.style.top = `${tooltipY - 40}px`;
+      
+      // Format time and value based on coordinate position
+      const hour = Math.floor(9 + pct * 2); 
+      const minute = Math.floor((pct * 2 % 1) * 60);
+      const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+      const activeVal = Math.floor(12 + (200 - pt.y) / 150 * 25);
+      
+      tooltipTime.textContent = timeStr;
+      tooltipValue.textContent = `${activeVal}人 配布中`;
+      
+      // Show guide overlay
+      guideLine.style.display = "block";
+      dataPoint.style.display = "block";
+      tooltip.classList.remove("hidden");
+    });
+    
+    trendContainer.addEventListener("mouseleave", () => {
+      // Clean display state
+      guideLine.style.display = "none";
+      dataPoint.style.display = "none";
+      tooltip.classList.add("hidden");
+    });
+  }
+}
+
+// Main initializer
 window.addEventListener("DOMContentLoaded", () => {
-  // Start rolling numbers after a tiny transition delay
+  // Start rolling numbers after transition delay
   setTimeout(() => {
     animateValue("kpi-active-members", 0, MOCK_TARGETS.activeMembers, 800);
     animateValue("kpi-new-members", 0, MOCK_TARGETS.newMembers, 600);
     animateValue("kpi-sheets-count", 144500, MOCK_TARGETS.sheetsCount, 1000);
   }, 300);
 
-  // Initialize static logs
+  // Initialize timeline stream logs
   const logContainer = document.getElementById("log-stream-container");
   if (logContainer) {
     logContainer.innerHTML = "";
     INITIAL_LOGS.forEach(log => {
       const el = createLogElement(log);
       logContainer.appendChild(el);
-      // Trigger entrance
       setTimeout(() => {
         el.classList.remove("translate-y-[-10px]", "opacity-0");
       }, 50);
     });
   }
 
-  // Set up breathing life simulation: add a log and count sheets up slightly every 8 seconds
+  // Bind SVG line chart trackers
+  initChartInteraction();
+
+  // Set up breathing life simulation
   setInterval(() => {
-    // 1. Add log
     const now = new Date();
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const randArea = AREA_POOL[Math.floor(Math.random() * AREA_POOL.length)];
@@ -119,7 +183,6 @@ window.addEventListener("DOMContentLoaded", () => {
       const el = createLogElement(newLog, true);
       logContainer.insertBefore(el, logContainer.firstChild);
       
-      // Remove last child to maintain 100vh log overflow limits
       if (logContainer.children.length > 5) {
         logContainer.removeChild(logContainer.lastChild);
       }
@@ -129,11 +192,9 @@ window.addEventListener("DOMContentLoaded", () => {
       }, 50);
     }
 
-    // 2. Increment sheets count and animate kpi values slightly
     MOCK_TARGETS.sheetsCount += randCountVal;
     animateValue("kpi-sheets-count", MOCK_TARGETS.sheetsCount - randCountVal, MOCK_TARGETS.sheetsCount, 500);
     
-    // Random active members fluctuation
     if (Math.random() > 0.6) {
       const currentActive = MOCK_TARGETS.activeMembers;
       MOCK_TARGETS.activeMembers += Math.random() > 0.5 ? 1 : -1;
