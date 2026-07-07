@@ -46,6 +46,22 @@ class ActivityLogCard {
       </section>
     `;
   }
+
+  /**
+   * 単一のログ項目 HTML を生成する (差分 Prepend 用)
+   * @param {object} log 
+   * @param {number} delay 
+   * @returns {string}
+   */
+  static renderItem(log, delay = 0) {
+    return `
+      <li class="log-item new-log-glow" data-motion="log-fade" data-delay="${delay}">
+        <span class="log-time">${log.time}</span>
+        <span class="log-module">${log.module}</span>
+        <span class="log-message">${log.message}</span>
+      </li>
+    `;
+  }
 }
 
 // グローバル公開

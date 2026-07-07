@@ -50,6 +50,33 @@ class DashboardMotion {
   }
 
   /**
+   * 新着ログが差分追加された際のアニメーション演出 (Smooth Scroll & Glow 制御)
+   */
+  static animateNewLogs() {
+    const listContainer = document.querySelector('.log-container');
+    const newItems = document.querySelectorAll('.new-log-glow');
+
+    newItems.forEach(item => {
+      // 1. 強制リフローによる出現フェードインの同期
+      item.getBoundingClientRect();
+      item.classList.add('motion-active');
+
+      // 2. 3秒（3000ms）経過後に Glow クラスを除去して周囲と調和させる
+      setTimeout(() => {
+        item.classList.remove('new-log-glow');
+      }, 3000);
+    });
+
+    // 3. ログコンテナを最上部へスムーズスクロールで引き戻す
+    if (listContainer) {
+      listContainer.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  /**
    * 整数型のドラムロール数値アニメーション
    */
   static startRollingInt(elementId, targetValue) {

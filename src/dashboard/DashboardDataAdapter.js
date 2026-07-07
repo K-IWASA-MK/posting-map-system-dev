@@ -43,12 +43,21 @@ const MOCK_FALLBACK_DATA = {
     lastRun: new Date().toISOString(),
     passed: 6,
     failed: 0
-  }
+  },
+  trendData: [25, 38, 55, 48, 72, 88.5],
+  logs: [
+    { time: '22:45:10', module: 'Simulation', message: 'Local Simulation PASS' },
+    { time: '22:43:08', module: 'Quality', message: 'Regression audit PASS' },
+    { time: '22:40:01', module: 'Governance', message: 'Boundary protection check active' }
+  ]
 };
 
 class DashboardDataAdapter {
   // 'MOCK' または 'API' の切替構造 (本番干渉の論理隔離)
   static DATA_SOURCE = 'MOCK';
+
+  // 定期更新用のログ比較キャッシュ
+  static lastLogCache = [];
 
   /**
    * 概要情報を非同期取得する
@@ -58,11 +67,25 @@ class DashboardDataAdapter {
     if (this.DATA_SOURCE === 'MOCK') {
       // 擬似非同期ロードを再現してLoading表示と滑らかに連携
       await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // デバッグ用に、一定確率または特定の秒数で擬似新着ログを注入する
+      const mockData = JSON.parse(JSON.stringify(MOCK_FALLBACK_DATA));
+      const seconds = new Date().getSeconds();
+      if (seconds % 20 === 0) {
+        // 20秒周期で擬似新着ログを先頭に注入
+        const timestamp = new Date().toLocaleTimeString();
+        mockData.logs.unshift({
+          time: timestamp,
+          module: 'Polling',
+          message: `Live update tick dynamic simulated log`
+        });
+      }
+
       return {
         isSuccess: true,
         statusState: 'MOCK',
         errorMessage: '',
-        data: MOCK_FALLBACK_DATA
+        data: mockData
       };
     }
 
@@ -131,8 +154,41 @@ class DashboardDataAdapter {
     if (raw.governance) Object.assign(base.governance, raw.governance);
     if (raw.billing) Object.assign(base.billing, raw.billing);
     if (raw.simulation) Object.assign(base.simulation, raw.simulation);
+    if (raw.trendData) base.trendData = raw.trendData;
+    if (raw.logs) base.logs = raw.logs;
 
     return base;
+  }
+
+  /**
+   * 最新ログ配列から、キャッシュに存在しない新着ログ項目のみを差分抽出する
+   * @param {Array<object>} latestLogs 最新ログ配列
+   * @returns {Array<object>} 新着ログのみの配列
+   */
+  static detectNewLogs(latestLogs) {
+    if (!latestLogs || latestLogs.length === 0) return [];
+
+    // 初回はキャッシュ構築のみ行い、新着通知は行わない（画面ロード時のStaggerアニメーションに任せるため）
+    if (this.lastLogCache.length === 0) {
+      this.lastLogCache = JSON.parse(JSON.stringify(latestLogs));
+      return [];
+    }
+
+    // キャッシュに同一項目（時間、モジュール、メッセージ）が存在しないものを差分抽出する
+    const newLogs = latestLogs.filter(latestItem => {
+      return !this.lastLogCache.some(cachedItem => 
+        cachedItem.time === latestItem.time &&
+        cachedItem.module === latestItem.module &&
+        cachedItem.message === latestItem.message
+      );
+    });
+
+    // キャッシュの更新
+    if (newLogs.length > 0) {
+      this.lastLogCache = JSON.parse(JSON.stringify(latestLogs));
+    }
+
+    return newLogs;
   }
 }
 

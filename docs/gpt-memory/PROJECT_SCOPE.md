@@ -13,22 +13,24 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard KPI Charts Components Foundation [現在のフェーズ]
-* **目的**: SVG による折れ線グラフ（活動推移）および時系列活動ログ（Activity Log）の表示専用ビジュアルコンポーネントを設計・構築し、Props の受信による一元的なマウントおよびドローイングモーションを統合する。コンポーネント内からの通信や予測計算は 100% 排除し、Observer を堅持する。
+### 現在のスプリント: AIOS Dashboard Activity Log Auto-Scroll & Polling Foundation [現在のフェーズ]
+* **目的**: ダッシュボードの時系列活動ログにおける自動スクロール演出、およびポーリング（一定間隔でのAPI読み込み更新）の論理構造と安全な統合設計・構築を行う。`DashboardEventBus` を介した疎結合更新通信と、`DashboardPollingController` による指数バックオフ障害制御を完結する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (DashboardChartArchitecture, ActivityTrendCard, ActivityLogCard)
-  - ✅ ビジュアルコンポーネント実装 (`src/dashboard/components/`): ActivityTrendCard (SVG線画), ActivityLogCard (時系列リスト)
-  - ✅ レンダラー更新 (`DashboardRenderer.js`): グラフ・ログの Props マッピング追加および一括 DOM 挿入
-  - ✅ 状態表示 UI 統合 (`DashboardApp.html`): コンポーネント用スクリプトのインクルード
-  - ✅ スタイル定義追加 (`Dashboard.css`): SVG グリッド線、折れ線、データポイント、Glow 発光演出、およびログ Stagger フェードインの CSS
-  - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md）の対応追加
+  - ✅ 新規仕様定義 (DashboardPolling, ActivityLogAutoScroll, DashboardRealtimeFlow)
+  - ✅ イベント仲介実装 (`src/dashboard/DashboardEventBus.js`): 疎結合 Publish/Subscribe 仲介
+  - ✅ ポーリング制御実装 (`src/dashboard/DashboardPollingController.js`): setTimeout 定期 GET、指数バックオフ再試行制限
+  - ✅ ログコンポーネント更新 (`src/dashboard/components/ActivityLogCard.js`): 差分 Prepend 用の renderItem 追記
+  - ✅ レンダラー更新 (`DashboardRenderer.js`): EventBus ログ・更新イベントの購読と差分 DOM インサート
+  - ✅ ロジック・モーション更新 (`Dashboard.js`, `DashboardMotion.js`): ポーリング開始、新着ログ追加時の Smooth Scroll と一定時間後の Glow 消灯演出
+  - ✅ データアダプター更新 (`DashboardDataAdapter.js`): ログ差分抽出用補助メソッド (detectNewLogs)
+  - ✅ 既存仕様（KernelDashboard.md, AGENTS.md, PROJECT_SCOPE.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ グラフ内部でのトレンド予測・統計分析・将来予報などの計算ロジック
-  - ❌ ログコンポーネント側でのログ要素の追加・削除の動的制御
-  - ❌ 操作をトリガーするボタン（Execute, Approve 等）の追加、通信メソッド（POST/PUT等）の参照
+  - ❌ `POST`, `PUT`, `PATCH`, `DELETE` 等の書き込み通信リクエスト
+  - ❌ ログコンポーネント内からの直接 API 呼び出し、およびログの削除や並べ替えなどの操作 UI (button/select等)
+  - ❌ 自動バックオフ以外での Kernel パラメータの上書きや自動修復プロセスのトリガー
 
-### 次期フェーズ: AIOS Dashboard Activity Log Auto-Scroll & Polling
-* **目的**: ダッシュボードの時系列活動ログにおける自動スクロール演出、およびポーリング（一定間隔でのAPI読み込み更新）の論理構造と安全な統合設計。
+### 次期フェーズ: AIOS Dashboard Turnout component
+* **目的**: 市別投票率の進捗バー表示専用ビジュアルコンポーネントの設計と構築。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: モックデータを用いてDashboardのアニメーション、および操作性のモックを完成させる。

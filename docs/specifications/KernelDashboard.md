@@ -126,6 +126,12 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **ActivityLogCard**:
   - `data.logs`（配列）を受信し、システムアクティビティ履歴リスト（ログ時間、モジュール、メッセージ）を出力。
 
+### ポーリング・自動スクロール制御 (Polling & Auto-Scroll Mechanics)
+- **定期取得 (Polling)**:
+  - `DashboardPollingController` により 10000ms 間隔で GET 呼び出しを実行し、データ更新時に `DashboardEventBus` を介して描画レイヤーへ伝播。障害時は指数バックオフ再試行を適用する。
+- **自動スクロール・Glow 演出 (Log Auto-Scroll & Glow)**:
+  - 新着ログ差分検知時、最上部に Prepend 挿入し、コンテナを最上部へ Smooth Scroll させるとともに、先頭要素に 3 秒間 Glow 光彩演出（`.new-log-glow`）を施す。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)
