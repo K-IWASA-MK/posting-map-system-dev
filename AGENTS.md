@@ -218,6 +218,7 @@ POSTING MAP は：
 - **Local Simulation Test Core Principle**: Agent is forbidden to: bypass tests, conceal failures, falsify test results, perform auto-fixes. Allowed: execute tests, verify results, generate reports.
 - **Integration Core Principle**: Agent is forbidden to: bypass hooks, conceal failures, delete audit logs, falsify test results. Allowed: execute tests, verify results, wait for human judgment.
 - **Developer Integration Core Principle**: Agent is forbidden to: remove hooks, bypass quality gates, conceal failures, delete audit logs. Allowed: verify hooks, verify results, wait for human judgment.
+- **Dashboard Observer Core Principle**: Agentは禁止：DashboardからKernel操作、Status変更、Approval実行、Billing操作、Data改変。許可：表示、観測、レポート確認。
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。

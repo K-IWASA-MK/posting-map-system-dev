@@ -76,6 +76,21 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **Commit Check Status**: Git コミット検証の成否、フックID、および発生タイムスタンプ。
 - **Deploy Check Status**: デプロイ前検証（`clasp push` 前等）の成否、フックID、および発生タイムスタンプ。
 
+### プロトタイプUIマッピング (Prototype UI Mapping & Component Mapping)
+ダッシュボードプロトタイプにおける各 UI 要素とモックデータのマッピング対応。
+- **Header component -> System Mappings**:
+  - `Environment` -> `MOCK_DASHBOARD_DATA.simulation.scenarioStatus` 等をインジケーターとしてマップ。
+  - `System Status` -> `healthy` (固定)。
+- **Sidebar component -> Nav Mappings**:
+  - 静的な読み取り専用メニュー。選択されたビュー項目を強調表示するのみ。
+- **Cards / Panels component -> Metrics Mappings**:
+  - `Kernel Status Card` -> `MOCK_DASHBOARD_DATA.kernelStatus` をバッジ描画。
+  - `Quality Card` -> `MOCK_DASHBOARD_DATA.quality` をスコア出力。
+  - `Knowledge Card` -> `MOCK_DASHBOARD_DATA.knowledge` を数量出力。
+  - `Governance Card` -> `MOCK_DASHBOARD_DATA.governance` を認可状態出力。
+  - `Billing Card` -> `MOCK_DASHBOARD_DATA.billing` を契約ステータス出力。
+  - `Simulation Card` -> `MOCK_DASHBOARD_DATA.simulation` をテスト適合度出力。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

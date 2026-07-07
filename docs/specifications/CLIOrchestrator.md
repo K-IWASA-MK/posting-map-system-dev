@@ -74,6 +74,11 @@ CLI実行は以下の単方向フローによってカーネルを制御し、�
   - **Target**: `Hook Installation Script`
   - **ガードレール**: 開発環境への Git 品質フック自動配置スクリプト（`install-hooks.sh`）を呼び出し、`.git/hooks/pre-commit` を生成する。品質検証を迂回（Bypass）するような設定の挿入はシステムレベルで厳密に禁止（排除）される。
 
+- **open-dashboard (CMD-008)**:
+  - **Name**: `open-dashboard`
+  - **Target**: `Dashboard Observer Component`
+  - **ガードレール**: コマンドラインからダッシュボード UI （`src/dashboard/DashboardApp.html`）をブラウザで開く。ダッシュボード上で表示される全情報は、モックデータによる読み取り専用（Read-Only）表示であり、CLIからダッシュボード経由で Kernel を実行、あるいは操作させるパラメータは一切マッピングしない。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

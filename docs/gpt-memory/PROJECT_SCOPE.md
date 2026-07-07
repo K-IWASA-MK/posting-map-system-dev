@@ -13,31 +13,32 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Kernel Local Simulation Tests Integration Implementation [現在のフェーズ]
-* **目的**: 完成済みのフックランナーを実際のGitコミットフック（`.git/hooks/pre-commit`）および clasp デプロイ前検証プロセス（`deploy_with_quality_gate.sh`）へ実環境で適用し、自動品質ゲートを開発フローに強制接続して実稼働検証を行う。
+### 現在のスプリント: AIOS Dashboard Skeleton Prototype Development [現在のフェーズ]
+* **目的**: 本番のGAS APIやStripe決済などの依存関係から完全に隔離された状態で、AIOSの動作を安全に監視する「100vh 骨格レイアウト」の Observer ダッシュボード UI プロトタイプ（`DashboardApp.html`, `Dashboard.css`, `Dashboard.js`）を `src/dashboard/` 配下に新規実装・構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (DeveloperQualityFlow, IntegrationVerification)
-  - ✅ Git コミット品質フックの `.git/hooks/pre-commit` への実登録
-  - ✅ 品質ゲート連動型デプロイ用ラッパースクリプトの実装 (`deploy_with_quality_gate.sh`)
-  - ✅ フック配置スクリプトの実装 (`install-hooks.sh`): フック配置、実行権限付与、配置監査記録
-  - ✅ フック監査ログの属性（Environment, Repository, gateResult等）拡張
-  - ✅ CLIおよびダッシュボードにおけるフックインストール、状況表示の追加
+  - ✅ 新規仕様定義 (DashboardPrototype, DashboardComponent, MockDashboardData)
+  - ✅ Observer ダッシュボード HTML 骨格実装 (`DashboardApp.html`): 100vh, Header, Sidebar, Cards/Grid
+  - ✅ ダッシュボード CSS スタイル実装 (`Dashboard.css`): 純黒 #000000, 構成背景 #1C1C1E, 白枠, 青・緑のアクセント
+  - ✅ 観測専用 JS ロジック実装 (`Dashboard.js`): 静的モックデータの非同期ロードとUI要素マッピング
+  - ✅ 既存仕様（KernelDashboard.md, IntegrationSimulation.md, CLIOrchestrator.md）の対応追加
+  - ✅ 開発理念（AGENTS.md）への Dashboard Observer Core Principle 追加
 * **今回実装しないもの (対象外)**:
-  - ❌ 本番の AIOS カーネルロジック、実 Spreadsheet や実 Stripe 決済の直接的な呼び出し・書き換え
-  - ❌ フック失敗（Exit Code != 0）を隠蔽または回避する Skip パス（Bypass）の組み込み
-  - ❌ 監査ログファイル（`simulation_audit.log`）の上書き（Update）や消去（Delete）処理の実装
+  - ❌ 本番 Spreadsheet / GAS API への接続や require / import 参照コードの組み込み
+  - ❌ Stripe 決済 API / SDK の直接アクセスや require / import 参照コードの組み込み
+  - ❌ カーネル実行や承認決定状態を書き換えるインタラクティブボタン（Execute, Approve, Reject, Delete 等）の配置
+  - ❌ ダッシュボード側での結果値や判定ロジックの算出・改変
 
-### 次期フェーズ: AIOS Dashboard Skeleton Prototype Development
-* **目的**: 実際のGAS API接続を行わず、モックデータとCSSを活用してDashboardのHeader, Sidebar, Main Grid, 100vhレイアウト, Glass Cardsなどの「視線誘導・骨格」のUIデザインプロトタイプを構築・完了する。
+### 次期フェーズ: AIOS Dashboard Motion & UX Styling
+* **目的**: 実際のGAS API接続を行わず、モックデータを用いてDashboardの画面遷移時のFade/Slide/Glassトランジション、およびLIVEインジケーターのゆっくりとした呼吸アニメーション（Pulse）等のUXインタラクションを構築・完了する。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: モックデータを用いてDashboardのアニメーション、および操作性のモックを完成させる。
 * **要件**: モックデータは、将来の実データ接続時に容易にJSON差し替えが行えるよう、**データ構造とUI描画ロジックを完全に分離（疎結合）**して設計する。
 
 #### 開発手順 (Implementation Order)
-1. **骨格 (Skeleton)** [次期フェーズ]
-   * 完成条件: Header, Sidebar, Main Grid, 100vhレイアウト, Glass Cards of 基礎構造の作成。中身は空で良く、余白・高さ・視線誘導のみをレビュー対象とする。
-2. **アニメーションファースト (Motion First)**  
+1. **骨格 (Skeleton)**  
+   * ✅ 完成条件: Header, Sidebar, Main Grid, 100vhレイアウト, Glass Cards of 基礎構造の作成。中身は空で良く、余白・高さ・視線誘導のみをレビュー対象とする。
+2. **アニメーションファースト (Motion First)** [次期フェーズ]
    * 完成条件: 画面読み込み時のFade, Slide, Glassトランジション、およびLIVEインジケーターのゆっくりとした呼吸アニメーション（Pulse）の実装。開いた瞬間の「気持ちよさ」を追求する。
 3. **実績値表示 (KPI)**  
    * 完成条件: 活動人数、新規活動人数、保有枚数を表示。KPI更新時のRolling Number（ドラムロールエフェクト）の実装。

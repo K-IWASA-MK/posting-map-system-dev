@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIOS Kernel Dashboard</title>
+  <!-- Google Fonts Inter のロード -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header Component -->
+    <header class="dashboard-header">
+      <div class="header-logo">
+        <h1>AIOS Kernel Dashboard</h1>
+      </div>
+      <div class="header-status-panel">
+        <span class="status-badge environment">Environment: <strong id="env-text">LOCAL SIMULATION</strong></span>
+        <span class="status-badge health-status">Status: <strong id="status-text" class="accent-green">HEALTHY</strong></span>
+        <span class="status-badge update-time">Last Update: <span id="update-time-text">-</span></span>
+      </div>
+    </header>
+
+    <div class="body-container">
+      <!-- Sidebar Component (Read-Only Navigation) -->
+      <aside class="dashboard-sidebar">
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="active">Dashboard</li>
+            <li>Kernel Status</li>
+            <li>Quality</li>
+            <li>Knowledge</li>
+            <li>Governance</li>
+            <li>Billing</li>
+            <li>Simulation</li>
+            <li>Audit</li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <p class="footer-tracking">OPERATIONAL</p>
+          <p class="footer-tracking">ENVIRONMENT</p>
+        </div>
+      </aside>
+
+      <!-- Main Dashboard View -->
+      <main class="dashboard-main">
+        <div class="dashboard-grid">
+          <!-- 1. Kernel Status Panel -->
+          <section class="card premium-glass grid-col-2">
+            <h2>Kernel Status</h2>
+            <div class="status-list" id="kernel-status-list">
+              <div class="status-item"><span>Execution</span><span class="badge badge-idle" id="ks-execution">-</span></div>
+              <div class="status-item"><span>Review</span><span class="badge badge-idle" id="ks-review">-</span></div>
+              <div class="status-item"><span>Quality</span><span class="badge badge-idle" id="ks-quality">-</span></div>
+              <div class="status-item"><span>Learning</span><span class="badge badge-idle" id="ks-learning">-</span></div>
+              <div class="status-item"><span>Governance</span><span class="badge badge-idle" id="ks-governance">-</span></div>
+              <div class="status-item"><span>Billing</span><span class="badge badge-idle" id="ks-billing">-</span></div>
+              <div class="status-item"><span>Simulation</span><span class="badge badge-idle" id="ks-simulation">-</span></div>
+            </div>
+          </section>
+
+          <!-- 2. Simulation Quality Gate Panel -->
+          <section class="card premium-glass">
+            <h2>Simulation Quality Gate</h2>
+            <div class="metrics-list">
+              <div class="metric-item">
+                <span class="label">Last Sim Result</span>
+                <span class="value" id="sim-last-result">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Quality Gate Result</span>
+                <span class="value accent-blue" id="sim-gate-result">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Scenario Status</span>
+                <span class="sub-text" id="sim-scenario-status">-</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. Quality Panel -->
+          <section class="card premium-glass">
+            <h2>Quality Metrics</h2>
+            <div class="metrics-list">
+              <div class="metric-item">
+                <span class="label">Overall Score</span>
+                <span class="value accent-blue" id="quality-overall-score">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Review Result</span>
+                <span class="value" id="quality-review-result">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Self Review Result</span>
+                <span class="value" id="quality-self-result">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Improvement Delta</span>
+                <span class="sub-text" id="quality-delta">-</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. Knowledge Panel -->
+          <section class="card premium-glass">
+            <h2>Knowledge Metrics</h2>
+            <div class="metrics-list">
+              <div class="metric-item">
+                <span class="label">Total Knowledge</span>
+                <span class="value" id="knowledge-total">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Official Count</span>
+                <span class="value accent-blue" id="knowledge-official">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Candidate Count</span>
+                <span class="value" id="knowledge-candidate">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Health Score</span>
+                <span class="sub-text accent-green" id="knowledge-health">-</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 5. Governance Panel -->
+          <section class="card premium-glass">
+            <h2>Governance Metrics</h2>
+            <div class="metrics-list">
+              <div class="metric-item">
+                <span class="label">Pending Approval</span>
+                <span class="value" id="gov-pending">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Approved</span>
+                <span class="value accent-green" id="gov-approved">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Rejected</span>
+                <span class="value" id="gov-rejected">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Audit Count</span>
+                <span class="sub-text" id="gov-audit">-</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 6. Billing Panel -->
+          <section class="card premium-glass">
+            <h2>Billing Metrics</h2>
+            <div class="metrics-list">
+              <div class="metric-item">
+                <span class="label">License Status</span>
+                <span class="value accent-green" id="bill-license">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Subscription Status</span>
+                <span class="value" id="bill-subscription">-</span>
+              </div>
+              <div class="metric-item">
+                <span class="label">Payment Event Status</span>
+                <span class="sub-text" id="bill-payment">-</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="Dashboard.js"></script>
+</body>
+</html>
