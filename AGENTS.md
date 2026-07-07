@@ -211,6 +211,7 @@ POSTING MAP は：
 - **Learning Core Principle**: AIOSは改善で終わらない。改善結果から学習し、次回の品質向上へ知識として反映する。経験は履歴ではなく、再利用可能な知識資産である。
 - **Knowledge Optimization Core Principle**: AIOSはナレッジを自動で書き換えたり自動統合したりしない。既存ナレッジの品質を評価し、統合候補・改善候補・不足領域を分析・提示するに留める。
 - **Governance Core Principle**: Agentは禁止：Governance Rule変更、Approval回避、Policy無視、Decision Record改ざん、Audit Log削除。許可：Rule参照、Decision生成、Approval要求。
+- **Dashboard Core Principle**: Agentは禁止：Dashboardからの判断、Metric改変、Status改ざん、Approval操作。許可：Status参照、Report生成、Visualization。
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。

@@ -119,6 +119,26 @@ flowchart TD
 
 ---
 
+## ダッシュボード観測統合 (Dashboard Observer Integration)
+本レビューパイプラインは、ダッシュボード（Observer Layer）に対して処理ステージ遷移や中間出力を非同期にイベント通知する接続モデルを持つ。
+
+```text
+Kernel Pipeline (実処理フロー)
+         │
+         ├─(非同期イベント通知・JSON出力)
+         ▼
+Dashboard Observer (横断観測レイヤー)
+         │
+         ▼
+Visualization (UI表示・可視化)
+```
+
+- **接続要件**:
+  - ダッシュボードはパイプラインの順序や実行内容そのもの（Pipeline Control）には一切介入できない（単方向の監視専用）。
+  - いずれかのカーネルレイヤーが処理を完了した際、または異常を検知した際、進捗状況（Status）および生成された出力JSONがObserverを介してダッシュボードに反映される。
+
+---
+
 ## 判定マージおよび早期終了ポリシー (Early Termination)
 - **早期終了 (Early Termination)**:
   - いずれかのステージで `FAIL` が確定した場合、後続のレビューはスキップされ、即座に「改善提案 (Improvement Proposal)」ステージに遷移する。

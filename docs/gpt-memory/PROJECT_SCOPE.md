@@ -13,20 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: Governance Engine Foundation [現在のフェーズ]
-* **目的**: Knowledge Optimization Engine が生成する最適化レポートを入力として、AIOS全体の品質・知識・改善活動をポリシー・ルール・承認ゲート・監査履歴によって統制するガバナンスレイヤーの基盤（Foundation）を構築する。
+### 現在のスプリント: AIOS Kernel Dashboard & Integration Mock Foundation [現在のフェーズ]
+* **目的**: 完成した AIOS Kernel レイヤーを横断的に観測し、状態（Status）、品質（Quality）、ナレッジ（Knowledge）、ガバナンス（Governance）、および承認・監査ログを人間が確認可能にするダッシュボード観測表示レイヤー（Observer）と、8つの Kernel モジュール間の接続整合性を検証・テストする統合モック（Integration Mock）の基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Governance Engine, Policy, Rule, Approval Gate, Decision, Audit)
-  - ✅ 意思決定記録（Governance Decision Record）および追記のみ可能な監査ログ（Governance Audit Log）定義
-  - ✅ AI自動承認・ルール改変を禁止し人間承認（Human Control Point）を必須とするガードレール定義
-  - ✅ レビューパイプラインの更新 (Review Pipeline Update)
+  - ✅ 仕様定義 (Specification: Kernel Dashboard, Status Model, Quality Display, Knowledge Display, Governance Display, Integration Mock)
+  - ✅ 各カーネル（Governance, Optimization）におけるダッシュボード参照用の Output 定義
+  - ✅ レビューパイプラインと Observer 観測通知の接続定義
+  - ✅ ダッシュボード内からの書き換え・承認操作等の介入行為を禁止するガードレール定義
 * **今回実装しないもの (対象外)**:
-  - ❌ 自動マージ・自動修正 (Automated Execution)
-  - ❌ 自動承認 Fallback (Automated Approval Fallback)
-  - ❌ ナレッジ直接変更 (Direct Knowledge Mutation)
+  - ❌ ダッシュボード内からの承認アクション実行 (Dashboard-driven Actions)
+  - ❌ ナレッジ、ポリシー、ルールのダッシュボードからの直接改変 (Direct Data Mutation)
+  - ❌ モック領域を超えた実ダッシュボードのUIコード・通信実装 (Production Frontend Code)
 
-### 次期フェーズ: AIOS Kernel 統合 ＆ ダッシュボード表示 (Kernel Integration & Dashboard UI)
-* **目的**: 構築されたAIOS Kernelレイヤー（Execution, Review, Quality, Self Review, Self Improvement, Learning, Optimization, Governance）を統合動作させ、意思決定記録や監査ログ、統計メトリクスを可視化する管理ダッシュボードの仕様化とモック開発。
+### 次期フェーズ: 課金・ライセンス管理エンジン (Billing Engine Foundation)
+* **目的**: Stripe 決済、支部ライセンス管理、および地域独占販売制御を統制するビジネス・課金管理エンジンの基盤設計と仕様化。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。

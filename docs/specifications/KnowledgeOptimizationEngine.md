@@ -80,4 +80,13 @@ AIOS（品質保証オペレーティングシステム）において、Learnin
 - **連携トリガー**: 最適化レポート（`Knowledge Optimization Report`）の作成完了。
 - **引き渡しデータ**: 生成されたレポートオブジェクト全体。
 - **境界制御**: 最適化エンジン自身はガバナンスルール（例: 承認の要否）を判断せず、分析結果の出力データ提供のみを行う。
-```
+
+---
+
+## ダッシュボード用統計データ出力 (Dashboard Metrics Output)
+本エンジンは、ダッシュボードでの可視化・観測へ向け、生成された `Knowledge Optimization Report` を通じて以下の統計情報を出力する。
+
+- **Metrics Output**:
+  - `healthSummary`: 健康状態ごとのナレッジ件数（Healthy / Stable / Warning / Stale / Deprecated）。
+  - `mergeOpportunityCount`: 検出された統合候補（Merge Candidates）の総数。
+  - `gapOpportunityCount`: 検出されたナレッジ不足領域（Knowledge Gap）の総数。
