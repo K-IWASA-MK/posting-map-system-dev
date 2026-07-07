@@ -12,7 +12,7 @@
         extend: {
           colors: {
             brand: {
-              DEFAULT: '#D95A10', /* Softer desaturated brand orange */
+              DEFAULT: '#D95A10', /* Softer corporate desaturated orange */
               bg: '#0B0F14',
               card: '#161B22',
             }
@@ -29,22 +29,22 @@
       display: none;
     }
     .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
+      width: 3px;
+      height: 3px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.05);
       border-radius: 99px;
     }
     
     .premium-glass {
       border-radius: 20px;
       background: #161B22;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 0 30px rgba(217, 90, 16, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 30px rgba(217, 90, 16, 0.005);
     }
 
     /* Keyframes for hardware-accelerated fluid entries */
@@ -103,8 +103,8 @@
 </head>
 <body class="bg-brand-bg text-white font-sans h-screen w-screen overflow-hidden select-none flex">
 
-  <!-- Left Sidebar (Categorized with Brand "間" and Smaller Icons) -->
-  <aside class="w-60 h-full bg-brand-card border-r border-[rgba(255,255,255,0.08)] flex flex-col p-6 flex-shrink-0 animate-entry-sidebar">
+  <!-- Left Sidebar (Categorized Structure) -->
+  <aside class="w-60 h-full bg-brand-card border-r border-[rgba(255,255,255,0.06)] flex flex-col p-6 flex-shrink-0 animate-entry-sidebar">
     <!-- Brand Title Area (Premium Brand Header with Spacing) -->
     <div class="mb-10 flex-shrink-0 select-none">
       <h1 class="text-[11px] font-black text-brand tracking-[0.2em] uppercase">POSTING MAP</h1>
@@ -118,7 +118,8 @@
       <!-- Main Console -->
       <div class="space-y-1">
         <div class="text-[9px] font-bold text-white/20 uppercase tracking-widest pl-2 mb-1">Main Console</div>
-        <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[rgba(217,90,16,0.1)] border-l-2 border-brand transition-all">
+        <!-- Active indicator: transparent background, left orange line -->
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-transparent border-l-2 border-brand transition-all">
           <span class="text-xs">📊</span> <span>ダッシュボード</span>
         </a>
       </div>
@@ -126,13 +127,13 @@
       <!-- Database -->
       <div class="space-y-1">
         <div class="text-[9px] font-bold text-white/20 uppercase tracking-widest pl-2 mb-1">Database</div>
-        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-[rgba(255,255,255,0.01)] transition-all">
           <span class="text-xs">📦</span> <span>保管者一覧</span>
         </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-[rgba(255,255,255,0.01)] transition-all">
           <span class="text-xs">🗺️</span> <span>配布エリア</span>
         </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-[rgba(255,255,255,0.01)] transition-all">
           <span class="text-xs">📝</span> <span>活動ログ</span>
         </a>
       </div>
@@ -140,13 +141,13 @@
       <!-- Analytics -->
       <div class="space-y-1">
         <div class="text-[9px] font-bold text-white/20 uppercase tracking-widest pl-2 mb-1">Analytics</div>
-        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-[rgba(255,255,255,0.01)] transition-all">
           <span class="text-xs">📈</span> <span>配布活動分析</span>
         </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-[rgba(255,255,255,0.01)] transition-all">
           <span class="text-xs">🗳️</span> <span>投票率対比</span>
         </a>
-        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/60 hover:text-white hover:bg-[rgba(255,255,255,0.02)] transition-all">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-[rgba(255,255,255,0.01)] transition-all">
           <span class="text-xs">⚙️</span> <span>システム設定</span>
         </a>
       </div>
@@ -156,37 +157,38 @@
   <!-- Main Content Container -->
   <div class="flex-1 flex flex-col p-8 overflow-hidden h-full">
     <!-- Header (Thinner, Quieter presence) -->
-    <header class="flex justify-between items-center py-2 border-b border-[rgba(255,255,255,0.06)] mb-4 flex-shrink-0 select-none text-[11px] animate-entry-card">
+    <header class="flex justify-between items-center py-2 border-b border-[rgba(255,255,255,0.05)] mb-4 flex-shrink-0 select-none text-[11px] animate-entry-card">
       <div class="flex items-center gap-2">
         <span class="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse-soft"></span>
-        <span class="font-bold text-[rgba(255,255,255,0.7)] tracking-wider">最新データを同期しています</span>
-        <span id="sync-time" class="text-[rgba(255,255,255,0.4)] font-mono ml-1">10:42</span>
+        <span class="font-bold text-[rgba(255,255,255,0.6)] tracking-wider">最新データを同期しています</span>
+        <span id="sync-time" class="text-[rgba(255,255,255,0.35)] font-mono ml-1">10:42</span>
       </div>
       <div class="flex items-center gap-3">
-        <button class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-white/50 hover:text-white transition-all">🔄</button>
-        <button class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-white/50 hover:text-white transition-all">🌙</button>
-        <button class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-white/50 hover:text-white transition-all">❓</button>
+        <button class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-white/40 hover:text-white transition-all">🔄</button>
+        <button class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-white/40 hover:text-white transition-all">🌙</button>
+        <button class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-[rgba(255,255,255,0.04)] text-white/40 hover:text-white transition-all">❓</button>
       </div>
     </header>
 
     <!-- Content Grid Layout -->
     <div class="flex-1 flex flex-col gap-6 overflow-hidden">
       
-      <!-- KPI Cards Container (Staggered entry delay-100) -->
+      <!-- KPI Cards Container (Asymmetric focal point setup, staggered entry delay-100) -->
       <div class="grid grid-cols-3 gap-6 flex-shrink-0 animate-entry-card delay-100">
-        <!-- KPI Card 1: Active Members -->
-        <div class="premium-glass p-5 min-h-[8rem] flex flex-col justify-between relative overflow-hidden select-none">
+        <!-- KPI Card 1: Active Members (Focal Point Card: Glowing border and scale presence) -->
+        <div style="border-color: rgba(217, 90, 16, 0.25); box-shadow: 0 0 30px rgba(217, 90, 16, 0.02), inset 0 0 0 1px rgba(217, 90, 16, 0.15);" 
+             class="premium-glass p-5 min-h-[8rem] flex flex-col justify-between relative overflow-hidden select-none">
           <div class="flex justify-between items-center">
-            <span class="text-[10px] font-bold text-[rgba(255,255,255,0.4)] uppercase tracking-widest">活動人数</span>
+            <span class="text-[10px] font-bold text-[rgba(255,255,255,0.5)] uppercase tracking-widest">活動人数</span>
             <span class="text-[9px] font-bold text-green-500 font-mono">ONLINE</span>
           </div>
-          <!-- Numbers shifted right by pl-3 (12px) for breathing margin -->
+          <!-- Larger value count for focal point contrast -->
           <div class="flex items-baseline gap-1 mt-1 pl-3">
-            <span id="kpi-active-members" class="text-4xl font-extrabold tracking-tight text-white font-mono">0</span>
+            <span id="kpi-active-members" class="text-5xl font-extrabold tracking-tight text-white font-mono">0</span>
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">人</span>
           </div>
           <!-- Sparkline Mini SVG -->
-          <div class="w-full h-4 mt-2 opacity-50">
+          <div class="w-full h-4 mt-2 opacity-60">
             <svg class="w-full h-full" viewBox="0 0 100 20" preserveAspectRatio="none">
               <path d="M 0 18 Q 20 8, 40 12 T 80 5 T 100 15" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"></path>
             </svg>
@@ -204,7 +206,7 @@
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">人</span>
           </div>
           <!-- Sparkline Mini SVG -->
-          <div class="w-full h-4 mt-2 opacity-50">
+          <div class="w-full h-4 mt-2 opacity-40">
             <svg class="w-full h-full" viewBox="0 0 100 20" preserveAspectRatio="none">
               <path d="M 0 15 Q 30 15, 50 5 T 100 8" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"></path>
             </svg>
@@ -222,7 +224,7 @@
             <span class="text-xs font-bold text-[rgba(255,255,255,0.4)]">枚</span>
           </div>
           <!-- Sparkline Mini SVG -->
-          <div class="w-full h-4 mt-2 opacity-50">
+          <div class="w-full h-4 mt-2 opacity-40">
             <svg class="w-full h-full" viewBox="0 0 100 20" preserveAspectRatio="none">
               <path d="M 0 5 Q 30 18, 60 10 T 100 2" fill="none" stroke="#D95A10" stroke-width="1.5" stroke-linecap="round"></path>
             </svg>
@@ -235,21 +237,21 @@
         
         <!-- Row 1: Activity Trend (col-span-9) & Activity Log (col-span-3) -->
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-200">
-          <!-- Activity Trend (col-span-9 - Flow and Interactive Tooltip) -->
-          <section class="col-span-9 premium-glass p-6 flex flex-col gap-4 overflow-hidden relative" id="chart-section">
-            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
+          <!-- Activity Trend (col-span-9 - Expanded vertical spacing) -->
+          <section class="col-span-9 premium-glass p-5 flex flex-col gap-2 overflow-hidden relative" id="chart-section">
+            <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2 flex-shrink-0 select-none">
               <div>
                 <h3 class="text-sm font-bold text-white tracking-tight">活動推移</h3>
                 <p class="text-[8px] font-bold text-[rgba(255,255,255,0.3)] tracking-wide uppercase mt-0.5">Activity Flow Trend</p>
               </div>
             </div>
             
-            <!-- SVG Line Chart with Guideline and Tracker Circle -->
+            <!-- SVG Line Chart (Height expanded by utilizing padding reductions) -->
             <div class="flex-1 w-full h-full relative" id="trend-chart-container">
               <svg class="w-full h-full" id="trend-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="trend-gradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#D95A10" stop-opacity="0.15"/>
+                    <stop offset="0%" stop-color="#D95A10" stop-opacity="0.12"/>
                     <stop offset="100%" stop-color="#D95A10" stop-opacity="0"/>
                   </linearGradient>
                 </defs>
@@ -265,14 +267,15 @@
                 <path id="trend-line-path" d="M 0 170 Q 100 130, 200 150 T 400 90 T 600 70 T 700 50" fill="none" stroke="#D95A10" stroke-width="2" stroke-linecap="round"/>
                 
                 <!-- Hover Tracking Guideline -->
-                <line id="hover-guide-line" x1="-10" y1="0" x2="-10" y2="200" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,3" style="display: none;"/>
-                <circle id="hover-data-point" cx="-10" cy="-10" r="5" fill="#D95A10" stroke="#FFFFFF" stroke-width="1.5" style="display: none;"/>
+                <line id="hover-guide-line" x1="-10" y1="0" x2="-10" y2="200" stroke="rgba(255,255,255,0.12)" stroke-width="1" stroke-dasharray="3,3" style="display: none;"/>
+                <circle id="hover-data-point" cx="-10" cy="-10" r="4.5" fill="#D95A10" stroke="#FFFFFF" stroke-width="1.5" style="display: none;"/>
               </svg>
               
-              <!-- Hover Tooltip (Glassmorphism design) -->
-              <div id="chart-tooltip" class="absolute hidden bg-[#161B22]/90 border border-white/10 px-3 py-2 rounded-xl text-[10px] pointer-events-none select-none shadow-2xl backdrop-blur-md z-30">
+              <!-- Hover Tooltip (Softer Floating Glassmorphism) -->
+              <div id="chart-tooltip" style="background: rgba(22, 27, 34, 0.85); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4); transition: opacity 0.15s ease, transform 0.1s ease;" 
+                   class="absolute hidden px-3 py-2 rounded-xl text-[10px] pointer-events-none select-none z-30">
                 <div class="text-white/40 font-mono" id="tooltip-time">10:00</div>
-                <div class="font-bold text-white mt-0.5" id="tooltip-value">--人 活動中</div>
+                <div class="font-bold text-white mt-0.5" id="tooltip-value">--人 配布中</div>
               </div>
             </div>
           </section>
@@ -318,7 +321,7 @@
             </div>
           </section>
 
-          <!-- Turnout Panel (col-span-4) -->
+          <!-- Turnout Panel (col-span-4 - Percentage hierarchy focus) -->
           <section class="col-span-4 premium-glass p-6 flex flex-col gap-4 overflow-hidden">
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-3 flex-shrink-0 select-none">
               <div>
@@ -326,44 +329,44 @@
                 <p class="text-[8px] font-bold text-[rgba(255,255,255,0.3)] tracking-wide uppercase mt-0.5">Turnout Progress</p>
               </div>
             </div>
-            <!-- Concrete progress bars -->
+            <!-- Concrete progress bars with muted lines and highlighted numbers -->
             <div class="flex-1 flex flex-col justify-center gap-3 overflow-y-auto custom-scrollbar pr-1">
               <div class="space-y-1 select-none">
-                <div class="flex justify-between items-center text-[11px] font-bold">
-                  <span class="text-white">鈴鹿市</span>
+                <div class="flex justify-between items-baseline text-xs">
+                  <span class="text-white/60 text-[11px]">鈴鹿市</span>
                   <div class="flex items-center gap-2">
-                    <span class="text-[rgba(255,255,255,0.65)]">67.43 %</span>
+                    <span class="text-white font-bold text-sm tracking-tight">67.43 %</span>
                     <span class="text-[9px] text-green-500 font-mono font-bold">+11.17 ▲</span>
                   </div>
                 </div>
-                <div class="w-full h-1 bg-brand-bg rounded-full overflow-hidden">
-                  <div class="h-full bg-brand rounded-full transition-all duration-1000 shadow-[0_0_8px_#D95A10]" style="width: 67.43%"></div>
+                <div class="w-full h-[2px] bg-brand-bg rounded-full overflow-hidden">
+                  <div class="h-full bg-brand rounded-full transition-all duration-1000" style="width: 67.43%"></div>
                 </div>
               </div>
               
               <div class="space-y-1 select-none">
-                <div class="flex justify-between items-center text-[11px] font-bold">
-                  <span class="text-white">津市</span>
+                <div class="flex justify-between items-baseline text-xs">
+                  <span class="text-white/60 text-[11px]">津市</span>
                   <div class="flex items-center gap-2">
-                    <span class="text-[rgba(255,255,255,0.65)]">52.12 %</span>
+                    <span class="text-white font-bold text-sm tracking-tight">52.12 %</span>
                     <span class="text-[9px] text-green-500 font-mono font-bold">+8.45 ▲</span>
                   </div>
                 </div>
-                <div class="w-full h-1 bg-brand-bg rounded-full overflow-hidden">
-                  <div class="h-full bg-brand rounded-full transition-all duration-1000 shadow-[0_0_8px_#D95A10]" style="width: 52.12%"></div>
+                <div class="w-full h-[2px] bg-brand-bg rounded-full overflow-hidden">
+                  <div class="h-full bg-brand rounded-full transition-all duration-1000" style="width: 52.12%"></div>
                 </div>
               </div>
 
               <div class="space-y-1 select-none">
-                <div class="flex justify-between items-center text-[11px] font-bold">
-                  <span class="text-white">四日市市</span>
+                <div class="flex justify-between items-baseline text-xs">
+                  <span class="text-white/60 text-[11px]">四日市市</span>
                   <div class="flex items-center gap-2">
-                    <span class="text-[rgba(255,255,255,0.65)]">41.80 %</span>
+                    <span class="text-white font-bold text-sm tracking-tight">41.80 %</span>
                     <span class="text-[9px] text-blue-500 font-mono font-bold">+3.20 ▲</span>
                   </div>
                 </div>
-                <div class="w-full h-1 bg-brand-bg rounded-full overflow-hidden">
-                  <div class="h-full bg-blue-500 rounded-full transition-all duration-1000 shadow-[0_0_8px_#3b82f6]" style="width: 41.80%"></div>
+                <div class="w-full h-[2px] bg-brand-bg rounded-full overflow-hidden">
+                  <div class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: 41.80%"></div>
                 </div>
               </div>
             </div>
