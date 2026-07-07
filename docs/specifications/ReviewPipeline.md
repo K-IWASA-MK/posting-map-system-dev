@@ -20,7 +20,8 @@ flowchart TD
     Score --> SelfReview[11. 自己レビュー (Self Review)]
     SelfReview -->|AUTO_IMPROVE| SelfImprove[12. 自己改善 (Self Improvement)]
     SelfImprove --> Learn[13. 学習 (Learning)]
-    Learn --> Output[14. 出力制御 (Output Engine)]
+    Learn --> Opt[14. 知識最適化 (Knowledge Optimization)]
+    Opt --> Output[15. 出力制御 (Output Engine)]
     
     SelfReview -->|BYPASS_PASS / ESCALATE| Learn
     
@@ -35,7 +36,7 @@ flowchart TD
     AISmell -->|FAIL| Imp
     
     Imp --> Output
-    Output --> Done([15. 合格 (PASS) / ユーザー提示])
+    Output --> Done([16. 合格 (PASS) / ユーザー提示])
 ```
 
 ## 各ステージの定義
@@ -100,9 +101,14 @@ flowchart TD
 - **入力**: 改善履歴、品質スコア履歴
 - **出力**: 新規ナレッジ定義、推薦情報、学習履歴データ
 
-### 13. 出力制御 (Output Engine)
-- **概要**: 品質スコアデータおよび改善提案・履歴・学習結果を受け取り、Output Engine仕様に沿って「日本語化」「フォーマット統一」「1つのコードブロック化」してユーザーに提示する。
-- **入力**: 品質スコアJSON、改善タスク、学習履歴、推薦データ
+### 13. 知識最適化 (Knowledge Optimization)
+- **概要**: 蓄積されたナレッジデータベースの評価・整理・最適化。ナレッジごとの健康評価（Health）、重複検知（Merge）、不足領域検出（Gap）を行い、全体の統計指標（Metrics）と推奨状態を付与した最適化レポート（Optimization Report）を生成。
+- **入力**: 既存ナレッジリスト、学習結果、レビュー実績ログ
+- **出力**: 知識最適化レポート（Optimization Report）
+
+### 14. 出力制御 (Output Engine)
+- **概要**: 品質スコアデータ、改善提案・履歴・学習結果および知識最適化レポートを受け取り、Output Engine仕様に沿って「日本語化」「フォーマット統一」「1つのコードブロック化」してユーザーに提示する。
+- **入力**: 品質スコアJSON、改善タスク、学習・推薦履歴、知識最適化レポート
 - **出力**: 最終提示テキスト（出力原則準拠）
 
 ---

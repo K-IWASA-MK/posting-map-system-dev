@@ -13,20 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: Learning Engine Foundation [現在のフェーズ]
-* **目的**: 改善および品質評価結果を継続的なナレッジとして蓄積し、次回以降のレビュー・改善品質を向上させるための、学習エンジン、パターン抽出（Pattern Engine）、知識進化（Knowledge Evolution）、推薦モデル（Recommendation Engine）、および学習履歴（Learning History）の基盤（Foundation）を構築する。
+### 現在のスプリント: Knowledge Optimization Engine Foundation [現在のフェーズ]
+* **目的**: Learning Engine が蓄積した Knowledge を評価・整理・最適化し、Knowledge Base 全体の品質を維持するための、健全性評価（Health）、統合候補生成（Merge）、不足領域検出（Gap）、および統計指標（Metrics）の基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Learning Engine, Pattern Engine, Knowledge Evolution, Recommendation, Learning History)
-  - ✅ 知識検証（Knowledge Validation）、信頼度（Knowledge Confidence / Promotion Level）およびナレッジの廃止ルール（Deprecation Rules）の定義
-  - ✅ 推薦フィードバックループ（Recommendation Feedback Loop）定義
+  - ✅ 仕様定義 (Specification: Knowledge Optimization, Health, Merge, Gap, Metrics)
+  - ✅ 最適化判定（Optimization Decision）および最適化レポート（Optimization Report）の定義
+  - ✅ ナレッジの自動削除・マージを禁止するガードレール定義
   - ✅ レビューパイプラインの更新 (Review Pipeline Update)
 * **今回実装しないもの (対象外)**:
-  - ❌ AIの再学習・Fine-tuning (AI Model Re-training)
-  - ❌ Embedding / ベクトルデータベース連携 (Vector DB Integration)
-  - ❌ 自動推薦実行 (Automated Recommendation Application)
+  - ❌ 自動マージ・自動削除 (Automated Merging / Deletion)
+  - ❌ ナレッジの自動生成 (Automated Knowledge Generation)
+  - ❌ RAG / ベクトル検索連携 (Vector Search / Embedding)
 
-### 次期フェーズ: 知識最適化エンジン (Knowledge Optimization Engine Foundation)
-* **目的**: 重複したナレッジのクレンジング・マージ、ナレッジの優先順位付けとライフサイクル管理、およびプロジェクト横断での最適な知識選択機構の仕様化。
+### 次期フェーズ: ガバナンスエンジン (Governance Engine Foundation)
+* **目的**: 最適化レポート（Optimization Report）を活用し、複数プロジェクトやテナント横断でのルール適合、ガバナンス監査、および人間による承認プロセスのシステム統制機能の仕様化。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。

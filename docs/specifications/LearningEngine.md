@@ -28,7 +28,7 @@ AIOS（品質保証オペレーティングシステム）において、過去�
 [自己改善完了] ──> [1. 学習起動 (Learning Trigger)] ──> [2. パターン抽出 (Pattern Analysis)]
                                                                   │
                                                                   ▼
-[5. 次回レビューへの推薦] <── [4. 知識進化 (Knowledge Evolution)] <── [3. 知識検証 (Knowledge Validation)]
+[知識最適化へ] <── [4. 知識進化 (Knowledge Evolution)] <── [3. 知識検証 (Knowledge Validation)]
 ```
 
 1. **学習起動**: 自己改善（Self Improvement）フェーズの完了（またはPASS）を検知して自動起動。
@@ -40,7 +40,7 @@ AIOS（品質保証オペレーティングシステム）において、過去�
      - **実証性 (Proven Delta)**: 改善前後で品質スコアの Delta が明確に向上しているか。
      - **持続性 (Sustainability)**: 一時的な場当たり的修正（クイックハック）ではないか。
 4. **知識進化 (Knowledge Evolution)**: 知識のバージョン更新と、信頼性成熟度の付与。
-5. **次回への推薦 (Recommendation)**: 新規開発や別ファイルでの同種問題検知時に、実証済みナレッジとして推薦を実行。
+5. **知識最適化への接続 (Knowledge Optimization)**: ナレッジの進化処理（昇格・降格・バージョン更新）が完了した後、その更新データおよびナレッジベース全体の健全性を評価・分析・クレンジングするため、後続の「知識最適化エンジン（Knowledge Optimization Engine）」へ処理を移管する。
 
 ---
 
