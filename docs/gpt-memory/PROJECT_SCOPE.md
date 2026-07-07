@@ -13,20 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: Self Improvement Engine Foundation [現在のフェーズ]
-* **目的**: 改善提案を具体的な計画に分解し、安全かつ検証可能なプロセスとして品質向上サイクルを実行するための改善計画立案、承認検証（Plan Approval）、改善戦略（Strategy）、検証モデル（Verification）、および実行モデル（Execution Model）の基盤（Foundation）を構築する。
+### 現在のスプリント: Learning Engine Foundation [現在のフェーズ]
+* **目的**: 改善および品質評価結果を継続的なナレッジとして蓄積し、次回以降のレビュー・改善品質を向上させるための、学習エンジン、パターン抽出（Pattern Engine）、知識進化（Knowledge Evolution）、推薦モデル（Recommendation Engine）、および学習履歴（Learning History）の基盤（Foundation）を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 仕様定義 (Specification: Self Improvement, Improvement Planner, Strategy, Verification, Execution Model)
-  - ✅ 計画承認、リスク評価（Risk Assessment）およびロールバック（Rollback Strategy）仕様の定義
-  - ✅ 改善量（Delta）および改善指標（Improvement Metrics）定義
+  - ✅ 仕様定義 (Specification: Learning Engine, Pattern Engine, Knowledge Evolution, Recommendation, Learning History)
+  - ✅ 知識検証（Knowledge Validation）、信頼度（Knowledge Confidence / Promotion Level）およびナレッジの廃止ルール（Deprecation Rules）の定義
+  - ✅ 推薦フィードバックループ（Recommendation Feedback Loop）定義
   - ✅ レビューパイプラインの更新 (Review Pipeline Update)
 * **今回実装しないもの (対象外)**:
-  - ❌ AI自動コード生成 (Automated AI Code Generation)
-  - ❌ HTML/CSSの自動書き換え (DOM Manipulation)
-  - ❌ 自動コミット / 自動Push (Automated Version Control)
+  - ❌ AIの再学習・Fine-tuning (AI Model Re-training)
+  - ❌ Embedding / ベクトルデータベース連携 (Vector DB Integration)
+  - ❌ 自動推薦実行 (Automated Recommendation Application)
 
-### 次期フェーズ: 学習エンジン (Learning Engine Foundation)
-* **目的**: 改善履歴（Improvement History）、品質推移（Quality Trend）、品質スコア（Quality Score）、レビュー履歴を分析し、「改善結果から学び、次回はより良い改善を提案できる」自己進化ループの仕様化。
+### 次期フェーズ: 知識最適化エンジン (Knowledge Optimization Engine Foundation)
+* **目的**: 重複したナレッジのクレンジング・マージ、ナレッジの優先順位付けとライフサイクル管理、およびプロジェクト横断での最適な知識選択機構の仕様化。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: 実際のGAS API接続を行わず、モックデータのみを用いてDashboard of 全体レイアウト、UIデザイン、アニメーション、および操作性のモックを完成させる。

@@ -19,9 +19,10 @@ flowchart TD
     AISmell -->|PASS / WARNING| Score[10. 品質スコアリング (Quality Score)]
     Score --> SelfReview[11. 自己レビュー (Self Review)]
     SelfReview -->|AUTO_IMPROVE| SelfImprove[12. 自己改善 (Self Improvement)]
-    SelfImprove --> Output[13. 出力制御 (Output Engine)]
+    SelfImprove --> Learn[13. 学習 (Learning)]
+    Learn --> Output[14. 出力制御 (Output Engine)]
     
-    SelfReview -->|BYPASS_PASS / ESCALATE| Output
+    SelfReview -->|BYPASS_PASS / ESCALATE| Learn
     
     %% FAIL時のルート
     Execution -->|FAIL| Imp[改善提案 (Improvement Proposal)]
@@ -34,7 +35,7 @@ flowchart TD
     AISmell -->|FAIL| Imp
     
     Imp --> Output
-    Output --> Done([14. 合格 (PASS) / ユーザー提示])
+    Output --> Done([15. 合格 (PASS) / ユーザー提示])
 ```
 
 ## 各ステージの定義
@@ -80,7 +81,7 @@ flowchart TD
 - **出力**: AI Smell Level（AI臭レベル判定結果）
 
 ### 9. 品質スコアリング (Quality Score)
-- **概要**: 収集したレビューデータを集約し、標準比重（Weight）に基づいて総合スコア（Overall Score）および優先順位（Priority）を計算。`ScoreSchema` 準拠 of JSONデータを生成。
+- **概要**: 収集したレビューデータを集約し、標準比重（Weight）に基づいて総合スコア（Overall Score）および優先順位（Priority）を計算。`ScoreSchema` 準拠のJSONデータを生成。
 - **入力**: 各レビューレイヤーの検証結果データ
 - **出力**: 品質スコアJSON (QualityScore JSON)
 
@@ -94,9 +95,14 @@ flowchart TD
 - **入力**: 改善提案（Improvement Proposal）
 - **出力**: 修正コードの適用、検証結果、改善履歴データ
 
-### 12. 出力制御 (Output Engine)
-- **概要**: 品質スコアデータおよび改善提案・履歴を受け取り、Output Engine仕様に沿って「日本語化」「フォーマット統一」「1つのコードブロック化」してユーザーに提示する。
-- **入力**: 品質スコアJSON、改善タスク、または改善履歴
+### 12. 学習 (Learning)
+- **概要**: 改善効果の証明された解決パターンから「改善パターン抽出」を行い、「知識検証（Knowledge Validation）」を経て「知識進化（Knowledge Evolution）」および「推薦（Recommendation）」を実行。
+- **入力**: 改善履歴、品質スコア履歴
+- **出力**: 新規ナレッジ定義、推薦情報、学習履歴データ
+
+### 13. 出力制御 (Output Engine)
+- **概要**: 品質スコアデータおよび改善提案・履歴・学習結果を受け取り、Output Engine仕様に沿って「日本語化」「フォーマット統一」「1つのコードブロック化」してユーザーに提示する。
+- **入力**: 品質スコアJSON、改善タスク、学習履歴、推薦データ
 - **出力**: 最終提示テキスト（出力原則準拠）
 
 ---
