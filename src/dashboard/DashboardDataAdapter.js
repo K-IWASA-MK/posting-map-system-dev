@@ -52,7 +52,7 @@ class DashboardDataAdapter {
 
   /**
    * 概要情報を非同期取得する
-   * @returns {Promise<{isSuccess: boolean, isWarning: boolean, errorMessage: string, data: object}>}
+   * @returns {Promise<{isSuccess: boolean, statusState: string, errorMessage: string, data: object}>}
    */
   static async fetchSummary() {
     if (this.DATA_SOURCE === 'MOCK') {
@@ -60,24 +60,22 @@ class DashboardDataAdapter {
       await new Promise(resolve => setTimeout(resolve, 800));
       return {
         isSuccess: true,
-        isWarning: false,
+        statusState: 'MOCK',
         errorMessage: '',
         data: MOCK_FALLBACK_DATA
       };
     }
 
     try {
-      // 読み取り専用 GET リクエスト (API 接続時)
-      const response = await fetch('/api/dashboard/summary', { method: 'GET' });
-      if (!response.ok) throw new Error('API接続エラーが発生しました。');
-      const rawData = await response.json();
+      // API クライアント経由で取得 (GET のみ、タイムアウト制御あり)
+      const rawData = await window.DashboardAPIClient.fetchSummary();
 
       // スキーマの検証
       if (!this.validateSchema(rawData)) {
         console.warn('[Dashboard Data Adapter] 必須キーが欠落しています。フォールバック正規化を適用します。');
         return {
           isSuccess: true,
-          isWarning: true,
+          statusState: 'WARNING',
           errorMessage: 'Warning: スキーマ不整合を検知したため、代替値で補完表示しています。',
           data: this.normalize(rawData)
         };
@@ -85,7 +83,7 @@ class DashboardDataAdapter {
 
       return {
         isSuccess: true,
-        isWarning: false,
+        statusState: 'LIVE',
         errorMessage: '',
         data: this.normalize(rawData)
       };
@@ -94,8 +92,8 @@ class DashboardDataAdapter {
       console.warn('[Dashboard Data Adapter] API接続に失敗したためオフラインフォールバックを作動します:', error.message);
       return {
         isSuccess: true,
-        isWarning: true,
-        errorMessage: 'Warning: APIと通信できません。オフラインデータを使用中。',
+        statusState: 'OFFLINE',
+        errorMessage: `Offline: ${error.message}。ローカルのオフラインデータを使用中。`,
         data: MOCK_FALLBACK_DATA
       };
     }

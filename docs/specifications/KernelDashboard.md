@@ -108,6 +108,17 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **BillingCard** -> `data.billing` を受信し、ライセンスの有効状況を描画。
 - **SimulationCard** -> `data.simulation` を受信し、テストゲート通過状況（PASS/FAIL）を描画。
 
+### API 接続状態および UI マッピング (API Connection Status Model)
+接続エラーや応答速度に起因するダッシュボード状態の UI マッピング規則。
+- **LIVE**:
+  - API から正常にすべての KPI 情報を取得完了。ステータスは緑色の「LIVE」バッジで表示される。
+- **MOCK**:
+  - デバッグ検証等で `DATA_SOURCE = 'MOCK'` が設定されている場合。ステータスは青色の「MOCK」で表示される。
+- **WARNING**:
+  - API レスポンスの一部項目にスキーマ不整合やパラメータ欠損がある場合。ステータスはオレンジの「WARNING」で表示され、上部バナーに警告メッセージが表示される。
+- **OFFLINE**:
+  - 通信断または 5000ms 以上の Timeout が発生した場合。ステータスは赤色の「OFFLINE」で表示され、ローカル代替 Mock データをロードして描画を維持する。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

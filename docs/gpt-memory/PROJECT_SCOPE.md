@@ -13,22 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard KPI Visual Components Foundation [現在のフェーズ]
-* **目的**: ダッシュボードの各 KPI カードおよびステータス表示領域を、一切の通信・計算ロジックを持たず、純粋に Props（オブジェクト引数）を受け取って描画を完結させる再利用可能な「表示専用ビジュアルコンポーネント（components/）」群へリファクタリング・分離し、表示責務と論理境界を整理する。
+### 現在のスプリント: AIOS Dashboard KPI Data Binding Connection Foundation [現在のフェーズ]
+* **目的**: ダッシュボードのモック表示から、GAS GET-JSON API（KPI Provider）へ接続する「Read Only KPI Data Binding Connection Layer」へ移行する。GET-JSON 取得の API クライアント（`DashboardAPIClient.js`）を構築し、通信タイムアウトやデータ欠損に対する Mock フォールバック挙動、および UI 状態モデル（LIVE, MOCK, WARNING, OFFLINE）を統合する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (DashboardComponentArchitecture, KPICardSpecification, DashboardTheme)
-  - ✅ ビジュアルコンポーネント実装 (`src/dashboard/components/`): KPICard, StatusCard, MetricCard, KnowledgeCard, GovernanceCard, BillingCard, SimulationCard
-  - ✅ コンポーネント仲介レンダラー実装 (`DashboardRenderer.js`): 各コンポーネントの配置、Propsの受け渡し、DOM Mount 制御
-  - ✅ 観測制御 JS ロジック更新 (`Dashboard.js`): データのロード完了時にレンダラーを呼び出して一元描画する流れに刷新、ロード完了後にモーションをアタッチ
-  - ✅ 状態表示 UI 統合 (`DashboardApp.html`): マウントポイント `#dashboard-grid-container` への変更、コンポーネント JS スクリプトタグの追加
-  - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, DashboardPrototype.md, AGENTS.md）の対応追加
+  - ✅ 新規仕様定義 (DashboardAPIConnection, GASKPIProvider, DashboardConnectionError)
+  - ✅ API クライアント実装 (`src/dashboard/DashboardAPIClient.js`): GET のみでの API 取得、Timeout 制限（5000ms）および通信中止
+  - ✅ データアダプター更新 (`src/dashboard/DashboardDataAdapter.js`): API クライアント経由へのデータ取得統合、レスポンス検証（Schema Validation）、補完（Normalize）、エラー時の警告・フォールバック
+  - ✅ 観測制御 JS ロジック更新 (`Dashboard.js`): `statusState`（LIVE, MOCK, WARNING, OFFLINE）に応じたヘッダーステータスバッジの点灯、およびモーション開始連携
+  - ✅ 状態表示 UI 統合 (`DashboardApp.html`): `DashboardAPIClient.js` のスクリプトタグ追加、ステータス文字「LIVE」のマウント
+  - ✅ スタイル定義追加 (`Dashboard.css`): WARNING（オレンジ）、OFFLINE（赤）の状態別バッジスタイル
+  - ✅ 既存仕様（KernelDashboard.md, DashboardDataBinding.md, AGENTS.md）の対応追加
   - ✅ 現在のスプリント定義（PROJECT_SCOPE.md）の更新
 * **今回実装しないもの (対象外)**:
-  - ❌ コンポーネント内部からの `fetch`, `axios` 等の通信や、状態計算、Stripe, SpreadsheetApp への直接アクセス
-  - ❌ 操作をトリガーするボタン（Execute, Approve 等）や、フォーム入力、更新系アクションのダッシュボードへの追加
+  - ❌ `POST`, `PUT`, `PATCH`, `DELETE` 等の書き込みリクエスト
+  - ❌ ダッシュボード UI 上からの Kernel 設定変更、契約決済の変更、Approval または Execute 操作ボタンの追加
 
-### 次期フェーズ: AIOS Dashboard KPI Data Binding Connection
-* **目的**: 各コンポーネントがProps受信で動作することを確認したダッシュボードに対して、本番のGAS（API）経由での読み取り専用 GET-JSON 取得の疎通と最終調整を行う。
+### 次期フェーズ: AIOS Dashboard KPI Charts Components
+* **目的**: SVG による折れ線グラフ（活動推移）、および新着リアルタイム活動ログなどのグラフ系ビジュアルコンポーネントの設計と構築。
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: モックデータを用いてDashboardのアニメーション、および操作性のモックを完成させる。

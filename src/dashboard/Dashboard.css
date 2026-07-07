@@ -214,6 +214,14 @@ body {
   color: #22c55e !important;
 }
 
+.accent-orange {
+  color: #ea580c !important;
+}
+
+.accent-red {
+  color: #ef4444 !important;
+}
+
 /* Glass Card Hover Effect & Transition */
 .card {
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);

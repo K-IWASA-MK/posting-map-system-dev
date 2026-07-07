@@ -23,3 +23,5 @@
    - フォールバックデータで表示している場合は、UI 上に「Warning: Using Offline Fallback Data」の警告ラベルを表示する。
 3. **自動修復の禁止**:
    - エラーを検知した際、ダッシュボード側で自動的な再実行や設定の書き換え、修復プロセスのトリガーを起動してはならない。
+- **データフォールバックフロー (API Connection Data Flow & Fallback)**:
+  - `DashboardAPIClient`（GETリクエスト, Timeout 5000ms） ──> `DashboardDataAdapter`（JSONスキーマ検証） ──> 正常時：`LIVE` ステータスへ / 異常時：`WARNING` または `OFFLINE` ステータスへ遷移し、Mock データを Fallback 反映する。

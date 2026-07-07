@@ -9,7 +9,7 @@
 
 class DashboardMotion {
   /**
-   * モーションレイヤーの初期化 (コンポーネントマウント完了後にアタッチ)
+   * モーションレイヤーの初期化 (API取得 ──> レンダリング完了後にアタッチ)
    */
   static init() {
     console.log('[Dashboard Motion] モーションコントローラーを初期化します...');
@@ -24,7 +24,6 @@ class DashboardMotion {
     });
 
     // 2. メトリクス数値の Rolling Number アニメーションを開始
-    // (注: 値は DOM 描画済みのテキストから動的にパースする)
     this.startRollingFloat('quality-overall-score', 88.5, ' %');
     this.startRollingInt('knowledge-total', 1420);
     this.startRollingInt('knowledge-official', 1200);
@@ -86,5 +85,5 @@ class DashboardMotion {
   }
 }
 
-// グローバルスコープへ公開 (Dashboard.js からロード完了時に呼び出すため)
+// グローバルスコープへ公開
 window.DashboardMotion = DashboardMotion;

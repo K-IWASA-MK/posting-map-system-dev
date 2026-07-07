@@ -25,10 +25,8 @@ class DashboardObserver {
       return;
     }
 
-    // 2. 警告状態のハンドリング
-    if (result.isWarning) {
-      this.showWarning(result.errorMessage);
-    }
+    // 2. 状態モデル (LIVE, MOCK, WARNING, OFFLINE) に応じたヘッダー表示更新
+    this.updateHeaderStatus(result.statusState, result.errorMessage);
 
     // 3. 更新タイムスタンプの反映
     const updateTimeEl = document.getElementById('update-time-text');
@@ -42,6 +40,31 @@ class DashboardObserver {
     // 5. レンダリング完了後に初めてアニメーションを開始 (途中状態の表示防止)
     if (window.DashboardMotion) {
       window.DashboardMotion.init();
+    }
+  }
+
+  /**
+   * ヘッダーのステータスバッジと警告表示を更新する
+   * @param {string} state LIVE / MOCK / WARNING / OFFLINE
+   * @param {string} message 警告メッセージ
+   */
+  static updateHeaderStatus(state, message) {
+    const statusTextEl = document.getElementById('status-text');
+    if (!statusTextEl) return;
+
+    statusTextEl.innerText = state;
+    statusTextEl.className = ''; // クラスリセット
+
+    if (state === 'LIVE') {
+      statusTextEl.classList.add('accent-green');
+    } else if (state === 'MOCK') {
+      statusTextEl.classList.add('accent-blue');
+    } else if (state === 'WARNING') {
+      statusTextEl.classList.add('accent-orange');
+      this.showWarning(message || 'Warning: データ項目の一部に欠損が発生しています。');
+    } else if (state === 'OFFLINE') {
+      statusTextEl.classList.add('accent-red');
+      this.showWarning(message || 'Offline: 接続エラー。代替オフラインデータを使用中。');
     }
   }
 
