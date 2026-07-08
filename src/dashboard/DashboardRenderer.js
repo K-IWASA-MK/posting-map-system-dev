@@ -29,7 +29,7 @@ class DashboardRenderer {
     
     // 1. クエリパラメータ指定を最優先
     if (viewQuery) {
-      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence') {
+      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations') {
         return viewQuery;
       }
     }
@@ -73,6 +73,7 @@ class DashboardRenderer {
     else if (viewMode === 'tenant') activeMenuId = 'menu-tenant';
     else if (viewMode === 'global') activeMenuId = 'menu-global';
     else if (viewMode === 'intelligence') activeMenuId = 'menu-intelligence';
+    else if (viewMode === 'operations') activeMenuId = 'menu-operations';
     const activeMenuEl = document.getElementById(activeMenuId);
     if (activeMenuEl) {
       activeMenuEl.classList.add('active');
@@ -217,6 +218,20 @@ class DashboardRenderer {
           key: 'AreaIntelligenceCard',
           render: () => window.AreaIntelligenceCard.render({ areas: intelData.areaSummary, fieldEventSummary: intelData.fieldEventSummary, delay: 200 }),
           props: { areas: intelData.areaSummary, fieldEventSummary: intelData.fieldEventSummary }
+        }
+      ];
+    } else if (viewMode === 'operations') {
+      const opsData = window.FieldOperationsAdapter ? window.FieldOperationsAdapter.getFieldOperationsData() : { tenantContext: {}, regionSummary: [], areaOperations: [] };
+      components = [
+        {
+          key: 'FieldOperationsCard',
+          render: () => window.FieldOperationsCard.render({ tenantContext: opsData.tenantContext, delay: 150 }),
+          props: opsData.tenantContext
+        },
+        {
+          key: 'AreaOperationsStatusCard',
+          render: () => window.AreaOperationsStatusCard.render({ areaOperations: opsData.areaOperations, delay: 200 }),
+          props: opsData.areaOperations
         }
       ];
     } else {
@@ -444,6 +459,10 @@ class DashboardRenderer {
         DashboardRenderer.updateIntelligenceDashboard();
         return;
       }
+      if (viewMode === 'operations') {
+        DashboardRenderer.updateOperationsDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
@@ -488,6 +507,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'intelligence') {
         DashboardRenderer.updateIntelligenceDashboard();
+        return;
+      }
+      if (viewMode === 'operations') {
+        DashboardRenderer.updateOperationsDashboard();
         return;
       }
 
@@ -536,6 +559,10 @@ class DashboardRenderer {
         DashboardRenderer.updateIntelligenceDashboard();
         return;
       }
+      if (viewMode === 'operations') {
+        DashboardRenderer.updateOperationsDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
@@ -580,6 +607,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'intelligence') {
         DashboardRenderer.updateIntelligenceDashboard();
+        return;
+      }
+      if (viewMode === 'operations') {
+        DashboardRenderer.updateOperationsDashboard();
         return;
       }
 
@@ -628,6 +659,10 @@ class DashboardRenderer {
         DashboardRenderer.updateIntelligenceDashboard();
         return;
       }
+      if (viewMode === 'operations') {
+        DashboardRenderer.updateOperationsDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
@@ -672,6 +707,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'intelligence') {
         DashboardRenderer.updateIntelligenceDashboard();
+        return;
+      }
+      if (viewMode === 'operations') {
+        DashboardRenderer.updateOperationsDashboard();
         return;
       }
 
@@ -720,6 +759,10 @@ class DashboardRenderer {
         DashboardRenderer.updateIntelligenceDashboard();
         return;
       }
+      if (viewMode === 'operations') {
+        DashboardRenderer.updateOperationsDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
@@ -764,6 +807,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'intelligence') {
         DashboardRenderer.updateIntelligenceDashboard();
+        return;
+      }
+      if (viewMode === 'operations') {
+        DashboardRenderer.updateOperationsDashboard();
         return;
       }
 
@@ -1035,6 +1082,36 @@ class DashboardRenderer {
       const el = gridContainer.children[1];
       if (el) {
         el.outerHTML = window.AreaIntelligenceCard.render({ areas: intelData.areaSummary, fieldEventSummary: intelData.fieldEventSummary, delay: 0 });
+        const newEl = gridContainer.children[1];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+  }
+
+  /**
+   * Operationsビューモード用の全画面差分更新を実行する
+   */
+  static updateOperationsDashboard() {
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (!gridContainer || !window.FieldOperationsAdapter) return;
+
+    const opsData = window.FieldOperationsAdapter.getFieldOperationsData();
+
+    // 0: FieldOperationsCard
+    if (window.FieldOperationsCard && window.DashboardRenderCache.hasChanged('FieldOperationsCard', opsData.tenantContext)) {
+      const el = gridContainer.children[0];
+      if (el) {
+        el.outerHTML = window.FieldOperationsCard.render({ tenantContext: opsData.tenantContext, delay: 0 });
+        const newEl = gridContainer.children[0];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+
+    // 1: AreaOperationsStatusCard
+    if (window.AreaOperationsStatusCard && window.DashboardRenderCache.hasChanged('AreaOperationsStatusCard', opsData.areaOperations)) {
+      const el = gridContainer.children[1];
+      if (el) {
+        el.outerHTML = window.AreaOperationsStatusCard.render({ areaOperations: opsData.areaOperations, delay: 0 });
         const newEl = gridContainer.children[1];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
