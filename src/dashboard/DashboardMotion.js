@@ -82,6 +82,7 @@ class DashboardMotion {
     });
 
     this.animateFlowGraph();
+    this.animateMobileFlow();
   }
 
   /**
@@ -395,6 +396,21 @@ class DashboardMotion {
     if (isReduced) return;
 
     const lines = document.querySelectorAll('.arrow-glow-line');
+    lines.forEach(line => {
+      line.style.animation = 'none';
+      line.getBoundingClientRect(); // 強制リフロー
+      line.style.animation = 'flowGlowPulse 1.2s ease-in-out infinite';
+    });
+  }
+
+  /**
+   * モバイル向け Flow Graph の縦方向進行矢印（↓）に対する脈動 (pulse) 演出
+   */
+  static animateMobileFlow() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) return;
+
+    const lines = document.querySelectorAll('.m-arrow-glow-line');
     lines.forEach(line => {
       line.style.animation = 'none';
       line.getBoundingClientRect(); // 強制リフロー

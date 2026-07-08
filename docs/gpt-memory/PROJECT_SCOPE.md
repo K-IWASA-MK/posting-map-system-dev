@@ -13,20 +13,21 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Executive Demo Visualization Foundation [現在のフェーズ]
-* **目的**: 8つのインテリジェンスレイヤーの内部データをマクロに集約し、経営・顧客向けに高度に要約された統合デモ画面（Executive View）を提供する。
+### 現在のスプリント: AIOS Dashboard Mobile Executive View Foundation [現在のフェーズ]
+* **目的**: 既存の Executive View を基盤とし、スマートフォンの狭い画面幅および片手操作に最適化した、監視専用の「Mobile Executive View」を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規デモ仕様定義 (`DashboardExecutiveVisualization.md`)
-  - ✅ Executive アダプター (`ExecutiveAdapter.js`): 各種データストアから Top KPI、フローグラフ状態、比率シェア、変化統計、ルール要約を計算する。
-  - ✅ Executive UI コンポーネント: KPIパネル、フロー進行図、要約活動ストリーム、分布シェアメーター、メモリ容量概要カード。
-  - ✅ 二画面共存ルーティング: URLパラメータ `?view=raw` と `?view=executive` による表示モードの安全な切り替え。
+  - ✅ 新規モバイルデモ仕様定義 (`DashboardMobileVisualization.md`)
+  - ✅ Mobile アダプター (`MobileExecutiveAdapter.js`): 主要 5大ノード選別、テキストトリミングなどモバイル表示に最適化されたパラメータを返却。
+  - ✅ Mobile UI コンポーネント: モバイルステータスヘッダー、2x2 KPIカード、5大レイヤー縦並びフロー、モバイル適合活動ストリーム、コンパクト進化統計、蓄積メモリサマリー。
+  - ✅ ビュー切り替え優先順位 (Priority Routing): URLクエリ指定（`?view=mobile`）を最優先とし、次点で `window.innerWidth < 768`（viewport自動判定）を適用。
+  - ✅ モバイル専用 CSS & 軽量 Motion: シングルカラム縦並びレイアウト、余白調整、負荷を抑えた脈動アニメーション。
 * **今回実装しないもの (対象外)**:
-  - ❌ 操作用 UI (button, form, input, select) などの設置。AIによる動的な障害判定、原因診断、および「対応してください」のようなリスク推奨メッセージの動的生成。
+  - ❌ 操作用 UI (button, form, input, select) などの設置。APIへの Write 送信、AIによる動的異常判定・改善提案の生成。
 
-### 完了したスプリント: AIOS Dashboard Demo Visualization Foundation
-* **目的**: 構築された AIOS Event Intelligence Pipeline (Event ➔ Timeline ➔ Correlation ➔ Graph ➔ Knowledge ➔ Insight ➔ Evolution ➔ Pattern ➔ Memory) 全体の価値を可視化する統合デモ画面を構築する。
-* **完了したスプリント2**: AIOS Dashboard Event Intelligence Memory Layer Foundation
-* **完了したスプリント3**: AIOS Dashboard Event Intelligence Pattern Layer Foundation
+### 完了したスプリント: AIOS Dashboard Executive Demo Visualization Foundation
+* **目的**: 8つのインテリジェンスレイヤーの内部データをマクロに集約し、経営・顧客向けに高度に要約された統合デモ画面（Executive View）を提供する。
+* **完了したスプリント2**: AIOS Dashboard Demo Visualization Foundation
+* **完了したスプリント3**: AIOS Dashboard Event Intelligence Memory Layer Foundation
 * **完了したスプリント4**: AIOS Dashboard Event Insight Layer Foundation
 * **完了したスプリント5**: AIOS Dashboard Event Knowledge Layer Foundation
 * **完了したスプリント6**: AIOS Dashboard Event Intelligence Graph Foundation

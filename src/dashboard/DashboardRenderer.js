@@ -12,6 +12,26 @@ class DashboardRenderer {
    * 正規化されたデータを受け取り、対応する各ビジュアルコンポーネントを DOM へ一元マウントする
    * @param {object} data 正規化されたデータ構造 (DashboardDataAdapter)
    */
+  static getViewMode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewQuery = urlParams.get('view');
+    
+    // 1. クエリパラメータ指定を最優先
+    if (viewQuery) {
+      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile') {
+        return viewQuery;
+      }
+    }
+    
+    // 2. クエリなしの場合のみ viewport 判定
+    if (window.innerWidth < 768) {
+      return 'mobile';
+    }
+    
+    // 3. デフォルトは PC版 Executive
+    return 'executive';
+  }
+
   static render(data) {
     const gridContainer = document.getElementById('dashboard-grid-container');
     if (!gridContainer) {
@@ -21,12 +41,50 @@ class DashboardRenderer {
 
     console.log('[Dashboard Renderer] コンポーネント群のレンダリングを開始します...');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const viewMode = urlParams.get('view') || 'executive';
-
+    const viewMode = DashboardRenderer.getViewMode();
     let components = [];
 
-    if (viewMode === 'executive') {
+    // グリッドコンテナのレイアウトクラス調整
+    gridContainer.className = 'dashboard-grid';
+    if (viewMode === 'mobile') {
+      gridContainer.classList.add('dashboard-grid-mobile');
+    }
+
+    if (viewMode === 'mobile') {
+      const mobData = window.MobileExecutiveAdapter ? window.MobileExecutiveAdapter.getMobileData() : { kpis: {}, flowGraph: {}, activityStream: [], evolutionStatus: {} };
+      components = [
+        {
+          key: 'MobileHeaderCard',
+          render: () => window.MobileHeaderCard.render({ statusState: 'ONLINE', timestamp: new Date().toLocaleTimeString(), delay: 100 }),
+          props: mobData.kpis
+        },
+        {
+          key: 'MobileKPICard',
+          render: () => window.MobileKPICard.render({ kpis: mobData.kpis, delay: 150 }),
+          props: mobData.kpis
+        },
+        {
+          key: 'MobileFlowCard',
+          render: () => window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, delay: 200 }),
+          props: mobData.flowGraph
+        },
+        {
+          key: 'MobileActivityCard',
+          render: () => window.MobileActivityCard.render({ activityStream: mobData.activityStream, delay: 250 }),
+          props: mobData.activityStream
+        },
+        {
+          key: 'MobileEvolutionCard',
+          render: () => window.MobileEvolutionCard.render({ evolutionStatus: mobData.evolutionStatus, delay: 300 }),
+          props: mobData.evolutionStatus
+        },
+        {
+          key: 'MobileMemoryCard',
+          render: () => window.MobileMemoryCard.render({ kpis: mobData.kpis, delay: 350 }),
+          props: mobData.kpis
+        }
+      ];
+    } else if (viewMode === 'executive') {
       const execData = window.ExecutiveAdapter ? window.ExecutiveAdapter.getExecutiveData() : { kpis: {}, flowGraph: {}, activityStream: [], distribution: {}, evolutionStatus: {} };
       components = [
         {
@@ -110,9 +168,11 @@ class DashboardRenderer {
       ];
     }
 
-    // 初回マウント時、またはコンポーネント数が一致しない場合は全件一括マウント
-    if (gridContainer.children.length !== components.length) {
-      console.log('[Dashboard Renderer] 初回一括マウントを実行します。');
+    // 初回マウント時、コンポーネント数が一致しない場合、または表示モードが変更された場合は全件一括マウント
+    const lastViewMode = gridContainer.getAttribute('data-last-view');
+    if (gridContainer.children.length !== components.length || lastViewMode !== viewMode) {
+      console.log(`[Dashboard Renderer] モード移行または初回読み込みのため、一括マウントを実行します。 Mode: ${viewMode}`);
+      gridContainer.setAttribute('data-last-view', viewMode);
       let html = '';
       components.forEach(c => {
         window.DashboardRenderCache.hasChanged(c.key, c.props);
@@ -262,8 +322,11 @@ class DashboardRenderer {
 
     // タイムライン更新イベントの購読
     window.DashboardEventBus.on('event-timeline-update', (timelineEvents) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const viewMode = urlParams.get('view') || 'executive';
+      const viewMode = DashboardRenderer.getViewMode();
+      if (viewMode === 'mobile') {
+        DashboardRenderer.updateMobileDashboard();
+        return;
+      }
       if (viewMode === 'executive') {
         DashboardRenderer.updateExecutiveDashboard();
         return;
@@ -293,8 +356,11 @@ class DashboardRenderer {
 
     // 相関グラフ更新イベントの購読
     window.DashboardEventBus.on('event-correlation-update', (correlations) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const viewMode = urlParams.get('view') || 'executive';
+      const viewMode = DashboardRenderer.getViewMode();
+      if (viewMode === 'mobile') {
+        DashboardRenderer.updateMobileDashboard();
+        return;
+      }
       if (viewMode === 'executive') {
         DashboardRenderer.updateExecutiveDashboard();
         return;
@@ -324,8 +390,11 @@ class DashboardRenderer {
 
     // 関係グラフ更新イベントの購読
     window.DashboardEventBus.on('event-graph-update', (graphs) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const viewMode = urlParams.get('view') || 'executive';
+      const viewMode = DashboardRenderer.getViewMode();
+      if (viewMode === 'mobile') {
+        DashboardRenderer.updateMobileDashboard();
+        return;
+      }
       if (viewMode === 'executive') {
         DashboardRenderer.updateExecutiveDashboard();
         return;
@@ -355,8 +424,11 @@ class DashboardRenderer {
 
     // 知識層更新イベントの購読
     window.DashboardEventBus.on('event-knowledge-update', (knowledges) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const viewMode = urlParams.get('view') || 'executive';
+      const viewMode = DashboardRenderer.getViewMode();
+      if (viewMode === 'mobile') {
+        DashboardRenderer.updateMobileDashboard();
+        return;
+      }
       if (viewMode === 'executive') {
         DashboardRenderer.updateExecutiveDashboard();
         return;
@@ -386,8 +458,11 @@ class DashboardRenderer {
 
     // インサイト層更新イベントの購読
     window.DashboardEventBus.on('event-insight-update', (insights) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const viewMode = urlParams.get('view') || 'executive';
+      const viewMode = DashboardRenderer.getViewMode();
+      if (viewMode === 'mobile') {
+        DashboardRenderer.updateMobileDashboard();
+        return;
+      }
       if (viewMode === 'executive') {
         DashboardRenderer.updateExecutiveDashboard();
         return;
@@ -417,8 +492,11 @@ class DashboardRenderer {
 
     // エボリューション層更新イベントの購読
     window.DashboardEventBus.on('event-evolution-update', (evolutions) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const viewMode = urlParams.get('view') || 'executive';
+      const viewMode = DashboardRenderer.getViewMode();
+      if (viewMode === 'mobile') {
+        DashboardRenderer.updateMobileDashboard();
+        return;
+      }
       if (viewMode === 'executive') {
         DashboardRenderer.updateExecutiveDashboard();
         return;
@@ -448,8 +526,11 @@ class DashboardRenderer {
 
     // パターン層更新イベントの購読
     window.DashboardEventBus.on('event-pattern-update', (patterns) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const viewMode = urlParams.get('view') || 'executive';
+      const viewMode = DashboardRenderer.getViewMode();
+      if (viewMode === 'mobile') {
+        DashboardRenderer.updateMobileDashboard();
+        return;
+      }
       if (viewMode === 'executive') {
         DashboardRenderer.updateExecutiveDashboard();
         return;
@@ -479,8 +560,11 @@ class DashboardRenderer {
 
     // メモリ層更新イベントの購読
     window.DashboardEventBus.on('event-memory-update', (memories) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const viewMode = urlParams.get('view') || 'executive';
+      const viewMode = DashboardRenderer.getViewMode();
+      if (viewMode === 'mobile') {
+        DashboardRenderer.updateMobileDashboard();
+        return;
+      }
       if (viewMode === 'executive') {
         DashboardRenderer.updateExecutiveDashboard();
         return;
@@ -571,6 +655,74 @@ class DashboardRenderer {
       const el = gridContainer.children[5];
       if (el) {
         el.outerHTML = window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 0 });
+        const newEl = gridContainer.children[5];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+  }
+
+  /**
+   * Mobileビューモード用の全画面差分更新を実行する
+   */
+  static updateMobileDashboard() {
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (!gridContainer || !window.MobileExecutiveAdapter) return;
+
+    const mobData = window.MobileExecutiveAdapter.getMobileData();
+
+    // 0: MobileHeaderCard
+    if (window.MobileHeaderCard && window.DashboardRenderCache.hasChanged('MobileHeaderCard', mobData.kpis)) {
+      const el = gridContainer.children[0];
+      if (el) {
+        el.outerHTML = window.MobileHeaderCard.render({ statusState: 'ONLINE', timestamp: new Date().toLocaleTimeString(), delay: 0 });
+        const newEl = gridContainer.children[0];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+    // 1: MobileKPICard
+    if (window.MobileKPICard && window.DashboardRenderCache.hasChanged('MobileKPICard', mobData.kpis)) {
+      const el = gridContainer.children[1];
+      if (el) {
+        el.outerHTML = window.MobileKPICard.render({ kpis: mobData.kpis, delay: 0 });
+        const newEl = gridContainer.children[1];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+    // 2: MobileFlowCard
+    if (window.MobileFlowCard && window.DashboardRenderCache.hasChanged('MobileFlowCard', mobData.flowGraph)) {
+      const el = gridContainer.children[2];
+      if (el) {
+        el.outerHTML = window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, delay: 0 });
+        const newEl = gridContainer.children[2];
+        if (newEl) newEl.classList.add('motion-active');
+        if (window.DashboardMotion && window.DashboardMotion.animateMobileFlow) {
+          window.DashboardMotion.animateMobileFlow();
+        }
+      }
+    }
+    // 3: MobileActivityCard
+    if (window.MobileActivityCard && window.DashboardRenderCache.hasChanged('MobileActivityCard', mobData.activityStream)) {
+      const el = gridContainer.children[3];
+      if (el) {
+        el.outerHTML = window.MobileActivityCard.render({ activityStream: mobData.activityStream, delay: 0 });
+        const newEl = gridContainer.children[3];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+    // 4: MobileEvolutionCard
+    if (window.MobileEvolutionCard && window.DashboardRenderCache.hasChanged('MobileEvolutionCard', mobData.evolutionStatus)) {
+      const el = gridContainer.children[4];
+      if (el) {
+        el.outerHTML = window.MobileEvolutionCard.render({ evolutionStatus: mobData.evolutionStatus, delay: 0 });
+        const newEl = gridContainer.children[4];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+    // 5: MobileMemoryCard
+    if (window.MobileMemoryCard && window.DashboardRenderCache.hasChanged('MobileMemoryCard', mobData.kpis)) {
+      const el = gridContainer.children[5];
+      if (el) {
+        el.outerHTML = window.MobileMemoryCard.render({ kpis: mobData.kpis, delay: 0 });
         const newEl = gridContainer.children[5];
         if (newEl) newEl.classList.add('motion-active');
       }
