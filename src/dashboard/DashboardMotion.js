@@ -232,6 +232,27 @@ class DashboardMotion {
       }, 1500);
     });
   }
+
+  /**
+   * 新着相関チェーンに対するアニメーション・アクセシビリティ適用
+   */
+  static animateCorrelation() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = document.querySelectorAll('.correlation-chain-new');
+    items.forEach(item => {
+      if (isReduced) {
+        item.style.animation = 'none';
+        item.style.boxShadow = 'none';
+        item.classList.remove('correlation-chain-new');
+        return;
+      }
+
+      // 演出完了後にクラス破棄
+      setTimeout(() => {
+        item.classList.remove('correlation-chain-new');
+      }, 1500);
+    });
+  }
 }
 
 // グローバルスコープへ公開

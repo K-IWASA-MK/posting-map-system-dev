@@ -72,7 +72,18 @@ class DashboardEventBus {
     if (window.DashboardEventTimelineStore) {
       const added = window.DashboardEventTimelineStore.add(mappedEvent);
       if (added) {
-        this.emit('event-timeline-update', window.DashboardEventTimelineStore.getTimeline());
+        const timeline = window.DashboardEventTimelineStore.getTimeline();
+        this.emit('event-timeline-update', timeline);
+
+        // コレレーション（相関関係）の抽出・構築と更新通知
+        if (window.DashboardCorrelationBuilder && window.DashboardEventCorrelationStore) {
+          const correlations = window.DashboardCorrelationBuilder.build(timeline);
+          window.DashboardEventCorrelationStore.clear();
+          correlations.forEach(corr => {
+            window.DashboardEventCorrelationStore.addCorrelation(corr);
+          });
+          this.emit('event-correlation-update', window.DashboardEventCorrelationStore.getCorrelations());
+        }
       }
     }
 

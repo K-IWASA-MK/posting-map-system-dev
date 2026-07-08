@@ -230,6 +230,7 @@ POSTING MAP は：
 - **Dashboard Realtime Core Principle**: Agentは禁止：受信ストリーム（SSE等）を介したカーネルへの操作、コマンド・書き込み指令（POST, PUT, DELETE等）の逆流生成、受信データ（eventId, timestamp, type）の改変および検証スルー。許可：一方向イベントストリームの受信、状態マシンのフォールバック、接続ステータス表示。
 - **Dashboard Event Intelligence Core Principle**: Agentは禁止：AI（LLM等）の呼び出し、推論予測による自律対応（Kernel操作やコマンド自動承認）、メールやアラーム音等の自動送信、受信イベントの元データの書き換え（不変性違反）。許可：ルールベースの静的分類、重要度レベルマッピング、アテンションキュー内ソート、表示上のVisual Routing。
 - **Dashboard Event Timeline Core Principle**: Agentは禁止：未来イベントの予測（Event prediction）、イベント推奨（Event recommendation）、イベント契機での自動コマンド送信（Auto action）、およびタイムラインストアを介したデータ更新。許可：時系列履歴の蓄積（最大500件）、不変データの保持、時系列ソート、View Onlyでのマーカー描画。
+- **Dashboard Event Correlation Core Principle**: Agentは禁止：相関関係と因果関係の混同（Correlation = Causationの推論）、Root Cause Analysis（根本原因分析）、トラブル予測、および相関グラフからの自動コマンド送信・操作UI配置。許可：時間的近接度およびカテゴリ共通性に基づく客観的ソートと固定配置表示（最大200件保持）。
 
 
 

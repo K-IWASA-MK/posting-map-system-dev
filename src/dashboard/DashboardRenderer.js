@@ -71,6 +71,11 @@ class DashboardRenderer {
         key: 'EventTimelineCard',
         render: () => window.EventTimelineCard.render({ events: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : [], delay: 600 }),
         props: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : []
+      },
+      {
+        key: 'EventCorrelationCard',
+        render: () => window.EventCorrelationCard.render({ correlations: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : [], delay: 650 }),
+        props: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : []
       }
     ];
 
@@ -236,6 +241,26 @@ class DashboardRenderer {
         // アニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateTimeline) {
           window.DashboardMotion.animateTimeline();
+        }
+      }
+    });
+
+    // 相関グラフ更新イベントの購読
+    window.DashboardEventBus.on('event-correlation-update', (correlations) => {
+      console.log('[Dashboard Renderer] 相関グラフ更新イベント受信:', correlations);
+      const gridContainer = document.getElementById('dashboard-grid-container');
+      if (!gridContainer || !window.EventCorrelationCard) return;
+
+      // EventCorrelationCard は components 配列の 11 番目（インデックス10）
+      const correlationCardEl = gridContainer.children[10];
+      if (correlationCardEl) {
+        const newHtml = window.EventCorrelationCard.render({ correlations: correlations, delay: 0 });
+        window.DashboardRenderCache.hasChanged('EventCorrelationCard', correlations);
+        correlationCardEl.outerHTML = newHtml;
+
+        // 相関アニメーション適用
+        if (window.DashboardMotion && window.DashboardMotion.animateCorrelation) {
+          window.DashboardMotion.animateCorrelation();
         }
       }
     });

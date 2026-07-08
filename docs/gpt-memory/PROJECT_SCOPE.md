@@ -13,22 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Event Timeline Intelligence Foundation [現在のフェーズ]
-* **目的**: 受信した各種イベントを単発ログではなく、時系列インテリジェンスビュー（Event Timeline Observer Layer）として可視化する。
+### 現在のスプリント: AIOS Dashboard Event Correlation Intelligence Foundation [現在のフェーズ]
+* **目的**: 蓄積された複数イベントの時系列・属性的関係性（相関関係）を表示用の関係チェーン（Correlation Graph View）として抽出し、可視化する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規タイムライン仕様定義 (DashboardEventTimeline.md, EventTimelineSchema.md, EventTimelineVisualization.md)
-  - ✅ 時系列タイムライン履歴ストア (`DashboardEventTimelineStore.js`): 最大500件保持, 重複排除, 不変オブジェクト(freeze)
-  - ✅ タイムラインビューモデルアダプター (`DashboardTimelineAdapter.js`): 純粋マッピング
-  - ✅ 表示専用タイムラインカード (`EventTimelineCard.js`) および重要度別マーカー (`EventTimelineMarker.js`)
-  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-timeline-update` に基づく差分マウント
-  - ✅ タイムラインCSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 縦結合ライン, マーカーGlow, フェードイン
+  - ✅ 新規相関可視化仕様定義 (DashboardEventCorrelation.md, EventCorrelationSchema.md, EventCorrelationVisualization.md)
+  - ✅ 時系列相関チェーン履歴ストア (`DashboardEventCorrelationStore.js`): 最大200件保持, 重複排除, 不変オブジェクト(freeze), API通信なし
+  - ✅ 静的相関関係ビルダー (`DashboardCorrelationBuilder.js`): 時間近接・カテゴリ共通の静的ルール抽出。因果/異常検出は禁止
+  - ✅ 表示専用相関カード (`EventCorrelationCard.js`)、ノード (`EventCorrelationNode.js`)、接続ライン (`EventCorrelationLine.js`)
+  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-correlation-update` に基づく差分マウント
+  - ✅ 接続ライン/ノード CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 縦結合ライン, Glow Pulse, ノードフェードイン
   - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md, AGENTS.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ AIによる予測、レコメンデーション、自動承認、自動実行（Kernelへのコマンド逆流）、音声アラームやメール等の通知
+  - ❌ AI予測・因果推論（Causation）、根本原因分析（RCA）、自動承認、自動実行（Kernelへのコマンド逆流）、音声アラームやメール等の通知
 
-### 完了したスプリント: AIOS Dashboard Event Intelligence & Attention Routing Foundation
-* **目的**: 受信したリアルタイムイベントをルールベースでインテリジェントに分類・重要度マッピングし、重要度の高いものから順に Attention Queue（アテンションキュー）で優先表示・ハイライト（Glow・ルーティング）するための基盤構築。
-* **目的2**: Polling ベース監視から、Server-Sent Events を活用した安全なイベント駆動型リアルタイムモニタリング層への拡張。
+### 完了したスプリント: AIOS Dashboard Event Timeline Intelligence Foundation
+* **目的**: 受信した各種イベントを単発ログではなく、時系列インテリジェンスビュー（Event Timeline Observer Layer）として可視化する。
+* **完了したスプリント2**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+
 
 
 

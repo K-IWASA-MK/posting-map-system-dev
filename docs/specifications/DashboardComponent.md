@@ -125,6 +125,18 @@ Observer Dashboard 内を構成する各 UI エレメント（コンポーネン
 3. **描画以外の計算の排除**:
    テキストのフィルタリングや推論、AI判定ロジックなどの表示ロジック以外の計算（No Calculation）は一切含まない純粋表示モジュールとすること。
 
+---
+
+## 相関グラフコンポーネント規則 (Correlation Graph Component Rules)
+相関グラフコンポーネント（`EventCorrelationCard`、`EventCorrelationNode`、`EventCorrelationLine`）は以下の規則に従う。
+1. **因果推論（Inference / Prediction）の厳格排除**:
+   コンポーネント内部、および関連ビルダーにおいて、イベントの原因特定、異常発生の予測、成功失敗の論理判断は一切行わないこと。
+2. **完全表示専用 (View Only)**:
+   ユーザーがクリックできるボタン（button）や入力項目（input, select）、およびフォーム（form）は一切配置しないこと。
+3. **不変属性 (Immutable Props) のバインド**:
+   ストアから供給される相関配列を不変データとして扱い、コンポーネント内での並び替え・絞り込みなどの書き換え処理は一切行わないこと。
+
+
 
 
 
