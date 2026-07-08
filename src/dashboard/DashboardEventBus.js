@@ -112,7 +112,17 @@ class DashboardEventBus {
                 insights.forEach(ins => {
                   window.DashboardEventInsightStore.addInsight(ins);
                 });
-                this.emit('event-insight-update', window.DashboardEventInsightStore.getInsights());
+                const currentInsights = window.DashboardEventInsightStore.getInsights();
+                this.emit('event-insight-update', currentInsights);
+
+                // 表示用エボリューションオブジェクトの生成・構築と更新通知
+                if (window.DashboardEvolutionBuilder && window.DashboardEventEvolutionStore) {
+                  const evos = window.DashboardEvolutionBuilder.build(currentInsights);
+                  evos.forEach(evo => {
+                    window.DashboardEventEvolutionStore.addEvolution(evo);
+                  });
+                  this.emit('event-evolution-update', window.DashboardEventEvolutionStore.getEvolutions());
+                }
               }
             }
           }

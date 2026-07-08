@@ -13,26 +13,28 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Event Insight Layer Foundation [現在のフェーズ]
-* **目的**: ナレッジ情報から客観的な統計や時系列トレンド、発生比率を抽出し、表示専用のインサイトオブジェクト（Event Insight Layer）として集約可視化する。
+### 現在のスプリント: AIOS Dashboard Event Intelligence Evolution Layer Foundation [現在のフェーズ]
+* **目的**: 状態変化や統計の推移を前後の差分（Before / After）として抽出し、表示専用のエボリューションオブジェクト（Event Evolution Layer）として集約可視化する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規インサイト仕様定義 (DashboardEventInsight.md, EventInsightSchema.md, EventInsightVisualization.md)
-  - ✅ インサイトデータストア (`DashboardEventInsightStore.js`): 最大100件保持, 不変オブジェクト(freeze), API通信なし
-  - ✅ 客観的インサイトビルダー (`DashboardInsightBuilder.js`): ナレッジデータから統計比率や時系列トレンドを静的に自動集計。因果/異常検出は禁止
-  - ✅ インサイトビューモデルアダプター (`DashboardInsightAdapter.js`): 表示用ビューモデル変換
-  - ✅ 表示専用インサイトカード (`EventInsightCard.js`) およびインサイトアイテム (`EventInsightItem.js`)
-  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-insight-update` に基づく差分マウント
-  - ✅ CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 新規インサイトフェードイン, バッジ発光, Reduced Motion対応
+  - ✅ 新規エボリューション仕様定義 (DashboardEventEvolution.md, EventEvolutionSchema.md, EventEvolutionVisualization.md)
+  - ✅ エボリューションデータストア (`DashboardEventEvolutionStore.js`): 最大500件保持, 不変オブジェクト(freeze), API通信なし
+  - ✅ 客観的エボリューションビルダー (`DashboardEvolutionBuilder.js`): 前回の状態スナップショットと最新の状態データを比較し、差分情報を静的に自動生成。原因判定/異常検知/自動改善は禁止
+  - ✅ エボリューションビューモデルアダプター (`DashboardEvolutionAdapter.js`): 表示用ビューモデル変換
+  - ✅ 表示専用エボリューションカード (`EventEvolutionCard.js`) およびエボリューションアイテム (`EventEvolutionItem.js`)
+  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-evolution-update` に基づく差分マウント
+  - ✅ CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 新規差分フェードイン, 変化バッジ発光, Reduced Motion対応
   - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md, AGENTS.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ AI予測、因果推論、根本原因分析、推奨アクション（Recommendation）の提示、自動承認、自動実行（Kernelへのコマンド逆流）、音声アラームやメール等の通知
+  - ❌ AI予測、因果推論、根本原因分析、推奨、自動改善、自動承認、自動実行（Kernelへのコマンド逆流）、音声アラームやメール等の通知
 
-### 完了したスプリント: AIOS Dashboard Event Knowledge Layer Foundation
-* **目的**: グラフ構造やタイムラインデータを整理・保持し、表示専用のナレッジオブジェクト（Event Knowledge Layer）として要約可視化する。
-* **完了したスプリント2**: AIOS Dashboard Event Intelligence Graph Foundation
-* **完了したスプリント3**: AIOS Dashboard Event Correlation Intelligence Foundation
-* **完了したスプリント4**: AIOS Dashboard Event Timeline Intelligence Foundation
-* **完了したスプリント5**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+### 完了したスプリント: AIOS Dashboard Event Insight Layer Foundation
+* **目的**: ナレッジ情報から客観的な統計や時系列トレンド、発生比率を抽出し、表示専用のインサイトオブジェクト（Event Insight Layer）として集約可視化する。
+* **完了したスプリント2**: AIOS Dashboard Event Knowledge Layer Foundation
+* **完了したスプリント3**: AIOS Dashboard Event Intelligence Graph Foundation
+* **完了したスプリント4**: AIOS Dashboard Event Correlation Intelligence Foundation
+* **完了したスプリント5**: AIOS Dashboard Event Timeline Intelligence Foundation
+* **完了したスプリント6**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+
 
 
 
