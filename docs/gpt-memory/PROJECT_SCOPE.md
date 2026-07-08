@@ -13,23 +13,26 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Event Intelligence Graph Foundation [現在のフェーズ]
-* **目的**: 相関関係をグラフ構造（Event Graph）として保持・可視化するトポロジーグラフ監視ビューを構築する。
+### 現在のスプリント: AIOS Dashboard Event Knowledge Layer Foundation [現在のフェーズ]
+* **目的**: グラフ構造やタイムラインデータを整理・保持し、表示専用のナレッジオブジェクト（Event Knowledge Layer）として要約可視化する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規グラフ可視化仕様定義 (DashboardEventGraph.md, EventGraphSchema.md, EventGraphVisualization.md)
-  - ✅ 関係構造グラフデータストア (`DashboardEventGraphStore.js`): 最大100グラフ・1000ノード保持, 不変オブジェクト(freeze), API通信なし
-  - ✅ トポロジーグラフ構築ビルダー (`DashboardGraphBuilder.js`): 相関結果からNode/Edge生成。因果/異常検出は禁止
-  - ✅ 表示専用グラフカード (`EventGraphCard.js`)、ノード (`EventGraphNode.js`)、接続エッジ (`EventGraphEdge.js`)
-  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-graph-update` に基づく差分マウント
-  - ✅ 接続エッジ/ノード CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 赤色 Glow Node/Edge, オレンジ Edge, ノードフェードイン
+  - ✅ 新規ナレッジ仕様定義 (DashboardEventKnowledge.md, EventKnowledgeSchema.md, EventKnowledgeVisualization.md)
+  - ✅ ナレッジデータストア (`DashboardEventKnowledgeStore.js`): 最大500件保持, 不変オブジェクト(freeze), API通信なし
+  - ✅ 客観的ナレッジビルダー (`DashboardKnowledgeBuilder.js`): グラフ構造から客観的要約サマリーを自動生成。因果/異常検出は禁止
+  - ✅ ナレッジビューモデルアダプター (`DashboardKnowledgeAdapter.js`): 表示用ビューモデル変換
+  - ✅ 表示専用ナレッジカード (`EventKnowledgeCard.js`) およびナレッジアイテム (`EventKnowledgeItem.js`)
+  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-knowledge-update` に基づく差分マウント
+  - ✅ CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 新規ナレッジフェードイン, バッジ発光, Reduced Motion対応
   - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md, AGENTS.md）の対応追加
 * **今回実装しないもの (対象外)**:
   - ❌ AI予測、因果推論、根本原因分析、自動承認、自動実行（Kernelへのコマンド逆流）、音声アラームやメール等の通知
 
-### 完了したスプリント: AIOS Dashboard Event Correlation Intelligence Foundation
-* **目的**: 蓄積された複数イベントの時系列・属性的関係性（相関関係）を表示用の関係チェーン（Correlation Graph View）として抽出し、可視化する。
-* **完了したスプリント2**: AIOS Dashboard Event Timeline Intelligence Foundation
-* **完了したスプリント3**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+### 完了したスプリント: AIOS Dashboard Event Intelligence Graph Foundation
+* **目的**: 相関関係をグラフ構造（Event Graph）として保持・可視化するトポロジーグラフ監視ビューを構築する。
+* **完了したスプリント2**: AIOS Dashboard Event Correlation Intelligence Foundation
+* **完了したスプリント3**: AIOS Dashboard Event Timeline Intelligence Foundation
+* **完了したスプリント4**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+
 
 
 

@@ -92,7 +92,18 @@ class DashboardEventBus {
             graphs.forEach(g => {
               window.DashboardEventGraphStore.addGraph(g);
             });
-            this.emit('event-graph-update', window.DashboardEventGraphStore.getGraphs());
+            const currentGraphs = window.DashboardEventGraphStore.getGraphs();
+            this.emit('event-graph-update', currentGraphs);
+
+            // 表示用ナレッジオブジェクトの生成・構築と更新通知
+            if (window.DashboardKnowledgeBuilder && window.DashboardEventKnowledgeStore) {
+              const knowledges = window.DashboardKnowledgeBuilder.build(currentGraphs);
+              window.DashboardEventKnowledgeStore.clear();
+              knowledges.forEach(k => {
+                window.DashboardEventKnowledgeStore.addKnowledge(k);
+              });
+              this.emit('event-knowledge-update', window.DashboardEventKnowledgeStore.getKnowledges());
+            }
           }
         }
       }

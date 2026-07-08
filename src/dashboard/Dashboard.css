@@ -1206,3 +1206,139 @@ body {
   text-align: center;
   padding: var(--space-xl) 0;
 }
+
+/* ==========================================================================
+   8. Event Knowledge Layer Styles
+   ========================================================================== */
+.knowledge-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.knowledge-anchor-links {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.knowledge-anchor {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  background-color: rgba(255, 255, 255, 0.03);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.knowledge-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: var(--space-sm);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.knowledge-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.knowledge-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+}
+
+.knowledge-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: knowledge-fade-in 0.4s ease-out forwards;
+}
+
+@keyframes knowledge-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.knowledge-item-new {
+  animation: knowledge-glow-pulse 1.5s ease-out;
+}
+
+@keyframes knowledge-glow-pulse {
+  0% {
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.15);
+    background-color: rgba(37, 99, 235, 0.03);
+  }
+  100% {
+    box-shadow: none;
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+}
+
+.knowledge-item-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.knowledge-category {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.knowledge-badge-runtime {
+  color: var(--accent-blue);
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+.knowledge-badge-governance {
+  color: #a855f7;
+  background-color: rgba(168, 85, 247, 0.1);
+}
+
+.knowledge-badge-quality {
+  color: #22c55e;
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.knowledge-badge-simulation {
+  color: #eab308;
+  background-color: rgba(234, 179, 8, 0.1);
+}
+
+.knowledge-title-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.knowledge-item-meta {
+  display: flex;
+  gap: var(--space-md);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: var(--space-xs);
+}
+
+.knowledge-empty {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  text-align: center;
+  padding: var(--space-xl) 0;
+}
