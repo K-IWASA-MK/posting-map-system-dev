@@ -65,6 +65,11 @@ class DashboardRenderer {
 
     const viewMode = DashboardRenderer.getViewMode();
 
+    // 起動シーケンス・ランタイムの駆動
+    if (window.DashboardRuntimeManager) {
+      window.DashboardRuntimeManager.boot();
+    }
+
     // 描画パイプラインの実行
     if (window.DashboardRenderingPipeline) {
       window.DashboardRenderingPipeline.run(viewMode, window.innerWidth);
@@ -228,6 +233,11 @@ class DashboardRenderer {
           key: 'DashboardRenderingCard',
           render: () => window.DashboardRenderingCard.render({ renderData: window.DashboardRenderAdapter ? window.DashboardRenderAdapter.getDashboardRenderData() : {}, delay: 800 }),
           props: window.DashboardRenderAdapter ? window.DashboardRenderAdapter.getDashboardRenderData() : {}
+        },
+        {
+          key: 'DashboardRuntimeCard',
+          render: () => window.DashboardRuntimeCard.render({ runtimeData: window.DashboardRuntimeAdapter ? window.DashboardRuntimeAdapter.getDashboardRuntimeData() : {}, delay: 850 }),
+          props: window.DashboardRuntimeAdapter ? window.DashboardRuntimeAdapter.getDashboardRuntimeData() : {}
         }
       ];
     } else if (viewMode === 'trust') {
@@ -1279,6 +1289,18 @@ class DashboardRenderer {
         if (el) {
           el.outerHTML = window.DashboardRenderingCard.render({ renderData: renderData, delay: 0 });
           const newEl = gridContainer.children[14];
+          if (newEl) DashboardRenderer.activateMotion(newEl);
+        }
+      }
+    }
+    // 15: DashboardRuntimeCard
+    if (window.DashboardRuntimeCard && window.DashboardRuntimeAdapter) {
+      const runtimeData = window.DashboardRuntimeAdapter.getDashboardRuntimeData();
+      if (window.DashboardRenderCache.hasChanged('DashboardRuntimeCard', runtimeData)) {
+        const el = gridContainer.children[15];
+        if (el) {
+          el.outerHTML = window.DashboardRuntimeCard.render({ runtimeData: runtimeData, delay: 0 });
+          const newEl = gridContainer.children[15];
           if (newEl) DashboardRenderer.activateMotion(newEl);
         }
       }

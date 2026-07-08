@@ -13,17 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 171: Dashboard Rendering Pipeline Foundation [現在のフェーズ]
-* **目的**: Phase 170 を基盤として、Dashboard 全体の描画順序・描画コンテキスト・描画ライフサイクルを決定論的に一元管理する Rendering Pipeline を構築する。
+### 現在のスプリント: AIOS Phase 172: Dashboard Runtime Foundation [現在のフェーズ]
+* **目的**: Phase 171 を基盤として、AIOS Dashboard 全体の起動・初期化・ライフサイクルを決定論的に一元管理する Runtime Framework を構築する。
 * **今回実装するもの (対象)**:
-  - Render Context スキーマ定義（`pipelineId`, `pipelineVersion` メタデータ含む）
-  - DashboardRenderContext, DashboardRenderingPipeline, DashboardRenderAdapter
-  - パイプライン状態と描画キューを表示する DashboardRenderingCard
+  - Runtime Context 定義（初期化モジュールリストおよび起動シーケンスのタイムスタンプ記録含む）
+  - DashboardRuntimeContext, DashboardRuntimeManager, DashboardRuntimeAdapter
+  - 各モジュールの起動状況・ランタイム状態を示す DashboardRuntimeCard
 * **今回実装しないもの (対象外)**:
-  - ❌ 仮想DOM（Virtual DOM）および差分DOMアルゴリズムの最適化
-  - ❌ レンダリング処理の非同期スケジューリング・アニメーション
-  - ❌ AIによる描画最適化・自動配置・自動描画
+  - ❌ 自動復旧（Auto-recovery）および自動再起動（Auto-reboot）
+  - ❌ プラグインの動的ロードおよびバックグラウンド実行タスク
+  - ❌ AIによる起動診断・自動最適化・自己修復
   - ❌ Write API、Command送信、Kernel操作
+
+### 完了したスプリント: AIOS Phase 171: Dashboard Rendering Pipeline Foundation
+* **目的**: Phase 170 を基盤として、Dashboard 全体の描画順序・描画コンテキスト・描画ライフサイクルを決定論的に一元管理する Rendering Pipeline を構築する。
 
 ### 完了したスプリント: AIOS Phase 170: Dashboard Navigation Foundation
 * **目的**: Phase 169 を基盤として、Dashboard 全体の画面遷移・ナビゲーションを統一管理する Navigation Framework を構築する。
