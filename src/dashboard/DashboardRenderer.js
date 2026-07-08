@@ -67,18 +67,25 @@ class DashboardRenderer {
     
     // 2. サイドバーメニューの active 状態を同期
     document.querySelectorAll('.sidebar-nav li').forEach(el => el.classList.remove('active'));
-    let activeMenuId = 'menu-raw'; // raw or default
-    if (viewMode === 'executive') activeMenuId = 'menu-executive';
-    else if (viewMode === 'trust') activeMenuId = 'menu-trust';
-    else if (viewMode === 'tenant') activeMenuId = 'menu-tenant';
-    else if (viewMode === 'global') activeMenuId = 'menu-global';
-    else if (viewMode === 'intelligence') activeMenuId = 'menu-intelligence';
-    else if (viewMode === 'operations') activeMenuId = 'menu-operations';
-    else if (viewMode === 'analytics') activeMenuId = 'menu-analytics';
-    else if (viewMode === 'history') activeMenuId = 'menu-history';
-    else if (viewMode === 'evidence') activeMenuId = 'menu-evidence';
-    else if (viewMode === 'audit') activeMenuId = 'menu-audit';
-    else if (viewMode === 'trace') activeMenuId = 'menu-trace';
+    let activeMenuId = 'menu-raw'; // デフォルトフォールバック
+    if (window.DashboardNavigationRegistry) {
+      const activeNav = window.DashboardNavigationRegistry.getNavigationByViewMode(viewMode);
+      if (activeNav) {
+        activeMenuId = activeNav.navigationId.replace('nav-', 'menu-');
+      }
+    } else {
+      if (viewMode === 'executive') activeMenuId = 'menu-executive';
+      else if (viewMode === 'trust') activeMenuId = 'menu-trust';
+      else if (viewMode === 'tenant') activeMenuId = 'menu-tenant';
+      else if (viewMode === 'global') activeMenuId = 'menu-global';
+      else if (viewMode === 'intelligence') activeMenuId = 'menu-intelligence';
+      else if (viewMode === 'operations') activeMenuId = 'menu-operations';
+      else if (viewMode === 'analytics') activeMenuId = 'menu-analytics';
+      else if (viewMode === 'history') activeMenuId = 'menu-history';
+      else if (viewMode === 'evidence') activeMenuId = 'menu-evidence';
+      else if (viewMode === 'audit') activeMenuId = 'menu-audit';
+      else if (viewMode === 'trace') activeMenuId = 'menu-trace';
+    }
     const activeMenuEl = document.getElementById(activeMenuId);
     if (activeMenuEl) {
       activeMenuEl.classList.add('active');
@@ -202,6 +209,15 @@ class DashboardRenderer {
           key: 'DashboardStateCard',
           render: () => window.DashboardStateCard.render({ stateData: window.DashboardStateAdapter ? window.DashboardStateAdapter.getDashboardStateData() : {}, delay: 700 }),
           props: window.DashboardStateAdapter ? window.DashboardStateAdapter.getDashboardStateData() : {}
+        },
+        {
+          key: 'DashboardNavigationCard',
+          render: () => window.DashboardNavigationCard.render({
+            navigations: window.DashboardNavigationAdapter ? window.DashboardNavigationAdapter.getDashboardNavigationData().navigations : [],
+            activeNavId: window.DashboardNavigationAdapter ? window.DashboardNavigationAdapter.getDashboardNavigationData().activeNavId : '-',
+            delay: 750
+          }),
+          props: window.DashboardNavigationAdapter ? window.DashboardNavigationAdapter.getDashboardNavigationData() : {}
         }
       ];
     } else if (viewMode === 'trust') {
@@ -1220,6 +1236,22 @@ class DashboardRenderer {
         if (el) {
           el.outerHTML = window.DashboardStateCard.render({ stateData: stateData, delay: 0 });
           const newEl = gridContainer.children[12];
+          if (newEl) DashboardRenderer.activateMotion(newEl);
+        }
+      }
+    }
+    // 13: DashboardNavigationCard
+    if (window.DashboardNavigationCard && window.DashboardNavigationAdapter) {
+      const navData = window.DashboardNavigationAdapter.getDashboardNavigationData();
+      if (window.DashboardRenderCache.hasChanged('DashboardNavigationCard', navData)) {
+        const el = gridContainer.children[13];
+        if (el) {
+          el.outerHTML = window.DashboardNavigationCard.render({
+            navigations: navData.navigations,
+            activeNavId: navData.activeNavId,
+            delay: 0
+          });
+          const newEl = gridContainer.children[13];
           if (newEl) DashboardRenderer.activateMotion(newEl);
         }
       }

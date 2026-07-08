@@ -13,17 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 169: Dashboard State Manager Foundation [現在のフェーズ]
-* **目的**: Phase 168 を基盤として、Dashboard 全体の状態（Workspace、Layout、Widget、View等）を一元的に決定論的・不変管理する State Manager Framework を構築する。
+### 現在のスプリント: AIOS Phase 170: Dashboard Navigation Foundation [現在のフェーズ]
+* **目的**: Phase 169 を基盤として、Dashboard 全体の画面遷移・ナビゲーションを統一管理する Navigation Framework を構築する。
 * **今回実装するもの (対象)**:
-  - Dashboard State Tree スキーマ定義（`stateVersion`, `lastUpdated` タイムスタンプ含む）
-  - DashboardStateStore, DashboardStateManager, DashboardStateAdapter
-  - ダッシュボードの現在の状態木情報を表示する DashboardStateCard
+  - Navigation Registry 定義（`breadcrumb` 階層名配列および `defaultView` フラグ含む）
+  - DashboardNavigationRegistry, DashboardNavigationManager, DashboardNavigationAdapter
+  - 登録されたナビゲーション定義とアクティブ状況を表示する DashboardNavigationCard
 * **今回実装しないもの (対象外)**:
-  - ❌ LocalStorage / SessionStorage / IndexedDB による状態の永続保存・復元
-  - ❌ Undo / Redo 機能、および手動でのロールバックUI
-  - ❌ AIによる状態推測・自動復元・最適化
+  - ❌ 動的なメニュー編集・ドラッグ＆ドロップ機能
+  - ❌ ロール・権限ベースの動的なナビゲーション制御
+  - ❌ AIによるナビゲーション推薦・推論、自動的な画面遷移
   - ❌ Write API、Command送信、Kernel操作
+
+### 完了したスプリント: AIOS Phase 169: Dashboard State Manager Foundation
+* **目的**: Phase 168 を基盤として、Dashboard 全体の状態（Workspace、Layout、Widget、View等）を一元的に決定論的・不変管理する State Manager Framework を構築する。
 
 ### 完了したスプリント: AIOS Phase 168: Dashboard Workspace Foundation
 * **目的**: Phase 167 を基盤として、Dashboard を用途ごとの Workspace 単位で構成・管理する Workspace Framework を構築する。
