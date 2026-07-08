@@ -36,10 +36,10 @@ class ActivityLogCard {
     });
 
     return `
-      <section class="card premium-glass grid-col-2" data-motion="fade-up" data-delay="${delay}">
+      <section class="card premium-glass grid-col-2" aria-label="System Activity Log" data-motion="fade-up" data-delay="${delay}">
         <h2>System Activity Log</h2>
         <div class="log-container">
-          <ul class="log-list">
+          <ul class="log-list" aria-live="polite">
             ${listHtml}
           </ul>
         </div>

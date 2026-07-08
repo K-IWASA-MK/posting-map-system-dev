@@ -14,13 +14,20 @@ class DashboardMotion {
   static init() {
     console.log('[Dashboard Motion] モーションコントローラーを初期化します...');
     
-    // 1. data-motion 要素を走査してフェード・スライドを実行 (Stagger 遅延対応)
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 1. data-motion 要素を走査してフェード・スライドを実行
     const elements = document.querySelectorAll('[data-motion]');
     elements.forEach(el => {
-      const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
-      setTimeout(() => {
+      if (isReduced) {
         el.classList.add('motion-active');
-      }, delay);
+      } else {
+        const rawDelay = parseInt(el.getAttribute('data-delay') || '0', 10);
+        const delay = Math.pow(rawDelay / 100, 1.15) * 80;
+        setTimeout(() => {
+          el.classList.add('motion-active');
+        }, delay);
+      }
     });
 
     // 2. メトリクス数値の Rolling Number アニメーションを開始
@@ -41,7 +48,11 @@ class DashboardMotion {
         trendPath.style.strokeDashoffset = length;
         // リフロー強制 (描画トリガー)
         trendPath.getBoundingClientRect();
-        trendPath.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)';
+        if (isReduced) {
+          trendPath.style.transition = 'none';
+        } else {
+          trendPath.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(0.16, 1, 0.3, 1)';
+        }
         trendPath.style.strokeDashoffset = '0';
       } catch (e) {
         console.warn('[Dashboard Motion] SVG線画延長の取得に失敗しました。代替描画を行います:', e.message);
@@ -54,7 +65,11 @@ class DashboardMotion {
       const targetWidth = fill.getAttribute('data-target-width') || '0%';
       // 強制リフローによるアニメーション同期
       fill.getBoundingClientRect();
-      fill.style.transition = 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      if (isReduced) {
+        fill.style.transition = 'none';
+      } else {
+        fill.style.transition = 'width 1.6s cubic-bezier(0.16, 1, 0.3, 1)';
+      }
       fill.style.width = targetWidth;
     });
   }
@@ -63,25 +78,31 @@ class DashboardMotion {
    * 新着ログが差分追加された際のアニメーション演出 (Smooth Scroll & Glow 制御)
    */
   static animateNewLogs() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const listContainer = document.querySelector('.log-container');
     const newItems = document.querySelectorAll('.new-log-glow');
 
     newItems.forEach(item => {
-      // 1. 強制リフローによる出現フェードインの同期
+      // 1. 出現フェードイン
       item.getBoundingClientRect();
       item.classList.add('motion-active');
 
-      // 2. 3秒（3000ms）経過後に Glow クラスを除去して周囲と調和させる
-      setTimeout(() => {
+      if (isReduced) {
+        // Reduced motion 時は Glow 演出をスキップする
         item.classList.remove('new-log-glow');
-      }, 3000);
+      } else {
+        // 2. 3秒（3000ms）経過後に Glow クラスを除去
+        setTimeout(() => {
+          item.classList.remove('new-log-glow');
+        }, 3000);
+      }
     });
 
-    // 3. ログコンテナを最上部へスムーズスクロールで引き戻す
+    // 3. ログコンテナをスクロール
     if (listContainer) {
       listContainer.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: isReduced ? 'auto' : 'smooth'
       });
     }
   }
@@ -92,6 +113,11 @@ class DashboardMotion {
   static startRollingInt(elementId, targetValue) {
     const el = document.getElementById(elementId);
     if (!el) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.innerText = targetValue;
+      return;
+    }
 
     const start = Math.max(0, targetValue - 30); // 30カウント前から開始
     let current = start;
@@ -119,6 +145,11 @@ class DashboardMotion {
   static startRollingFloat(elementId, targetValue, suffix = '') {
     const el = document.getElementById(elementId);
     if (!el) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.innerText = `${targetValue.toFixed(1)}${suffix}`;
+      return;
+    }
 
     const start = Math.max(0, targetValue - 8.0);
     let current = start;

@@ -224,6 +224,10 @@ POSTING MAP は：
 - **Dashboard Component Core Principle**: Agentは禁止：Component内API通信、Component内Kernel操作、Component内状態変更、Component内Business Logic。許可：Props Rendering、Visual Display、Animation。
 - **Dashboard Connection Core Principle**: Agentは禁止：GET以外のAPI呼び出し、Stripe等の決済設定変更、SpreadsheetApp等の直接参照、自動復旧リトライの永続ループ（リトライ間隔制限および指数バックオフの未適用）。許可：GET、Response取得、Timeout処理、例外キャッチおよび警告状態遷移。
 - **Dashboard Turnout Component Core Principle**: Agentは禁止：投票率データの再計算、勝敗予測、当落見込み、AI分析、およびダッシュボードからの決済や Kernel 操作などの Write 操作全般。許可：受信した投票率データの HTML プログレスメーター表示、メーター拡張イージング。
+- **Dashboard Layout Core Principle**: Agentは禁止：表示レイアウト以外の変更、計算ロジック追加、データフロー変更、状態操作、インタラクティブ要素の追加。許可：余白調整、フォントスケール適用、角丸整理、デザインシステム適用。
+- **Dashboard Accessibility Core Principle**: Agentは禁止：音声読み上げやコントラスト等の支援技術最適化の範囲を超えた機能追加、状態操作、およびデータフローの変更全般。許可：ARIAタグ整備、role割り当て、Reduced Motion対応、WCAG基準のカラーコントラスト調整。
+
+
 
 # AI行動指針 (Action Policy)
 - **🚨 承認なき実行の絶対禁止**: AIは提案のみを行い、岩佐さんの明確な「承認(Yes/OK)」なしにいかなるファイル操作（編集・削除・適用）も実行しない。

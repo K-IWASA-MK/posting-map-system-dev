@@ -22,14 +22,14 @@
 
   <div class="app-container">
     <!-- Warning Banner Component -->
-    <div id="warning-panel" class="warning-banner" style="display: none;"></div>
+    <div id="warning-panel" class="warning-banner" role="alert" aria-live="assertive" style="display: none;"></div>
 
-    <!-- Header Component (Slide Down) -->
-    <header class="dashboard-header" data-motion="slide-down" data-delay="0">
+    <!-- Header Component (Slide Down) - Integrated with Spacing Tokens -->
+    <header class="dashboard-header" role="banner" aria-label="AIOS Dashboard Header" data-motion="slide-down" data-delay="0">
       <div class="header-logo">
         <h1>AIOS Kernel Dashboard</h1>
       </div>
-      <div class="header-status-panel">
+      <div class="header-status-panel" role="status" aria-live="polite" aria-label="AIOS Operational Status">
         <span class="status-badge environment">Environment: <strong id="env-text">LOCAL SIMULATION</strong></span>
         <span class="status-badge health-status">Status: <strong id="status-text" class="accent-green">LIVE</strong></span>
         <span class="status-badge update-time">Last Update: <span id="update-time-text">-</span></span>
@@ -38,8 +38,8 @@
 
     <div class="body-container">
       <!-- Sidebar Component (Slide In Left) -->
-      <aside class="dashboard-sidebar" data-motion="slide-in-left" data-delay="100">
-        <nav class="sidebar-nav">
+      <aside class="dashboard-sidebar" role="complementary" aria-label="AIOS Sidebar" data-motion="slide-in-left" data-delay="100">
+        <nav class="sidebar-nav" role="navigation" aria-label="AIOS Sidebar Navigation">
           <ul>
             <li class="active">Dashboard</li>
             <li>Kernel Status</li>
@@ -58,9 +58,9 @@
       </aside>
 
       <!-- Main Dashboard View -->
-      <main class="dashboard-main">
+      <main class="dashboard-main" role="main" aria-label="AIOS Main Content">
         <!-- Component Mount Container -->
-        <div id="dashboard-grid-container" class="dashboard-grid"></div>
+        <div id="dashboard-grid-container" class="dashboard-grid" aria-readonly="true" aria-label="AIOS Dashboard Grid"></div>
       </main>
     </div>
   </div>

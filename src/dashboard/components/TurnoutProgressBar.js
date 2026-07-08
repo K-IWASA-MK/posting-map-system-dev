@@ -26,7 +26,7 @@ class TurnoutProgressBar {
           <span class="turnout-rate-badge">${status}</span>
           <span class="turnout-rate">${turnoutRate.toFixed(1)} %</span>
         </div>
-        <div class="turnout-progress">
+        <div class="turnout-progress" role="progressbar" aria-valuenow="${turnoutRate.toFixed(1)}" aria-valuemin="0" aria-valuemax="100" aria-label="${city} turnout rate">
           <div class="turnout-fill" style="width: 0%;" data-target-width="${turnoutRate.toFixed(1)}%"></div>
         </div>
       </div>

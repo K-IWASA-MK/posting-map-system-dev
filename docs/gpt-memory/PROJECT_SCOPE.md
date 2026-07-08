@@ -13,23 +13,22 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Turnout Component Foundation [現在のフェーズ]
-* **目的**: 投票率概要および市別投票率を表示する専用ビジュアルコンポーネント（`TurnoutCard.js`, `TurnoutProgressBar.js`）を設計・構築し、Props の受信による一元的なマウントおよびメーターのイージング拡張アニメーションを統合する。コンポーネント内からの通信や予測計算は 100% 排除し、Observer を堅持する。
+### 現在のスプリント: AIOS Dashboard Accessibility & Responsive Optimization [現在のフェーズ]
+* **目的**: 構築済みの Dashboard 各画面に対し、アクセシビリティ対応（スクリーンリーダー・prefers-reduced-motion）および複数デバイス表示（レスポンシブメディアクエリ）の最適化。
 * **今回実装するもの (対象)**:
-  - ✅ 新規仕様定義 (TurnoutComponent, TurnoutCardSpecification, TurnoutDataSchema)
-  - ✅ ビジュアルコンポーネント実装 (`src/dashboard/components/`): TurnoutCard (カードレイアウト), TurnoutProgressBar (進捗バーメーター)
-  - ✅ レンダラー更新 (`DashboardRenderer.js`): 投票率の Props マッピング追加および一括 DOM 挿入
-  - ✅ 状態表示 UI 統合 (`DashboardApp.html`): コンポーネント用スクリプトのインクルード
-  - ✅ スタイル定義追加 (`Dashboard.css`): 進捗バー枠、プログレス塗りつぶし、およびイージングメーター、バッジ等の CSS
-  - ✅ モーション同期更新 (`DashboardMotion.js`): 0% から受信値（目標幅）までのイージング width 拡張アニメーション
-  - ✅ データアダプター更新 (`DashboardDataAdapter.js`): 投票率データの正規化（Normalize）およびデフォルトモック
+  - ✅ 新規ビジュアル仕様定義 (DashboardAccessibility.md, DashboardResponsive.md, DashboardMotionAccessibility.md)
+  - ✅ HTML アクセシビリティマークアップ最適化 (`DashboardApp.html`): ランドマーク, ARIA属性整備
+  - ✅ CSS アクセシビリティ & レスポンシブ化 (`Dashboard.css`): clamp(), メディアクエリ Grid, prefers-reduced-motion, コントラスト比調整
+  - ✅ 各コンポーネントのレスポンシブ対応: WAI-ARIA 属性, overflow対策
+  - ✅ アニメーションのReduced Motion動的制御 (`DashboardMotion.js`)
   - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md, AGENTS.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ コンポーネント内部での勝敗予測、当落見込み、AI分析、および変動の集計ロジック
-  - ❌ 操作をトリガーするボタン（Execute, Approve 等）の追加、通信メソッド（POST/PUT等）の参照
+  - ❌ 操作UI（button, form等）の追加、Write操作、およびビジネスロジック
 
-### 次期フェーズ: AIOS Dashboard Layout Polish & Detail adjustments
-* **目的**: ダッシュボード全体の余余白（Padding / Margin）、フォントサイズ、および暗黒 UI 境界配色の極微細調整。
+### 完了したスプリント: AIOS Dashboard Layout Polish & Detail Adjustments
+* **目的**: 構築済みの各種カードやグラフ、投票率パネルの余白（Spacing）、角丸（Radius）、フォント階層（Typography Scale）の CSS Token 整理とガラスモーフィズム表現の洗練。
+* **目的2**: 投票率概要および市別投票率を表示する専用ビジュアルコンポーネント（`TurnoutCard.js`, `TurnoutProgressBar.js`）を設計・構築し、Props の受信による一元的なマウントおよびメーターのイージング拡張アニメーションを統合。
+
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)
 * **目的**: モックデータを用いてDashboardのアニメーション、および操作性のモックを完成させる。

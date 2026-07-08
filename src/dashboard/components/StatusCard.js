@@ -41,7 +41,7 @@ class StatusCard {
     });
 
     return `
-      <section class="card premium-glass grid-col-2" data-motion="fade-up" data-delay="${delay}">
+      <section class="card premium-glass grid-col-2" aria-label="${props.title}" data-motion="fade-up" data-delay="${delay}">
         <h2>${props.title}</h2>
         <div class="status-list" id="kernel-status-list">
           ${listHtml}

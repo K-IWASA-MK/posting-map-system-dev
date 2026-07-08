@@ -63,3 +63,26 @@ Observer Dashboard 内を構成する各 UI エレメント（コンポーネン
   - `ActivityTrendCard.js` (活動推移折れ線 SVG グラフ) および `ActivityLogCard.js` (システム活動ログ) は、時系列データやメッセージ配列を Props 受信し、静的に HTML/SVG を出力する責任のみを持つ。トレンドの予測計算や分析、およびログの動的追加・削除処理は行わない。
 - **投票率コンポーネント責任 (Voter Turnout Visual Components)**:
   - `TurnoutCard.js` (投票率カード) および `TurnoutProgressBar.js` (進捗バー) は、投票率・稼働状態・市区町村名を Props 受信し、メーター比率と数値を静的に HTML 描画する。勝敗表現や変動の予測・AI分析などは一切行わない。
+
+---
+
+## コンポーネント視覚的一貫性ルール (Component Visual Consistency Rules)
+すべてのダッシュボードコンポーネント（カード型 UI 要素）は、統一された視覚基準を満たすために以下の実装ルールを遵守しなければならない。
+1. **カード基調（カードラッパー）**: 常に `.card.premium-glass` をルートタグ（通常は `section` または `div`）に使用し、独自背景色のインラインスタイルは指定しない。
+2. **タイトル構成（Card Titles）**: 各カードのタイトルには `h2` タグを使用し、下部に境界線を引いて内容と区切る。
+3. **余白適用（Margin/Padding）**: 要素間マージン、リストアイテムギャップはインラインでの指定を禁止し、すべて `Dashboard.css` の Spacing Tokens (`--space-sm`, `--space-md` 等) に基づいてレンダリング時の階層で担保する。
+4. **バッジ仕様（Badges）**: ステータス等のバッジは `.badge` に加えて `.badge-active` または `.badge-idle` の共通クラスのみを使用し、角丸は `--radius-md` (12px) とすること。
+5. **フォント・配色制御（Typography & Colors）**: テキスト色は CSS カスタムプロパティ（`--text-primary`, `--text-secondary`, `--text-muted`, `--text-dim`）を使用し、アクセントカラーも原則として青（`accent-blue`）、緑（`accent-green`）、橙（`accent-orange`）、赤（`accent-red`）の定義クラスのみを適用する。
+
+---
+
+## レスポンシブ・コンポーネント規則 (Responsive Component Rules)
+各コンポーネントは、画面幅の急激な変化やモバイルへの再配置に対して、単独で情報の折り返し・はみ出しを防ぐ以下の措置を遵守する。
+1. **テキスト見切れ防止 (Text Overflow Prevent)**:
+   市区町村名やログメッセージなど、可変幅のコンテキストを持つインラインテキスト要素には、適宜 `text-overflow: ellipsis; white-space: nowrap; overflow: hidden;` を適用するか、折り返し属性を明記する。
+2. **アイテムの回り込み (Flex Wrap)**:
+   見出し・ステータス等と数値が横並びフレックス配置される場合、極小ビューポートでテキストが重なり合わないよう、`flex-wrap: wrap` を付与しつつ隙間の Gap を確保する。
+3. **グラフの伸縮性**:
+   `ActivityTrendCard` などの SVG 描画要素は、固定の `width` / `height` 属性によるレンダリングを禁止し、`viewBox` を用いたアスペクト比固定の `w-full` 流動サイジングを採用する。
+
+

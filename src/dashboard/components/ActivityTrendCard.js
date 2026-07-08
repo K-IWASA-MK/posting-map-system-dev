@@ -52,10 +52,10 @@ class ActivityTrendCard {
     });
 
     return `
-      <section class="card premium-glass grid-col-2" data-motion="fade-up" data-delay="${delay}">
+      <section class="card premium-glass grid-col-2" aria-label="Activity Trend" data-motion="fade-up" data-delay="${delay}">
         <h2>Activity Trend</h2>
         <div class="chart-container">
-          <svg viewBox="0 0 500 200" class="trend-svg">
+          <svg viewBox="0 0 500 200" class="trend-svg" role="img" aria-label="Activity trend line chart">
             <!-- グリッド線 -->
             <line x1="50" y1="35" x2="450" y2="35" class="grid-line" />
             <line x1="50" y1="100" x2="450" y2="100" class="grid-line" />

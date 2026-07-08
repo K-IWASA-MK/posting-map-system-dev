@@ -31,7 +31,7 @@ class TurnoutCard {
     });
 
     return `
-      <section class="card premium-glass grid-col-2" data-motion="fade-up" data-delay="${delay}">
+      <section class="card premium-glass grid-col-2" aria-label="Turnout Status" data-motion="fade-up" data-delay="${delay}">
         <h2>Turnout Status</h2>
         
         <div class="turnout-summary">

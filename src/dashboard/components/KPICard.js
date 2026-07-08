@@ -36,7 +36,7 @@ class KPICard {
     });
 
     return `
-      <section class="card premium-glass ${gridClass}" data-motion="fade-up" data-delay="${delay}">
+      <section class="card premium-glass ${gridClass}" aria-label="${props.title}" data-motion="fade-up" data-delay="${delay}">
         <h2>${props.title}</h2>
         <div class="metrics-list">
           ${itemsHtml}
