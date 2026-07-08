@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIOS Kernel Dashboard</title>
+  <title>AIOS Control Center</title>
   <!-- Google Fonts Inter のロード -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
   <!-- Loading Panel Overlay -->
   <div id="loading-panel" class="loading-overlay">
     <div class="skeleton-spinner"></div>
-    <span>Loading AIOS Kernel Metrics...</span>
+    <span>Loading AIOS Control Center...</span>
   </div>
 
   <!-- Error Panel Overlay -->
@@ -27,7 +27,7 @@
     <!-- Header Component (Slide Down) - Integrated with Spacing Tokens -->
     <header class="dashboard-header" role="banner" aria-label="AIOS Dashboard Header" data-motion="slide-down" data-delay="0">
       <div class="header-logo">
-        <h1>AIOS Kernel Dashboard</h1>
+        <h1>AIOS Control Center</h1>
       </div>
       <div class="header-status-panel" role="status" aria-live="polite" aria-label="AIOS Operational Status">
         <span class="status-badge environment">Environment: <strong id="env-text">LOCAL SIMULATION</strong></span>
@@ -42,14 +42,7 @@
       <aside class="dashboard-sidebar" role="complementary" aria-label="AIOS Sidebar" data-motion="slide-in-left" data-delay="100">
         <nav class="sidebar-nav" role="navigation" aria-label="AIOS Sidebar Navigation">
           <ul>
-            <li class="active">Dashboard</li>
-            <li>Kernel Status</li>
-            <li>Quality</li>
-            <li>Knowledge</li>
-            <li>Governance</li>
-            <li>Billing</li>
-            <li>Simulation</li>
-            <li>Audit</li>
+            <li class="active">AIOS Pipeline</li>
           </ul>
         </nav>
         <div class="sidebar-footer">
@@ -131,6 +124,7 @@
   <script src="DashboardPollingController.js"></script>
   <script src="DashboardRenderer.js"></script>
   <script src="DashboardMotion.js"></script>
+  <script src="DemoEventGenerator.js"></script>
   <script src="Dashboard.js"></script>
 </body>
 </html>

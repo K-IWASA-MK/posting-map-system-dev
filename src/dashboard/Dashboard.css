@@ -144,9 +144,9 @@ body {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-lg);
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
@@ -631,7 +631,7 @@ body {
     padding: var(--space-lg);
   }
   .dashboard-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     gap: var(--space-md);
   }
 }

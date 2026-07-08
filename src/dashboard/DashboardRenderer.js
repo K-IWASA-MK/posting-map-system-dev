@@ -23,88 +23,48 @@ class DashboardRenderer {
 
     const components = [
       {
-        key: 'StatusCard',
-        render: () => window.StatusCard.render({ title: 'Kernel Status', delay: 150, statusMap: data.kernelStatus }),
-        props: data.kernelStatus
-      },
-      {
-        key: 'SimulationCard',
-        render: () => window.SimulationCard.render({ lastRun: data.simulation.lastRun, passed: data.simulation.passed, failed: data.simulation.failed, delay: 200 }),
-        props: data.simulation
-      },
-      {
-        key: 'MetricCard',
-        render: () => window.MetricCard.render({ qualityScore: data.quality.qualityScore, reviewCount: data.quality.reviewCount, improvementDelta: data.quality.improvementDelta, delay: 250 }),
-        props: data.quality
-      },
-      {
-        key: 'KnowledgeCard',
-        render: () => window.KnowledgeCard.render({ knowledgeTotal: data.knowledge.knowledgeTotal, officialCount: data.knowledge.officialCount, candidateCount: data.knowledge.candidateCount || (data.knowledge.knowledgeTotal - data.knowledge.officialCount), healthScore: data.knowledge.healthScore, gapCount: data.knowledge.gapCount, delay: 300 }),
-        props: data.knowledge
-      },
-      {
-        key: 'GovernanceCard',
-        render: () => window.GovernanceCard.render({ pendingApproval: data.governance.pendingApproval, approvedCount: data.governance.approvedCount, auditCount: data.governance.auditCount, delay: 350 }),
-        props: data.governance
-      },
-      {
-        key: 'BillingCard',
-        render: () => window.BillingCard.render({ licenseStatus: data.billing.licenseStatus, subscriptionStatus: data.billing.subscriptionStatus, delay: 400 }),
-        props: data.billing
-      },
-      {
-        key: 'ActivityTrendCard',
-        render: () => window.ActivityTrendCard.render({ trendData: data.trendData || [25, 38, 55, 48, 72, 88.5], delay: 450 }),
-        props: data.trendData
-      },
-      {
         key: 'ActivityLogCard',
-        render: () => window.ActivityLogCard.render({ logs: data.logs, delay: 500 }),
+        render: () => window.ActivityLogCard.render({ logs: data.logs, delay: 150 }),
         props: data.logs
       },
       {
-        key: 'TurnoutCard',
-        render: () => window.TurnoutCard.render({ overall: data.turnout.overall, cities: data.turnout.cities, delay: 550 }),
-        props: data.turnout
-      },
-      {
         key: 'EventTimelineCard',
-        render: () => window.EventTimelineCard.render({ events: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : [], delay: 600 }),
+        render: () => window.EventTimelineCard.render({ events: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : [], delay: 200 }),
         props: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : []
       },
       {
         key: 'EventCorrelationCard',
-        render: () => window.EventCorrelationCard.render({ correlations: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : [], delay: 650 }),
+        render: () => window.EventCorrelationCard.render({ correlations: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : [], delay: 250 }),
         props: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : []
       },
       {
         key: 'EventGraphCard',
-        render: () => window.EventGraphCard.render({ graphs: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : [], delay: 700 }),
+        render: () => window.EventGraphCard.render({ graphs: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : [], delay: 300 }),
         props: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : []
       },
       {
         key: 'EventKnowledgeCard',
-        render: () => window.EventKnowledgeCard.render({ knowledges: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : [], delay: 750 }),
+        render: () => window.EventKnowledgeCard.render({ knowledges: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : [], delay: 350 }),
         props: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : []
       },
       {
         key: 'EventInsightCard',
-        render: () => window.EventInsightCard.render({ insights: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : [], delay: 800 }),
+        render: () => window.EventInsightCard.render({ insights: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : [], delay: 400 }),
         props: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : []
       },
       {
         key: 'EventEvolutionCard',
-        render: () => window.EventEvolutionCard.render({ evolutions: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : [], delay: 850 }),
+        render: () => window.EventEvolutionCard.render({ evolutions: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : [], delay: 450 }),
         props: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : []
       },
       {
         key: 'EventPatternCard',
-        render: () => window.EventPatternCard.render({ patterns: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : [], delay: 900 }),
+        render: () => window.EventPatternCard.render({ patterns: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : [], delay: 500 }),
         props: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : []
       },
       {
         key: 'EventMemoryCard',
-        render: () => window.EventMemoryCard.render({ memories: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : [], delay: 950 }),
+        render: () => window.EventMemoryCard.render({ memories: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : [], delay: 550 }),
         props: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : []
       }
     ];
@@ -261,8 +221,8 @@ class DashboardRenderer {
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
 
-      // EventTimelineCard は components 配列の 10 番目（インデックス9）
-      const timelineCardEl = gridContainer.children[9];
+      // EventTimelineCard は components 配列の 2 番目（インデックス1）
+      const timelineCardEl = gridContainer.children[1];
       if (timelineCardEl) {
         const newHtml = window.EventTimelineCard.render({ events: timelineEvents, delay: 0 });
         window.DashboardRenderCache.hasChanged('EventTimelineCard', timelineEvents);
@@ -281,8 +241,8 @@ class DashboardRenderer {
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventCorrelationCard) return;
 
-      // EventCorrelationCard は components 配列の 11 番目（インデックス10）
-      const correlationCardEl = gridContainer.children[10];
+      // EventCorrelationCard は components 配列の 3 番目（インデックス2）
+      const correlationCardEl = gridContainer.children[2];
       if (correlationCardEl) {
         const newHtml = window.EventCorrelationCard.render({ correlations: correlations, delay: 0 });
         window.DashboardRenderCache.hasChanged('EventCorrelationCard', correlations);
@@ -301,8 +261,8 @@ class DashboardRenderer {
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
 
-      // EventGraphCard は components 配列の 12 番目（インデックス11）
-      const graphCardEl = gridContainer.children[11];
+      // EventGraphCard は components 配列の 4 番目（インデックス3）
+      const graphCardEl = gridContainer.children[3];
       if (graphCardEl) {
         const newHtml = window.EventGraphCard.render({ graphs: graphs, delay: 0 });
         window.DashboardRenderCache.hasChanged('EventGraphCard', graphs);
@@ -321,8 +281,8 @@ class DashboardRenderer {
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventKnowledgeCard) return;
 
-      // EventKnowledgeCard は components 配列の 13 番目（インデックス12）
-      const knowledgeCardEl = gridContainer.children[12];
+      // EventKnowledgeCard は components 配列の 5 番目（インデックス4）
+      const knowledgeCardEl = gridContainer.children[4];
       if (knowledgeCardEl) {
         const newHtml = window.EventKnowledgeCard.render({ knowledges: knowledges, delay: 0 });
         window.DashboardRenderCache.hasChanged('EventKnowledgeCard', knowledges);
@@ -341,8 +301,8 @@ class DashboardRenderer {
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
 
-      // EventInsightCard は components 配列の 14 番目（インデックス13）
-      const insightCardEl = gridContainer.children[13];
+      // EventInsightCard は components 配列の 6 番目（インデックス5）
+      const insightCardEl = gridContainer.children[5];
       if (insightCardEl) {
         const newHtml = window.EventInsightCard.render({ insights: insights, delay: 0 });
         window.DashboardRenderCache.hasChanged('EventInsightCard', insights);
@@ -361,8 +321,8 @@ class DashboardRenderer {
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventEvolutionCard) return;
 
-      // EventEvolutionCard は components 配列の 15 番目（インデックス14）
-      const evolutionCardEl = gridContainer.children[14];
+      // EventEvolutionCard は components 配列の 7 番目（インデックス6）
+      const evolutionCardEl = gridContainer.children[6];
       if (evolutionCardEl) {
         const newHtml = window.EventEvolutionCard.render({ evolutions: evolutions, delay: 0 });
         window.DashboardRenderCache.hasChanged('EventEvolutionCard', evolutions);
@@ -381,8 +341,8 @@ class DashboardRenderer {
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
 
-      // EventPatternCard は components 配列の 16 番目（インデックス15）
-      const patternCardEl = gridContainer.children[15];
+      // EventPatternCard は components 配列の 8 番目（インデックス7）
+      const patternCardEl = gridContainer.children[7];
       if (patternCardEl) {
         const newHtml = window.EventPatternCard.render({ patterns: patterns, delay: 0 });
         window.DashboardRenderCache.hasChanged('EventPatternCard', patterns);
@@ -401,8 +361,8 @@ class DashboardRenderer {
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventMemoryCard) return;
 
-      // EventMemoryCard は components 配列 of 17 番目（インデックス16）
-      const memoryCardEl = gridContainer.children[16];
+      // EventMemoryCard は components 配列 of 9 番目（インデックス8）
+      const memoryCardEl = gridContainer.children[8];
       if (memoryCardEl) {
         const newHtml = window.EventMemoryCard.render({ memories: memories, delay: 0 });
         window.DashboardRenderCache.hasChanged('EventMemoryCard', memories);
