@@ -148,13 +148,18 @@ class ExecutiveAdapter {
       totalReceivedCount: fieldOpsEvents.length
     };
 
+    const hierarchyContext = window.DashboardHierarchyContext
+      ? window.DashboardHierarchyContext.getContext()
+      : { tenantId: 'DEFAULT', regionId: 'DEFAULT', areaId: 'DEFAULT' };
+
     return {
       kpis,
       flowGraph,
       activityStream,
       distribution,
       evolutionStatus,
-      fieldOpsStatus
+      fieldOpsStatus,
+      hierarchyContext
     };
   }
 

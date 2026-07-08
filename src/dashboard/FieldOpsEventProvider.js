@@ -20,13 +20,21 @@ class FieldOpsEventProvider {
       ? window.DashboardTenantContext.getContext().tenantId
       : 'DEFAULT';
 
+    const activeRegionId = (window.DashboardHierarchyContext && window.DashboardHierarchyContext.getContext())
+      ? window.DashboardHierarchyContext.getContext().regionId
+      : 'DEFAULT';
+    const activeAreaId = (window.DashboardHierarchyContext && window.DashboardHierarchyContext.getContext())
+      ? window.DashboardHierarchyContext.getContext().areaId
+      : 'DEFAULT';
+
     // スキーマ適合と Object.freeze による不変性保証
     const fieldOpsEvent = Object.freeze({
       eventId: rawEvent.eventId || `evt-field-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       tenantId: rawEvent.tenantId || activeTenantId,
+      regionId: rawEvent.regionId || activeRegionId,
+      areaId: rawEvent.areaId || activeAreaId,
       sourceType: "FIELDOPS",
       category: "field_operation",
-      areaId: rawEvent.areaId || "UNKNOWN-AREA",
       action: rawEvent.action || "ACTIVITY_LOG",
       timestamp: rawEvent.timestamp || new Date().toLocaleTimeString(),
       rawTimestamp: rawEvent.rawTimestamp || Date.now(),

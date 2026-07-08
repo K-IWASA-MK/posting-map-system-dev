@@ -94,6 +94,11 @@ class DashboardRenderer {
           props: mobData.kpis
         },
         {
+          key: 'HierarchyContextCard',
+          render: () => window.HierarchyContextCard.render({ hierarchyContext: mobData.hierarchyContext, delay: 120 }),
+          props: mobData.hierarchyContext
+        },
+        {
           key: 'MobileKPICard',
           render: () => window.MobileKPICard.render({ kpis: mobData.kpis, delay: 150 }),
           props: mobData.kpis
@@ -124,6 +129,11 @@ class DashboardRenderer {
       const healthData = window.PipelineHealthAdapter ? window.PipelineHealthAdapter.getHealthData() : { pipelineNodes: [] };
 
       components = [
+        {
+          key: 'HierarchyContextCard',
+          render: () => window.HierarchyContextCard.render({ hierarchyContext: execData.hierarchyContext, delay: 100 }),
+          props: execData.hierarchyContext
+        },
         {
           key: 'ExecutiveKPICard',
           render: () => window.ExecutiveKPICard.render({ kpis: execData.kpis, delay: 150 }),
@@ -659,34 +669,43 @@ class DashboardRenderer {
     const execData = window.ExecutiveAdapter.getExecutiveData();
     const healthData = window.PipelineHealthAdapter ? window.PipelineHealthAdapter.getHealthData() : { pipelineNodes: [] };
 
-    // 0: ExecutiveKPICard
-    if (window.ExecutiveKPICard && window.DashboardRenderCache.hasChanged('ExecutiveKPICard', execData.kpis)) {
+    // 0: HierarchyContextCard
+    if (window.HierarchyContextCard && window.DashboardRenderCache.hasChanged('HierarchyContextCard', execData.hierarchyContext)) {
       const el = gridContainer.children[0];
       if (el) {
-        el.outerHTML = window.ExecutiveKPICard.render({ kpis: execData.kpis, delay: 0 });
+        el.outerHTML = window.HierarchyContextCard.render({ hierarchyContext: execData.hierarchyContext, delay: 0 });
         const newEl = gridContainer.children[0];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 1: IntelligenceFlowGraphCard (Composite props check)
-    const flowProps = { flowGraph: execData.flowGraph, healthData };
-    if (window.IntelligenceFlowGraphCard && window.DashboardRenderCache.hasChanged('IntelligenceFlowGraphCard', flowProps)) {
+    // 1: ExecutiveKPICard
+    if (window.ExecutiveKPICard && window.DashboardRenderCache.hasChanged('ExecutiveKPICard', execData.kpis)) {
       const el = gridContainer.children[1];
       if (el) {
-        el.outerHTML = window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, healthData, delay: 0 });
+        el.outerHTML = window.ExecutiveKPICard.render({ kpis: execData.kpis, delay: 0 });
         const newEl = gridContainer.children[1];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+    // 2: IntelligenceFlowGraphCard (Composite props check)
+    const flowProps = { flowGraph: execData.flowGraph, healthData };
+    if (window.IntelligenceFlowGraphCard && window.DashboardRenderCache.hasChanged('IntelligenceFlowGraphCard', flowProps)) {
+      const el = gridContainer.children[2];
+      if (el) {
+        el.outerHTML = window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, healthData, delay: 0 });
+        const newEl = gridContainer.children[2];
         if (newEl) DashboardRenderer.activateMotion(newEl);
         if (window.DashboardMotion && window.DashboardMotion.animateFlowGraph) {
           window.DashboardMotion.animateFlowGraph();
         }
       }
     }
-    // 2: PipelineHealthCard (New)
+    // 3: PipelineHealthCard
     if (window.PipelineHealthCard && window.DashboardRenderCache.hasChanged('PipelineHealthCard', healthData)) {
-      const el = gridContainer.children[2];
+      const el = gridContainer.children[3];
       if (el) {
         el.outerHTML = window.PipelineHealthCard.render({ healthData, delay: 0 });
-        const newEl = gridContainer.children[2];
+        const newEl = gridContainer.children[3];
         if (newEl) DashboardRenderer.activateMotion(newEl);
         if (window.DashboardMotion && window.DashboardMotion.init) {
           // アニメーション再アタッチ
@@ -694,48 +713,48 @@ class DashboardRenderer {
         }
       }
     }
-    // 3: RealtimeActivityStreamCard
+    // 4: RealtimeActivityStreamCard
     if (window.RealtimeActivityStreamCard && window.DashboardRenderCache.hasChanged('RealtimeActivityStreamCard', execData.activityStream)) {
-      const el = gridContainer.children[3];
-      if (el) {
-        el.outerHTML = window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 0 });
-        const newEl = gridContainer.children[3];
-        if (newEl) DashboardRenderer.activateMotion(newEl);
-      }
-    }
-    // 4: IntelligenceDistributionCard
-    if (window.IntelligenceDistributionCard && window.DashboardRenderCache.hasChanged('IntelligenceDistributionCard', execData.distribution)) {
       const el = gridContainer.children[4];
       if (el) {
-        el.outerHTML = window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 0 });
+        el.outerHTML = window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 0 });
         const newEl = gridContainer.children[4];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 5: ExecutiveEvolutionStatusCard
-    if (window.ExecutiveEvolutionStatusCard && window.DashboardRenderCache.hasChanged('ExecutiveEvolutionStatusCard', execData.evolutionStatus)) {
+    // 5: IntelligenceDistributionCard
+    if (window.IntelligenceDistributionCard && window.DashboardRenderCache.hasChanged('IntelligenceDistributionCard', execData.distribution)) {
       const el = gridContainer.children[5];
       if (el) {
-        el.outerHTML = window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 0 });
+        el.outerHTML = window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 0 });
         const newEl = gridContainer.children[5];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 6: ExecutivePatternMemorySummaryCard
-    if (window.ExecutivePatternMemorySummaryCard && window.DashboardRenderCache.hasChanged('ExecutivePatternMemorySummaryCard', execData.kpis)) {
+    // 6: ExecutiveEvolutionStatusCard
+    if (window.ExecutiveEvolutionStatusCard && window.DashboardRenderCache.hasChanged('ExecutiveEvolutionStatusCard', execData.evolutionStatus)) {
       const el = gridContainer.children[6];
       if (el) {
-        el.outerHTML = window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 0 });
+        el.outerHTML = window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 0 });
         const newEl = gridContainer.children[6];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 7: FieldOpsStatusCard (New)
-    if (window.FieldOpsStatusCard && window.DashboardRenderCache.hasChanged('FieldOpsStatusCard', execData.fieldOpsStatus)) {
+    // 7: ExecutivePatternMemorySummaryCard
+    if (window.ExecutivePatternMemorySummaryCard && window.DashboardRenderCache.hasChanged('ExecutivePatternMemorySummaryCard', execData.kpis)) {
       const el = gridContainer.children[7];
       if (el) {
-        el.outerHTML = window.FieldOpsStatusCard.render({ fieldOpsStatus: execData.fieldOpsStatus, delay: 0 });
+        el.outerHTML = window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 0 });
         const newEl = gridContainer.children[7];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+    // 8: FieldOpsStatusCard
+    if (window.FieldOpsStatusCard && window.DashboardRenderCache.hasChanged('FieldOpsStatusCard', execData.fieldOpsStatus)) {
+      const el = gridContainer.children[8];
+      if (el) {
+        el.outerHTML = window.FieldOpsStatusCard.render({ fieldOpsStatus: execData.fieldOpsStatus, delay: 0 });
+        const newEl = gridContainer.children[8];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
@@ -760,52 +779,61 @@ class DashboardRenderer {
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 1: MobileKPICard
-    if (window.MobileKPICard && window.DashboardRenderCache.hasChanged('MobileKPICard', mobData.kpis)) {
+    // 1: HierarchyContextCard
+    if (window.HierarchyContextCard && window.DashboardRenderCache.hasChanged('HierarchyContextCard', mobData.hierarchyContext)) {
       const el = gridContainer.children[1];
       if (el) {
-        el.outerHTML = window.MobileKPICard.render({ kpis: mobData.kpis, delay: 0 });
+        el.outerHTML = window.HierarchyContextCard.render({ hierarchyContext: mobData.hierarchyContext, delay: 0 });
         const newEl = gridContainer.children[1];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 2: MobileFlowCard (Composite props check)
-    const mobileFlowProps = { flowGraph: mobData.flowGraph, healthData };
-    if (window.MobileFlowCard && window.DashboardRenderCache.hasChanged('MobileFlowCard', mobileFlowProps)) {
+    // 2: MobileKPICard
+    if (window.MobileKPICard && window.DashboardRenderCache.hasChanged('MobileKPICard', mobData.kpis)) {
       const el = gridContainer.children[2];
       if (el) {
-        el.outerHTML = window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, healthData, delay: 0 });
+        el.outerHTML = window.MobileKPICard.render({ kpis: mobData.kpis, delay: 0 });
         const newEl = gridContainer.children[2];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+    // 3: MobileFlowCard (Composite props check)
+    const mobileFlowProps = { flowGraph: mobData.flowGraph, healthData };
+    if (window.MobileFlowCard && window.DashboardRenderCache.hasChanged('MobileFlowCard', mobileFlowProps)) {
+      const el = gridContainer.children[3];
+      if (el) {
+        el.outerHTML = window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, healthData, delay: 0 });
+        const newEl = gridContainer.children[3];
         if (newEl) DashboardRenderer.activateMotion(newEl);
         if (window.DashboardMotion && window.DashboardMotion.animateMobileFlow) {
           window.DashboardMotion.animateMobileFlow();
         }
       }
     }
-    // 3: MobileActivityCard
+    // 4: MobileActivityCard
     if (window.MobileActivityCard && window.DashboardRenderCache.hasChanged('MobileActivityCard', mobData.activityStream)) {
-      const el = gridContainer.children[3];
-      if (el) {
-        el.outerHTML = window.MobileActivityCard.render({ activityStream: mobData.activityStream, delay: 0 });
-        const newEl = gridContainer.children[3];
-        if (newEl) DashboardRenderer.activateMotion(newEl);
-      }
-    }
-    // 4: MobileEvolutionCard
-    if (window.MobileEvolutionCard && window.DashboardRenderCache.hasChanged('MobileEvolutionCard', mobData.evolutionStatus)) {
       const el = gridContainer.children[4];
       if (el) {
-        el.outerHTML = window.MobileEvolutionCard.render({ evolutionStatus: mobData.evolutionStatus, delay: 0 });
+        el.outerHTML = window.MobileActivityCard.render({ activityStream: mobData.activityStream, delay: 0 });
         const newEl = gridContainer.children[4];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 5: MobileMemoryCard
-    if (window.MobileMemoryCard && window.DashboardRenderCache.hasChanged('MobileMemoryCard', mobData.kpis)) {
+    // 5: MobileEvolutionCard
+    if (window.MobileEvolutionCard && window.DashboardRenderCache.hasChanged('MobileEvolutionCard', mobData.evolutionStatus)) {
       const el = gridContainer.children[5];
       if (el) {
-        el.outerHTML = window.MobileMemoryCard.render({ kpis: mobData.kpis, delay: 0 });
+        el.outerHTML = window.MobileEvolutionCard.render({ evolutionStatus: mobData.evolutionStatus, delay: 0 });
         const newEl = gridContainer.children[5];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+    // 6: MobileMemoryCard
+    if (window.MobileMemoryCard && window.DashboardRenderCache.hasChanged('MobileMemoryCard', mobData.kpis)) {
+      const el = gridContainer.children[6];
+      if (el) {
+        el.outerHTML = window.MobileMemoryCard.render({ kpis: mobData.kpis, delay: 0 });
+        const newEl = gridContainer.children[6];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }

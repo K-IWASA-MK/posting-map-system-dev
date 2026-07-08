@@ -29,9 +29,18 @@ class DashboardEventTimelineStore {
       ? window.DashboardTenantContext.getContext().tenantId
       : 'DEFAULT';
 
+    const activeRegionId = (window.DashboardHierarchyContext && window.DashboardHierarchyContext.getContext())
+      ? window.DashboardHierarchyContext.getContext().regionId
+      : 'DEFAULT';
+    const activeAreaId = (window.DashboardHierarchyContext && window.DashboardHierarchyContext.getContext())
+      ? window.DashboardHierarchyContext.getContext().areaId
+      : 'DEFAULT';
+
     // 2. スキーマ定義に基づく Object.freeze 不変性担保
     const frozenEvent = Object.freeze({
       tenantId: event.tenantId || activeTenantId,
+      regionId: event.regionId || activeRegionId,
+      areaId: event.areaId || activeAreaId,
       eventId: event.eventId,
       timestamp: event.timestamp || new Date().toLocaleTimeString(),
       rawTimestamp: event.rawTimestamp || Date.now(),

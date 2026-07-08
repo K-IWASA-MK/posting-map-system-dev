@@ -3248,3 +3248,67 @@ body {
   color: #ffffff;
 }
 
+/* ==========================================================================
+   20. Tenant Hierarchy Context Card Styles
+   ========================================================================== */
+.hierarchy-context-card {
+  grid-column: span 6;
+  padding: var(--space-lg);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+  box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.hierarchy-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: var(--space-sm);
+}
+
+.hierarchy-body {
+  margin-top: var(--space-md);
+}
+
+.hierarchy-badge-flow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.hierarchy-badge-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 16px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  min-width: 110px;
+}
+
+.hierarchy-badge-item .badge-lbl {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hierarchy-badge-item .badge-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.hierarchy-arrow {
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+

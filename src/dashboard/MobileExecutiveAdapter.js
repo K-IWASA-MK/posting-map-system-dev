@@ -62,11 +62,16 @@ class MobileExecutiveAdapter {
     // 4. 進化ステータス
     const evolutionStatus = base.evolutionStatus;
 
+    const hierarchyContext = window.DashboardHierarchyContext
+      ? window.DashboardHierarchyContext.getContext()
+      : { tenantId: 'DEFAULT', regionId: 'DEFAULT', areaId: 'DEFAULT' };
+
     return {
       kpis,
       flowGraph,
       activityStream,
-      evolutionStatus
+      evolutionStatus,
+      hierarchyContext
     };
   }
 
