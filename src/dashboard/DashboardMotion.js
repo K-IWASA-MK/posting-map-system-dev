@@ -80,6 +80,8 @@ class DashboardMotion {
       }
       fill.style.width = targetWidth;
     });
+
+    this.animateFlowGraph();
   }
 
   /**
@@ -382,6 +384,21 @@ class DashboardMotion {
       setTimeout(() => {
         item.classList.remove('memory-item-new');
       }, 1500);
+    });
+  }
+
+  /**
+   * Flow Graph 内の進行方向矢印に対する脈動 (pulse) 線画演出
+   */
+  static animateFlowGraph() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) return;
+
+    const lines = document.querySelectorAll('.arrow-glow-line');
+    lines.forEach(line => {
+      line.style.animation = 'none';
+      line.getBoundingClientRect(); // 強制リフロー
+      line.style.animation = 'flowGlowPulse 1.2s ease-in-out infinite';
     });
   }
 }

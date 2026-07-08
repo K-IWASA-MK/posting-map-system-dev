@@ -13,20 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Demo Visualization Foundation [現在のフェーズ]
-* **目的**: 構築された AIOS Event Intelligence Pipeline (Event ➔ Timeline ➔ Correlation ➔ Graph ➔ Knowledge ➔ Insight ➔ Evolution ➔ Pattern ➔ Memory) 全体の価値を可視化する統合デモ画面を構築する。
+### 現在のスプリント: AIOS Dashboard Executive Demo Visualization Foundation [現在のフェーズ]
+* **目的**: 8つのインテリジェンスレイヤーの内部データをマクロに集約し、経営・顧客向けに高度に要約された統合デモ画面（Executive View）を提供する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規デモ仕様定義 (DashboardDemoVisualization.md)
-  - ✅ 独立デモプロバイダー (`DemoEventGenerator.js`): 画面ロード後に一定時間（5秒）ごとに模擬イベントを自動配信。UIからの操作要素はなし。
-  - ✅ グリッドレイアウト統合 (`DashboardRenderer.js` / `DashboardApp.html`): 8つの主要レイヤーカードをPC等の大画面で 2列構成に均等グリッド配置し、タイトルを「AIOS Control Center」に最適化。
-  - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md）の対応追加
+  - ✅ 新規デモ仕様定義 (`DashboardExecutiveVisualization.md`)
+  - ✅ Executive アダプター (`ExecutiveAdapter.js`): 各種データストアから Top KPI、フローグラフ状態、比率シェア、変化統計、ルール要約を計算する。
+  - ✅ Executive UI コンポーネント: KPIパネル、フロー進行図、要約活動ストリーム、分布シェアメーター、メモリ容量概要カード。
+  - ✅ 二画面共存ルーティング: URLパラメータ `?view=raw` と `?view=executive` による表示モードの安全な切り替え。
 * **今回実装しないもの (対象外)**:
-  - ❌ デモ開始・停止・手動送信などの操作用 UI (button, form, input, select)、および Write API や AIの自己改善・予測分析ロジック
+  - ❌ 操作用 UI (button, form, input, select) などの設置。AIによる動的な障害判定、原因診断、および「対応してください」のようなリスク推奨メッセージの動的生成。
 
-### 完了したスプリント: AIOS Dashboard Event Intelligence Memory Layer Foundation
-* **目的**: パターンデータおよびエボリューションデータから長期スナップショットを生成し、表示専用の長期履歴メモリオブジェクト（Event Memory Layer）としてアーカイブ可視化する。
-* **完了したスプリント2**: AIOS Dashboard Event Intelligence Pattern Layer Foundation
-* **完了したスプリント3**: AIOS Dashboard Event Intelligence Evolution Layer Foundation
+### 完了したスプリント: AIOS Dashboard Demo Visualization Foundation
+* **目的**: 構築された AIOS Event Intelligence Pipeline (Event ➔ Timeline ➔ Correlation ➔ Graph ➔ Knowledge ➔ Insight ➔ Evolution ➔ Pattern ➔ Memory) 全体の価値を可視化する統合デモ画面を構築する。
+* **完了したスプリント2**: AIOS Dashboard Event Intelligence Memory Layer Foundation
+* **完了したスプリント3**: AIOS Dashboard Event Intelligence Pattern Layer Foundation
 * **完了したスプリント4**: AIOS Dashboard Event Insight Layer Foundation
 * **完了したスプリント5**: AIOS Dashboard Event Knowledge Layer Foundation
 * **完了したスプリント6**: AIOS Dashboard Event Intelligence Graph Foundation

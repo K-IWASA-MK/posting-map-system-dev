@@ -21,53 +21,94 @@ class DashboardRenderer {
 
     console.log('[Dashboard Renderer] コンポーネント群のレンダリングを開始します...');
 
-    const components = [
-      {
-        key: 'ActivityLogCard',
-        render: () => window.ActivityLogCard.render({ logs: data.logs, delay: 150 }),
-        props: data.logs
-      },
-      {
-        key: 'EventTimelineCard',
-        render: () => window.EventTimelineCard.render({ events: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : [], delay: 200 }),
-        props: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : []
-      },
-      {
-        key: 'EventCorrelationCard',
-        render: () => window.EventCorrelationCard.render({ correlations: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : [], delay: 250 }),
-        props: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : []
-      },
-      {
-        key: 'EventGraphCard',
-        render: () => window.EventGraphCard.render({ graphs: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : [], delay: 300 }),
-        props: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : []
-      },
-      {
-        key: 'EventKnowledgeCard',
-        render: () => window.EventKnowledgeCard.render({ knowledges: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : [], delay: 350 }),
-        props: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : []
-      },
-      {
-        key: 'EventInsightCard',
-        render: () => window.EventInsightCard.render({ insights: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : [], delay: 400 }),
-        props: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : []
-      },
-      {
-        key: 'EventEvolutionCard',
-        render: () => window.EventEvolutionCard.render({ evolutions: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : [], delay: 450 }),
-        props: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : []
-      },
-      {
-        key: 'EventPatternCard',
-        render: () => window.EventPatternCard.render({ patterns: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : [], delay: 500 }),
-        props: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : []
-      },
-      {
-        key: 'EventMemoryCard',
-        render: () => window.EventMemoryCard.render({ memories: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : [], delay: 550 }),
-        props: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : []
-      }
-    ];
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewMode = urlParams.get('view') || 'executive';
+
+    let components = [];
+
+    if (viewMode === 'executive') {
+      const execData = window.ExecutiveAdapter ? window.ExecutiveAdapter.getExecutiveData() : { kpis: {}, flowGraph: {}, activityStream: [], distribution: {}, evolutionStatus: {} };
+      components = [
+        {
+          key: 'ExecutiveKPICard',
+          render: () => window.ExecutiveKPICard.render({ kpis: execData.kpis, delay: 150 }),
+          props: execData.kpis
+        },
+        {
+          key: 'IntelligenceFlowGraphCard',
+          render: () => window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, delay: 200 }),
+          props: execData.flowGraph
+        },
+        {
+          key: 'RealtimeActivityStreamCard',
+          render: () => window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 250 }),
+          props: execData.activityStream
+        },
+        {
+          key: 'IntelligenceDistributionCard',
+          render: () => window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 300 }),
+          props: execData.distribution
+        },
+        {
+          key: 'ExecutiveEvolutionStatusCard',
+          render: () => window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 350 }),
+          props: execData.evolutionStatus
+        },
+        {
+          key: 'ExecutivePatternMemorySummaryCard',
+          render: () => window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 400 }),
+          props: execData.kpis
+        }
+      ];
+    } else {
+      components = [
+        {
+          key: 'ActivityLogCard',
+          render: () => window.ActivityLogCard.render({ logs: data.logs, delay: 150 }),
+          props: data.logs
+        },
+        {
+          key: 'EventTimelineCard',
+          render: () => window.EventTimelineCard.render({ events: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : [], delay: 200 }),
+          props: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : []
+        },
+        {
+          key: 'EventCorrelationCard',
+          render: () => window.EventCorrelationCard.render({ correlations: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : [], delay: 250 }),
+          props: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : []
+        },
+        {
+          key: 'EventGraphCard',
+          render: () => window.EventGraphCard.render({ graphs: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : [], delay: 300 }),
+          props: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : []
+        },
+        {
+          key: 'EventKnowledgeCard',
+          render: () => window.EventKnowledgeCard.render({ knowledges: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : [], delay: 350 }),
+          props: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : []
+        },
+        {
+          key: 'EventInsightCard',
+          render: () => window.EventInsightCard.render({ insights: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : [], delay: 400 }),
+          props: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : []
+        },
+        {
+          key: 'EventEvolutionCard',
+          render: () => window.EventEvolutionCard.render({ evolutions: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : [], delay: 450 }),
+          props: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : []
+        },
+        {
+          key: 'EventPatternCard',
+          render: () => window.EventPatternCard.render({ patterns: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : [], delay: 500 }),
+          props: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : []
+        },
+        {
+          key: 'EventMemoryCard',
+          render: () => window.EventMemoryCard.render({ memories: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : [], delay: 550 }),
+          props: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : []
+        }
+      ];
+    }
 
     // 初回マウント時、またはコンポーネント数が一致しない場合は全件一括マウント
     if (gridContainer.children.length !== components.length) {
@@ -221,6 +262,13 @@ class DashboardRenderer {
 
     // タイムライン更新イベントの購読
     window.DashboardEventBus.on('event-timeline-update', (timelineEvents) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewMode = urlParams.get('view') || 'executive';
+      if (viewMode === 'executive') {
+        DashboardRenderer.updateExecutiveDashboard();
+        return;
+      }
+
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
       if (!window.DashboardRenderCache.hasChanged('EventTimelineCard', timelineEvents)) return;
@@ -245,6 +293,13 @@ class DashboardRenderer {
 
     // 相関グラフ更新イベントの購読
     window.DashboardEventBus.on('event-correlation-update', (correlations) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewMode = urlParams.get('view') || 'executive';
+      if (viewMode === 'executive') {
+        DashboardRenderer.updateExecutiveDashboard();
+        return;
+      }
+
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventCorrelationCard) return;
       if (!window.DashboardRenderCache.hasChanged('EventCorrelationCard', correlations)) return;
@@ -269,6 +324,13 @@ class DashboardRenderer {
 
     // 関係グラフ更新イベントの購読
     window.DashboardEventBus.on('event-graph-update', (graphs) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewMode = urlParams.get('view') || 'executive';
+      if (viewMode === 'executive') {
+        DashboardRenderer.updateExecutiveDashboard();
+        return;
+      }
+
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
       if (!window.DashboardRenderCache.hasChanged('EventGraphCard', graphs)) return;
@@ -293,6 +355,13 @@ class DashboardRenderer {
 
     // 知識層更新イベントの購読
     window.DashboardEventBus.on('event-knowledge-update', (knowledges) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewMode = urlParams.get('view') || 'executive';
+      if (viewMode === 'executive') {
+        DashboardRenderer.updateExecutiveDashboard();
+        return;
+      }
+
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventKnowledgeCard) return;
       if (!window.DashboardRenderCache.hasChanged('EventKnowledgeCard', knowledges)) return;
@@ -317,6 +386,13 @@ class DashboardRenderer {
 
     // インサイト層更新イベントの購読
     window.DashboardEventBus.on('event-insight-update', (insights) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewMode = urlParams.get('view') || 'executive';
+      if (viewMode === 'executive') {
+        DashboardRenderer.updateExecutiveDashboard();
+        return;
+      }
+
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
       if (!window.DashboardRenderCache.hasChanged('EventInsightCard', insights)) return;
@@ -341,6 +417,13 @@ class DashboardRenderer {
 
     // エボリューション層更新イベントの購読
     window.DashboardEventBus.on('event-evolution-update', (evolutions) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewMode = urlParams.get('view') || 'executive';
+      if (viewMode === 'executive') {
+        DashboardRenderer.updateExecutiveDashboard();
+        return;
+      }
+
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventEvolutionCard) return;
       if (!window.DashboardRenderCache.hasChanged('EventEvolutionCard', evolutions)) return;
@@ -365,6 +448,13 @@ class DashboardRenderer {
 
     // パターン層更新イベントの購読
     window.DashboardEventBus.on('event-pattern-update', (patterns) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewMode = urlParams.get('view') || 'executive';
+      if (viewMode === 'executive') {
+        DashboardRenderer.updateExecutiveDashboard();
+        return;
+      }
+
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
       if (!window.DashboardRenderCache.hasChanged('EventPatternCard', patterns)) return;
@@ -389,6 +479,13 @@ class DashboardRenderer {
 
     // メモリ層更新イベントの購読
     window.DashboardEventBus.on('event-memory-update', (memories) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewMode = urlParams.get('view') || 'executive';
+      if (viewMode === 'executive') {
+        DashboardRenderer.updateExecutiveDashboard();
+        return;
+      }
+
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventMemoryCard) return;
       if (!window.DashboardRenderCache.hasChanged('EventMemoryCard', memories)) return;
@@ -410,6 +507,74 @@ class DashboardRenderer {
         }
       }
     });
+  }
+
+  /**
+   * Executiveビューモード用の全画面差分更新を実行する
+   */
+  static updateExecutiveDashboard() {
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (!gridContainer || !window.ExecutiveAdapter) return;
+
+    const execData = window.ExecutiveAdapter.getExecutiveData();
+
+    // 0: ExecutiveKPICard
+    if (window.ExecutiveKPICard && window.DashboardRenderCache.hasChanged('ExecutiveKPICard', execData.kpis)) {
+      const el = gridContainer.children[0];
+      if (el) {
+        el.outerHTML = window.ExecutiveKPICard.render({ kpis: execData.kpis, delay: 0 });
+        const newEl = gridContainer.children[0];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+    // 1: IntelligenceFlowGraphCard
+    if (window.IntelligenceFlowGraphCard && window.DashboardRenderCache.hasChanged('IntelligenceFlowGraphCard', execData.flowGraph)) {
+      const el = gridContainer.children[1];
+      if (el) {
+        el.outerHTML = window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, delay: 0 });
+        const newEl = gridContainer.children[1];
+        if (newEl) newEl.classList.add('motion-active');
+        if (window.DashboardMotion && window.DashboardMotion.animateFlowGraph) {
+          window.DashboardMotion.animateFlowGraph();
+        }
+      }
+    }
+    // 2: RealtimeActivityStreamCard
+    if (window.RealtimeActivityStreamCard && window.DashboardRenderCache.hasChanged('RealtimeActivityStreamCard', execData.activityStream)) {
+      const el = gridContainer.children[2];
+      if (el) {
+        el.outerHTML = window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 0 });
+        const newEl = gridContainer.children[2];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+    // 3: IntelligenceDistributionCard
+    if (window.IntelligenceDistributionCard && window.DashboardRenderCache.hasChanged('IntelligenceDistributionCard', execData.distribution)) {
+      const el = gridContainer.children[3];
+      if (el) {
+        el.outerHTML = window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 0 });
+        const newEl = gridContainer.children[3];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+    // 4: ExecutiveEvolutionStatusCard
+    if (window.ExecutiveEvolutionStatusCard && window.DashboardRenderCache.hasChanged('ExecutiveEvolutionStatusCard', execData.evolutionStatus)) {
+      const el = gridContainer.children[4];
+      if (el) {
+        el.outerHTML = window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 0 });
+        const newEl = gridContainer.children[4];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
+    // 5: ExecutivePatternMemorySummaryCard
+    if (window.ExecutivePatternMemorySummaryCard && window.DashboardRenderCache.hasChanged('ExecutivePatternMemorySummaryCard', execData.kpis)) {
+      const el = gridContainer.children[5];
+      if (el) {
+        el.outerHTML = window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 0 });
+        const newEl = gridContainer.children[5];
+        if (newEl) newEl.classList.add('motion-active');
+      }
+    }
   }
 }
 
