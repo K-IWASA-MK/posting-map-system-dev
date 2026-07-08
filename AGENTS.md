@@ -233,6 +233,8 @@ POSTING MAP は：
 - **Dashboard Event Correlation Core Principle**: Agentは禁止：相関関係と因果関係の混同（Correlation = Causationの推論）、Root Cause Analysis（根本原因分析）、トラブル予測、および相関グラフからの自動コマンド送信・操作UI配置。許可：時間的近接度およびカテゴリ共通性に基づく客観的ソートと固定配置表示（最大200件保持）。
 - **Dashboard Event Graph Core Principle**: Agentは禁止：AIを用いたトポロジー分析（AI Graph Analysis）、自律的な意思決定（Auto Decision）、およびグラフ契機でのKernelコマンド送信・Write操作全般。許可：時系列・属性に基づく関係構造グラフデータの格納（最大100グラフ、1000ノード）、およびトポロジーの表示専用描画。
 - **Dashboard Event Knowledge Core Principle**: Agentは禁止：AIによるトラブル判定・異常判定・意思決定（No AI Judgment）、アクション推奨（Recommendation）の提示、およびナレッジ起点での Kernel コマンド送信。許可：定型ルールに基づく客観的事象の要約整理（最大500件保持）、および表示専用（Display Only）でのレンダリング。
+- **Dashboard Event Insight Core Principle**: Agentは禁止：AIによる障害の原因分析・異常判定、推奨アクション（Recommendation）の提示、予測データの生成（No Prediction）、およびインサイト契機での Kernel コマンド送信・Write操作全般。許可：静的統計・比率・時系列変化履歴に基づくインサイトデータの格納（最大100件）、およびインサイトの表示専用描画。
+
 
 
 

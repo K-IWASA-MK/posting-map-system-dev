@@ -86,6 +86,11 @@ class DashboardRenderer {
         key: 'EventKnowledgeCard',
         render: () => window.EventKnowledgeCard.render({ knowledges: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : [], delay: 750 }),
         props: window.DashboardEventKnowledgeStore ? window.DashboardEventKnowledgeStore.getKnowledges() : []
+      },
+      {
+        key: 'EventInsightCard',
+        render: () => window.EventInsightCard.render({ insights: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : [], delay: 800 }),
+        props: window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : []
       }
     ];
 
@@ -311,6 +316,26 @@ class DashboardRenderer {
         // 知識アニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateKnowledge) {
           window.DashboardMotion.animateKnowledge();
+        }
+      }
+    });
+
+    // インサイト層更新イベントの購読
+    window.DashboardEventBus.on('event-insight-update', (insights) => {
+      console.log('[Dashboard Renderer] インサイト層更新イベント受信:', insights);
+      const gridContainer = document.getElementById('dashboard-grid-container');
+      if (!gridContainer || !window.EventInsightCard) return;
+
+      // EventInsightCard は components 配列の 14 番目（インデックス13）
+      const insightCardEl = gridContainer.children[13];
+      if (insightCardEl) {
+        const newHtml = window.EventInsightCard.render({ insights: insights, delay: 0 });
+        window.DashboardRenderCache.hasChanged('EventInsightCard', insights);
+        insightCardEl.outerHTML = newHtml;
+
+        // インサイトアニメーション適用
+        if (window.DashboardMotion && window.DashboardMotion.animateInsight) {
+          window.DashboardMotion.animateInsight();
         }
       }
     });
