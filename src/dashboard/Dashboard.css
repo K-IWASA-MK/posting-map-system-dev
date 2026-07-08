@@ -3837,3 +3837,58 @@ body {
   color: var(--text-muted);
 }
 
+/* ==========================================================================
+   26. Field Intelligence History View Card Styles
+   ========================================================================== */
+.field-history-card {
+  grid-column: span 6;
+  padding: var(--space-lg);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+  box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.history-timeline-list, .snapshot-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.history-timeline-row, .snapshot-row-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.005);
+  border: 1px solid rgba(255, 255, 255, 0.01);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.history-timeline-row:hover, .snapshot-row-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.15);
+}
+
+.history-timeline-row .history-time, .snapshot-row-item .snapshot-time {
+  color: var(--text-muted);
+}
+
+.history-timeline-row .history-area-tag, .snapshot-row-item .snapshot-id {
+  font-weight: 700;
+}
+
+.history-timeline-row .history-msg, .snapshot-row-item .snapshot-count {
+  color: #ffffff;
+}
+
+.snapshot-row-item .snapshot-coverage {
+  color: var(--accent-green);
+  font-weight: 700;
+}
+

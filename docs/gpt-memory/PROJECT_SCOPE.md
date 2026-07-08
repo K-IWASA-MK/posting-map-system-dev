@@ -13,7 +13,7 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 161: Enterprise SaaS Routing & Config Separation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 163: Enterprise SaaS Routing & Config Separation [現在のフェーズ]
 * **目的**: テナント固有の設定（config.js 等）に応じたダッシュボードテーマ切替や、ルートパラメータに応じた動的 context 切替表示の検証。
 * **今回実装するもの (対象)**:
   - config.js へのマルチテナント設定構造追加
@@ -21,7 +21,13 @@
 * **今回実装しないもの (対象外)**:
   - ❌ 動的テナント追加やDB作成のWrite操作
 
-### 完了したスプリント: AIOS Phase 160: Field Intelligence Operations View Foundation
+### 完了したスプリント: AIOS Phase 162: Field Intelligence History Foundation
+* **目的**: 現場活動履歴の長期蓄積・証跡化。
+
+### 完了したスプリント: AIOS Phase 161: Field Intelligence Analytics Foundation
+* **目的**: 現場活動の履歴・推移・比較を可視化する Analytics Foundation の構築。
+
+### 完了したスプリント: AIOS Phase 160: Field Operations View Foundation
 * **目的**: 現場インテリジェンスを観測する Field Operations View Foundation の構築。
 
 ### 完了したスプリント: AIOS Phase 159: Tenant Intelligence Drilldown Foundation

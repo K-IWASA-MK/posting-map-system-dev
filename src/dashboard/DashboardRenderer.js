@@ -29,7 +29,7 @@ class DashboardRenderer {
     
     // 1. クエリパラメータ指定を最優先
     if (viewQuery) {
-      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations' || viewQuery === 'analytics') {
+      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations' || viewQuery === 'analytics' || viewQuery === 'history') {
         return viewQuery;
       }
     }
@@ -75,6 +75,7 @@ class DashboardRenderer {
     else if (viewMode === 'intelligence') activeMenuId = 'menu-intelligence';
     else if (viewMode === 'operations') activeMenuId = 'menu-operations';
     else if (viewMode === 'analytics') activeMenuId = 'menu-analytics';
+    else if (viewMode === 'history') activeMenuId = 'menu-history';
     const activeMenuEl = document.getElementById(activeMenuId);
     if (activeMenuEl) {
       activeMenuEl.classList.add('active');
@@ -247,6 +248,20 @@ class DashboardRenderer {
           key: 'FieldAnalyticsComparisonCard',
           render: () => window.FieldAnalyticsComparisonCard.render({ areaComparison: analyticsData.areaComparison, coverageHistory: analyticsData.coverageHistory, delay: 200 }),
           props: { areaComparison: analyticsData.areaComparison, coverageHistory: analyticsData.coverageHistory }
+        }
+      ];
+    } else if (viewMode === 'history') {
+      const historyData = window.FieldHistoryAdapter ? window.FieldHistoryAdapter.getFieldHistoryData() : { tenantId: "", historyTimeline: [], historySnapshots: [] };
+      components = [
+        {
+          key: 'FieldHistoryTimelineCard',
+          render: () => window.FieldHistoryTimelineCard.render({ historyTimeline: historyData.historyTimeline, delay: 150 }),
+          props: historyData.historyTimeline
+        },
+        {
+          key: 'HistorySnapshotCard',
+          render: () => window.HistorySnapshotCard.render({ historySnapshots: historyData.historySnapshots, delay: 200 }),
+          props: historyData.historySnapshots
         }
       ];
     } else {
@@ -482,6 +497,10 @@ class DashboardRenderer {
         DashboardRenderer.updateAnalyticsDashboard();
         return;
       }
+      if (viewMode === 'history') {
+        DashboardRenderer.updateHistoryDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
@@ -534,6 +553,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'analytics') {
         DashboardRenderer.updateAnalyticsDashboard();
+        return;
+      }
+      if (viewMode === 'history') {
+        DashboardRenderer.updateHistoryDashboard();
         return;
       }
 
@@ -590,6 +613,10 @@ class DashboardRenderer {
         DashboardRenderer.updateAnalyticsDashboard();
         return;
       }
+      if (viewMode === 'history') {
+        DashboardRenderer.updateHistoryDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
@@ -642,6 +669,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'analytics') {
         DashboardRenderer.updateAnalyticsDashboard();
+        return;
+      }
+      if (viewMode === 'history') {
+        DashboardRenderer.updateHistoryDashboard();
         return;
       }
 
@@ -698,6 +729,10 @@ class DashboardRenderer {
         DashboardRenderer.updateAnalyticsDashboard();
         return;
       }
+      if (viewMode === 'history') {
+        DashboardRenderer.updateHistoryDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
@@ -750,6 +785,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'analytics') {
         DashboardRenderer.updateAnalyticsDashboard();
+        return;
+      }
+      if (viewMode === 'history') {
+        DashboardRenderer.updateHistoryDashboard();
         return;
       }
 
@@ -806,6 +845,10 @@ class DashboardRenderer {
         DashboardRenderer.updateAnalyticsDashboard();
         return;
       }
+      if (viewMode === 'history') {
+        DashboardRenderer.updateHistoryDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
@@ -858,6 +901,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'analytics') {
         DashboardRenderer.updateAnalyticsDashboard();
+        return;
+      }
+      if (viewMode === 'history') {
+        DashboardRenderer.updateHistoryDashboard();
         return;
       }
 
@@ -1191,6 +1238,36 @@ class DashboardRenderer {
       const el = gridContainer.children[1];
       if (el) {
         el.outerHTML = window.FieldAnalyticsComparisonCard.render({ areaComparison: analyticsData.areaComparison, coverageHistory: analyticsData.coverageHistory, delay: 0 });
+        const newEl = gridContainer.children[1];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+  }
+
+  /**
+   * Historyビューモード用の全画面差分更新を実行する
+   */
+  static updateHistoryDashboard() {
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (!gridContainer || !window.FieldHistoryAdapter) return;
+
+    const historyData = window.FieldHistoryAdapter.getFieldHistoryData();
+
+    // 0: FieldHistoryTimelineCard
+    if (window.FieldHistoryTimelineCard && window.DashboardRenderCache.hasChanged('FieldHistoryTimelineCard', historyData.historyTimeline)) {
+      const el = gridContainer.children[0];
+      if (el) {
+        el.outerHTML = window.FieldHistoryTimelineCard.render({ historyTimeline: historyData.historyTimeline, delay: 0 });
+        const newEl = gridContainer.children[0];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+
+    // 1: HistorySnapshotCard
+    if (window.HistorySnapshotCard && window.DashboardRenderCache.hasChanged('HistorySnapshotCard', historyData.historySnapshots)) {
+      const el = gridContainer.children[1];
+      if (el) {
+        el.outerHTML = window.HistorySnapshotCard.render({ historySnapshots: historyData.historySnapshots, delay: 0 });
         const newEl = gridContainer.children[1];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
