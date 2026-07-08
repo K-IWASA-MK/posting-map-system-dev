@@ -3459,3 +3459,144 @@ body {
   text-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
 }
 
+/* ==========================================================================
+   23. Tenant Intelligence Drilldown Card Styles
+   ========================================================================== */
+.tenant-intelligence-card {
+  grid-column: span 6;
+  padding: var(--space-lg);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+  box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.drilldown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.drilldown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.drilldown-item .drilldown-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.drilldown-item .drilldown-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.intelligence-metric-bar {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: var(--space-md);
+}
+
+.intelligence-metric-bar .metric-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+}
+
+.intelligence-metric-bar .metric-lbl {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.intelligence-metric-bar .metric-val {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.area-nodes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.area-node-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.area-node-row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.area-node-row .node-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.area-node-row .node-id {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.area-node-row .node-type {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.area-node-row .node-stats {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.area-node-row .stat-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.area-node-row .stat-lbl {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.area-node-row .stat-val {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.no-nodes {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: var(--space-lg) 0;
+}
+
