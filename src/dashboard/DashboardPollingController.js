@@ -22,6 +22,9 @@ class DashboardPollingController {
   static isTabVisible = true;
   static isFetching = false;
 
+  static realtimeState = 'POLLING_BACKUP'; // CONNECTED, DEGRADED, POLLING_BACKUP
+  static hasBoundRealtime = false;
+
   /**
    * ポーリングサイクルを開始する
    */
@@ -36,6 +39,12 @@ class DashboardPollingController {
     if (!this.hasBoundVisibility) {
       this.hasBoundVisibility = true;
       document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
+    }
+
+    // 一度だけリアルタイム接続状態イベントをバインド
+    if (!this.hasBoundRealtime) {
+      this.hasBoundRealtime = true;
+      window.DashboardEventBus.on('realtime-status-changed', (status) => this.handleRealtimeStatusChange(status));
     }
     
     console.log('[Dashboard Polling] ポーリングを開始します。更新間隔:', this.currentInterval, 'ms');
@@ -59,6 +68,12 @@ class DashboardPollingController {
    */
   static scheduleNext() {
     if (!this.isRunning || !this.isTabVisible) return;
+
+    // リアルタイム接続が確立されている場合は、定時ポーリングのスケジュールを抑止する (Backupモード)
+    if (this.realtimeState === 'REALTIME_CONNECTED' || this.realtimeState === 'REALTIME_DEGRADED') {
+      console.log('[Dashboard Polling] リアルタイム通信が稼働中のため、定時ポーリングを抑止します。');
+      return;
+    }
     
     if (this.intervalId) {
       clearTimeout(this.intervalId);
@@ -154,10 +169,48 @@ class DashboardPollingController {
       }
     } else {
       console.log('[Dashboard Polling] タブが再度表示されました。ポーリングを再開します。');
-      if (this.isRunning) {
+      if (this.isRunning && this.realtimeState === 'POLLING_BACKUP') {
         // 重複実行を防止しつつ、復帰した瞬間に即座に最新データを1回取得する
         this.tick().then(() => this.scheduleNext());
       }
+    }
+  }
+
+  /**
+   * リアルタイムストリームの接続状態変化に応じたフォールバック制御 (状態マシン)
+   * @param {object} status 
+   */
+  static handleRealtimeStatusChange(status) {
+    const prevState = this.realtimeState;
+    
+    switch (status.state) {
+      case 'LIVE':
+        this.realtimeState = 'REALTIME_CONNECTED';
+        console.log('[Dashboard Polling] リアルタイム接続確立。自動ポーリングを抑止（Backupモード）します。');
+        if (this.intervalId) {
+          clearTimeout(this.intervalId);
+          this.intervalId = null;
+        }
+        break;
+
+      case 'CONNECTING':
+        this.realtimeState = 'REALTIME_DEGRADED';
+        console.log('[Dashboard Polling] リアルタイム切断。再接続プロセス中（Degradedモード）。');
+        break;
+
+      case 'OFFLINE':
+        if (status.fallbackRequired) {
+          this.realtimeState = 'POLLING_BACKUP';
+          console.log('[Dashboard Polling] 再接続限界に達したため、定時ポーリングによるバックアップ監視（Fallbackモード）を開始します。');
+          if (this.isRunning && !this.intervalId && this.isTabVisible) {
+            this.scheduleNext();
+          }
+        }
+        break;
+    }
+
+    if (prevState !== this.realtimeState) {
+      console.log(`[Dashboard Polling] 協調状態遷移: [${prevState}] ──> [${this.realtimeState}]`);
     }
   }
 }

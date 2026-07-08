@@ -136,6 +136,50 @@ class DashboardRenderer {
         }
       }
     });
+
+    // リアルタイム・ランタイムイベントの購読 (StatusCard の即時リフレッシュなど)
+    window.DashboardEventBus.on('runtime-event', (event) => {
+      console.log('[Dashboard Renderer] ランタイム・リアルタイムイベント受信:', event);
+      const statusTextEl = document.getElementById('status-text');
+      if (statusTextEl && event.type === 'KERNEL_INITIALIZED') {
+        statusTextEl.innerText = 'LIVE';
+        statusTextEl.className = 'accent-green';
+      }
+    });
+
+    // リアルタイム・クオリティイベントの購読 (MetricCard のレビューカウンター増分など)
+    window.DashboardEventBus.on('quality-event', (event) => {
+      console.log('[Dashboard Renderer] 品質ゲート・リアルタイムイベント受信:', event);
+      const reviewCountEl = document.getElementById('quality-review-count');
+      if (reviewCountEl) {
+        let current = parseInt(reviewCountEl.innerText || '0', 10);
+        reviewCountEl.innerText = current + 1;
+        
+        // Glow 演出の連動
+        const qualityCard = document.querySelector('[aria-label="Quality Metrics"]');
+        if (qualityCard && window.DashboardMotion && window.DashboardMotion.glowCard) {
+          window.DashboardMotion.glowCard(qualityCard);
+        }
+      }
+    });
+
+    // リアルタイム接続ステータスバッジの同期
+    window.DashboardEventBus.on('realtime-status-changed', (status) => {
+      const el = document.getElementById('realtime-status-text');
+      if (!el) return;
+
+      el.className = '';
+      if (status.state === 'LIVE') {
+        el.innerText = '● LIVE STREAM';
+        el.classList.add('realtime-live');
+      } else if (status.state === 'CONNECTING') {
+        el.innerText = '● CONNECTING';
+        el.classList.add('realtime-warning');
+      } else {
+        el.innerText = '● OFFLINE';
+        el.classList.add('realtime-offline');
+      }
+    });
   }
 }
 

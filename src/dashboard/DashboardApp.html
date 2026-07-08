@@ -32,6 +32,7 @@
       <div class="header-status-panel" role="status" aria-live="polite" aria-label="AIOS Operational Status">
         <span class="status-badge environment">Environment: <strong id="env-text">LOCAL SIMULATION</strong></span>
         <span class="status-badge health-status">Status: <strong id="status-text" class="accent-green">LIVE</strong></span>
+        <span class="status-badge realtime-status">Stream: <strong id="realtime-status-text" class="realtime-offline">● OFFLINE</strong></span>
         <span class="status-badge update-time">Last Update: <span id="update-time-text">-</span></span>
       </div>
     </header>
@@ -80,6 +81,8 @@
 
   <!-- Control & Data Scripts -->
   <script src="DashboardRenderCache.js"></script>
+  <script src="DashboardRealtimeClient.js"></script>
+  <script src="DashboardRealtimeAdapter.js"></script>
   <script src="DashboardEventBus.js"></script>
   <script src="DashboardAPIClient.js"></script>
   <script src="DashboardDataAdapter.js"></script>

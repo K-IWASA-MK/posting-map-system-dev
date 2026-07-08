@@ -227,6 +227,8 @@ POSTING MAP は：
 - **Dashboard Layout Core Principle**: Agentは禁止：表示レイアウト以外の変更、計算ロジック追加、データフロー変更、状態操作、インタラクティブ要素の追加。許可：余白調整、フォントスケール適用、角丸整理、デザインシステム適用。
 - **Dashboard Accessibility Core Principle**: Agentは禁止：音声読み上げやコントラスト等の支援技術最適化の範囲を超えた機能追加、状態操作、およびデータフローの変更全般。許可：ARIAタグ整備、role割り当て、Reduced Motion対応、WCAG基準のカラーコントラスト調整。
 - **Dashboard Performance Core Principle**: Agentは禁止：同一データ（不変Props）に対するDOMの再生成、タブ非表示（hidden）時の無用なポーリングおよびアニメーション実行、EventBus等への多重リスナー登録、グローバルスコープへのDetached DOM参照放置。許可：Propsハッシュ比較による差分マウント、Visibility API連動、イベント登録解除、限定的なGPUレイヤー促進。
+- **Dashboard Realtime Core Principle**: Agentは禁止：受信ストリーム（SSE等）を介したカーネルへの操作、コマンド・書き込み指令（POST, PUT, DELETE等）の逆流生成、受信データ（eventId, timestamp, type）の改変および検証スルー。許可：一方向イベントストリームの受信、状態マシンのフォールバック、接続ステータス表示。
+
 
 
 

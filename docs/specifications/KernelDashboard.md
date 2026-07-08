@@ -166,6 +166,12 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **明示的メモリ解放 (Memory Leak Prevention)**:
   EventBus の重複リスナー登録防止機構を敷設し、アンロード時にはすべての購読とタイマーを破棄し、クロージャや Detached DOM ノードによるリークを排除する。
 
+## リアルタイム監視観測規則 (Realtime Observer Layer & Event Stream Mapping)
+ダッシュボードは、定時ポーリング監視に加え、Kernel Runtime で発生するイベントを一方向のストリーム（Server-Sent Events）経由でリアルタイム観測する。
+- **一方向ストリームの順守**: 双方向接続（WebSocket等）の使用は禁止し、受信専用チャネル（EventSource）のみで運用すること。
+- **セキュリティ・検証チェック**: 受信イベントはアダプター（`DashboardRealtimeAdapter`）の入口で、IDの重複（Replay防止）、タイムスタンプ範囲（現在時刻から過去5分・未来1分以内）の検証を行う。
+- **協調状態マシンの稼働**: SSE 接続のオンライン/オフライン検知と連動し、リアルタイム観測（LIVE STREAM）と、接続切断時の自動ポーリングによるフォールバック（POLLING_BACKUP）の間で自動的に監視モードを切り替え、監視の永続性を確保する。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

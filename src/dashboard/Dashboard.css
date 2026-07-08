@@ -750,3 +750,25 @@ body {
   will-change: box-shadow, background-color;
   transform: translateZ(0);
 }
+
+/* 3. リアルタイム接続ステータスバッジの演出 */
+.realtime-live {
+  color: #22c55e !important;
+  animation: gentle-pulse 2s infinite ease-in-out;
+}
+
+.realtime-warning {
+  color: #eab308 !important;
+  animation: gentle-pulse 1.5s infinite ease-in-out;
+}
+
+.realtime-offline {
+  color: #ef4444 !important;
+}
+
+/* 4. リアルタイムイベント受信時のカード発光演出 */
+.new-card-glow {
+  box-shadow: 0 0 35px rgba(37, 99, 235, 0.3) !important;
+  border-color: rgba(37, 99, 235, 0.6) !important;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}

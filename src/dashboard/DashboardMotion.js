@@ -195,6 +195,21 @@ class DashboardMotion {
       }
     }
   }
+
+  /**
+   * リアルタイムイベント受信時にカード要素を一時的に発光させる演出
+   * @param {HTMLElement} el 対象のカード要素
+   */
+  static glowCard(el) {
+    if (!el) return;
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) return;
+
+    el.classList.add('new-card-glow');
+    setTimeout(() => {
+      el.classList.remove('new-card-glow');
+    }, 1500);
+  }
 }
 
 // グローバルスコープへ公開

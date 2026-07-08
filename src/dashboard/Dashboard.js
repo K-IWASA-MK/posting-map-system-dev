@@ -46,6 +46,11 @@ class DashboardObserver {
     if (window.DashboardPollingController) {
       window.DashboardPollingController.start();
     }
+
+    // 7. リアルタイムストリーム接続の開始 (Event Driven)
+    if (window.DashboardRealtimeClient) {
+      window.DashboardRealtimeClient.connect();
+    }
   }
 
   /**
@@ -115,6 +120,9 @@ window.addEventListener('DOMContentLoaded', () => {
 // メモリリーク防止のためのアンロードクリーンアップ
 window.addEventListener('unload', () => {
   console.log('[Dashboard] ページアンロードに伴いリソースを解放します...');
+  if (window.DashboardRealtimeClient) {
+    window.DashboardRealtimeClient.disconnect();
+  }
   if (window.DashboardPollingController) {
     window.DashboardPollingController.stop();
   }

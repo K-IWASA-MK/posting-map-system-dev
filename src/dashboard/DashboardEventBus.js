@@ -60,6 +60,24 @@ class DashboardEventBus {
   }
 
   /**
+   * リアルタイムイベントを中継・配信する
+   * @param {object} mappedEvent マップ済みのUIイベントオブジェクト
+   */
+  publishRealtimeEvent(mappedEvent) {
+    const eventName = `${mappedEvent.category}-event`;
+    // カテゴリ別の専用イベントを発行
+    this.emit(eventName, mappedEvent);
+
+    // 互換性維持のための new-activity-logs イベントへの変換・配信
+    const logItem = {
+      time: mappedEvent.timestamp,
+      module: mappedEvent.category.charAt(0).toUpperCase() + mappedEvent.category.slice(1),
+      message: mappedEvent.message
+    };
+    this.emit('new-activity-logs', [logItem]);
+  }
+
+  /**
    * イベントを発火し登録された購読者にデータを伝播する
    * @param {string} event イベント名
    * @param {any} data 伝播データ
