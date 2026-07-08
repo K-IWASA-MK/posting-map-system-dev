@@ -253,6 +253,27 @@ class DashboardMotion {
       }, 1500);
     });
   }
+
+  /**
+   * 新着関係グラフ項目に対するアニメーション・アクセシビリティ適用
+   */
+  static animateGraph() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = document.querySelectorAll('.event-graph-item-new');
+    items.forEach(item => {
+      if (isReduced) {
+        item.style.animation = 'none';
+        item.style.boxShadow = 'none';
+        item.classList.remove('event-graph-item-new');
+        return;
+      }
+
+      // 演出完了後にクラス破棄
+      setTimeout(() => {
+        item.classList.remove('event-graph-item-new');
+      }, 1500);
+    });
+  }
 }
 
 // グローバルスコープへ公開

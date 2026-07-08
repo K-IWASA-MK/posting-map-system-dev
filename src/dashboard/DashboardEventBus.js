@@ -82,7 +82,18 @@ class DashboardEventBus {
           correlations.forEach(corr => {
             window.DashboardEventCorrelationStore.addCorrelation(corr);
           });
-          this.emit('event-correlation-update', window.DashboardEventCorrelationStore.getCorrelations());
+          const currentCorrelations = window.DashboardEventCorrelationStore.getCorrelations();
+          this.emit('event-correlation-update', currentCorrelations);
+
+          // 関係グラフ (Event Graph) の生成・構築と更新通知
+          if (window.DashboardGraphBuilder && window.DashboardEventGraphStore) {
+            const graphs = window.DashboardGraphBuilder.build(currentCorrelations);
+            window.DashboardEventGraphStore.clear();
+            graphs.forEach(g => {
+              window.DashboardEventGraphStore.addGraph(g);
+            });
+            this.emit('event-graph-update', window.DashboardEventGraphStore.getGraphs());
+          }
         }
       }
     }

@@ -76,6 +76,11 @@ class DashboardRenderer {
         key: 'EventCorrelationCard',
         render: () => window.EventCorrelationCard.render({ correlations: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : [], delay: 650 }),
         props: window.DashboardEventCorrelationStore ? window.DashboardEventCorrelationStore.getCorrelations() : []
+      },
+      {
+        key: 'EventGraphCard',
+        render: () => window.EventGraphCard.render({ graphs: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : [], delay: 700 }),
+        props: window.DashboardEventGraphStore ? window.DashboardEventGraphStore.getGraphs() : []
       }
     ];
 
@@ -261,6 +266,26 @@ class DashboardRenderer {
         // 相関アニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateCorrelation) {
           window.DashboardMotion.animateCorrelation();
+        }
+      }
+    });
+
+    // 関係グラフ更新イベントの購読
+    window.DashboardEventBus.on('event-graph-update', (graphs) => {
+      console.log('[Dashboard Renderer] 関係グラフ更新イベント受信:', graphs);
+      const gridContainer = document.getElementById('dashboard-grid-container');
+      if (!gridContainer || !window.EventGraphCard) return;
+
+      // EventGraphCard は components 配列の 12 番目（インデックス11）
+      const graphCardEl = gridContainer.children[11];
+      if (graphCardEl) {
+        const newHtml = window.EventGraphCard.render({ graphs: graphs, delay: 0 });
+        window.DashboardRenderCache.hasChanged('EventGraphCard', graphs);
+        graphCardEl.outerHTML = newHtml;
+
+        // グラフアニメーション適用
+        if (window.DashboardMotion && window.DashboardMotion.animateGraph) {
+          window.DashboardMotion.animateGraph();
         }
       }
     });

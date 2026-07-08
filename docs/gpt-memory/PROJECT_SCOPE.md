@@ -13,22 +13,24 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Event Correlation Intelligence Foundation [現在のフェーズ]
-* **目的**: 蓄積された複数イベントの時系列・属性的関係性（相関関係）を表示用の関係チェーン（Correlation Graph View）として抽出し、可視化する。
+### 現在のスプリント: AIOS Dashboard Event Intelligence Graph Foundation [現在のフェーズ]
+* **目的**: 相関関係をグラフ構造（Event Graph）として保持・可視化するトポロジーグラフ監視ビューを構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規相関可視化仕様定義 (DashboardEventCorrelation.md, EventCorrelationSchema.md, EventCorrelationVisualization.md)
-  - ✅ 時系列相関チェーン履歴ストア (`DashboardEventCorrelationStore.js`): 最大200件保持, 重複排除, 不変オブジェクト(freeze), API通信なし
-  - ✅ 静的相関関係ビルダー (`DashboardCorrelationBuilder.js`): 時間近接・カテゴリ共通の静的ルール抽出。因果/異常検出は禁止
-  - ✅ 表示専用相関カード (`EventCorrelationCard.js`)、ノード (`EventCorrelationNode.js`)、接続ライン (`EventCorrelationLine.js`)
-  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-correlation-update` に基づく差分マウント
-  - ✅ 接続ライン/ノード CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 縦結合ライン, Glow Pulse, ノードフェードイン
+  - ✅ 新規グラフ可視化仕様定義 (DashboardEventGraph.md, EventGraphSchema.md, EventGraphVisualization.md)
+  - ✅ 関係構造グラフデータストア (`DashboardEventGraphStore.js`): 最大100グラフ・1000ノード保持, 不変オブジェクト(freeze), API通信なし
+  - ✅ トポロジーグラフ構築ビルダー (`DashboardGraphBuilder.js`): 相関結果からNode/Edge生成。因果/異常検出は禁止
+  - ✅ 表示専用グラフカード (`EventGraphCard.js`)、ノード (`EventGraphNode.js`)、接続エッジ (`EventGraphEdge.js`)
+  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-graph-update` に基づく差分マウント
+  - ✅ 接続エッジ/ノード CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 赤色 Glow Node/Edge, オレンジ Edge, ノードフェードイン
   - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md, AGENTS.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ AI予測・因果推論（Causation）、根本原因分析（RCA）、自動承認、自動実行（Kernelへのコマンド逆流）、音声アラームやメール等の通知
+  - ❌ AI予測、因果推論、根本原因分析、自動承認、自動実行（Kernelへのコマンド逆流）、音声アラームやメール等の通知
 
-### 完了したスプリント: AIOS Dashboard Event Timeline Intelligence Foundation
-* **目的**: 受信した各種イベントを単発ログではなく、時系列インテリジェンスビュー（Event Timeline Observer Layer）として可視化する。
-* **完了したスプリント2**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+### 完了したスプリント: AIOS Dashboard Event Correlation Intelligence Foundation
+* **目的**: 蓄積された複数イベントの時系列・属性的関係性（相関関係）を表示用の関係チェーン（Correlation Graph View）として抽出し、可視化する。
+* **完了したスプリント2**: AIOS Dashboard Event Timeline Intelligence Foundation
+* **完了したスプリント3**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+
 
 
 
