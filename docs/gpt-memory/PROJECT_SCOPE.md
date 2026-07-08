@@ -13,17 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 170: Dashboard Navigation Foundation [現在のフェーズ]
-* **目的**: Phase 169 を基盤として、Dashboard 全体の画面遷移・ナビゲーションを統一管理する Navigation Framework を構築する。
+### 現在のスプリント: AIOS Phase 171: Dashboard Rendering Pipeline Foundation [現在のフェーズ]
+* **目的**: Phase 170 を基盤として、Dashboard 全体の描画順序・描画コンテキスト・描画ライフサイクルを決定論的に一元管理する Rendering Pipeline を構築する。
 * **今回実装するもの (対象)**:
-  - Navigation Registry 定義（`breadcrumb` 階層名配列および `defaultView` フラグ含む）
-  - DashboardNavigationRegistry, DashboardNavigationManager, DashboardNavigationAdapter
-  - 登録されたナビゲーション定義とアクティブ状況を表示する DashboardNavigationCard
+  - Render Context スキーマ定義（`pipelineId`, `pipelineVersion` メタデータ含む）
+  - DashboardRenderContext, DashboardRenderingPipeline, DashboardRenderAdapter
+  - パイプライン状態と描画キューを表示する DashboardRenderingCard
 * **今回実装しないもの (対象外)**:
-  - ❌ 動的なメニュー編集・ドラッグ＆ドロップ機能
-  - ❌ ロール・権限ベースの動的なナビゲーション制御
-  - ❌ AIによるナビゲーション推薦・推論、自動的な画面遷移
+  - ❌ 仮想DOM（Virtual DOM）および差分DOMアルゴリズムの最適化
+  - ❌ レンダリング処理の非同期スケジューリング・アニメーション
+  - ❌ AIによる描画最適化・自動配置・自動描画
   - ❌ Write API、Command送信、Kernel操作
+
+### 完了したスプリント: AIOS Phase 170: Dashboard Navigation Foundation
+* **目的**: Phase 169 を基盤として、Dashboard 全体の画面遷移・ナビゲーションを統一管理する Navigation Framework を構築する。
 
 ### 完了したスプリント: AIOS Phase 169: Dashboard State Manager Foundation
 * **目的**: Phase 168 を基盤として、Dashboard 全体の状態（Workspace、Layout、Widget、View等）を一元的に決定論的・不変管理する State Manager Framework を構築する。

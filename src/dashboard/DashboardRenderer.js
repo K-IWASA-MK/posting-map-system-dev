@@ -64,6 +64,11 @@ class DashboardRenderer {
     console.log('[Dashboard Renderer] コンポーネント群のレンダリングを開始します...');
 
     const viewMode = DashboardRenderer.getViewMode();
+
+    // 描画パイプラインの実行
+    if (window.DashboardRenderingPipeline) {
+      window.DashboardRenderingPipeline.run(viewMode, window.innerWidth);
+    }
     
     // 2. サイドバーメニューの active 状態を同期
     document.querySelectorAll('.sidebar-nav li').forEach(el => el.classList.remove('active'));
@@ -218,6 +223,11 @@ class DashboardRenderer {
             delay: 750
           }),
           props: window.DashboardNavigationAdapter ? window.DashboardNavigationAdapter.getDashboardNavigationData() : {}
+        },
+        {
+          key: 'DashboardRenderingCard',
+          render: () => window.DashboardRenderingCard.render({ renderData: window.DashboardRenderAdapter ? window.DashboardRenderAdapter.getDashboardRenderData() : {}, delay: 800 }),
+          props: window.DashboardRenderAdapter ? window.DashboardRenderAdapter.getDashboardRenderData() : {}
         }
       ];
     } else if (viewMode === 'trust') {
@@ -1100,6 +1110,11 @@ class DashboardRenderer {
     const gridContainer = document.getElementById('dashboard-grid-container');
     if (!gridContainer || !window.ExecutiveAdapter) return;
 
+    // 描画パイプラインの実行
+    if (window.DashboardRenderingPipeline) {
+      window.DashboardRenderingPipeline.run('executive', window.innerWidth);
+    }
+
     const execData = window.ExecutiveAdapter.getExecutiveData();
     const healthData = window.PipelineHealthAdapter ? window.PipelineHealthAdapter.getHealthData() : { pipelineNodes: [] };
 
@@ -1252,6 +1267,18 @@ class DashboardRenderer {
             delay: 0
           });
           const newEl = gridContainer.children[13];
+          if (newEl) DashboardRenderer.activateMotion(newEl);
+        }
+      }
+    }
+    // 14: DashboardRenderingCard
+    if (window.DashboardRenderingCard && window.DashboardRenderAdapter) {
+      const renderData = window.DashboardRenderAdapter.getDashboardRenderData();
+      if (window.DashboardRenderCache.hasChanged('DashboardRenderingCard', renderData)) {
+        const el = gridContainer.children[14];
+        if (el) {
+          el.outerHTML = window.DashboardRenderingCard.render({ renderData: renderData, delay: 0 });
+          const newEl = gridContainer.children[14];
           if (newEl) DashboardRenderer.activateMotion(newEl);
         }
       }
