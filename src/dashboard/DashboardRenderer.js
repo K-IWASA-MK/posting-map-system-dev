@@ -29,7 +29,7 @@ class DashboardRenderer {
     
     // 1. クエリパラメータ指定を最優先
     if (viewQuery) {
-      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile') {
+      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust') {
         return viewQuery;
       }
     }
@@ -64,6 +64,17 @@ class DashboardRenderer {
     console.log('[Dashboard Renderer] コンポーネント群のレンダリングを開始します...');
 
     const viewMode = DashboardRenderer.getViewMode();
+    
+    // 2. サイドバーメニューの active 状態を同期
+    document.querySelectorAll('.sidebar-nav li').forEach(el => el.classList.remove('active'));
+    let activeMenuId = 'menu-raw'; // raw or default
+    if (viewMode === 'executive') activeMenuId = 'menu-executive';
+    else if (viewMode === 'trust') activeMenuId = 'menu-trust';
+    const activeMenuEl = document.getElementById(activeMenuId);
+    if (activeMenuEl) {
+      activeMenuEl.classList.add('active');
+    }
+
     let components = [];
 
     // グリッドコンテナのレイアウトクラス調整
@@ -147,6 +158,15 @@ class DashboardRenderer {
           key: 'ExecutivePatternMemorySummaryCard',
           render: () => window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 450 }),
           props: execData.kpis
+        }
+      ];
+    } else if (viewMode === 'trust') {
+      const trustData = window.TrustGovernanceAdapter ? window.TrustGovernanceAdapter.getGovernanceData() : { complianceScore: 100, status: 'PASS', records: [] };
+      components = [
+        {
+          key: 'TrustGovernanceCard',
+          render: () => window.TrustGovernanceCard.render({ data: trustData, delay: 150 }),
+          props: trustData
         }
       ];
     } else {

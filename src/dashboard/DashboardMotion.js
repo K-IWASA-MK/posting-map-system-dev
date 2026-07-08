@@ -84,6 +84,65 @@ class DashboardMotion {
     this.animateFlowGraph();
     this.animateMobileFlow();
     this.animatePipelineHealth();
+    this.animateTrustGovernance();
+  }
+
+  /**
+   * ガバナンス順守状態（Trust Governance）のアニメーション
+   */
+  static animateTrustGovernance() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    // スコアサークルアニメーション (dashoffset の推移)
+    const circles = document.querySelectorAll('.score-progress-circle');
+    circles.forEach(circle => {
+      const targetOffset = circle.style.strokeDashoffset;
+      circle.style.strokeDashoffset = '251.2';
+      circle.getBoundingClientRect(); // リフロー
+      if (isReduced) {
+        circle.style.transition = 'none';
+      } else {
+        circle.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      }
+      circle.style.strokeDashoffset = targetOffset;
+    });
+
+    // スコア数値のローリング
+    const scoreValEl = document.querySelector('.compliance-score-val');
+    if (scoreValEl) {
+      const targetVal = parseInt(scoreValEl.textContent || '100', 10);
+      scoreValEl.textContent = '0';
+      this.startRollingIntElement(scoreValEl, targetVal);
+    }
+  }
+
+  /**
+   * 任意の要素の数値をローリングさせるヘルパー
+   */
+  static startRollingIntElement(el, targetVal) {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) {
+      el.textContent = targetVal.toString();
+      return;
+    }
+
+    let current = 0;
+    const duration = 1200; // ms
+    const steps = 30;
+    const stepVal = targetVal / steps;
+    const interval = duration / steps;
+    let stepCount = 0;
+
+    const timer = setInterval(() => {
+      current += stepVal;
+      stepCount++;
+      if (stepCount >= steps) {
+        clearInterval(timer);
+        el.textContent = targetVal.toString();
+      } else {
+        el.textContent = Math.round(current).toString();
+      }
+    }, interval);
   }
 
   /**

@@ -43,7 +43,9 @@
       <aside class="dashboard-sidebar" role="complementary" aria-label="AIOS Sidebar" data-motion="slide-in-left" data-delay="100">
         <nav class="sidebar-nav" role="navigation" aria-label="AIOS Sidebar Navigation">
           <ul>
-            <li class="active">AIOS Pipeline</li>
+            <li id="menu-executive"><a href="?view=executive">AIOS Executive</a></li>
+            <li id="menu-raw"><a href="?view=raw">AIOS Pipeline</a></li>
+            <li id="menu-trust"><a href="?view=trust">Trust Governance</a></li>
           </ul>
         </nav>
         <div class="sidebar-footer">
@@ -98,6 +100,8 @@
   <script src="components/ExecutiveEvolutionStatusCard.js"></script>
   <script src="components/ExecutivePatternMemorySummaryCard.js"></script>
   <script src="components/PipelineHealthCard.js"></script>
+  <script src="components/TrustMetricItem.js"></script>
+  <script src="components/TrustGovernanceCard.js"></script>
   <script src="components/MobileHeaderCard.js"></script>
   <script src="components/MobileKPICard.js"></script>
   <script src="components/MobileFlowCard.js"></script>
@@ -136,6 +140,9 @@
   <script src="ExecutiveAdapter.js"></script>
   <script src="MobileExecutiveAdapter.js"></script>
   <script src="PipelineHealthAdapter.js"></script>
+  <script src="DashboardTrustStore.js"></script>
+  <script src="DashboardTrustBuilder.js"></script>
+  <script src="TrustGovernanceAdapter.js"></script>
   <script src="DashboardRealtimeAdapter.js"></script>
   <script src="DashboardEventBus.js"></script>
   <script src="DashboardAPIClient.js"></script>

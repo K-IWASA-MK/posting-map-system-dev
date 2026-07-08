@@ -13,19 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 153: Tenant Context Foundation [現在のフェーズ]
-* **目的**: 将来のマルチテナント化（複数支部・複数組織展開）を見据え、現在アクティブなテナント情報を管理・提示する Tenant Context Foundation を導入する。
+### 現在のスプリント: AIOS Phase 154: Trust Governance View Foundation [現在のフェーズ]
+* **目的**: 既存データパイプラインおよびコンテキストの信頼性状態を客観的監査ログとスコアによって表示する Trust Governance View を追加する。
 * **今回実装するもの (対象)**:
-  - 新規テナント仕様定義 (`TenantContext.md`)
-  - Tenant Context 管理 Singleton 導入: `DashboardTenantContext.js` による現在アクティブなテナント（ID・支部名・環境）の一元管理。
-  - ストア拡張: 各データストアへ `tenantId` 属性を追加し、未設定データに対するフォールバック互換を確保。
-  - アダプター拡張: 各アダプターへ `getTenantContext()` メソッドを追加。
-  - UI 適合: PC/モバイルのヘッダー部へのテナント情報のインジェクションとバッジ表示。
+  - 新規仕様定義 (`TrustGovernance.md`)
+  - データ & ロジック層追加: `DashboardTrustStore.js` および `DashboardTrustBuilder.js` による規約順守状態メトリクス生成。
+  - アダプター & UI追加: `TrustGovernanceAdapter.js`、`TrustGovernanceCard.js`、`TrustMetricItem.js` の新設。
+  - Renderer/Routing 適合: `?view=trust` 用の最小ルーティング実装、ヘッダーナビに `Trust` 項目追加。
 * **今回実装しないもの (対象外)**:
-  - ❌ ユーザー認証・認可、アカウント管理、自動ルーティング、および課金管理。
-  - ❌ ストア内部でのテナント境界フィルタリング（将来フェーズ）。
+  - ❌ AIによるセキュリティ診断・脅威判定、自己修復、ポリシーの自動復旧アクション。
+  - ❌ ユーザー管理、アクセス権限変更、Stripe課金、およびDashboardRendererの大規模リファクタリング。
 
-### 完了したスプリント: AIOS Phase 152: Executive Pipeline Health Visualization Foundation
+### 完了したスプリント: AIOS Phase 153: Tenant Context Foundation
+* **目的**: 将来のマルチテナント化（複数支部・複数組織展開）を見据え、現在アクティブなテナント情報を管理・提示する Tenant Context Foundation を導入する。
+* **完了したスプリント2**: AIOS Phase 152: Executive Pipeline Health Visualization Foundation
 * **目的**: 既存のデータフロー（Event ➔ Memory）における処理流量、レイテンシ、およびバッファ占有率の状態を可視化する Pipeline Health Visualization Foundation を構築する。
 * **完了したスプリント2**: AIOS Phase 151: Executive KPI Temporal Intelligence Foundation
 * **目的**: 既存の Executive View および Mobile Executive View に時間比較軸を追加し、現在値の単一表示から「増減率、トレンド、静的ステータスラベル」の可視化へと進化させる。

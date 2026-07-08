@@ -112,8 +112,15 @@ body {
   font-size: 0.95rem;
   font-weight: 500;
   color: var(--text-secondary);
-  cursor: default;
+  cursor: pointer;
   transition: all 0.2s ease-out;
+}
+
+.sidebar-nav li a {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  width: 100%;
 }
 
 .sidebar-nav li.active, .sidebar-nav li:hover {
@@ -2979,3 +2986,192 @@ body {
   border-radius: 3px;
   border: 1px solid rgba(59, 130, 246, 0.15);
 }
+
+/* ==========================================================================
+   18. Trust Governance Card Styles
+   ========================================================================== */
+.trust-governance-card {
+  grid-column: span 12;
+  padding: 32px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+  box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.trust-summary-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--space-xl);
+  padding: var(--space-xl) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: var(--space-xl);
+}
+
+.trust-score-gauge {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-circle-svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.score-bg-circle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.03);
+  stroke-width: 8px;
+}
+
+.score-progress-circle {
+  fill: none;
+  stroke-width: 8px;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.score-progress-circle.score-high {
+  stroke: #10b981; /* 緑 */
+}
+.score-progress-circle.score-medium {
+  stroke: #f59e0b; /* 黄 */
+}
+.score-progress-circle.score-low {
+  stroke: #ef4444; /* 赤 */
+}
+
+.score-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 2;
+}
+
+.compliance-score-val {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.compliance-score-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.trust-status-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.indicator-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.indicator-value-badge {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 8px;
+}
+
+/* Status badge color definitions */
+.indicator-value-badge.audit-pass,
+.metric-row-badge.audit-pass {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.indicator-value-badge.audit-notice,
+.metric-row-badge.audit-notice {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.indicator-value-badge.audit-fail,
+.metric-row-badge.audit-fail {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.trust-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.trust-metric-row {
+  padding: var(--space-md);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.01);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.metric-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-row-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.metric-row-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.metric-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-row-score-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.8rem;
+}
+
+.metric-row-label {
+  color: var(--text-secondary);
+}
+
+.metric-row-value {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.metric-row-details {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
