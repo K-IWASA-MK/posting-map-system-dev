@@ -192,6 +192,11 @@ class DashboardRenderer {
           key: 'DashboardLayoutCard',
           render: () => window.DashboardLayoutCard.render({ activeLayout: window.DashboardLayoutAdapter ? window.DashboardLayoutAdapter.getDashboardLayoutData().activeLayout : { widgets: [] }, delay: 600 }),
           props: window.DashboardLayoutAdapter ? window.DashboardLayoutAdapter.getDashboardLayoutData().activeLayout : { widgets: [] }
+        },
+        {
+          key: 'DashboardWorkspaceCard',
+          render: () => window.DashboardWorkspaceCard.render({ workspaces: window.DashboardWorkspaceAdapter ? window.DashboardWorkspaceAdapter.getDashboardWorkspaceData().workspaces : [], delay: 650 }),
+          props: window.DashboardWorkspaceAdapter ? window.DashboardWorkspaceAdapter.getDashboardWorkspaceData().workspaces : []
         }
       ];
     } else if (viewMode === 'trust') {
@@ -1186,6 +1191,18 @@ class DashboardRenderer {
         if (el) {
           el.outerHTML = window.DashboardLayoutCard.render({ activeLayout: layoutData.activeLayout, delay: 0 });
           const newEl = gridContainer.children[10];
+          if (newEl) DashboardRenderer.activateMotion(newEl);
+        }
+      }
+    }
+    // 11: DashboardWorkspaceCard
+    if (window.DashboardWorkspaceCard && window.DashboardWorkspaceAdapter) {
+      const workspaceData = window.DashboardWorkspaceAdapter.getDashboardWorkspaceData();
+      if (window.DashboardRenderCache.hasChanged('DashboardWorkspaceCard', workspaceData.workspaces)) {
+        const el = gridContainer.children[11];
+        if (el) {
+          el.outerHTML = window.DashboardWorkspaceCard.render({ workspaces: workspaceData.workspaces, delay: 0 });
+          const newEl = gridContainer.children[11];
           if (newEl) DashboardRenderer.activateMotion(newEl);
         }
       }

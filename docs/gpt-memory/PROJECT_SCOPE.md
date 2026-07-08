@@ -13,16 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 167: Dashboard Layout Engine Foundation [現在のフェーズ]
-* **目的**: Phase 166 を基盤として、Dashboard 上の Widget 配置・グリッド構造・レスポンシブブレイクポイントを決定論的に管理するレイアウトエンジン共通基盤を構築する。
+### 現在のスプリント: AIOS Phase 168: Dashboard Workspace Foundation [現在のフェーズ]
+* **目的**: Phase 167 を基盤として、Dashboard を用途ごとの Workspace 単位で構成・管理する Workspace Framework を構築する。
 * **今回実装するもの (対象)**:
-  - Layout Definition/Grid/Breakpoint 共通構造定義（各Widgetのx, y, w, h座標管理）
-  - DashboardLayoutRegistry, DashboardLayoutEngine, DashboardLayoutAdapter
-  - レイアウトの仕様と配置ウィジェットを表示する DashboardLayoutCard
+  - Workspace Definition/Metadata 共通構造定義（viewMode マッピング含む）
+  - DashboardWorkspaceRegistry, DashboardWorkspaceFactory, DashboardWorkspaceAdapter
+  - 登録されたすべてのワークスペース構成を表示する DashboardWorkspaceCard
 * **今回実装しないもの (対象外)**:
-  - ❌ レイアウトのドラッグ＆ドロップ編集・サイズ変更UI、Widgetの動的な追加・削除
-  - ❌ AIによる自動レイアウト・最適配置
+  - ❌ Workspace の追加・削除・編集・保存UI
+  - ❌ Stateの保持、および画面切替やナビゲーション制御
+  - ❌ AIによるWorkspace推薦・自動生成・自動切替
   - ❌ Write API、Command送信、Kernel操作
+
+### 完了したスプリント: AIOS Phase 167: Dashboard Layout Engine Foundation
+* **目的**: Phase 166 を基盤として、Dashboard 上の Widget 配置・グリッド構造・レスポンシブブレイクポイントを決定論的に管理するレイアウトエンジン共通基盤を構築する。
 
 ### 完了したスプリント: AIOS Phase 166: Dashboard Widget Foundation
 * **目的**: Dashboard Widget の共通基盤（生成・登録・状態管理・ViewModel変換）を構築し、今後のレイアウトや状態管理の土台を整える。
