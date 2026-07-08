@@ -197,6 +197,11 @@ class DashboardRenderer {
           key: 'DashboardWorkspaceCard',
           render: () => window.DashboardWorkspaceCard.render({ workspaces: window.DashboardWorkspaceAdapter ? window.DashboardWorkspaceAdapter.getDashboardWorkspaceData().workspaces : [], delay: 650 }),
           props: window.DashboardWorkspaceAdapter ? window.DashboardWorkspaceAdapter.getDashboardWorkspaceData().workspaces : []
+        },
+        {
+          key: 'DashboardStateCard',
+          render: () => window.DashboardStateCard.render({ stateData: window.DashboardStateAdapter ? window.DashboardStateAdapter.getDashboardStateData() : {}, delay: 700 }),
+          props: window.DashboardStateAdapter ? window.DashboardStateAdapter.getDashboardStateData() : {}
         }
       ];
     } else if (viewMode === 'trust') {
@@ -1203,6 +1208,18 @@ class DashboardRenderer {
         if (el) {
           el.outerHTML = window.DashboardWorkspaceCard.render({ workspaces: workspaceData.workspaces, delay: 0 });
           const newEl = gridContainer.children[11];
+          if (newEl) DashboardRenderer.activateMotion(newEl);
+        }
+      }
+    }
+    // 12: DashboardStateCard
+    if (window.DashboardStateCard && window.DashboardStateAdapter) {
+      const stateData = window.DashboardStateAdapter.getDashboardStateData();
+      if (window.DashboardRenderCache.hasChanged('DashboardStateCard', stateData)) {
+        const el = gridContainer.children[12];
+        if (el) {
+          el.outerHTML = window.DashboardStateCard.render({ stateData: stateData, delay: 0 });
+          const newEl = gridContainer.children[12];
           if (newEl) DashboardRenderer.activateMotion(newEl);
         }
       }
