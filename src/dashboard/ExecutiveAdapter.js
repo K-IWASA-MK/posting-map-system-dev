@@ -140,12 +140,21 @@ class ExecutiveAdapter {
     // 5. 変化タイプの統計 (Evolution Status)
     const evolutionStatus = this.calculateEvolutionStatus(evolutions);
 
+    // 6. Field Operations 接続状態 (FieldOps Source Status)
+    const fieldOpsEvents = timeline.filter(evt => evt.source === 'FIELDOPS');
+    const fieldOpsStatus = {
+      providerStatus: fieldOpsEvents.length > 0 ? 'CONNECTED' : 'STANDBY',
+      lastActivityTime: fieldOpsEvents.length > 0 ? fieldOpsEvents[0].timestamp : null,
+      totalReceivedCount: fieldOpsEvents.length
+    };
+
     return {
       kpis,
       flowGraph,
       activityStream,
       distribution,
-      evolutionStatus
+      evolutionStatus,
+      fieldOpsStatus
     };
   }
 

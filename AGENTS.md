@@ -1389,6 +1389,26 @@ Execution Plan
    - 信頼性状態の判定ステータス名は、システムのポリシー順守状態を示すため、`PASS`、`NOTICE`、`FAIL` のみを使用する。
    - スコア表示は、AIOS自身の主観的な自己評価（例:「信頼度98%」等）を徹底して排し、客観的なチェック項目の達成度を示す「Compliance Score」（例: 100 / 100）として表現しなければならない。
 
+---
+
+### 46. Field Intelligence Bridge Core Principle
+
+本ルールは、POSTING MAP Field Intelligence Bridge の導入と処理における**開発統制ルール**である。
+
+1. **現場活動の客観的観測 (Observation-Only Field Activity)**
+   - Field Intelligence Bridge は、現場で発生した実際の配布活動状況や在庫移動などのイベントの観測とパイプライン供給のみを行わなければならない。
+
+2. **書き込み・業務操作の絶対禁止 (No Write/Operational Actions)**
+   - Field Intelligence Bridge は、以下の書き込みや操作をトリガー、または仲介してはならない。
+     - POSTING MAP DBへの直接データ書き込み (DB writes)
+     - 配布完了処理や配布員ステータスの実更新 (posting/staff state changes)
+     - ユーザーに対する自動通知、メッセージ送信 (notification delivery)
+     - 自動改善コマンドや配布指示の送信 (operational commands / recommendations)
+
+3. **外部通信の抽象化 (Abstraction of External Connection)**
+   - Bridge Provider は、本番API接続やWebhook、認証認可のロジックを直接混入させず、将来外部供給源に容易に差し替え可能な疎結合なProvider Interface構造（およびSimulation Provider連携）を維持しなければならない。
+
+
 
 
 

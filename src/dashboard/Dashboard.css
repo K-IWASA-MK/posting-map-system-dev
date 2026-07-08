@@ -3175,3 +3175,76 @@ body {
   margin-top: 2px;
 }
 
+/* ==========================================================================
+   19. Field Operations Status Card Styles
+   ========================================================================== */
+.field-ops-status-card {
+  grid-column: span 6;
+  padding: var(--space-lg);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+  box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.field-ops-status-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.status-indicator-wrap {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.status-indicator-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
+
+.status-indicator-badge.status-active {
+  color: #3b82f6; /* 青 */
+  background-color: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.15);
+}
+
+.status-indicator-badge.status-standby {
+  color: var(--text-secondary);
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.status-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+
+.status-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-md);
+  background-color: rgba(255, 255, 255, 0.01);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.status-info-item .info-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.status-info-item .info-val {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+

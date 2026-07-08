@@ -38,7 +38,7 @@ class DashboardEventTimelineStore {
       category: event.category || 'runtime',
       severity: event.severity || 'INFO',
       message: event.message || '',
-      source: event.source || (event.payload && event.payload.source) || 'Kernel',
+      source: event.source || event.sourceType || (event.payload && event.payload.source) || 'Kernel',
       payload: event.payload ? Object.freeze({ ...event.payload }) : {}
     });
 

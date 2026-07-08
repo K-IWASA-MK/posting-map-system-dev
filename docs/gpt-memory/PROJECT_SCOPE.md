@@ -13,18 +13,21 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 154: Trust Governance View Foundation [現在のフェーズ]
-* **目的**: 既存データパイプラインおよびコンテキストの信頼性状態を客観的監査ログとスコアによって表示する Trust Governance View を追加する。
+### 現在のスプリント: AIOS Phase 156: Multi-Tenant Tenant Separation View [現在のフェーズ]
+* **目的**: 将来のマルチテナント化を見据え、データ境界（tenantId）に基づいた複数支部の切り替え・データ分離表示の構築。
 * **今回実装するもの (対象)**:
-  - 新規仕様定義 (`TrustGovernance.md`)
-  - データ & ロジック層追加: `DashboardTrustStore.js` および `DashboardTrustBuilder.js` による規約順守状態メトリクス生成。
-  - アダプター & UI追加: `TrustGovernanceAdapter.js`、`TrustGovernanceCard.js`、`TrustMetricItem.js` の新設。
-  - Renderer/Routing 適合: `?view=trust` 用の最小ルーティング実装、ヘッダーナビに `Trust` 項目追加。
+  - 支部・自治体切り替え用セレクタ等の UI/UX（Read Only 境界設計維持）
+  - tenantId に基づく各 Store からのデータフィルタリング機構
+  - Tenant Context に基づく表示の分離検証
 * **今回実装しないもの (対象外)**:
-  - ❌ AIによるセキュリティ診断・脅威判定、自己修復、ポリシーの自動復旧アクション。
-  - ❌ ユーザー管理、アクセス権限変更、Stripe課金、およびDashboardRendererの大規模リファクタリング。
+  - ❌ ユーザーログイン認証・ロール認可の直接実装。
+  - ❌ 課金管理や Stripe 連携。
 
-### 完了したスプリント: AIOS Phase 153: Tenant Context Foundation
+### 完了したスプリント: AIOS Phase 155: POSTING MAP Field Intelligence Bridge Foundation
+* **目的**: POSTING MAP の現場活動データを AIOS Pipeline へ安全に供給するための Field Intelligence Bridge Foundation を構築する。
+* **完了したスプリント2**: AIOS Phase 154: Trust Governance View Foundation
+* **目的**: 既存データパイプラインおよびコンテキストの信頼性状態を客観的監査ログとスコアによって表示する Trust Governance View を追加する。
+* **完了したスプリント2**: AIOS Phase 153: Tenant Context Foundation
 * **目的**: 将来のマルチテナント化（複数支部・複数組織展開）を見据え、現在アクティブなテナント情報を管理・提示する Tenant Context Foundation を導入する。
 * **完了したスプリント2**: AIOS Phase 152: Executive Pipeline Health Visualization Foundation
 * **目的**: 既存のデータフロー（Event ➔ Memory）における処理流量、レイテンシ、およびバッファ占有率の状態を可視化する Pipeline Health Visualization Foundation を構築する。

@@ -53,10 +53,34 @@ class DemoEventGenerator {
         details: 'Mutation index: 1.45, threshold: 1.00'
       },
       {
+        sourceType: 'FIELDOPS',
+        category: 'field_operation',
+        severity: 'INFO',
+        action: 'DISTRIBUTION_ACTIVITY',
+        message: 'Field Operations Activity: staff-028 distributed volume: 150.',
+        payload: {
+          staffId: 'staff-028',
+          volume: 150,
+          details: 'Distributed leaflets in AREA-302'
+        }
+      },
+      {
         category: 'security',
         severity: 'danger',
         message: 'Security validation check failed: token verification latency.',
         details: 'Latency: 1450ms, allowed: 500ms'
+      },
+      {
+        sourceType: 'FIELDOPS',
+        category: 'field_operation',
+        severity: 'INFO',
+        action: 'AREA_MOVEMENT',
+        message: 'Field Operations Movement: staff-012 entered AREA-305.',
+        payload: {
+          staffId: 'staff-012',
+          areaId: 'AREA-305',
+          details: 'Entered AREA-305 for posting'
+        }
       },
       {
         category: 'runtime',
@@ -71,16 +95,31 @@ class DemoEventGenerator {
 
     const eventId = `EVT_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // EventBus へイベントを配信 (これが Pipeline 全体を自動で駆動する)
-    window.DashboardEventBus.publishRealtimeEvent({
-      eventId: eventId,
-      category: rawEvent.category,
-      severity: rawEvent.severity,
-      message: rawEvent.message,
-      details: rawEvent.details,
-      timestamp: new Date().toISOString(),
-      rawTimestamp: Date.now()
-    });
+    if (rawEvent.sourceType === 'FIELDOPS') {
+      if (window.FieldOpsEventProvider) {
+        window.FieldOpsEventProvider.injectEvent({
+          eventId: eventId,
+          sourceType: rawEvent.sourceType,
+          category: rawEvent.category,
+          severity: rawEvent.severity,
+          action: rawEvent.action,
+          message: rawEvent.message,
+          timestamp: new Date().toLocaleTimeString(),
+          rawTimestamp: Date.now(),
+          payload: rawEvent.payload
+        });
+      }
+    } else {
+      window.DashboardEventBus.publishRealtimeEvent({
+        eventId: eventId,
+        category: rawEvent.category,
+        severity: rawEvent.severity,
+        message: rawEvent.message,
+        details: rawEvent.details,
+        timestamp: new Date().toLocaleTimeString(),
+        rawTimestamp: Date.now()
+      });
+    }
   }
 
   /**

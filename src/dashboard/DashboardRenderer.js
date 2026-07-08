@@ -158,6 +158,11 @@ class DashboardRenderer {
           key: 'ExecutivePatternMemorySummaryCard',
           render: () => window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 450 }),
           props: execData.kpis
+        },
+        {
+          key: 'FieldOpsStatusCard',
+          render: () => window.FieldOpsStatusCard.render({ fieldOpsStatus: execData.fieldOpsStatus, delay: 500 }),
+          props: execData.fieldOpsStatus
         }
       ];
     } else if (viewMode === 'trust') {
@@ -722,6 +727,15 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 0 });
         const newEl = gridContainer.children[6];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+    // 7: FieldOpsStatusCard (New)
+    if (window.FieldOpsStatusCard && window.DashboardRenderCache.hasChanged('FieldOpsStatusCard', execData.fieldOpsStatus)) {
+      const el = gridContainer.children[7];
+      if (el) {
+        el.outerHTML = window.FieldOpsStatusCard.render({ fieldOpsStatus: execData.fieldOpsStatus, delay: 0 });
+        const newEl = gridContainer.children[7];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
