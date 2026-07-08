@@ -83,6 +83,35 @@ class DashboardMotion {
 
     this.animateFlowGraph();
     this.animateMobileFlow();
+    this.animatePipelineHealth();
+  }
+
+  /**
+   * パイプライン・ヘルス表示用のアニメーション
+   */
+  static animatePipelineHealth() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const progressFills = document.querySelectorAll('.pipeline-health-progress-fill');
+    
+    progressFills.forEach(fill => {
+      const widthVal = fill.style.width;
+      fill.style.width = '0%';
+      fill.getBoundingClientRect();
+      if (isReduced) {
+        fill.style.transition = 'none';
+      } else {
+        fill.style.transition = 'width 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+      }
+      fill.style.width = widthVal;
+    });
+
+    // 混雑度バッジに対して緩やかな光彩パルスをバインド
+    const badges = document.querySelectorAll('.health-status-badge');
+    badges.forEach(badge => {
+      if (badge.classList.contains('health-status-attention') || badge.classList.contains('health-status-congested')) {
+        badge.classList.add('badge-active');
+      }
+    });
   }
 
   /**

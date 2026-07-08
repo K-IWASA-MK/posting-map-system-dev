@@ -13,7 +13,16 @@ class IntelligenceFlowGraphCard {
    */
   static render(props) {
     const flow = props.flowGraph || { event: 0, timeline: 0, correlation: 0, graph: 0, knowledge: 0, insight: 0, evolution: 0, pattern: 0, memory: 0 };
+    const healthData = props.healthData || { pipelineNodes: [] };
     const delay = props.delay || 0;
+
+    const getNodeHealth = (layerName) => {
+      return healthData.pipelineNodes.find(n => n.layerName.toLowerCase() === layerName.toLowerCase()) || {
+        latency: { value: 0, source: 'SIMULATION' },
+        bufferSize: 0,
+        status: 'HEALTHY'
+      };
+    };
 
     const steps = [
       { key: 'event', label: 'Event', value: flow.event, theme: 'flow-node-event' },
@@ -29,10 +38,23 @@ class IntelligenceFlowGraphCard {
 
     let stepsHtml = '';
     steps.forEach((step, i) => {
+      const health = getNodeHealth(step.label);
+      const healthInfoHtml = step.key === 'event' ? `
+        <div class="flow-node-health-detail">
+          <span class="flow-health-lbl">Active</span>
+        </div>
+      ` : `
+        <div class="flow-node-health-detail">
+          <span class="flow-health-lat">${health.latency.value}ms</span>
+          <span class="flow-health-buf">Buf ${health.bufferSize}%</span>
+        </div>
+      `;
+
       stepsHtml += `
         <div class="flow-node ${step.theme}">
           <div class="flow-node-badge">${step.value}</div>
           <div class="flow-node-name">${step.label}</div>
+          ${healthInfoHtml}
         </div>
       `;
 

@@ -63,6 +63,8 @@ class DashboardRenderer {
 
     if (viewMode === 'mobile') {
       const mobData = window.MobileExecutiveAdapter ? window.MobileExecutiveAdapter.getMobileData() : { kpis: {}, flowGraph: {}, activityStream: [], evolutionStatus: {} };
+      const healthData = window.PipelineHealthAdapter ? window.PipelineHealthAdapter.getHealthData() : { pipelineNodes: [] };
+
       components = [
         {
           key: 'MobileHeaderCard',
@@ -76,8 +78,8 @@ class DashboardRenderer {
         },
         {
           key: 'MobileFlowCard',
-          render: () => window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, delay: 200 }),
-          props: mobData.flowGraph
+          render: () => window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, healthData, delay: 200 }),
+          props: { flowGraph: mobData.flowGraph, healthData }
         },
         {
           key: 'MobileActivityCard',
@@ -97,6 +99,8 @@ class DashboardRenderer {
       ];
     } else if (viewMode === 'executive') {
       const execData = window.ExecutiveAdapter ? window.ExecutiveAdapter.getExecutiveData() : { kpis: {}, flowGraph: {}, activityStream: [], distribution: {}, evolutionStatus: {} };
+      const healthData = window.PipelineHealthAdapter ? window.PipelineHealthAdapter.getHealthData() : { pipelineNodes: [] };
+
       components = [
         {
           key: 'ExecutiveKPICard',
@@ -105,27 +109,32 @@ class DashboardRenderer {
         },
         {
           key: 'IntelligenceFlowGraphCard',
-          render: () => window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, delay: 200 }),
-          props: execData.flowGraph
+          render: () => window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, healthData, delay: 200 }),
+          props: { flowGraph: execData.flowGraph, healthData }
+        },
+        {
+          key: 'PipelineHealthCard',
+          render: () => window.PipelineHealthCard.render({ healthData, delay: 250 }),
+          props: healthData
         },
         {
           key: 'RealtimeActivityStreamCard',
-          render: () => window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 250 }),
+          render: () => window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 300 }),
           props: execData.activityStream
         },
         {
           key: 'IntelligenceDistributionCard',
-          render: () => window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 300 }),
+          render: () => window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 350 }),
           props: execData.distribution
         },
         {
           key: 'ExecutiveEvolutionStatusCard',
-          render: () => window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 350 }),
+          render: () => window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 400 }),
           props: execData.evolutionStatus
         },
         {
           key: 'ExecutivePatternMemorySummaryCard',
-          render: () => window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 400 }),
+          render: () => window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 450 }),
           props: execData.kpis
         }
       ];
@@ -612,6 +621,7 @@ class DashboardRenderer {
     if (!gridContainer || !window.ExecutiveAdapter) return;
 
     const execData = window.ExecutiveAdapter.getExecutiveData();
+    const healthData = window.PipelineHealthAdapter ? window.PipelineHealthAdapter.getHealthData() : { pipelineNodes: [] };
 
     // 0: ExecutiveKPICard
     if (window.ExecutiveKPICard && window.DashboardRenderCache.hasChanged('ExecutiveKPICard', execData.kpis)) {
@@ -622,11 +632,12 @@ class DashboardRenderer {
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 1: IntelligenceFlowGraphCard
-    if (window.IntelligenceFlowGraphCard && window.DashboardRenderCache.hasChanged('IntelligenceFlowGraphCard', execData.flowGraph)) {
+    // 1: IntelligenceFlowGraphCard (Composite props check)
+    const flowProps = { flowGraph: execData.flowGraph, healthData };
+    if (window.IntelligenceFlowGraphCard && window.DashboardRenderCache.hasChanged('IntelligenceFlowGraphCard', flowProps)) {
       const el = gridContainer.children[1];
       if (el) {
-        el.outerHTML = window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, delay: 0 });
+        el.outerHTML = window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, healthData, delay: 0 });
         const newEl = gridContainer.children[1];
         if (newEl) DashboardRenderer.activateMotion(newEl);
         if (window.DashboardMotion && window.DashboardMotion.animateFlowGraph) {
@@ -634,39 +645,52 @@ class DashboardRenderer {
         }
       }
     }
-    // 2: RealtimeActivityStreamCard
-    if (window.RealtimeActivityStreamCard && window.DashboardRenderCache.hasChanged('RealtimeActivityStreamCard', execData.activityStream)) {
+    // 2: PipelineHealthCard (New)
+    if (window.PipelineHealthCard && window.DashboardRenderCache.hasChanged('PipelineHealthCard', healthData)) {
       const el = gridContainer.children[2];
       if (el) {
-        el.outerHTML = window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 0 });
+        el.outerHTML = window.PipelineHealthCard.render({ healthData, delay: 0 });
         const newEl = gridContainer.children[2];
         if (newEl) DashboardRenderer.activateMotion(newEl);
+        if (window.DashboardMotion && window.DashboardMotion.init) {
+          // アニメーション再アタッチ
+          window.DashboardMotion.init();
+        }
       }
     }
-    // 3: IntelligenceDistributionCard
-    if (window.IntelligenceDistributionCard && window.DashboardRenderCache.hasChanged('IntelligenceDistributionCard', execData.distribution)) {
+    // 3: RealtimeActivityStreamCard
+    if (window.RealtimeActivityStreamCard && window.DashboardRenderCache.hasChanged('RealtimeActivityStreamCard', execData.activityStream)) {
       const el = gridContainer.children[3];
       if (el) {
-        el.outerHTML = window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 0 });
+        el.outerHTML = window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 0 });
         const newEl = gridContainer.children[3];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 4: ExecutiveEvolutionStatusCard
-    if (window.ExecutiveEvolutionStatusCard && window.DashboardRenderCache.hasChanged('ExecutiveEvolutionStatusCard', execData.evolutionStatus)) {
+    // 4: IntelligenceDistributionCard
+    if (window.IntelligenceDistributionCard && window.DashboardRenderCache.hasChanged('IntelligenceDistributionCard', execData.distribution)) {
       const el = gridContainer.children[4];
       if (el) {
-        el.outerHTML = window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 0 });
+        el.outerHTML = window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 0 });
         const newEl = gridContainer.children[4];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 5: ExecutivePatternMemorySummaryCard
-    if (window.ExecutivePatternMemorySummaryCard && window.DashboardRenderCache.hasChanged('ExecutivePatternMemorySummaryCard', execData.kpis)) {
+    // 5: ExecutiveEvolutionStatusCard
+    if (window.ExecutiveEvolutionStatusCard && window.DashboardRenderCache.hasChanged('ExecutiveEvolutionStatusCard', execData.evolutionStatus)) {
       const el = gridContainer.children[5];
       if (el) {
-        el.outerHTML = window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 0 });
+        el.outerHTML = window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 0 });
         const newEl = gridContainer.children[5];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+    // 6: ExecutivePatternMemorySummaryCard
+    if (window.ExecutivePatternMemorySummaryCard && window.DashboardRenderCache.hasChanged('ExecutivePatternMemorySummaryCard', execData.kpis)) {
+      const el = gridContainer.children[6];
+      if (el) {
+        el.outerHTML = window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 0 });
+        const newEl = gridContainer.children[6];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
@@ -680,6 +704,7 @@ class DashboardRenderer {
     if (!gridContainer || !window.MobileExecutiveAdapter) return;
 
     const mobData = window.MobileExecutiveAdapter.getMobileData();
+    const healthData = window.PipelineHealthAdapter ? window.PipelineHealthAdapter.getHealthData() : { pipelineNodes: [] };
 
     // 0: MobileHeaderCard
     if (window.MobileHeaderCard && window.DashboardRenderCache.hasChanged('MobileHeaderCard', mobData.kpis)) {
@@ -699,11 +724,12 @@ class DashboardRenderer {
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
-    // 2: MobileFlowCard
-    if (window.MobileFlowCard && window.DashboardRenderCache.hasChanged('MobileFlowCard', mobData.flowGraph)) {
+    // 2: MobileFlowCard (Composite props check)
+    const mobileFlowProps = { flowGraph: mobData.flowGraph, healthData };
+    if (window.MobileFlowCard && window.DashboardRenderCache.hasChanged('MobileFlowCard', mobileFlowProps)) {
       const el = gridContainer.children[2];
       if (el) {
-        el.outerHTML = window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, delay: 0 });
+        el.outerHTML = window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, healthData, delay: 0 });
         const newEl = gridContainer.children[2];
         if (newEl) DashboardRenderer.activateMotion(newEl);
         if (window.DashboardMotion && window.DashboardMotion.animateMobileFlow) {

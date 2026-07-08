@@ -13,16 +13,19 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 151: Executive KPI Temporal Intelligence Foundation [現在のフェーズ]
-* **目的**: 既存の Executive View および Mobile Executive View に時間比較軸を追加し、現在値の単一表示から「増減率、トレンド、静的ステータスラベル」の可視化へと進化させる。
+### 現在のスプリント: AIOS Phase 152: Executive Pipeline Health Visualization Foundation [現在のフェーズ]
+* **目的**: 既存のデータフロー（Event ➔ Memory）における処理流量、レイテンシ、およびバッファ占有率の状態を可視化する Pipeline Health Visualization Foundation を構築する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規時間軸 KPI 仕様定義 (`ExecutiveKPITemporal.md`)
-  - ✅ Temporal Snapshot 構造の導入: `ExecutiveAdapter.js` 内に Immutable な時間軸 Snapshot データ構造を定義・算出。
-  - ✅ KPI コンポーネント強化: PC/モバイルでの増減矢印、Previous 過去値、静的 Status Label（NORMAL/HIGH/SIGNIFICANT）の表示。
+  - 新規パイプライン仕様定義 (`PipelineHealthVisualization.md`)
+  - Pipeline Health Adapter の導入: `PipelineHealthAdapter.js` 内に不変な Pipeline Health Metric オブジェクト配列を算出する処理を実装。
+  - UIコンポーネント強化: Flow Graph 内での処理件数・latency（source 属性付き）・buffer% の表示。
+  - PC版 `PipelineHealthCard` およびモバイル用 `MobileFlowCard` の Pipeline State 簡易表示の統合。
 * **今回実装しないもの (対象外)**:
-  - ❌ AIを用いた動的な異常診断、対応推奨メッセージの生成。自動アクションおよび外部へのデータ書き込み処理（Write API）。
+  - ❌ AIを用いた主観的なシステム障害診断、Incident自動判定、自動復旧アクションの実行。操作用 UI (button/select等) や Write 通信 (POST/DELETE等) の追加。
 
-### 完了したスプリント: AIOS Dashboard Mobile Executive View Foundation
+### 完了したスプリント: AIOS Phase 151: Executive KPI Temporal Intelligence Foundation
+* **目的**: 既存の Executive View および Mobile Executive View に時間比較軸を追加し、現在値の単一表示から「増減率、トレンド、静的ステータスラベル」の可視化へと進化させる。
+* **完了したスプリント2**: AIOS Dashboard Mobile Executive View Foundation
 * **目的**: 既存の Executive View を基盤とし、スマートフォンの狭い画面幅および片手操作に最適化した、監視専用の「Mobile Executive View」を構築する。
 * **完了したスプリント2**: AIOS Dashboard Executive Demo Visualization Foundation
 * **完了したスプリント3**: AIOS Dashboard Demo Visualization Foundation

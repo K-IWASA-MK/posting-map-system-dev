@@ -13,7 +13,23 @@ class MobileFlowCard {
    */
   static render(props) {
     const flow = props.flowGraph || { event: 0, timeline: 0, knowledge: 0, insight: 0, memory: 0 };
+    const healthData = props.healthData || { pipelineNodes: [] };
     const delay = props.delay || 0;
+
+    const getNodeHealth = (layerName) => {
+      const map = {
+        'Event Input': 'Event',
+        'Timeline Store': 'Timeline',
+        'Knowledge Base': 'Knowledge',
+        'Insight Layer': 'Insight',
+        'Memory Archive': 'Memory'
+      };
+      const nodeName = map[layerName] || layerName;
+      return healthData.pipelineNodes.find(n => n.layerName.toLowerCase() === nodeName.toLowerCase()) || {
+        latency: { value: 0 },
+        status: 'HEALTHY'
+      };
+    };
 
     const steps = [
       { label: 'Event Input', value: flow.event, theme: 'm-flow-node-event' },
@@ -25,10 +41,18 @@ class MobileFlowCard {
 
     let stepsHtml = '';
     steps.forEach((step, i) => {
+      const health = getNodeHealth(step.label);
+      const healthHtml = step.label === 'Event Input' ? '' : `
+        <span class="m-flow-node-latency health-status-${health.status.toLowerCase()}">${health.latency.value}ms</span>
+      `;
+
       stepsHtml += `
         <div class="mobile-flow-node ${step.theme}">
           <div class="mobile-flow-node-name">${step.label}</div>
-          <div class="mobile-flow-node-badge">${step.value}</div>
+          <div class="mobile-flow-node-right-wrap">
+            ${healthHtml}
+            <div class="mobile-flow-node-badge">${step.value}</div>
+          </div>
         </div>
       `;
 

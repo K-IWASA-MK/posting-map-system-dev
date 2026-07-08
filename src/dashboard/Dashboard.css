@@ -2747,3 +2747,180 @@ body {
   color: #ef4444;
   background-color: rgba(239, 68, 68, 0.06);
 }
+
+/* ==========================================================================
+   16. Pipeline Health & Node State Styles
+   ========================================================================== */
+.pipeline-health-card {
+  grid-column: span 2 !important;
+}
+
+.pipeline-health-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.pipeline-health-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 100px;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.pipeline-health-row:last-child {
+  border-bottom: none;
+}
+
+.pipeline-health-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.pipeline-health-layer {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.pipeline-health-processed {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.pipeline-health-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.pipeline-health-progress-bg {
+  flex: 1;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.pipeline-health-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.health-status-healthy {
+  background-color: #10b981; /* 緑 */
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.health-status-attention {
+  background-color: #f59e0b; /* 黄 */
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.health-status-congested {
+  background-color: #a855f7; /* 紫 */
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+}
+
+.pipeline-health-latency {
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  color: var(--text-dim);
+  width: 50px;
+  text-align: right;
+}
+
+.pipeline-health-status-wrap {
+  text-align: right;
+}
+
+.health-status-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  text-align: center;
+  min-width: 75px;
+}
+
+.health-status-badge.health-status-healthy {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.health-status-badge.health-status-attention {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.health-status-badge.health-status-congested {
+  color: #a855f7;
+  background-color: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+/* Node Health Detail inside PC Flow Graph */
+.flow-node-health-detail {
+  font-size: 0.625rem;
+  color: var(--text-dim);
+  margin-top: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.flow-health-lat {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.flow-health-buf {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.flow-health-lbl {
+  color: #3b82f6;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Mobile Latency styles inside MobileFlowCard */
+.mobile-flow-node-right-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.m-flow-node-latency {
+  font-size: 0.65rem;
+  font-family: var(--font-mono, monospace);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.m-flow-node-latency.health-status-healthy {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.06);
+}
+
+.m-flow-node-latency.health-status-attention {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.06);
+}
+
+.m-flow-node-latency.health-status-congested {
+  color: #a855f7;
+  background-color: rgba(168, 85, 247, 0.06);
+}

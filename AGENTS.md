@@ -1321,11 +1321,31 @@ Execution Plan
 本ルールは、Dashboard KPI の時間変化分析（Executive KPI Temporal Intelligence）における**AI（Flash）の開発統制ルール**である。
 
 1. **AI推論・予測の禁止 (No AI Predictions/Recommendations)**
-   - トレンド抽出（UP/DOWN/STABLE）およびステータス分類（NORMAL/HIGH/SIGNIFICANT）の決定において、AI・機械学習を用いた動的推測や、障害状況を断定・示唆するようなリスク推奨テキストの動的生成は一切行ってはならない。必ず決定論的な固定の閾値ルールに基づく静的マッピングを適用する。
+   - トレンド抽出（UP/DOWN/STABLE）およびステータス分類（NORMAL/HIGH/SIGNIFICANT）の決定において、AI・機械学習を用いた動的推測や、障害状況を断定・示唆するようなリスク推奨テキスト of 動的生成は一切行ってはならない。必ず決定論的な固定の閾値ルールに基づく静的マッピングを適用する。
 
 2. **Immutable な Temporal Snapshot 構造の順守 (Temporal Snapshot Immutability)**
    - 時間変化の演算および表示に用いるデータオブジェクトは、現在値、過去値、取得タイムスタンプを含む `Temporal Snapshot` 構造として一貫させ、生成時に必ず `Object.freeze()` を適用して不変性を保証する。
 
 3. **完全 Read-Only ガードレール (Read-Only Guardrails)**
-   - KPI 時間変化インジケータ表示部分において、手動でのデータ書き換え、リセット、閾値変更等を促すボタン、リンク、フォーム等の操作用 UI 要素は一切配置してはならない。完全な Observer (観測) 画面としての動作を死守する。
+   - KPI 時間変化インジケータ表示部分において、手動でのデータ書き換え、リreset、閾値変更等を促すボタン、リンク、フォーム等の操作用 UI 要素は一切配置してはならない。完全な Observer (観測) 画面としての動作を死守する。
+
+---
+
+### 43. Pipeline Health Core Principle
+
+本ルールは、AIOS Pipeline Health の表示における**開発統制ルール**である。
+
+1. **観測メトリクスの客観的表示 (Observable Metrics Only)**
+   - Pipeline Health は、観測された客観的メトリクス（処理件数、実測またはシミュレーションされた遅延時間、バッファ占有率）のみをそのまま提示しなければならない。
+
+2. **AI判断および障害診断の絶対禁止 (No AI Judgement or Diagnosis)**
+   - Pipeline Health は、以下の項目を表したり生成したりしてはならない。
+     - システムの「健全性 / 障害有無」の主観的・AI的な診断判断 (system health judgement)
+     - 障害やインシデントの自動検出・アラート判断 (incident detection)
+     - 復旧作業や改善に関する推奨メッセージの動的生成 (recovery recommendation)
+     - 運用上の意思決定の誘導 (operational decision)
+
+3. **バッジ・ステータス分類名の適合**
+   - パイプライン状態を示すステータス分類名は、システムの異常を誤判定させないため、`NORMAL/WARNING/HIGH` などの表現を排し、`HEALTHY` (正常範囲)、`ATTENTION` (注意領域)、`CONGESTED` (数値上の混雑状態) のみを使用する。
+
 
