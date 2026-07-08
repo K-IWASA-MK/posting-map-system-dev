@@ -7,6 +7,8 @@
  */
 
 class DashboardWidgetFactory {
+  static instanceCounter = 0;
+
   /**
    * ウィジェット仕様からウィジェットインスタンスを生成する
    * @param {object} spec レジストリに登録されたウィジェット仕様
@@ -23,7 +25,7 @@ class DashboardWidgetFactory {
       throw new Error('[DashboardWidgetFactory] componentName is required');
     }
 
-    const uniqueId = `inst-${spec.widgetId}-${Math.floor(Math.random() * 1000000)}`;
+    const uniqueId = `inst-${spec.widgetId}-${++DashboardWidgetFactory.instanceCounter}`;
 
     const widgetInstance = {
       instanceId: uniqueId,
