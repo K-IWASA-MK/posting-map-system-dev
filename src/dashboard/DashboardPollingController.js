@@ -17,6 +17,10 @@ class DashboardPollingController {
   static currentInterval = 10000;
   static isRunning = false;
   static consecutiveFailures = 0;
+  
+  static hasBoundVisibility = false;
+  static isTabVisible = true;
+  static isFetching = false;
 
   /**
    * ポーリングサイクルを開始する
@@ -26,6 +30,13 @@ class DashboardPollingController {
     this.isRunning = true;
     this.currentInterval = this.DEFAULT_INTERVAL;
     this.consecutiveFailures = 0;
+    this.isTabVisible = document.visibilityState !== 'hidden';
+
+    // 一度だけ Visibility 監視イベントをバインド
+    if (!this.hasBoundVisibility) {
+      this.hasBoundVisibility = true;
+      document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
+    }
     
     console.log('[Dashboard Polling] ポーリングを開始します。更新間隔:', this.currentInterval, 'ms');
     this.scheduleNext();
@@ -47,7 +58,7 @@ class DashboardPollingController {
    * 次回のデータ取得をスケジュールする (setTimeoutによる動的インターバル制御)
    */
   static scheduleNext() {
-    if (!this.isRunning) return;
+    if (!this.isRunning || !this.isTabVisible) return;
     
     if (this.intervalId) {
       clearTimeout(this.intervalId);
@@ -63,33 +74,41 @@ class DashboardPollingController {
    * 1ポーリングごとのデータ取得および障害制御
    */
   static async tick() {
-    if (!this.isRunning) return;
+    if (!this.isRunning || this.isFetching) return;
+    this.isFetching = true;
 
-    // データアダプター経由での取得 (Read-Only)
-    const result = await window.DashboardDataAdapter.fetchSummary();
+    try {
+      // データアダプター経由での取得 (Read-Only)
+      const result = await window.DashboardDataAdapter.fetchSummary();
 
-    // 接続障害 (OFFLINE または スキーマ不整合警告) のハンドリング
-    if (result.statusState === 'OFFLINE' || result.statusState === 'WARNING') {
-      this.handleFailure();
-      // 障害状態でもバナー更新等のためイベントを発火
-      window.DashboardEventBus.emit('dashboard-updated', result);
-      return;
-    }
-
-    // 正常完了 ──> リトライ・バックオフのリセット
-    this.handleSuccess();
-
-    // 新着ログの有無を差分検出
-    if (result.data && result.data.logs) {
-      const newLogs = window.DashboardDataAdapter.detectNewLogs(result.data.logs);
-      if (newLogs && newLogs.length > 0) {
-        // 新しいログをイベントバス経由で通知
-        window.DashboardEventBus.emit('new-activity-logs', newLogs);
+      // 接続障害 (OFFLINE または スキーマ不整合警告) のハンドリング
+      if (result.statusState === 'OFFLINE' || result.statusState === 'WARNING') {
+        this.handleFailure();
+        // 障害状態でもバナー更新等のためイベントを発火
+        window.DashboardEventBus.emit('dashboard-updated', result);
+        return;
       }
-    }
 
-    // 全体更新完了イベントの発行 (KPIカード等の再描画連携用)
-    window.DashboardEventBus.emit('dashboard-updated', result);
+      // 正常完了 ──> リトライ・バックオフのリセット
+      this.handleSuccess();
+
+      // 新着ログの有無を差分検出
+      if (result.data && result.data.logs) {
+        const newLogs = window.DashboardDataAdapter.detectNewLogs(result.data.logs);
+        if (newLogs && newLogs.length > 0) {
+          // 新しいログをイベントバス経由で通知
+          window.DashboardEventBus.emit('new-activity-logs', newLogs);
+        }
+      }
+
+      // 全体更新完了イベントの発行 (KPIカード等の再描画連携用)
+      window.DashboardEventBus.emit('dashboard-updated', result);
+    } catch (e) {
+      console.error('[Dashboard Polling] Tick取得中に想定外のエラーが発生しました:', e);
+      this.handleFailure();
+    } finally {
+      this.isFetching = false;
+    }
   }
 
   /**
@@ -117,6 +136,29 @@ class DashboardPollingController {
       `[Dashboard Polling] 接続障害を検知しました (連続 ${this.consecutiveFailures} 回)。`,
       `指数バックオフを適用します。次回取得まで: ${this.currentInterval} ms`
     );
+  }
+
+  /**
+   * タブの表示状態変更イベントハンドラ
+   */
+  static handleVisibilityChange() {
+    const isHidden = document.visibilityState === 'hidden';
+    this.isTabVisible = !isHidden;
+    console.log(`[Dashboard Polling] VisibilityState変更検知: isTabVisible = ${this.isTabVisible}`);
+
+    if (isHidden) {
+      console.log('[Dashboard Polling] タブが非表示のため、タイマーをクリアしてポーリングを一時停止します。');
+      if (this.intervalId) {
+        clearTimeout(this.intervalId);
+        this.intervalId = null;
+      }
+    } else {
+      console.log('[Dashboard Polling] タブが再度表示されました。ポーリングを再開します。');
+      if (this.isRunning) {
+        // 重複実行を防止しつつ、復帰した瞬間に即座に最新データを1回取得する
+        this.tick().then(() => this.scheduleNext());
+      }
+    }
   }
 }
 

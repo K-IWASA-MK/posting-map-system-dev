@@ -19,83 +19,81 @@ class DashboardRenderer {
       return;
     }
 
-    console.log('[Dashboard Renderer] コンポーネント群をレンダリングしています...');
+    console.log('[Dashboard Renderer] コンポーネント群のレンダリングを開始します...');
 
-    let html = '';
+    const components = [
+      {
+        key: 'StatusCard',
+        render: () => window.StatusCard.render({ title: 'Kernel Status', delay: 150, statusMap: data.kernelStatus }),
+        props: data.kernelStatus
+      },
+      {
+        key: 'SimulationCard',
+        render: () => window.SimulationCard.render({ lastRun: data.simulation.lastRun, passed: data.simulation.passed, failed: data.simulation.failed, delay: 200 }),
+        props: data.simulation
+      },
+      {
+        key: 'MetricCard',
+        render: () => window.MetricCard.render({ qualityScore: data.quality.qualityScore, reviewCount: data.quality.reviewCount, improvementDelta: data.quality.improvementDelta, delay: 250 }),
+        props: data.quality
+      },
+      {
+        key: 'KnowledgeCard',
+        render: () => window.KnowledgeCard.render({ knowledgeTotal: data.knowledge.knowledgeTotal, officialCount: data.knowledge.officialCount, candidateCount: data.knowledge.candidateCount || (data.knowledge.knowledgeTotal - data.knowledge.officialCount), healthScore: data.knowledge.healthScore, gapCount: data.knowledge.gapCount, delay: 300 }),
+        props: data.knowledge
+      },
+      {
+        key: 'GovernanceCard',
+        render: () => window.GovernanceCard.render({ pendingApproval: data.governance.pendingApproval, approvedCount: data.governance.approvedCount, auditCount: data.governance.auditCount, delay: 350 }),
+        props: data.governance
+      },
+      {
+        key: 'BillingCard',
+        render: () => window.BillingCard.render({ licenseStatus: data.billing.licenseStatus, subscriptionStatus: data.billing.subscriptionStatus, delay: 400 }),
+        props: data.billing
+      },
+      {
+        key: 'ActivityTrendCard',
+        render: () => window.ActivityTrendCard.render({ trendData: data.trendData || [25, 38, 55, 48, 72, 88.5], delay: 450 }),
+        props: data.trendData
+      },
+      {
+        key: 'ActivityLogCard',
+        render: () => window.ActivityLogCard.render({ logs: data.logs, delay: 500 }),
+        props: data.logs
+      },
+      {
+        key: 'TurnoutCard',
+        render: () => window.TurnoutCard.render({ overall: data.turnout.overall, cities: data.turnout.cities, delay: 550 }),
+        props: data.turnout
+      }
+    ];
 
-    // 1. Kernel Status Card
-    html += window.StatusCard.render({
-      title: 'Kernel Status',
-      delay: 150,
-      statusMap: data.kernelStatus
-    });
-
-    // 2. Simulation Quality Gate Card
-    html += window.SimulationCard.render({
-      lastRun: data.simulation.lastRun,
-      passed: data.simulation.passed,
-      failed: data.simulation.failed,
-      delay: 200
-    });
-
-    // 3. Quality Metrics Card
-    html += window.MetricCard.render({
-      qualityScore: data.quality.qualityScore,
-      reviewCount: data.quality.reviewCount,
-      improvementDelta: data.quality.improvementDelta,
-      delay: 250
-    });
-
-    // 4. Knowledge Metrics Card
-    html += window.KnowledgeCard.render({
-      knowledgeTotal: data.knowledge.knowledgeTotal,
-      officialCount: data.knowledge.officialCount,
-      candidateCount: data.knowledge.candidateCount || (data.knowledge.knowledgeTotal - data.knowledge.officialCount),
-      healthScore: data.knowledge.healthScore,
-      gapCount: data.knowledge.gapCount,
-      delay: 300
-    });
-
-    // 5. Governance Metrics Card
-    html += window.GovernanceCard.render({
-      pendingApproval: data.governance.pendingApproval,
-      approvedCount: data.governance.approvedCount,
-      auditCount: data.governance.auditCount,
-      delay: 350
-    });
-
-    // 6. Billing Metrics Card
-    html += window.BillingCard.render({
-      licenseStatus: data.billing.licenseStatus,
-      subscriptionStatus: data.billing.subscriptionStatus,
-      delay: 400
-    });
-
-    // 7. Activity Trend Card (SVGグラフ)
-    html += window.ActivityTrendCard.render({
-      trendData: data.trendData || [25, 38, 55, 48, 72, 88.5],
-      delay: 450
-    });
-
-    // 8. Activity Log Card (システム活動ログ)
-    html += window.ActivityLogCard.render({
-      logs: data.logs || [
-        { time: '22:45:10', module: 'Simulation', message: 'Local Simulation PASS' },
-        { time: '22:43:08', module: 'Quality', message: 'Regression audit PASS' },
-        { time: '22:40:01', module: 'Governance', message: 'Boundary protection check active' }
-      ],
-      delay: 500
-    });
-
-    // 9. Turnout Status Card (投票率進捗メーター)
-    html += window.TurnoutCard.render({
-      overall: data.turnout.overall,
-      cities: data.turnout.cities,
-      delay: 550
-    });
-
-    // 一括インサート (途中状態のチラつき防止)
-    gridContainer.innerHTML = html;
+    // 初回マウント時、またはコンポーネント数が一致しない場合は全件一括マウント
+    if (gridContainer.children.length !== components.length) {
+      console.log('[Dashboard Renderer] 初回一括マウントを実行します。');
+      let html = '';
+      components.forEach(c => {
+        window.DashboardRenderCache.hasChanged(c.key, c.props);
+        html += c.render();
+      });
+      gridContainer.innerHTML = html;
+    } else {
+      // 差分更新 (Changed Component Detection)
+      console.log('[Dashboard Renderer] 差分更新チェックを実行します。');
+      components.forEach((c, idx) => {
+        if (window.DashboardRenderCache.hasChanged(c.key, c.props)) {
+          console.log(`[Dashboard Renderer] コンポーネントの変更を検知: ${c.key}`);
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = c.render();
+          const targetCard = gridContainer.children[idx];
+          
+          if (targetCard) {
+            targetCard.outerHTML = tempDiv.innerHTML;
+          }
+        }
+      });
+    }
 
     // 定期更新用の EventBus イベント購読をアタッチ
     this.attachEventListeners();

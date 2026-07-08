@@ -11,9 +11,17 @@ class DashboardMotion {
   /**
    * モーションレイヤーの初期化 (API取得 ──> レンダリング完了後にアタッチ)
    */
+  static hasBoundVisibility = false;
+
   static init() {
     console.log('[Dashboard Motion] モーションコントローラーを初期化します...');
     
+    // 視覚的な Visibility 監視の統合
+    if (!this.hasBoundVisibility) {
+      this.hasBoundVisibility = true;
+      document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
+    }
+
     const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // 1. data-motion 要素を走査してフェード・スライドを実行
@@ -166,6 +174,26 @@ class DashboardMotion {
         clearInterval(timer);
       }
     }, stepTime);
+  }
+
+  /**
+   * VisibilityState 変更検知時の視覚演出制御
+   */
+  static handleVisibilityChange() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) return;
+
+    const isHidden = document.visibilityState === 'hidden';
+    console.log(`[Dashboard Motion] VisibilityState変更検知: hidden = ${isHidden}`);
+
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (gridContainer) {
+      if (isHidden) {
+        gridContainer.classList.add('motion-paused');
+      } else {
+        gridContainer.classList.remove('motion-paused');
+      }
+    }
   }
 }
 

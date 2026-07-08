@@ -716,3 +716,37 @@ body {
     border-color: var(--border-color) !important;
   }
 }
+
+/* ==========================================
+   Performance Optimizations (GPU & Visibility)
+   ========================================== */
+
+/* 1. Visibility Hidden 時のアニメーション一時停止 */
+.motion-paused .badge-active::before,
+.motion-paused .badge-idle::before,
+.motion-paused .new-log-glow,
+.motion-paused .loading-spinner {
+  animation-play-state: paused !important;
+}
+
+/* 2. 特定のアニメーション対象要素への GPU レイヤー促進 */
+.trend-line {
+  will-change: stroke-dashoffset;
+  transform: translateZ(0);
+}
+
+.turnout-fill {
+  will-change: width;
+  transform: translateZ(0);
+}
+
+.badge-active::before,
+.badge-idle::before {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.new-log-glow {
+  will-change: box-shadow, background-color;
+  transform: translateZ(0);
+}

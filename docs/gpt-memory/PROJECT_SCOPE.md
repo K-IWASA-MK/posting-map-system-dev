@@ -13,21 +13,22 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Accessibility & Responsive Optimization [現在のフェーズ]
-* **目的**: 構築済みの Dashboard 各画面に対し、アクセシビリティ対応（スクリーンリーダー・prefers-reduced-motion）および複数デバイス表示（レスポンシブメディアクエリ）の最適化。
+### 現在のスプリント: AIOS Dashboard Performance Optimization Foundation [現在のフェーズ]
+* **目的**: 表示速度、描画効率、およびメモリ使用量の最適化。既存の Observer Architecture、EventBus、および Polling 制御を維持したままパフォーマンス向上。
 * **今回実装するもの (対象)**:
-  - ✅ 新規ビジュアル仕様定義 (DashboardAccessibility.md, DashboardResponsive.md, DashboardMotionAccessibility.md)
-  - ✅ HTML アクセシビリティマークアップ最適化 (`DashboardApp.html`): ランドマーク, ARIA属性整備
-  - ✅ CSS アクセシビリティ & レスポンシブ化 (`Dashboard.css`): clamp(), メディアクエリ Grid, prefers-reduced-motion, コントラスト比調整
-  - ✅ 各コンポーネントのレスポンシブ対応: WAI-ARIA 属性, overflow対策
-  - ✅ アニメーションのReduced Motion動的制御 (`DashboardMotion.js`)
+  - ✅ 新規ビジュアル仕様定義 (DashboardPerformance.md, DashboardRenderingPipeline.md, DashboardMemoryManagement.md)
+  - ✅ 差分描画機構の導入 (`DashboardRenderer.js`): `DashboardRenderCache` を介した変更コンポーネントのみの部分的マウント
+  - ✅ Visibility API 連携 (`DashboardMotion.js` / `DashboardPollingController.js`): タブ非表示時のポーリング・アニメーション停止と復帰時の即時同期
+  - ✅ 通信・イベント購読クリーンアップ (`DashboardEventBus.js` / `Dashboard.js`): unsubscribe, clearListeners, アンロードクリーンアップ
+  - ✅ GPUアクセラレーションの最適化 (`Dashboard.css`): will-change, translateZ を特定のアニメーション要素のみに適用
   - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md, AGENTS.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ 操作UI（button, form等）の追加、Write操作、およびビジネスロジック
+  - ❌ 操作UIの追加、データの書込み（Write）操作、API仕様の変更
 
-### 完了したスプリント: AIOS Dashboard Layout Polish & Detail Adjustments
-* **目的**: 構築済みの各種カードやグラフ、投票率パネルの余白（Spacing）、角丸（Radius）、フォント階層（Typography Scale）の CSS Token 整理とガラスモーフィズム表現の洗練。
-* **目的2**: 投票率概要および市別投票率を表示する専用ビジュアルコンポーネント（`TurnoutCard.js`, `TurnoutProgressBar.js`）を設計・構築し、Props の受信による一元的なマウントおよびメーターのイージング拡張アニメーションを統合。
+### 完了したスプリント: AIOS Dashboard Accessibility & Responsive Optimization
+* **目的**: 構築済みの Dashboard 各画面に対し、アクセシビリティ対応（スクリーンリーダー・prefers-reduced-motion）および複数デバイス表示（レスポンシブメディアクエリ）の最適化。
+* **目的2**: 構築済みの各種カードやグラフ、投票率パネルの余白（Spacing）、角丸（Radius）、フォント階層（Typography Scale）の CSS Token 整理とガラスモーフィズム表現の洗練。
+
 
 
 ### 将来フェーズ: ダッシュボード開発ロードマップ (Dashboard Development Sequence)

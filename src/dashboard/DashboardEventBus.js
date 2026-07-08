@@ -17,9 +17,19 @@ class DashboardEventBus {
    * @param {string} event イベント名
    * @param {Function} callback コールバック関数
    */
+  /**
+   * イベントハンドラーを登録する
+   * @param {string} event イベント名
+   * @param {Function} callback コールバック関数
+   */
   on(event, callback) {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
+    }
+    // 重複登録を防止する
+    if (this.listeners[event].includes(callback)) {
+      console.warn(`[Dashboard EventBus] リスナーは既に登録されています: ${event}`);
+      return;
     }
     this.listeners[event].push(callback);
   }
@@ -32,6 +42,21 @@ class DashboardEventBus {
   off(event, callback) {
     if (!this.listeners[event]) return;
     this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+  }
+
+  /**
+   * 明示的な購読解除 (offのエイリアス)
+   */
+  unsubscribe(event, callback) {
+    this.off(event, callback);
+  }
+
+  /**
+   * すべてのリスナーをクリアし、メモリ解放する
+   */
+  clearListeners() {
+    this.listeners = {};
+    console.log('[Dashboard EventBus] すべてのイベントリスナーがクリアされました。');
   }
 
   /**

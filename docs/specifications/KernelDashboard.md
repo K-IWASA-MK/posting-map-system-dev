@@ -155,6 +155,17 @@ AIOS（品質保証オペレーティングシステム）において、各カ�
 - **メディアクエリ制御**: ブレイクポイントは 4 段階（Large Desktop, Desktop, Tablet, Small Screen）とし、Grid のカラム数や Margin などを CSS レベルでのみ自動スケーリング・再配置する。
 - **サイドバーの再配置**: モバイル環境では、操作トグルボタンの追加を一切行わず、CSS によって画面下部にフレックス横並びメニューとして自動再配置する。
 
+## パフォーマンス・オブザーバー規則 (Performance Observer Layer & Rendering Responsibility)
+ダッシュボードは、長時間稼働および高頻度のデータ更新においても、極小のフットプリントと描画効率を維持しなければならない。
+- **データ不変キャッシュによる不要再描画防止**: 
+  `DashboardRenderCache` に保存された前回の Props 値（JSON 表現）と今回の Props 値を評価し、差分がない場合は DOM 書き換えをスキップする。
+- **カード単位の部分的 DOM 更新（差分マウント）**:
+  更新が必要と判定されたカードのみ、`gridContainer.children[index].outerHTML` 等を用いてピンポイントで更新し、ページ全体の再構築や他のカードへの影響を遮断する。
+- **Visibility API による不要リソース消費の抑制**:
+  タブが非表示（`document.visibilityState === 'hidden'`）の際は、自動ポーリングリクエストを一時停止し、CSS / JS のすべてのアニメーション（脈動バッジ、SVG 描画）を停止してリソースを解放する。
+- **明示的メモリ解放 (Memory Leak Prevention)**:
+  EventBus の重複リスナー登録防止機構を敷設し、アンロード時にはすべての購読とタイマーを破棄し、クロージャや Detached DOM ノードによるリークを排除する。
+
 ---
 
 ## 将来拡張ポイント (Future Extensions)

@@ -111,3 +111,17 @@ class DashboardObserver {
 window.addEventListener('DOMContentLoaded', () => {
   DashboardObserver.load();
 });
+
+// メモリリーク防止のためのアンロードクリーンアップ
+window.addEventListener('unload', () => {
+  console.log('[Dashboard] ページアンロードに伴いリソースを解放します...');
+  if (window.DashboardPollingController) {
+    window.DashboardPollingController.stop();
+  }
+  if (window.DashboardEventBus) {
+    window.DashboardEventBus.clearListeners();
+  }
+  if (window.DashboardRenderCache) {
+    window.DashboardRenderCache.clear();
+  }
+});
