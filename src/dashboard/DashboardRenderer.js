@@ -29,7 +29,7 @@ class DashboardRenderer {
     
     // 1. クエリパラメータ指定を最優先
     if (viewQuery) {
-      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations' || viewQuery === 'analytics' || viewQuery === 'history') {
+      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations' || viewQuery === 'analytics' || viewQuery === 'history' || viewQuery === 'evidence') {
         return viewQuery;
       }
     }
@@ -76,6 +76,7 @@ class DashboardRenderer {
     else if (viewMode === 'operations') activeMenuId = 'menu-operations';
     else if (viewMode === 'analytics') activeMenuId = 'menu-analytics';
     else if (viewMode === 'history') activeMenuId = 'menu-history';
+    else if (viewMode === 'evidence') activeMenuId = 'menu-evidence';
     const activeMenuEl = document.getElementById(activeMenuId);
     if (activeMenuEl) {
       activeMenuEl.classList.add('active');
@@ -262,6 +263,15 @@ class DashboardRenderer {
           key: 'HistorySnapshotCard',
           render: () => window.HistorySnapshotCard.render({ historySnapshots: historyData.historySnapshots, delay: 200 }),
           props: historyData.historySnapshots
+        }
+      ];
+    } else if (viewMode === 'evidence') {
+      const evidenceData = window.FieldEvidenceAdapter ? window.FieldEvidenceAdapter.getFieldEvidenceData() : { tenantId: "", evidenceList: [] };
+      components = [
+        {
+          key: 'FieldEvidenceCard',
+          render: () => window.FieldEvidenceCard.render({ evidenceList: evidenceData.evidenceList, delay: 150 }),
+          props: evidenceData.evidenceList
         }
       ];
     } else {
@@ -501,6 +511,10 @@ class DashboardRenderer {
         DashboardRenderer.updateHistoryDashboard();
         return;
       }
+      if (viewMode === 'evidence') {
+        DashboardRenderer.updateEvidenceDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
@@ -557,6 +571,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'history') {
         DashboardRenderer.updateHistoryDashboard();
+        return;
+      }
+      if (viewMode === 'evidence') {
+        DashboardRenderer.updateEvidenceDashboard();
         return;
       }
 
@@ -617,6 +635,10 @@ class DashboardRenderer {
         DashboardRenderer.updateHistoryDashboard();
         return;
       }
+      if (viewMode === 'evidence') {
+        DashboardRenderer.updateEvidenceDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
@@ -673,6 +695,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'history') {
         DashboardRenderer.updateHistoryDashboard();
+        return;
+      }
+      if (viewMode === 'evidence') {
+        DashboardRenderer.updateEvidenceDashboard();
         return;
       }
 
@@ -733,6 +759,10 @@ class DashboardRenderer {
         DashboardRenderer.updateHistoryDashboard();
         return;
       }
+      if (viewMode === 'evidence') {
+        DashboardRenderer.updateEvidenceDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
@@ -789,6 +819,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'history') {
         DashboardRenderer.updateHistoryDashboard();
+        return;
+      }
+      if (viewMode === 'evidence') {
+        DashboardRenderer.updateEvidenceDashboard();
         return;
       }
 
@@ -849,6 +883,10 @@ class DashboardRenderer {
         DashboardRenderer.updateHistoryDashboard();
         return;
       }
+      if (viewMode === 'evidence') {
+        DashboardRenderer.updateEvidenceDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
@@ -905,6 +943,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'history') {
         DashboardRenderer.updateHistoryDashboard();
+        return;
+      }
+      if (viewMode === 'evidence') {
+        DashboardRenderer.updateEvidenceDashboard();
         return;
       }
 
@@ -1269,6 +1311,26 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.HistorySnapshotCard.render({ historySnapshots: historyData.historySnapshots, delay: 0 });
         const newEl = gridContainer.children[1];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+  }
+
+  /**
+   * Evidenceビューモード用の全画面差分更新を実行する
+   */
+  static updateEvidenceDashboard() {
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (!gridContainer || !window.FieldEvidenceAdapter) return;
+
+    const evidenceData = window.FieldEvidenceAdapter.getFieldEvidenceData();
+
+    // 0: FieldEvidenceCard
+    if (window.FieldEvidenceCard && window.DashboardRenderCache.hasChanged('FieldEvidenceCard', evidenceData.evidenceList)) {
+      const el = gridContainer.children[0];
+      if (el) {
+        el.outerHTML = window.FieldEvidenceCard.render({ evidenceList: evidenceData.evidenceList, delay: 0 });
+        const newEl = gridContainer.children[0];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }

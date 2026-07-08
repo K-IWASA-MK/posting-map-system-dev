@@ -13,13 +13,14 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 163: Enterprise SaaS Routing & Config Separation [現在のフェーズ]
-* **目的**: テナント固有の設定（config.js 等）に応じたダッシュボードテーマ切替や、ルートパラメータに応じた動的 context 切替表示の検証。
+### 現在のスプリント: AIOS Phase 163: Field Intelligence Evidence Foundation [現在のフェーズ]
+* **目的**: Phase 162 Field Intelligence History Foundation を拡張し、現場活動の履歴を監査証跡（Evidence）として整理・保持・可視化する。
 * **今回実装するもの (対象)**:
-  - config.js へのマルチテナント設定構造追加
-  - テーマ・配色スタイルのテナント別バインド
+  - Timeline・History に蓄積された事実データから Evidence Record を決定論的に生成する基盤の構築。
+  - `?view=evidence` として参照できる Observer Dashboard の追加。
 * **今回実装しないもの (対象外)**:
-  - ❌ 動的テナント追加やDB作成のWrite操作
+  - ❌ AIによる証拠評価・改ざん判定・異常検知・推論・改善提案
+  - ❌ Write API、Command送信、Kernel操作、編集/削除UI、Export機能
 
 ### 完了したスプリント: AIOS Phase 162: Field Intelligence History Foundation
 * **目的**: 現場活動履歴の長期蓄積・証跡化。
