@@ -29,7 +29,7 @@ class DashboardRenderer {
     
     // 1. クエリパラメータ指定を最優先
     if (viewQuery) {
-      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations' || viewQuery === 'analytics' || viewQuery === 'history' || viewQuery === 'evidence' || viewQuery === 'audit') {
+      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations' || viewQuery === 'analytics' || viewQuery === 'history' || viewQuery === 'evidence' || viewQuery === 'audit' || viewQuery === 'trace') {
         return viewQuery;
       }
     }
@@ -78,6 +78,7 @@ class DashboardRenderer {
     else if (viewMode === 'history') activeMenuId = 'menu-history';
     else if (viewMode === 'evidence') activeMenuId = 'menu-evidence';
     else if (viewMode === 'audit') activeMenuId = 'menu-audit';
+    else if (viewMode === 'trace') activeMenuId = 'menu-trace';
     const activeMenuEl = document.getElementById(activeMenuId);
     if (activeMenuEl) {
       activeMenuEl.classList.add('active');
@@ -282,6 +283,15 @@ class DashboardRenderer {
           key: 'FieldAuditCard',
           render: () => window.FieldAuditCard.render({ auditList: auditData.auditList, delay: 150 }),
           props: auditData.auditList
+        }
+      ];
+    } else if (viewMode === 'trace') {
+      const traceData = window.FieldTraceAdapter ? window.FieldTraceAdapter.getFieldTraceData() : { tenantId: "", traceList: [] };
+      components = [
+        {
+          key: 'FieldTraceCard',
+          render: () => window.FieldTraceCard.render({ traceList: traceData.traceList, delay: 150 }),
+          props: traceData.traceList
         }
       ];
     } else {
@@ -529,6 +539,10 @@ class DashboardRenderer {
         DashboardRenderer.updateAuditDashboard();
         return;
       }
+      if (viewMode === 'trace') {
+        DashboardRenderer.updateTraceDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
@@ -593,6 +607,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'audit') {
         DashboardRenderer.updateAuditDashboard();
+        return;
+      }
+      if (viewMode === 'trace') {
+        DashboardRenderer.updateTraceDashboard();
         return;
       }
 
@@ -661,6 +679,10 @@ class DashboardRenderer {
         DashboardRenderer.updateAuditDashboard();
         return;
       }
+      if (viewMode === 'trace') {
+        DashboardRenderer.updateTraceDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
@@ -725,6 +747,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'audit') {
         DashboardRenderer.updateAuditDashboard();
+        return;
+      }
+      if (viewMode === 'trace') {
+        DashboardRenderer.updateTraceDashboard();
         return;
       }
 
@@ -793,6 +819,10 @@ class DashboardRenderer {
         DashboardRenderer.updateAuditDashboard();
         return;
       }
+      if (viewMode === 'trace') {
+        DashboardRenderer.updateTraceDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
@@ -857,6 +887,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'audit') {
         DashboardRenderer.updateAuditDashboard();
+        return;
+      }
+      if (viewMode === 'trace') {
+        DashboardRenderer.updateTraceDashboard();
         return;
       }
 
@@ -925,6 +959,10 @@ class DashboardRenderer {
         DashboardRenderer.updateAuditDashboard();
         return;
       }
+      if (viewMode === 'trace') {
+        DashboardRenderer.updateTraceDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
@@ -989,6 +1027,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'audit') {
         DashboardRenderer.updateAuditDashboard();
+        return;
+      }
+      if (viewMode === 'trace') {
+        DashboardRenderer.updateTraceDashboard();
         return;
       }
 
@@ -1392,6 +1434,26 @@ class DashboardRenderer {
       const el = gridContainer.children[0];
       if (el) {
         el.outerHTML = window.FieldAuditCard.render({ auditList: auditData.auditList, delay: 0 });
+        const newEl = gridContainer.children[0];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+  }
+
+  /**
+   * Traceビューモード用の全画面差分更新を実行する
+   */
+  static updateTraceDashboard() {
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (!gridContainer || !window.FieldTraceAdapter) return;
+
+    const traceData = window.FieldTraceAdapter.getFieldTraceData();
+
+    // 0: FieldTraceCard
+    if (window.FieldTraceCard && window.DashboardRenderCache.hasChanged('FieldTraceCard', traceData.traceList)) {
+      const el = gridContainer.children[0];
+      if (el) {
+        el.outerHTML = window.FieldTraceCard.render({ traceList: traceData.traceList, delay: 0 });
         const newEl = gridContainer.children[0];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }

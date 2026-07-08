@@ -13,17 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 164: Field Intelligence Audit Foundation [現在のフェーズ]
-* **目的**: Phase 163 Field Intelligence Evidence Foundation を拡張し、Evidence Record を監査対象（Audit Record）として体系的に管理・可視化する。
+### 現在のスプリント: AIOS Phase 165: Field Intelligence Traceability Foundation [現在のフェーズ]
+* **目的**: Phase 164 Field Intelligence Audit Foundation を拡張し、Timeline・History・Evidence・Audit の各レコード間の由来（Traceability）を決定論的に関連付けて可視化する。
 * **今回実装するもの (対象)**:
-  - Evidence データから Audit Record を決定論的に生成する基盤の構築。
-  - `?view=audit` として参照できる Observer Dashboard の追加。
+  - Audit Record から元となる Evidence・History・Timeline を追跡可能な Trace Record を決定論的に生成する基盤の構築。
+  - `?view=trace` として参照できる Observer Dashboard の追加。
 * **今回実装しないもの (対象外)**:
-  - ❌ AIによる監査判断・異常判定・リスク評価・改善提案・推論
+  - ❌ AIによる原因分析・推論・異常判定・改善提案
   - ❌ Write API、Command送信、Kernel操作、編集/削除UI、Export機能
 
-### 完了したスプリント: AIOS Phase 163: Field Intelligence Evidence Foundation
-* **目的**: Phase 162 Field Intelligence History Foundation を拡張し、現場活動の履歴を監査証跡（Evidence）として整理・保持・可視化する。
+### 完了したスプリント: AIOS Phase 164: Field Intelligence Audit Foundation
+* **目的**: Phase 163 Field Intelligence Evidence Foundation を拡張し、Evidence Record を監査対象（Audit Record）として体系的に管理・可視化する。
 
 ### 完了したスプリント: AIOS Phase 162: Field Intelligence History Foundation
 * **目的**: 現場活動履歴の長期蓄積・証跡化。

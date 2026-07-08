@@ -4066,3 +4066,103 @@ body {
   font-size: 1.1rem;
 }
 
+/* ==========================================================================
+   29. Field Intelligence Traceability View Card Styles
+   ========================================================================== */
+.field-trace-card {
+  grid-column: span 12;
+  padding: var(--space-lg);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+  box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.trace-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.trace-row {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.005);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  gap: var(--space-sm);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.trace-row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.trace-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding-bottom: var(--space-xs);
+}
+
+.trace-id {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+}
+
+.trace-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.trace-details .trace-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trace-details .trace-detail-item.flex-row-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--space-lg);
+  border-top: 1px dashed rgba(255, 255, 255, 0.03);
+  padding-top: var(--space-xs);
+  margin-top: 4px;
+}
+
+.trace-sub-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trace-detail-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.trace-detail-value {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.trace-detail-value.truncate-text {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
