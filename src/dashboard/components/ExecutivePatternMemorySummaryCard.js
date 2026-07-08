@@ -15,7 +15,16 @@ class ExecutivePatternMemorySummaryCard {
     const kpis = props.kpis || { patternCount: 0, memoryCapacity: 0, maxMemoryCapacity: 1000 };
     const delay = props.delay || 0;
 
-    const utilization = Math.min(100, Math.round((kpis.memoryCapacity / kpis.maxMemoryCapacity) * 100));
+    const patternCountVal = (kpis.patternCount && typeof kpis.patternCount === 'object' && 'currentValue' in kpis.patternCount)
+      ? kpis.patternCount.currentValue
+      : kpis.patternCount;
+
+    const memoryCapacityVal = (kpis.memoryCapacity && typeof kpis.memoryCapacity === 'object' && 'currentValue' in kpis.memoryCapacity)
+      ? kpis.memoryCapacity.currentValue
+      : kpis.memoryCapacity;
+
+    const maxMemoryCapacity = kpis.maxMemoryCapacity !== undefined ? kpis.maxMemoryCapacity : 1000;
+    const utilization = Math.min(100, Math.round((memoryCapacityVal / maxMemoryCapacity) * 100));
 
     return `
       <section class="card premium-glass" aria-label="Executive Pattern & Memory Summary" data-motion="fade-up" data-delay="${delay}">
@@ -23,12 +32,12 @@ class ExecutivePatternMemorySummaryCard {
         <div class="executive-summary-container">
           <div class="summary-meta-item">
             <div class="summary-meta-title">Identified Operational Patterns</div>
-            <div class="summary-meta-value">${kpis.patternCount} <span class="summary-meta-unit">Active Signatures</span></div>
+            <div class="summary-meta-value">${patternCountVal.toLocaleString()} <span class="summary-meta-unit">Active Signatures</span></div>
           </div>
           
           <div class="summary-meta-item">
             <div class="summary-meta-title">Long-term Snapshot Retention</div>
-            <div class="summary-meta-value">${kpis.memoryCapacity} / ${kpis.maxMemoryCapacity} <span class="summary-meta-unit">Records</span></div>
+            <div class="summary-meta-value">${memoryCapacityVal.toLocaleString()} / ${maxMemoryCapacity.toLocaleString()} <span class="summary-meta-unit">Records</span></div>
           </div>
 
           <div class="retention-bar-wrap">

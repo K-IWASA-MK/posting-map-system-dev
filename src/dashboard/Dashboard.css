@@ -2603,3 +2603,147 @@ body {
   border-radius: 2px;
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* ==========================================================================
+   16. Temporal KPI Style Rules (PC & Mobile)
+   ========================================================================== */
+/* PC KPI Temporal styles */
+.kpi-element-temporal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.kpi-trend-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.trend-up {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.trend-down {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.trend-stable {
+  color: #9ca3af;
+  background-color: rgba(156, 163, 175, 0.06);
+  border: 1px solid rgba(156, 163, 175, 0.15);
+}
+
+.kpi-prev-text {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-family: monospace;
+}
+
+.kpi-status-container {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.kpi-status-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.status-lbl-normal {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.08);
+}
+
+.status-lbl-high {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.08);
+}
+
+.status-lbl-significant {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.08);
+  animation: statusAlertPulse 2s infinite ease-in-out;
+}
+
+@keyframes statusAlertPulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.2); }
+  100% { opacity: 0.8; }
+}
+
+/* Mobile KPI Temporal styles */
+.mobile-kpi-temporal-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  gap: 4px;
+  width: 100%;
+}
+
+.m-kpi-trend {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.m-trend-up {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.m-trend-down {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.m-trend-stable {
+  color: #9ca3af;
+  background-color: rgba(156, 163, 175, 0.05);
+}
+
+.m-kpi-status {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.m-status-lbl-normal {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.06);
+}
+
+.m-status-lbl-high {
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.06);
+}
+
+.m-status-lbl-significant {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.06);
+}

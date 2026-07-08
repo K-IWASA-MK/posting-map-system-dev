@@ -78,7 +78,10 @@ Observer Dashboard 内を構成する各 UI エレメント（コンポーネン
 
 ## エグゼクティブ・コンポーネント規則 (Executive Component Rules)
 エグゼクティブビューを構成するコンポーネント（KPI、Flow Graph、Activity Streamなど）は、経営・顧客向けに高度に統合された UI を実現するために、以下の設計原則を遵守する。
-1. **Top KPI 統合性**: 4大 KPI ユニットは `ExecutiveKPICard` をコンテナとして横一列に整列配置し、大画面では 4 カラム、中画面では 2 カラム、小画面では 1 カラムに動的レスポンシブ配置を行う。
+1. **Top KPI 統合性 & 時系列（Temporal）インジケータ**:
+   - 4大 KPI ユニットは `ExecutiveKPICard` をコンテナとして横一列に整列配置し、レスポンシブ配置を行う。
+   - `ExecutiveKPIElement` は、現在値に加えて、比較過去値（`Previous`）、増減率（`▲ / ▼`）、および静的分類された重要度ステータスラベル（`NORMAL` / `HIGH` / `SIGNIFICANT`）を描画する。
+   - 増減率は、変化方向（`trendDirection`）に基づき、緑色（UP・正常）、黄色（変化中）、赤色（急変・警告）、または灰色（安定）の配色を用いて視覚的な強調を行い、タッチ操作用UIは一切配置しない。
 2. **Flow Graph 順序性**: `IntelligenceFlowGraphCard` は、Event ➔ Memory の 8段階処理プロセスを順番どおりに左から右へ接続ラインで連結して表示し、データの流れと資産化の循環を一目で把握可能にする。
 3. **ルールベーステキスト要約**: `RealtimeActivityStreamCard` に技術的ログメッセージを出力する際は、`ExecutiveAdapter` が持つ静的なルールマップを必ず経由させ、人間が読みやすい非技術的メッセージに標準化すること。AIによる原因診断や障害警告などの意思決定表現の混入は厳禁とする。
 4. **比率メーターの動的イージング**: `IntelligenceDistributionCard` や `ExecutivePatternMemorySummaryCard` に配置される進捗メーターは、初期ロードおよび変更時に `width 0.6s cubic-bezier(0.16, 1, 0.3, 1)` のイージング遷移を適用し、なめらかな視覚体験を提供する。

@@ -1313,3 +1313,19 @@ Execution Plan
 
 #### 4. 支部長が毎日立ち上げたくなる体験 (Daily Active Engagement UX)
 - 本システムは単なる仕様通りのモック構築ではない。「現場が美しく動き、活動への参加障壁を下げる」という目的のために、毎日支部長が誇らしく開きたくなるような高級感と直感的UXを画面上に宿すこと。
+
+---
+
+### 42. Executive KPI Temporal Intelligence Rules
+
+本ルールは、Dashboard KPI の時間変化分析（Executive KPI Temporal Intelligence）における**AI（Flash）の開発統制ルール**である。
+
+1. **AI推論・予測の禁止 (No AI Predictions/Recommendations)**
+   - トレンド抽出（UP/DOWN/STABLE）およびステータス分類（NORMAL/HIGH/SIGNIFICANT）の決定において、AI・機械学習を用いた動的推測や、障害状況を断定・示唆するようなリスク推奨テキストの動的生成は一切行ってはならない。必ず決定論的な固定の閾値ルールに基づく静的マッピングを適用する。
+
+2. **Immutable な Temporal Snapshot 構造の順守 (Temporal Snapshot Immutability)**
+   - 時間変化の演算および表示に用いるデータオブジェクトは、現在値、過去値、取得タイムスタンプを含む `Temporal Snapshot` 構造として一貫させ、生成時に必ず `Object.freeze()` を適用して不変性を保証する。
+
+3. **完全 Read-Only ガードレール (Read-Only Guardrails)**
+   - KPI 時間変化インジケータ表示部分において、手動でのデータ書き換え、リセット、閾値変更等を促すボタン、リンク、フォーム等の操作用 UI 要素は一切配置してはならない。完全な Observer (観測) 画面としての動作を死守する。
+

@@ -13,21 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Mobile Executive View Foundation [現在のフェーズ]
-* **目的**: 既存の Executive View を基盤とし、スマートフォンの狭い画面幅および片手操作に最適化した、監視専用の「Mobile Executive View」を構築する。
+### 現在のスプリント: AIOS Phase 151: Executive KPI Temporal Intelligence Foundation [現在のフェーズ]
+* **目的**: 既存の Executive View および Mobile Executive View に時間比較軸を追加し、現在値の単一表示から「増減率、トレンド、静的ステータスラベル」の可視化へと進化させる。
 * **今回実装するもの (対象)**:
-  - ✅ 新規モバイルデモ仕様定義 (`DashboardMobileVisualization.md`)
-  - ✅ Mobile アダプター (`MobileExecutiveAdapter.js`): 主要 5大ノード選別、テキストトリミングなどモバイル表示に最適化されたパラメータを返却。
-  - ✅ Mobile UI コンポーネント: モバイルステータスヘッダー、2x2 KPIカード、5大レイヤー縦並びフロー、モバイル適合活動ストリーム、コンパクト進化統計、蓄積メモリサマリー。
-  - ✅ ビュー切り替え優先順位 (Priority Routing): URLクエリ指定（`?view=mobile`）を最優先とし、次点で `window.innerWidth < 768`（viewport自動判定）を適用。
-  - ✅ モバイル専用 CSS & 軽量 Motion: シングルカラム縦並びレイアウト、余白調整、負荷を抑えた脈動アニメーション。
+  - ✅ 新規時間軸 KPI 仕様定義 (`ExecutiveKPITemporal.md`)
+  - ✅ Temporal Snapshot 構造の導入: `ExecutiveAdapter.js` 内に Immutable な時間軸 Snapshot データ構造を定義・算出。
+  - ✅ KPI コンポーネント強化: PC/モバイルでの増減矢印、Previous 過去値、静的 Status Label（NORMAL/HIGH/SIGNIFICANT）の表示。
 * **今回実装しないもの (対象外)**:
-  - ❌ 操作用 UI (button, form, input, select) などの設置。APIへの Write 送信、AIによる動的異常判定・改善提案の生成。
+  - ❌ AIを用いた動的な異常診断、対応推奨メッセージの生成。自動アクションおよび外部へのデータ書き込み処理（Write API）。
 
-### 完了したスプリント: AIOS Dashboard Executive Demo Visualization Foundation
-* **目的**: 8つのインテリジェンスレイヤーの内部データをマクロに集約し、経営・顧客向けに高度に要約された統合デモ画面（Executive View）を提供する。
-* **完了したスプリント2**: AIOS Dashboard Demo Visualization Foundation
-* **完了したスプリント3**: AIOS Dashboard Event Intelligence Memory Layer Foundation
+### 完了したスプリント: AIOS Dashboard Mobile Executive View Foundation
+* **目的**: 既存の Executive View を基盤とし、スマートフォンの狭い画面幅および片手操作に最適化した、監視専用の「Mobile Executive View」を構築する。
+* **完了したスプリント2**: AIOS Dashboard Executive Demo Visualization Foundation
+* **完了したスプリント3**: AIOS Dashboard Demo Visualization Foundation
+* **完了したスプリント4**: AIOS Dashboard Event Intelligence Memory Layer Foundation
 * **完了したスプリント4**: AIOS Dashboard Event Insight Layer Foundation
 * **完了したスプリント5**: AIOS Dashboard Event Knowledge Layer Foundation
 * **完了したスプリント6**: AIOS Dashboard Event Intelligence Graph Foundation

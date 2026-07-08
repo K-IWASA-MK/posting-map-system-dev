@@ -15,7 +15,16 @@ class MobileMemoryCard {
     const kpis = props.kpis || { patternCount: 0, memoryCapacity: 0, maxMemoryCapacity: 1000 };
     const delay = props.delay || 0;
 
-    const utilization = Math.min(100, Math.round((kpis.memoryCapacity / kpis.maxMemoryCapacity) * 100));
+    const patternCountVal = (kpis.patternCount && typeof kpis.patternCount === 'object' && 'currentValue' in kpis.patternCount)
+      ? kpis.patternCount.currentValue
+      : kpis.patternCount;
+
+    const memoryCapacityVal = (kpis.memoryCapacity && typeof kpis.memoryCapacity === 'object' && 'currentValue' in kpis.memoryCapacity)
+      ? kpis.memoryCapacity.currentValue
+      : kpis.memoryCapacity;
+
+    const maxMemoryCapacity = kpis.maxMemoryCapacity !== undefined ? kpis.maxMemoryCapacity : 1000;
+    const utilization = Math.min(100, Math.round((memoryCapacityVal / maxMemoryCapacity) * 100));
 
     return `
       <section class="card premium-glass" aria-label="Mobile Pattern & Memory Summary" data-motion="fade-up" data-delay="${delay}">
@@ -23,12 +32,12 @@ class MobileMemoryCard {
         <div class="mobile-summary-container">
           <div class="mobile-summary-row">
             <span class="m-summary-lbl">Identified Patterns</span>
-            <span class="m-summary-val">${kpis.patternCount} Signatures</span>
+            <span class="m-summary-val">${patternCountVal.toLocaleString()} Signatures</span>
           </div>
           
           <div class="mobile-summary-row">
             <span class="m-summary-lbl">Archive Retention</span>
-            <span class="m-summary-val">${kpis.memoryCapacity} / ${kpis.maxMemoryCapacity} Recs</span>
+            <span class="m-summary-val">${memoryCapacityVal.toLocaleString()} / ${maxMemoryCapacity.toLocaleString()} Recs</span>
           </div>
 
           <div class="mobile-retention-progress-wrap">

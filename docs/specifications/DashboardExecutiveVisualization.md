@@ -19,6 +19,11 @@
 - **Pattern Count**: `PatternStore` 内の識別された発生パターン総数（最大 300）。
 - **Memory Capacity**: `MemoryStore` のアーカイブ保持件数（最大 1000）および占有率（例: `345 / 1000`）。
 
+各 KPI には、前回のデモ更新ステップでの過去値（`previousValue`）を比較元とする **Temporal Snapshot** 情報を表示する。
+- 変化量（`delta`）、パーセンテージ（`deltaRate`）、および増減記号（`▲ / ▼ / ▶`）を表示。
+- 静的ルールによる `statusLabel`（NORMAL / HIGH / SIGNIFICANT）をインジケータ表示。
+- データ構造は `metricId`、`currentValue`、`previousValue`、`capturedAt`、`previousCapturedAt` を含み、`Object.freeze()` を適用。
+
 ---
 
 ### ② Intelligence Flow Graph

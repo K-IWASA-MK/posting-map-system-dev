@@ -9,6 +9,17 @@ class DashboardRenderer {
   static hasAttached = false;
 
   /**
+   * 差し替えられた要素、およびその配下の data-motion 要素をすべて活性化する
+   */
+  static activateMotion(el) {
+    if (!el) return;
+    el.classList.add('motion-active');
+    el.querySelectorAll('[data-motion]').forEach(item => {
+      item.classList.add('motion-active');
+    });
+  }
+
+  /**
    * 正規化されたデータを受け取り、対応する各ビジュアルコンポーネントを DOM へ一元マウントする
    * @param {object} data 正規化されたデータ構造 (DashboardDataAdapter)
    */
@@ -193,7 +204,7 @@ class DashboardRenderer {
             targetCard.outerHTML = tempDiv.innerHTML;
             const newCard = gridContainer.children[idx];
             if (newCard) {
-              newCard.classList.add('motion-active');
+              DashboardRenderer.activateMotion(newCard);
             }
           }
         }
@@ -608,7 +619,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.ExecutiveKPICard.render({ kpis: execData.kpis, delay: 0 });
         const newEl = gridContainer.children[0];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
     // 1: IntelligenceFlowGraphCard
@@ -617,7 +628,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.IntelligenceFlowGraphCard.render({ flowGraph: execData.flowGraph, delay: 0 });
         const newEl = gridContainer.children[1];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
         if (window.DashboardMotion && window.DashboardMotion.animateFlowGraph) {
           window.DashboardMotion.animateFlowGraph();
         }
@@ -629,7 +640,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.RealtimeActivityStreamCard.render({ activityStream: execData.activityStream, delay: 0 });
         const newEl = gridContainer.children[2];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
     // 3: IntelligenceDistributionCard
@@ -638,7 +649,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.IntelligenceDistributionCard.render({ distribution: execData.distribution, delay: 0 });
         const newEl = gridContainer.children[3];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
     // 4: ExecutiveEvolutionStatusCard
@@ -647,7 +658,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.ExecutiveEvolutionStatusCard.render({ evolutionStatus: execData.evolutionStatus, delay: 0 });
         const newEl = gridContainer.children[4];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
     // 5: ExecutivePatternMemorySummaryCard
@@ -656,7 +667,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.ExecutivePatternMemorySummaryCard.render({ kpis: execData.kpis, delay: 0 });
         const newEl = gridContainer.children[5];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
   }
@@ -676,7 +687,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.MobileHeaderCard.render({ statusState: 'ONLINE', timestamp: new Date().toLocaleTimeString(), delay: 0 });
         const newEl = gridContainer.children[0];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
     // 1: MobileKPICard
@@ -685,7 +696,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.MobileKPICard.render({ kpis: mobData.kpis, delay: 0 });
         const newEl = gridContainer.children[1];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
     // 2: MobileFlowCard
@@ -694,7 +705,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.MobileFlowCard.render({ flowGraph: mobData.flowGraph, delay: 0 });
         const newEl = gridContainer.children[2];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
         if (window.DashboardMotion && window.DashboardMotion.animateMobileFlow) {
           window.DashboardMotion.animateMobileFlow();
         }
@@ -706,7 +717,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.MobileActivityCard.render({ activityStream: mobData.activityStream, delay: 0 });
         const newEl = gridContainer.children[3];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
     // 4: MobileEvolutionCard
@@ -715,7 +726,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.MobileEvolutionCard.render({ evolutionStatus: mobData.evolutionStatus, delay: 0 });
         const newEl = gridContainer.children[4];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
     // 5: MobileMemoryCard
@@ -724,7 +735,7 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.MobileMemoryCard.render({ kpis: mobData.kpis, delay: 0 });
         const newEl = gridContainer.children[5];
-        if (newEl) newEl.classList.add('motion-active');
+        if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }
   }

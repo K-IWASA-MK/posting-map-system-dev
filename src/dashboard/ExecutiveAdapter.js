@@ -8,6 +8,75 @@
  */
 
 class ExecutiveAdapter {
+  static temporalSnapshots = {
+    activeEvents: null,
+    knowledgeRecords: null,
+    patternCount: null,
+    memoryCapacity: null
+  };
+
+  /**
+   * 単一メトリクスに対する Immutable な Temporal Snapshot を計算・更新する
+   * @param {string} metricId 
+   * @param {number} currentValue 
+   * @returns {object} Immutable Temporal KPI Object
+   */
+  static computeTemporalSnapshot(metricId, currentValue) {
+    const now = new Date().toISOString();
+    const lastSnapshot = this.temporalSnapshots[metricId];
+
+    if (!lastSnapshot) {
+      // 初回生成 (PreviousValue = CurrentValue)
+      const snap = Object.freeze({
+        metricId,
+        currentValue,
+        previousValue: currentValue,
+        capturedAt: now,
+        previousCapturedAt: now,
+        delta: 0,
+        deltaRate: 0,
+        trendDirection: 'STABLE',
+        statusLabel: 'NORMAL'
+      });
+      this.temporalSnapshots[metricId] = snap;
+      return snap;
+    }
+
+    if (lastSnapshot.currentValue === currentValue) {
+      // 値に変更がない場合は前回のスナップショットをそのまま維持して再利用
+      return lastSnapshot;
+    }
+
+    // 値が変化した場合のみ、差分計算を行ってスナップショットを更新
+    const previousValue = lastSnapshot.currentValue;
+    const delta = currentValue - previousValue;
+    const deltaRate = previousValue === 0 ? 0 : parseFloat(((delta / previousValue) * 100).toFixed(1));
+    
+    let trendDirection = 'STABLE';
+    if (delta > 0) trendDirection = 'UP';
+    else if (delta < 0) trendDirection = 'DOWN';
+
+    const absRate = Math.abs(deltaRate);
+    let statusLabel = 'NORMAL';
+    if (absRate > 70) statusLabel = 'SIGNIFICANT';
+    else if (absRate > 30) statusLabel = 'HIGH';
+
+    const newSnap = Object.freeze({
+      metricId,
+      currentValue,
+      previousValue,
+      capturedAt: now,
+      previousCapturedAt: lastSnapshot.capturedAt,
+      delta,
+      deltaRate,
+      trendDirection,
+      statusLabel
+    });
+
+    this.temporalSnapshots[metricId] = newSnap;
+    return newSnap;
+  }
+
   /**
    * 8つのレイヤーからデータを集約してエグゼクティブ向けデータを生成する
    * @returns {object} エグゼクティブ用データオブジェクト
@@ -22,12 +91,12 @@ class ExecutiveAdapter {
     const insights = window.DashboardEventInsightStore ? window.DashboardEventInsightStore.getInsights() : [];
     const evolutions = window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : [];
 
-    // 1. KPI集計
+    // 1. KPI集計 (Immutable Temporal Snapshots)
     const kpis = {
-      activeEvents: timeline.length,
-      knowledgeRecords: knowledges.length,
-      patternCount: patterns.length,
-      memoryCapacity: memories.length,
+      activeEvents: this.computeTemporalSnapshot('activeEvents', timeline.length),
+      knowledgeRecords: this.computeTemporalSnapshot('knowledgeRecords', knowledges.length),
+      patternCount: this.computeTemporalSnapshot('patternCount', patterns.length),
+      memoryCapacity: this.computeTemporalSnapshot('memoryCapacity', memories.length),
       maxMemoryCapacity: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.maxCapacity : 1000
     };
 
