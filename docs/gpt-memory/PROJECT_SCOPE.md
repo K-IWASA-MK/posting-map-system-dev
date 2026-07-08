@@ -13,19 +13,19 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 166: Dashboard Widget Foundation [現在のフェーズ]
-* **目的**: Dashboard Widget の共通基盤（生成・登録・状態管理・ViewModel変換）を構築し、今後のレイアウトや状態管理の土台を整える。
+### 現在のスプリント: AIOS Phase 167: Dashboard Layout Engine Foundation [現在のフェーズ]
+* **目的**: Phase 166 を基盤として、Dashboard 上の Widget 配置・グリッド構造・レスポンシブブレイクポイントを決定論的に管理するレイアウトエンジン共通基盤を構築する。
 * **今回実装するもの (対象)**:
-  - Widget Definition/Metadata 共通構造定義
-  - DashboardWidgetRegistry, DashboardWidgetFactory, DashboardWidgetLifecycle, DashboardWidgetAdapter
-  - Widget 一覧とライフサイクルを表示する DashboardWidgetCard
+  - Layout Definition/Grid/Breakpoint 共通構造定義（各Widgetのx, y, w, h座標管理）
+  - DashboardLayoutRegistry, DashboardLayoutEngine, DashboardLayoutAdapter
+  - レイアウトの仕様と配置ウィジェットを表示する DashboardLayoutCard
 * **今回実装しないもの (対象外)**:
-  - ❌ Layout 配置制御・ドラッグ＆ドロップ機能
-  - ❌ Widgetの追加・削除UI、AIによるWidget推薦・自動配置
+  - ❌ レイアウトのドラッグ＆ドロップ編集・サイズ変更UI、Widgetの動的な追加・削除
+  - ❌ AIによる自動レイアウト・最適配置
   - ❌ Write API、Command送信、Kernel操作
 
-### 完了したスプリント: AIOS Phase 165: Field Intelligence Traceability Foundation
-* **目的**: Phase 164 Field Intelligence Audit Foundation を拡張し、Timeline・History・Evidence・Audit の各レコード間の由来（Traceability）を決定論的に関連付けて可視化する。
+### 完了したスプリント: AIOS Phase 166: Dashboard Widget Foundation
+* **目的**: Dashboard Widget の共通基盤（生成・登録・状態管理・ViewModel変換）を構築し、今後のレイアウトや状態管理の土台を整える。
 
 ### 完了したスプリント: AIOS Phase 164: Field Intelligence Audit Foundation
 
