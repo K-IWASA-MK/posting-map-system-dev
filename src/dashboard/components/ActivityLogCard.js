@@ -26,8 +26,15 @@ class ActivityLogCard {
       const glowClass = i === 0 ? 'new-log-glow' : '';
       const itemDelay = delay + i * 50;
 
+      let severityClass = '';
+      if (log.severity === 'CRITICAL') {
+        severityClass = 'log-critical';
+      } else if (log.severity === 'WARNING') {
+        severityClass = 'log-warning';
+      }
+
       listHtml += `
-        <li class="log-item ${glowClass}" data-motion="log-fade" data-delay="${itemDelay}">
+        <li class="log-item ${glowClass} ${severityClass}" data-motion="log-fade" data-delay="${itemDelay}">
           <span class="log-time">${log.time}</span>
           <span class="log-module">${log.module}</span>
           <span class="log-message">${log.message}</span>
@@ -54,8 +61,15 @@ class ActivityLogCard {
    * @returns {string}
    */
   static renderItem(log, delay = 0) {
+    let severityClass = '';
+    if (log.severity === 'CRITICAL') {
+      severityClass = 'log-critical';
+    } else if (log.severity === 'WARNING') {
+      severityClass = 'log-warning';
+    }
+
     return `
-      <li class="log-item new-log-glow" data-motion="log-fade" data-delay="${delay}">
+      <li class="log-item new-log-glow ${severityClass}" data-motion="log-fade" data-delay="${delay}">
         <span class="log-time">${log.time}</span>
         <span class="log-module">${log.module}</span>
         <span class="log-message">${log.message}</span>

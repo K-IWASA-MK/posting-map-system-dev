@@ -137,28 +137,62 @@ class DashboardRenderer {
       }
     });
 
-    // リアルタイム・ランタイムイベントの購読 (StatusCard の即時リフレッシュなど)
-    window.DashboardEventBus.on('runtime-event', (event) => {
-      console.log('[Dashboard Renderer] ランタイム・リアルタイムイベント受信:', event);
-      const statusTextEl = document.getElementById('status-text');
-      if (statusTextEl && event.type === 'KERNEL_INITIALIZED') {
-        statusTextEl.innerText = 'LIVE';
-        statusTextEl.className = 'accent-green';
-      }
-    });
+    // 統合リアルタイムイベントの購読 (Attention Queue 順に描画をソート＆Visual Routing)
+    window.DashboardEventBus.on('realtime-event-received', (event) => {
+      console.log('[Dashboard Renderer] インテリジェントリアルタイムイベント受信:', event);
+      
+      // 1. アテンションキューに基づくログの重要度順再ソート描画
+      const logListEl = document.querySelector('.log-list');
+      if (logListEl && window.DashboardAttentionQueue) {
+        const queue = window.DashboardAttentionQueue.getQueue();
+        let listHtml = '';
+        queue.forEach((item, i) => {
+          let severityClass = '';
+          if (item.severity === 'CRITICAL') severityClass = 'log-critical';
+          else if (item.severity === 'WARNING') severityClass = 'log-warning';
 
-    // リアルタイム・クオリティイベントの購読 (MetricCard のレビューカウンター増分など)
-    window.DashboardEventBus.on('quality-event', (event) => {
-      console.log('[Dashboard Renderer] 品質ゲート・リアルタイムイベント受信:', event);
-      const reviewCountEl = document.getElementById('quality-review-count');
-      if (reviewCountEl) {
-        let current = parseInt(reviewCountEl.innerText || '0', 10);
-        reviewCountEl.innerText = current + 1;
-        
-        // Glow 演出の連動
-        const qualityCard = document.querySelector('[aria-label="Quality Metrics"]');
-        if (qualityCard && window.DashboardMotion && window.DashboardMotion.glowCard) {
-          window.DashboardMotion.glowCard(qualityCard);
+          // 受信から 2 秒未満の新着ログ項目のみ一時的に脈動
+          const glowClass = (item.eventId === event.eventId && (Date.now() - item.rawTimestamp) < 2000) ? 'new-log-glow' : '';
+
+          listHtml += `
+            <li class="log-item ${glowClass} ${severityClass}">
+              <span class="log-time">${item.timestamp}</span>
+              <span class="log-module">${item.category.charAt(0).toUpperCase() + item.category.slice(1)}</span>
+              <span class="log-message">${item.message}</span>
+            </li>
+          `;
+        });
+        logListEl.innerHTML = listHtml;
+      }
+
+      // 2. 重要度別ビジュアルルーティング (Visual Routing)
+      if (window.DashboardMotion && window.DashboardMotion.glowCard) {
+        if (event.severity === 'CRITICAL') {
+          // CRITICAL: StatusCard を Glow 発光させて警告
+          const statusCard = document.querySelector('[aria-label="Kernel Status"]');
+          if (statusCard) window.DashboardMotion.glowCard(statusCard);
+
+          // StatusText も連動
+          const statusTextEl = document.getElementById('status-text');
+          if (statusTextEl) {
+            statusTextEl.innerText = 'LIVE';
+            statusTextEl.className = 'accent-green';
+          }
+        } else if (event.severity === 'WARNING') {
+          // WARNING: ActivityLogCard を Glow 発光させて警告
+          const logCard = document.querySelector('[aria-label="System Activity Log"]');
+          if (logCard) window.DashboardMotion.glowCard(logCard);
+        } else {
+          // INFO (quality等): Quality Metricsカードを Glow
+          if (event.category === 'quality') {
+            const reviewCountEl = document.getElementById('quality-review-count');
+            if (reviewCountEl) {
+              let current = parseInt(reviewCountEl.innerText || '0', 10);
+              reviewCountEl.innerText = current + 1;
+            }
+            const qualityCard = document.querySelector('[aria-label="Quality Metrics"]');
+            if (qualityCard) window.DashboardMotion.glowCard(qualityCard);
+          }
         }
       }
     });

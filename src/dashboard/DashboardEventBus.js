@@ -65,14 +65,16 @@ class DashboardEventBus {
    */
   publishRealtimeEvent(mappedEvent) {
     const eventName = `${mappedEvent.category}-event`;
-    // カテゴリ別の専用イベントを発行
     this.emit(eventName, mappedEvent);
+    this.emit('realtime-event-received', mappedEvent);
 
     // 互換性維持のための new-activity-logs イベントへの変換・配信
     const logItem = {
       time: mappedEvent.timestamp,
       module: mappedEvent.category.charAt(0).toUpperCase() + mappedEvent.category.slice(1),
-      message: mappedEvent.message
+      message: mappedEvent.message,
+      severity: mappedEvent.severity,
+      level: mappedEvent.level
     };
     this.emit('new-activity-logs', [logItem]);
   }

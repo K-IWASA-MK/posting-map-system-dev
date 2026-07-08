@@ -13,23 +13,24 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Real-time Monitoring Enhancement Foundation [現在のフェーズ]
-* **目的**: Polling ベース監視から、Server-Sent Events を活用した安全なイベント駆動型リアルタイムモニタリング層への拡張。
+### 現在のスプリント: AIOS Dashboard Event Intelligence & Attention Routing Foundation [現在のフェーズ]
+* **目的**: 受信したリアルタイムイベントをルールベースでインテリジェントに分類・重要度マッピングし、重要度の高いものから順に Attention Queue（アテンションキュー）で優先表示・ハイライト（Glow・ルーティング）するための基盤構築。
 * **今回実装するもの (対象)**:
-  - ✅ 新規リアルタイム監視仕様定義 (DashboardRealtimeMonitoring.md, DashboardEventStream.md, DashboardRealtimeSecurity.md)
-  - ✅ SSE 受信ストリームクライアント (`DashboardRealtimeClient.js`): 再接続・CONFIG.REALTIME_ENDPOINT管理
-  - ✅ ストリームイベントアダプター (`DashboardRealtimeAdapter.js`): 重複排除, タイムスタンプ検証, UIイベントマッピング
-  - ✅ イベント中継拡張 (`DashboardEventBus.js`): `publishRealtimeEvent()`
-  - ✅ レンダラーのイベント連動差分描画 (`DashboardRenderer.js`): StatusCardバッジ, MetricCardカウンター, ActivityLogCard新着ログ更新
-  - ✅ 状態バッジUIとスタイル (`DashboardApp.html` / `Dashboard.css` / `DashboardMotion.js`): リアルタイム接続バッジ, 新カードGlow演出
-  - ✅ 協調状態マシンの実装 (`DashboardPollingController.js` / `Dashboard.js`): リアルタイム接続時は定時ポーリング停止(Backup)、接続失敗時はポーリング起動(Fallback)の自動切替
+  - ✅ 新規インテリジェンス仕様定義 (DashboardEventIntelligence.md, DashboardSeverityModel.md, DashboardAttentionRouting.md)
+  - ✅ ルールベース・イベント分類器 (`DashboardEventClassifier.js`)
+  - ✅ 重要度・UIレベル静的マッパー (`DashboardSeverityMapper.js`)
+  - ✅ 重要度順ソートアテンションキュー (`DashboardAttentionQueue.js`): 重複排除, タイムスタンプ判定, 50件上限容量制御
+  - ✅ アテンションキュー同期描画 (`DashboardRenderer.js` / `ActivityLogCard.js` / `DashboardEventBus.js`): 優先度順再ソート描画, 新着ログGlow演出
+  - ✅ 重要度別 Visual Routing (`DashboardRenderer.js` / `Dashboard.css`): CRITICAL時のStatusCard Glow, WARNING時のActivityLog Glow & 黄境界線
+  - ✅ スクリプトインクルード (`DashboardApp.html`)
   - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md, AGENTS.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ 操作UIの追加、データの書込み（Write）操作、API仕様の変更
+  - ❌ AI予測・推論判断、自動対応、Kernel操作・承認の自動実行、電子メールやアラーム音等の自動通知
 
-### 完了したスプリント: AIOS Dashboard Performance Optimization Foundation
-* **目的**: 表示速度、描画効率、およびメモリ使用量の最適化。既存の Observer Architecture、EventBus、および Polling 制御を維持したままパフォーマンス向上。
-* **目的2**: 構築済みの Dashboard 各画面に対し、アクセシビリティ対応（スクリーンリーダー・prefers-reduced-motion）および複数デバイス表示（レスポンシブメディアクエリ）の最適化。
+### 完了したスプリント: AIOS Dashboard Real-time Monitoring Enhancement Foundation
+* **目的**: Polling ベース監視から、Server-Sent Events を活用した安全なイベント駆動型リアルタイムモニタリング層への拡張。
+* **目的2**: 表示速度、描画効率、およびメモリ使用量の最適化。既存の Observer Architecture、EventBus、および Polling 制御を維持したままパフォーマンス向上。
+
 
 
 

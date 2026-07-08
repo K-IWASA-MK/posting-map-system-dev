@@ -228,6 +228,8 @@ POSTING MAP は：
 - **Dashboard Accessibility Core Principle**: Agentは禁止：音声読み上げやコントラスト等の支援技術最適化の範囲を超えた機能追加、状態操作、およびデータフローの変更全般。許可：ARIAタグ整備、role割り当て、Reduced Motion対応、WCAG基準のカラーコントラスト調整。
 - **Dashboard Performance Core Principle**: Agentは禁止：同一データ（不変Props）に対するDOMの再生成、タブ非表示（hidden）時の無用なポーリングおよびアニメーション実行、EventBus等への多重リスナー登録、グローバルスコープへのDetached DOM参照放置。許可：Propsハッシュ比較による差分マウント、Visibility API連動、イベント登録解除、限定的なGPUレイヤー促進。
 - **Dashboard Realtime Core Principle**: Agentは禁止：受信ストリーム（SSE等）を介したカーネルへの操作、コマンド・書き込み指令（POST, PUT, DELETE等）の逆流生成、受信データ（eventId, timestamp, type）の改変および検証スルー。許可：一方向イベントストリームの受信、状態マシンのフォールバック、接続ステータス表示。
+- **Dashboard Event Intelligence Core Principle**: Agentは禁止：AI（LLM等）の呼び出し、推論予測による自律対応（Kernel操作やコマンド自動承認）、メールやアラーム音等の自動送信、受信イベントの元データの書き換え（不変性違反）。許可：ルールベースの静的分類、重要度レベルマッピング、アテンションキュー内ソート、表示上のVisual Routing。
+
 
 
 

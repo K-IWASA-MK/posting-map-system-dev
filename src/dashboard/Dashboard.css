@@ -486,6 +486,18 @@ body {
   transform: translateY(0);
 }
 
+.log-item.log-critical {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.05);
+}
+
+.log-item.log-warning {
+  border-left: 3px solid #eab308 !important;
+  background-color: rgba(234, 179, 8, 0.03) !important;
+  border-color: rgba(234, 179, 8, 0.15) rgba(234, 179, 8, 0.15) rgba(234, 179, 8, 0.15) rgba(234, 179, 8, 0.15) !important;
+}
+
 .log-time {
   color: var(--text-dim);
   font-weight: 500;

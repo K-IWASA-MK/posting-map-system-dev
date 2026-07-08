@@ -22,7 +22,7 @@ class DashboardRealtimeAdapter {
       return;
     }
 
-    const { eventId, timestamp, type, payload } = rawEvent;
+    const { eventId, timestamp, type, payload = {} } = rawEvent;
 
     // 2. 重複排除 (Replay 対策)
     if (this.processedEventIds.has(eventId)) {
@@ -30,7 +30,6 @@ class DashboardRealtimeAdapter {
       return;
     }
     
-    // 履歴ストア管理 (最大件数オーバー時は古いものから消去)
     if (this.processedEventIds.size >= this.maxStoredEventIds) {
       const firstKey = this.processedEventIds.values().next().value;
       this.processedEventIds.delete(firstKey);
@@ -58,111 +57,55 @@ class DashboardRealtimeAdapter {
       return;
     }
 
-    // 4. イベントタイプのマッピング
-    const mapped = this.mapToUiEvent(type, payload, timestamp);
-    if (!mapped) {
-      console.log(`[Dashboard Realtime Adapter] マップ対象外のイベントタイプです: ${type}`);
-      return;
+    // 4. イベントタイプの分類と重要度マッピング (インテリジェンス委譲)
+    const category = window.DashboardEventClassifier.classify(type);
+    const severity = window.DashboardSeverityMapper.getSeverity(type);
+    const level = window.DashboardSeverityMapper.getUiLevel(severity);
+    const timeStr = new Date(timestamp).toLocaleTimeString();
+
+    // 共通UIイベント構造体の構築
+    const mapped = {
+      eventId,
+      rawTimestamp: eventTime,
+      timestamp: timeStr,
+      type,
+      category,
+      severity,
+      level,
+      message: payload.message || this.getDefaultMessage(type),
+      payload
+    };
+
+    console.log(`[Dashboard Realtime Adapter] マッピング完了: [${type}] ➔ [${category}] (Severity: ${severity})`);
+
+    // 5. アテンションキューへの蓄積 (優先度ソート & 容量管理)
+    if (window.DashboardAttentionQueue) {
+      const added = window.DashboardAttentionQueue.add(mapped);
+      if (!added) return; // 重複等で破棄された場合は終了
     }
 
-    console.log(`[Dashboard Realtime Adapter] イベントをマッピングしました [${type}] ──> [${mapped.category}]`);
-
-    // 5. 拡張された EventBus メソッドで発行
+    // 6. 拡張された EventBus メソッドで発行
     if (window.DashboardEventBus && window.DashboardEventBus.publishRealtimeEvent) {
       window.DashboardEventBus.publishRealtimeEvent(mapped);
     }
   }
 
   /**
-   * 生のカーネルイベントタイプをUI表示用のモデルにマッピングする
-   * @returns {object|null}
+   * 各イベントタイプの標準メッセージを取得するヘルパー
+   * @param {string} type 
+   * @returns {string}
    */
-  static mapToUiEvent(type, payload = {}, timestamp) {
-    const timeStr = new Date(timestamp).toLocaleTimeString();
-    
+  static getDefaultMessage(type) {
     switch (type) {
-      case 'KERNEL_INITIALIZED':
-        return {
-          category: 'runtime',
-          level: 'success',
-          type: type,
-          message: 'Kernel Runtime initialized successfully.',
-          timestamp: timeStr,
-          payload: payload
-        };
-      
-      case 'GOVERNANCE_RULE_VIOLATION':
-        return {
-          category: 'governance',
-          level: 'warning',
-          type: type,
-          message: payload.message || 'Governance rule violation detected.',
-          timestamp: timeStr,
-          payload: payload
-        };
-
-      case 'GOVERNANCE_APPROVED':
-        return {
-          category: 'governance',
-          level: 'success',
-          type: type,
-          message: payload.message || 'Governance approval request confirmed.',
-          timestamp: timeStr,
-          payload: payload
-        };
-
-      case 'QUALITY_GATE_PASS':
-        return {
-          category: 'quality',
-          level: 'success',
-          type: type,
-          message: 'Quality verification gate PASSED.',
-          timestamp: timeStr,
-          payload: payload
-        };
-
-      case 'QUALITY_GATE_FAIL':
-        return {
-          category: 'quality',
-          level: 'danger',
-          type: type,
-          message: payload.message || 'Quality verification gate FAILED.',
-          timestamp: timeStr,
-          payload: payload
-        };
-
-      case 'SIMULATION_RUN_START':
-        return {
-          category: 'simulation',
-          level: 'info',
-          type: type,
-          message: 'Local Simulation execution started.',
-          timestamp: timeStr,
-          payload: payload
-        };
-
-      case 'SIMULATION_RUN_PASS':
-        return {
-          category: 'simulation',
-          level: 'success',
-          type: type,
-          message: 'Simulation completed with zero regressions.',
-          timestamp: timeStr,
-          payload: payload
-        };
-
-      case 'TRUST_BOUNDARY_ALERT':
-        return {
-          category: 'trust',
-          level: 'danger',
-          type: type,
-          message: payload.message || 'Boundary violation alert! Isolation compromised.',
-          timestamp: timeStr,
-          payload: payload
-        };
-
-      default:
-        return null;
+      case 'KERNEL_INITIALIZED': return 'Kernel Runtime initialized successfully.';
+      case 'GOVERNANCE_RULE_VIOLATION': return 'Governance rule violation detected.';
+      case 'GOVERNANCE_APPROVED': return 'Governance approval request confirmed.';
+      case 'QUALITY_GATE_PASS': return 'Quality verification gate PASSED.';
+      case 'QUALITY_GATE_FAIL': return 'Quality verification gate FAILED.';
+      case 'SIMULATION_RUN_START': return 'Local Simulation execution started.';
+      case 'SIMULATION_RUN_PASS': return 'Simulation completed with zero regressions.';
+      case 'TRUST_BOUNDARY_ALERT': return 'Boundary violation alert! Isolation compromised.';
+      default: return `System Event: ${type}`;
     }
   }
 }
