@@ -29,7 +29,7 @@ class DashboardRenderer {
     
     // 1. クエリパラメータ指定を最優先
     if (viewQuery) {
-      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations') {
+      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global' || viewQuery === 'intelligence' || viewQuery === 'operations' || viewQuery === 'analytics') {
         return viewQuery;
       }
     }
@@ -74,6 +74,7 @@ class DashboardRenderer {
     else if (viewMode === 'global') activeMenuId = 'menu-global';
     else if (viewMode === 'intelligence') activeMenuId = 'menu-intelligence';
     else if (viewMode === 'operations') activeMenuId = 'menu-operations';
+    else if (viewMode === 'analytics') activeMenuId = 'menu-analytics';
     const activeMenuEl = document.getElementById(activeMenuId);
     if (activeMenuEl) {
       activeMenuEl.classList.add('active');
@@ -232,6 +233,20 @@ class DashboardRenderer {
           key: 'AreaOperationsStatusCard',
           render: () => window.AreaOperationsStatusCard.render({ areaOperations: opsData.areaOperations, delay: 200 }),
           props: opsData.areaOperations
+        }
+      ];
+    } else if (viewMode === 'analytics') {
+      const analyticsData = window.FieldAnalyticsAdapter ? window.FieldAnalyticsAdapter.getFieldAnalyticsData() : { tenantId: "", averageCoverage: 0, trendData: {}, areaComparison: [], coverageHistory: [] };
+      components = [
+        {
+          key: 'FieldAnalyticsTrendCard',
+          render: () => window.FieldAnalyticsTrendCard.render({ trendData: analyticsData.trendData, averageCoverage: analyticsData.averageCoverage, delay: 150 }),
+          props: { trendData: analyticsData.trendData, averageCoverage: analyticsData.averageCoverage }
+        },
+        {
+          key: 'FieldAnalyticsComparisonCard',
+          render: () => window.FieldAnalyticsComparisonCard.render({ areaComparison: analyticsData.areaComparison, coverageHistory: analyticsData.coverageHistory, delay: 200 }),
+          props: { areaComparison: analyticsData.areaComparison, coverageHistory: analyticsData.coverageHistory }
         }
       ];
     } else {
@@ -463,6 +478,10 @@ class DashboardRenderer {
         DashboardRenderer.updateOperationsDashboard();
         return;
       }
+      if (viewMode === 'analytics') {
+        DashboardRenderer.updateAnalyticsDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
@@ -511,6 +530,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'operations') {
         DashboardRenderer.updateOperationsDashboard();
+        return;
+      }
+      if (viewMode === 'analytics') {
+        DashboardRenderer.updateAnalyticsDashboard();
         return;
       }
 
@@ -563,6 +586,10 @@ class DashboardRenderer {
         DashboardRenderer.updateOperationsDashboard();
         return;
       }
+      if (viewMode === 'analytics') {
+        DashboardRenderer.updateAnalyticsDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
@@ -611,6 +638,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'operations') {
         DashboardRenderer.updateOperationsDashboard();
+        return;
+      }
+      if (viewMode === 'analytics') {
+        DashboardRenderer.updateAnalyticsDashboard();
         return;
       }
 
@@ -663,6 +694,10 @@ class DashboardRenderer {
         DashboardRenderer.updateOperationsDashboard();
         return;
       }
+      if (viewMode === 'analytics') {
+        DashboardRenderer.updateAnalyticsDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
@@ -711,6 +746,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'operations') {
         DashboardRenderer.updateOperationsDashboard();
+        return;
+      }
+      if (viewMode === 'analytics') {
+        DashboardRenderer.updateAnalyticsDashboard();
         return;
       }
 
@@ -763,6 +802,10 @@ class DashboardRenderer {
         DashboardRenderer.updateOperationsDashboard();
         return;
       }
+      if (viewMode === 'analytics') {
+        DashboardRenderer.updateAnalyticsDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
@@ -811,6 +854,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'operations') {
         DashboardRenderer.updateOperationsDashboard();
+        return;
+      }
+      if (viewMode === 'analytics') {
+        DashboardRenderer.updateAnalyticsDashboard();
         return;
       }
 
@@ -1112,6 +1159,38 @@ class DashboardRenderer {
       const el = gridContainer.children[1];
       if (el) {
         el.outerHTML = window.AreaOperationsStatusCard.render({ areaOperations: opsData.areaOperations, delay: 0 });
+        const newEl = gridContainer.children[1];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+  }
+
+  /**
+   * Analyticsビューモード用の全画面差分更新を実行する
+   */
+  static updateAnalyticsDashboard() {
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (!gridContainer || !window.FieldAnalyticsAdapter) return;
+
+    const analyticsData = window.FieldAnalyticsAdapter.getFieldAnalyticsData();
+
+    // 0: FieldAnalyticsTrendCard
+    const trendProps = { trendData: analyticsData.trendData, averageCoverage: analyticsData.averageCoverage };
+    if (window.FieldAnalyticsTrendCard && window.DashboardRenderCache.hasChanged('FieldAnalyticsTrendCard', trendProps)) {
+      const el = gridContainer.children[0];
+      if (el) {
+        el.outerHTML = window.FieldAnalyticsTrendCard.render({ trendData: analyticsData.trendData, averageCoverage: analyticsData.averageCoverage, delay: 0 });
+        const newEl = gridContainer.children[0];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+
+    // 1: FieldAnalyticsComparisonCard
+    const comparisonProps = { areaComparison: analyticsData.areaComparison, coverageHistory: analyticsData.coverageHistory };
+    if (window.FieldAnalyticsComparisonCard && window.DashboardRenderCache.hasChanged('FieldAnalyticsComparisonCard', comparisonProps)) {
+      const el = gridContainer.children[1];
+      if (el) {
+        el.outerHTML = window.FieldAnalyticsComparisonCard.render({ areaComparison: analyticsData.areaComparison, coverageHistory: analyticsData.coverageHistory, delay: 0 });
         const newEl = gridContainer.children[1];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
