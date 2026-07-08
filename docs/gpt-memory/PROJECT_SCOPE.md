@@ -13,17 +13,21 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 156: Multi-Tenant Tenant Separation View [現在のフェーズ]
-* **目的**: 将来のマルチテナント化を見据え、データ境界（tenantId）に基づいた複数支部の切り替え・データ分離表示の構築。
+### 現在のスプリント: AIOS Phase 158: Enterprise SaaS Routing & Config Separation [現在のフェーズ]
+* **目的**: テナント固有の設定（config.js 等）に応じたダッシュボードテーマ切替や、ルートパラメータに応じた動的 context 切替表示の検証。
 * **今回実装するもの (対象)**:
-  - 支部・自治体切り替え用セレクタ等の UI/UX（Read Only 境界設計維持）
-  - tenantId に基づく各 Store からのデータフィルタリング機構
-  - Tenant Context に基づく表示の分離検証
+  - config.js へのマルチテナント設定構造追加
+  - テーマ・配色スタイルのテナント別バインド
 * **今回実装しないもの (対象外)**:
-  - ❌ ユーザーログイン認証・ロール認可の直接実装。
-  - ❌ 課金管理や Stripe 連携。
+  - ❌ 動的テナント追加やDB作成のWrite操作
 
-### 完了したスプリント: AIOS Phase 155: POSTING MAP Field Intelligence Bridge Foundation
+### 完了したスプリント: AIOS Phase 157: Multi-Tenant Separation View Foundation
+* **目的**: 複数テナントのデータ境界を安全に観測・可視化できる Multi-Tenant Separation View Foundation の構築。
+
+### 完了したスプリント: AIOS Phase 156: Tenant Hierarchy Foundation
+* **目的**: 将来のマルチテナント化を見据え、データ境界（tenantId）に基づいた汎用3階層モデルの構築。
+
+### 完了したスプリント: AIOS Phase 155: POSTING MAP Field Operations Bridge Foundation
 * **目的**: POSTING MAP の現場活動データを AIOS Pipeline へ安全に供給するための Field Intelligence Bridge Foundation を構築する。
 * **完了したスプリント2**: AIOS Phase 154: Trust Governance View Foundation
 * **目的**: 既存データパイプラインおよびコンテキストの信頼性状態を客観的監査ログとスコアによって表示する Trust Governance View を追加する。
