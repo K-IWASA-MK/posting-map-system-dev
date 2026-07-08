@@ -96,6 +96,11 @@ class DashboardRenderer {
         key: 'EventEvolutionCard',
         render: () => window.EventEvolutionCard.render({ evolutions: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : [], delay: 850 }),
         props: window.DashboardEventEvolutionStore ? window.DashboardEventEvolutionStore.getEvolutions() : []
+      },
+      {
+        key: 'EventPatternCard',
+        render: () => window.EventPatternCard.render({ patterns: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : [], delay: 900 }),
+        props: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : []
       }
     ];
 
@@ -361,6 +366,26 @@ class DashboardRenderer {
         // エボリューションアニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateEvolution) {
           window.DashboardMotion.animateEvolution();
+        }
+      }
+    });
+
+    // パターン層更新イベントの購読
+    window.DashboardEventBus.on('event-pattern-update', (patterns) => {
+      console.log('[Dashboard Renderer] パターン層更新イベント受信:', patterns);
+      const gridContainer = document.getElementById('dashboard-grid-container');
+      if (!gridContainer || !window.EventPatternCard) return;
+
+      // EventPatternCard は components 配列の 16 番目（インデックス15）
+      const patternCardEl = gridContainer.children[15];
+      if (patternCardEl) {
+        const newHtml = window.EventPatternCard.render({ patterns: patterns, delay: 0 });
+        window.DashboardRenderCache.hasChanged('EventPatternCard', patterns);
+        patternCardEl.outerHTML = newHtml;
+
+        // パターンアニメーション適用
+        if (window.DashboardMotion && window.DashboardMotion.animatePattern) {
+          window.DashboardMotion.animatePattern();
         }
       }
     });

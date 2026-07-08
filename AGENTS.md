@@ -235,6 +235,8 @@ POSTING MAP は：
 - **Dashboard Event Knowledge Core Principle**: Agentは禁止：AIによるトラブル判定・異常判定・意思決定（No AI Judgment）、アクション推奨（Recommendation）の提示、およびナレッジ起点での Kernel コマンド送信。許可：定型ルールに基づく客観的事象の要約整理（最大500件保持）、および表示専用（Display Only）でのレンダリング。
 - **Dashboard Event Insight Core Principle**: Agentは禁止：AIによる障害の原因分析・異常判定、推奨アクション（Recommendation）の提示、予測データの生成（No Prediction）、およびインサイト契機での Kernel コマンド送信・Write操作全般。許可：静的統計・比率・時系列変化履歴に基づくインサイトデータの格納（最大100件）、およびインサイトの表示専用描画。
 - **Dashboard Event Evolution Core Principle**: Agentは禁止：AIによる状態異常判定、改善提案・推奨（Recommendation）の生成、自動改善・自動対応アクションの実行、およびエボリューション契機での Kernel コマンド送信。許可：各種スナップショット（Timeline, Graph等）間の差分検出、履歴情報の格納（最大500件保持）、および差分の表示専用描画。
+- **Dashboard Event Pattern Core Principle**: Agentは禁止：パターンの将来予測（Pattern Prediction）、AIによる分類モデルの動的追加学習（Dynamic Model Training）、異常検知・警告発生、およびパターン契機での Kernel コマンド送信。許可：静的シグネチャに基づく繰り返し構造変化パターンの分類・発生回数集計（最大300件保持）、およびパターンの表示専用描画。
+
 
 
 

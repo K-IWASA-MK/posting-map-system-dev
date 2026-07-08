@@ -340,6 +340,28 @@ class DashboardMotion {
       }, 1500);
     });
   }
+
+  /**
+   * 新着パターン項目に対するアニメーション・アクセシビリティ適用
+   */
+  static animatePattern() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = document.querySelectorAll('.pattern-item-new');
+    items.forEach(item => {
+      if (isReduced) {
+        item.style.opacity = '1';
+        item.style.transform = 'none';
+        item.style.animation = 'none';
+        item.classList.remove('pattern-item-new');
+        return;
+      }
+
+      // 演出完了後にクラス破棄
+      setTimeout(() => {
+        item.classList.remove('pattern-item-new');
+      }, 1500);
+    });
+  }
 }
 
 // グローバルスコープへ公開

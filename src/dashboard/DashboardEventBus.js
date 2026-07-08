@@ -121,7 +121,18 @@ class DashboardEventBus {
                   evos.forEach(evo => {
                     window.DashboardEventEvolutionStore.addEvolution(evo);
                   });
-                  this.emit('event-evolution-update', window.DashboardEventEvolutionStore.getEvolutions());
+                  const currentEvolutions = window.DashboardEventEvolutionStore.getEvolutions();
+                  this.emit('event-evolution-update', currentEvolutions);
+
+                  // 表示用パターンオブジェクトの生成・構築と更新通知
+                  if (window.DashboardPatternBuilder && window.DashboardEventPatternStore) {
+                    const patterns = window.DashboardPatternBuilder.build(currentEvolutions);
+                    window.DashboardEventPatternStore.clear();
+                    patterns.forEach(pat => {
+                      window.DashboardEventPatternStore.addPattern(pat);
+                    });
+                    this.emit('event-pattern-update', window.DashboardEventPatternStore.getPatterns());
+                  }
                 }
               }
             }
