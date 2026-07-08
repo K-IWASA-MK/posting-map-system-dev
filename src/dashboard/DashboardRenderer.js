@@ -66,6 +66,11 @@ class DashboardRenderer {
         key: 'TurnoutCard',
         render: () => window.TurnoutCard.render({ overall: data.turnout.overall, cities: data.turnout.cities, delay: 550 }),
         props: data.turnout
+      },
+      {
+        key: 'EventTimelineCard',
+        render: () => window.EventTimelineCard.render({ events: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : [], delay: 600 }),
+        props: window.DashboardEventTimelineStore ? window.DashboardEventTimelineStore.getTimeline() : []
       }
     ];
 
@@ -212,6 +217,26 @@ class DashboardRenderer {
       } else {
         el.innerText = '● OFFLINE';
         el.classList.add('realtime-offline');
+      }
+    });
+
+    // タイムライン更新イベントの購読
+    window.DashboardEventBus.on('event-timeline-update', (timelineEvents) => {
+      console.log('[Dashboard Renderer] タイムライン更新イベント受信:', timelineEvents);
+      const gridContainer = document.getElementById('dashboard-grid-container');
+      if (!gridContainer || !window.EventTimelineCard) return;
+
+      // EventTimelineCard は components 配列の 10 番目（インデックス9）
+      const timelineCardEl = gridContainer.children[9];
+      if (timelineCardEl) {
+        const newHtml = window.EventTimelineCard.render({ events: timelineEvents, delay: 0 });
+        window.DashboardRenderCache.hasChanged('EventTimelineCard', timelineEvents);
+        timelineCardEl.outerHTML = newHtml;
+
+        // アニメーション適用
+        if (window.DashboardMotion && window.DashboardMotion.animateTimeline) {
+          window.DashboardMotion.animateTimeline();
+        }
       }
     });
   }

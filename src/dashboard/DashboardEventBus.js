@@ -68,6 +68,14 @@ class DashboardEventBus {
     this.emit(eventName, mappedEvent);
     this.emit('realtime-event-received', mappedEvent);
 
+    // タイムラインストアへの蓄積と更新通知
+    if (window.DashboardEventTimelineStore) {
+      const added = window.DashboardEventTimelineStore.add(mappedEvent);
+      if (added) {
+        this.emit('event-timeline-update', window.DashboardEventTimelineStore.getTimeline());
+      }
+    }
+
     // 互換性維持のための new-activity-logs イベントへの変換・配信
     const logItem = {
       time: mappedEvent.timestamp,

@@ -210,6 +210,28 @@ class DashboardMotion {
       el.classList.remove('new-card-glow');
     }, 1500);
   }
+
+  /**
+   * 新着タイムラインアイテムに対するアニメーション・アクセシビリティ適用
+   */
+  static animateTimeline() {
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = document.querySelectorAll('.timeline-item-new');
+    items.forEach(item => {
+      if (isReduced) {
+        item.style.opacity = '1';
+        item.style.transform = 'none';
+        item.style.animation = 'none';
+        item.classList.remove('timeline-item-new');
+        return;
+      }
+      
+      // アニメーション完了後にクラスを破棄
+      setTimeout(() => {
+        item.classList.remove('timeline-item-new');
+      }, 1500);
+    });
+  }
 }
 
 // グローバルスコープへ公開
