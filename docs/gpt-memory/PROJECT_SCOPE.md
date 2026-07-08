@@ -13,18 +13,18 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 172: Dashboard Runtime Foundation [現在のフェーズ]
-* **目的**: Phase 171 を基盤として、AIOS Dashboard 全体の起動・初期化・ライフサイクルを決定論的に一元管理する Runtime Framework を構築する。
-* **今回実装するもの (対象)**:
-  - Runtime Context 定義（初期化モジュールリストおよび起動シーケンスのタイムスタンプ記録含む）
-  - DashboardRuntimeContext, DashboardRuntimeManager, DashboardRuntimeAdapter
-  - 各モジュールの起動状況・ランタイム状態を示す DashboardRuntimeCard
-* **今回実装しないもの (対象外)**:
-  - ❌ 自動復旧（Auto-recovery）および自動再起動（Auto-reboot）
-  - ❌ プラグインの動的ロードおよびバックグラウンド実行タスク
-  - ❌ AIによる起動診断・自動最適化・自己修復
-  - ❌ Write API、Command送信、Kernel操作
+### 現在のスプリント: AIOS Dashboard v1.0 Release [現在のフェーズ]
+* **目的**: Phase 173 で監査対応・品質改善を終えた Dashboard Stack を、正式版 v1.0.0 としてリリースする。
+* **今回実施するもの (対象)**:
+  - 最終リリース成果物の確認
+  - Git Tag `AIOS-Dashboard-v1.0.0` の作成・反映
+  - HANDOVER.md / PROJECT_SCOPE.md のリリース記録更新
 
+### 完了したスプリント: AIOS Phase 173: Dashboard Architecture Audit Fixes
+* **目的**: v1.0 正式リリース前品質監査の指摘（MAJOR 5件、MINOR 3件、SUGGESTION 2件）をすべて修正・反映し、決定論性・不変化・レスポンシブ動作を正常化する。
+
+### 完了したスプリント: AIOS Phase 172: Dashboard Runtime Foundation
+* **目的**: Phase 171 を基盤として、AIOS Dashboard 全体の起動・初期化・ライフサイクルを決定論的に一元管理する Runtime Framework を構築する。
 ### 完了したスプリント: AIOS Phase 171: Dashboard Rendering Pipeline Foundation
 * **目的**: Phase 170 を基盤として、Dashboard 全体の描画順序・描画コンテキスト・描画ライフサイクルを決定論的に一元管理する Rendering Pipeline を構築する。
 
