@@ -25,8 +25,13 @@ class DashboardEventTimelineStore {
       return false;
     }
 
+    const activeTenantId = (window.DashboardTenantContext && window.DashboardTenantContext.getContext())
+      ? window.DashboardTenantContext.getContext().tenantId
+      : 'DEFAULT';
+
     // 2. スキーマ定義に基づく Object.freeze 不変性担保
     const frozenEvent = Object.freeze({
+      tenantId: event.tenantId || activeTenantId,
       eventId: event.eventId,
       timestamp: event.timestamp || new Date().toLocaleTimeString(),
       rawTimestamp: event.rawTimestamp || Date.now(),

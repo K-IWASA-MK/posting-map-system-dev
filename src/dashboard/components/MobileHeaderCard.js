@@ -15,10 +15,15 @@ class MobileHeaderCard {
     const timestamp = props.timestamp || new Date().toLocaleTimeString();
     const delay = props.delay || 0;
 
+    const tenantInfoHtml = (window.DashboardTenantContext)
+      ? `<span class="mobile-header-tenant">${window.DashboardTenantContext.getContext().tenantId}</span>`
+      : '';
+
     return `
       <header class="mobile-header-panel premium-glass" data-motion="slide-down" data-delay="${delay}">
         <div class="mobile-header-title-wrap">
           <h1>AIOS Mobile Monitor</h1>
+          ${tenantInfoHtml}
         </div>
         <div class="mobile-header-status-wrap">
           <span id="mobile-status-badge" class="mobile-status-badge status-${statusState.toLowerCase()}">

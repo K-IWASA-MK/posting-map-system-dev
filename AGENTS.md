@@ -1342,10 +1342,32 @@ Execution Plan
    - Pipeline Health は、以下の項目を表したり生成したりしてはならない。
      - システムの「健全性 / 障害有無」の主観的・AI的な診断判断 (system health judgement)
      - 障害やインシデントの自動検出・アラート判断 (incident detection)
-     - 復旧作業や改善に関する推奨メッセージの動的生成 (recovery recommendation)
+     - 復旧作業や改善に関する推奨メッセージ of 動的生成 (recovery recommendation)
      - 運用上の意思決定の誘導 (operational decision)
 
 3. **バッジ・ステータス分類名の適合**
    - パイプライン状態を示すステータス分類名は、システムの異常を誤判定させないため、`NORMAL/WARNING/HIGH` などの表現を排し、`HEALTHY` (正常範囲)、`ATTENTION` (注意領域)、`CONGESTED` (数値上の混雑状態) のみを使用する。
+
+---
+
+### 44. Tenant Context Core Principle
+
+本ルールは、Tenant Context の導入と表示における**開発統制ルール**である。
+
+1. **データ隔離境界の提示限定 (Data Isolation Context Only)**
+   - Tenant Context は、データ隔離のためのコンテキスト（テナントID、組織名等）の提示のみを提供しなければならない。
+
+2. **認証・権限管理等の実装禁止 (No Security/Auth Functionality)**
+   - Tenant Context は、以下のセキュリティや管理機能を提供、あるいは内部処理してはならない。
+     - ユーザー認証 (authentication)
+     - アクセス認可 (authorization)
+     - 課金管理 (billing)
+     - ユーザー・アカウント管理 (user management)
+     - テナント決定・自動割当て (tenant decision)
+     - 自動ルーティング・動的フィルタ (automatic routing / filtering)
+
+3. **明示的かつ決定論的解決の順守 (Explicit & Deterministic)**
+   - テナント情報の取得および解決は、常に明示的かつ静的な定義（Singleton構造等）に基づいて決定論的に行われなければならない。
+
 
 

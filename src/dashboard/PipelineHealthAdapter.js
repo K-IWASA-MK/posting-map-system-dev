@@ -10,6 +10,17 @@
 
 class PipelineHealthAdapter {
   /**
+   * 現在のテナント・コンテキストを取得する
+   */
+  static getTenantContext() {
+    return window.DashboardTenantContext ? window.DashboardTenantContext.getContext() : Object.freeze({
+      tenantId: "DEFAULT",
+      tenantName: "DEFAULT BRANCH",
+      environment: "SIMULATION"
+    });
+  }
+
+  /**
    * 総合 Status を算出する (決定論的静的ルール)
    * CONGESTED ＞ ATTENTION ＞ HEALTHY
    */

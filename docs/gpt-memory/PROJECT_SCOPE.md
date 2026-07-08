@@ -13,17 +13,21 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 152: Executive Pipeline Health Visualization Foundation [現在のフェーズ]
-* **目的**: 既存のデータフロー（Event ➔ Memory）における処理流量、レイテンシ、およびバッファ占有率の状態を可視化する Pipeline Health Visualization Foundation を構築する。
+### 現在のスプリント: AIOS Phase 153: Tenant Context Foundation [現在のフェーズ]
+* **目的**: 将来のマルチテナント化（複数支部・複数組織展開）を見据え、現在アクティブなテナント情報を管理・提示する Tenant Context Foundation を導入する。
 * **今回実装するもの (対象)**:
-  - 新規パイプライン仕様定義 (`PipelineHealthVisualization.md`)
-  - Pipeline Health Adapter の導入: `PipelineHealthAdapter.js` 内に不変な Pipeline Health Metric オブジェクト配列を算出する処理を実装。
-  - UIコンポーネント強化: Flow Graph 内での処理件数・latency（source 属性付き）・buffer% の表示。
-  - PC版 `PipelineHealthCard` およびモバイル用 `MobileFlowCard` の Pipeline State 簡易表示の統合。
+  - 新規テナント仕様定義 (`TenantContext.md`)
+  - Tenant Context 管理 Singleton 導入: `DashboardTenantContext.js` による現在アクティブなテナント（ID・支部名・環境）の一元管理。
+  - ストア拡張: 各データストアへ `tenantId` 属性を追加し、未設定データに対するフォールバック互換を確保。
+  - アダプター拡張: 各アダプターへ `getTenantContext()` メソッドを追加。
+  - UI 適合: PC/モバイルのヘッダー部へのテナント情報のインジェクションとバッジ表示。
 * **今回実装しないもの (対象外)**:
-  - ❌ AIを用いた主観的なシステム障害診断、Incident自動判定、自動復旧アクションの実行。操作用 UI (button/select等) や Write 通信 (POST/DELETE等) の追加。
+  - ❌ ユーザー認証・認可、アカウント管理、自動ルーティング、および課金管理。
+  - ❌ ストア内部でのテナント境界フィルタリング（将来フェーズ）。
 
-### 完了したスプリント: AIOS Phase 151: Executive KPI Temporal Intelligence Foundation
+### 完了したスプリント: AIOS Phase 152: Executive Pipeline Health Visualization Foundation
+* **目的**: 既存のデータフロー（Event ➔ Memory）における処理流量、レイテンシ、およびバッファ占有率の状態を可視化する Pipeline Health Visualization Foundation を構築する。
+* **完了したスプリント2**: AIOS Phase 151: Executive KPI Temporal Intelligence Foundation
 * **目的**: 既存の Executive View および Mobile Executive View に時間比較軸を追加し、現在値の単一表示から「増減率、トレンド、静的ステータスラベル」の可視化へと進化させる。
 * **完了したスプリント2**: AIOS Dashboard Mobile Executive View Foundation
 * **目的**: 既存の Executive View を基盤とし、スマートフォンの狭い画面幅および片手操作に最適化した、監視専用の「Mobile Executive View」を構築する。

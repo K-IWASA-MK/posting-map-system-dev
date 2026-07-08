@@ -50,6 +50,17 @@ class DashboardRenderer {
       return;
     }
 
+    // 1. テナント情報のインジェクション (PC用)
+    const tenantEl = document.getElementById('header-tenant-context');
+    if (tenantEl && window.DashboardTenantContext) {
+      const context = window.DashboardTenantContext.getContext();
+      tenantEl.innerHTML = `
+        <span class="tenant-name">${context.tenantName}</span>
+        <span class="tenant-id">${context.tenantId}</span>
+      `;
+      tenantEl.style.display = 'flex';
+    }
+
     console.log('[Dashboard Renderer] コンポーネント群のレンダリングを開始します...');
 
     const viewMode = DashboardRenderer.getViewMode();

@@ -28,6 +28,7 @@
     <header class="dashboard-header" role="banner" aria-label="AIOS Dashboard Header" data-motion="slide-down" data-delay="0">
       <div class="header-logo">
         <h1>AIOS Control Center</h1>
+        <div id="header-tenant-context" class="header-tenant-badge" style="display: none;"></div>
       </div>
       <div class="header-status-panel" role="status" aria-live="polite" aria-label="AIOS Operational Status">
         <span class="status-badge environment">Environment: <strong id="env-text">LOCAL SIMULATION</strong></span>
@@ -105,6 +106,7 @@
   <script src="components/MobileMemoryCard.js"></script>
  
   <!-- Control & Data Scripts -->
+  <script src="DashboardTenantContext.js"></script>
   <script src="DashboardRenderCache.js"></script>
   <script src="DashboardRealtimeClient.js"></script>
   <script src="DashboardEventClassifier.js"></script>

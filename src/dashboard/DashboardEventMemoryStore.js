@@ -25,8 +25,13 @@ class DashboardEventMemoryStore {
       return false;
     }
 
+    const activeTenantId = (window.DashboardTenantContext && window.DashboardTenantContext.getContext())
+      ? window.DashboardTenantContext.getContext().tenantId
+      : 'DEFAULT';
+
     // 2. 厳格な不変性（Object.freeze）の適用
     const frozenMemory = Object.freeze({
+      tenantId: memory.tenantId || activeTenantId,
       memoryId: memory.memoryId,
       sourceType: memory.sourceType || 'pattern',
       sourceId: memory.sourceId || '',

@@ -25,8 +25,13 @@ class DashboardEventEvolutionStore {
       return false;
     }
 
+    const activeTenantId = (window.DashboardTenantContext && window.DashboardTenantContext.getContext())
+      ? window.DashboardTenantContext.getContext().tenantId
+      : 'DEFAULT';
+
     // 2. 厳格な不変性（Object.freeze）の適用
     const frozenEvolution = Object.freeze({
+      tenantId: evolution.tenantId || activeTenantId,
       evolutionId: evolution.evolutionId,
       sourceType: evolution.sourceType || 'knowledge',
       sourceId: evolution.sourceId || '',

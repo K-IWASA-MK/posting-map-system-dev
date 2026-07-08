@@ -78,6 +78,17 @@ class ExecutiveAdapter {
   }
 
   /**
+   * 現在のテナント・コンテキストを取得する
+   */
+  static getTenantContext() {
+    return window.DashboardTenantContext ? window.DashboardTenantContext.getContext() : Object.freeze({
+      tenantId: "DEFAULT",
+      tenantName: "DEFAULT BRANCH",
+      environment: "SIMULATION"
+    });
+  }
+
+  /**
    * 8つのレイヤーからデータを集約してエグゼクティブ向けデータを生成する
    * @returns {object} エグゼクティブ用データオブジェクト
    */

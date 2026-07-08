@@ -2924,3 +2924,58 @@ body {
   color: #a855f7;
   background-color: rgba(168, 85, 247, 0.06);
 }
+
+/* ==========================================================================
+   17. Tenant Context Display Styles
+   ========================================================================== */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.header-tenant-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 2px 4px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.02);
+}
+
+.header-tenant-badge .tenant-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.header-tenant-badge .tenant-id {
+  font-size: 0.65rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: #3b82f6; /* 青 */
+  background-color: rgba(59, 130, 246, 0.08);
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+/* Mobile header tenant styles */
+.mobile-header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.mobile-header-tenant {
+  font-size: 0.65rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.08);
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}

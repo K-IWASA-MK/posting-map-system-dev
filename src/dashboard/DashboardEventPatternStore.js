@@ -25,8 +25,13 @@ class DashboardEventPatternStore {
       return false;
     }
 
+    const activeTenantId = (window.DashboardTenantContext && window.DashboardTenantContext.getContext())
+      ? window.DashboardTenantContext.getContext().tenantId
+      : 'DEFAULT';
+
     // 2. 厳格な不変性（Object.freeze）の適用
     const frozenPattern = Object.freeze({
+      tenantId: pattern.tenantId || activeTenantId,
       patternId: pattern.patternId,
       signature: pattern.signature || '',
       occurrenceCount: pattern.occurrenceCount || 0,

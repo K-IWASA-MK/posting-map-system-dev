@@ -9,6 +9,17 @@
 
 class MobileExecutiveAdapter {
   /**
+   * 現在のテナント・コンテキストを取得する
+   */
+  static getTenantContext() {
+    return window.DashboardTenantContext ? window.DashboardTenantContext.getContext() : Object.freeze({
+      tenantId: "DEFAULT",
+      tenantName: "DEFAULT BRANCH",
+      environment: "SIMULATION"
+    });
+  }
+
+  /**
    * モバイル向けデータを集約・適合化して取得する
    * @returns {object} モバイル用データオブジェクト
    */

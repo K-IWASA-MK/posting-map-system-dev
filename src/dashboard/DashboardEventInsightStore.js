@@ -25,8 +25,13 @@ class DashboardEventInsightStore {
       return false;
     }
 
+    const activeTenantId = (window.DashboardTenantContext && window.DashboardTenantContext.getContext())
+      ? window.DashboardTenantContext.getContext().tenantId
+      : 'DEFAULT';
+
     // 2. 厳格な不変性（Object.freeze）の適用
     const frozenInsight = Object.freeze({
+      tenantId: insight.tenantId || activeTenantId,
       insightId: insight.insightId,
       knowledgeIds: Object.freeze([...(insight.knowledgeIds || [])]),
       category: insight.category || 'runtime',
