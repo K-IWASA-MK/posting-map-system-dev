@@ -131,7 +131,18 @@ class DashboardEventBus {
                     patterns.forEach(pat => {
                       window.DashboardEventPatternStore.addPattern(pat);
                     });
-                    this.emit('event-pattern-update', window.DashboardEventPatternStore.getPatterns());
+                    const currentPatterns = window.DashboardEventPatternStore.getPatterns();
+                    this.emit('event-pattern-update', currentPatterns);
+
+                    // 表示用メモリオブジェクトの生成・構築と更新通知
+                    if (window.DashboardMemoryBuilder && window.DashboardEventMemoryStore) {
+                      const memories = window.DashboardMemoryBuilder.build(currentPatterns);
+                      // 蓄積させたいのでストアのクリアはしない（ストア内部で1000件上限制御）
+                      memories.forEach(mem => {
+                        window.DashboardEventMemoryStore.addMemory(mem);
+                      });
+                      this.emit('event-memory-update', window.DashboardEventMemoryStore.getMemories());
+                    }
                   }
                 }
               }

@@ -101,6 +101,11 @@ class DashboardRenderer {
         key: 'EventPatternCard',
         render: () => window.EventPatternCard.render({ patterns: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : [], delay: 900 }),
         props: window.DashboardEventPatternStore ? window.DashboardEventPatternStore.getPatterns() : []
+      },
+      {
+        key: 'EventMemoryCard',
+        render: () => window.EventMemoryCard.render({ memories: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : [], delay: 950 }),
+        props: window.DashboardEventMemoryStore ? window.DashboardEventMemoryStore.getMemories() : []
       }
     ];
 
@@ -386,6 +391,26 @@ class DashboardRenderer {
         // パターンアニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animatePattern) {
           window.DashboardMotion.animatePattern();
+        }
+      }
+    });
+
+    // メモリ層更新イベントの購読
+    window.DashboardEventBus.on('event-memory-update', (memories) => {
+      console.log('[Dashboard Renderer] メモリ層更新イベント受信:', memories);
+      const gridContainer = document.getElementById('dashboard-grid-container');
+      if (!gridContainer || !window.EventMemoryCard) return;
+
+      // EventMemoryCard は components 配列 of 17 番目（インデックス16）
+      const memoryCardEl = gridContainer.children[16];
+      if (memoryCardEl) {
+        const newHtml = window.EventMemoryCard.render({ memories: memories, delay: 0 });
+        window.DashboardRenderCache.hasChanged('EventMemoryCard', memories);
+        memoryCardEl.outerHTML = newHtml;
+
+        // メモリアニメーション適用
+        if (window.DashboardMotion && window.DashboardMotion.animateMemory) {
+          window.DashboardMotion.animateMemory();
         }
       }
     });

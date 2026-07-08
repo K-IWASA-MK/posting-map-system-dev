@@ -13,28 +13,30 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard Event Intelligence Pattern Layer Foundation [現在のフェーズ]
-* **目的**: 構造変化エボリューションデータから同一シグネチャを静的グループ化し、発生頻度や時系列分布を表示専用パターンオブジェクト（Event Pattern Layer）として集約可視化する。
+### 現在のスプリント: AIOS Dashboard Event Intelligence Memory Layer Foundation [現在のフェーズ]
+* **目的**: パターンデータおよびエボリューションデータから長期スナップショットを生成し、表示専用の長期履歴メモリオブジェクト（Event Memory Layer）としてアーカイブ可視化する。
 * **今回実装するもの (対象)**:
-  - ✅ 新規パターン仕様定義 (DashboardEventPattern.md, EventPatternSchema.md, EventPatternVisualization.md)
-  - ✅ パターンデータストア (`DashboardEventPatternStore.js`): 最大300件保持, 不変オブジェクト(freeze), API通信なし
-  - ✅ 客観的パターンビルダー (`DashboardPatternBuilder.js`): エボリューション履歴から客観的な構造パターンを自動集計。予測や異常検知、AI学習は禁止
-  - ✅ パターンビューモデルアダプター (`DashboardPatternAdapter.js`): 表示用ビューモデル変換
-  - ✅ 表示専用パターンカード (`EventPatternCard.js`) およびパターンアイテム (`EventPatternItem.js`)
-  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-pattern-update` に基づく差分マウント
-  - ✅ CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 新規パターンフェードイン, メーター発光, Reduced Motion対応
+  - ✅ 新規メモリ仕様定義 (DashboardEventMemory.md, EventMemorySchema.md, EventMemoryVisualization.md)
+  - ✅ メモリデータストア (`DashboardEventMemoryStore.js`): 最大1000件保持, 不変オブジェクト(freeze), API通信なし
+  - ✅ 客観的メモリビルダー (`DashboardMemoryBuilder.js`): パターンデータから客観的な長期履歴スナップショットを自動生成。自己改善、予測、AI学習は禁止
+  - ✅ メモリビューモデルアダプター (`DashboardMemoryAdapter.js`): 表示用ビューモデル変換
+  - ✅ 表示専用メモリカード (`EventMemoryCard.js`) およびメモリアイテム (`EventMemoryItem.js`)
+  - ✅ レンダラーおよび通信・UI統合 (`DashboardRenderer.js` / `DashboardEventBus.js` / `DashboardApp.html`): `event-memory-update` に基づく差分マウント
+  - ✅ CSSスタイルとアニメーション演出 (`Dashboard.css` / `DashboardMotion.js`): 新規メモリフェードイン, 容量メーター発光, Reduced Motion対応
   - ✅ 既存仕様（KernelDashboard.md, DashboardComponent.md, PROJECT_SCOPE.md, AGENTS.md）の対応追加
 * **今回実装しないもの (対象外)**:
-  - ❌ AI学習、将来パターンの予測、異常予兆の検知、原因分析、推奨生成、自動改善、自動実行（Kernelへのコマンド逆流）、外部通知
+  - ❌ 自己改善計画の自動生成、AIによるモデル生成および追加学習、将来予測、異常判定、およびメモリ契機での Kernel コマンド送信
 
-### 完了したスプリント: AIOS Dashboard Event Intelligence Evolution Layer Foundation
-* **目的**: 状態変化や統計の推移を前後の差分（Before / After）として抽出し、表示専用のエボリューションオブジェクト（Event Evolution Layer）として集約可視化する。
-* **完了したスプリント2**: AIOS Dashboard Event Insight Layer Foundation
-* **完了したスプリント3**: AIOS Dashboard Event Knowledge Layer Foundation
-* **完了したスプリント4**: AIOS Dashboard Event Intelligence Graph Foundation
-* **完了したスプリント5**: AIOS Dashboard Event Correlation Intelligence Foundation
-* **完了したスプリント6**: AIOS Dashboard Event Timeline Intelligence Foundation
-* **完了したスプリント7**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+### 完了したスプリント: AIOS Dashboard Event Intelligence Pattern Layer Foundation
+* **目的**: 構造変化エボリューションデータから同一シグネチャを静的グループ化し、発生頻度や時系列分布を表示専用パターンオブジェクト（Event Pattern Layer）として集約可視化する。
+* **完了したスプリント2**: AIOS Dashboard Event Intelligence Evolution Layer Foundation
+* **完了したスプリント3**: AIOS Dashboard Event Insight Layer Foundation
+* **完了したスプリント4**: AIOS Dashboard Event Knowledge Layer Foundation
+* **完了したスプリント5**: AIOS Dashboard Event Intelligence Graph Foundation
+* **完了したスプリント6**: AIOS Dashboard Event Correlation Intelligence Foundation
+* **完了したスプリント7**: AIOS Dashboard Event Timeline Intelligence Foundation
+* **完了したスプリント8**: AIOS Dashboard Event Intelligence & Attention Routing Foundation
+
 
 
 
