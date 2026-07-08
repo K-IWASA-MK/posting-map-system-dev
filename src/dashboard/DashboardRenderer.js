@@ -29,7 +29,7 @@ class DashboardRenderer {
     
     // 1. クエリパラメータ指定を最優先
     if (viewQuery) {
-      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant') {
+      if (viewQuery === 'raw' || viewQuery === 'executive' || viewQuery === 'mobile' || viewQuery === 'trust' || viewQuery === 'tenant' || viewQuery === 'global') {
         return viewQuery;
       }
     }
@@ -71,6 +71,7 @@ class DashboardRenderer {
     if (viewMode === 'executive') activeMenuId = 'menu-executive';
     else if (viewMode === 'trust') activeMenuId = 'menu-trust';
     else if (viewMode === 'tenant') activeMenuId = 'menu-tenant';
+    else if (viewMode === 'global') activeMenuId = 'menu-global';
     const activeMenuEl = document.getElementById(activeMenuId);
     if (activeMenuEl) {
       activeMenuEl.classList.add('active');
@@ -192,6 +193,15 @@ class DashboardRenderer {
           key: 'MultiTenantSeparationCard',
           render: () => window.MultiTenantSeparationCard.render({ tenants: tenantData.tenants, delay: 150 }),
           props: tenantData.tenants
+        }
+      ];
+    } else if (viewMode === 'global') {
+      const summaryData = window.MultiTenantExecutiveAdapter ? window.MultiTenantExecutiveAdapter.getMultiTenantExecutiveData() : { totalTenants: 0, totalRegions: 0, totalAreas: 0, totalEvents: 0, trustScore: 100 };
+      components = [
+        {
+          key: 'MultiTenantExecutiveCard',
+          render: () => window.MultiTenantExecutiveCard.render({ summary: summaryData, delay: 150 }),
+          props: summaryData
         }
       ];
     } else {
@@ -411,6 +421,10 @@ class DashboardRenderer {
         DashboardRenderer.updateTenantDashboard();
         return;
       }
+      if (viewMode === 'global') {
+        DashboardRenderer.updateGlobalDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
@@ -447,6 +461,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'tenant') {
         DashboardRenderer.updateTenantDashboard();
+        return;
+      }
+      if (viewMode === 'global') {
+        DashboardRenderer.updateGlobalDashboard();
         return;
       }
 
@@ -487,6 +505,10 @@ class DashboardRenderer {
         DashboardRenderer.updateTenantDashboard();
         return;
       }
+      if (viewMode === 'global') {
+        DashboardRenderer.updateGlobalDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
@@ -523,6 +545,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'tenant') {
         DashboardRenderer.updateTenantDashboard();
+        return;
+      }
+      if (viewMode === 'global') {
+        DashboardRenderer.updateGlobalDashboard();
         return;
       }
 
@@ -563,6 +589,10 @@ class DashboardRenderer {
         DashboardRenderer.updateTenantDashboard();
         return;
       }
+      if (viewMode === 'global') {
+        DashboardRenderer.updateGlobalDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
@@ -599,6 +629,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'tenant') {
         DashboardRenderer.updateTenantDashboard();
+        return;
+      }
+      if (viewMode === 'global') {
+        DashboardRenderer.updateGlobalDashboard();
         return;
       }
 
@@ -639,6 +673,10 @@ class DashboardRenderer {
         DashboardRenderer.updateTenantDashboard();
         return;
       }
+      if (viewMode === 'global') {
+        DashboardRenderer.updateGlobalDashboard();
+        return;
+      }
 
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
@@ -675,6 +713,10 @@ class DashboardRenderer {
       }
       if (viewMode === 'tenant') {
         DashboardRenderer.updateTenantDashboard();
+        return;
+      }
+      if (viewMode === 'global') {
+        DashboardRenderer.updateGlobalDashboard();
         return;
       }
 
@@ -895,6 +937,26 @@ class DashboardRenderer {
       const el = gridContainer.children[0];
       if (el) {
         el.outerHTML = window.MultiTenantSeparationCard.render({ tenants: tenantData.tenants, delay: 0 });
+        const newEl = gridContainer.children[0];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+  }
+
+  /**
+   * Globalビューモード用の全画面差分更新を実行する
+   */
+  static updateGlobalDashboard() {
+    const gridContainer = document.getElementById('dashboard-grid-container');
+    if (!gridContainer || !window.MultiTenantExecutiveAdapter) return;
+
+    const summaryData = window.MultiTenantExecutiveAdapter.getMultiTenantExecutiveData();
+
+    // 0: MultiTenantExecutiveCard
+    if (window.MultiTenantExecutiveCard && window.DashboardRenderCache.hasChanged('MultiTenantExecutiveCard', summaryData)) {
+      const el = gridContainer.children[0];
+      if (el) {
+        el.outerHTML = window.MultiTenantExecutiveCard.render({ summary: summaryData, delay: 0 });
         const newEl = gridContainer.children[0];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }

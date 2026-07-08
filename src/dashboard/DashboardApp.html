@@ -43,6 +43,7 @@
       <aside class="dashboard-sidebar" role="complementary" aria-label="AIOS Sidebar" data-motion="slide-in-left" data-delay="100">
         <nav class="sidebar-nav" role="navigation" aria-label="AIOS Sidebar Navigation">
           <ul>
+            <li id="menu-global"><a href="?view=global">Global Overview</a></li>
             <li id="menu-tenant"><a href="?view=tenant">Tenant Boundary</a></li>
             <li id="menu-executive"><a href="?view=executive">AIOS Executive</a></li>
             <li id="menu-raw"><a href="?view=raw">AIOS Pipeline</a></li>
@@ -142,6 +143,8 @@
   <script src="DashboardTenantRegistryStore.js"></script>
   <script src="MultiTenantAdapter.js"></script>
   <script src="components/MultiTenantSeparationCard.js"></script>
+  <script src="MultiTenantExecutiveAdapter.js"></script>
+  <script src="components/MultiTenantExecutiveCard.js"></script>
   <script src="DashboardTenantHierarchyStore.js"></script>
   <script src="DashboardHierarchyContext.js"></script>
   <script src="components/HierarchyContextCard.js"></script>
