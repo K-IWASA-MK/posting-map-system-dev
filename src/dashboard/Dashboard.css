@@ -1887,3 +1887,17 @@ body {
   text-align: center;
   padding: var(--space-xl) 0;
 }
+
+/* ==========================================================================
+   13. Demo Visualization Grid Override Rules
+   ========================================================================== */
+#dashboard-grid-container > .card {
+  grid-column: span 1 !important;
+}
+
+/* モバイルレスポンシブ用の 1列上書き */
+@media (max-width: 1024px) {
+  #dashboard-grid-container > .card {
+    grid-column: span 1 !important;
+  }
+}

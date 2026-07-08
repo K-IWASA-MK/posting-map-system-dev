@@ -69,13 +69,17 @@ class DemoEventGenerator {
     const rawEvent = demoEvents[this.currentIndex];
     this.currentIndex = (this.currentIndex + 1) % demoEvents.length;
 
+    const eventId = `EVT_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
     // EventBus へイベントを配信 (これが Pipeline 全体を自動で駆動する)
     window.DashboardEventBus.publishRealtimeEvent({
+      eventId: eventId,
       category: rawEvent.category,
       severity: rawEvent.severity,
       message: rawEvent.message,
       details: rawEvent.details,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      rawTimestamp: Date.now()
     });
   }
 

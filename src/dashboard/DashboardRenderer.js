@@ -90,6 +90,10 @@ class DashboardRenderer {
           
           if (targetCard) {
             targetCard.outerHTML = tempDiv.innerHTML;
+            const newCard = gridContainer.children[idx];
+            if (newCard) {
+              newCard.classList.add('motion-active');
+            }
           }
         }
       });
@@ -217,16 +221,20 @@ class DashboardRenderer {
 
     // タイムライン更新イベントの購読
     window.DashboardEventBus.on('event-timeline-update', (timelineEvents) => {
-      console.log('[Dashboard Renderer] タイムライン更新イベント受信:', timelineEvents);
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventTimelineCard) return;
+      if (!window.DashboardRenderCache.hasChanged('EventTimelineCard', timelineEvents)) return;
+      console.log('[Dashboard Renderer] タイムライン更新イベント受信:', timelineEvents);
 
       // EventTimelineCard は components 配列の 2 番目（インデックス1）
       const timelineCardEl = gridContainer.children[1];
       if (timelineCardEl) {
         const newHtml = window.EventTimelineCard.render({ events: timelineEvents, delay: 0 });
-        window.DashboardRenderCache.hasChanged('EventTimelineCard', timelineEvents);
         timelineCardEl.outerHTML = newHtml;
+        const newCard = gridContainer.children[1];
+        if (newCard) {
+          newCard.classList.add('motion-active');
+        }
 
         // アニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateTimeline) {
@@ -237,16 +245,20 @@ class DashboardRenderer {
 
     // 相関グラフ更新イベントの購読
     window.DashboardEventBus.on('event-correlation-update', (correlations) => {
-      console.log('[Dashboard Renderer] 相関グラフ更新イベント受信:', correlations);
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventCorrelationCard) return;
+      if (!window.DashboardRenderCache.hasChanged('EventCorrelationCard', correlations)) return;
+      console.log('[Dashboard Renderer] 相関グラフ更新イベント受信:', correlations);
 
       // EventCorrelationCard は components 配列の 3 番目（インデックス2）
       const correlationCardEl = gridContainer.children[2];
       if (correlationCardEl) {
         const newHtml = window.EventCorrelationCard.render({ correlations: correlations, delay: 0 });
-        window.DashboardRenderCache.hasChanged('EventCorrelationCard', correlations);
         correlationCardEl.outerHTML = newHtml;
+        const newCard = gridContainer.children[2];
+        if (newCard) {
+          newCard.classList.add('motion-active');
+        }
 
         // 相関アニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateCorrelation) {
@@ -257,16 +269,20 @@ class DashboardRenderer {
 
     // 関係グラフ更新イベントの購読
     window.DashboardEventBus.on('event-graph-update', (graphs) => {
-      console.log('[Dashboard Renderer] 関係グラフ更新イベント受信:', graphs);
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventGraphCard) return;
+      if (!window.DashboardRenderCache.hasChanged('EventGraphCard', graphs)) return;
+      console.log('[Dashboard Renderer] 関係グラフ更新イベント受信:', graphs);
 
       // EventGraphCard は components 配列の 4 番目（インデックス3）
       const graphCardEl = gridContainer.children[3];
       if (graphCardEl) {
         const newHtml = window.EventGraphCard.render({ graphs: graphs, delay: 0 });
-        window.DashboardRenderCache.hasChanged('EventGraphCard', graphs);
         graphCardEl.outerHTML = newHtml;
+        const newCard = gridContainer.children[3];
+        if (newCard) {
+          newCard.classList.add('motion-active');
+        }
 
         // グラフアニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateGraph) {
@@ -277,16 +293,20 @@ class DashboardRenderer {
 
     // 知識層更新イベントの購読
     window.DashboardEventBus.on('event-knowledge-update', (knowledges) => {
-      console.log('[Dashboard Renderer] 知識層更新イベント受信:', knowledges);
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventKnowledgeCard) return;
+      if (!window.DashboardRenderCache.hasChanged('EventKnowledgeCard', knowledges)) return;
+      console.log('[Dashboard Renderer] 知識層更新イベント受信:', knowledges);
 
       // EventKnowledgeCard は components 配列の 5 番目（インデックス4）
       const knowledgeCardEl = gridContainer.children[4];
       if (knowledgeCardEl) {
         const newHtml = window.EventKnowledgeCard.render({ knowledges: knowledges, delay: 0 });
-        window.DashboardRenderCache.hasChanged('EventKnowledgeCard', knowledges);
         knowledgeCardEl.outerHTML = newHtml;
+        const newCard = gridContainer.children[4];
+        if (newCard) {
+          newCard.classList.add('motion-active');
+        }
 
         // 知識アニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateKnowledge) {
@@ -297,16 +317,20 @@ class DashboardRenderer {
 
     // インサイト層更新イベントの購読
     window.DashboardEventBus.on('event-insight-update', (insights) => {
-      console.log('[Dashboard Renderer] インサイト層更新イベント受信:', insights);
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventInsightCard) return;
+      if (!window.DashboardRenderCache.hasChanged('EventInsightCard', insights)) return;
+      console.log('[Dashboard Renderer] インサイト層更新イベント受信:', insights);
 
       // EventInsightCard は components 配列の 6 番目（インデックス5）
       const insightCardEl = gridContainer.children[5];
       if (insightCardEl) {
         const newHtml = window.EventInsightCard.render({ insights: insights, delay: 0 });
-        window.DashboardRenderCache.hasChanged('EventInsightCard', insights);
         insightCardEl.outerHTML = newHtml;
+        const newCard = gridContainer.children[5];
+        if (newCard) {
+          newCard.classList.add('motion-active');
+        }
 
         // インサイトアニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateInsight) {
@@ -317,16 +341,20 @@ class DashboardRenderer {
 
     // エボリューション層更新イベントの購読
     window.DashboardEventBus.on('event-evolution-update', (evolutions) => {
-      console.log('[Dashboard Renderer] エボリューション層更新イベント受信:', evolutions);
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventEvolutionCard) return;
+      if (!window.DashboardRenderCache.hasChanged('EventEvolutionCard', evolutions)) return;
+      console.log('[Dashboard Renderer] エボリューション層更新イベント受信:', evolutions);
 
       // EventEvolutionCard は components 配列の 7 番目（インデックス6）
       const evolutionCardEl = gridContainer.children[6];
       if (evolutionCardEl) {
         const newHtml = window.EventEvolutionCard.render({ evolutions: evolutions, delay: 0 });
-        window.DashboardRenderCache.hasChanged('EventEvolutionCard', evolutions);
         evolutionCardEl.outerHTML = newHtml;
+        const newCard = gridContainer.children[6];
+        if (newCard) {
+          newCard.classList.add('motion-active');
+        }
 
         // エボリューションアニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateEvolution) {
@@ -337,16 +365,20 @@ class DashboardRenderer {
 
     // パターン層更新イベントの購読
     window.DashboardEventBus.on('event-pattern-update', (patterns) => {
-      console.log('[Dashboard Renderer] パターン層更新イベント受信:', patterns);
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventPatternCard) return;
+      if (!window.DashboardRenderCache.hasChanged('EventPatternCard', patterns)) return;
+      console.log('[Dashboard Renderer] パターン層更新イベント受信:', patterns);
 
       // EventPatternCard は components 配列の 8 番目（インデックス7）
       const patternCardEl = gridContainer.children[7];
       if (patternCardEl) {
         const newHtml = window.EventPatternCard.render({ patterns: patterns, delay: 0 });
-        window.DashboardRenderCache.hasChanged('EventPatternCard', patterns);
         patternCardEl.outerHTML = newHtml;
+        const newCard = gridContainer.children[7];
+        if (newCard) {
+          newCard.classList.add('motion-active');
+        }
 
         // パターンアニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animatePattern) {
@@ -357,16 +389,20 @@ class DashboardRenderer {
 
     // メモリ層更新イベントの購読
     window.DashboardEventBus.on('event-memory-update', (memories) => {
-      console.log('[Dashboard Renderer] メモリ層更新イベント受信:', memories);
       const gridContainer = document.getElementById('dashboard-grid-container');
       if (!gridContainer || !window.EventMemoryCard) return;
+      if (!window.DashboardRenderCache.hasChanged('EventMemoryCard', memories)) return;
+      console.log('[Dashboard Renderer] メモリ層更新イベント受信:', memories);
 
       // EventMemoryCard は components 配列 of 9 番目（インデックス8）
       const memoryCardEl = gridContainer.children[8];
       if (memoryCardEl) {
         const newHtml = window.EventMemoryCard.render({ memories: memories, delay: 0 });
-        window.DashboardRenderCache.hasChanged('EventMemoryCard', memories);
         memoryCardEl.outerHTML = newHtml;
+        const newCard = gridContainer.children[8];
+        if (newCard) {
+          newCard.classList.add('motion-active');
+        }
 
         // メモリアニメーション適用
         if (window.DashboardMotion && window.DashboardMotion.animateMemory) {
