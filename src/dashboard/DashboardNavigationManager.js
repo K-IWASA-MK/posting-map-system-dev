@@ -81,8 +81,5 @@ class DashboardNavigationManager {
   }
 }
 
-// グローバル公開と自動初期化
+// グローバル公開（初期化は DashboardRuntimeManager.boot() が担当）
 window.DashboardNavigationManager = DashboardNavigationManager;
-if (typeof window !== 'undefined') {
-  DashboardNavigationManager.init();
-}

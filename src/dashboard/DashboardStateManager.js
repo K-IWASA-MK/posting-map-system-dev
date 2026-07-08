@@ -83,8 +83,5 @@ class DashboardStateManager {
   }
 }
 
-// グローバル公開と自動初期化
+// グローバル公開（初期化は DashboardRuntimeManager.boot() が担当）
 window.DashboardStateManager = DashboardStateManager;
-if (typeof window !== 'undefined') {
-  DashboardStateManager.init();
-}

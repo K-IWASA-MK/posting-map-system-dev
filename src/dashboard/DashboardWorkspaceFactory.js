@@ -8,6 +8,8 @@
  */
 
 class DashboardWorkspaceFactory {
+  static instanceCounter = 0;
+
   /**
    * ワークスペース仕様からインスタンスをバリデーション検証した上で生成する
    * @param {object} spec レジストリに登録された仕様定義
@@ -38,7 +40,7 @@ class DashboardWorkspaceFactory {
       });
     }
 
-    const uniqueId = `winst-${spec.workspaceId}-${Math.floor(Math.random() * 1000000)}`;
+    const uniqueId = `winst-${spec.workspaceId}-${++DashboardWorkspaceFactory.instanceCounter}`;
 
     const workspaceInstance = {
       instanceId: uniqueId,

@@ -33,6 +33,10 @@ const eventBus = global.window.DashboardEventBus;
 const stateManager = global.window.DashboardStateManager;
 
 try {
+  // 明示的な初期化（自動初期化が廃止されたため）
+  stateManager.init();
+  navManager.init();
+
   // Test 1: Navigation Registry Object.freeze 不変性検証
   console.log('[Test 1] Navigation Registry Object.freeze validation starting...');
   const routes = navRegistry.getAllNavigations();

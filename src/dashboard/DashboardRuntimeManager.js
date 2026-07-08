@@ -29,9 +29,14 @@ class DashboardRuntimeManager {
 
   /**
    * ダッシュボード全体のモジュール起動シーケンスを決定論的に実行する
+   * @param {string} viewMode ビューモード（例: 'executive'）
+   * @param {number} viewportWidth ビューポート幅
    * @returns {object} Frozen Runtime Context Snapshot Object
    */
-  static boot() {
+  static boot(viewMode, viewportWidth) {
+    if (!viewMode) viewMode = 'executive';
+    if (!viewportWidth) viewportWidth = 1200;
+
     this.initialize();
 
     // 1. BOOTING フェーズ
@@ -100,7 +105,11 @@ class DashboardRuntimeManager {
     });
     this.emitEvent('dashboard-runtime-ready');
 
-    // 4. RUNNING フェーズ
+    // 4. RUNNING フェーズ（描画パイプラインをRuntimeと同期実行）
+    if (window.DashboardRenderingPipeline) {
+      window.DashboardRenderingPipeline.run(viewMode, viewportWidth);
+    }
+
     this.activeContext = window.DashboardRuntimeContext.buildContext({
       runtimeId: this.activeContext.runtimeId,
       runtimeStatus: 'RUNNING',

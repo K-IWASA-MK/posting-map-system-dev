@@ -44,12 +44,21 @@ class DashboardRenderingPipeline {
     // 2. CONTEXT_ASSEMBLED フェーズ
     const navigation = navRegistry ? navRegistry.getNavigationByViewMode(viewMode) : null;
     const workspace = navigation ? workspaceRegistry.getWorkspace(navigation.workspaceId) : null;
-    const layoutId = workspace ? workspace.layoutId : '-';
 
     // ビューポート幅からレスポンシブブレイクポイントを判定
     let viewport = 'desktop';
     if (viewportWidth < 768) viewport = 'mobile';
     else if (viewportWidth < 1024) viewport = 'tablet';
+
+    // ブレイクポイントに応じたレイアウトをワークスペースの layouts マップから解決
+    let layoutId = '-';
+    if (workspace) {
+      if (workspace.layouts && workspace.layouts[viewport]) {
+        layoutId = workspace.layouts[viewport];
+      } else {
+        layoutId = workspace.layoutId || '-';
+      }
+    }
 
     const widgetIds = workspace ? [...workspace.widgetIds] : [];
 
@@ -91,8 +100,8 @@ class DashboardRenderingPipeline {
       sortedWidgets.sort((a, b) => {
         const specA = widgetRegistry.getWidget(a);
         const specB = widgetRegistry.getWidget(b);
-        const prioA = specA ? specA.priority : 100;
-        const prioB = specB ? specB.priority : 100;
+        const prioA = specA ? specA.widgetPriority : 100;
+        const prioB = specB ? specB.widgetPriority : 100;
         return prioA - prioB;
       });
     }
@@ -142,8 +151,5 @@ class DashboardRenderingPipeline {
   }
 }
 
-// グローバル公開と自動初期化
+// グローバル公開（初期化は DashboardRuntimeManager.boot() が担当）
 window.DashboardRenderingPipeline = DashboardRenderingPipeline;
-if (typeof window !== 'undefined') {
-  DashboardRenderingPipeline.initialize();
-}

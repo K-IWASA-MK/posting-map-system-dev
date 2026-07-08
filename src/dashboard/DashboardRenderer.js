@@ -65,14 +65,9 @@ class DashboardRenderer {
 
     const viewMode = DashboardRenderer.getViewMode();
 
-    // 起動シーケンス・ランタイムの駆動
+    // 起動シーケンス・ランタイムおよび描画パイプラインの統合駆動
     if (window.DashboardRuntimeManager) {
-      window.DashboardRuntimeManager.boot();
-    }
-
-    // 描画パイプラインの実行
-    if (window.DashboardRenderingPipeline) {
-      window.DashboardRenderingPipeline.run(viewMode, window.innerWidth);
+      window.DashboardRuntimeManager.boot(viewMode, window.innerWidth);
     }
     
     // 2. サイドバーメニューの active 状態を同期
@@ -1120,9 +1115,9 @@ class DashboardRenderer {
     const gridContainer = document.getElementById('dashboard-grid-container');
     if (!gridContainer || !window.ExecutiveAdapter) return;
 
-    // 描画パイプラインの実行
-    if (window.DashboardRenderingPipeline) {
-      window.DashboardRenderingPipeline.run('executive', window.innerWidth);
+    // ランタイムおよび描画パイプラインの統合駆動
+    if (window.DashboardRuntimeManager) {
+      window.DashboardRuntimeManager.boot('executive', window.innerWidth);
     }
 
     const execData = window.ExecutiveAdapter.getExecutiveData();

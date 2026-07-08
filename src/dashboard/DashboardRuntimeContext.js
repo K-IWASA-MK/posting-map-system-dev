@@ -8,6 +8,8 @@
  */
 
 class DashboardRuntimeContext {
+  static runtimeCounter = 0;
+
   /**
    * 不変なランタイムコンテキストを組み立てる
    * @param {object} params 
@@ -17,7 +19,7 @@ class DashboardRuntimeContext {
     if (!params) params = {};
 
     const context = {
-      runtimeId: params.runtimeId || `rt-${Math.floor(Math.random() * 65536).toString(16)}`,
+      runtimeId: params.runtimeId || `rt-${++DashboardRuntimeContext.runtimeCounter}`,
       runtimeVersion: params.runtimeVersion || 'v1.0.0',
       runtimeStatus: params.runtimeStatus || 'CREATED',
       initializedModules: Object.freeze(params.initializedModules ? [...params.initializedModules] : []),

@@ -29,6 +29,9 @@ const stateCard = global.window.DashboardStateCard;
 const eventBus = global.window.DashboardEventBus;
 
 try {
+  // 明示的な初期化（自動初期化が廃止されたため）
+  stateManager.init();
+
   // Test 1: 初期状態の Object.freeze 不変性検証
   console.log('[Test 1] Initial state Object.freeze validation starting...');
   const snapshot = stateManager.getSnapshot();

@@ -19,16 +19,30 @@ class DashboardWorkspaceRegistry {
       throw new Error('[DashboardWorkspaceRegistry] Invalid workspace specification');
     }
 
+    // layouts マップの構築（layoutId からの後方互換対応）
+    let layoutsMap;
+    if (spec.layouts) {
+      layoutsMap = Object.freeze({ ...spec.layouts });
+    } else {
+      const fallbackId = spec.layoutId || 'lyt-exec-desktop';
+      layoutsMap = Object.freeze({
+        desktop: fallbackId,
+        tablet: fallbackId,
+        mobile: fallbackId
+      });
+    }
+
     const frozenSpec = Object.freeze({
       workspaceId: spec.workspaceId,
       workspaceName: spec.workspaceName || 'Untitled Workspace',
       workspaceCategory: spec.workspaceCategory || 'general',
       description: spec.description || '',
-      layoutId: spec.layoutId || 'lyt-exec-desktop',
+      layoutId: layoutsMap.desktop, // 後方互換（デフォルトは desktop）
+      layouts: layoutsMap,
       widgetIds: Object.freeze(spec.widgetIds ? [...spec.widgetIds] : []),
       priority: typeof spec.priority === 'number' ? spec.priority : 100,
       status: spec.status || 'active',
-      viewMode: spec.viewMode || 'executive' // ナビゲーションおよびサイドメニューに対応するクエリ文字列値
+      viewMode: spec.viewMode || 'executive'
     });
 
     this.workspaces.set(spec.workspaceId, frozenSpec);
@@ -69,7 +83,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Executive Operations Workspace',
     workspaceCategory: 'executive',
     description: 'Executive view aggregating real-time KPIs and system audit tracks.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-kpi', 'wdg-history', 'wdg-evidence', 'wdg-audit'],
     priority: 1,
     status: 'active',
@@ -81,7 +99,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Operations Monitoring Workspace',
     workspaceCategory: 'operational',
     description: 'Field activity tracking and live deployment stats.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-kpi', 'wdg-history'],
     priority: 2,
     status: 'active',
@@ -93,7 +115,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Analytics Dashboard Workspace',
     workspaceCategory: 'operational',
     description: 'Historical performance metrics and coverage ratios.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-kpi', 'wdg-history'],
     priority: 3,
     status: 'active',
@@ -105,7 +131,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Field History Workspace',
     workspaceCategory: 'operational',
     description: 'Deep audit trails of all field activity events.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-history'],
     priority: 4,
     status: 'active',
@@ -117,7 +147,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Evidence Trail Workspace',
     workspaceCategory: 'trust',
     description: 'Immutable evidence ledger for validation records.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-evidence'],
     priority: 5,
     status: 'active',
@@ -129,7 +163,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Audit Ledger Workspace',
     workspaceCategory: 'trust',
     description: 'Audit logs tracking workspace configuration integrity.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-audit'],
     priority: 6,
     status: 'active',
@@ -141,7 +179,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Traceability Map Workspace',
     workspaceCategory: 'trust',
     description: 'Complete traceability chains showing event lineage.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-trace'],
     priority: 7,
     status: 'active',
@@ -153,7 +195,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Trust & Governance Workspace',
     workspaceCategory: 'trust',
     description: 'Compliance metrics and secure boundary validation panels.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-evidence'],
     priority: 8,
     status: 'active',
@@ -165,7 +211,11 @@ if (typeof window !== 'undefined') {
     workspaceName: 'Tenant Boundary Workspace',
     workspaceCategory: 'tenant',
     description: 'Multitenancy scope verification and access logs.',
-    layoutId: 'lyt-exec-desktop',
+    layouts: {
+      desktop: 'lyt-exec-desktop',
+      tablet: 'lyt-exec-tablet',
+      mobile: 'lyt-exec-mobile'
+    },
     widgetIds: ['wdg-kpi'],
     priority: 9,
     status: 'active',

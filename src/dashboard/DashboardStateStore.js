@@ -14,6 +14,7 @@ class DashboardStateStore {
    * @param {object} initialState 
    */
   static initialize(initialState) {
+    this.validateState(initialState);
     this.state = Object.freeze(initialState);
   }
 
@@ -30,7 +31,24 @@ class DashboardStateStore {
    * @param {object} newState 
    */
   static setState(newState) {
+    this.validateState(newState);
     this.state = Object.freeze(newState);
+  }
+
+  /**
+   * 状態の妥当性を検証する
+   * @param {object} state 
+   */
+  static validateState(state) {
+    if (!state) {
+      throw new Error('[DashboardStateStore] State cannot be empty');
+    }
+    const required = ['stateVersion', 'currentWorkspace', 'renderStatus'];
+    for (const key of required) {
+      if (state[key] === undefined || state[key] === null) {
+        throw new Error(`[DashboardStateStore] Missing required state field: ${key}`);
+      }
+    }
   }
 }
 
