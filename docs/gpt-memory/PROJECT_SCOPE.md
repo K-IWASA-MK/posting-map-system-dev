@@ -13,17 +13,21 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 165: Field Intelligence Traceability Foundation [現在のフェーズ]
-* **目的**: Phase 164 Field Intelligence Audit Foundation を拡張し、Timeline・History・Evidence・Audit の各レコード間の由来（Traceability）を決定論的に関連付けて可視化する。
+### 現在のスプリント: AIOS Phase 166: Dashboard Widget Foundation [現在のフェーズ]
+* **目的**: Dashboard Widget の共通基盤（生成・登録・状態管理・ViewModel変換）を構築し、今後のレイアウトや状態管理の土台を整える。
 * **今回実装するもの (対象)**:
-  - Audit Record から元となる Evidence・History・Timeline を追跡可能な Trace Record を決定論的に生成する基盤の構築。
-  - `?view=trace` として参照できる Observer Dashboard の追加。
+  - Widget Definition/Metadata 共通構造定義
+  - DashboardWidgetRegistry, DashboardWidgetFactory, DashboardWidgetLifecycle, DashboardWidgetAdapter
+  - Widget 一覧とライフサイクルを表示する DashboardWidgetCard
 * **今回実装しないもの (対象外)**:
-  - ❌ AIによる原因分析・推論・異常判定・改善提案
-  - ❌ Write API、Command送信、Kernel操作、編集/削除UI、Export機能
+  - ❌ Layout 配置制御・ドラッグ＆ドロップ機能
+  - ❌ Widgetの追加・削除UI、AIによるWidget推薦・自動配置
+  - ❌ Write API、Command送信、Kernel操作
+
+### 完了したスプリント: AIOS Phase 165: Field Intelligence Traceability Foundation
+* **目的**: Phase 164 Field Intelligence Audit Foundation を拡張し、Timeline・History・Evidence・Audit の各レコード間の由来（Traceability）を決定論的に関連付けて可視化する。
 
 ### 完了したスプリント: AIOS Phase 164: Field Intelligence Audit Foundation
-* **目的**: Phase 163 Field Intelligence Evidence Foundation を拡張し、Evidence Record を監査対象（Audit Record）として体系的に管理・可視化する。
 
 ### 完了したスプリント: AIOS Phase 162: Field Intelligence History Foundation
 * **目的**: 現場活動履歴の長期蓄積・証跡化。

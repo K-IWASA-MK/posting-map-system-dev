@@ -182,6 +182,11 @@ class DashboardRenderer {
           key: 'FieldOpsStatusCard',
           render: () => window.FieldOpsStatusCard.render({ fieldOpsStatus: execData.fieldOpsStatus, delay: 500 }),
           props: execData.fieldOpsStatus
+        },
+        {
+          key: 'DashboardWidgetCard',
+          render: () => window.DashboardWidgetCard.render({ widgets: window.DashboardWidgetAdapter ? window.DashboardWidgetAdapter.getDashboardWidgetData().widgets : [], delay: 550 }),
+          props: window.DashboardWidgetAdapter ? window.DashboardWidgetAdapter.getDashboardWidgetData().widgets : []
         }
       ];
     } else if (viewMode === 'trust') {
@@ -1154,6 +1159,18 @@ class DashboardRenderer {
         el.outerHTML = window.FieldOpsStatusCard.render({ fieldOpsStatus: execData.fieldOpsStatus, delay: 0 });
         const newEl = gridContainer.children[8];
         if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+    // 9: DashboardWidgetCard
+    if (window.DashboardWidgetCard && window.DashboardWidgetAdapter) {
+      const widgetData = window.DashboardWidgetAdapter.getDashboardWidgetData();
+      if (window.DashboardRenderCache.hasChanged('DashboardWidgetCard', widgetData.widgets)) {
+        const el = gridContainer.children[9];
+        if (el) {
+          el.outerHTML = window.DashboardWidgetCard.render({ widgets: widgetData.widgets, delay: 0 });
+          const newEl = gridContainer.children[9];
+          if (newEl) DashboardRenderer.activateMotion(newEl);
+        }
       }
     }
   }

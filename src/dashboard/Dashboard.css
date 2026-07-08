@@ -4166,3 +4166,113 @@ body {
   text-overflow: ellipsis;
 }
 
+/* ==========================================================================
+   30. Dashboard Widget View Card Styles
+   ========================================================================== */
+.dashboard-widget-card {
+  grid-column: span 12;
+  padding: var(--space-lg);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+  box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.widget-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.widget-row {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.005);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  gap: var(--space-sm);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.widget-row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.widget-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding-bottom: var(--space-xs);
+}
+
+.widget-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+}
+
+.widget-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+.widget-status.status-created {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+
+.widget-status.status-registered {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-blue);
+}
+
+.widget-status.status-ready {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}
+
+.widget-status.status-rendered {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.widget-details {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-md);
+}
+
+.widget-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.widget-detail-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.widget-detail-value {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.widget-detail-value.highlight-number {
+  color: var(--accent-blue);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
