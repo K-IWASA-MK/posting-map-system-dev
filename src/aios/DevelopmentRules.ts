@@ -11,6 +11,7 @@ import { SkillRegistry, Skill } from './SkillRegistry';
 import { SkillPipelineRegistry, SkillPipeline } from './SkillPipelineRegistry';
 import { ExecutionLedgerRegistry, ExecutionRecord } from './ExecutionLedgerRegistry';
 import { QualityGateRegistry, QualityGateRecord } from './QualityGateRegistry';
+import { ToolAdapterRegistry, ToolAdapter } from './ToolAdapter';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -94,5 +95,16 @@ export class DevelopmentRules {
     // 最新の Ledger に対応する QualityGateRecord を取得
     const latestLedger = ledgers[ledgers.length - 1];
     return QualityGateRegistry.getByLedger(latestLedger.executionId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする全 ToolAdapter を取得する
+   */
+  static getToolAdapters(rule: DevelopmentRule): ToolAdapter[] {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return [];
+    }
+    return ToolAdapterRegistry.getByPipeline(pipeline.pipelineId);
   }
 }

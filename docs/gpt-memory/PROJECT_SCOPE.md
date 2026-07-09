@@ -13,13 +13,22 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 200-7: Development Quality Gate Foundation [現在のフェーズ]
-* **目的**: Phase 200-6 Development Execution Ledger Foundation を基盤とし、Development OS 全体の品質判定ゲートとなる Development Quality Gate Foundation（定義・状態遷移・評価集計・Ruleバージョン・対称構造）を構築する。
+### 現在のスプリント: AIOS Phase 201-1: Tool Adapter Foundation [現在のフェーズ]
+* **目的**: Phase 200 で完成した Development OS Foundation を基盤として、Development OS と外部開発環境を完全分離する Tool Adapter Foundation（定義・登録・解決・簡素依存・ToolCategory・AdapterStatus・対称構造）を構築する。
 * **今回実施するもの (対象)**:
+  - Tool Adapter 設計仕様書（`docs/specifications/DevelopmentToolAdapter.md`）の策定。
+  - `src/aios/` への新規追加（ToolRegistry, ToolFactory, ToolValidator, ToolAdapter, ToolAdapterFactory, ToolAdapterValidator, ToolAdapterAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Tool Adapter 解決（getToolAdapters）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 200-7: Development Quality Gate Foundation
+* **目的**: Phase 200-6 Development Execution Ledger Foundation を基盤とし、Development OS 全体の品質判定ゲートとなる Development Quality Gate Foundation（定義・状態遷移・評価集計・Ruleバージョン・対称構造）を構築する。
+* **実施したもの**:
   - Quality Gate 設計仕様書（`docs/specifications/DevelopmentQualityGate.md`）の策定。
   - `src/aios/` への新規追加（QualityGateRegistry, QualityGateFactory, QualityGateValidator, QualityGateAdapter）の実装。
   - `DevelopmentRules.ts` の Capability → Pipeline → Ledger → Quality Gate 解決（getQualityGate）の実装。
   - テストおよびビルド検証。
+
 
 ### 完了したスプリント: AIOS Phase 200-6: Development Execution Ledger Foundation
 * **目的**: Phase 200-5 Development Skill Pipeline Foundation を基盤とし、Development OS 全体の不変な監査台帳となる Development Execution Ledger Foundation（定義・検証・型安全・対称構造・状態遷移・監査イベント）を構築する。
