@@ -43,6 +43,7 @@ import { ExecutionBlueprintValidator, EXECUTION_BLUEPRINT_VALIDATOR_BLUEPRINT } 
 import { ExecutionRuntimeContext, EXECUTION_RUNTIME_CONTEXT_BLUEPRINT } from '../execution/ExecutionRuntimeContext';
 import { ExecutionRuntimeSession, EXECUTION_RUNTIME_SESSION_BLUEPRINT } from '../execution/ExecutionRuntimeSession';
 import { ExecutionRuntimeManager, EXECUTION_RUNTIME_MANAGER_BLUEPRINT } from '../execution/ExecutionRuntimeManager';
+import { RuntimeResolverResult, EXECUTION_RUNTIME_RESOLVER_LOGIC } from '../execution/ExecutionRuntimeResolver';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -570,5 +571,15 @@ export class DevelopmentRules {
     }
     // ExecutionRuntimeManager はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_MANAGER_BLUEPRINT.getRuntimeManager();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic から RuntimeResolverResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeResolverLogic(rule: DevelopmentRule): RuntimeResolverResult | undefined {
+    // ExecutionRuntimeResolverLogic シングルトン解決ロジックを使用して解決を実行する
+    return EXECUTION_RUNTIME_RESOLVER_LOGIC.resolveRuntime(rule);
   }
 }
