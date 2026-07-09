@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 208-1: Execution Runtime Component Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 208-2: Execution Runtime Component Registry Foundation [現在のフェーズ]
+* **目的**: Execution Runtime における Component Registry の静的 Blueprint を定義する Execution Runtime Component Registry Foundation を構築する。
+
+### 完了したスプリント: AIOS Phase 208-1: Execution Runtime Component Foundation
 * **目的**: Execution Runtime における Component の静的 Blueprint を定義する Execution Runtime Component Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeComponent.md）
+  - ExecutionRuntimeComponent.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeComponent）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 207-7: Execution Runtime Service Executor Foundation
 * **目的**: Execution Runtime Service Scheduler が返却する静的 Blueprint を基に、Execution Runtime Service Executor Foundation を構築する。

@@ -65,6 +65,7 @@ import { ExecutionRuntimeServiceDispatcher, EXECUTION_RUNTIME_SERVICE_DISPATCHER
 import { ExecutionRuntimeServiceScheduler, EXECUTION_RUNTIME_SERVICE_SCHEDULER_BLUEPRINT } from '../execution/ExecutionRuntimeServiceScheduler';
 import { ExecutionRuntimeServiceExecutor, EXECUTION_RUNTIME_SERVICE_EXECUTOR_BLUEPRINT } from '../execution/ExecutionRuntimeServiceExecutor';
 import { ExecutionRuntimeComponent, EXECUTION_RUNTIME_COMPONENT_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponent';
+import { ExecutionRuntimeComponentRegistry, EXECUTION_RUNTIME_COMPONENT_REGISTRY_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -872,5 +873,19 @@ export class DevelopmentRules {
     }
     // ExecutionRuntimeComponent は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_COMPONENT_BLUEPRINT.getExecutionRuntimeComponent();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponent から ExecutionRuntimeComponentRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Registry Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentRegistry(rule: DevelopmentRule): ExecutionRuntimeComponentRegistry | undefined {
+    const component = this.getExecutionRuntimeComponent(rule);
+    if (!component) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_REGISTRY_BLUEPRINT.getExecutionRuntimeComponentRegistry();
   }
 }
