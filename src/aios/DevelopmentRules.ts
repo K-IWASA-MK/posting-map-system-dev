@@ -69,6 +69,7 @@ import { ExecutionRuntimeComponentRegistry, EXECUTION_RUNTIME_COMPONENT_REGISTRY
 import { ExecutionRuntimeComponentResolver, EXECUTION_RUNTIME_COMPONENT_RESOLVER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentResolver';
 import { ExecutionRuntimeComponentValidator, EXECUTION_RUNTIME_COMPONENT_VALIDATOR_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentValidator';
 import { ExecutionRuntimeComponentDispatcher, EXECUTION_RUNTIME_COMPONENT_DISPATCHER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentDispatcher';
+import { ExecutionRuntimeComponentScheduler, EXECUTION_RUNTIME_COMPONENT_SCHEDULER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentScheduler';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -932,5 +933,19 @@ export class DevelopmentRules {
     }
     // ExecutionRuntimeComponentDispatcher は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_COMPONENT_DISPATCHER_BLUEPRINT.getExecutionRuntimeComponentDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentDispatcher から ExecutionRuntimeComponentScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Scheduler Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentScheduler(rule: DevelopmentRule): ExecutionRuntimeComponentScheduler | undefined {
+    const dispatcher = this.getExecutionRuntimeComponentDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentScheduler は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_SCHEDULER_BLUEPRINT.getExecutionRuntimeComponentScheduler();
   }
 }
