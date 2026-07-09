@@ -13,9 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 202-4: Development Runtime Queue Foundation [現在のフェーズ]
-* **目的**: Phase 202-3 Runtime Context Foundation を基盤とし、Development OS における論理的な処理待ちキューを抽象的に管理する Development Runtime Queue Foundation（仕様・RuntimeQueueRegistry・Queue・RuntimeQueueState・QueuePriority・RuntimeQueueFactory・RuntimeQueueValidator・RuntimeQueueAdapter）を構築する。
+### 現在のスプリント: AIOS Phase 202-5: Development Runtime Task Foundation [現在のフェーズ]
+* **目的**: Phase 202-4 Runtime Queue Foundation を基盤とし、Development OS における最小実行単位を抽象的に管理する Runtime Task Foundation（仕様・RuntimeTaskRegistry・Task・RuntimeTaskState・RuntimeTaskType・RuntimeTaskFactory・RuntimeTaskValidator・RuntimeTaskAdapter）を構築する。
 * **今回実施するもの (対象)**:
+  - Development Runtime Task 設計仕様書（`docs/specifications/DevelopmentRuntimeTask.md`）の策定。
+  - `src/aios/` への新規追加（RuntimeTaskRegistry, RuntimeTaskFactory, RuntimeTaskValidator, RuntimeTaskAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext → RuntimeQueue → RuntimeTask 解決（getRuntimeTask）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 202-4: Development Runtime Queue Foundation
+* **目的**: Phase 202-3 Runtime Context Foundation を基盤とし、Development OS における論理的な処理待ちキューを抽象的に管理する Development Runtime Queue Foundation（仕様・RuntimeQueueRegistry・Queue・RuntimeQueueState・QueuePriority・RuntimeQueueFactory・RuntimeQueueValidator・RuntimeQueueAdapter）を構築する。
+* **実施したもの**:
   - Development Runtime Queue 設計仕様書（`docs/specifications/DevelopmentRuntimeQueue.md`）の策定。
   - `src/aios/` への新規追加（RuntimeQueueRegistry, RuntimeQueueFactory, RuntimeQueueValidator, RuntimeQueueAdapter）の実装。
   - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext → RuntimeQueue 解決（getRuntimeQueue）の実装。
