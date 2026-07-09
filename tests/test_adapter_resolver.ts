@@ -4,7 +4,7 @@ import { SkillRegistry, SkillCategory, SkillStatus } from '../src/aios/SkillRegi
 import { SkillFactory } from '../src/aios/SkillFactory';
 import { SkillPipelineRegistry, SkillPipelineStatus } from '../src/aios/SkillPipelineRegistry';
 import { SkillPipelineFactory } from '../src/aios/SkillPipelineFactory';
-import { ToolRegistry } from '../src/aios/ToolRegistry';
+import { ToolRegistry, ToolCategory } from '../src/aios/ToolRegistry';
 import { ClaudeModelRegistry, ClaudeProvider, ClaudeModelStatus } from '../src/aios/ClaudeModelRegistry';
 import { ClaudeAdapterRegistry } from '../src/aios/ClaudeAdapter';
 import { ClaudeAdapterFactory } from '../src/aios/ClaudeAdapterFactory';
@@ -17,6 +17,8 @@ import { AdapterResolverFactory } from '../src/aios/AdapterResolverFactory';
 import { AdapterResolver } from '../src/aios/AdapterResolver';
 import { AdapterResolverAdapter } from '../src/aios/AdapterResolverAdapter';
 import { DevelopmentRules } from '../src/aios/DevelopmentRules';
+import { MultiAdapterRegistry, AdapterHealthStatus, AdapterPriorityPolicy } from '../src/aios/MultiAdapterRegistry';
+import { MultiAdapterFactory } from '../src/aios/MultiAdapterFactory';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -40,6 +42,8 @@ function setupAllEnvironments() {
   GeminiAdapterFactory.resetCounter();
   AdapterResolutionRegistry.clear();
   AdapterResolverFactory.resetCounter();
+  MultiAdapterRegistry.clear();
+  MultiAdapterFactory.resetCounter();
 
   // Register Capability
   const cap = CapabilityFactory.create('Testing', CapabilityCategory.Testing, 'Desc', 10, CapabilityStatus.ACTIVE, '1.0.0');
@@ -217,31 +221,32 @@ function testResolverLogic() {
   console.log('[Test 4] Resolver logical priority resolution starting...');
   setupAllEnvironments();
 
-  // Resolution 1: Claude, PREFERRED, Priority 10
-  const r1 = AdapterResolverFactory.create('capability-1', 'pipeline-1', 'adapter-1', AdapterType.CLAUDE, 10, ResolutionPolicy.PREFERRED, 'Main LLM', ResolutionState.ACTIVE, '1.0.0');
-  AdapterResolutionRegistry.register(r1);
+  // Resolution 1: Claude, DYNAMIC, Priority 10
+  const r1 = MultiAdapterFactory.create('adapter-1', AdapterType.CLAUDE, ToolCategory.LLM, 10, AdapterPriorityPolicy.DYNAMIC, AdapterHealthStatus.HEALTHY, ToolAdapterStatus.ACTIVE, ['capability-1'], ['pipeline-1'], '1.0.0');
+  MultiAdapterRegistry.register(r1);
 
   // Resolution 2: Gemini, FALLBACK, Priority 20 (Higher priority value, but lower policy rank)
-  const r2 = AdapterResolverFactory.create('capability-1', 'pipeline-1', 'adapter-2', AdapterType.GEMINI, 20, ResolutionPolicy.FALLBACK, 'Fallback LLM', ResolutionState.ACTIVE, '1.0.0');
-  AdapterResolutionRegistry.register(r2);
+  const r2 = MultiAdapterFactory.create('adapter-2', AdapterType.GEMINI, ToolCategory.LLM, 20, AdapterPriorityPolicy.FALLBACK, AdapterHealthStatus.HEALTHY, ToolAdapterStatus.ACTIVE, ['capability-1'], ['pipeline-1'], '1.0.0');
+  MultiAdapterRegistry.register(r2);
 
-  // We should resolve Claude since PREFERRED rank is higher than FALLBACK rank
+  // We should resolve Claude since DYNAMIC rank (2) is higher than FALLBACK rank (1)
   let resolved = AdapterResolver.resolve('capability-1')!;
   assert(resolved.adapterId === 'adapter-1', 'Should resolve Claude based on policy rank');
 
   // Let's add Resolution 3: Gemini, FIXED, Priority 5 (Lowest priority value, but FIXED policy rank)
-  const r3 = AdapterResolverFactory.create('capability-1', 'pipeline-1', 'adapter-2', AdapterType.GEMINI, 5, ResolutionPolicy.FIXED, 'Fixed LLM', ResolutionState.ACTIVE, '1.0.0');
-  AdapterResolutionRegistry.register(r3);
+  // Registering a second Gemini configuration with FIXED policy rank (3)
+  const r3 = MultiAdapterFactory.create('adapter-1', AdapterType.GEMINI, ToolCategory.LLM, 5, AdapterPriorityPolicy.FIXED, AdapterHealthStatus.HEALTHY, ToolAdapterStatus.ACTIVE, ['capability-1'], ['pipeline-1'], '1.0.0');
+  MultiAdapterRegistry.register(r3);
 
   // We should resolve Gemini now because FIXED has highest policy rank
   resolved = AdapterResolver.resolve('capability-1')!;
-  assert(resolved.adapterId === 'adapter-2', 'Should resolve Gemini based on FIXED policy');
+  assert(resolved.adapterId === 'adapter-1', 'Should resolve Gemini based on FIXED policy');
 
-  // Verify DISABLED policy candidate is ignored
-  AdapterResolutionRegistry.clear();
-  const disabledRecord = AdapterResolverFactory.create('capability-1', 'pipeline-1', 'adapter-1', AdapterType.CLAUDE, 100, ResolutionPolicy.DISABLED, 'Disabled', ResolutionState.ACTIVE, '1.0.0');
-  AdapterResolutionRegistry.register(disabledRecord);
-  assert(AdapterResolver.resolve('capability-1') === undefined, 'DISABLED policy should return undefined');
+  // Verify INACTIVE status candidate is ignored
+  MultiAdapterRegistry.clear();
+  const disabledRecord = MultiAdapterFactory.create('adapter-1', AdapterType.CLAUDE, ToolCategory.LLM, 100, AdapterPriorityPolicy.FIXED, AdapterHealthStatus.HEALTHY, ToolAdapterStatus.INACTIVE, ['capability-1'], ['pipeline-1'], '1.0.0');
+  MultiAdapterRegistry.register(disabledRecord);
+  assert(AdapterResolver.resolve('capability-1') === undefined, 'INACTIVE status should return undefined');
 
   console.log('[Test 4] Resolver logical priority resolution: PASSED');
 }
@@ -288,18 +293,19 @@ function testRulesIntegration() {
   console.log('[Test 6] DevelopmentRules integration verification starting...');
   setupAllEnvironments();
 
-  const record = AdapterResolverFactory.create(
-    'capability-1',
-    'pipeline-1',
+  const record = MultiAdapterFactory.create(
     'adapter-1',
     AdapterType.CLAUDE,
+    ToolCategory.LLM,
     10,
-    ResolutionPolicy.PREFERRED,
-    'Reason text',
-    ResolutionState.ACTIVE,
+    AdapterPriorityPolicy.FIXED,
+    AdapterHealthStatus.HEALTHY,
+    ToolAdapterStatus.ACTIVE,
+    ['capability-1'],
+    ['pipeline-1'],
     '1.0.0'
   );
-  AdapterResolutionRegistry.register(record);
+  MultiAdapterRegistry.register(record);
 
   const rule = DevelopmentRules.createRule('rule-1', 'Test rule', 'Testing', 5);
   const resolved = DevelopmentRules.getResolvedAdapter(rule);

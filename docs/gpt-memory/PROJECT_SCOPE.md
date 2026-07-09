@@ -13,13 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 201-6: Adapter Resolver Foundation [現在のフェーズ]
-* **目的**: Phase 201-5 OpenAI Adapter Foundation を基盤とし、Development OS が Capability に対する最適な ToolAdapter を決定論的かつ優先順位付きポリシーに従い静的解決する Adapter Resolver Foundation（仕様・AdapterResolutionRegistry・ResolutionPolicy・AdapterType・ResolutionReason・AdapterResolver）を構築する。
+### 現在のスプリント: AIOS Phase 201-7: Multi Adapter Registry Foundation [現在のフェーズ]
+* **目的**: Phase 201-6 Adapter Resolver Foundation を基盤とし、Development OS 全体のすべての ToolAdapter を一元管理・Discovery できるようにする Multi Adapter Registry Foundation（仕様・MultiAdapterRegistry・AdapterCapabilityMatrix・AdapterHealthStatus・AdapterPriorityPolicy・Discovery APIs）を構築する。
 * **今回実施するもの (対象)**:
+  - Multi Adapter Registry 設計仕様書（`docs/specifications/DevelopmentMultiAdapterRegistry.md`）の策定。
+  - `src/aios/` への新規追加（MultiAdapterRegistry, MultiAdapterFactory, MultiAdapterValidator, MultiAdapterAdapter）の実装。
+  - `AdapterResolver.ts` の参照先を `MultiAdapterRegistry` に統一。
+  - `DevelopmentRules.ts` の Capability → MultiAdapterRegistry 解決（getAvailableAdapters）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 201-6: Adapter Resolver Foundation
+* **目的**: Phase 201-5 OpenAI Adapter Foundation を基盤とし、Development OS が Capability に対する最適な ToolAdapter を決定論的かつ優先順位付きポリシーに従い静的解決する Adapter Resolver Foundation（仕様・AdapterResolutionRegistry・ResolutionPolicy・AdapterType・ResolutionReason・AdapterResolver）を構築する。
+* **実施したもの**:
   - Adapter Resolver 設計仕様書（`docs/specifications/DevelopmentAdapterResolver.md`）の策定。
   - `src/aios/` への新規追加（AdapterResolutionRegistry, AdapterResolver, AdapterResolverFactory, AdapterResolverValidator, AdapterResolverAdapter）の実装。
   - `DevelopmentRules.ts` の Capability → Pipeline → Tool Adapter → AdapterResolver 解決（getResolvedAdapter）の実装。
   - テストおよびビルド検証。
+
 
 ### 完了したスプリント: AIOS Phase 201-5: OpenAI Adapter Foundation
 * **目的**: Phase 201-4 Gemini Adapter Foundation を基盤とし、AIOS が利用する LLM Adapter の第三弾である OpenAI Adapter Foundation（仕様・OpenAIModelRegistry・OpenAIProvider・OpenAIModelStatus・インターフェース実装）を構築する。

@@ -1,9 +1,11 @@
-import { ToolAdapter } from './ToolAdapter';
+import { ToolAdapter, ToolAdapterStatus } from './ToolAdapter';
 import { AntigravityAdapterRegistry } from './AntigravityAdapter';
 import { ClaudeAdapterRegistry } from './ClaudeAdapter';
 import { GeminiAdapterRegistry } from './GeminiAdapter';
 import { OpenAIAdapterRegistry } from './OpenAIAdapter';
-import { AdapterResolutionRegistry, ResolutionPolicy, AdapterType, ResolutionState } from './AdapterResolutionRegistry';
+import { SkillPipelineRegistry } from './SkillPipelineRegistry';
+import { MultiAdapterRegistry, AdapterPriorityPolicy } from './MultiAdapterRegistry';
+import { AdapterType } from './AdapterResolutionRegistry';
 
 /**
  * AdapterResolver.ts
@@ -15,10 +17,9 @@ import { AdapterResolutionRegistry, ResolutionPolicy, AdapterType, ResolutionSta
 
 export class AdapterResolver {
   private static readonly policyPriorityMap = {
-    [ResolutionPolicy.FIXED]: 3,
-    [ResolutionPolicy.PREFERRED]: 2,
-    [ResolutionPolicy.FALLBACK]: 1,
-    [ResolutionPolicy.DISABLED]: 0
+    [AdapterPriorityPolicy.FIXED]: 3,
+    [AdapterPriorityPolicy.DYNAMIC]: 2,
+    [AdapterPriorityPolicy.FALLBACK]: 1
   };
 
   /**
@@ -29,24 +30,27 @@ export class AdapterResolver {
       throw new Error('[AdapterResolver] capabilityId is required');
     }
 
-    // 1. レジストリから対象 Capability の全解決設定を取得
-    const records = AdapterResolutionRegistry.getByCapability(capabilityId);
+    // 1. Capability に対する Pipeline を取得
+    const pipeline = SkillPipelineRegistry.getByCapability(capabilityId);
+    if (!pipeline) {
+      return undefined;
+    }
 
-    // 2. ACTIVE かつ DISABLED 以外の設定レコードに絞り込む
-    const candidates = records.filter(r => 
-      r.resolutionState === ResolutionState.ACTIVE &&
-      r.resolutionPolicy !== ResolutionPolicy.DISABLED
-    );
+    // 2. MultiAdapterRegistry から Pipeline に対応する全 AdapterRecord を取得
+    const records = MultiAdapterRegistry.findByPipeline(pipeline.pipelineId);
+
+    // 3. ACTIVE な設定レコードに絞り込む
+    const candidates = records.filter(r => r.status === ToolAdapterStatus.ACTIVE);
 
     if (candidates.length === 0) {
       return undefined;
     }
 
-    // 3. 解決ルールに従ってソート (安定ソートを利用)
-    //    優先度1: ResolutionPolicy (FIXED > PREFERRED > FALLBACK)
+    // 4. 解決ルールに従ってソート (安定ソートを利用)
+    //    優先度1: AdapterPriorityPolicy (FIXED > DYNAMIC > FALLBACK)
     //    優先度2: priority 数値 (降順)
     candidates.sort((a, b) => {
-      const policyDiff = this.policyPriorityMap[b.resolutionPolicy] - this.policyPriorityMap[a.resolutionPolicy];
+      const policyDiff = this.policyPriorityMap[b.priorityPolicy] - this.policyPriorityMap[a.priorityPolicy];
       if (policyDiff !== 0) {
         return policyDiff;
       }
@@ -55,7 +59,7 @@ export class AdapterResolver {
 
     const chosen = candidates[0];
 
-    // 4. 指定された AdapterType に応じて各具象レジストリから Adapter を解決取得
+    // 5. 指定された AdapterType に応じて各具象レジストリから Adapter を解決取得
     switch (chosen.adapterType) {
       case AdapterType.ANTIGRAVITY:
         return AntigravityAdapterRegistry.get(chosen.adapterId);
@@ -70,3 +74,4 @@ export class AdapterResolver {
     }
   }
 }
+

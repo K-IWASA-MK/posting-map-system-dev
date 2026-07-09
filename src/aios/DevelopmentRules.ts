@@ -20,6 +20,8 @@ import { GeminiModelRegistry, GeminiModel } from './GeminiModelRegistry';
 import { OpenAIAdapterRegistry, OpenAIAdapter } from './OpenAIAdapter';
 import { OpenAIModelRegistry, OpenAIModel } from './OpenAIModelRegistry';
 import { AdapterResolver } from './AdapterResolver';
+import { MultiAdapterRegistry } from './MultiAdapterRegistry';
+import { AdapterType } from './AdapterResolutionRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -227,5 +229,42 @@ export class DevelopmentRules {
       return undefined;
     }
     return AdapterResolver.resolve(verified.capabilityId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability に対するすべての利用可能アダプター一覧を取得する
+   */
+  static getAvailableAdapters(rule: DevelopmentRule): readonly ToolAdapter[] {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return [];
+    }
+    
+    // MultiAdapterRegistry から該当 Capability をサポートするレコードを取得
+    const records = MultiAdapterRegistry.findByCapability(verified.capabilityId);
+    const list: ToolAdapter[] = [];
+    
+    for (const rec of records) {
+      let adapter: ToolAdapter | undefined;
+      switch (rec.adapterType) {
+        case AdapterType.ANTIGRAVITY:
+          adapter = AntigravityAdapterRegistry.get(rec.adapterId);
+          break;
+        case AdapterType.CLAUDE:
+          adapter = ClaudeAdapterRegistry.get(rec.adapterId);
+          break;
+        case AdapterType.GEMINI:
+          adapter = GeminiAdapterRegistry.get(rec.adapterId);
+          break;
+        case AdapterType.OPENAI:
+          adapter = OpenAIAdapterRegistry.get(rec.adapterId);
+          break;
+      }
+      if (adapter) {
+        list.push(adapter);
+      }
+    }
+    
+    return Object.freeze(list);
   }
 }
