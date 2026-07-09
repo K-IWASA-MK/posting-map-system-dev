@@ -28,6 +28,7 @@ import { RuntimeContextRegistry, Context } from './RuntimeContextRegistry';
 import { RuntimeQueueRegistry, Queue } from './RuntimeQueueRegistry';
 import { RuntimeTaskRegistry, Task } from './RuntimeTaskRegistry';
 import { RuntimeExecutionPlanRegistry, ExecutionPlan } from './RuntimeExecutionPlanRegistry';
+import { RuntimeExecutionGraphRegistry, ExecutionGraph } from './RuntimeExecutionGraphRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -347,5 +348,17 @@ export class DevelopmentRules {
     }
     const plans = RuntimeExecutionPlanRegistry.findByTask(task.taskId);
     return plans.length > 0 ? plans[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan から RuntimeExecutionGraph を静的に解決・取得する
+   */
+  static getRuntimeExecutionGraph(rule: DevelopmentRule): ExecutionGraph | undefined {
+    const plan = this.getRuntimeExecutionPlan(rule);
+    if (!plan) {
+      return undefined;
+    }
+    const graphs = RuntimeExecutionGraphRegistry.findByPlan(plan.planId);
+    return graphs.length > 0 ? graphs[0] : undefined;
   }
 }
