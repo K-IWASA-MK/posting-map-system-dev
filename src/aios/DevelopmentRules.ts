@@ -48,6 +48,7 @@ import { RuntimeHydrationResult, EXECUTION_RUNTIME_HYDRATION_LOGIC } from '../ex
 import { RuntimeValidationResult, EXECUTION_RUNTIME_VALIDATION_LOGIC } from '../execution/ExecutionRuntimeValidation';
 import { RuntimeDispatchResult, EXECUTION_RUNTIME_DISPATCH_LOGIC } from '../execution/ExecutionRuntimeDispatch';
 import { RuntimeQueueResult, EXECUTION_RUNTIME_QUEUE_LOGIC } from '../execution/ExecutionRuntimeQueue';
+import { RuntimeSchedulerResult, EXECUTION_RUNTIME_SCHEDULER_LOGIC } from '../execution/ExecutionRuntimeScheduler';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -625,5 +626,15 @@ export class DevelopmentRules {
   static getExecutionRuntimeQueueLogic(rule: DevelopmentRule): RuntimeQueueResult | undefined {
     // ExecutionRuntimeQueueLogic シングルトン解決ロジックを使用してキュー解決を実行する
     return EXECUTION_RUNTIME_QUEUE_LOGIC.queueRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic から RuntimeSchedulerResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeSchedulerLogic(rule: DevelopmentRule): RuntimeSchedulerResult | undefined {
+    // ExecutionRuntimeSchedulerLogic シングルトン解決ロジックを使用してスケジュール解決を実行する
+    return EXECUTION_RUNTIME_SCHEDULER_LOGIC.scheduleRuntime(rule);
   }
 }
