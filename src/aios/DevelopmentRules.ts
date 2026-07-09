@@ -44,6 +44,7 @@ import { ExecutionRuntimeContext, EXECUTION_RUNTIME_CONTEXT_BLUEPRINT } from '..
 import { ExecutionRuntimeSession, EXECUTION_RUNTIME_SESSION_BLUEPRINT } from '../execution/ExecutionRuntimeSession';
 import { ExecutionRuntimeManager, EXECUTION_RUNTIME_MANAGER_BLUEPRINT } from '../execution/ExecutionRuntimeManager';
 import { RuntimeResolverResult, EXECUTION_RUNTIME_RESOLVER_LOGIC } from '../execution/ExecutionRuntimeResolver';
+import { RuntimeHydrationResult, EXECUTION_RUNTIME_HYDRATION_LOGIC } from '../execution/ExecutionRuntimeHydration';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -581,5 +582,15 @@ export class DevelopmentRules {
   static getExecutionRuntimeResolverLogic(rule: DevelopmentRule): RuntimeResolverResult | undefined {
     // ExecutionRuntimeResolverLogic シングルトン解決ロジックを使用して解決を実行する
     return EXECUTION_RUNTIME_RESOLVER_LOGIC.resolveRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic から RuntimeHydrationResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeHydrationLogic(rule: DevelopmentRule): RuntimeHydrationResult | undefined {
+    // ExecutionRuntimeHydrationLogic シングルトン解決ロジックを使用してハイドレーション解決を実行する
+    return EXECUTION_RUNTIME_HYDRATION_LOGIC.hydrateContext(rule);
   }
 }

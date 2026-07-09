@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 205-1: Execution Runtime Resolver Logic Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 205-2: Execution Context Hydration Logic Foundation [現在のフェーズ]
+* **目的**: Phase 205-1 で完成した Execution Runtime Resolver Logic を基盤とし、Execution Context Hydration Logic の構造定義・データモデル・ハイドレーション処理・公開インターフェースを構築する。
+
+### 完了したスプリント: AIOS Phase 205-1: Execution Runtime Resolver Logic Foundation
 * **目的**: Phase 204 で完成した Execution Runtime Foundation を基盤とし、Execution Runtime Resolver Logic の構造定義・データモデル・解決処理・公開インターフェースを構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeResolverLogic.md）
+  - ExecutionRuntimeResolver.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeResolverLogic）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 204-7: Execution Runtime Manager Foundation
 * **目的**: Phase 204-6 で完成した Execution Runtime Session Foundation を基盤とし、Execution Runtime Manager の構造定義・データモデル・Blueprint・公開インターフェースを構築する。
