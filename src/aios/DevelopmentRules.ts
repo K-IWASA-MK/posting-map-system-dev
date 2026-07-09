@@ -34,6 +34,7 @@ import { ExecutionRegistry, EXECUTION_REGISTRY_BLUEPRINT } from '../execution/Ex
 import { ExecutionRequest, EXECUTION_REQUEST_BLUEPRINT } from '../execution/ExecutionRequest';
 import { ExecutionResult, EXECUTION_RESULT_BLUEPRINT } from '../execution/ExecutionResult';
 import { ExecutionState, EXECUTION_STATE_BLUEPRINT } from '../execution/ExecutionState';
+import { ExecutionResolver, EXECUTION_RESOLVER_BLUEPRINT } from '../execution/ExecutionResolver';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -435,5 +436,19 @@ export class DevelopmentRules {
     }
     // ExecutionState は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_STATE_BLUEPRINT.getState();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState から ExecutionResolver を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionResolver(rule: DevelopmentRule): ExecutionResolver | undefined {
+    const state = this.getExecutionState(rule);
+    if (!state) {
+      return undefined;
+    }
+    // ExecutionResolver は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RESOLVER_BLUEPRINT.getResolver();
   }
 }
