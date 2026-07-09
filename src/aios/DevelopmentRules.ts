@@ -12,6 +12,7 @@ import { SkillPipelineRegistry, SkillPipeline } from './SkillPipelineRegistry';
 import { ExecutionLedgerRegistry, ExecutionRecord } from './ExecutionLedgerRegistry';
 import { QualityGateRegistry, QualityGateRecord } from './QualityGateRegistry';
 import { ToolAdapterRegistry, ToolAdapter } from './ToolAdapter';
+import { AntigravityAdapterRegistry, AntigravityAdapter } from './AntigravityAdapter';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -106,5 +107,17 @@ export class DevelopmentRules {
       return [];
     }
     return ToolAdapterRegistry.getByPipeline(pipeline.pipelineId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする AntigravityAdapter を取得する
+   */
+  static getAntigravityAdapter(rule: DevelopmentRule): AntigravityAdapter | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const list = AntigravityAdapterRegistry.getByPipeline(pipeline.pipelineId);
+    return list.length > 0 ? list[0] : undefined;
   }
 }

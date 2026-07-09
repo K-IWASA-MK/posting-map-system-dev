@@ -43,7 +43,18 @@ export interface RegistryMetadata {
 }
 
 export class ToolRegistry {
-  private static registry: Map<string, Tool> = new Map();
+  private static registry: Map<string, Tool> = new Map([
+    ['tool-antigravity', Object.freeze({
+      toolId: 'tool-antigravity',
+      toolName: 'Antigravity IDE',
+      category: ToolCategory.IDE,
+      description: 'Antigravity development environment integration tool',
+      status: ToolStatus.ACTIVE,
+      version: '1.0.0',
+      createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),
+      updatedAt: new Date('2026-07-09T09:30:00Z').toISOString()
+    })]
+  ]);
 
   // レジストリメタデータの定義
   public static readonly metadata: RegistryMetadata = Object.freeze({
@@ -112,5 +123,15 @@ export class ToolRegistry {
    */
   static clear(): void {
     this.registry.clear();
+    this.registry.set('tool-antigravity', Object.freeze({
+      toolId: 'tool-antigravity',
+      toolName: 'Antigravity IDE',
+      category: ToolCategory.IDE,
+      description: 'Antigravity development environment integration tool',
+      status: ToolStatus.ACTIVE,
+      version: '1.0.0',
+      createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),
+      updatedAt: new Date('2026-07-09T09:30:00Z').toISOString()
+    }));
   }
 }
