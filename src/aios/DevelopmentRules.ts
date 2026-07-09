@@ -46,6 +46,7 @@ import { ExecutionRuntimeManager, EXECUTION_RUNTIME_MANAGER_BLUEPRINT } from '..
 import { RuntimeResolverResult, EXECUTION_RUNTIME_RESOLVER_LOGIC } from '../execution/ExecutionRuntimeResolver';
 import { RuntimeHydrationResult, EXECUTION_RUNTIME_HYDRATION_LOGIC } from '../execution/ExecutionRuntimeHydration';
 import { RuntimeValidationResult, EXECUTION_RUNTIME_VALIDATION_LOGIC } from '../execution/ExecutionRuntimeValidation';
+import { RuntimeDispatchResult, EXECUTION_RUNTIME_DISPATCH_LOGIC } from '../execution/ExecutionRuntimeDispatch';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -603,5 +604,15 @@ export class DevelopmentRules {
   static getExecutionRuntimeValidationLogic(rule: DevelopmentRule): RuntimeValidationResult | undefined {
     // ExecutionRuntimeValidationLogic シングルトン解決ロジックを使用して整合性検証を実行する
     return EXECUTION_RUNTIME_VALIDATION_LOGIC.validateRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic から RuntimeDispatchResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeDispatchLogic(rule: DevelopmentRule): RuntimeDispatchResult | undefined {
+    // ExecutionRuntimeDispatchLogic シングルトン解決ロジックを使用してディスパッチ解決を実行する
+    return EXECUTION_RUNTIME_DISPATCH_LOGIC.dispatchRuntime(rule);
   }
 }
