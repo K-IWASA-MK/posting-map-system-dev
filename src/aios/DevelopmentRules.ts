@@ -67,6 +67,7 @@ import { ExecutionRuntimeServiceExecutor, EXECUTION_RUNTIME_SERVICE_EXECUTOR_BLU
 import { ExecutionRuntimeComponent, EXECUTION_RUNTIME_COMPONENT_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponent';
 import { ExecutionRuntimeComponentRegistry, EXECUTION_RUNTIME_COMPONENT_REGISTRY_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentRegistry';
 import { ExecutionRuntimeComponentResolver, EXECUTION_RUNTIME_COMPONENT_RESOLVER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentResolver';
+import { ExecutionRuntimeComponentValidator, EXECUTION_RUNTIME_COMPONENT_VALIDATOR_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentValidator';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -902,5 +903,19 @@ export class DevelopmentRules {
     }
     // ExecutionRuntimeComponentResolver は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_COMPONENT_RESOLVER_BLUEPRINT.getExecutionRuntimeComponentResolver();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentResolver から ExecutionRuntimeComponentValidator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Validator Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentValidator(rule: DevelopmentRule): ExecutionRuntimeComponentValidator | undefined {
+    const resolver = this.getExecutionRuntimeComponentResolver(rule);
+    if (!resolver) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentValidator は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_VALIDATOR_BLUEPRINT.getExecutionRuntimeComponentValidator();
   }
 }
