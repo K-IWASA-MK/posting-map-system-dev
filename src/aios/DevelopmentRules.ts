@@ -9,6 +9,7 @@
 import { CapabilityRegistry } from './CapabilityRegistry';
 import { SkillRegistry, Skill } from './SkillRegistry';
 import { SkillPipelineRegistry, SkillPipeline } from './SkillPipelineRegistry';
+import { ExecutionLedgerRegistry, ExecutionRecord } from './ExecutionLedgerRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -68,5 +69,16 @@ export class DevelopmentRules {
       return undefined;
     }
     return SkillPipelineRegistry.getByCapability(verified.capabilityId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability に対応する ExecutionRecord 履歴を ExecutionLedgerRegistry から取得する
+   */
+  static getExecutionLedger(rule: DevelopmentRule): ExecutionRecord[] {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return [];
+    }
+    return ExecutionLedgerRegistry.getByCapability(verified.capabilityId);
   }
 }
