@@ -13,9 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 202-1: Development Runtime Foundation [現在のフェーズ]
-* **目的**: Phase 201-7 Multi Adapter Registry Foundation を基盤とし、Development OS の実行状態・実行コンテキストを抽象的に管理する Development Runtime Foundation（仕様・RuntimeRegistry・RuntimeRecord・RuntimeState・RuntimeMode・RuntimeFactory・RuntimeValidator・RuntimeAdapter）を構築する。
+### 現在のスプリント: AIOS Phase 202-2: Development Runtime Session Foundation [現在のフェーズ]
+* **目的**: Phase 202-1 Development Runtime Foundation を基盤とし、Development OS における論理的な実行セッションを抽象的に管理する Development Runtime Session Foundation（仕様・RuntimeSessionRegistry・Session・RuntimeSessionState・RuntimeSessionFactory・RuntimeSessionValidator・RuntimeSessionAdapter）を構築する。
 * **今回実施するもの (対象)**:
+  - Development Runtime Session 設計仕様書（`docs/specifications/DevelopmentRuntimeSession.md`）の策定。
+  - `src/aios/` への新規追加（RuntimeSessionRegistry, RuntimeSessionFactory, RuntimeSessionValidator, RuntimeSessionAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession 解決（getRuntimeSession）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 202-1: Development Runtime Foundation
+* **目的**: Phase 201-7 Multi Adapter Registry Foundation を基盤とし、Development OS の実行状態・実行コンテキストを抽象的に管理する Development Runtime Foundation（仕様・RuntimeRegistry・RuntimeRecord・RuntimeState・RuntimeMode・RuntimeFactory・RuntimeValidator・RuntimeAdapter）を構築する。
+* **実施したもの**:
   - Development Runtime 設計仕様書（`docs/specifications/DevelopmentRuntime.md`）の策定。
   - `src/aios/` への新規追加（RuntimeRegistry, RuntimeFactory, RuntimeValidator, RuntimeAdapter）の実装。
   - `DevelopmentRules.ts` の Capability → Pipeline → Runtime 解決（getRuntime）の実装。

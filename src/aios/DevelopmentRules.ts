@@ -23,6 +23,7 @@ import { AdapterResolver } from './AdapterResolver';
 import { MultiAdapterRegistry } from './MultiAdapterRegistry';
 import { AdapterType } from './AdapterResolutionRegistry';
 import { RuntimeRegistry, RuntimeRecord } from './RuntimeRegistry';
+import { RuntimeSessionRegistry, Session } from './RuntimeSessionRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -282,5 +283,17 @@ export class DevelopmentRules {
       return undefined;
     }
     return RuntimeRegistry.get(`runtime-${match[0]}`);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime から RuntimeSession を静的に解決・取得する
+   */
+  static getRuntimeSession(rule: DevelopmentRule): Session | undefined {
+    const runtime = this.getRuntime(rule);
+    if (!runtime) {
+      return undefined;
+    }
+    const sessions = RuntimeSessionRegistry.findByRuntime(runtime.runtimeId);
+    return sessions.length > 0 ? sessions[0] : undefined;
   }
 }
