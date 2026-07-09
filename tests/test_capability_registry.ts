@@ -96,7 +96,8 @@ function testValidator() {
     description: 'Bad version desc',
     priority: 1,
     status: CapabilityStatus.ACTIVE,
-    version: '1.0.beta' // bad semver
+    version: '1.0.beta', // bad semver
+    supportedSkillIds: []
   };
 
   try {

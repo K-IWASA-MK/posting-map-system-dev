@@ -3,7 +3,7 @@ import { CapabilityFactory } from '../src/aios/CapabilityFactory';
 import { DevelopmentMode } from '../src/aios/DevelopmentMode';
 import { DevelopmentRules } from '../src/aios/DevelopmentRules';
 import { CapabilityResolver } from '../src/aios/CapabilityResolver';
-import { SkillRegistry } from '../src/aios/SkillRegistry';
+import { SkillRegistry, Skill, SkillCategory, SkillStatus } from '../src/aios/SkillRegistry';
 import { SkillPipeline } from '../src/aios/SkillPipeline';
 import { ExecutionLedger } from '../src/aios/ExecutionLedger';
 import { QualityGate } from '../src/aios/QualityGate';
@@ -97,17 +97,25 @@ function testSkillAndPipeline() {
   console.log('[Test] SkillRegistry & Pipeline verification starting...');
   SkillRegistry.clear();
   
-  const skill1 = {
+  const skill1: Skill = {
     skillId: 'web-arch',
     skillName: 'WebArchitecture',
+    category: SkillCategory.ExecutionPlanning,
     description: 'System architectural design',
-    capabilityType: 'Architecture'
+    capabilityId: 'capability-1', // maps to Architecture capabilityId
+    priority: 10,
+    status: SkillStatus.ACTIVE,
+    version: '1.0.0'
   };
-  const skill2 = {
+  const skill2: Skill = {
     skillId: 'code-aud',
     skillName: 'CodeAudit',
+    category: SkillCategory.Audit,
     description: 'Static review skill',
-    capabilityType: 'Review'
+    capabilityId: 'capability-5', // maps to Review capabilityId
+    priority: 10,
+    status: SkillStatus.ACTIVE,
+    version: '1.0.0'
   };
 
   SkillRegistry.register(skill1);

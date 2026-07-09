@@ -32,6 +32,7 @@ export interface Capability {
   readonly priority: number;
   readonly status: CapabilityStatus;
   readonly version: string;
+  readonly supportedSkillIds: readonly string[];
 }
 
 export interface RegistryMetadata {
@@ -97,6 +98,27 @@ export class CapabilityRegistry {
       }
     }
     return undefined;
+  }
+  
+  /**
+   * Capability にサポートする Skill ID を追加（完全置換による不変性維持）
+   */
+  static addSupportedSkill(capabilityId: string, skillId: string): void {
+    const cap = this.get(capabilityId) || this.getByName(capabilityId);
+    if (!cap) {
+      throw new Error(`[CapabilityRegistry] Capability not found: ${capabilityId}`);
+    }
+
+    if (cap.supportedSkillIds.includes(skillId)) {
+      return; // 既に追加済み
+    }
+
+    const updatedCap: Capability = {
+      ...cap,
+      supportedSkillIds: Object.freeze([...cap.supportedSkillIds, skillId])
+    };
+
+    this.registry.set(cap.capabilityId, Object.freeze(updatedCap));
   }
 
   /**

@@ -13,13 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 200-3: Development Capability Registry Foundation [現在のフェーズ]
-* **目的**: Phase 200-2 Development OS Foundation を基盤とし、Development OS 全体で利用する Capability Registry Foundation（管理・定義・検証・型安全の確保）を構築する。
+### 現在のスプリント: AIOS Phase 200-4: Development Skill Registry Foundation [現在のフェーズ]
+* **目的**: Phase 200-3 Development Capability Registry Foundation を基盤とし、Development OS 全体で利用する Development Skill Registry Foundation（定義・登録・検証・型安全・静的マッピング）を構築する。
 * **今回実施するもの (対象)**:
+  - Skill Registry 設計仕様書（`docs/specifications/DevelopmentSkillRegistry.md`）の策定。
+  - `src/aios/` への新規追加（SkillRegistry, SkillFactory, SkillValidator, SkillAdapter）の実装。
+  - `CapabilityRegistry.ts` の `Capability` インターフェース更新（supportedSkillIds の追加）およびマッピングヘルパーの実装。
+  - `DevelopmentRules.ts` の Skill Registry 逆引き参照対応。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 200-3: Development Capability Registry Foundation
+* **目的**: Phase 200-2 Development OS Foundation を基盤とし、Development OS 全体で利用する Capability Registry Foundation（管理・定義・検証・型安全の確保）を構築する。
+* **実施したもの**:
   - Capability Registry 設計仕様書（`docs/specifications/DevelopmentCapabilityRegistry.md`）の策定。
   - `src/aios/` への新規追加（CapabilityRegistry, CapabilityFactory, CapabilityValidator, CapabilityAdapter）の実装。
   - 既存モジュール（DevelopmentRules, CapabilityResolver）のレジストリ参照型へのリファクタリング。
   - テストおよびビルド検証。
+
 
 ### 完了したスプリント: AIOS Phase 200-2: Development OS Foundation
 * **目的**: Phase 200-1 にて策定した AIOS Architecture Charter を基盤とし、AIOS v1.1 の新OSレイヤーである Development OS の Foundation（不変データモデル・型定義・レジストリ）を構築する。

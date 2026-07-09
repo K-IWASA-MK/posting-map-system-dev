@@ -21,7 +21,8 @@ export class CapabilityFactory {
     description: string,
     priority: number,
     status: CapabilityStatus,
-    version: string
+    version: string,
+    supportedSkillIds: string[] = []
   ): Capability {
     const id = `capability-${++CapabilityFactory.instanceCounter}`;
 
@@ -32,7 +33,8 @@ export class CapabilityFactory {
       description: description,
       priority: priority,
       status: status,
-      version: version
+      version: version,
+      supportedSkillIds: Object.freeze([...supportedSkillIds])
     };
 
     // 登録前の妥当性検証

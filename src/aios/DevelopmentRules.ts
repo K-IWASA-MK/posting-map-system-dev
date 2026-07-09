@@ -7,6 +7,7 @@
  */
 
 import { CapabilityRegistry } from './CapabilityRegistry';
+import { SkillRegistry, Skill } from './SkillRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -44,5 +45,16 @@ export class DevelopmentRules {
     };
 
     return Object.freeze(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability を満たすための全 Skill を SkillRegistry から取得する
+   */
+  static getRequiredSkills(rule: DevelopmentRule): Skill[] {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return [];
+    }
+    return SkillRegistry.getByCapability(verified.capabilityId);
   }
 }
