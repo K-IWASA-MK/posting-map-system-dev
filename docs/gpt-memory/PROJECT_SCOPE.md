@@ -13,12 +13,21 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 200-2: Development OS Foundation [現在のフェーズ]
-* **目的**: Phase 200-1 にて策定した AIOS Architecture Charter を基盤とし、AIOS v1.1 の新OSレイヤーである Development OS の Foundation（不変データモデル・型定義・レジストリ）を構築する。
+### 現在のスプリント: AIOS Phase 200-3: Development Capability Registry Foundation [現在のフェーズ]
+* **目的**: Phase 200-2 Development OS Foundation を基盤とし、Development OS 全体で利用する Capability Registry Foundation（管理・定義・検証・型安全の確保）を構築する。
 * **今回実施するもの (対象)**:
+  - Capability Registry 設計仕様書（`docs/specifications/DevelopmentCapabilityRegistry.md`）の策定。
+  - `src/aios/` への新規追加（CapabilityRegistry, CapabilityFactory, CapabilityValidator, CapabilityAdapter）の実装。
+  - 既存モジュール（DevelopmentRules, CapabilityResolver）のレジストリ参照型へのリファクタリング。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 200-2: Development OS Foundation
+* **目的**: Phase 200-1 にて策定した AIOS Architecture Charter を基盤とし、AIOS v1.1 の新OSレイヤーである Development OS の Foundation（不変データモデル・型定義・レジストリ）を構築する。
+* **実施したもの**:
   - Development OS 設計仕様書（`docs/specifications/DevelopmentOS.md`）の策定。
   - `src/aios/` 以下の 7 モジュール（DevelopmentMode, DevelopmentRules, CapabilityResolver, SkillRegistry, SkillPipeline, ExecutionLedger, QualityGate）の実装。
   - テストおよびビルド検証。
+
 
 ### 完了したスプリント: AIOS Phase 200-1: AIOS Architecture Charter Foundation
 * **目的**: AIOS v1.1 Development OS の開始にあたり、AIOS全体を統括する最高設計原則 AIOS Architecture Charter を策定する。

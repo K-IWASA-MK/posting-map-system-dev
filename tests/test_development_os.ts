@@ -1,3 +1,5 @@
+import { CapabilityRegistry, CapabilityCategory, CapabilityStatus } from '../src/aios/CapabilityRegistry';
+import { CapabilityFactory } from '../src/aios/CapabilityFactory';
 import { DevelopmentMode } from '../src/aios/DevelopmentMode';
 import { DevelopmentRules } from '../src/aios/DevelopmentRules';
 import { CapabilityResolver } from '../src/aios/CapabilityResolver';
@@ -10,6 +12,22 @@ function assert(condition: boolean, message: string) {
   if (!condition) {
     throw new Error(`[Assertion Failure] ${message}`);
   }
+}
+
+function setupStandardRegistry() {
+  CapabilityRegistry.clear();
+  CapabilityFactory.resetCounter();
+  Object.values(CapabilityCategory).forEach(cat => {
+    const cap = CapabilityFactory.create(
+      cat,
+      cat,
+      `Abstract ${cat} capability`,
+      10,
+      CapabilityStatus.ACTIVE,
+      '1.0.0'
+    );
+    CapabilityRegistry.register(cap);
+  });
 }
 
 // ==============================================================================
@@ -60,14 +78,14 @@ function testDevelopmentRules() {
 function testCapabilityResolver() {
   console.log('[Test] CapabilityResolver verification starting...');
   
-  assert(CapabilityResolver.resolve('Draft architectural charter') === 'Architecture', 'Architecture resolution failed');
-  assert(CapabilityResolver.resolve('Create sprint implementation plan') === 'Planning', 'Planning resolution failed');
-  assert(CapabilityResolver.resolve('Run test suite on changes') === 'Testing', 'Testing resolution failed');
-  assert(CapabilityResolver.resolve('Static analysis audit report') === 'Review', 'Review resolution failed');
-  assert(CapabilityResolver.resolve('Fix widget ID duplication') === 'Debugging', 'Debugging resolution failed');
-  assert(CapabilityResolver.resolve('Create docs/spec.md') === 'Documentation', 'Documentation resolution failed');
-  assert(CapabilityResolver.resolve('Publish release version tags') === 'Release', 'Release resolution failed');
-  assert(CapabilityResolver.resolve('Implement widget component renderer') === 'Implementation', 'Implementation resolution failed');
+  assert(CapabilityResolver.resolve('Draft architectural charter').category === 'Architecture', 'Architecture resolution failed');
+  assert(CapabilityResolver.resolve('Create sprint implementation plan').category === 'Planning', 'Planning resolution failed');
+  assert(CapabilityResolver.resolve('Run test suite on changes').category === 'Testing', 'Testing resolution failed');
+  assert(CapabilityResolver.resolve('Static analysis audit report').category === 'Review', 'Review resolution failed');
+  assert(CapabilityResolver.resolve('Fix widget ID duplication').category === 'Debugging', 'Debugging resolution failed');
+  assert(CapabilityResolver.resolve('Create docs/spec.md').category === 'Documentation', 'Documentation resolution failed');
+  assert(CapabilityResolver.resolve('Publish release version tags').category === 'Release', 'Release resolution failed');
+  assert(CapabilityResolver.resolve('Implement widget component renderer').category === 'Implementation', 'Implementation resolution failed');
 
   console.log('[Test] CapabilityResolver verification: PASSED');
 }
@@ -164,6 +182,7 @@ function testQualityGate() {
 // ==============================================================================
 function runAllTests() {
   try {
+    setupStandardRegistry();
     testDevelopmentMode();
     testDevelopmentRules();
     testCapabilityResolver();

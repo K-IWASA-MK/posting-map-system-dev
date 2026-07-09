@@ -6,6 +6,8 @@
  * 警告：本ファイル内への API 通信、コマンド送信、自律改善、AI予測・推論・自動配置ロジックの実装は厳禁である。
  */
 
+import { CapabilityRegistry } from './CapabilityRegistry';
+
 export interface DevelopmentRule {
   readonly ruleId: string;
   readonly ruleName: string;
@@ -26,6 +28,12 @@ export class DevelopmentRules {
     }
     if (!capability) {
       throw new Error('[DevelopmentRules] capability is required');
+    }
+
+    // Capability がレジストリに存在するか検証 (Name または ID)
+    const verified = CapabilityRegistry.get(capability) || CapabilityRegistry.getByName(capability);
+    if (!verified) {
+      throw new Error(`[DevelopmentRules] Capability is not registered: ${capability}`);
     }
 
     const rule: DevelopmentRule = {
