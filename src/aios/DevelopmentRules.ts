@@ -8,6 +8,7 @@
 
 import { CapabilityRegistry } from './CapabilityRegistry';
 import { SkillRegistry, Skill } from './SkillRegistry';
+import { SkillPipelineRegistry, SkillPipeline } from './SkillPipelineRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -56,5 +57,16 @@ export class DevelopmentRules {
       return [];
     }
     return SkillRegistry.getByCapability(verified.capabilityId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability を実行するための SkillPipeline を SkillPipelineRegistry から取得する
+   */
+  static getRequiredPipeline(rule: DevelopmentRule): SkillPipeline | undefined {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return undefined;
+    }
+    return SkillPipelineRegistry.getByCapability(verified.capabilityId);
   }
 }

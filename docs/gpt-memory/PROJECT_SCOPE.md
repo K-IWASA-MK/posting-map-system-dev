@@ -13,14 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 200-4: Development Skill Registry Foundation [現在のフェーズ]
-* **目的**: Phase 200-3 Development Capability Registry Foundation を基盤とし、Development OS 全体で利用する Development Skill Registry Foundation（定義・登録・検証・型安全・静的マッピング）を構築する。
+### 現在のスプリント: AIOS Phase 200-5: Development Skill Pipeline Foundation [現在のフェーズ]
+* **目的**: Phase 200-4 Development Skill Registry Foundation を基盤とし、Development OS 全体で利用する Development Skill Pipeline Foundation（定義・順序・検証・型安全・対称構造・順序バリデーション）を構築する。
 * **今回実施するもの (対象)**:
+  - Skill Pipeline 設計仕様書（`docs/specifications/DevelopmentSkillPipeline.md`）の策定。
+  - `src/aios/` への新規追加（SkillPipelineRegistry, SkillPipelineFactory, SkillPipelineValidator, SkillPipelineAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline 解決（getRequiredPipeline）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 200-4: Development Skill Registry Foundation
+* **目的**: Phase 200-3 Development Capability Registry Foundation を基盤とし、Development OS 全体で利用する Development Skill Registry Foundation（定義・登録・検証・型安全・静的マッピング）を構築する。
+* **実施したもの**:
   - Skill Registry 設計仕様書（`docs/specifications/DevelopmentSkillRegistry.md`）の策定。
   - `src/aios/` への新規追加（SkillRegistry, SkillFactory, SkillValidator, SkillAdapter）の実装。
   - `CapabilityRegistry.ts` の `Capability` インターフェース更新（supportedSkillIds の追加）およびマッピングヘルパーの実装。
   - `DevelopmentRules.ts` の Skill Registry 逆引き参照対応。
   - テストおよびビルド検証。
+
 
 ### 完了したスプリント: AIOS Phase 200-3: Development Capability Registry Foundation
 * **目的**: Phase 200-2 Development OS Foundation を基盤とし、Development OS 全体で利用する Capability Registry Foundation（管理・定義・検証・型安全の確保）を構築する。
