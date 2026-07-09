@@ -43,12 +43,22 @@ export interface RegistryMetadata {
 }
 
 export class ToolRegistry {
-  private static registry: Map<string, Tool> = new Map([
+  private static registry: Map<string, Tool> = new Map<string, Tool>([
     ['tool-antigravity', Object.freeze({
       toolId: 'tool-antigravity',
       toolName: 'Antigravity IDE',
       category: ToolCategory.IDE,
       description: 'Antigravity development environment integration tool',
+      status: ToolStatus.ACTIVE,
+      version: '1.0.0',
+      createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),
+      updatedAt: new Date('2026-07-09T09:30:00Z').toISOString()
+    })],
+    ['tool-claude', Object.freeze({
+      toolId: 'tool-claude',
+      toolName: 'Claude LLM',
+      category: ToolCategory.LLM,
+      description: 'Claude Large Language Model integration tool',
       status: ToolStatus.ACTIVE,
       version: '1.0.0',
       createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),
@@ -128,6 +138,16 @@ export class ToolRegistry {
       toolName: 'Antigravity IDE',
       category: ToolCategory.IDE,
       description: 'Antigravity development environment integration tool',
+      status: ToolStatus.ACTIVE,
+      version: '1.0.0',
+      createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),
+      updatedAt: new Date('2026-07-09T09:30:00Z').toISOString()
+    }));
+    this.registry.set('tool-claude', Object.freeze({
+      toolId: 'tool-claude',
+      toolName: 'Claude LLM',
+      category: ToolCategory.LLM,
+      description: 'Claude Large Language Model integration tool',
       status: ToolStatus.ACTIVE,
       version: '1.0.0',
       createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),

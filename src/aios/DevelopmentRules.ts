@@ -13,6 +13,8 @@ import { ExecutionLedgerRegistry, ExecutionRecord } from './ExecutionLedgerRegis
 import { QualityGateRegistry, QualityGateRecord } from './QualityGateRegistry';
 import { ToolAdapterRegistry, ToolAdapter } from './ToolAdapter';
 import { AntigravityAdapterRegistry, AntigravityAdapter } from './AntigravityAdapter';
+import { ClaudeAdapterRegistry, ClaudeAdapter } from './ClaudeAdapter';
+import { ClaudeModelRegistry, ClaudeModel } from './ClaudeModelRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -119,5 +121,35 @@ export class DevelopmentRules {
     }
     const list = AntigravityAdapterRegistry.getByPipeline(pipeline.pipelineId);
     return list.length > 0 ? list[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする ClaudeAdapter を取得する
+   */
+  static getClaudeAdapter(rule: DevelopmentRule): ClaudeAdapter | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const list = ClaudeAdapterRegistry.getByPipeline(pipeline.pipelineId);
+    return list.length > 0 ? list[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする全 ClaudeModel を取得する (4層解決)
+   */
+  static getClaudeModels(rule: DevelopmentRule): ClaudeModel[] {
+    const adapter = this.getClaudeAdapter(rule);
+    if (!adapter) {
+      return [];
+    }
+    const models: ClaudeModel[] = [];
+    for (const modelId of adapter.supportedModelIds) {
+      const m = ClaudeModelRegistry.get(modelId);
+      if (m) {
+        models.push(m);
+      }
+    }
+    return models;
   }
 }
