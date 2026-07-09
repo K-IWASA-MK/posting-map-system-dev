@@ -13,10 +13,120 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 205-7: Execution Runtime Executor Logic Foundation [現在のフェーズ]
-* **目的**: Phase 205-6 で完成した Execution Runtime Scheduler Logic を基盤とし、Execution Runtime Executor Logic の構造定義・データモデル・実行解決・公開インターフェースを構築する。
+### 現在のスプリント: AIOS Phase 207-7: Execution Runtime Service Executor Foundation [現在のフェーズ]
+* **目的**: Execution Runtime Service Scheduler が返却する静的 Blueprint を基に、Execution Runtime Service Executor Foundation を構築する。
 
-### 完了したスプリント: AIOS Phase 205-6: Execution Runtime Scheduler Logic Foundation
+### 完了したスプリント: AIOS Phase 207-6: Execution Runtime Service Scheduler Foundation
+* **目的**: Execution Runtime Service Dispatcher が返却する静日 Blueprint を基に、Execution Runtime Service Scheduler Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeServiceScheduler.md）
+  - ExecutionRuntimeServiceScheduler.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeServiceScheduler）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 207-5: Execution Runtime Service Dispatcher Foundation
+* **目的**: Execution Runtime Service Validator が返却する静的な Service Blueprint を基に、Execution Runtime Service Dispatcher Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeServiceDispatcher.md）
+  - ExecutionRuntimeServiceDispatcher.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeServiceDispatcher）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 207-4: Execution Runtime Service Validator Foundation
+* **目的**: Execution Runtime Service Resolver が返却する静的な Service Blueprint の構造整合性を表現する Execution Runtime Service Validator Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeServiceValidator.md）
+  - ExecutionRuntimeServiceValidator.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeServiceValidator）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 207-3: Execution Runtime Service Resolver Foundation
+* **目的**: Execution Runtime Service Registry に登録された静的な Service Blueprint を、決定論的かつ Read-Only に解決する Execution Runtime Service Resolver Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeServiceResolver.md）
+  - ExecutionRuntimeServiceResolver.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeServiceResolver）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 207-2: Execution Runtime Service Registry Foundation
+* **目的**: Execution Runtime Service を一元管理する Execution Runtime Service Registry Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeServiceRegistry.md）
+  - ExecutionRuntimeServiceRegistry.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeServiceRegistry）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 207-1: Execution Runtime Service Foundation
+* **目的**: Execution Runtime Engine Foundation の上位レイヤーとして Execution Runtime Service Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeService.md）
+  - ExecutionRuntimeService.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeService）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 206-7: Execution Runtime Engine Executor Foundation
+* **目的**: Execution Runtime Engine Scheduler が返却する静的 Engine Blueprint を基に、Execution Runtime Engine Executor Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeEngineExecutor.md）
+  - ExecutionRuntimeEngineExecutor.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeEngineExecutor）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 206-6: Execution Runtime Engine Scheduler Foundation
+* **目的**: Execution Runtime Engine Dispatcher が返却する静的 Engine Blueprint を基に、Execution Runtime Engine Scheduler Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeEngineScheduler.md）
+  - ExecutionRuntimeEngineScheduler.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeEngineScheduler）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 206-5: Execution Runtime Engine Dispatcher Foundation
+* **目的**: Execution Runtime Engine Validator が返却する静的 Engine Blueprint を基に、Execution Runtime Engine Dispatcher Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeEngineDispatcher.md）
+  - ExecutionRuntimeEngineDispatcher.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeEngineDispatcher）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 206-4: Execution Runtime Engine Validator Foundation
+* **目的**: Execution Runtime Engine Resolver が返却する静的 Engine Blueprint の構造整合性を表現する Execution Runtime Engine Validator Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeEngineValidator.md）
+  - ExecutionRuntimeEngineValidator.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeEngineValidator）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 206-3: Execution Runtime Engine Resolver Foundation
+* **目的**: Execution Runtime Engine Registry に登録された静的 Engine Blueprint を決定論的に解決する Execution Runtime Engine Resolver Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeEngineResolver.md）
+  - ExecutionRuntimeEngineResolver.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeEngineResolver）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 206-2: Execution Runtime Engine Registry Foundation
+* **目的**: Execution Runtime Engine を一元管理する Execution Runtime Engine Registry Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeEngineRegistry.md）
+  - ExecutionRuntimeEngineRegistry.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeEngineRegistry）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 206-1: Execution Runtime Engine Foundation
+* **目的**: Execution Runtime 全体を実際に実行するための最上位構造となる Execution Runtime Engine Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeEngine.md）
+  - ExecutionRuntimeEngine.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeEngine）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 205-7: Execution Runtime Executor Logic Foundation
+* **目的**: Phase 205-6 で完成した Execution Runtime Scheduler Logic を基盤とし、Execution Runtime Executor Logic の構造定義・データモデル・実行解決・公開インターフェースを構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeExecutorLogic.md）
+  - ExecutionRuntimeExecutor.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeExecutorLogic）追加
+  - テストおよびビルド検証。
 * **目的**: Phase 205-5 で完成した Execution Runtime Queue Logic を基盤とし、Execution Runtime Scheduler Logic の構造定義・データモデル・スケジュール解決・公開インターフェースを構築する。
 * **実施したもの**:
   - specifications 策定（ExecutionRuntimeSchedulerLogic.md）

@@ -50,6 +50,20 @@ import { RuntimeDispatchResult, EXECUTION_RUNTIME_DISPATCH_LOGIC } from '../exec
 import { RuntimeQueueResult, EXECUTION_RUNTIME_QUEUE_LOGIC } from '../execution/ExecutionRuntimeQueue';
 import { RuntimeSchedulerResult, EXECUTION_RUNTIME_SCHEDULER_LOGIC } from '../execution/ExecutionRuntimeScheduler';
 import { RuntimeExecutorResult, EXECUTION_RUNTIME_EXECUTOR_LOGIC } from '../execution/ExecutionRuntimeExecutor';
+import { ExecutionRuntimeEngine, EXECUTION_RUNTIME_ENGINE_BLUEPRINT } from '../execution/ExecutionRuntimeEngine';
+import { ExecutionRuntimeEngineRegistry, EXECUTION_RUNTIME_ENGINE_REGISTRY_BLUEPRINT } from '../execution/ExecutionRuntimeEngineRegistry';
+import { ExecutionRuntimeEngineResolver, EXECUTION_RUNTIME_ENGINE_RESOLVER_BLUEPRINT } from '../execution/ExecutionRuntimeEngineResolver';
+import { ExecutionRuntimeEngineValidator, EXECUTION_RUNTIME_ENGINE_VALIDATOR_BLUEPRINT } from '../execution/ExecutionRuntimeEngineValidator';
+import { ExecutionRuntimeEngineDispatcher, EXECUTION_RUNTIME_ENGINE_DISPATCHER_BLUEPRINT } from '../execution/ExecutionRuntimeEngineDispatcher';
+import { ExecutionRuntimeEngineScheduler, EXECUTION_RUNTIME_ENGINE_SCHEDULER_BLUEPRINT } from '../execution/ExecutionRuntimeEngineScheduler';
+import { ExecutionRuntimeEngineExecutor, EXECUTION_RUNTIME_ENGINE_EXECUTOR_BLUEPRINT } from '../execution/ExecutionRuntimeEngineExecutor';
+import { ExecutionRuntimeService, EXECUTION_RUNTIME_SERVICE_BLUEPRINT } from '../execution/ExecutionRuntimeService';
+import { ExecutionRuntimeServiceRegistry, EXECUTION_RUNTIME_SERVICE_REGISTRY_BLUEPRINT } from '../execution/ExecutionRuntimeServiceRegistry';
+import { ExecutionRuntimeServiceResolver, EXECUTION_RUNTIME_SERVICE_RESOLVER_BLUEPRINT } from '../execution/ExecutionRuntimeServiceResolver';
+import { ExecutionRuntimeServiceValidator, EXECUTION_RUNTIME_SERVICE_VALIDATOR_BLUEPRINT } from '../execution/ExecutionRuntimeServiceValidator';
+import { ExecutionRuntimeServiceDispatcher, EXECUTION_RUNTIME_SERVICE_DISPATCHER_BLUEPRINT } from '../execution/ExecutionRuntimeServiceDispatcher';
+import { ExecutionRuntimeServiceScheduler, EXECUTION_RUNTIME_SERVICE_SCHEDULER_BLUEPRINT } from '../execution/ExecutionRuntimeServiceScheduler';
+import { ExecutionRuntimeServiceExecutor, EXECUTION_RUNTIME_SERVICE_EXECUTOR_BLUEPRINT } from '../execution/ExecutionRuntimeServiceExecutor';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -647,5 +661,201 @@ export class DevelopmentRules {
   static getExecutionRuntimeExecutorLogic(rule: DevelopmentRule): RuntimeExecutorResult | undefined {
     // ExecutionRuntimeExecutorLogic シングルトン解決ロジックを使用して実行解決を実行する
     return EXECUTION_RUNTIME_EXECUTOR_LOGIC.executeRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic から ExecutionRuntimeEngine を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngine(rule: DevelopmentRule): ExecutionRuntimeEngine | undefined {
+    const executorLogic = this.getExecutionRuntimeExecutorLogic(rule);
+    if (!executorLogic) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngine は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getEngine();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine から ExecutionRuntimeEngineRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineRegistry(rule: DevelopmentRule): ExecutionRuntimeEngineRegistry | undefined {
+    const engine = this.getExecutionRuntimeEngine(rule);
+    if (!engine) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_REGISTRY_BLUEPRINT.getRegistry();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry から ExecutionRuntimeEngineResolver を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineResolver(rule: DevelopmentRule): ExecutionRuntimeEngineResolver | undefined {
+    const registry = this.getExecutionRuntimeEngineRegistry(rule);
+    if (!registry) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineResolver は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_RESOLVER_BLUEPRINT.getResolver();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver から ExecutionRuntimeEngineValidator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineValidator(rule: DevelopmentRule): ExecutionRuntimeEngineValidator | undefined {
+    const resolver = this.getExecutionRuntimeEngineResolver(rule);
+    if (!resolver) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineValidator は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_VALIDATOR_BLUEPRINT.getValidator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator から ExecutionRuntimeEngineDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineDispatcher(rule: DevelopmentRule): ExecutionRuntimeEngineDispatcher | undefined {
+    const validator = this.getExecutionRuntimeEngineValidator(rule);
+    if (!validator) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineDispatcher は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_DISPATCHER_BLUEPRINT.getDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher から ExecutionRuntimeEngineScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineScheduler(rule: DevelopmentRule): ExecutionRuntimeEngineScheduler | undefined {
+    const dispatcher = this.getExecutionRuntimeEngineDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineScheduler は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_SCHEDULER_BLUEPRINT.getScheduler();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler から ExecutionRuntimeEngineExecutor を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineExecutor(rule: DevelopmentRule): ExecutionRuntimeEngineExecutor | undefined {
+    const scheduler = this.getExecutionRuntimeEngineScheduler(rule);
+    if (!scheduler) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineExecutor は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_EXECUTOR_BLUEPRINT.getExecutor();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor から ExecutionRuntimeService を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeService(rule: DevelopmentRule): ExecutionRuntimeService | undefined {
+    const executor = this.getExecutionRuntimeEngineExecutor(rule);
+    if (!executor) {
+      return undefined;
+    }
+    // ExecutionRuntimeService は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_BLUEPRINT.getService();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService から ExecutionRuntimeServiceRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceRegistry(rule: DevelopmentRule): ExecutionRuntimeServiceRegistry | undefined {
+    const service = this.getExecutionRuntimeService(rule);
+    if (!service) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_REGISTRY_BLUEPRINT.getRegistry();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry から ExecutionRuntimeServiceResolver を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceResolver(rule: DevelopmentRule): ExecutionRuntimeServiceResolver | undefined {
+    const registry = this.getExecutionRuntimeServiceRegistry(rule);
+    if (!registry) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceResolver は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_RESOLVER_BLUEPRINT.getResolver();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry -> ExecutionRuntimeServiceResolver から ExecutionRuntimeServiceValidator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceValidator(rule: DevelopmentRule): ExecutionRuntimeServiceValidator | undefined {
+    const resolver = this.getExecutionRuntimeServiceResolver(rule);
+    if (!resolver) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceValidator は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_VALIDATOR_BLUEPRINT.getValidator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry -> ExecutionRuntimeServiceResolver -> ExecutionRuntimeServiceValidator から ExecutionRuntimeServiceDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceDispatcher(rule: DevelopmentRule): ExecutionRuntimeServiceDispatcher | undefined {
+    const validator = this.getExecutionRuntimeServiceValidator(rule);
+    if (!validator) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceDispatcher は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_DISPATCHER_BLUEPRINT.getDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry -> ExecutionRuntimeServiceResolver -> ExecutionRuntimeServiceValidator -> ExecutionRuntimeServiceDispatcher から ExecutionRuntimeServiceScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceScheduler(rule: DevelopmentRule): ExecutionRuntimeServiceScheduler | undefined {
+    const dispatcher = this.getExecutionRuntimeServiceDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceScheduler は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_SCHEDULER_BLUEPRINT.getScheduler();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry -> ExecutionRuntimeServiceResolver -> ExecutionRuntimeServiceValidator -> ExecutionRuntimeServiceDispatcher -> ExecutionRuntimeServiceScheduler から ExecutionRuntimeServiceExecutor を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceExecutor(rule: DevelopmentRule): ExecutionRuntimeServiceExecutor | undefined {
+    const scheduler = this.getExecutionRuntimeServiceScheduler(rule);
+    if (!scheduler) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceExecutor は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_EXECUTOR_BLUEPRINT.getExecutor();
   }
 }
