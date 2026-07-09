@@ -13,14 +13,23 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 201-5: OpenAI Adapter Foundation [現在のフェーズ]
-* **目的**: Phase 201-4 Gemini Adapter Foundation を基盤とし、AIOS が利用する LLM Adapter の第三弾である OpenAI Adapter Foundation（仕様・OpenAIModelRegistry・OpenAIProvider・OpenAIModelStatus・インターフェース実装）を構築する。
+### 現在のスプリント: AIOS Phase 201-6: Adapter Resolver Foundation [現在のフェーズ]
+* **目的**: Phase 201-5 OpenAI Adapter Foundation を基盤とし、Development OS が Capability に対する最適な ToolAdapter を決定論的かつ優先順位付きポリシーに従い静的解決する Adapter Resolver Foundation（仕様・AdapterResolutionRegistry・ResolutionPolicy・AdapterType・ResolutionReason・AdapterResolver）を構築する。
 * **今回実施するもの (対象)**:
+  - Adapter Resolver 設計仕様書（`docs/specifications/DevelopmentAdapterResolver.md`）の策定。
+  - `src/aios/` への新規追加（AdapterResolutionRegistry, AdapterResolver, AdapterResolverFactory, AdapterResolverValidator, AdapterResolverAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Tool Adapter → AdapterResolver 解決（getResolvedAdapter）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 201-5: OpenAI Adapter Foundation
+* **目的**: Phase 201-4 Gemini Adapter Foundation を基盤とし、AIOS が利用する LLM Adapter の第三弾である OpenAI Adapter Foundation（仕様・OpenAIModelRegistry・OpenAIProvider・OpenAIModelStatus・インターフェース実装）を構築する。
+* **実施したもの**:
   - OpenAI Adapter 設計仕様書（`docs/specifications/DevelopmentOpenAIAdapter.md`）の策定。
   - `src/aios/` への新規追加（OpenAIAdapter, OpenAIModelRegistry, OpenAIAdapterFactory, OpenAIAdapterValidator, OpenAIAdapterAdapter）の実装。
   - `ToolRegistry.ts` の `tool-openai` 定義追加。
   - `DevelopmentRules.ts` の Capability → Pipeline → Tool Adapter → OpenAIAdapter → OpenAIModelRegistry 解決（getOpenAIAdapter, getOpenAIModels）の実装。
   - テストおよびビルド検証。
+
 
 ### 完了したスプリント: AIOS Phase 201-4: Gemini Adapter Foundation
 * **目的**: Phase 201-3 Claude Adapter Foundation を基盤とし、AIOS が利用する LLM Adapter の第二弾である Gemini Adapter Foundation（仕様・GeminiModelRegistry・GeminiProvider・GeminiModelStatus・インターフェース実装）を構築する。

@@ -19,6 +19,7 @@ import { GeminiAdapterRegistry, GeminiAdapter } from './GeminiAdapter';
 import { GeminiModelRegistry, GeminiModel } from './GeminiModelRegistry';
 import { OpenAIAdapterRegistry, OpenAIAdapter } from './OpenAIAdapter';
 import { OpenAIModelRegistry, OpenAIModel } from './OpenAIModelRegistry';
+import { AdapterResolver } from './AdapterResolver';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -215,5 +216,16 @@ export class DevelopmentRules {
       }
     }
     return models;
+  }
+
+  /**
+   * ルールに関連付けられた Capability に対する最適な ToolAdapter を AdapterResolver を介して自動解決・取得する
+   */
+  static getResolvedAdapter(rule: DevelopmentRule): ToolAdapter | undefined {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return undefined;
+    }
+    return AdapterResolver.resolve(verified.capabilityId);
   }
 }
