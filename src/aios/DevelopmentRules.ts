@@ -37,6 +37,7 @@ import { ExecutionState, EXECUTION_STATE_BLUEPRINT } from '../execution/Executio
 import { ExecutionResolver, EXECUTION_RESOLVER_BLUEPRINT } from '../execution/ExecutionResolver';
 import { ExecutionDispatcher, EXECUTION_DISPATCHER_BLUEPRINT } from '../execution/ExecutionDispatcher';
 import { ExecutionRuntime, EXECUTION_RUNTIME_BLUEPRINT } from '../execution/ExecutionRuntime';
+import { ExecutionRuntimeRegistry, EXECUTION_RUNTIME_REGISTRY_BLUEPRINT } from '../execution/ExecutionRuntimeRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -480,5 +481,19 @@ export class DevelopmentRules {
     }
     // ExecutionRuntime はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_BLUEPRINT.getRuntime();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry から ExecutionRuntimeRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeRegistry(rule: DevelopmentRule): ExecutionRuntimeRegistry | undefined {
+    const runtime = this.getExecutionRuntime(rule);
+    if (!runtime) {
+      return undefined;
+    }
+    // ExecutionRuntimeRegistry はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_REGISTRY_BLUEPRINT.getRegistry();
   }
 }

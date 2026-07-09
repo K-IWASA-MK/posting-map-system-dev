@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 204-1: Execution Runtime Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 204-2: Execution Runtime Registry Foundation [現在のフェーズ]
+* **目的**: Phase 204-1 で完成した Execution Runtime Foundation を基盤とし、Execution Runtime Registry の構造定義・データモデル・Blueprint・公開インターフェースを構築する。
+
+### 完了したスプリント: AIOS Phase 204-1: Execution Runtime Foundation
 * **目的**: Phase 203 で完成した Execution Layer Foundation Blueprint 群を基盤とし、Execution Runtime の構造定義・データモデル・Blueprint・公開インターフェースを構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntime.md）
+  - ExecutionRuntime.ts の実装、不変シングルトン Blueprint コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntime）追加
+  - テストおよびビルド検証。
 
 
 ### 完了したスプリント: AIOS Phase 203-7: Execution Dispatcher Foundation
