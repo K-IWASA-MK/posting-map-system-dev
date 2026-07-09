@@ -13,13 +13,22 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 200-6: Development Execution Ledger Foundation [現在のフェーズ]
-* **目的**: Phase 200-5 Development Skill Pipeline Foundation を基盤とし、Development OS 全体の不変な監査台帳となる Development Execution Ledger Foundation（定義・検証・型安全・対称構造・状態遷移・監査イベント）を構築する。
+### 現在のスプリント: AIOS Phase 200-7: Development Quality Gate Foundation [現在のフェーズ]
+* **目的**: Phase 200-6 Development Execution Ledger Foundation を基盤とし、Development OS 全体の品質判定ゲートとなる Development Quality Gate Foundation（定義・状態遷移・評価集計・Ruleバージョン・対称構造）を構築する。
 * **今回実施するもの (対象)**:
+  - Quality Gate 設計仕様書（`docs/specifications/DevelopmentQualityGate.md`）の策定。
+  - `src/aios/` への新規追加（QualityGateRegistry, QualityGateFactory, QualityGateValidator, QualityGateAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Ledger → Quality Gate 解決（getQualityGate）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 200-6: Development Execution Ledger Foundation
+* **目的**: Phase 200-5 Development Skill Pipeline Foundation を基盤とし、Development OS 全体の不変な監査台帳となる Development Execution Ledger Foundation（定義・検証・型安全・対称構造・状態遷移・監査イベント）を構築する。
+* **実施したもの**:
   - Execution Ledger 設計仕様書（`docs/specifications/DevelopmentExecutionLedger.md`）の策定。
   - `src/aios/` への新規追加（ExecutionLedgerRegistry, ExecutionLedgerFactory, ExecutionLedgerValidator, ExecutionLedgerAdapter）の実装。
   - `DevelopmentRules.ts` の Capability → Pipeline → Ledger 解決（getExecutionLedger）の実装。
   - テストおよびビルド検証。
+
 
 ### 完了したスプリント: AIOS Phase 200-5: Development Skill Pipeline Foundation
 * **目的**: Phase 200-4 Development Skill Registry Foundation を基盤とし、Development OS 全体で利用する Development Skill Pipeline Foundation（定義・順序・検証・型安全・対称構造・順序バリデーション）を構築する。

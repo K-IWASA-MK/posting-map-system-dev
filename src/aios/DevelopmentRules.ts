@@ -10,6 +10,7 @@ import { CapabilityRegistry } from './CapabilityRegistry';
 import { SkillRegistry, Skill } from './SkillRegistry';
 import { SkillPipelineRegistry, SkillPipeline } from './SkillPipelineRegistry';
 import { ExecutionLedgerRegistry, ExecutionRecord } from './ExecutionLedgerRegistry';
+import { QualityGateRegistry, QualityGateRecord } from './QualityGateRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -80,5 +81,18 @@ export class DevelopmentRules {
       return [];
     }
     return ExecutionLedgerRegistry.getByCapability(verified.capabilityId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability の最新の QualityGateRecord を取得する
+   */
+  static getQualityGate(rule: DevelopmentRule): QualityGateRecord | undefined {
+    const ledgers = this.getExecutionLedger(rule);
+    if (ledgers.length === 0) {
+      return undefined;
+    }
+    // 最新の Ledger に対応する QualityGateRecord を取得
+    const latestLedger = ledgers[ledgers.length - 1];
+    return QualityGateRegistry.getByLedger(latestLedger.executionId);
   }
 }
