@@ -13,9 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 202-5: Development Runtime Task Foundation [現在のフェーズ]
-* **目的**: Phase 202-4 Runtime Queue Foundation を基盤とし、Development OS における最小実行単位を抽象的に管理する Runtime Task Foundation（仕様・RuntimeTaskRegistry・Task・RuntimeTaskState・RuntimeTaskType・RuntimeTaskFactory・RuntimeTaskValidator・RuntimeTaskAdapter）を構築する。
+### 現在のスプリント: AIOS Phase 202-6: Development Runtime Execution Plan Foundation [現在のフェーズ]
+* **目的**: Phase 202-5 Runtime Task Foundation を基盤とし、Development OS におけるタスクの実行順序・依存関係・実行計画を抽象的に管理する Runtime Execution Plan Foundation（仕様・RuntimeExecutionPlanRegistry・ExecutionPlan・RuntimeExecutionPlanState・ExecutionStrategy・RuntimeExecutionPlanFactory・RuntimeExecutionPlanValidator・RuntimeExecutionPlanAdapter）を構築する。
 * **今回実施するもの (対象)**:
+  - Development Runtime Execution Plan 設計仕様書（`docs/specifications/DevelopmentRuntimeExecutionPlan.md`）の策定。
+  - `src/aios/` への新規追加（RuntimeExecutionPlanRegistry, RuntimeExecutionPlanFactory, RuntimeExecutionPlanValidator, RuntimeExecutionPlanAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext → RuntimeQueue → RuntimeTask → RuntimeExecutionPlan 解決（getRuntimeExecutionPlan）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 202-5: Development Runtime Task Foundation
+* **目的**: Phase 202-4 Runtime Queue Foundation を基盤とし、Development OS における最小実行単位を抽象的に管理する Runtime Task Foundation（仕様・RuntimeTaskRegistry・Task・RuntimeTaskState・RuntimeTaskType・RuntimeTaskFactory・RuntimeTaskValidator・RuntimeTaskAdapter）を構築する。
+* **実施したもの**:
   - Development Runtime Task 設計仕様書（`docs/specifications/DevelopmentRuntimeTask.md`）の策定。
   - `src/aios/` への新規追加（RuntimeTaskRegistry, RuntimeTaskFactory, RuntimeTaskValidator, RuntimeTaskAdapter）の実装。
   - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext → RuntimeQueue → RuntimeTask 解決（getRuntimeTask）の実装。
