@@ -49,6 +49,7 @@ import { RuntimeValidationResult, EXECUTION_RUNTIME_VALIDATION_LOGIC } from '../
 import { RuntimeDispatchResult, EXECUTION_RUNTIME_DISPATCH_LOGIC } from '../execution/ExecutionRuntimeDispatch';
 import { RuntimeQueueResult, EXECUTION_RUNTIME_QUEUE_LOGIC } from '../execution/ExecutionRuntimeQueue';
 import { RuntimeSchedulerResult, EXECUTION_RUNTIME_SCHEDULER_LOGIC } from '../execution/ExecutionRuntimeScheduler';
+import { RuntimeExecutorResult, EXECUTION_RUNTIME_EXECUTOR_LOGIC } from '../execution/ExecutionRuntimeExecutor';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -636,5 +637,15 @@ export class DevelopmentRules {
   static getExecutionRuntimeSchedulerLogic(rule: DevelopmentRule): RuntimeSchedulerResult | undefined {
     // ExecutionRuntimeSchedulerLogic シングルトン解決ロジックを使用してスケジュール解決を実行する
     return EXECUTION_RUNTIME_SCHEDULER_LOGIC.scheduleRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic から RuntimeExecutorResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeExecutorLogic(rule: DevelopmentRule): RuntimeExecutorResult | undefined {
+    // ExecutionRuntimeExecutorLogic シングルトン解決ロジックを使用して実行解決を実行する
+    return EXECUTION_RUNTIME_EXECUTOR_LOGIC.executeRuntime(rule);
   }
 }
