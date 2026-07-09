@@ -73,6 +73,16 @@ export class ToolRegistry {
       version: '1.0.0',
       createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),
       updatedAt: new Date('2026-07-09T09:30:00Z').toISOString()
+    })],
+    ['tool-openai', Object.freeze({
+      toolId: 'tool-openai',
+      toolName: 'OpenAI LLM',
+      category: ToolCategory.LLM,
+      description: 'OpenAI Large Language Model integration tool',
+      status: ToolStatus.ACTIVE,
+      version: '1.0.0',
+      createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),
+      updatedAt: new Date('2026-07-09T09:30:00Z').toISOString()
     })]
   ]);
 
@@ -168,6 +178,16 @@ export class ToolRegistry {
       toolName: 'Gemini LLM',
       category: ToolCategory.LLM,
       description: 'Gemini Large Language Model integration tool',
+      status: ToolStatus.ACTIVE,
+      version: '1.0.0',
+      createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),
+      updatedAt: new Date('2026-07-09T09:30:00Z').toISOString()
+    }));
+    this.registry.set('tool-openai', Object.freeze({
+      toolId: 'tool-openai',
+      toolName: 'OpenAI LLM',
+      category: ToolCategory.LLM,
+      description: 'OpenAI Large Language Model integration tool',
       status: ToolStatus.ACTIVE,
       version: '1.0.0',
       createdAt: new Date('2026-07-09T09:30:00Z').toISOString(),

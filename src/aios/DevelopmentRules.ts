@@ -17,6 +17,8 @@ import { ClaudeAdapterRegistry, ClaudeAdapter } from './ClaudeAdapter';
 import { ClaudeModelRegistry, ClaudeModel } from './ClaudeModelRegistry';
 import { GeminiAdapterRegistry, GeminiAdapter } from './GeminiAdapter';
 import { GeminiModelRegistry, GeminiModel } from './GeminiModelRegistry';
+import { OpenAIAdapterRegistry, OpenAIAdapter } from './OpenAIAdapter';
+import { OpenAIModelRegistry, OpenAIModel } from './OpenAIModelRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -178,6 +180,36 @@ export class DevelopmentRules {
     const models: GeminiModel[] = [];
     for (const modelId of adapter.supportedModelIds) {
       const m = GeminiModelRegistry.get(modelId);
+      if (m) {
+        models.push(m);
+      }
+    }
+    return models;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする OpenAIAdapter を取得する
+   */
+  static getOpenAIAdapter(rule: DevelopmentRule): OpenAIAdapter | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const list = OpenAIAdapterRegistry.getByPipeline(pipeline.pipelineId);
+    return list.length > 0 ? list[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする全 OpenAIModel を取得する (4層解決)
+   */
+  static getOpenAIModels(rule: DevelopmentRule): OpenAIModel[] {
+    const adapter = this.getOpenAIAdapter(rule);
+    if (!adapter) {
+      return [];
+    }
+    const models: OpenAIModel[] = [];
+    for (const modelId of adapter.supportedModelIds) {
+      const m = OpenAIModelRegistry.get(modelId);
       if (m) {
         models.push(m);
       }
