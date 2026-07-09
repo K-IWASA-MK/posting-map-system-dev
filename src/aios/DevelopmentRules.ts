@@ -24,6 +24,7 @@ import { MultiAdapterRegistry } from './MultiAdapterRegistry';
 import { AdapterType } from './AdapterResolutionRegistry';
 import { RuntimeRegistry, RuntimeRecord } from './RuntimeRegistry';
 import { RuntimeSessionRegistry, Session } from './RuntimeSessionRegistry';
+import { RuntimeContextRegistry, Context } from './RuntimeContextRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -295,5 +296,17 @@ export class DevelopmentRules {
     }
     const sessions = RuntimeSessionRegistry.findByRuntime(runtime.runtimeId);
     return sessions.length > 0 ? sessions[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession から RuntimeContext を静的に解決・取得する
+   */
+  static getRuntimeContext(rule: DevelopmentRule): Context | undefined {
+    const session = this.getRuntimeSession(rule);
+    if (!session) {
+      return undefined;
+    }
+    const contexts = RuntimeContextRegistry.findBySession(session.sessionId);
+    return contexts.length > 0 ? contexts[0] : undefined;
   }
 }
