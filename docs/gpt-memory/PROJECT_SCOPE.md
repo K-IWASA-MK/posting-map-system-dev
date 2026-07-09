@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 205-4: Execution Runtime Dispatch Logic Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 205-5: Execution Runtime Queue Logic Foundation [現在のフェーズ]
+* **目的**: Phase 205-4 で完成した Execution Runtime Dispatch Logic を基盤とし、Execution Runtime Queue Logic の構造定義・データモデル・キュー構造解決・公開インターフェースを構築する。
+
+### 完了したスプリント: AIOS Phase 205-4: Execution Runtime Dispatch Logic Foundation
 * **目的**: Phase 205-3 で完成した Execution Runtime Validation Logic を基盤とし、Execution Runtime Dispatch Logic の構造定義・データモデル・整合性検証・公開インターフェースを構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeDispatchLogic.md）
+  - ExecutionRuntimeDispatch.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeDispatchLogic）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 205-3: Execution Runtime Validation Logic Foundation
 * **目的**: Phase 205-2 で完成した Execution Context Hydration Logic を基盤とし、Execution Runtime Validation Logic の構造定義・データモデル・整合性検証・公開インターフェースを構築する。
