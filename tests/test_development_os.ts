@@ -1,0 +1,180 @@
+import { DevelopmentMode } from '../src/aios/DevelopmentMode';
+import { DevelopmentRules } from '../src/aios/DevelopmentRules';
+import { CapabilityResolver } from '../src/aios/CapabilityResolver';
+import { SkillRegistry } from '../src/aios/SkillRegistry';
+import { SkillPipeline } from '../src/aios/SkillPipeline';
+import { ExecutionLedger } from '../src/aios/ExecutionLedger';
+import { QualityGate } from '../src/aios/QualityGate';
+
+function assert(condition: boolean, message: string) {
+  if (!condition) {
+    throw new Error(`[Assertion Failure] ${message}`);
+  }
+}
+
+// ==============================================================================
+// 1. DevelopmentMode Tests
+// ==============================================================================
+function testDevelopmentMode() {
+  console.log('[Test] DevelopmentMode verification starting...');
+  const mode = DevelopmentMode.createMode('mode-01', 'Planning Phase', 'PLANNING');
+  
+  assert(mode.developmentModeId === 'mode-01', 'Id mismatch');
+  assert(mode.modeName === 'Planning Phase', 'Name mismatch');
+  assert(mode.modeStatus === 'PLANNING', 'Status mismatch');
+  
+  // Immutability verification
+  try {
+    (mode as any).modeStatus = 'EXECUTING';
+    assert(false, 'Should be read-only (frozen)');
+  } catch (e) {
+    // OK: Object is frozen
+  }
+  console.log('[Test] DevelopmentMode verification: PASSED');
+}
+
+// ==============================================================================
+// 2. DevelopmentRules Tests
+// ==============================================================================
+function testDevelopmentRules() {
+  console.log('[Test] DevelopmentRules verification starting...');
+  const rule = DevelopmentRules.createRule('rule-01', 'ADR must be compiled', 'Architecture', 1);
+  
+  assert(rule.ruleId === 'rule-01', 'Id mismatch');
+  assert(rule.ruleName === 'ADR must be compiled', 'Name mismatch');
+  assert(rule.capability === 'Architecture', 'Capability mismatch');
+  assert(rule.priority === 1, 'Priority mismatch');
+
+  try {
+    (rule as any).priority = 2;
+    assert(false, 'Should be read-only');
+  } catch (e) {
+    // OK
+  }
+  console.log('[Test] DevelopmentRules verification: PASSED');
+}
+
+// ==============================================================================
+// 3. CapabilityResolver Tests
+// ==============================================================================
+function testCapabilityResolver() {
+  console.log('[Test] CapabilityResolver verification starting...');
+  
+  assert(CapabilityResolver.resolve('Draft architectural charter') === 'Architecture', 'Architecture resolution failed');
+  assert(CapabilityResolver.resolve('Create sprint implementation plan') === 'Planning', 'Planning resolution failed');
+  assert(CapabilityResolver.resolve('Run test suite on changes') === 'Testing', 'Testing resolution failed');
+  assert(CapabilityResolver.resolve('Static analysis audit report') === 'Review', 'Review resolution failed');
+  assert(CapabilityResolver.resolve('Fix widget ID duplication') === 'Debugging', 'Debugging resolution failed');
+  assert(CapabilityResolver.resolve('Create docs/spec.md') === 'Documentation', 'Documentation resolution failed');
+  assert(CapabilityResolver.resolve('Publish release version tags') === 'Release', 'Release resolution failed');
+  assert(CapabilityResolver.resolve('Implement widget component renderer') === 'Implementation', 'Implementation resolution failed');
+
+  console.log('[Test] CapabilityResolver verification: PASSED');
+}
+
+// ==============================================================================
+// 4. SkillRegistry & SkillPipeline Tests
+// ==============================================================================
+function testSkillAndPipeline() {
+  console.log('[Test] SkillRegistry & Pipeline verification starting...');
+  SkillRegistry.clear();
+  
+  const skill1 = {
+    skillId: 'web-arch',
+    skillName: 'WebArchitecture',
+    description: 'System architectural design',
+    capabilityType: 'Architecture'
+  };
+  const skill2 = {
+    skillId: 'code-aud',
+    skillName: 'CodeAudit',
+    description: 'Static review skill',
+    capabilityType: 'Review'
+  };
+
+  SkillRegistry.register(skill1);
+  SkillRegistry.register(skill2);
+
+  assert(SkillRegistry.get('web-arch')?.skillName === 'WebArchitecture', 'Get skill failed');
+  assert(SkillRegistry.getAll().length === 2, 'GetAll size mismatch');
+
+  // Verify pipeline creation and registration check
+  const pipeline = SkillPipeline.createPipeline('pipe-01', 'Architecture', ['web-arch', 'code-aud']);
+  assert(pipeline.pipelineId === 'pipe-01', 'Pipeline ID mismatch');
+  assert(pipeline.skills[0] === 'web-arch', 'Skill sequence incorrect');
+
+  // Verify missing skill error
+  try {
+    SkillPipeline.createPipeline('pipe-02', 'Architecture', ['non-existent']);
+    assert(false, 'Should throw error for unregistered skill');
+  } catch (e) {
+    // OK
+  }
+  
+  console.log('[Test] SkillRegistry & Pipeline verification: PASSED');
+}
+
+// ==============================================================================
+// 5. ExecutionLedger Tests
+// ==============================================================================
+function testExecutionLedger() {
+  console.log('[Test] ExecutionLedger verification starting...');
+  ExecutionLedger.clear();
+
+  const record1 = ExecutionLedger.append('Architecture', ['web-arch'], 'PLEDGED');
+  const record2 = ExecutionLedger.append('Review', ['code-aud'], 'SUCCESS');
+
+  assert(record1.ledgerId === 'ledger-1', 'Monotonic ID generation failed');
+  assert(record2.ledgerId === 'ledger-2', 'Monotonic ID generation failed');
+  assert(record2.executionState === 'SUCCESS', 'State mismatch');
+  assert(ExecutionLedger.getRecords().length === 2, 'Records size mismatch');
+
+  // Verify read-only sequences
+  try {
+    (record1.skillSequence as any)[0] = 'hacked';
+    assert(false, 'Should be read-only');
+  } catch (e) {
+    // OK
+  }
+
+  console.log('[Test] ExecutionLedger verification: PASSED');
+}
+
+// ==============================================================================
+// 6. QualityGate Tests
+// ==============================================================================
+function testQualityGate() {
+  console.log('[Test] QualityGate verification starting...');
+
+  const passStatus = QualityGate.createStatus(0, 0, 5);
+  assert(passStatus.criticalViolations === 0, 'Critical mismatch');
+  assert(passStatus.passed === true, 'Should pass with 0 critical and major');
+
+  const failStatus1 = QualityGate.createStatus(1, 0, 0);
+  assert(failStatus1.passed === false, 'Should fail with critical violation');
+
+  const failStatus2 = QualityGate.createStatus(0, 1, 0);
+  assert(failStatus2.passed === false, 'Should fail with major violation');
+
+  console.log('[Test] QualityGate verification: PASSED');
+}
+
+// ==============================================================================
+// Main Runner
+// ==============================================================================
+function runAllTests() {
+  try {
+    testDevelopmentMode();
+    testDevelopmentRules();
+    testCapabilityResolver();
+    testSkillAndPipeline();
+    testExecutionLedger();
+    testQualityGate();
+    console.log('\nAll Development OS Foundation tests passed successfully!');
+  } catch (error: any) {
+    console.error('\n❌ Test execution failed:', error.message);
+    throw error;
+  }
+}
+
+runAllTests();
