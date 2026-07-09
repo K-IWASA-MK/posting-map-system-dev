@@ -13,12 +13,63 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 203-1: Execution Engine Foundation [現在のフェーズ]
-* **目的**: Phase 202-7 Runtime Execution Graph Foundation の完了を受け、Execution Layer の最上位エントリーポイントとなる Execution Engine のデータモデル・インターフェース・静的 Blueprint（仕様・ExecutionEngine・EngineType・EXECUTION_ENGINE_BLUEPRINT・getExecutionEngine）を構築する。
-* **今回実施するもの (対象)**:
-  - Execution Engine 設計仕様書（`docs/specifications/ExecutionEngine.md`）の策定。
-  - `src/execution/` への新規追加（ExecutionEngine.ts）の実装。
-  - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext → RuntimeQueue → RuntimeTask → RuntimeExecutionPlan → RuntimeExecutionGraph → ExecutionEngine 静的解決（getExecutionEngine）の実装。
+### 現在のスプリント: AIOS Phase 204: Execution Runtime / Execution Engine Implementation [現在のフェーズ]
+* **目的**: Phase 203 で完成した Execution Layer Foundation Blueprint 群を基盤とし、上位実行レイヤー（ランタイム・エンジン等）の設計および構築を行う。
+
+### 完了したスプリント: AIOS Phase 203-7: Execution Dispatcher Foundation
+* **目的**: Execution Layer におけるディスパッチ構造を表現する静的 Blueprint（仕様・ExecutionDispatcher・DispatcherType・EXECUTION_DISPATCHER_BLUEPRINT・getExecutionDispatcher）を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionDispatcher.md）
+  - ExecutionDispatcher.ts の実装、不変シングルトン Blueprint コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionDispatcher）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 203-6: Execution Resolver Foundation
+* **目的**: Execution Layer における実行定義の静的な解決構造を表現する静的 Blueprint（仕様・ExecutionResolver・ResolverType・EXECUTION_RESOLVER_BLUEPRINT・getExecutionResolver）を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionResolver.md）
+  - ExecutionResolver.ts の実装、不変シングルトン Blueprint コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionResolver）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 203-5: Execution State Foundation
+* **目的**: Execution Layer における実行状態を表現する静的データモデル（仕様・ExecutionState・StateType・EXECUTION_STATE_BLUEPRINT・getExecutionState）を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionState.md）
+  - ExecutionState.ts の実装、不変シングルトン Blueprint コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionState）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 203-4: Execution Result Foundation
+* **目的**: Execution Layer における実行結果を表現する静的データモデル（仕様・ExecutionResult・ResultType・EXECUTION_RESULT_BLUEPRINT・getExecutionResult）を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionResult.md）
+  - ExecutionResult.ts の実装、不変シングルトン Blueprint コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionResult）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 203-3: Execution Request Foundation
+* **目的**: Execution Layer における実行要求の静的データモデル（仕様・ExecutionRequest・RequestType・EXECUTION_REQUEST_BLUEPRINT・getExecutionRequest）を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRequest.md）
+  - ExecutionRequest.ts の実装、不変シングルトン Blueprint コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRequest）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 203-2: Execution Registry Foundation
+* **目的**: Execution Layer における Execution 定義を一元管理する静的レジストリ（仕様・ExecutionRegistry・RegistryType・EXECUTION_REGISTRY_BLUEPRINT・getExecutionRegistry）を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRegistry.md）
+  - ExecutionRegistry.ts の実装、不変シングルトン Blueprint コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRegistry）追加
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 203-1: Execution Engine Foundation
+* **目的**: Execution Layer の最上位エントリーポイントとなる Execution Engine のデータモデル・インターフェース・静的 Blueprint（仕様・ExecutionEngine・EngineType・EXECUTION_ENGINE_BLUEPRINT・getExecutionEngine）を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionEngine.md）
+  - ExecutionEngine.ts の実装、不変シングルトン Blueprint コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionEngine）追加
   - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 202-7: Development Runtime Execution Graph Foundation
