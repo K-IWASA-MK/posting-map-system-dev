@@ -13,12 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Dashboard v1.0 Release [現在のフェーズ]
-* **目的**: Phase 173 で監査対応・品質改善を終えた Dashboard Stack を、正式版 v1.0.0 としてリリースする。
+### 現在のスプリント: AIOS Phase 200-1: AIOS Architecture Charter Foundation [現在のフェーズ]
+* **目的**: AIOS v1.1 Development OS の開始にあたり、AIOS全体を統括する最高設計原則 AIOS Architecture Charter を策定する。
 * **今回実施するもの (対象)**:
+  - 最高位アーキテクチャ憲章（`docs/architecture/AIOS_ARCHITECTURE_CHARTER.md`）の新規策定。
+  - ADR（Architecture Decision Record）規則および拡張原則（Extension Principle）の明文化。
+  - 各種ドキュメントとロードマップの更新。
+
+### 完了したスプリント: AIOS Dashboard v1.0 Release
+* **目的**: Phase 173 で監査対応・品質改善を終えた Dashboard Stack を、正式版 v1.0.0 としてリリースする。
+* **実施したもの**:
   - 最終リリース成果物の確認
   - Git Tag `AIOS-Dashboard-v1.0.0` の作成・反映
   - HANDOVER.md / PROJECT_SCOPE.md のリリース記録更新
+
 
 ### 完了したスプリント: AIOS Phase 173: Dashboard Architecture Audit Fixes
 * **目的**: v1.0 正式リリース前品質監査の指摘（MAJOR 5件、MINOR 3件、SUGGESTION 2件）をすべて修正・反映し、決定論性・不変化・レスポンシブ動作を正常化する。
