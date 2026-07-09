@@ -15,6 +15,8 @@ import { ToolAdapterRegistry, ToolAdapter } from './ToolAdapter';
 import { AntigravityAdapterRegistry, AntigravityAdapter } from './AntigravityAdapter';
 import { ClaudeAdapterRegistry, ClaudeAdapter } from './ClaudeAdapter';
 import { ClaudeModelRegistry, ClaudeModel } from './ClaudeModelRegistry';
+import { GeminiAdapterRegistry, GeminiAdapter } from './GeminiAdapter';
+import { GeminiModelRegistry, GeminiModel } from './GeminiModelRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -146,6 +148,36 @@ export class DevelopmentRules {
     const models: ClaudeModel[] = [];
     for (const modelId of adapter.supportedModelIds) {
       const m = ClaudeModelRegistry.get(modelId);
+      if (m) {
+        models.push(m);
+      }
+    }
+    return models;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする GeminiAdapter を取得する
+   */
+  static getGeminiAdapter(rule: DevelopmentRule): GeminiAdapter | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const list = GeminiAdapterRegistry.getByPipeline(pipeline.pipelineId);
+    return list.length > 0 ? list[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする全 GeminiModel を取得する (4層解決)
+   */
+  static getGeminiModels(rule: DevelopmentRule): GeminiModel[] {
+    const adapter = this.getGeminiAdapter(rule);
+    if (!adapter) {
+      return [];
+    }
+    const models: GeminiModel[] = [];
+    for (const modelId of adapter.supportedModelIds) {
+      const m = GeminiModelRegistry.get(modelId);
       if (m) {
         models.push(m);
       }

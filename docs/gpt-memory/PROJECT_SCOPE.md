@@ -13,14 +13,24 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 201-3: Claude Adapter Foundation [現在のフェーズ]
-* **目的**: Phase 201-2 Antigravity Adapter Foundation を基盤とし、AIOS が利用する LLM Adapter の第一弾である Claude Adapter Foundation（仕様・ClaudeModelRegistry・ClaudeProvider・ClaudeModelStatus・インターフェース実装）を構築する。
+### 現在のスプリント: AIOS Phase 201-4: Gemini Adapter Foundation [現在のフェーズ]
+* **目的**: Phase 201-3 Claude Adapter Foundation を基盤とし、AIOS が利用する LLM Adapter の第二弾である Gemini Adapter Foundation（仕様・GeminiModelRegistry・GeminiProvider・GeminiModelStatus・インターフェース実装）を構築する。
 * **今回実施するもの (対象)**:
+  - Gemini Adapter 設計仕様書（`docs/specifications/DevelopmentGeminiAdapter.md`）の策定。
+  - `src/aios/` への新規追加（GeminiAdapter, GeminiModelRegistry, GeminiAdapterFactory, GeminiAdapterValidator, GeminiAdapterAdapter）の実装。
+  - `ToolRegistry.ts` の `tool-gemini` 定義追加。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Tool Adapter → GeminiAdapter → GeminiModelRegistry 解決（getGeminiAdapter, getGeminiModels）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 201-3: Claude Adapter Foundation
+* **目的**: Phase 201-2 Antigravity Adapter Foundation を基盤とし、AIOS が利用する LLM Adapter の第一弾である Claude Adapter Foundation（仕様・ClaudeModelRegistry・ClaudeProvider・ClaudeModelStatus・インターフェース実装）を構築する。
+* **実施したもの**:
   - Claude Adapter 設計仕様書（`docs/specifications/DevelopmentClaudeAdapter.md`）の策定。
   - `src/aios/` への新規追加（ClaudeAdapter, ClaudeModelRegistry, ClaudeAdapterFactory, ClaudeAdapterValidator, ClaudeAdapterAdapter）の実装。
   - `ToolRegistry.ts` の `tool-claude` 定義追加。
   - `DevelopmentRules.ts` の Capability → Pipeline → Tool Adapter → ClaudeAdapter → ClaudeModelRegistry 解決（getClaudeAdapter, getClaudeModels）の実装。
   - テストおよびビルド検証。
+
 
 ### 完了したスプリント: AIOS Phase 201-2: Antigravity Adapter Foundation
 * **目的**: Phase 201-1 Tool Adapter Foundation を基盤とし、AIOS が最初に接続する具象 Adapter である Antigravity Adapter Foundation（仕様・CommandRegistry・CommandCategory・抽象IDマッピング・インターフェース実装）を構築する。
