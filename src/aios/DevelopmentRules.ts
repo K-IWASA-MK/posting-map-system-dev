@@ -30,6 +30,7 @@ import { RuntimeTaskRegistry, Task } from './RuntimeTaskRegistry';
 import { RuntimeExecutionPlanRegistry, ExecutionPlan } from './RuntimeExecutionPlanRegistry';
 import { RuntimeExecutionGraphRegistry, ExecutionGraph } from './RuntimeExecutionGraphRegistry';
 import { ExecutionEngine, EXECUTION_ENGINE_BLUEPRINT } from '../execution/ExecutionEngine';
+import { ExecutionRegistry, EXECUTION_REGISTRY_BLUEPRINT } from '../execution/ExecutionRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -375,5 +376,19 @@ export class DevelopmentRules {
     }
     // ExecutionEngine はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_ENGINE_BLUEPRINT.getBlueprint();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine から ExecutionRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRegistry(rule: DevelopmentRule): ExecutionRegistry | undefined {
+    const engine = this.getExecutionEngine(rule);
+    if (!engine) {
+      return undefined;
+    }
+    // ExecutionRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_REGISTRY_BLUEPRINT.getRegistry();
   }
 }
