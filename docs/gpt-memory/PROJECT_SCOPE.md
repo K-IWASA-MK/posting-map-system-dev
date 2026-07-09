@@ -13,9 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 201-7: Multi Adapter Registry Foundation [現在のフェーズ]
-* **目的**: Phase 201-6 Adapter Resolver Foundation を基盤とし、Development OS 全体のすべての ToolAdapter を一元管理・Discovery できるようにする Multi Adapter Registry Foundation（仕様・MultiAdapterRegistry・AdapterCapabilityMatrix・AdapterHealthStatus・AdapterPriorityPolicy・Discovery APIs）を構築する。
+### 現在のスプリント: AIOS Phase 202-1: Development Runtime Foundation [現在のフェーズ]
+* **目的**: Phase 201-7 Multi Adapter Registry Foundation を基盤とし、Development OS の実行状態・実行コンテキストを抽象的に管理する Development Runtime Foundation（仕様・RuntimeRegistry・RuntimeRecord・RuntimeState・RuntimeMode・RuntimeFactory・RuntimeValidator・RuntimeAdapter）を構築する。
 * **今回実施するもの (対象)**:
+  - Development Runtime 設計仕様書（`docs/specifications/DevelopmentRuntime.md`）の策定。
+  - `src/aios/` への新規追加（RuntimeRegistry, RuntimeFactory, RuntimeValidator, RuntimeAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Runtime 解決（getRuntime）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 201-7: Multi Adapter Registry Foundation
+* **目的**: Phase 201-6 Adapter Resolver Foundation を基盤とし、Development OS 全体のすべての ToolAdapter を一元管理・Discovery できるようにする Multi Adapter Registry Foundation（仕様・MultiAdapterRegistry・AdapterCapabilityMatrix・AdapterHealthStatus・AdapterPriorityPolicy・Discovery APIs）を構築する。
+* **実施したもの**:
   - Multi Adapter Registry 設計仕様書（`docs/specifications/DevelopmentMultiAdapterRegistry.md`）の策定。
   - `src/aios/` への新規追加（MultiAdapterRegistry, MultiAdapterFactory, MultiAdapterValidator, MultiAdapterAdapter）の実装。
   - `AdapterResolver.ts` の参照先を `MultiAdapterRegistry` に統一。

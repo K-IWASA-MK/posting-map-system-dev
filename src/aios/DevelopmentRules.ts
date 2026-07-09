@@ -22,6 +22,7 @@ import { OpenAIModelRegistry, OpenAIModel } from './OpenAIModelRegistry';
 import { AdapterResolver } from './AdapterResolver';
 import { MultiAdapterRegistry } from './MultiAdapterRegistry';
 import { AdapterType } from './AdapterResolutionRegistry';
+import { RuntimeRegistry, RuntimeRecord } from './RuntimeRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -266,5 +267,17 @@ export class DevelopmentRules {
     }
     
     return Object.freeze(list);
+  }
+
+  /**
+   * ルールに関連付けられた Capability から Pipeline を経由して RuntimeRecord を静的に解決・取得する
+   */
+  static getRuntime(rule: DevelopmentRule): RuntimeRecord | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const runtimes = RuntimeRegistry.findByPipeline(pipeline.pipelineId);
+    return runtimes.length > 0 ? runtimes[0] : undefined;
   }
 }
