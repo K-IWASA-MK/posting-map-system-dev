@@ -7,9 +7,9 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Phase 208-1 through 208-4 (Execution Runtime Component, Registry, Resolver & Validator Foundation)`
-- **Current Phase**: `Phase 208-5`
-- **Next Action**: `Define spec, strategy and roadmap for Phase 208-5 (Execution Runtime Component Dispatcher Foundation)`
+- **Completed**: `Phase 208-1 through 208-5 (Execution Runtime Component, Registry, Resolver, Validator & Dispatcher Foundation)`
+- **Current Phase**: `Phase 208-6`
+- **Next Action**: `Define spec, strategy and roadmap for Phase 208-6 (Execution Runtime Component Scheduler Foundation)`
 - **Branch**: `main`
 
 ---

@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 208-4: Execution Runtime Component Validator Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 208-5: Execution Runtime Component Dispatcher Foundation [現在のフェーズ]
+* **目的**: Execution Runtime における Component Dispatcher の静的 Blueprint を定義する Execution Runtime Component Dispatcher Foundation を構築する。
+
+### 完了したスプリント: AIOS Phase 208-4: Execution Runtime Component Validator Foundation
 * **目的**: Execution Runtime における Component Validator の静的 Blueprint を定義する Execution Runtime Component Validator Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeComponentValidator.md）
+  - ExecutionRuntimeComponentValidator.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeComponentValidator）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 208-3: Execution Runtime Component Resolver Foundation
 * **目的**: Execution Runtime における Component Resolver の静的 Blueprint を定義する Execution Runtime Component Resolver Foundation を構築する。
