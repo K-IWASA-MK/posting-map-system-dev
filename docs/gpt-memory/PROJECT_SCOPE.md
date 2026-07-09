@@ -13,9 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 202-3: Development Runtime Context Foundation [現在のフェーズ]
-* **目的**: Phase 202-2 Runtime Session Foundation を基盤とし、Development OS における論理的な実行コンテキストを抽象的に管理する Development Runtime Context Foundation（仕様・RuntimeContextRegistry・Context・RuntimeContextState・RuntimeContextFactory・RuntimeContextValidator・RuntimeContextAdapter）を構築する。
+### 現在のスプリント: AIOS Phase 202-4: Development Runtime Queue Foundation [現在のフェーズ]
+* **目的**: Phase 202-3 Runtime Context Foundation を基盤とし、Development OS における論理的な処理待ちキューを抽象的に管理する Development Runtime Queue Foundation（仕様・RuntimeQueueRegistry・Queue・RuntimeQueueState・QueuePriority・RuntimeQueueFactory・RuntimeQueueValidator・RuntimeQueueAdapter）を構築する。
 * **今回実施するもの (対象)**:
+  - Development Runtime Queue 設計仕様書（`docs/specifications/DevelopmentRuntimeQueue.md`）の策定。
+  - `src/aios/` への新規追加（RuntimeQueueRegistry, RuntimeQueueFactory, RuntimeQueueValidator, RuntimeQueueAdapter）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext → RuntimeQueue 解決（getRuntimeQueue）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 202-3: Development Runtime Context Foundation
+* **目的**: Phase 202-2 Runtime Session Foundation を基盤とし、Development OS における論理的な実行コンテキストを抽象的に管理する Development Runtime Context Foundation（仕様・RuntimeContextRegistry・Context・RuntimeContextState・RuntimeContextFactory・RuntimeContextValidator・RuntimeContextAdapter）を構築する。
+* **実施したもの**:
   - Development Runtime Context 設計仕様書（`docs/specifications/DevelopmentRuntimeContext.md`）の策定。
   - `src/aios/` への新規追加（RuntimeContextRegistry, RuntimeContextFactory, RuntimeContextValidator, RuntimeContextAdapter）の実装。
   - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext 解決（getRuntimeContext）の実装。

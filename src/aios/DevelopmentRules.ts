@@ -25,6 +25,7 @@ import { AdapterType } from './AdapterResolutionRegistry';
 import { RuntimeRegistry, RuntimeRecord } from './RuntimeRegistry';
 import { RuntimeSessionRegistry, Session } from './RuntimeSessionRegistry';
 import { RuntimeContextRegistry, Context } from './RuntimeContextRegistry';
+import { RuntimeQueueRegistry, Queue } from './RuntimeQueueRegistry';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -308,5 +309,17 @@ export class DevelopmentRules {
     }
     const contexts = RuntimeContextRegistry.findBySession(session.sessionId);
     return contexts.length > 0 ? contexts[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext から RuntimeQueue を静的に解決・取得する
+   */
+  static getRuntimeQueue(rule: DevelopmentRule): Queue | undefined {
+    const context = this.getRuntimeContext(rule);
+    if (!context) {
+      return undefined;
+    }
+    const queues = RuntimeQueueRegistry.findByContext(context.contextId);
+    return queues.length > 0 ? queues[0] : undefined;
   }
 }
