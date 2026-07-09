@@ -13,9 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 202-7: Development Runtime Execution Graph Foundation [現在のフェーズ]
-* **目的**: Phase 202-6 Runtime Execution Plan Foundation を基盤とし、Development OS における複数の Execution Plan の依存関係・トポロジー・実行フローを抽象的に管理する Runtime Execution Graph Foundation（仕様・RuntimeExecutionGraphRegistry・ExecutionGraph・RuntimeExecutionGraphState・RuntimeExecutionGraphFactory・RuntimeExecutionGraphValidator・RuntimeExecutionGraphAdapter）を構築する。
+### 現在のスプリント: AIOS Phase 203-1: Execution Engine Foundation [現在のフェーズ]
+* **目的**: Phase 202-7 Runtime Execution Graph Foundation の完了を受け、Execution Layer の最上位エントリーポイントとなる Execution Engine のデータモデル・インターフェース・静的 Blueprint（仕様・ExecutionEngine・EngineType・EXECUTION_ENGINE_BLUEPRINT・getExecutionEngine）を構築する。
 * **今回実施するもの (対象)**:
+  - Execution Engine 設計仕様書（`docs/specifications/ExecutionEngine.md`）の策定。
+  - `src/execution/` への新規追加（ExecutionEngine.ts）の実装。
+  - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext → RuntimeQueue → RuntimeTask → RuntimeExecutionPlan → RuntimeExecutionGraph → ExecutionEngine 静的解決（getExecutionEngine）の実装。
+  - テストおよびビルド検証。
+
+### 完了したスプリント: AIOS Phase 202-7: Development Runtime Execution Graph Foundation
+* **目的**: Phase 202-6 Runtime Execution Plan Foundation を基盤とし、Development OS における複数の Execution Plan の依存関係・トポロジー・実行フローを抽象的に管理する Runtime Execution Graph Foundation（仕様・RuntimeExecutionGraphRegistry・ExecutionGraph・RuntimeExecutionGraphState・RuntimeExecutionGraphFactory・RuntimeExecutionGraphValidator・RuntimeExecutionGraphAdapter）を構築する。
+* **実施したもの**:
   - Development Runtime Execution Graph 設計仕様書（`docs/specifications/DevelopmentRuntimeExecutionGraph.md`）の策定。
   - `src/aios/` への新規追加（RuntimeExecutionGraphRegistry, RuntimeExecutionGraphFactory, RuntimeExecutionGraphValidator, RuntimeExecutionGraphAdapter）の実装。
   - `DevelopmentRules.ts` の Capability → Pipeline → Runtime → RuntimeSession → RuntimeContext → RuntimeQueue → RuntimeTask → RuntimeExecutionPlan → RuntimeExecutionGraph 解決（getRuntimeExecutionGraph）の実装。
