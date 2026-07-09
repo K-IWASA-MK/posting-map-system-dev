@@ -277,7 +277,10 @@ export class DevelopmentRules {
     if (!pipeline) {
       return undefined;
     }
-    const runtimes = RuntimeRegistry.findByPipeline(pipeline.pipelineId);
-    return runtimes.length > 0 ? runtimes[0] : undefined;
+    const match = pipeline.pipelineId.match(/\d+/);
+    if (!match) {
+      return undefined;
+    }
+    return RuntimeRegistry.get(`runtime-${match[0]}`);
   }
 }

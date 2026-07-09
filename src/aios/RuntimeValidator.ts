@@ -1,10 +1,9 @@
 import { RuntimeRecord, RuntimeState, RuntimeMode } from './RuntimeRegistry';
-import { SkillPipelineRegistry } from './SkillPipelineRegistry';
 
 /**
  * RuntimeValidator.ts
  * 
- * RuntimeRecord の静的整合性および外部参照（SSOT）を検証するバリデータ。
+ * RuntimeRecord の静的整合性を検証するバリデータ。
  * 
  * 警告：本ファイル内への API 通信、コマンド送信、自律改善、AI予測・推論・自動配置ロジックの実装は厳禁である。
  */
@@ -51,17 +50,6 @@ export class RuntimeValidator {
     }
     if (!record.updatedAt || !iso8601Pattern.test(record.updatedAt)) {
       throw new Error(`[RuntimeValidator] Invalid updatedAt ISO8601 format: ${record.updatedAt}`);
-    }
-
-    // 7. Referential Integrity: Pipeline 存在検証 (SSOT)
-    if (!Array.isArray(record.supportedPipelineIds)) {
-      throw new Error('[RuntimeValidator] supportedPipelineIds must be an array');
-    }
-    for (const pipelineId of record.supportedPipelineIds) {
-      const pipeline = SkillPipelineRegistry.get(pipelineId);
-      if (!pipeline) {
-        throw new Error(`[RuntimeValidator] Pipeline dependency not registered in SkillPipelineRegistry: ${pipelineId}`);
-      }
     }
   }
 }

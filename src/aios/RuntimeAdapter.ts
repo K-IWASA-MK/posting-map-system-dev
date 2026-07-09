@@ -15,7 +15,6 @@ export interface RuntimeViewModel {
   readonly modeLabel: string;
   readonly descriptionText: string;
   readonly specVersion: string;
-  readonly pipelineCount: number;
   readonly createdTimestamp: string;
   readonly updatedTimestamp: string;
 }
@@ -36,7 +35,6 @@ export class RuntimeAdapter {
       modeLabel: String(record.runtimeMode),
       descriptionText: record.description || '',
       specVersion: record.version,
-      pipelineCount: Array.isArray(record.supportedPipelineIds) ? record.supportedPipelineIds.length : 0,
       createdTimestamp: record.createdAt,
       updatedTimestamp: record.updatedAt
     };

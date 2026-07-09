@@ -19,7 +19,6 @@ export class RuntimeFactory {
     state: RuntimeState,
     mode: RuntimeMode,
     description: string,
-    supportedPipelineIds: readonly string[],
     version: string = '1.0.0'
   ): RuntimeRecord {
     if (!name) {
@@ -43,7 +42,6 @@ export class RuntimeFactory {
       runtimeMode: mode,
       description: description || '',
       version: version,
-      supportedPipelineIds: Object.freeze([...supportedPipelineIds]),
       createdAt: now,
       updatedAt: now
     };

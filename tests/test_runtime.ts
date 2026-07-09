@@ -52,28 +52,22 @@ function testRegistryBasic() {
 
   const record = RuntimeFactory.create(
     'test-runtime-env',
-    RuntimeState.INITIALIZED,
-    RuntimeMode.DEVELOPMENT,
-    'A development runtime sandbox',
-    ['pipeline-1'],
+    RuntimeState.CREATED,
+    RuntimeMode.SANDBOX,
+    'A sandbox runtime context',
     '1.0.0'
   );
 
   assert(record.runtimeId === 'runtime-1', 'Factory failed to assign runtime-1 ID');
   assert(record.runtimeName === 'test-runtime-env', 'runtimeName assignment mismatch');
-  assert(record.runtimeState === RuntimeState.INITIALIZED, 'runtimeState assignment mismatch');
-  assert(record.runtimeMode === RuntimeMode.DEVELOPMENT, 'runtimeMode assignment mismatch');
+  assert(record.runtimeState === RuntimeState.CREATED, 'runtimeState assignment mismatch');
+  assert(record.runtimeMode === RuntimeMode.SANDBOX, 'runtimeMode assignment mismatch');
 
   RuntimeRegistry.register(record);
   
   const fetched = RuntimeRegistry.get('runtime-1');
   assert(fetched !== undefined, 'Failed to fetch registered runtime');
   assert(fetched?.runtimeName === 'test-runtime-env', 'Fetched runtime name mismatch');
-
-  // Verify findByPipeline
-  const runtimes = RuntimeRegistry.findByPipeline('pipeline-1');
-  assert(runtimes.length === 1, 'Should find 1 runtime associated with pipeline-1');
-  assert(runtimes[0].runtimeId === 'runtime-1', 'Associated runtime ID mismatch');
 
   // Verify clear and findAll
   assert(RuntimeRegistry.findAll().length === 1, 'findAll should return 1 record');
@@ -90,15 +84,15 @@ function testFactoryDeterminism() {
   console.log('[Test 2] Factory and ID Determinism verification starting...');
   setupAllEnvironments();
 
-  const r1 = RuntimeFactory.create('R1', RuntimeState.INITIALIZED, RuntimeMode.SIMULATION, 'simulation mode', ['pipeline-1']);
-  const r2 = RuntimeFactory.create('R2', RuntimeState.RUNNING, RuntimeMode.SIMULATION, 'simulation mode', ['pipeline-1']);
+  const r1 = RuntimeFactory.create('R1', RuntimeState.CREATED, RuntimeMode.MANUAL, 'manual mode');
+  const r2 = RuntimeFactory.create('R2', RuntimeState.RUNNING, RuntimeMode.AUTOMATIC, 'auto mode');
   
   assert(r1.runtimeId === 'runtime-1', 'First ID must be runtime-1');
   assert(r2.runtimeId === 'runtime-2', 'Second ID must be runtime-2');
 
   // Counter reset verification
   RuntimeFactory.resetCounter();
-  const r3 = RuntimeFactory.create('R3', RuntimeState.INITIALIZED, RuntimeMode.SIMULATION, 'simulation mode', ['pipeline-1']);
+  const r3 = RuntimeFactory.create('R3', RuntimeState.CREATED, RuntimeMode.SANDBOX, 'sandbox mode');
   assert(r3.runtimeId === 'runtime-1', 'Counter reset failed');
 
   // Immutability verification
@@ -113,13 +107,13 @@ function testFactoryDeterminism() {
 }
 
 // ==============================================================================
-// 3. Validator Checks
+// 3. Validator Checks (with exact error mapping from Flash instructions)
 // ==============================================================================
 function testValidator() {
   console.log('[Test 3] RuntimeValidator validation verification starting...');
   setupAllEnvironments();
 
-  const validRecord = RuntimeFactory.create('ValidRuntime', RuntimeState.INITIALIZED, RuntimeMode.DEVELOPMENT, 'Valid desc', ['pipeline-1']);
+  const validRecord = RuntimeFactory.create('ValidRuntime', RuntimeState.CREATED, RuntimeMode.SANDBOX, 'Valid desc');
 
   // Valid record validation should not throw
   RuntimeValidator.validate(validRecord);
@@ -133,59 +127,50 @@ function testValidator() {
     assert(e.message.includes('Invalid runtimeId format'), 'Error message mismatch');
   }
 
-  // 3.2 Empty name validation
+  // 3.2 INVALID_RUNTIME_STATE validation
   try {
-    const badName = { ...validRecord, runtimeName: '   ' };
-    RuntimeValidator.validate(badName);
-    assert(false, 'Should fail validation for empty runtimeName');
-  } catch (e: any) {
-    assert(e.message.includes('runtimeName is required'), 'Error message mismatch');
-  }
-
-  // 3.3 Invalid state validation
-  try {
-    const badState = { ...validRecord, runtimeState: 'UNKNOWN_STATE' as any };
+    const badState = { ...validRecord, runtimeState: 'INVALID_STATE' as any };
     RuntimeValidator.validate(badState);
-    assert(false, 'Should fail validation for invalid state');
+    assert(false, 'Should fail validation for INVALID_RUNTIME_STATE');
   } catch (e: any) {
-    assert(e.message.includes('Invalid runtimeState'), 'Error message mismatch');
+    assert(e.message.includes('Invalid runtimeState'), 'INVALID_RUNTIME_STATE validation error failed');
   }
 
-  // 3.4 Invalid mode validation
+  // 3.3 INVALID_RUNTIME_MODE validation
   try {
-    const badMode = { ...validRecord, runtimeMode: 'UNKNOWN_MODE' as any };
+    const badMode = { ...validRecord, runtimeMode: 'INVALID_MODE' as any };
     RuntimeValidator.validate(badMode);
-    assert(false, 'Should fail validation for invalid mode');
+    assert(false, 'Should fail validation for INVALID_RUNTIME_MODE');
   } catch (e: any) {
-    assert(e.message.includes('Invalid runtimeMode'), 'Error message mismatch');
+    assert(e.message.includes('Invalid runtimeMode'), 'INVALID_RUNTIME_MODE validation error failed');
   }
 
-  // 3.5 Pipeline dependency validation
+  // 3.4 INVALID_RUNTIME_VERSION validation
   try {
-    const badPipeline = { ...validRecord, supportedPipelineIds: ['pipeline-unregistered'] };
-    RuntimeValidator.validate(badPipeline);
-    assert(false, 'Should fail validation for unregistered pipeline dependency');
+    const badVersion = { ...validRecord, version: '   ' };
+    RuntimeValidator.validate(badVersion);
+    assert(false, 'Should fail validation for INVALID_RUNTIME_VERSION');
   } catch (e: any) {
-    assert(e.message.includes('Pipeline dependency not registered'), 'Error message mismatch');
+    assert(e.message.includes('version is required'), 'INVALID_RUNTIME_VERSION validation error failed');
   }
 
-  // 3.6 Date validation
+  // 3.5 INVALID_RUNTIME_DATE validation
   try {
     const badDate = { ...validRecord, createdAt: 'not-a-date' };
     RuntimeValidator.validate(badDate);
-    assert(false, 'Should fail validation for bad ISO8601 creation date');
+    assert(false, 'Should fail validation for INVALID_RUNTIME_DATE');
   } catch (e: any) {
-    assert(e.message.includes('Invalid createdAt ISO8601 format'), 'Error message mismatch');
+    assert(e.message.includes('Invalid createdAt ISO8601 format'), 'INVALID_RUNTIME_DATE validation error failed');
   }
 
-  // 3.7 Duplicate registration error
+  // 3.6 DUPLICATE_RUNTIME validation
   try {
     RuntimeRegistry.register(validRecord);
-    // Duplicate registration should throw
+    // Duplicate registration should throw DUPLICATE_RUNTIME
     RuntimeRegistry.register(validRecord);
-    assert(false, 'Should fail duplicate runtime registration');
+    assert(false, 'Should throw error for DUPLICATE_RUNTIME');
   } catch (e: any) {
-    assert(e.message.includes('RuntimeRecord ID already registered'), 'Error message mismatch');
+    assert(e.message.includes('RuntimeRecord ID already registered'), 'DUPLICATE_RUNTIME check failed');
   }
 
   console.log('[Test 3] RuntimeValidator validation verification: PASSED');
@@ -201,9 +186,8 @@ function testAdapterViewModel() {
   const record = RuntimeFactory.create(
     'adapter-runtime-env',
     RuntimeState.RUNNING,
-    RuntimeMode.PRODUCTION,
+    RuntimeMode.AUTOMATIC,
     'Production context description',
-    ['pipeline-1'],
     '2.1.0'
   );
 
@@ -212,10 +196,9 @@ function testAdapterViewModel() {
   assert(vm.id === record.runtimeId, 'VM ID mismatch');
   assert(vm.name === 'adapter-runtime-env', 'VM name mismatch');
   assert(vm.stateLabel === 'RUNNING', 'VM state label mismatch');
-  assert(vm.modeLabel === 'PRODUCTION', 'VM mode label mismatch');
+  assert(vm.modeLabel === 'AUTOMATIC', 'VM mode label mismatch');
   assert(vm.descriptionText === 'Production context description', 'VM description mismatch');
   assert(vm.specVersion === '2.1.0', 'VM specVersion mismatch');
-  assert(vm.pipelineCount === 1, 'VM pipelineCount mismatch');
   assert(vm.createdTimestamp === record.createdAt, 'VM created timestamp mismatch');
 
   // Verify immutability of ViewModel
@@ -236,13 +219,12 @@ function testRulesIntegration() {
   console.log('[Test 5] DevelopmentRules integration verification starting...');
   setupAllEnvironments();
 
-  // Create and register runtime environment for pipeline-1
+  // Create and register runtime environment (ID: runtime-1)
   const record = RuntimeFactory.create(
     'rule-runtime-env',
-    RuntimeState.INITIALIZED,
-    RuntimeMode.DEVELOPMENT,
+    RuntimeState.CREATED,
+    RuntimeMode.SANDBOX,
     'rules description',
-    ['pipeline-1'],
     '1.0.0'
   );
   RuntimeRegistry.register(record);

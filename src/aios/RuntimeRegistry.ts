@@ -9,17 +9,18 @@ import { RuntimeValidator } from './RuntimeValidator';
  */
 
 export enum RuntimeState {
-  INITIALIZED = 'INITIALIZED',
+  CREATED = 'CREATED',
+  READY = 'READY',
   RUNNING = 'RUNNING',
   PAUSED = 'PAUSED',
-  TERMINATED = 'TERMINATED',
-  FAILED = 'FAILED'
+  STOPPED = 'STOPPED',
+  TERMINATED = 'TERMINATED'
 }
 
 export enum RuntimeMode {
-  SIMULATION = 'SIMULATION',
-  DEVELOPMENT = 'DEVELOPMENT',
-  PRODUCTION = 'PRODUCTION'
+  MANUAL = 'MANUAL',
+  AUTOMATIC = 'AUTOMATIC',
+  SANDBOX = 'SANDBOX'
 }
 
 export interface RuntimeRecord {
@@ -29,7 +30,6 @@ export interface RuntimeRecord {
   readonly runtimeMode: RuntimeMode;
   readonly description: string;
   readonly version: string;
-  readonly supportedPipelineIds: readonly string[];
   readonly createdAt: string;
   readonly updatedAt: string;
 }
@@ -73,8 +73,7 @@ export class RuntimeRegistry {
 
     // 完全な不変性を担保して格納
     this.registry.set(record.runtimeId, Object.freeze({
-      ...record,
-      supportedPipelineIds: Object.freeze([...record.supportedPipelineIds])
+      ...record
     }));
   }
 
@@ -83,19 +82,6 @@ export class RuntimeRegistry {
    */
   static get(id: string): RuntimeRecord | undefined {
     return this.registry.get(id);
-  }
-
-  /**
-   * Pipeline ID から関連する RuntimeRecord のリストを検索する
-   */
-  static findByPipeline(pipelineId: string): RuntimeRecord[] {
-    const results: RuntimeRecord[] = [];
-    for (const record of this.registry.values()) {
-      if (record.supportedPipelineIds.includes(pipelineId)) {
-        results.push(record);
-      }
-    }
-    return results;
   }
 
   /**

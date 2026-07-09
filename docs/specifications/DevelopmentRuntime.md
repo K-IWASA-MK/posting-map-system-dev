@@ -23,11 +23,12 @@ The operational lifecycle state of the runtime environment.
 
 ```typescript
 export enum RuntimeState {
-  INITIALIZED = 'INITIALIZED',  // Statically initialized, ready for startup
-  RUNNING     = 'RUNNING',      // Actively executing or ready to execute processes
-  PAUSED      = 'PAUSED',       // Temporarily suspended, state preserved
-  TERMINATED  = 'TERMINATED',   // Gracefully stopped, state persisted/finalized
-  FAILED      = 'FAILED'        // Crashed or halted due to an unrecoverable error
+  CREATED    = 'CREATED',     // Created context
+  READY      = 'READY',       // Ready to execute
+  RUNNING    = 'RUNNING',     // Actively executing processes
+  PAUSED     = 'PAUSED',      // Temporarily suspended, state preserved
+  STOPPED    = 'STOPPED',     // Stalled or manually halted
+  TERMINATED = 'TERMINATED'   // Gracefully ended/cleaned up
 }
 ```
 
@@ -36,9 +37,9 @@ The configuration mode of the execution environment.
 
 ```typescript
 export enum RuntimeMode {
-  SIMULATION  = 'SIMULATION',   // Sandboxed dry-run environment
-  DEVELOPMENT = 'DEVELOPMENT',  // Active development/debugging environment
-  PRODUCTION  = 'PRODUCTION'   // Live production execution environment
+  MANUAL    = 'MANUAL',     // Manual interactive environment
+  AUTOMATIC = 'AUTOMATIC',  // Autonomous scheduler execution
+  SANDBOX   = 'SANDBOX'    // Safe simulation environment
 }
 ```
 
@@ -53,7 +54,6 @@ export interface RuntimeRecord {
   readonly runtimeMode: RuntimeMode;               // Execution mode
   readonly description: string;                   // Description of the runtime context
   readonly version: string;                       // Semantic version of the runtime spec
-  readonly supportedPipelineIds: readonly string[]; // Pipelines mapped to this runtime
   readonly createdAt: string;                     // ISO8601 creation timestamp
   readonly updatedAt: string;                     // ISO8601 update timestamp
 }
@@ -80,10 +80,9 @@ To prevent corrupted states, the `RuntimeValidator` enforces the following valid
 1. **ID Format**: `runtimeId` must match the regular expression `/^runtime-\d+$/`.
 2. **State Validation**: `runtimeState` must be a valid member of the `RuntimeState` Enum.
 3. **Mode Validation**: `runtimeMode` must be a valid member of the `RuntimeMode` Enum.
-4. **Referential Integrity**: Every pipeline listed in `supportedPipelineIds` must be registered in the global `SkillPipelineRegistry`.
-5. **Version Semantics**: `version` must be a non-empty string matching standard semantic version formats.
-6. **Date Semantics**: `createdAt` and `updatedAt` must be valid ISO8601 date-time strings.
-7. **No Duplicates**: `RuntimeRegistry` rejects registrations with duplicate `runtimeId` values.
+4. **Version Semantics**: `version` must be a non-empty string matching standard semantic version formats.
+5. **Date Semantics**: `createdAt` and `updatedAt` must be valid ISO8601 date-time strings.
+6. **No Duplicates**: `RuntimeRegistry` rejects registrations with duplicate `runtimeId` values.
 
 ---
 
@@ -93,15 +92,16 @@ Runtimes must transition logically through their lifecycle states:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> INITIALIZED
-    INITIALIZED --> RUNNING : Start
+    [*] --> CREATED
+    CREATED --> READY : Prepare
+    READY --> RUNNING : Start
     RUNNING --> PAUSED : Suspend
     PAUSED --> RUNNING : Resume
-    RUNNING --> TERMINATED : Stop (Success)
-    RUNNING --> FAILED : Crash (Error)
-    PAUSED --> TERMINATED : Stop
+    RUNNING --> STOPPED : Halt
+    STOPPED --> RUNNING : Restart
+    RUNNING --> TERMINATED : Terminate
+    STOPPED --> TERMINATED : Terminate
     TERMINATED --> [*]
-    FAILED --> [*]
 ```
 
 ---
@@ -111,3 +111,4 @@ stateDiagram-v2
 * **Strict GET Layering**: Higher-level operations query runtime status solely via the `RuntimeRegistry`.
 * **No Autonomous Evolution**: Runtimes are configured strictly by definition files or explicit control inputs. Auto-tuning, AI-driven state shifting, or direct process hooks are prohibited in this layer.
 * **Separation of Concerns**: Actual execution mechanisms (Schedules, Queues, Contexts) are handled in downstream Phase 202 sub-phases.
+
