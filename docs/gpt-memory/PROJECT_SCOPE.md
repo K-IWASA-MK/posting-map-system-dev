@@ -13,8 +13,9 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 204: Execution Runtime / Execution Engine Implementation [現在のフェーズ]
-* **目的**: Phase 203 で完成した Execution Layer Foundation Blueprint 群を基盤とし、上位実行レイヤー（ランタイム・エンジン等）の設計および構築を行う。
+### 現在のスプリント: AIOS Phase 204-1: Execution Runtime Foundation [現在のフェーズ]
+* **目的**: Phase 203 で完成した Execution Layer Foundation Blueprint 群を基盤とし、Execution Runtime の構造定義・データモデル・Blueprint・公開インターフェースを構築する。
+
 
 ### 完了したスプリント: AIOS Phase 203-7: Execution Dispatcher Foundation
 * **目的**: Execution Layer におけるディスパッチ構造を表現する静的 Blueprint（仕様・ExecutionDispatcher・DispatcherType・EXECUTION_DISPATCHER_BLUEPRINT・getExecutionDispatcher）を構築する。
