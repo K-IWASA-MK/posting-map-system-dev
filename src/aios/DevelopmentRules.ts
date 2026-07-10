@@ -49,7 +49,7 @@ import { RuntimeValidationResult, EXECUTION_RUNTIME_VALIDATION_LOGIC } from '../
 import { RuntimeDispatchResult, EXECUTION_RUNTIME_DISPATCH_LOGIC } from '../execution/ExecutionRuntimeDispatch';
 import { RuntimeQueueResult, EXECUTION_RUNTIME_QUEUE_LOGIC } from '../execution/ExecutionRuntimeQueue';
 import { RuntimeSchedulerResult, EXECUTION_RUNTIME_SCHEDULER_LOGIC } from '../execution/ExecutionRuntimeScheduler';
-import { RuntimeExecutorResult, EXECUTION_RUNTIME_EXECUTOR_LOGIC } from '../execution/ExecutionRuntimeExecutor';
+import { RuntimeExecutorResult, EXECUTION_RUNTIME_EXECUTOR_LOGIC } from '../execution/ExecutionRuntimeExecutorLogic';
 import { ExecutionRuntimeEngine, EXECUTION_RUNTIME_ENGINE_BLUEPRINT } from '../execution/ExecutionRuntimeEngine';
 import { ExecutionRuntimeEngineRegistry, EXECUTION_RUNTIME_ENGINE_REGISTRY_BLUEPRINT } from '../execution/ExecutionRuntimeEngineRegistry';
 import { ExecutionRuntimeEngineResolver, EXECUTION_RUNTIME_ENGINE_RESOLVER_BLUEPRINT } from '../execution/ExecutionRuntimeEngineResolver';
@@ -88,6 +88,7 @@ import { ExecutionRuntimeInstance, EXECUTION_RUNTIME_INSTANCE_BLUEPRINT } from '
 import { ExecutionRuntimeLoader, EXECUTION_RUNTIME_LOADER_BLUEPRINT } from '../execution/ExecutionRuntimeLoader';
 import { ExecutionRuntimeBuilder, EXECUTION_RUNTIME_BUILDER_BLUEPRINT } from '../execution/ExecutionRuntimeBuilder';
 import { ExecutionRuntimeComposer, EXECUTION_RUNTIME_COMPOSER_BLUEPRINT } from '../execution/ExecutionRuntimeComposer';
+import { ExecutionRuntimeExecutor, EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT } from '../execution/ExecutionRuntimeExecutor';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1220,7 +1221,23 @@ export class DevelopmentRules {
     // ExecutionRuntimeComposer は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_COMPOSER_BLUEPRINT.getExecutionRuntimeComposer();
   }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeExecutor を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Executor Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeExecutor(rule: DevelopmentRule): ExecutionRuntimeExecutor | undefined {
+    // 依存性検証のため composer の解決可能性のみ確認
+    const composer = this.getExecutionRuntimeComposer(rule);
+    if (!composer) {
+      return undefined;
+    }
+    // ExecutionRuntimeExecutor は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getExecutionRuntimeExecutor();
+  }
 }
+
 
 
 

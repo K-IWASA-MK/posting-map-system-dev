@@ -18,7 +18,7 @@ import { RuntimeExecutionPlanRegistry, RuntimeExecutionPlanState, ExecutionStrat
 import { RuntimeExecutionPlanFactory } from '../src/aios/RuntimeExecutionPlanFactory';
 import { RuntimeExecutionGraphRegistry, RuntimeExecutionGraphState } from '../src/aios/RuntimeExecutionGraphRegistry';
 import { RuntimeExecutionGraphFactory } from '../src/aios/RuntimeExecutionGraphFactory';
-import { EXECUTION_RUNTIME_EXECUTOR_LOGIC, ExecutorStatus } from '../src/execution/ExecutionRuntimeExecutor';
+import { EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT, ExecutorType, ExecutorScope, RuntimeExecutionType, ExecutionStep, RUNTIME_EXECUTION_MODELS, EXECUTION_SEQUENCE } from '../src/execution/ExecutionRuntimeExecutor';
 import { DevelopmentRules } from '../src/aios/DevelopmentRules';
 
 function assert(condition: boolean, message: string) {
@@ -91,77 +91,118 @@ function setupAllEnvironments() {
 }
 
 // 1. Structure and Immutability check
-function testExecutorStructureAndImmutability() {
-  console.log('[Test 1] Executor metadata and result structures check starting...');
+function testExecutorManagerStructureAndImmutability() {
+  console.log('[Test 1] Executor Manager metadata, context, and data structures check starting...');
   
-  assert(Object.isFrozen(EXECUTION_RUNTIME_EXECUTOR_LOGIC), 'EXECUTION_RUNTIME_EXECUTOR_LOGIC container must be frozen');
+  assert(Object.isFrozen(EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT), 'EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT container must be frozen');
   
-  const metadata = EXECUTION_RUNTIME_EXECUTOR_LOGIC.getExecutorMetadata();
+  const manager = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getExecutionRuntimeExecutor();
+  assert(Object.isFrozen(manager), 'Executor Manager data must be frozen');
+  
+  const context = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getContext();
+  assert(Object.isFrozen(context), 'Context must be frozen');
+  
+  const metadata = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getMetadata();
   assert(Object.isFrozen(metadata), 'Metadata must be frozen');
-  assert(metadata.author === 'AIOS Team', 'Metadata author mismatch');
-  assert(metadata.version === '1.0.0', 'Metadata version mismatch');
-  assert(metadata.phase === 'Phase 205-7', 'Metadata phase mismatch');
+  
+  const data = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getData();
+  assert(Object.isFrozen(data), 'Data must be frozen');
 
-  assert(ExecutorStatus.READY === 'READY', 'Enum ExecutorStatus check failed');
+  assert(metadata.id === 'runtime-executor-manager-meta-01', 'Metadata id mismatch');
+  assert(metadata.version === '1.0.0', 'Metadata version mismatch');
+  assert(metadata.layer === 'Executor Manager Layer', 'Metadata layer mismatch');
+
+  assert(ExecutorType.FOUNDATION === 'FOUNDATION', 'Enum ExecutorType check failed');
+  assert(ExecutorScope.SYSTEM === 'SYSTEM', 'Enum ExecutorScope check failed');
 
   console.log('[Test 1] Structure and Immutability check: PASSED');
 }
 
-// 2. Executor resolve result validation
-function testExecutorLogicExecutionAndReadonly() {
-  console.log('[Test 2] Executor logic execution and result validation starting...');
-  setupAllEnvironments();
+// 2. Executor Manager Context and Blueprint values checks
+function testExecutorManagerBlueprintValues() {
+  console.log('[Test 2] Executor Manager context and blueprint values validation starting...');
 
-  const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
-  const result = EXECUTION_RUNTIME_EXECUTOR_LOGIC.executeRuntime(rule);
+  const manager = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getExecutionRuntimeExecutor();
+  const context = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getContext();
+  const data = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getData();
 
-  assert(result !== undefined, 'Executor result should be resolved');
-  assert(Object.isFrozen(result), 'Returned executor result must be frozen');
+  assert(manager.id === 'runtime-executor-01', 'Executor Manager ID mismatch');
+  assert(manager.context === context, 'Executor Manager context mismatch');
+  assert(manager.data === data, 'Executor Manager data mismatch');
 
-  assert(result?.runtimeManagerId === 'runtime-manager-01', 'Manager ID mismatch');
-  assert(result?.runtimeSessionId === 'runtime-session-01', 'Session ID mismatch');
-  assert(result?.runtimeContextId === 'runtime-context-01', 'Context ID mismatch');
-  assert(result?.runtimeRegistryId === 'registry-runtime-01', 'Registry ID mismatch');
-  assert(result?.runtimeResolverId === 'runtime-resolver-01', 'Resolver ID mismatch');
-  assert(result?.hydratorId === 'context-hydrator-01', 'Hydrator ID mismatch');
-  assert(result?.validatorId === 'blueprint-validator-01', 'Validator ID mismatch');
-  assert(result?.dispatcherId === 'runtime-dispatcher-01', 'Dispatcher ID mismatch');
-  assert(result?.queueId === 'queue-1', 'Queue ID mismatch');
-  assert(result?.schedulerId === 'scheduler-1', 'Scheduler ID mismatch');
-  assert(result?.executorId === 'executor-1', 'Executor ID mismatch');
-  assert(result?.executorStatus === ExecutorStatus.READY, 'Executor status mismatch');
+  // Verify context holds only runtimeExecutorId (simple context check)
+  const contextKeys = Object.keys(context);
+  assert(contextKeys.length === 1, 'Executor Manager Context must hold exactly 1 property');
+  assert(context.runtimeExecutorId === 'runtime-executor-01', 'Context runtimeExecutorId mismatch');
 
-  console.log('[Test 2] Executor logic execution and result validation: PASSED');
+  // Verify executionModels are specified correctly
+  assert(data.executionModels.length === 5, 'Execution models count must be exactly 5');
+  assert(data.executionModels[0].executionType === RuntimeExecutionType.SYSTEM_EXECUTION, 'Execution model 1 mismatch');
+  assert(data.executionModels[1].executionType === RuntimeExecutionType.ENGINE_EXECUTION, 'Execution model 2 mismatch');
+  assert(data.executionModels[2].executionType === RuntimeExecutionType.SERVICE_EXECUTION, 'Execution model 3 mismatch');
+  assert(data.executionModels[3].executionType === RuntimeExecutionType.COMPONENT_EXECUTION, 'Execution model 4 mismatch');
+  assert(data.executionModels[4].executionType === RuntimeExecutionType.APPLICATION_EXECUTION, 'Execution model 5 mismatch');
+
+  // Verify each execution model has version 1.0, executionOrder, targetLayouts and allowedSteps
+  for (let i = 0; i < 5; i++) {
+    const model = data.executionModels[i];
+    assert(model.metadata.executionModelVersion === '1.0', `Execution model ${i} version mismatch`);
+    assert(model.executionOrder === i + 1, `Execution model ${i} executionOrder mismatch`);
+    assert(Object.isFrozen(model.targetLayouts), `Execution model ${i} targetLayouts must be frozen`);
+    assert(model.allowedSteps === EXECUTION_SEQUENCE, `Execution model ${i} allowedSteps mismatch`);
+  }
+
+  // Verify targetLayouts setup (e.g. system execution targets system-layout-blueprint-id)
+  assert(data.executionModels[0].targetLayouts[0] === 'system-layout-blueprint-id', 'System execution targetLayouts mismatch');
+
+  // Verify EXECUTION_SEQUENCE (VALIDATE_LAYOUT, PREPARE_EXECUTION, BUILD_EXECUTION_SCHEMA, READY_FOR_EXECUTION, EXECUTION_SCHEMA_READY)
+  const seq = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getExecutionSequence();
+  assert(seq === EXECUTION_SEQUENCE, 'Execution sequence mismatch');
+  assert(seq[0] === ExecutionStep.VALIDATE_LAYOUT, 'Seq 0 mismatch');
+  assert(seq[1] === ExecutionStep.PREPARE_EXECUTION, 'Seq 1 mismatch');
+  assert(seq[2] === ExecutionStep.BUILD_EXECUTION_SCHEMA, 'Seq 2 mismatch');
+  assert(seq[3] === ExecutionStep.READY_FOR_EXECUTION, 'Seq 3 mismatch');
+  assert(seq[4] === ExecutionStep.EXECUTION_SCHEMA_READY, 'Seq 4 mismatch');
+
+  // Verify static execution models list matches
+  const list = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getExecutionModels();
+  assert(list === RUNTIME_EXECUTION_MODELS, 'Execution models list object mismatch');
+  assert(Object.isFrozen(list), 'Execution models list must be frozen');
+
+  console.log('[Test 2] Executor Manager context and blueprint values validation: PASSED');
 }
 
 // 3. Referential Determinism verification
 function testReferentialDeterminism() {
-  console.log('[Test 3] Executor referential determinism checks starting...');
+  console.log('[Test 3] Executor Manager referential determinism checks starting...');
   setupAllEnvironments();
 
   const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
-  const e1 = EXECUTION_RUNTIME_EXECUTOR_LOGIC.executeRuntime(rule);
-  const e2 = EXECUTION_RUNTIME_EXECUTOR_LOGIC.executeRuntime(rule);
+  const manager1 = DevelopmentRules.getExecutionRuntimeExecutor(rule);
+  const manager2 = DevelopmentRules.getExecutionRuntimeExecutor(rule);
   
-  assert(e1 === e2, 'Consecutive executor calls on the same rule must return the exact same frozen reference');
+  assert(manager1 !== undefined, 'Executor Manager should be resolved');
+  assert(manager1 === manager2, 'Consecutive executor manager resolver calls on the same rule must return the exact same frozen reference');
 
   console.log('[Test 3] Referential determinism checks: PASSED');
 }
 
 // 4. Verification that active runtime methods are absent
-function testAbsenceOfRuntimeLogicExecution() {
-  console.log('[Test 4] Verifying total absence of active execution/launcher/plugin APIs...');
+function testAbsenceOfRuntimeExecutorManager() {
+  console.log('[Test 4] Verifying total absence of active executor manager/execution/launcher/plugin/execute/run/start/stop/shutdown/tick APIs...');
 
   const forbiddenMethods = [
-    'execute', 'invoke', 'run', 'start', 'stop', 'cancel', 'terminate',
-    'ai', 'shell', 'browser', 'mcp'
+    'execute', 'run', 'start', 'stop', 'shutdown', 'restart', 'tick',
+    'instantiate', 'buildRuntime', 'compose', 'mount', 'attach', 'connect'
   ];
 
   for (const method of forbiddenMethods) {
-    assert((EXECUTION_RUNTIME_EXECUTOR_LOGIC as any)[method] === undefined, `EXECUTION_RUNTIME_EXECUTOR_LOGIC should not contain ${method}`);
+    assert((EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT as any)[method] === undefined, `EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT should not contain ${method}`);
+    const manager = EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getExecutionRuntimeExecutor();
+    assert((manager as any)[method] === undefined, `ExecutionRuntimeExecutor object should not contain ${method}`);
   }
 
-  console.log('[Test 4] Total absence of active execution/launcher/plugin APIs: PASSED');
+  console.log('[Test 4] Total absence of active executor manager/execution/launcher/plugin/execute/run/start/stop/shutdown/tick APIs: PASSED');
 }
 
 // 5. DevelopmentRules Static Mapping integration verification
@@ -170,15 +211,15 @@ function testDevelopmentRulesIntegration() {
   setupAllEnvironments();
 
   const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
-  const result = DevelopmentRules.getExecutionRuntimeExecutorLogic(rule);
+  const manager = DevelopmentRules.getExecutionRuntimeExecutor(rule);
   
-  assert(result !== undefined, 'getExecutionRuntimeExecutorLogic should return a valid result');
-  assert(result?.executorId === 'executor-1', 'Resolved executor ID mismatch in rules resolver');
+  assert(manager !== undefined, 'getExecutionRuntimeExecutor should return a valid result');
+  assert(manager?.id === 'runtime-executor-01', 'Resolved executor manager ID mismatch in rules resolver');
 
-  // Unregistered Capability/Pipeline test
+  // Unregistered Capability test
   CapabilityRegistry.clear();
   const ruleWithoutPipeline = { ...rule };
-  assert(DevelopmentRules.getExecutionRuntimeExecutorLogic(ruleWithoutPipeline) === undefined, 'Rules executor should return undefined if capability/pipeline is missing');
+  assert(DevelopmentRules.getExecutionRuntimeExecutor(ruleWithoutPipeline) === undefined, 'Rules executor manager resolver should return undefined if capability is missing');
 
   console.log('[Test 5] DevelopmentRules static integration check: PASSED');
 }
@@ -186,12 +227,12 @@ function testDevelopmentRulesIntegration() {
 // Main Runner
 function runAllTests() {
   try {
-    testExecutorStructureAndImmutability();
-    testExecutorLogicExecutionAndReadonly();
+    testExecutorManagerStructureAndImmutability();
+    testExecutorManagerBlueprintValues();
     testReferentialDeterminism();
-    testAbsenceOfRuntimeLogicExecution();
+    testAbsenceOfRuntimeExecutorManager();
     testDevelopmentRulesIntegration();
-    console.log('\nAll Execution Runtime Executor Logic Foundation tests passed successfully!');
+    console.log('\nAll Execution Runtime Executor Foundation tests passed successfully!');
   } catch (error: any) {
     console.error('\n❌ Test execution failed:', error.message);
     throw error;
