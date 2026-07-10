@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 254: Runtime Protocol Data Plane Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 255: Runtime Transport Foundation [現在のフェーズ]
+* **目的**: Runtime Protocol Data Plane が提供する Data Representation Schema をもとに、Dynamic Runtime における論理トランスポート境界（Transport Schema）を定義する Runtime Transport の静的 Blueprint を構築する。
+
+### 完了したスプリント: AIOS Phase 254: Runtime Protocol Data Plane Foundation
 * **目的**: Runtime Pipe / Stream / Buffer 上で扱われるデータ表現境界を定義する静的 Blueprint を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeProtocolData.md）
+  - ExecutionRuntimeProtocolData.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeProtocolData）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 253: Runtime Pipe Foundation
 * **目的**: Execution Runtime Buffer が提供する Buffer Schema をもとに、Dynamic Runtime における Pipe Schema を定義する Runtime Pipe の静的 Blueprint を構築する。

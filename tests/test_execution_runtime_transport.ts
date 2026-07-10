@@ -18,8 +18,12 @@ import { RuntimeExecutionPlanRegistry, RuntimeExecutionPlanState, ExecutionStrat
 import { RuntimeExecutionPlanFactory } from '../src/aios/RuntimeExecutionPlanFactory';
 import { RuntimeExecutionGraphRegistry, RuntimeExecutionGraphState } from '../src/aios/RuntimeExecutionGraphRegistry';
 import { RuntimeExecutionGraphFactory } from '../src/aios/RuntimeExecutionGraphFactory';
-import { EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT, TransportType, TransportScope, RuntimeTransportType, TransportLifecycleState, TransportCapability, TransportCategory, TransportProtocolPolicy, TransportReliabilityPolicy, TransportSecurityPolicy, TransportExecutionPolicy, TransportDependencyPolicy, TransportTopology, RUNTIME_TRANSPORT_MODELS, TRANSPORT_SEQUENCE } from '../src/execution/ExecutionRuntimeTransport';
+import { EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT, TransportType, TransportScope, RuntimeTransportType, TransportLifecycleState, TransportCapability, TransportCategory, TransportProtocolPolicy, TransportConnectionPolicy, TransportValidationPolicy, TransportExecutionPolicy, TransportDependencyPolicy, TransportTopology, RUNTIME_TRANSPORT_MODELS, TRANSPORT_SEQUENCE } from '../src/execution/ExecutionRuntimeTransport';
 import { DevelopmentRules } from '../src/aios/DevelopmentRules';
+
+// Node modules used for static source code scan
+const fs = require('fs');
+const path = require('path');
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -96,21 +100,21 @@ function testTransportStructureAndImmutability() {
   
   assert(Object.isFrozen(EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT), 'EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT container must be frozen');
   
-  const manager = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
-  assert(Object.isFrozen(manager), 'Transport Manager must be frozen');
-  assert(Object.isFrozen(manager.metadata), 'Transport Metadata must be frozen');
-  assert(Object.isFrozen(manager.context), 'Transport Context must be frozen');
-  assert(Object.isFrozen(manager.data), 'Transport Data must be frozen');
-  assert(Object.isFrozen(manager.data.transportModels), 'Transport Models must be frozen');
+  const transport = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
+  assert(Object.isFrozen(transport), 'Transport must be frozen');
+  assert(Object.isFrozen(transport.metadata), 'Transport Metadata must be frozen');
+  assert(Object.isFrozen(transport.context), 'Transport Context must be frozen');
+  assert(Object.isFrozen(transport.data), 'Transport Data must be frozen');
+  assert(Object.isFrozen(transport.data.transportModels), 'Transport Models array must be frozen');
   assert(Object.isFrozen(TRANSPORT_SEQUENCE), 'TRANSPORT_SEQUENCE must be frozen');
   assert(Object.isFrozen(RUNTIME_TRANSPORT_MODELS), 'RUNTIME_TRANSPORT_MODELS must be frozen');
   
   // Verify metadata fields
   const metadata = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getMetadata();
   assert(metadata.id === 'runtime-transport-meta-01', 'Invalid metadata ID');
-  assert(metadata.name === 'Execution Runtime Transport Metadata', 'Invalid metadata Name');
+  assert(metadata.name === 'ExecutionRuntimeTransportMetadata', 'Invalid metadata Name');
   assert(metadata.version === '1.0.0', 'Invalid metadata Version');
-  assert(metadata.layer === 'Transport Layer', 'Invalid metadata Layer');
+  assert(metadata.layer === 'TransportLayer', 'Invalid metadata Layer');
   assert(metadata.category === 'Infrastructure', 'Invalid metadata Category');
 
   console.log('[Test 1] PASSED');
@@ -123,29 +127,36 @@ function testTransportContextIdOnly() {
   const context = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getContext();
   assert(context.runtimeTransportId === 'runtime-transport-01', 'Context must have runtimeTransportId');
   
-  // Verify that context does NOT contain any direct references to other entities
+  // Verify that context does NOT contain any direct references or buffers/streams
   const keys = Object.keys(context);
   assert(keys.length === 1 && keys[0] === 'runtimeTransportId', 'Context must contain only runtimeTransportId');
+  
+  const forbiddenContextKeys = [
+    'transportRef', 'connectionRef', 'socketRef', 'streamRef', 'protocolRef', 'endpoint', 'address', 'port', 'pointer', 'checksum'
+  ];
+  for (const key of forbiddenContextKeys) {
+    assert((context as any)[key] === undefined, `Context must not contain key: ${key}`);
+  }
   
   console.log('[Test 2] PASSED');
 }
 
-// 3. Runtime Logic Separation check (No threads, schedulers, queues, tasks, workers, dispatchers, event loop, etc.)
+// 3. Runtime Logic Separation check
 function testTransportRuntimeLogicSeparation() {
   console.log('[Test 3] Runtime logic separation check starting...');
 
   const blueprint: any = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT;
-  const manager: any = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
+  const transport: any = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
 
-  // Ensure forbidden properties/methods do not exist
+  // Ensure forbidden properties/methods do not exist in the Blueprint
   const forbiddenKeys = [
-    'connect', 'disconnect', 'send', 'receive', 'transmit', 'stream', 'reconnect', 'retry', 'encrypt', 'decrypt', 'compress', 'decompress',
-    'thread', 'scheduler', 'queue', 'task', 'worker', 'dispatcher', 'event', 'eventBus', 'router', 'eventLoop', 'kernel', 'connection', 'socket'
+    'createTransport', 'openTransport', 'closeTransport', 'connect', 'disconnect', 'listen', 'bind', 'send', 'receive', 'transfer', 'route', 'dispatch',
+    'fd', 'descriptor', 'payload', 'header', 'body', 'checksum', 'buffer', 'socket', 'stream'
   ];
 
   for (const key of forbiddenKeys) {
-    assert(blueprint[key] === undefined, `EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT must not contain method or property: ${key}`);
-    assert(manager[key] === undefined, `ExecutionRuntimeTransport data must not contain method or property: ${key}`);
+    assert(blueprint[key] === undefined, `EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT must not contain: ${key}`);
+    assert(transport[key] === undefined, `ExecutionRuntimeTransport must not contain: ${key}`);
   }
 
   // Check Transport Policies
@@ -154,47 +165,33 @@ function testTransportRuntimeLogicSeparation() {
     const policies = model.executionPolicies;
     assert(policies.includes(TransportExecutionPolicy.NO_THREAD), 'Must include NO_THREAD policy');
     assert(policies.includes(TransportExecutionPolicy.NO_QUEUE), 'Must include NO_QUEUE policy');
-    assert(policies.includes(TransportExecutionPolicy.NO_SCHEDULER), 'Must include NO_SCHEDULER policy');
     assert(policies.includes(TransportExecutionPolicy.NO_TASK), 'Must include NO_TASK policy');
     assert(policies.includes(TransportExecutionPolicy.NO_WORKER), 'Must include NO_WORKER policy');
-    assert(policies.includes(TransportExecutionPolicy.NO_DISPATCHER), 'Must include NO_DISPATCHER policy');
     assert(policies.includes(TransportExecutionPolicy.NO_EVENT), 'Must include NO_EVENT policy');
     assert(policies.includes(TransportExecutionPolicy.NO_EVENT_BUS), 'Must include NO_EVENT_BUS policy');
     assert(policies.includes(TransportExecutionPolicy.NO_ROUTER), 'Must include NO_ROUTER policy');
-    assert(policies.includes(TransportExecutionPolicy.NO_CONNECTION), 'Must include NO_CONNECTION policy');
-    assert(policies.includes(TransportExecutionPolicy.NO_SOCKET), 'Must include NO_SOCKET policy');
-    assert(policies.includes(TransportExecutionPolicy.NO_STREAM), 'Must include NO_STREAM policy');
-    assert(policies.includes(TransportExecutionPolicy.NO_TRANSMISSION), 'Must include NO_TRANSMISSION policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_TRANSPORT_CREATE), 'Must include NO_TRANSPORT_CREATE policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_TRANSPORT_OPEN), 'Must include NO_TRANSPORT_OPEN policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_TRANSPORT_CLOSE), 'Must include NO_TRANSPORT_CLOSE policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_CONNECT), 'Must include NO_CONNECT policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_DISCONNECT), 'Must include NO_DISCONNECT policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_LISTEN), 'Must include NO_LISTEN policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_BIND), 'Must include NO_BIND policy');
     assert(policies.includes(TransportExecutionPolicy.NO_SEND), 'Must include NO_SEND policy');
     assert(policies.includes(TransportExecutionPolicy.NO_RECEIVE), 'Must include NO_RECEIVE policy');
-    assert(policies.includes(TransportExecutionPolicy.NO_RETRY), 'Must include NO_RETRY policy');
-    assert(policies.includes(TransportExecutionPolicy.NO_ENCRYPTION), 'Must include NO_ENCRYPTION policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_ROUTE), 'Must include NO_ROUTE policy');
+    assert(policies.includes(TransportExecutionPolicy.NO_DISPATCH), 'Must include NO_DISPATCH policy');
     
-    // Check that supportedCapabilities, dependencyPolicy, topology, supportedTransportProtocols, supportedSecurityPolicies, supportedReliabilityPolicies, supportedConnectionPolicies, supportedProtocolPolicies exist and are immutable
     assert(Object.isFrozen(model.supportedCapabilities), 'supportedCapabilities must be frozen');
-    assert(model.dependencyPolicy !== undefined, 'dependencyPolicy must be defined');
-    assert(model.topology !== undefined, 'topology must be defined');
-    assert(model.supportedTransportProtocols !== undefined, 'supportedTransportProtocols must be defined');
-    assert(model.supportedSecurityPolicies !== undefined, 'supportedSecurityPolicies must be defined');
-    assert(model.supportedReliabilityPolicies !== undefined, 'supportedReliabilityPolicies must be defined');
-    assert(model.supportedConnectionPolicies !== undefined, 'supportedConnectionPolicies must be defined');
-    assert(model.supportedProtocolPolicies !== undefined, 'supportedProtocolPolicies must be defined');
-    assert(model.metadata.transportSchemaVersion === '1.0', 'Invalid transportSchemaVersion');
-
-    // Confirm that enums contain recommended values
-    for (const cap of model.supportedCapabilities) {
-      assert(Object.values(TransportCapability).includes(cap), `Invalid capability: ${cap}`);
-    }
-    assert(Object.values(TransportTopology).includes(model.topology), 'Invalid topology');
-    for (const protocol of model.supportedTransportProtocols) {
-      assert(Object.values(TransportProtocolPolicy).includes(protocol), 'Invalid protocol');
-    }
-    for (const security of model.supportedSecurityPolicies) {
-      assert(Object.values(TransportSecurityPolicy).includes(security), 'Invalid security');
-    }
-    for (const reliability of model.supportedReliabilityPolicies) {
-      assert(Object.values(TransportReliabilityPolicy).includes(reliability), 'Invalid reliability');
-    }
+    assert(Object.isFrozen(model.supportedTransportPolicies), 'supportedTransportPolicies must be frozen');
+    assert(Object.isFrozen(model.supportedValidationPolicies), 'supportedValidationPolicies must be frozen');
+    assert(Object.isFrozen(model.supportedConnectionPolicies), 'supportedConnectionPolicies must be frozen');
+    assert(Object.isFrozen(model.supportedProtocolPolicies), 'supportedProtocolPolicies must be frozen');
+    assert(Object.isFrozen(model.lifecycleStates), 'lifecycleStates must be frozen');
+    assert(Object.isFrozen(model.executionPolicies), 'executionPolicies must be frozen');
+    assert(Object.isFrozen(model.allowedSteps), 'allowedSteps must be frozen');
+    assert(Object.isFrozen(model.metadata), 'model metadata must be frozen');
+    assert(Object.isFrozen(model), 'model must be frozen');
   }
 
   console.log('[Test 3] PASSED');
@@ -204,9 +201,9 @@ function testTransportRuntimeLogicSeparation() {
 function testTransportDeterministicResolution() {
   console.log('[Test 4] Deterministic check starting...');
   
-  const m1 = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
-  const m2 = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
-  assert(m1 === m2, 'getExecutionRuntimeTransport must return identical references');
+  const b1 = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
+  const b2 = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
+  assert(b1 === b2, 'getExecutionRuntimeTransport must return identical references');
 
   const c1 = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getContext();
   const c2 = EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getContext();
@@ -232,6 +229,55 @@ function testDevelopmentRulesIntegration() {
   console.log('[Test 5] PASSED');
 }
 
+// 6. Source code static scan check (Ensure absolutely no runtime logic methods or network APIs)
+function testSourceCodeStaticScan() {
+  console.log('[Test 6] Source code static scan check starting...');
+
+  const srcPath = path.join(process.cwd(), 'src/execution/ExecutionRuntimeTransport.ts');
+  const content = fs.readFileSync(srcPath, 'utf8');
+
+  // Forbidden patterns: function definitions/calls for execution methods, or Promise/async/await/Timer/network APIs
+  const forbiddenPatterns = [
+    { pattern: /\bcreateTransport\s*\(/, name: 'createTransport()' },
+    { pattern: /\bopenTransport\s*\(/, name: 'openTransport()' },
+    { pattern: /\bcloseTransport\s*\(/, name: 'closeTransport()' },
+    { pattern: /\bconnect\s*\(/, name: 'connect()' },
+    { pattern: /\bdisconnect\s*\(/, name: 'disconnect()' },
+    { pattern: /\blisten\s*\(/, name: 'listen()' },
+    { pattern: /\bbind\s*\(/, name: 'bind()' },
+    { pattern: /\bsend\s*\(/, name: 'send()' },
+    { pattern: /\breceive\s*\(/, name: 'receive()' },
+    { pattern: /\btransfer\s*\(/, name: 'transfer()' },
+    { pattern: /\broute\s*\(/, name: 'route()' },
+    { pattern: /\bdispatch\s*\(/, name: 'dispatch()' },
+    { pattern: /\bPromise\b/, name: 'Promise' },
+    { pattern: /\basync\b/, name: 'async' },
+    { pattern: /\bawait\b/, name: 'await' },
+    { pattern: /\bsetTimeout\b/, name: 'setTimeout' },
+    { pattern: /\bsetInterval\b/, name: 'setInterval' },
+    { pattern: /\bTimer\b/, name: 'Timer' },
+    { pattern: /\bEventEmitter\b/, name: 'EventEmitter' },
+    { pattern: /\bSocket\b/, name: 'Socket' },
+    { pattern: /\bStream\b/, name: 'Stream' },
+    { pattern: /\bBuffer\b/, name: 'Buffer' },
+    { pattern: /\bConnection\b/, name: 'Connection' },
+    { pattern: /\bnet\./, name: 'net.' },
+    { pattern: /\btls\./, name: 'tls.' },
+    { pattern: /\bdgram\b/, name: 'dgram' },
+    { pattern: /\bhttp\./, name: 'http.' },
+    { pattern: /\bhttps\./, name: 'https.' },
+    { pattern: /\bWebSocket\b/, name: 'WebSocket' },
+    { pattern: /\bfetch\s*\(/, name: 'fetch(' },
+    { pattern: /\bXMLHttpRequest\b/, name: 'XMLHttpRequest' }
+  ];
+
+  for (const item of forbiddenPatterns) {
+    assert(!item.pattern.test(content), `Source code contains forbidden pattern: ${item.name}`);
+  }
+
+  console.log('[Test 6] PASSED');
+}
+
 // Execute Tests
 setupAllEnvironments();
 testTransportStructureAndImmutability();
@@ -239,6 +285,7 @@ testTransportContextIdOnly();
 testTransportRuntimeLogicSeparation();
 testTransportDeterministicResolution();
 testDevelopmentRulesIntegration();
+testSourceCodeStaticScan();
 
 console.log('\n======================================');
 console.log('  ALL RUNTIME TRANSPORT TESTS PASSED');

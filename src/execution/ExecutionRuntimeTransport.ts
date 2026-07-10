@@ -1,10 +1,10 @@
 /**
  * ExecutionRuntimeTransport.ts
  * 
- * Execution Runtime Transport Foundation の構造および公開インターフェース定義 (SSOT)。
+ * ExecutionRuntimeTransport Foundation の構造および公開インターフェース定義 (SSOT)。
  * 
- * 警告：本ファイル内への実際の接続、切断、送信、受信、伝送、ストリーム生成、再送、
- * リトライ、暗号化・復号、圧縮・展開、非同期処理、API 通信、コマンド送信、AI予測・推論・自動配置ロジックの実装は厳禁である。
+ * 警告：本ファイル内への実際のトランスポート生成、接続、切断、送受信、Listen、Bind、
+ * 非同期処理、API 通信、コマンド送信、AI予測・推論・自動配置ロジックの実装は厳禁である。
  */
 
 export enum TransportType {
@@ -37,49 +37,41 @@ export enum TransportCapability {
   APPLICATION = 'APPLICATION',
   PLUGIN = 'PLUGIN',
   FIELD = 'FIELD',
-  AI = 'AI',
-  WORKFLOW = 'WORKFLOW',
-  MONITORING = 'MONITORING',
   LOCAL = 'LOCAL',
   REMOTE = 'REMOTE',
   DISTRIBUTED = 'DISTRIBUTED',
   INTER_PROCESS = 'INTER_PROCESS',
-  INTER_NODE = 'INTER_NODE'
+  INTER_NODE = 'INTER_NODE',
+  AI = 'AI',
+  WORKFLOW = 'WORKFLOW',
+  MONITORING = 'MONITORING'
 }
 
 export enum TransportCategory {
-  LOCAL = 'LOCAL',
-  IPC = 'IPC',
   NETWORK = 'NETWORK',
+  IPC = 'IPC',
+  LOCAL = 'LOCAL',
   REMOTE = 'REMOTE',
-  DISTRIBUTED = 'DISTRIBUTED'
+  DISTRIBUTED = 'DISTRIBUTED',
+  SCHEMA_ONLY = 'SCHEMA_ONLY'
 }
 
 export enum TransportProtocolPolicy {
-  LOCAL = 'LOCAL',
-  IPC = 'IPC',
-  TCP = 'TCP',
-  UDP = 'UDP',
-  HTTP = 'HTTP',
-  HTTPS = 'HTTPS',
-  WEBSOCKET = 'WEBSOCKET',
-  GRPC = 'GRPC',
+  STATIC_ONLY = 'STATIC_ONLY',
   SCHEMA_ONLY = 'SCHEMA_ONLY'
 }
 
-export enum TransportReliabilityPolicy {
-  BEST_EFFORT = 'BEST_EFFORT',
-  AT_MOST_ONCE = 'AT_MOST_ONCE',
-  AT_LEAST_ONCE = 'AT_LEAST_ONCE',
-  EXACTLY_ONCE = 'EXACTLY_ONCE',
+export enum TransportConnectionPolicy {
+  NO_CONNECTION = 'NO_CONNECTION',
+  STATIC_REFERENCE = 'STATIC_REFERENCE',
   SCHEMA_ONLY = 'SCHEMA_ONLY'
 }
 
-export enum TransportSecurityPolicy {
+export enum TransportValidationPolicy {
   NONE = 'NONE',
-  SIGNATURE = 'SIGNATURE',
-  ENCRYPTION = 'ENCRYPTION',
-  AUTHENTICATION = 'AUTHENTICATION',
+  HEADER_ONLY = 'HEADER_ONLY',
+  SCHEMA = 'SCHEMA',
+  FULL = 'FULL',
   SCHEMA_ONLY = 'SCHEMA_ONLY'
 }
 
@@ -89,21 +81,22 @@ export enum TransportExecutionPolicy {
   IMMUTABLE_SCHEMA = 'IMMUTABLE_SCHEMA',
   NO_THREAD = 'NO_THREAD',
   NO_QUEUE = 'NO_QUEUE',
-  NO_SCHEDULER = 'NO_SCHEDULER',
   NO_TASK = 'NO_TASK',
   NO_WORKER = 'NO_WORKER',
-  NO_DISPATCHER = 'NO_DISPATCHER',
   NO_EVENT = 'NO_EVENT',
   NO_EVENT_BUS = 'NO_EVENT_BUS',
   NO_ROUTER = 'NO_ROUTER',
-  NO_CONNECTION = 'NO_CONNECTION',
-  NO_SOCKET = 'NO_SOCKET',
-  NO_STREAM = 'NO_STREAM',
-  NO_TRANSMISSION = 'NO_TRANSMISSION',
+  NO_TRANSPORT_CREATE = 'NO_TRANSPORT_CREATE',
+  NO_TRANSPORT_OPEN = 'NO_TRANSPORT_OPEN',
+  NO_TRANSPORT_CLOSE = 'NO_TRANSPORT_CLOSE',
+  NO_CONNECT = 'NO_CONNECT',
+  NO_DISCONNECT = 'NO_DISCONNECT',
+  NO_LISTEN = 'NO_LISTEN',
+  NO_BIND = 'NO_BIND',
   NO_SEND = 'NO_SEND',
   NO_RECEIVE = 'NO_RECEIVE',
-  NO_RETRY = 'NO_RETRY',
-  NO_ENCRYPTION = 'NO_ENCRYPTION'
+  NO_ROUTE = 'NO_ROUTE',
+  NO_DISPATCH = 'NO_DISPATCH'
 }
 
 export enum TransportDependencyPolicy {
@@ -134,12 +127,10 @@ export interface RuntimeTransportModel {
   readonly metadata: RuntimeTransportMetadata;
   readonly transportOrder: number;
   readonly supportedCapabilities: readonly TransportCapability[];
-  readonly supportedTransportProtocols: readonly TransportProtocolPolicy[];
-  readonly supportedSecurityPolicies: readonly TransportSecurityPolicy[];
-  readonly supportedReliabilityPolicies: readonly TransportReliabilityPolicy[];
   readonly supportedTransportPolicies: readonly string[];
-  readonly supportedConnectionPolicies: readonly string[];
-  readonly supportedProtocolPolicies: readonly string[];
+  readonly supportedValidationPolicies: readonly TransportValidationPolicy[];
+  readonly supportedConnectionPolicies: readonly TransportConnectionPolicy[];
+  readonly supportedProtocolPolicies: readonly TransportProtocolPolicy[];
   readonly dependencyPolicy: TransportDependencyPolicy;
   readonly topology: TransportTopology;
   readonly lifecycleStates: readonly TransportLifecycleState[];
@@ -200,21 +191,22 @@ const defaultPolicies: readonly TransportExecutionPolicy[] = Object.freeze([
   TransportExecutionPolicy.IMMUTABLE_SCHEMA,
   TransportExecutionPolicy.NO_THREAD,
   TransportExecutionPolicy.NO_QUEUE,
-  TransportExecutionPolicy.NO_SCHEDULER,
   TransportExecutionPolicy.NO_TASK,
   TransportExecutionPolicy.NO_WORKER,
-  TransportExecutionPolicy.NO_DISPATCHER,
   TransportExecutionPolicy.NO_EVENT,
   TransportExecutionPolicy.NO_EVENT_BUS,
   TransportExecutionPolicy.NO_ROUTER,
-  TransportExecutionPolicy.NO_CONNECTION,
-  TransportExecutionPolicy.NO_SOCKET,
-  TransportExecutionPolicy.NO_STREAM,
-  TransportExecutionPolicy.NO_TRANSMISSION,
+  TransportExecutionPolicy.NO_TRANSPORT_CREATE,
+  TransportExecutionPolicy.NO_TRANSPORT_OPEN,
+  TransportExecutionPolicy.NO_TRANSPORT_CLOSE,
+  TransportExecutionPolicy.NO_CONNECT,
+  TransportExecutionPolicy.NO_DISCONNECT,
+  TransportExecutionPolicy.NO_LISTEN,
+  TransportExecutionPolicy.NO_BIND,
   TransportExecutionPolicy.NO_SEND,
   TransportExecutionPolicy.NO_RECEIVE,
-  TransportExecutionPolicy.NO_RETRY,
-  TransportExecutionPolicy.NO_ENCRYPTION
+  TransportExecutionPolicy.NO_ROUTE,
+  TransportExecutionPolicy.NO_DISPATCH
 ]);
 
 // 静的ライフサイクル状態リストの定義と凍結
@@ -233,21 +225,19 @@ export const RUNTIME_TRANSPORT_MODELS: readonly RuntimeTransportModel[] = Object
     modelId: 'transport-model-system-01',
     metadata: Object.freeze({
       id: 'transport-meta-system-01',
-      name: 'System Transport Metadata',
+      name: 'SystemTransportMetadata',
       transportModelVersion: '1.0',
       transportSchemaVersion: '1.0',
-      description: 'Metadata for System Transport Schema'
+      description: 'Metadata for SystemTransport Schema'
     }),
     transportOrder: 1,
-    supportedTransportProtocols: Object.freeze([TransportProtocolPolicy.LOCAL]),
-    supportedSecurityPolicies: Object.freeze([TransportSecurityPolicy.NONE]),
-    supportedReliabilityPolicies: Object.freeze([TransportReliabilityPolicy.BEST_EFFORT]),
+    supportedCapabilities: Object.freeze([TransportCapability.SYSTEM, TransportCapability.REMOTE, TransportCapability.LOCAL]),
     supportedTransportPolicies: Object.freeze(['StaticRouting']),
-    supportedConnectionPolicies: Object.freeze(['SCHEMA_ONLY']),
-    supportedProtocolPolicies: Object.freeze(['SCHEMA_ONLY']),
+    supportedValidationPolicies: Object.freeze([TransportValidationPolicy.SCHEMA_ONLY]),
+    supportedConnectionPolicies: Object.freeze([TransportConnectionPolicy.SCHEMA_ONLY]),
+    supportedProtocolPolicies: Object.freeze([TransportProtocolPolicy.SCHEMA_ONLY]),
     dependencyPolicy: TransportDependencyPolicy.NO_DEPENDENCY,
     topology: TransportTopology.LOCAL,
-    supportedCapabilities: Object.freeze([TransportCapability.SYSTEM, TransportCapability.REMOTE, TransportCapability.LOCAL]),
     lifecycleStates: defaultLifecycleStates,
     executionPolicies: defaultPolicies,
     allowedSteps: TRANSPORT_SEQUENCE
@@ -257,21 +247,19 @@ export const RUNTIME_TRANSPORT_MODELS: readonly RuntimeTransportModel[] = Object
     modelId: 'transport-model-core-01',
     metadata: Object.freeze({
       id: 'transport-meta-core-01',
-      name: 'Core Transport Metadata',
+      name: 'CoreTransportMetadata',
       transportModelVersion: '1.0',
       transportSchemaVersion: '1.0',
-      description: 'Metadata for Core Transport Schema'
+      description: 'Metadata for CoreTransport Schema'
     }),
     transportOrder: 2,
-    supportedTransportProtocols: Object.freeze([TransportProtocolPolicy.IPC]),
-    supportedSecurityPolicies: Object.freeze([TransportSecurityPolicy.SIGNATURE]),
-    supportedReliabilityPolicies: Object.freeze([TransportReliabilityPolicy.AT_MOST_ONCE]),
+    supportedCapabilities: Object.freeze([TransportCapability.SYSTEM, TransportCapability.APPLICATION, TransportCapability.INTER_PROCESS]),
     supportedTransportPolicies: Object.freeze([]),
-    supportedConnectionPolicies: Object.freeze(['SCHEMA_ONLY']),
-    supportedProtocolPolicies: Object.freeze(['SCHEMA_ONLY']),
+    supportedValidationPolicies: Object.freeze([TransportValidationPolicy.HEADER_ONLY, TransportValidationPolicy.SCHEMA_ONLY]),
+    supportedConnectionPolicies: Object.freeze([TransportConnectionPolicy.SCHEMA_ONLY]),
+    supportedProtocolPolicies: Object.freeze([TransportProtocolPolicy.SCHEMA_ONLY]),
     dependencyPolicy: TransportDependencyPolicy.STATIC_DEPENDENCY,
     topology: TransportTopology.PROCESS,
-    supportedCapabilities: Object.freeze([TransportCapability.SYSTEM, TransportCapability.APPLICATION, TransportCapability.INTER_PROCESS]),
     lifecycleStates: defaultLifecycleStates,
     executionPolicies: defaultPolicies,
     allowedSteps: TRANSPORT_SEQUENCE
@@ -281,21 +269,19 @@ export const RUNTIME_TRANSPORT_MODELS: readonly RuntimeTransportModel[] = Object
     modelId: 'transport-model-app-01',
     metadata: Object.freeze({
       id: 'transport-meta-app-01',
-      name: 'Application Transport Metadata',
+      name: 'ApplicationTransportMetadata',
       transportModelVersion: '1.0',
       transportSchemaVersion: '1.0',
-      description: 'Metadata for Application Transport Schema'
+      description: 'Metadata for ApplicationTransport Schema'
     }),
     transportOrder: 3,
-    supportedTransportProtocols: Object.freeze([TransportProtocolPolicy.WEBSOCKET, TransportProtocolPolicy.GRPC]),
-    supportedSecurityPolicies: Object.freeze([TransportSecurityPolicy.SCHEMA_ONLY]),
-    supportedReliabilityPolicies: Object.freeze([TransportReliabilityPolicy.SCHEMA_ONLY]),
+    supportedCapabilities: Object.freeze([TransportCapability.APPLICATION, TransportCapability.AI, TransportCapability.WORKFLOW, TransportCapability.DISTRIBUTED, TransportCapability.INTER_NODE]),
     supportedTransportPolicies: Object.freeze(['DynamicRouting']),
-    supportedConnectionPolicies: Object.freeze(['SCHEMA_ONLY']),
-    supportedProtocolPolicies: Object.freeze(['SCHEMA_ONLY']),
+    supportedValidationPolicies: Object.freeze([TransportValidationPolicy.FULL, TransportValidationPolicy.SCHEMA_ONLY]),
+    supportedConnectionPolicies: Object.freeze([TransportConnectionPolicy.SCHEMA_ONLY]),
+    supportedProtocolPolicies: Object.freeze([TransportProtocolPolicy.SCHEMA_ONLY]),
     dependencyPolicy: TransportDependencyPolicy.SCHEMA_ONLY,
     topology: TransportTopology.NODE,
-    supportedCapabilities: Object.freeze([TransportCapability.APPLICATION, TransportCapability.AI, TransportCapability.WORKFLOW, TransportCapability.DISTRIBUTED, TransportCapability.INTER_NODE]),
     lifecycleStates: defaultLifecycleStates,
     executionPolicies: defaultPolicies,
     allowedSteps: TRANSPORT_SEQUENCE
@@ -305,21 +291,19 @@ export const RUNTIME_TRANSPORT_MODELS: readonly RuntimeTransportModel[] = Object
     modelId: 'transport-model-plugin-01',
     metadata: Object.freeze({
       id: 'transport-meta-plugin-01',
-      name: 'Plugin Transport Metadata',
+      name: 'PluginTransportMetadata',
       transportModelVersion: '1.0',
       transportSchemaVersion: '1.0',
-      description: 'Metadata for Plugin Transport Schema'
+      description: 'Metadata for PluginTransport Schema'
     }),
     transportOrder: 4,
-    supportedTransportProtocols: Object.freeze([TransportProtocolPolicy.TCP]),
-    supportedSecurityPolicies: Object.freeze([TransportSecurityPolicy.ENCRYPTION]),
-    supportedReliabilityPolicies: Object.freeze([TransportReliabilityPolicy.AT_LEAST_ONCE]),
+    supportedCapabilities: Object.freeze([TransportCapability.PLUGIN, TransportCapability.MONITORING]),
     supportedTransportPolicies: Object.freeze([]),
-    supportedConnectionPolicies: Object.freeze(['SCHEMA_ONLY']),
-    supportedProtocolPolicies: Object.freeze(['SCHEMA_ONLY']),
+    supportedValidationPolicies: Object.freeze([TransportValidationPolicy.SCHEMA, TransportValidationPolicy.SCHEMA_ONLY]),
+    supportedConnectionPolicies: Object.freeze([TransportConnectionPolicy.SCHEMA_ONLY]),
+    supportedProtocolPolicies: Object.freeze([TransportProtocolPolicy.SCHEMA_ONLY]),
     dependencyPolicy: TransportDependencyPolicy.NO_DEPENDENCY,
     topology: TransportTopology.CLUSTER,
-    supportedCapabilities: Object.freeze([TransportCapability.PLUGIN, TransportCapability.MONITORING]),
     lifecycleStates: defaultLifecycleStates,
     executionPolicies: defaultPolicies,
     allowedSteps: TRANSPORT_SEQUENCE
@@ -329,21 +313,19 @@ export const RUNTIME_TRANSPORT_MODELS: readonly RuntimeTransportModel[] = Object
     modelId: 'transport-model-field-01',
     metadata: Object.freeze({
       id: 'transport-meta-field-01',
-      name: 'Field Transport Metadata',
+      name: 'FieldTransportMetadata',
       transportModelVersion: '1.0',
       transportSchemaVersion: '1.0',
-      description: 'Metadata for Field Transport Schema'
+      description: 'Metadata for FieldTransport Schema'
     }),
     transportOrder: 5,
-    supportedTransportProtocols: Object.freeze([TransportProtocolPolicy.HTTP, TransportProtocolPolicy.HTTPS]),
-    supportedSecurityPolicies: Object.freeze([TransportSecurityPolicy.AUTHENTICATION]),
-    supportedReliabilityPolicies: Object.freeze([TransportReliabilityPolicy.EXACTLY_ONCE]),
+    supportedCapabilities: Object.freeze([TransportCapability.FIELD]),
     supportedTransportPolicies: Object.freeze([]),
-    supportedConnectionPolicies: Object.freeze(['SCHEMA_ONLY']),
-    supportedProtocolPolicies: Object.freeze(['SCHEMA_ONLY']),
+    supportedValidationPolicies: Object.freeze([TransportValidationPolicy.FULL, TransportValidationPolicy.SCHEMA_ONLY]),
+    supportedConnectionPolicies: Object.freeze([TransportConnectionPolicy.SCHEMA_ONLY]),
+    supportedProtocolPolicies: Object.freeze([TransportProtocolPolicy.SCHEMA_ONLY]),
     dependencyPolicy: TransportDependencyPolicy.NO_DEPENDENCY,
     topology: TransportTopology.DISTRIBUTED,
-    supportedCapabilities: Object.freeze([TransportCapability.FIELD]),
     lifecycleStates: defaultLifecycleStates,
     executionPolicies: defaultPolicies,
     allowedSteps: TRANSPORT_SEQUENCE
@@ -353,10 +335,10 @@ export const RUNTIME_TRANSPORT_MODELS: readonly RuntimeTransportModel[] = Object
 // 3. メタデータオブジェクトの作成と凍結
 const transportMetadata: TransportMetadata = Object.freeze({
   id: 'runtime-transport-meta-01',
-  name: 'Execution Runtime Transport Metadata',
+  name: 'ExecutionRuntimeTransportMetadata',
   version: '1.0.0',
-  description: 'Metadata for Execution Runtime Transport Foundation',
-  layer: 'Transport Layer',
+  description: 'Metadata for ExecutionRuntimeTransport Foundation',
+  layer: 'TransportLayer',
   category: 'Infrastructure'
 });
 
@@ -372,32 +354,32 @@ const transportData: ExecutionRuntimeTransportData = Object.freeze({
   transportModels: RUNTIME_TRANSPORT_MODELS
 });
 
-// 6. トランスポートマネージャーオブジェクト本体の作成と凍結
-const runtimeTransportData: ExecutionRuntimeTransport = Object.freeze({
+// 6. 主体マネージャーオブジェクト本体の作成と凍結
+const runtimeTransportObj: ExecutionRuntimeTransport = Object.freeze({
   id: 'runtime-transport-01',
-  name: 'Default Execution Runtime Transport Foundation',
-  description: 'The static execution runtime transport structure definition',
+  name: 'DefaultExecutionRuntimeTransport Foundation',
+  description: 'The static execution-runtime-transport structure definition',
   context: transportContext,
   metadata: transportMetadata,
   data: transportData
 });
 
-// Blueprint コンテナの不変シングルトンインスタンス実装
-export const EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT: ExecutionRuntimeTransportBlueprint = Object.freeze({
+// Blueprint コンテナの不変シングルトンインスタンス実装 (型固定の適用)
+export const EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT: Readonly<ExecutionRuntimeTransportBlueprint> = Object.freeze({
   getExecutionRuntimeTransport(): ExecutionRuntimeTransport {
-    return runtimeTransportData;
+    return runtimeTransportObj;
   },
 
   getMetadata(): TransportMetadata {
-    return runtimeTransportData.metadata;
+    return runtimeTransportObj.metadata;
   },
 
   getContext(): ExecutionRuntimeTransportContext {
-    return runtimeTransportData.context;
+    return runtimeTransportObj.context;
   },
 
   getData(): ExecutionRuntimeTransportData {
-    return runtimeTransportData.data;
+    return runtimeTransportObj.data;
   },
 
   getTransportModels(): readonly RuntimeTransportModel[] {
