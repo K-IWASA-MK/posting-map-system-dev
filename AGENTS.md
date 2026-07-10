@@ -1428,7 +1428,7 @@ Execution Plan
 12. **One Responsibility**: モジュールやAPIは単一の役割・責務に特化させ、肥大化や重複を排除する。
 13. **Foundation First**: 常に静的 Blueprint や型定義などの基盤層の設計整合性を最優先する。
 14. **Real Data First (No Dummy Data)**: 開発時もダミーデータの使用を禁止し、Spreadsheet やマスターCSV由来のリアルデータを取得して描画する。
-15. **Dashboard & App Separation**: 本部/管理者向けダッシュボード（Kアプリ）と、現場配布員向けアプリ（Hアプリ）の役割とUIコードを厳格に分離する。
+15. **Dashboard & H-App Separation**: Webダッシュボードと現場配布員向けHアプリは役割・UI・コードを厳格に分離する。Hアプリは現場作業に特化する。Webダッシュボードは閲覧・分析・管理に特化する。両者は同一バックエンド（GAS / Spreadsheet）を利用するが、UI・UXは独立して設計する。
 16. **Limited AI Role (No AI Dispatch)**: AIは配布員に対する直接の配布指示（ルート変更強制等）を行わず、実績データの可視化や意思決定の支援に限定する。
 
 - **バージョン管理ルール**:
