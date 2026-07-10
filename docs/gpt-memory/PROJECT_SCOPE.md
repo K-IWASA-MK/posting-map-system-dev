@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 259: Runtime Routing Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Runtime Foundation Milestone 1 COMPLETED
+* **目的**: AIOS Runtime Foundation Milestone 1 (Phase 248 - Phase 259) が完了し、論理実行境界 Schema の静的 Blueprint Layer が完成した。次スプリントは Bridge Layer & POSTING MAP Field Event Runtime 接続。
+
+### 完了したスプリント: AIOS Phase 259: Runtime Routing Foundation
 * **目的**: Runtime Message Queue Foundation が提供する Queue Schema をもとに、Dynamic Runtime における論理ルーティング境界（Routing Schema）を定義する Runtime Routing の静的 Blueprint を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeRouting.md）
+  - ExecutionRuntimeRouting.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeRouting）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 258: Runtime Message Queue Foundation
 * **目的**: Runtime Port Foundation が提供する Port Schema をもとに、Dynamic Runtime における論理メッセージ保留境界（Message Queue Schema）を定義する Runtime Message Queue の静的 Blueprint を構築する。
