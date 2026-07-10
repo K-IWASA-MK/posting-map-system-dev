@@ -13,8 +13,20 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: POSTING MAP Product Sprint 1 Phase S1-3: Dashboard Data Integration Foundation [現在のフェーズ]
+### 現在のスプリント: POSTING MAP Product Sprint 1 Phase S1-5: Dashboard Map Intelligence Foundation [現在のフェーズ]
+* **目的**: 地図表示と地域データ（進捗率・投票率）の可視化を統合する Map Intelligence Layer を構築する。
+
+### 完了したスプリント: POSTING MAP Product Sprint 1 Phase S1-4: Dashboard Premium UI Foundation
+* **目的**: Glass Morphism、Depth & Transparency、Click = Animation、No Static UI を適用した未来的で高級感のある Dashboard UI Foundation を構築する。
+* **実施したもの**:
+  - specifications 策定（DashboardPremiumUI.md）
+  - DataGlassCard, DashboardHeader, MapPanel, AreaDetailPanel, DashboardLayout 等の UI コンポーネントおよび Spacing, Radius, Blur などのデザイン・トークン設計と実装。
+
+### 完了したスプリント: POSTING MAP Product Sprint 1 Phase S1-3: Dashboard Data Integration Foundation
 * **目的**: Webダッシュボードが実データを取得・表示するためのデータ統合基盤を構築し、APIクライアント、マッパー、状態管理モデルを設計・実装する。
+* **実施したもの**:
+  - specifications 策定（DashboardDataIntegration.md）
+  - DashboardApiClient, DashboardDataMapper, DashboardStateModel 実装および結合テストの追加。
 
 ### 完了したスプリント: POSTING MAP Product Sprint 1 Phase S1-2: GAS API Foundation
 * **目的**: 設計された Spreadsheet 構造をベースとして、GAS (Google Apps Script) の API 定義（エンドポイント、リクエスト/レスポンス形式、およびDBIマッパー）の Blueprint 策定を行う。
