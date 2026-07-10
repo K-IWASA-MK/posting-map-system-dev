@@ -92,6 +92,7 @@ import { ExecutionRuntimeExecutor, EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT } from '
 import { ExecutionRuntimeBlueprintInterpreter, EXECUTION_RUNTIME_BLUEPRINT_INTERPRETER_BLUEPRINT } from '../execution/ExecutionRuntimeBlueprintInterpreter';
 import { ExecutionRuntimeKernel, EXECUTION_RUNTIME_KERNEL_BLUEPRINT } from '../execution/ExecutionRuntimeKernel';
 import { ExecutionRuntimeKernelEngine, EXECUTION_RUNTIME_KERNEL_ENGINE_BLUEPRINT } from '../execution/ExecutionRuntimeKernelEngine';
+import { ExecutionRuntimeThread, EXECUTION_RUNTIME_THREAD_BLUEPRINT } from '../execution/ExecutionRuntimeThread';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1283,6 +1284,15 @@ export class DevelopmentRules {
     }
     // ExecutionRuntimeKernelEngine は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_KERNEL_ENGINE_BLUEPRINT.getExecutionRuntimeKernelEngine();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeThread を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Thread Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeThread(rule: DevelopmentRule): ExecutionRuntimeThread | undefined {
+    return EXECUTION_RUNTIME_THREAD_BLUEPRINT.getExecutionRuntimeThread();
   }
 }
 

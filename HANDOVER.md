@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Phase 230 (Runtime Kernel Engine Foundation)`
+- **Completed**: `Phase 231 (Runtime Thread Foundation)`
 - **Milestone**: `Dynamic Runtime Series (Phase 230-240) in progress`
 - **Tag**: `v4.31-runtime-foundation`
-- **Current Phase**: `Phase 231`
-- **Next Action**: `Phase 231 (Runtime Thread / Dynamic Component)`
+- **Current Phase**: `Phase 232`
+- **Next Action**: `Phase 232 (Runtime Scheduler Foundation)`
 - **Branch**: `main`
 
 ---
@@ -120,6 +120,7 @@ Before starting development:
 | Runtime Blueprint Interpreter Foundation | Phase 228 | - | ✅ Completed | 2026-07-10 |
 | Runtime Kernel Foundation | Phase 229 | - | ✅ Completed | 2026-07-10 |
 | Runtime Kernel Engine Foundation | Phase 230 | - | ✅ Completed | 2026-07-10 |
+| Runtime Thread Foundation | Phase 231 | - | ✅ Completed | 2026-07-10 |
 
 ---
 
@@ -143,5 +144,10 @@ Runtime Kernel Engine Foundation（Phase 230）完了。
 
 静的 Blueprint（Kernel Engine Schema）の策定、不変定義および検証テストを実装。
 
-次のフェーズ（Phase 231 以降）より、実際の Dynamic Runtime（Thread, Scheduler, Event Loop）の実装へ移行可能。
+### Runtime Thread Foundation
+
+Runtime Thread Foundation（Phase 231）完了。
+
+静的 Blueprint（Thread Schema）の策定、不変定義、および検証テストを実装。
+次のフェーズ（Phase 232：Runtime Scheduler Foundation）へ安全に移行可能。
 
