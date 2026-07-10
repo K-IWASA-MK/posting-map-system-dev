@@ -109,6 +109,7 @@ import { ExecutionRuntimeFrame, EXECUTION_RUNTIME_FRAME_BLUEPRINT } from '../exe
 import { ExecutionRuntimeMessage, EXECUTION_RUNTIME_MESSAGE_BLUEPRINT } from '../execution/ExecutionRuntimeMessage';
 import { ExecutionRuntimeEnvelope, EXECUTION_RUNTIME_ENVELOPE_BLUEPRINT } from '../execution/ExecutionRuntimeEnvelope';
 import { ExecutionRuntimeSecureChannel, EXECUTION_RUNTIME_SECURE_CHANNEL_BLUEPRINT } from '../execution/ExecutionRuntimeSecureChannel';
+import { ExecutionRuntimeIdentity, EXECUTION_RUNTIME_IDENTITY_BLUEPRINT } from '../execution/ExecutionRuntimeIdentity';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1449,6 +1450,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeSecureChannel(rule: DevelopmentRule): ExecutionRuntimeSecureChannel | undefined {
     return EXECUTION_RUNTIME_SECURE_CHANNEL_BLUEPRINT.getExecutionRuntimeSecureChannel();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeIdentity を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Identity Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeIdentity(rule: DevelopmentRule): ExecutionRuntimeIdentity | undefined {
+    return EXECUTION_RUNTIME_IDENTITY_BLUEPRINT.getExecutionRuntimeIdentity();
   }
 }
 
