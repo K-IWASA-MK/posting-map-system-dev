@@ -91,6 +91,7 @@ import { ExecutionRuntimeComposer, EXECUTION_RUNTIME_COMPOSER_BLUEPRINT } from '
 import { ExecutionRuntimeExecutor, EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT } from '../execution/ExecutionRuntimeExecutor';
 import { ExecutionRuntimeBlueprintInterpreter, EXECUTION_RUNTIME_BLUEPRINT_INTERPRETER_BLUEPRINT } from '../execution/ExecutionRuntimeBlueprintInterpreter';
 import { ExecutionRuntimeKernel, EXECUTION_RUNTIME_KERNEL_BLUEPRINT } from '../execution/ExecutionRuntimeKernel';
+import { ExecutionRuntimeKernelEngine, EXECUTION_RUNTIME_KERNEL_ENGINE_BLUEPRINT } from '../execution/ExecutionRuntimeKernelEngine';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1267,6 +1268,21 @@ export class DevelopmentRules {
     }
     // ExecutionRuntimeKernel は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_KERNEL_BLUEPRINT.getExecutionRuntimeKernel();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeKernelEngine を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Kernel Engine Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeKernelEngine(rule: DevelopmentRule): ExecutionRuntimeKernelEngine | undefined {
+    // 依存性検証のため kernel の解決可能性のみ確認
+    const kernel = this.getExecutionRuntimeKernel(rule);
+    if (!kernel) {
+      return undefined;
+    }
+    // ExecutionRuntimeKernelEngine は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_KERNEL_ENGINE_BLUEPRINT.getExecutionRuntimeKernelEngine();
   }
 }
 
