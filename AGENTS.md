@@ -1408,7 +1408,29 @@ Execution Plan
 3. **外部通信の抽象化 (Abstraction of External Connection)**
    - Bridge Provider は、本番API接続やWebhook、認証認可のロジックを直接混入させず、将来外部供給源に容易に差し替え可能な疎結合なProvider Interface構造（およびSimulation Provider連携）を維持しなければならない。
 
+---
 
+### 47. POSTING MAP Product Development Rules Version 1.0
 
+本ルールは、POSTING MAP の商品開発における**開発統制ルール（バージョン 1.0）**である。このルールは凍結されており、変更には厳格な承認プロセス（Version 2.0 移行手続き）を要する。
 
+1. **Dashboard First**: 司令室ダッシュボードの表示と使いやすさを最優先する。
+2. **Mobile First**: 配布員が現場で使用するモバイル画面の操作性と安定性を最優先する。
+3. **Glass Morphism Design**: Apple級の高級感を演出するため、ガラスモーフィズム背景・極上余白を維持する。
+4. **Depth & Transparency**: 画面に奥行きと透明感（背景ブラー、多層シャドウ）を持たせ、チープな平面UIを排除する。
+5. **Click = Animation**: タップやクリック操作には、必ず適切でなめらかな（200〜400msの）微アニメーション/フィードバックを伴わせる。
+6. **No Static UI**: 画面遷移や情報の表示は動的かつ有機的に変化させ、一瞬の白画面やガクつきを見せない。
+7. **Apps Script + GAS Backend**: バックエンドはGoogle Apps Script（API/Event Kernel）を基盤とする。
+8. **Google Spreadsheet Single Source of Truth**: すべての実績データとシステムの状態は、Google Spreadsheet（特に EventLog シート）を唯一の正（SSOT）とする。
+9. **LIFF First**: 配布員用(H)アプリは LINE LIFF プラットフォーム上での動作を前提とする。
+10. **PWA Compatible**: オフラインや不安定な通信環境に対応するため、PWA 互換の Service Worker 構造を維持する。
+11. **Elderly Friendly UI**: 高齢の配布員でも迷わずタップできるよう、タッチターゲットの大型化、巨大なフォントサイズ、シンプルな操作導線（3タップ以内）を徹底する。
+12. **One Responsibility**: モジュールやAPIは単一の役割・責務に特化させ、肥大化や重複を排除する。
+13. **Foundation First**: 常に静的 Blueprint や型定義などの基盤層の設計整合性を最優先する。
+14. **Real Data First (No Dummy Data)**: 開発時もダミーデータの使用を禁止し、Spreadsheet やマスターCSV由来のリアルデータを取得して描画する。
+15. **Dashboard & App Separation**: 本部/管理者向けダッシュボード（Kアプリ）と、現場配布員向けアプリ（Hアプリ）の役割とUIコードを厳格に分離する。
+16. **Limited AI Role (No AI Dispatch)**: AIは配布員に対する直接の配布指示（ルート変更強制等）を行わず、実績データの可視化や意思決定の支援に限定する。
 
+- **バージョン管理ルール**:
+  - 新規ルールの追加は、本項目を変更せず「Version 1.x」として追加すること。
+  - 既存項目の改変・削除は「Version 2.0」への移行を定義し、岩佐CEOの明示的なレビュー・承認を得ることを必須とする。
