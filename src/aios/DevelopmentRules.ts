@@ -47,7 +47,7 @@ import { RuntimeResolverResult, EXECUTION_RUNTIME_RESOLVER_LOGIC } from '../exec
 import { RuntimeHydrationResult, EXECUTION_RUNTIME_HYDRATION_LOGIC } from '../execution/ExecutionRuntimeHydration';
 import { RuntimeValidationResult, EXECUTION_RUNTIME_VALIDATION_LOGIC } from '../execution/ExecutionRuntimeValidation';
 import { RuntimeDispatchResult, EXECUTION_RUNTIME_DISPATCH_LOGIC } from '../execution/ExecutionRuntimeDispatch';
-import { RuntimeQueueResult, EXECUTION_RUNTIME_QUEUE_LOGIC } from '../execution/ExecutionRuntimeQueue';
+import { RuntimeQueueResult, EXECUTION_RUNTIME_QUEUE_LOGIC } from '../execution/ExecutionRuntimeQueueLogic';
 import { RuntimeSchedulerResult, EXECUTION_RUNTIME_SCHEDULER_LOGIC } from '../execution/ExecutionRuntimeSchedulerLogic';
 import { RuntimeExecutorResult, EXECUTION_RUNTIME_EXECUTOR_LOGIC } from '../execution/ExecutionRuntimeExecutorLogic';
 import { ExecutionRuntimeEngine, EXECUTION_RUNTIME_ENGINE_BLUEPRINT } from '../execution/ExecutionRuntimeEngine';
@@ -94,6 +94,7 @@ import { ExecutionRuntimeKernel, EXECUTION_RUNTIME_KERNEL_BLUEPRINT } from '../e
 import { ExecutionRuntimeKernelEngine, EXECUTION_RUNTIME_KERNEL_ENGINE_BLUEPRINT } from '../execution/ExecutionRuntimeKernelEngine';
 import { ExecutionRuntimeThread, EXECUTION_RUNTIME_THREAD_BLUEPRINT } from '../execution/ExecutionRuntimeThread';
 import { ExecutionRuntimeScheduler, EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT } from '../execution/ExecutionRuntimeScheduler';
+import { ExecutionRuntimeQueue, EXECUTION_RUNTIME_QUEUE_BLUEPRINT } from '../execution/ExecutionRuntimeQueue';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1303,6 +1304,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeScheduler(rule: DevelopmentRule): ExecutionRuntimeScheduler | undefined {
     return EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeQueue を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Queue Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeQueue(rule: DevelopmentRule): ExecutionRuntimeQueue | undefined {
+    return EXECUTION_RUNTIME_QUEUE_BLUEPRINT.getExecutionRuntimeQueue();
   }
 }
 
