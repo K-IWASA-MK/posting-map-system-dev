@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 247: Runtime Envelope Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 248: Runtime Secure Channel Foundation [現在のフェーズ]
+* **目的**: Execution Runtime Envelope が提供する Envelope Schema をもとに、Dynamic Runtime における安全な通信チャネル（Secure Channel Schema）を定義する Runtime Secure Channel の静的 Blueprint を構築する。
+
+### 完了したスプリント: AIOS Phase 247: Runtime Envelope Foundation
 * **目的**: Execution Runtime Message が提供する Message Schema をもとに、Dynamic Runtime における通信エンベロープ（Envelope Schema）を定義する Runtime Envelope の静的 Blueprint を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeEnvelope.md）
+  - ExecutionRuntimeEnvelope.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeEnvelope）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 246: Runtime Message Foundation
 * **目的**: Execution Runtime Frame が提供する Frame Schema をもとに、Dynamic Runtime における論理メッセージ（Message Schema）を定義する Runtime Message の静的 Blueprint を構築する。
