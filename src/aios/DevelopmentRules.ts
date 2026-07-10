@@ -78,6 +78,7 @@ import { ExecutionRuntimeComponentLifecycleValidator, EXECUTION_RUNTIME_COMPONEN
 import { ExecutionRuntimeComponentLifecycleDispatcher, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_DISPATCHER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleDispatcher';
 import { ExecutionRuntimeComponentLifecycleScheduler, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_SCHEDULER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleScheduler';
 import { ExecutionRuntimeComponentLifecycleExecutor, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_EXECUTOR_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleExecutor';
+import { ExecutionRuntimeBoot, EXECUTION_RUNTIME_BOOT_BLUEPRINT } from '../execution/ExecutionRuntimeBoot';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1068,4 +1069,18 @@ export class DevelopmentRules {
     // ExecutionRuntimeComponentLifecycleExecutor は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_EXECUTOR_BLUEPRINT.getExecutionRuntimeComponentLifecycleExecutor();
   }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeBoot を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Boot Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeBoot(rule: DevelopmentRule): ExecutionRuntimeBoot | undefined {
+    if (!rule) {
+      return undefined;
+    }
+    // ExecutionRuntimeBoot は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_BOOT_BLUEPRINT.getExecutionRuntimeBoot();
+  }
 }
+
