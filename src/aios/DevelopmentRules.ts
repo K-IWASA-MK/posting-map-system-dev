@@ -85,6 +85,7 @@ import { ExecutionRuntimeContextManager, EXECUTION_RUNTIME_CONTEXT_MANAGER_BLUEP
 import { ExecutionRuntimeStateManager, EXECUTION_RUNTIME_STATE_MANAGER_BLUEPRINT } from '../execution/ExecutionRuntimeStateManager';
 import { ExecutionRuntimeSessionManager, EXECUTION_RUNTIME_SESSION_MANAGER_BLUEPRINT } from '../execution/ExecutionRuntimeSessionManager';
 import { ExecutionRuntimeInstance, EXECUTION_RUNTIME_INSTANCE_BLUEPRINT } from '../execution/ExecutionRuntimeInstance';
+import { ExecutionRuntimeLoader, EXECUTION_RUNTIME_LOADER_BLUEPRINT } from '../execution/ExecutionRuntimeLoader';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1173,7 +1174,22 @@ export class DevelopmentRules {
     // ExecutionRuntimeInstance は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_INSTANCE_BLUEPRINT.getExecutionRuntimeInstance();
   }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeLoader を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Loader Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeLoader(rule: DevelopmentRule): ExecutionRuntimeLoader | undefined {
+    const instanceManager = this.getExecutionRuntimeInstance(rule);
+    if (!instanceManager) {
+      return undefined;
+    }
+    // ExecutionRuntimeLoader は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_LOADER_BLUEPRINT.getExecutionRuntimeLoader();
+  }
 }
+
 
 
 
