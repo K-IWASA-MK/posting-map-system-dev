@@ -79,6 +79,7 @@ import { ExecutionRuntimeComponentLifecycleDispatcher, EXECUTION_RUNTIME_COMPONE
 import { ExecutionRuntimeComponentLifecycleScheduler, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_SCHEDULER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleScheduler';
 import { ExecutionRuntimeComponentLifecycleExecutor, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_EXECUTOR_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleExecutor';
 import { ExecutionRuntimeBoot, EXECUTION_RUNTIME_BOOT_BLUEPRINT } from '../execution/ExecutionRuntimeBoot';
+import { ExecutionRuntimeOrchestrator, EXECUTION_RUNTIME_ORCHESTRATOR_BLUEPRINT } from '../execution/ExecutionRuntimeOrchestrator';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1076,11 +1077,26 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Boot Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
    */
   static getExecutionRuntimeBoot(rule: DevelopmentRule): ExecutionRuntimeBoot | undefined {
-    if (!rule) {
+    const executor = this.getExecutionRuntimeComponentLifecycleExecutor(rule);
+    if (!executor) {
       return undefined;
     }
     // ExecutionRuntimeBoot は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_BOOT_BLUEPRINT.getExecutionRuntimeBoot();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeOrchestrator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Orchestrator Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeOrchestrator(rule: DevelopmentRule): ExecutionRuntimeOrchestrator | undefined {
+    const boot = this.getExecutionRuntimeBoot(rule);
+    if (!boot) {
+      return undefined;
+    }
+    // ExecutionRuntimeOrchestrator は静的配置された単一 of Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ORCHESTRATOR_BLUEPRINT.getExecutionRuntimeOrchestrator();
   }
 }
 
