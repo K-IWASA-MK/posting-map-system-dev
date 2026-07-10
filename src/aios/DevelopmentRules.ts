@@ -118,6 +118,7 @@ import { ExecutionRuntimeProtocolData, EXECUTION_RUNTIME_PROTOCOL_DATA_BLUEPRINT
 import { ExecutionRuntimeEndpoint, EXECUTION_RUNTIME_ENDPOINT_BLUEPRINT } from '../execution/ExecutionRuntimeEndpoint';
 import { ExecutionRuntimePort, EXECUTION_RUNTIME_PORT_BLUEPRINT } from '../execution/ExecutionRuntimePort';
 import { ExecutionRuntimeMessageQueue, EXECUTION_RUNTIME_MESSAGE_QUEUE_BLUEPRINT } from '../execution/ExecutionRuntimeMessageQueue';
+import { ExecutionRuntimeRouting, EXECUTION_RUNTIME_ROUTING_BLUEPRINT } from '../execution/ExecutionRuntimeRouting';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1539,6 +1540,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeMessageQueue(rule: DevelopmentRule): ExecutionRuntimeMessageQueue | undefined {
     return EXECUTION_RUNTIME_MESSAGE_QUEUE_BLUEPRINT.getExecutionRuntimeMessageQueue();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeRouting を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Routing Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeRouting(rule: DevelopmentRule): ExecutionRuntimeRouting | undefined {
+    return EXECUTION_RUNTIME_ROUTING_BLUEPRINT.getExecutionRuntimeRouting();
   }
 }
 
