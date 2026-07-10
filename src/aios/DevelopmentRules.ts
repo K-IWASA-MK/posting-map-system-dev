@@ -107,6 +107,7 @@ import { ExecutionRuntimeProtocol, EXECUTION_RUNTIME_PROTOCOL_BLUEPRINT } from '
 import { ExecutionRuntimePacket, EXECUTION_RUNTIME_PACKET_BLUEPRINT } from '../execution/ExecutionRuntimePacket';
 import { ExecutionRuntimeFrame, EXECUTION_RUNTIME_FRAME_BLUEPRINT } from '../execution/ExecutionRuntimeFrame';
 import { ExecutionRuntimeMessage, EXECUTION_RUNTIME_MESSAGE_BLUEPRINT } from '../execution/ExecutionRuntimeMessage';
+import { ExecutionRuntimeEnvelope, EXECUTION_RUNTIME_ENVELOPE_BLUEPRINT } from '../execution/ExecutionRuntimeEnvelope';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1429,6 +1430,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeMessage(rule: DevelopmentRule): ExecutionRuntimeMessage | undefined {
     return EXECUTION_RUNTIME_MESSAGE_BLUEPRINT.getExecutionRuntimeMessage();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeEnvelope を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Envelope Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeEnvelope(rule: DevelopmentRule): ExecutionRuntimeEnvelope | undefined {
+    return EXECUTION_RUNTIME_ENVELOPE_BLUEPRINT.getExecutionRuntimeEnvelope();
   }
 }
 
