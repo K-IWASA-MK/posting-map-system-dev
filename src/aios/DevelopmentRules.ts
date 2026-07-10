@@ -105,6 +105,7 @@ import { ExecutionRuntimeTransport, EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT } from
 import { ExecutionRuntimeConnection, EXECUTION_RUNTIME_CONNECTION_BLUEPRINT } from '../execution/ExecutionRuntimeConnection';
 import { ExecutionRuntimeProtocol, EXECUTION_RUNTIME_PROTOCOL_BLUEPRINT } from '../execution/ExecutionRuntimeProtocol';
 import { ExecutionRuntimePacket, EXECUTION_RUNTIME_PACKET_BLUEPRINT } from '../execution/ExecutionRuntimePacket';
+import { ExecutionRuntimeFrame, EXECUTION_RUNTIME_FRAME_BLUEPRINT } from '../execution/ExecutionRuntimeFrame';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1409,6 +1410,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimePacket(rule: DevelopmentRule): ExecutionRuntimePacket | undefined {
     return EXECUTION_RUNTIME_PACKET_BLUEPRINT.getExecutionRuntimePacket();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeFrame を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Frame Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeFrame(rule: DevelopmentRule): ExecutionRuntimeFrame | undefined {
+    return EXECUTION_RUNTIME_FRAME_BLUEPRINT.getExecutionRuntimeFrame();
   }
 }
 

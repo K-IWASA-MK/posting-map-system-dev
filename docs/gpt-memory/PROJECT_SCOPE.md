@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 244: Runtime Packet Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 245: Runtime Frame Foundation [現在のフェーズ]
+* **目的**: Execution Runtime Packet が提供する Packet Schema をもとに、Dynamic Runtime における通信フレーム（Frame Schema）を定義する Runtime Frame の静的 Blueprint を構築する。
+
+### 完了したスプリント: AIOS Phase 244: Runtime Packet Foundation
 * **目的**: Execution Runtime Session が提供する Session Schema をもとに、Dynamic Runtime における通信データの最小単位（Packet Schema）を定義する Runtime Packet の静的 Blueprint を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimePacket.md）
+  - ExecutionRuntimePacket.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimePacket）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 243: Runtime Session Foundation
 * **目的**: Execution Runtime Session の静的 Blueprint を定義する Runtime Session Foundation を構築する。
