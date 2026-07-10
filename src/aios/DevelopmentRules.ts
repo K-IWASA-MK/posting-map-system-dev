@@ -115,6 +115,7 @@ import { ExecutionRuntimeStream, EXECUTION_RUNTIME_STREAM_BLUEPRINT } from '../e
 import { ExecutionRuntimeBuffer, EXECUTION_RUNTIME_BUFFER_BLUEPRINT } from '../execution/ExecutionRuntimeBuffer';
 import { ExecutionRuntimePipe, EXECUTION_RUNTIME_PIPE_BLUEPRINT } from '../execution/ExecutionRuntimePipe';
 import { ExecutionRuntimeProtocolData, EXECUTION_RUNTIME_PROTOCOL_DATA_BLUEPRINT } from '../execution/ExecutionRuntimeProtocolData';
+import { ExecutionRuntimeEndpoint, EXECUTION_RUNTIME_ENDPOINT_BLUEPRINT } from '../execution/ExecutionRuntimeEndpoint';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1509,6 +1510,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeProtocolData(rule: DevelopmentRule): ExecutionRuntimeProtocolData | undefined {
     return EXECUTION_RUNTIME_PROTOCOL_DATA_BLUEPRINT.getExecutionRuntimeProtocolData();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeEndpoint を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Endpoint Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeEndpoint(rule: DevelopmentRule): ExecutionRuntimeEndpoint | undefined {
+    return EXECUTION_RUNTIME_ENDPOINT_BLUEPRINT.getExecutionRuntimeEndpoint();
   }
 }
 
