@@ -8,10 +8,10 @@
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
 - **Completed**: `Phase 229 (Runtime Kernel Foundation)`
-- **Milestone**: `Execution Runtime Foundation (Phase 206-215) ✅ COMPLETED`
-- **Tag**: `v4.30-execution-runtime-foundation`
+- **Milestone**: `Execution Runtime Foundation (Phase 206-229) ✅ COMPLETED`
+- **Tag**: `v4.31-runtime-foundation`
 - **Current Phase**: `Phase 230`
-- **Next Action**: `Define specification and roadmap for Phase 230 (Dynamic Runtime / Kernel Engine)`
+- **Next Action**: `Phase 230 (Runtime Kernel Engine / Dynamic Runtime)`
 - **Branch**: `main`
 
 ---
@@ -104,7 +104,7 @@ Before starting development:
 
 | Milestone | Phase Range | Tag | Status | Date |
 | :--- | :--- | :--- | :--- | :--- |
-| Execution Runtime Foundation | Phase 206 – 215 | `v4.30-execution-runtime-foundation` | ✅ Completed | 2026-07-10 |
+| Execution Runtime Foundation | Phase 206 – 229 | `v4.31-runtime-foundation` | ✅ Completed | 2026-07-10 |
 | Runtime Boot Foundation | Phase 216 | - | ✅ Completed | 2026-07-10 |
 | Runtime Orchestrator Foundation | Phase 217 | - | ✅ Completed | 2026-07-10 |
 | Runtime Execution Pipeline Foundation | Phase 218 | - | ✅ Completed | 2026-07-10 |
@@ -119,3 +119,20 @@ Before starting development:
 | Runtime Engine Foundation | Phase 227 | - | ✅ Completed | 2026-07-10 |
 | Runtime Blueprint Interpreter Foundation | Phase 228 | - | ✅ Completed | 2026-07-10 |
 | Runtime Kernel Foundation | Phase 229 | - | ✅ Completed | 2026-07-10 |
+
+---
+
+### Runtime Foundation
+
+Execution Runtime Foundation（Phase 206 ～ 229）完了。
+
+Static Blueprint Foundation を凍結。
+
+Dynamic Runtime Series は Phase 230 より開始。
+
+Runtime Foundation Tag
+
+```text
+v4.31-runtime-foundation
+```
+
