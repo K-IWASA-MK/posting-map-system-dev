@@ -87,6 +87,7 @@ import { ExecutionRuntimeSessionManager, EXECUTION_RUNTIME_SESSION_MANAGER_BLUEP
 import { ExecutionRuntimeInstance, EXECUTION_RUNTIME_INSTANCE_BLUEPRINT } from '../execution/ExecutionRuntimeInstance';
 import { ExecutionRuntimeLoader, EXECUTION_RUNTIME_LOADER_BLUEPRINT } from '../execution/ExecutionRuntimeLoader';
 import { ExecutionRuntimeBuilder, EXECUTION_RUNTIME_BUILDER_BLUEPRINT } from '../execution/ExecutionRuntimeBuilder';
+import { ExecutionRuntimeComposer, EXECUTION_RUNTIME_COMPOSER_BLUEPRINT } from '../execution/ExecutionRuntimeComposer';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1204,7 +1205,23 @@ export class DevelopmentRules {
     // ExecutionRuntimeBuilder は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_BUILDER_BLUEPRINT.getExecutionRuntimeBuilder();
   }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeComposer を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Composer Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeComposer(rule: DevelopmentRule): ExecutionRuntimeComposer | undefined {
+    // 依存性検証のため builder の解決可能性のみ確認
+    const builder = this.getExecutionRuntimeBuilder(rule);
+    if (!builder) {
+      return undefined;
+    }
+    // ExecutionRuntimeComposer は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPOSER_BLUEPRINT.getExecutionRuntimeComposer();
+  }
 }
+
 
 
 
