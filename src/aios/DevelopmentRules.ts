@@ -76,6 +76,7 @@ import { ExecutionRuntimeComponentLifecycleRegistry, EXECUTION_RUNTIME_COMPONENT
 import { ExecutionRuntimeComponentLifecycleResolver, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_RESOLVER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleResolver';
 import { ExecutionRuntimeComponentLifecycleValidator, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_VALIDATOR_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleValidator';
 import { ExecutionRuntimeComponentLifecycleDispatcher, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_DISPATCHER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleDispatcher';
+import { ExecutionRuntimeComponentLifecycleScheduler, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_SCHEDULER_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleScheduler';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1037,5 +1038,19 @@ export class DevelopmentRules {
     }
     // ExecutionRuntimeComponentLifecycleDispatcher は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_DISPATCHER_BLUEPRINT.getExecutionRuntimeComponentLifecycleDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentLifecycleDispatcher から ExecutionRuntimeComponentLifecycleScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Scheduler Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentLifecycleScheduler(rule: DevelopmentRule): ExecutionRuntimeComponentLifecycleScheduler | undefined {
+    const dispatcher = this.getExecutionRuntimeComponentLifecycleDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentLifecycleScheduler は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_SCHEDULER_BLUEPRINT.getExecutionRuntimeComponentLifecycleScheduler();
   }
 }

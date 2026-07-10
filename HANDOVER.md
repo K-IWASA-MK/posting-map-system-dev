@@ -7,9 +7,9 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Phase 213 (Execution Runtime Component Lifecycle Dispatcher Foundation)`
-- **Current Phase**: `Phase 214`
-- **Next Action**: `Define specification and roadmap for Phase 214 (Execution Runtime Component Lifecycle Scheduler Foundation)`
+- **Completed**: `Phase 214 (Execution Runtime Component Lifecycle Scheduler Foundation)`
+- **Current Phase**: `Phase 215`
+- **Next Action**: `Define specification and roadmap for Phase 215 (Execution Runtime Component Lifecycle Executor Foundation)`
 - **Branch**: `main`
 
 ---
