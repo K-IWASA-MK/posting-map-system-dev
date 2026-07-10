@@ -97,6 +97,7 @@ import { ExecutionRuntimeScheduler, EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT } from
 import { ExecutionRuntimeQueue, EXECUTION_RUNTIME_QUEUE_BLUEPRINT } from '../execution/ExecutionRuntimeQueue';
 import { ExecutionRuntimeTask, EXECUTION_RUNTIME_TASK_BLUEPRINT } from '../execution/ExecutionRuntimeTask';
 import { ExecutionRuntimeWorker, EXECUTION_RUNTIME_WORKER_BLUEPRINT } from '../execution/ExecutionRuntimeWorker';
+import { ExecutionRuntimeDispatcher, EXECUTION_RUNTIME_DISPATCHER_BLUEPRINT } from '../execution/ExecutionRuntimeDispatcher';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1333,6 +1334,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeWorker(rule: DevelopmentRule): ExecutionRuntimeWorker | undefined {
     return EXECUTION_RUNTIME_WORKER_BLUEPRINT.getExecutionRuntimeWorker();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Dispatcher Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeDispatcher(rule: DevelopmentRule): ExecutionRuntimeDispatcher | undefined {
+    return EXECUTION_RUNTIME_DISPATCHER_BLUEPRINT.getExecutionRuntimeDispatcher();
   }
 }
 

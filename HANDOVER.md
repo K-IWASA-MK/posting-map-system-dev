@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Phase 235 (Runtime Worker Foundation)`
+- **Completed**: `Phase 236 (Runtime Dispatcher Foundation)`
 - **Milestone**: `Dynamic Runtime Series (Phase 230-240) in progress`
 - **Tag**: `v4.31-runtime-foundation`
-- **Current Phase**: `Phase 236`
-- **Next Action**: `Phase 236 (Runtime Dispatcher Foundation)`
+- **Current Phase**: `Phase 237`
+- **Next Action**: `Phase 237 (Runtime Event Foundation)`
 - **Branch**: `main`
 
 ---
@@ -125,6 +125,7 @@ Before starting development:
 | Runtime Queue Foundation | Phase 233 | - | ✅ Completed | 2026-07-10 |
 | Runtime Task Foundation | Phase 234 | - | ✅ Completed | 2026-07-10 |
 | Runtime Worker Foundation | Phase 235 | - | ✅ Completed | 2026-07-10 |
+| Runtime Dispatcher Foundation | Phase 236 | - | ✅ Completed | 2026-07-10 |
 
 ---
 
@@ -177,4 +178,10 @@ Runtime Task Foundation（Phase 234）完了。
 Runtime Worker Foundation（Phase 235）完了。
 
 静的 Blueprint（Worker Schema）の策定、不変定義（WorkerCapability, WorkerDependencyPolicy, supportedWorkerPolicies, workerSchemaVersion 等の追加）、および検証テストを実装。
-次のフェーズ（Phase 236：Runtime Dispatcher Foundation）へ安全に移行可能。
+
+### Runtime Dispatcher Foundation
+
+Runtime Dispatcher Foundation（Phase 236）完了。
+
+静的 Blueprint（Dispatch Schema）の策定、不変定義（DispatcherCapability, DispatcherExecutionPolicy, DispatcherDependencyPolicy, dispatcherSchemaVersion 等の追加）、および検証テストを実装。
+次のフェーズ（Phase 237：Runtime Event Foundation）へ安全に移行可能。
