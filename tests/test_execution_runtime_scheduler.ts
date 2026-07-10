@@ -18,7 +18,7 @@ import { RuntimeExecutionPlanRegistry, RuntimeExecutionPlanState, ExecutionStrat
 import { RuntimeExecutionPlanFactory } from '../src/aios/RuntimeExecutionPlanFactory';
 import { RuntimeExecutionGraphRegistry, RuntimeExecutionGraphState } from '../src/aios/RuntimeExecutionGraphRegistry';
 import { RuntimeExecutionGraphFactory } from '../src/aios/RuntimeExecutionGraphFactory';
-import { EXECUTION_RUNTIME_SCHEDULER_LOGIC, SchedulerStatus } from '../src/execution/ExecutionRuntimeScheduler';
+import { EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT, SchedulerType, SchedulerScope, RuntimeSchedulerType, SchedulerLifecycleState, SchedulerExecutionPolicy, RUNTIME_SCHEDULER_MODELS, SCHEDULER_SEQUENCE } from '../src/execution/ExecutionRuntimeScheduler';
 import { DevelopmentRules } from '../src/aios/DevelopmentRules';
 
 function assert(condition: boolean, message: string) {
@@ -61,140 +61,152 @@ function setupAllEnvironments() {
   const pipeline = SkillPipelineFactory.create('TestPipe', 'Desc', cap.capabilityId, [skill.skillId], 5, SkillPipelineStatus.ACTIVE, '1.0.0', '1.0.0');
   SkillPipelineRegistry.register(pipeline);
 
-  // Register Runtime (ID: runtime-1)
+  // Register Runtime
   const runtime = RuntimeFactory.create('TestRuntime', RuntimeState.CREATED, RuntimeMode.SANDBOX, 'Desc', '1.0.0');
   RuntimeRegistry.register(runtime);
 
-  // Register Session (ID: session-1)
+  // Register Session
   const session = RuntimeSessionFactory.create('TestSession', 'runtime-1', 'Desc', RuntimeSessionState.CREATED);
   RuntimeSessionRegistry.register(session);
 
-  // Register Context (ID: context-1)
+  // Register Context
   const context = RuntimeContextFactory.create('TestContext', 'session-1', 'Desc', RuntimeContextState.CREATED);
   RuntimeContextRegistry.register(context);
 
-  // Register Queue (ID: queue-1)
+  // Register Queue
   const queue = RuntimeQueueFactory.create('TestQueue', 'context-1', 'Desc', RuntimeQueueState.CREATED, QueuePriority.NORMAL);
   RuntimeQueueRegistry.register(queue);
 
-  // Register Task (ID: task-1)
+  // Register Task
   const task = RuntimeTaskFactory.create('TestTask', 'queue-1', RuntimeTaskType.VALIDATION, RuntimeTaskState.CREATED);
   RuntimeTaskRegistry.register(task);
 
-  // Register Plan (ID: plan-1)
+  // Register Plan
   const plan = RuntimeExecutionPlanFactory.create('TestPlan', 'task-1', ExecutionStrategy.SEQUENTIAL, RuntimeExecutionPlanState.CREATED);
   RuntimeExecutionPlanRegistry.register(plan);
 
-  // Register Graph (ID: graph-1)
+  // Register Graph
   const graph = RuntimeExecutionGraphFactory.create('TestGraph', ['plan-1'], RuntimeExecutionGraphState.CREATED);
   RuntimeExecutionGraphRegistry.register(graph);
 }
 
-// 1. Structure and Immutability check
-function testSchedulerStructureAndImmutability() {
-  console.log('[Test 1] Scheduler metadata and result structures check starting...');
+// 1. Structure, Immutability, and Getter Only check
+function testSchedulerManagerStructureAndImmutability() {
+  console.log('[Test 1] Scheduler Manager structure and immutability check starting...');
   
-  assert(Object.isFrozen(EXECUTION_RUNTIME_SCHEDULER_LOGIC), 'EXECUTION_RUNTIME_SCHEDULER_LOGIC container must be frozen');
+  assert(Object.isFrozen(EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT), 'EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT container must be frozen');
   
-  const metadata = EXECUTION_RUNTIME_SCHEDULER_LOGIC.getSchedulerMetadata();
-  assert(Object.isFrozen(metadata), 'Metadata must be frozen');
-  assert(metadata.author === 'AIOS Team', 'Metadata author mismatch');
-  assert(metadata.version === '1.0.0', 'Metadata version mismatch');
-  assert(metadata.phase === 'Phase 205-6', 'Metadata phase mismatch');
+  const manager = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler();
+  assert(Object.isFrozen(manager), 'Scheduler Manager must be frozen');
+  assert(Object.isFrozen(manager.metadata), 'Scheduler Manager Metadata must be frozen');
+  assert(Object.isFrozen(manager.context), 'Scheduler Manager Context must be frozen');
+  assert(Object.isFrozen(manager.data), 'Scheduler Manager Data must be frozen');
+  assert(Object.isFrozen(manager.data.schedulerModels), 'Scheduler Manager Scheduler Models must be frozen');
+  assert(Object.isFrozen(SCHEDULER_SEQUENCE), 'SCHEDULER_SEQUENCE must be frozen');
+  assert(Object.isFrozen(RUNTIME_SCHEDULER_MODELS), 'RUNTIME_SCHEDULER_MODELS must be frozen');
+  
+  // Verify metadata fields
+  const metadata = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getMetadata();
+  assert(metadata.id === 'runtime-scheduler-meta-01', 'Invalid metadata ID');
+  assert(metadata.name === 'Execution Runtime Scheduler Metadata', 'Invalid metadata Name');
+  assert(metadata.version === '1.0.0', 'Invalid metadata Version');
+  assert(metadata.layer === 'Scheduler Layer', 'Invalid metadata Layer');
+  assert(metadata.category === 'Infrastructure', 'Invalid metadata Category');
 
-  assert(SchedulerStatus.READY === 'READY', 'Enum SchedulerStatus check failed');
-
-  console.log('[Test 1] Structure and Immutability check: PASSED');
+  console.log('[Test 1] PASSED');
 }
 
-// 2. Scheduler resolve result validation
-function testSchedulerLogicExecutionAndReadonly() {
-  console.log('[Test 2] Scheduler logic execution and result validation starting...');
-  setupAllEnvironments();
-
-  const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
-  const result = EXECUTION_RUNTIME_SCHEDULER_LOGIC.scheduleRuntime(rule);
-
-  assert(result !== undefined, 'Scheduler result should be resolved');
-  assert(Object.isFrozen(result), 'Returned scheduler result must be frozen');
-
-  assert(result?.runtimeManagerId === 'runtime-manager-01', 'Manager ID mismatch');
-  assert(result?.runtimeSessionId === 'runtime-session-01', 'Session ID mismatch');
-  assert(result?.runtimeContextId === 'runtime-context-01', 'Context ID mismatch');
-  assert(result?.runtimeRegistryId === 'registry-runtime-01', 'Registry ID mismatch');
-  assert(result?.runtimeResolverId === 'runtime-resolver-01', 'Resolver ID mismatch');
-  assert(result?.hydratorId === 'context-hydrator-01', 'Hydrator ID mismatch');
-  assert(result?.validatorId === 'blueprint-validator-01', 'Validator ID mismatch');
-  assert(result?.dispatcherId === 'runtime-dispatcher-01', 'Dispatcher ID mismatch');
-  assert(result?.queueId === 'queue-1', 'Queue ID mismatch');
-  assert(result?.schedulerId === 'scheduler-1', 'Scheduler ID mismatch');
-  assert(result?.schedulerStatus === SchedulerStatus.READY, 'Scheduler status mismatch');
-
-  console.log('[Test 2] Scheduler logic execution and result validation: PASSED');
-}
-
-// 3. Referential Determinism verification
-function testReferentialDeterminism() {
-  console.log('[Test 3] Scheduler referential determinism checks starting...');
-  setupAllEnvironments();
-
-  const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
-  const s1 = EXECUTION_RUNTIME_SCHEDULER_LOGIC.scheduleRuntime(rule);
-  const s2 = EXECUTION_RUNTIME_SCHEDULER_LOGIC.scheduleRuntime(rule);
+// 2. Context ID Only check
+function testSchedulerContextIdOnly() {
+  console.log('[Test 2] Context ID Only check starting...');
   
-  assert(s1 === s2, 'Consecutive scheduler calls on the same rule must return the exact same frozen reference');
-
-  console.log('[Test 3] Referential determinism checks: PASSED');
+  const context = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getContext();
+  assert(context.runtimeSchedulerId === 'runtime-scheduler-01', 'Context must have runtimeSchedulerId');
+  
+  // Verify that context does NOT contain any direct references to other entities
+  const keys = Object.keys(context);
+  assert(keys.length === 1 && keys[0] === 'runtimeSchedulerId', 'Context must contain only runtimeSchedulerId');
+  
+  console.log('[Test 2] PASSED');
 }
 
-// 4. Verification that active runtime methods are absent
-function testAbsenceOfRuntimeLogicExecution() {
-  console.log('[Test 4] Verifying total absence of active execution/scheduling/timer/jobs APIs...');
+// 3. Runtime Logic Separation check (No threads, queues, tasks, event loop, timers, dispatchers, etc.)
+function testSchedulerRuntimeLogicSeparation() {
+  console.log('[Test 3] Runtime logic separation check starting...');
 
-  const forbiddenMethods = [
-    'schedule', 'unschedule', 'start', 'stop', 'pause', 'resume', 'execute', 'retry',
-    'ai', 'shell', 'browser', 'mcp'
+  const blueprint: any = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT;
+  const manager: any = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler();
+
+  // Ensure forbidden properties/methods do not exist
+  const forbiddenKeys = [
+    'schedule', 'dispatch', 'enqueue', 'dequeue', 'wakeup', 'sleep', 
+    'startScheduler', 'stopScheduler', 'tick',
+    'thread', 'queue', 'task', 'worker', 'eventLoop', 'timer'
   ];
 
-  for (const method of forbiddenMethods) {
-    assert((EXECUTION_RUNTIME_SCHEDULER_LOGIC as any)[method] === undefined, `EXECUTION_RUNTIME_SCHEDULER_LOGIC should not contain ${method}`);
+  for (const key of forbiddenKeys) {
+    assert(blueprint[key] === undefined, `EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT must not contain method or property: ${key}`);
+    assert(manager[key] === undefined, `ExecutionRuntimeScheduler data must not contain method or property: ${key}`);
   }
 
-  console.log('[Test 4] Total absence of active execution/scheduling/timer/jobs APIs: PASSED');
+  // Check Scheduler Policies explicitly include NO_THREAD, NO_TASK, NO_QUEUE, NO_WORKER, NO_EVENT_LOOP, NO_TIMER, NO_DISPATCH, NO_PRIORITY_CALCULATION, NO_LOAD_BALANCING
+  const models = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getSchedulerModels();
+  for (const model of models) {
+    const policies = model.executionPolicies;
+    assert(policies.includes(SchedulerExecutionPolicy.NO_THREAD), 'Must include NO_THREAD policy');
+    assert(policies.includes(SchedulerExecutionPolicy.NO_TASK), 'Must include NO_TASK policy');
+    assert(policies.includes(SchedulerExecutionPolicy.NO_QUEUE), 'Must include NO_QUEUE policy');
+    assert(policies.includes(SchedulerExecutionPolicy.NO_WORKER), 'Must include NO_WORKER policy');
+    assert(policies.includes(SchedulerExecutionPolicy.NO_EVENT_LOOP), 'Must include NO_EVENT_LOOP policy');
+    assert(policies.includes(SchedulerExecutionPolicy.NO_TIMER), 'Must include NO_TIMER policy');
+    assert(policies.includes(SchedulerExecutionPolicy.NO_DISPATCH), 'Must include NO_DISPATCH policy');
+    assert(policies.includes(SchedulerExecutionPolicy.NO_PRIORITY_CALCULATION), 'Must include NO_PRIORITY_CALCULATION policy');
+    assert(policies.includes(SchedulerExecutionPolicy.NO_LOAD_BALANCING), 'Must include NO_LOAD_BALANCING policy');
+  }
+
+  console.log('[Test 3] PASSED');
 }
 
-// 5. DevelopmentRules Static Mapping integration verification
-function testDevelopmentRulesIntegration() {
-  console.log('[Test 5] DevelopmentRules static integration check starting...');
-  setupAllEnvironments();
-
-  const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
-  const result = DevelopmentRules.getExecutionRuntimeSchedulerLogic(rule);
+// 4. Deterministic resolution check
+function testSchedulerDeterministicResolution() {
+  console.log('[Test 4] Deterministic check starting...');
   
-  assert(result !== undefined, 'getExecutionRuntimeSchedulerLogic should return a valid result');
-  assert(result?.schedulerId === 'scheduler-1', 'Resolved scheduler ID mismatch in rules resolver');
+  const m1 = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler();
+  const m2 = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler();
+  assert(m1 === m2, 'getExecutionRuntimeScheduler must return identical references');
 
-  // Unregistered Capability/Pipeline test
-  CapabilityRegistry.clear();
-  const ruleWithoutPipeline = { ...rule };
-  assert(DevelopmentRules.getExecutionRuntimeSchedulerLogic(ruleWithoutPipeline) === undefined, 'Rules scheduler should return undefined if capability/pipeline is missing');
+  const c1 = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getContext();
+  const c2 = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getContext();
+  assert(c1 === c2, 'getContext must return identical references');
 
-  console.log('[Test 5] DevelopmentRules static integration check: PASSED');
+  const d1 = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getData();
+  const d2 = EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getData();
+  assert(d1 === d2, 'getData must return identical references');
+
+  console.log('[Test 4] PASSED');
 }
 
-// Main Runner
-function runAllTests() {
-  try {
-    testSchedulerStructureAndImmutability();
-    testSchedulerLogicExecutionAndReadonly();
-    testReferentialDeterminism();
-    testAbsenceOfRuntimeLogicExecution();
-    testDevelopmentRulesIntegration();
-    console.log('\nAll Execution Runtime Scheduler Logic Foundation tests passed successfully!');
-  } catch (error: any) {
-    console.error('\n❌ Test execution failed:', error.message);
-    throw error;
-  }
+// 5. DevelopmentRules Integration check
+function testDevelopmentRulesIntegration() {
+  console.log('[Test 5] DevelopmentRules integration check starting...');
+  
+  const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
+  const scheduler = DevelopmentRules.getExecutionRuntimeScheduler(rule);
+  
+  assert(scheduler !== undefined, 'getExecutionRuntimeScheduler must resolve properly');
+  assert(scheduler === EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler(), 'Resolved scheduler must be equal to singleton');
+
+  console.log('[Test 5] PASSED');
 }
 
-runAllTests();
+// Execute Tests
+setupAllEnvironments();
+testSchedulerManagerStructureAndImmutability();
+testSchedulerContextIdOnly();
+testSchedulerRuntimeLogicSeparation();
+testSchedulerDeterministicResolution();
+testDevelopmentRulesIntegration();
+
+console.log('\n======================================');
+console.log('  ALL RUNTIME SCHEDULER TESTS PASSED');
+console.log('======================================\n');

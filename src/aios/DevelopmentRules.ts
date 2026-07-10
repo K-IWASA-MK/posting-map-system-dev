@@ -48,7 +48,7 @@ import { RuntimeHydrationResult, EXECUTION_RUNTIME_HYDRATION_LOGIC } from '../ex
 import { RuntimeValidationResult, EXECUTION_RUNTIME_VALIDATION_LOGIC } from '../execution/ExecutionRuntimeValidation';
 import { RuntimeDispatchResult, EXECUTION_RUNTIME_DISPATCH_LOGIC } from '../execution/ExecutionRuntimeDispatch';
 import { RuntimeQueueResult, EXECUTION_RUNTIME_QUEUE_LOGIC } from '../execution/ExecutionRuntimeQueue';
-import { RuntimeSchedulerResult, EXECUTION_RUNTIME_SCHEDULER_LOGIC } from '../execution/ExecutionRuntimeScheduler';
+import { RuntimeSchedulerResult, EXECUTION_RUNTIME_SCHEDULER_LOGIC } from '../execution/ExecutionRuntimeSchedulerLogic';
 import { RuntimeExecutorResult, EXECUTION_RUNTIME_EXECUTOR_LOGIC } from '../execution/ExecutionRuntimeExecutorLogic';
 import { ExecutionRuntimeEngine, EXECUTION_RUNTIME_ENGINE_BLUEPRINT } from '../execution/ExecutionRuntimeEngine';
 import { ExecutionRuntimeEngineRegistry, EXECUTION_RUNTIME_ENGINE_REGISTRY_BLUEPRINT } from '../execution/ExecutionRuntimeEngineRegistry';
@@ -93,6 +93,7 @@ import { ExecutionRuntimeBlueprintInterpreter, EXECUTION_RUNTIME_BLUEPRINT_INTER
 import { ExecutionRuntimeKernel, EXECUTION_RUNTIME_KERNEL_BLUEPRINT } from '../execution/ExecutionRuntimeKernel';
 import { ExecutionRuntimeKernelEngine, EXECUTION_RUNTIME_KERNEL_ENGINE_BLUEPRINT } from '../execution/ExecutionRuntimeKernelEngine';
 import { ExecutionRuntimeThread, EXECUTION_RUNTIME_THREAD_BLUEPRINT } from '../execution/ExecutionRuntimeThread';
+import { ExecutionRuntimeScheduler, EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT } from '../execution/ExecutionRuntimeScheduler';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1293,6 +1294,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeThread(rule: DevelopmentRule): ExecutionRuntimeThread | undefined {
     return EXECUTION_RUNTIME_THREAD_BLUEPRINT.getExecutionRuntimeThread();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Scheduler Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeScheduler(rule: DevelopmentRule): ExecutionRuntimeScheduler | undefined {
+    return EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler();
   }
 }
 
