@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Phase 240 (Runtime Transport Foundation)`
+- **Completed**: `Phase 241 (Runtime Connection Foundation)`
 - **Milestone**: `Dynamic Runtime Series (Phase 230-240) in progress`
 - **Tag**: `v4.31-runtime-foundation`
-- **Current Phase**: `Phase 241`
-- **Next Action**: `Phase 241 (Runtime Connection Foundation)`
+- **Current Phase**: `Phase 242`
+- **Next Action**: `Phase 242 (Runtime Protocol Foundation)`
 - **Branch**: `main`
 
 ---
@@ -130,6 +130,7 @@ Before starting development:
 | Runtime Event Bus Foundation | Phase 238 | - | ✅ Completed | 2026-07-10 |
 | Runtime Message Router Foundation | Phase 239 | - | ✅ Completed | 2026-07-10 |
 | Runtime Transport Foundation | Phase 240 | - | ✅ Completed | 2026-07-10 |
+| Runtime Connection Foundation | Phase 241 | - | ✅ Completed | 2026-07-10 |
 
 ---
 
@@ -212,4 +213,10 @@ Runtime Message Router Foundation（Phase 239）完了。
 Runtime Transport Foundation（Phase 240）完了。
 
 静的 Blueprint（Transport Schema）の策定、不変定義（TransportTopology, TransportReliabilityPolicy, TransportSecurityPolicy, TransportCategory, TransportProtocolPolicy, supportedConnectionPolicies, supportedProtocolPolicies, transportSchemaVersion 等の追加）、および検証テストを実装。
-次のフェーズ（Phase 241：Runtime Connection Foundation）へ安全に移行可能。
+
+### Runtime Connection Foundation
+
+Runtime Connection Foundation（Phase 241）完了。
+
+静的 Blueprint（Connection Schema）の策定、不変定義（ConnectionTopology, ConnectionSecurityPolicy, ConnectionStatePolicy, ConnectionDependencyPolicy, supportedAuthenticationPolicies, supportedConnectionModes, connectionSchemaVersion 等の追加）、および検証テストを実装。
+次のフェーズ（Phase 242：Runtime Protocol Foundation）へ安全に移行可能。
