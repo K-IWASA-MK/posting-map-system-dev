@@ -698,8 +698,8 @@ export class DevelopmentRules {
     if (!executorLogic) {
       return undefined;
     }
-    // ExecutionRuntimeEngine は静的配置された単一の Blueprint として不変で解決される
-    return EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getEngine();
+    // ExecutionRuntimeEngine は静的配置された単一 of Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getExecutionRuntimeEngine();
   }
 
   /**

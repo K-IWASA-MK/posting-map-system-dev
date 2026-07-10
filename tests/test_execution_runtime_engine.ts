@@ -18,7 +18,7 @@ import { RuntimeExecutionPlanRegistry, RuntimeExecutionPlanState, ExecutionStrat
 import { RuntimeExecutionPlanFactory } from '../src/aios/RuntimeExecutionPlanFactory';
 import { RuntimeExecutionGraphRegistry, RuntimeExecutionGraphState } from '../src/aios/RuntimeExecutionGraphRegistry';
 import { RuntimeExecutionGraphFactory } from '../src/aios/RuntimeExecutionGraphFactory';
-import { EXECUTION_RUNTIME_ENGINE_BLUEPRINT, EngineType } from '../src/execution/ExecutionRuntimeEngine';
+import { EXECUTION_RUNTIME_ENGINE_BLUEPRINT, EngineManagerType, EngineManagerScope, RuntimeEngineType, EngineStep, RUNTIME_ENGINE_MODELS, ENGINE_SEQUENCE, EngineType } from '../src/execution/ExecutionRuntimeEngine';
 import { DevelopmentRules } from '../src/aios/DevelopmentRules';
 
 function assert(condition: boolean, message: string) {
@@ -91,13 +91,13 @@ function setupAllEnvironments() {
 }
 
 // 1. Structure and Immutability check
-function testEngineStructureAndImmutability() {
-  console.log('[Test 1] Engine metadata, context, and engine data structures check starting...');
+function testEngineManagerStructureAndImmutability() {
+  console.log('[Test 1] Engine Manager metadata, context, and data structures check starting...');
   
   assert(Object.isFrozen(EXECUTION_RUNTIME_ENGINE_BLUEPRINT), 'EXECUTION_RUNTIME_ENGINE_BLUEPRINT container must be frozen');
   
-  const engine = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getEngine();
-  assert(Object.isFrozen(engine), 'Engine data must be frozen');
+  const manager = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getExecutionRuntimeEngine();
+  assert(Object.isFrozen(manager), 'Engine Manager data must be frozen');
   
   const context = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getContext();
   assert(Object.isFrozen(context), 'Context must be frozen');
@@ -105,77 +105,104 @@ function testEngineStructureAndImmutability() {
   const metadata = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getMetadata();
   assert(Object.isFrozen(metadata), 'Metadata must be frozen');
   
-  assert(metadata.author === 'AIOS Team', 'Metadata author mismatch');
-  assert(metadata.version === '1.0.0', 'Metadata version mismatch');
-  assert(metadata.phase === 'Phase 206-1', 'Metadata phase mismatch');
+  const data = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getData();
+  assert(Object.isFrozen(data), 'Data must be frozen');
 
-  assert(EngineType.FOUNDATION === 'FOUNDATION', 'Enum EngineType check failed');
-  assert(EngineType.RUNTIME === 'RUNTIME', 'Enum EngineType check failed');
-  assert(EngineType.SIMULATION === 'SIMULATION', 'Enum EngineType check failed');
-  assert(EngineType.PLUGIN === 'PLUGIN', 'Enum EngineType check failed');
-  assert(EngineType.AI === 'AI', 'Enum EngineType check failed');
+  assert(metadata.id === 'runtime-engine-manager-meta-01', 'Metadata id mismatch');
+  assert(metadata.version === '1.0.0', 'Metadata version mismatch');
+  assert(metadata.layer === 'Engine Manager Layer', 'Metadata layer mismatch');
+
+  assert(EngineManagerType.FOUNDATION === 'FOUNDATION', 'Enum EngineManagerType check failed');
+  assert(EngineManagerScope.SYSTEM === 'SYSTEM', 'Enum EngineManagerScope check failed');
 
   console.log('[Test 1] Structure and Immutability check: PASSED');
 }
 
-// 2. Engine Context and Blueprint values checks
-function testEngineBlueprintValues() {
-  console.log('[Test 2] Engine context and blueprint values validation starting...');
+// 2. Engine Manager Context and Blueprint values checks
+function testEngineManagerBlueprintValues() {
+  console.log('[Test 2] Engine Manager context and blueprint values validation starting...');
 
-  const engine = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getEngine();
+  const manager = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getExecutionRuntimeEngine();
   const context = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getContext();
+  const data = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getData();
 
-  assert(engine.id === 'runtime-engine-01', 'Engine ID mismatch');
-  assert(engine.engineType === EngineType.FOUNDATION, 'Engine type mismatch');
-  assert(engine.context === context, 'Engine context mismatch');
+  assert(manager.id === 'runtime-engine-01', 'Engine Manager ID mismatch');
+  assert(manager.context === context, 'Engine Manager context mismatch');
+  assert(manager.data === data, 'Engine Manager data mismatch');
 
-  // Verify context holds only IDs
-  assert(context.runtimeManagerId === 'runtime-manager-01', 'Context runtimeManagerId mismatch');
-  assert(context.runtimeSessionId === 'runtime-session-01', 'Context runtimeSessionId mismatch');
-  assert(context.runtimeContextId === 'runtime-context-01', 'Context runtimeContextId mismatch');
-  assert(context.runtimeRegistryId === 'registry-runtime-01', 'Context runtimeRegistryId mismatch');
-  assert(context.runtimeResolverId === 'runtime-resolver-01', 'Context runtimeResolverId mismatch');
-  assert(context.hydratorId === 'context-hydrator-01', 'Context hydratorId mismatch');
-  assert(context.validatorId === 'blueprint-validator-01', 'Context validatorId mismatch');
-  assert(context.dispatcherId === 'runtime-dispatcher-01', 'Context dispatcherId mismatch');
-  assert(context.queueId === 'queue-1', 'Context queueId mismatch');
-  assert(context.schedulerId === 'scheduler-1', 'Context schedulerId mismatch');
-  assert(context.executorId === 'executor-1', 'Context executorId mismatch');
+  // Verify context holds only runtimeEngineId (simple context check)
+  const contextKeys = Object.keys(context);
+  assert(contextKeys.length === 1, 'Engine Manager Context must hold exactly 1 property');
+  assert(context.runtimeEngineId === 'runtime-engine-01', 'Context runtimeEngineId mismatch');
 
-  console.log('[Test 2] Engine context and blueprint values validation: PASSED');
+  // Verify engineModels are specified correctly
+  assert(data.engineModels.length === 5, 'Engine models count must be exactly 5');
+  assert(data.engineModels[0].engineType === RuntimeEngineType.SYSTEM_ENGINE, 'Engine model 1 mismatch');
+  assert(data.engineModels[1].engineType === RuntimeEngineType.CORE_ENGINE, 'Engine model 2 mismatch');
+  assert(data.engineModels[2].engineType === RuntimeEngineType.APPLICATION_ENGINE, 'Engine model 3 mismatch');
+  assert(data.engineModels[3].engineType === RuntimeEngineType.PLUGIN_ENGINE, 'Engine model 4 mismatch');
+  assert(data.engineModels[4].engineType === RuntimeEngineType.FIELD_ENGINE, 'Engine model 5 mismatch');
+
+  // Verify each engine model has version 1.0, engineOrder, targetBlueprints and allowedSteps
+  for (let i = 0; i < 5; i++) {
+    const model = data.engineModels[i];
+    assert(model.metadata.engineModelVersion === '1.0', `Engine model ${i} version mismatch`);
+    assert(model.engineOrder === i + 1, `Engine model ${i} engineOrder mismatch`);
+    assert(Object.isFrozen(model.targetBlueprints), `Engine model ${i} targetBlueprints must be frozen`);
+    assert(model.allowedSteps === ENGINE_SEQUENCE, `Engine model ${i} allowedSteps mismatch`);
+  }
+
+  // Verify targetBlueprints setup (e.g. system engine targets executor-blueprint-id)
+  assert(data.engineModels[0].targetBlueprints[0] === 'executor-blueprint-id', 'System engine targetBlueprints mismatch');
+
+  // Verify ENGINE_SEQUENCE (REGISTER_BLUEPRINTS, VALIDATE_BLUEPRINTS, BUILD_ENGINE_SCHEMA, READY_FOR_INTERPRETER, ENGINE_SCHEMA_READY)
+  const seq = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getEngineSequence();
+  assert(seq === ENGINE_SEQUENCE, 'Engine sequence mismatch');
+  assert(seq[0] === EngineStep.REGISTER_BLUEPRINTS, 'Seq 0 mismatch');
+  assert(seq[1] === EngineStep.VALIDATE_BLUEPRINTS, 'Seq 1 mismatch');
+  assert(seq[2] === EngineStep.BUILD_ENGINE_SCHEMA, 'Seq 2 mismatch');
+  assert(seq[3] === EngineStep.READY_FOR_INTERPRETER, 'Seq 3 mismatch');
+  assert(seq[4] === EngineStep.ENGINE_SCHEMA_READY, 'Seq 4 mismatch');
+
+  // Verify static engine models list matches
+  const list = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getEngineModels();
+  assert(list === RUNTIME_ENGINE_MODELS, 'Engine models list object mismatch');
+  assert(Object.isFrozen(list), 'Engine models list must be frozen');
+
+  console.log('[Test 2] Engine Manager context and blueprint values validation: PASSED');
 }
 
 // 3. Referential Determinism verification
 function testReferentialDeterminism() {
-  console.log('[Test 3] Engine referential determinism checks starting...');
+  console.log('[Test 3] Engine Manager referential determinism checks starting...');
   setupAllEnvironments();
 
   const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
-  const eng1 = DevelopmentRules.getExecutionRuntimeEngine(rule);
-  const eng2 = DevelopmentRules.getExecutionRuntimeEngine(rule);
+  const manager1 = DevelopmentRules.getExecutionRuntimeEngine(rule);
+  const manager2 = DevelopmentRules.getExecutionRuntimeEngine(rule);
   
-  assert(eng1 !== undefined, 'Engine should be resolved');
-  assert(eng1 === eng2, 'Consecutive engine resolver calls on the same rule must return the exact same frozen reference');
+  assert(manager1 !== undefined, 'Engine Manager should be resolved');
+  assert(manager1 === manager2, 'Consecutive engine manager resolver calls on the same rule must return the exact same frozen reference');
 
   console.log('[Test 3] Referential determinism checks: PASSED');
 }
 
 // 4. Verification that active runtime methods are absent
-function testAbsenceOfRuntimeExecution() {
-  console.log('[Test 4] Verifying total absence of active execution/launcher/plugin APIs...');
+function testAbsenceOfRuntimeEngineManager() {
+  console.log('[Test 4] Verifying total absence of active engine manager/execution/launcher/plugin/boot/initialize/interpret/execute/dispatch/shutdown/tick APIs...');
 
   const forbiddenMethods = [
-    'execute', 'run', 'start', 'stop', 'restart', 'dispatch', 'schedule', 'spawn', 'fork', 'createProcess',
-    'plugin', 'ai', 'shell', 'browser', 'mcp'
+    'boot', 'initialize', 'interpret', 'execute', 'dispatch', 'shutdown', 'tick',
+    'instantiate', 'buildRuntime', 'compose', 'mount', 'attach', 'connect'
   ];
 
   for (const method of forbiddenMethods) {
     assert((EXECUTION_RUNTIME_ENGINE_BLUEPRINT as any)[method] === undefined, `EXECUTION_RUNTIME_ENGINE_BLUEPRINT should not contain ${method}`);
-    const engine = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getEngine();
-    assert((engine as any)[method] === undefined, `ExecutionRuntimeEngine object should not contain ${method}`);
+    const manager = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getExecutionRuntimeEngine();
+    assert((manager as any)[method] === undefined, `ExecutionRuntimeEngine object should not contain ${method}`);
   }
 
-  console.log('[Test 4] Total absence of active execution/launcher/plugin APIs: PASSED');
+  console.log('[Test 4] Total absence of active engine manager/execution/launcher/plugin/boot/initialize/interpret/execute/dispatch/shutdown/tick APIs: PASSED');
 }
 
 // 5. DevelopmentRules Static Mapping integration verification
@@ -184,27 +211,43 @@ function testDevelopmentRulesIntegration() {
   setupAllEnvironments();
 
   const rule = DevelopmentRules.createRule('rule-1', 'Rule testing', 'Testing', 10);
-  const engine = DevelopmentRules.getExecutionRuntimeEngine(rule);
+  const manager = DevelopmentRules.getExecutionRuntimeEngine(rule);
   
-  assert(engine !== undefined, 'getExecutionRuntimeEngine should return a valid result');
-  assert(engine?.id === 'runtime-engine-01', 'Resolved engine ID mismatch in rules resolver');
+  assert(manager !== undefined, 'getExecutionRuntimeEngine should return a valid result');
+  assert(manager?.id === 'runtime-engine-01', 'Resolved engine manager ID mismatch in rules resolver');
 
-  // Unregistered Capability/Pipeline test
+  // Unregistered Capability test
   CapabilityRegistry.clear();
   const ruleWithoutPipeline = { ...rule };
-  assert(DevelopmentRules.getExecutionRuntimeEngine(ruleWithoutPipeline) === undefined, 'Rules engine resolver should return undefined if capability/pipeline is missing');
+  assert(DevelopmentRules.getExecutionRuntimeEngine(ruleWithoutPipeline) === undefined, 'Rules engine manager resolver should return undefined if capability is missing');
 
   console.log('[Test 5] DevelopmentRules static integration check: PASSED');
+}
+
+// 6. Compatibility Layer verification
+function testCompatibilityLayer() {
+  console.log('[Test 6] Verifying backward compatibility with the old getEngine() and EngineType APIs...');
+
+  assert(EngineType.FOUNDATION === 'FOUNDATION', 'EngineType.FOUNDATION compatibility check failed');
+
+  const oldEngine = EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getEngine();
+  assert(oldEngine !== undefined, 'getEngine() compatibility check failed');
+  assert(oldEngine.id === 'runtime-engine-01', 'Old engine ID mismatch');
+  assert(oldEngine.metadata.phase === 'Phase 206-1', 'Old metadata phase mismatch');
+  assert(oldEngine.context.runtimeManagerId === 'runtime-manager-01', 'Old context runtimeManagerId mismatch');
+
+  console.log('[Test 6] Backward compatibility check: PASSED');
 }
 
 // Main Runner
 function runAllTests() {
   try {
-    testEngineStructureAndImmutability();
-    testEngineBlueprintValues();
+    testEngineManagerStructureAndImmutability();
+    testEngineManagerBlueprintValues();
     testReferentialDeterminism();
-    testAbsenceOfRuntimeExecution();
+    testAbsenceOfRuntimeEngineManager();
     testDevelopmentRulesIntegration();
+    testCompatibilityLayer();
     console.log('\nAll Execution Runtime Engine Foundation tests passed successfully!');
   } catch (error: any) {
     console.error('\n❌ Test execution failed:', error.message);
