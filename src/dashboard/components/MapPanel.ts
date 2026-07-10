@@ -6,13 +6,15 @@
  */
 
 import { AreaDetail } from '../DashboardStateModel';
+import { MapEngine, DOMMapEngine } from '../map/MapEngine';
 
 export class MapPanel {
   private readonly element: HTMLDivElement;
   private readonly markerContainer: HTMLDivElement;
+  private readonly mapEngine: MapEngine;
   private onAreaSelectedCallback: ((areaId: string) => void) | null = null;
 
-  constructor() {
+  constructor(mapEngine?: MapEngine) {
     this.element = document.createElement('div');
     this.element.className = 'map-visualization-panel';
     this.applyStyles();
@@ -44,6 +46,14 @@ export class MapPanel {
 
     this.element.appendChild(title);
     this.element.appendChild(this.markerContainer);
+
+    // Initialize Map Engine
+    this.mapEngine = mapEngine || new DOMMapEngine((areaId) => {
+      if (this.onAreaSelectedCallback) {
+        this.onAreaSelectedCallback(areaId);
+      }
+    });
+    this.mapEngine.initialize(this.markerContainer);
   }
 
   private applyStyles() {
@@ -66,82 +76,18 @@ export class MapPanel {
    * エリアマスタの実データをマッピング表示する (Real Data Binding)
    */
   updateAreas(areas: readonly AreaDetail[]) {
-    this.markerContainer.innerHTML = '';
-    
-    if (areas.length === 0) {
-      const emptyMsg = document.createElement('div');
-      emptyMsg.innerText = '地区データが登録されていません。';
-      emptyMsg.style.color = 'rgba(255, 255, 255, 0.3)';
-      emptyMsg.style.fontSize = '14px';
-      emptyMsg.style.margin = 'auto';
-      this.markerContainer.appendChild(emptyMsg);
-      return;
-    }
-
-    areas.forEach(area => {
-      const pin = document.createElement('div');
-      pin.className = 'area-map-pin';
-      this.applyPinStyles(pin, area.progressRate);
-
-      const label = document.createElement('span');
-      label.innerText = `${area.areaName} (${area.progressRate}%)`;
-      
-      pin.appendChild(label);
-      
-      // Click = Animation Rule
-      pin.addEventListener('click', () => {
-        pin.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-          pin.style.transform = 'scale(1)';
-          if (this.onAreaSelectedCallback) {
-            this.onAreaSelectedCallback(area.areaId);
-          }
-        }, 100);
-      });
-
-      this.markerContainer.appendChild(pin);
-    });
+    this.mapEngine.showAreas(areas);
   }
 
-  private applyPinStyles(el: HTMLDivElement, progress: number) {
-    const s = el.style;
-    s.padding = '8px 16px';
-    s.borderRadius = '16px';
-    s.fontSize = '12px';
-    s.fontWeight = '700';
-    s.cursor = 'pointer';
-    s.display = 'inline-flex';
-    s.alignItems = 'center';
-    s.border = '1px solid rgba(255, 255, 255, 0.08)';
-    s.transition = 'all 150ms cubic-bezier(0.16, 1, 0.3, 1)';
-    s.height = 'fit-content';
-
-    // 進捗率に応じたプレミアム発光カラーマッピング
-    if (progress >= 100) {
-      s.color = '#10b981';
-      s.background = 'rgba(16, 185, 129, 0.1)';
-      s.boxShadow = 'inset 0 0 10px rgba(16, 185, 129, 0.1)';
-    } else if (progress > 0) {
-      s.color = '#3b82f6';
-      s.background = 'rgba(59, 130, 246, 0.1)';
-      s.boxShadow = 'inset 0 0 10px rgba(59, 130, 246, 0.1)';
-    } else {
-      s.color = 'rgba(255, 255, 255, 0.4)';
-      s.background = 'rgba(255, 255, 255, 0.03)';
-    }
-
-    el.addEventListener('mouseenter', () => {
-      s.transform = 'translateY(-2px)';
-      s.borderColor = 'rgba(255, 255, 255, 0.2)';
-    });
-
-    el.addEventListener('mouseleave', () => {
-      s.transform = 'translateY(0)';
-      s.borderColor = 'rgba(255, 255, 255, 0.08)';
-    });
+  /**
+   * 特定のエリアを選択ハイライト表示する
+   */
+  highlightArea(areaId: string) {
+    this.mapEngine.highlightArea(areaId);
   }
 
   getElement(): HTMLDivElement {
     return this.element;
   }
 }
+
