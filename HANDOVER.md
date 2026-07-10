@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Phase 237 (Runtime Event Foundation)`
+- **Completed**: `Phase 238 (Runtime Event Bus Foundation)`
 - **Milestone**: `Dynamic Runtime Series (Phase 230-240) in progress`
 - **Tag**: `v4.31-runtime-foundation`
-- **Current Phase**: `Phase 238`
-- **Next Action**: `Phase 238 (Runtime Event Loop Foundation)`
+- **Current Phase**: `Phase 239`
+- **Next Action**: `Phase 239 (Runtime Message Router Foundation)`
 - **Branch**: `main`
 
 ---
@@ -127,6 +127,7 @@ Before starting development:
 | Runtime Worker Foundation | Phase 235 | - | ✅ Completed | 2026-07-10 |
 | Runtime Dispatcher Foundation | Phase 236 | - | ✅ Completed | 2026-07-10 |
 | Runtime Event Foundation | Phase 237 | - | ✅ Completed | 2026-07-10 |
+| Runtime Event Bus Foundation | Phase 238 | - | ✅ Completed | 2026-07-10 |
 
 ---
 
@@ -191,4 +192,10 @@ Runtime Dispatcher Foundation（Phase 236）完了。
 Runtime Event Foundation（Phase 237）完了。
 
 静的 Blueprint（Event Schema）の策定、不変定義（EventCategory, EventDirection, EventPriorityPolicy, supportedCapabilities, supportedEventPolicies, eventSchemaVersion 等の追加）、および検証テストを実装。
-次のフェーズ（Phase 238：Runtime Event Loop Foundation）へ安全に移行可能。
+
+### Runtime Event Bus Foundation
+
+Runtime Event Bus Foundation（Phase 238）完了。
+
+静的 Blueprint（Event Bus Schema）の策定、不変定義（EventBusTopology, EventBusDeliveryPolicy, EventBusReliabilityPolicy, EventBusCategory, EventBusChannelPolicy, eventBusSchemaVersion 等の追加）、および検証テストを実装。
+次のフェーズ（Phase 239：Runtime Message Router Foundation）へ安全に移行可能。

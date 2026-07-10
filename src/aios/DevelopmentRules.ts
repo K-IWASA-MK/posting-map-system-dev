@@ -99,6 +99,7 @@ import { ExecutionRuntimeTask, EXECUTION_RUNTIME_TASK_BLUEPRINT } from '../execu
 import { ExecutionRuntimeWorker, EXECUTION_RUNTIME_WORKER_BLUEPRINT } from '../execution/ExecutionRuntimeWorker';
 import { ExecutionRuntimeDispatcher, EXECUTION_RUNTIME_DISPATCHER_BLUEPRINT } from '../execution/ExecutionRuntimeDispatcher';
 import { ExecutionRuntimeEvent, EXECUTION_RUNTIME_EVENT_BLUEPRINT } from '../execution/ExecutionRuntimeEvent';
+import { ExecutionRuntimeEventBus, EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT } from '../execution/ExecutionRuntimeEventBus';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1353,6 +1354,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeEvent(rule: DevelopmentRule): ExecutionRuntimeEvent | undefined {
     return EXECUTION_RUNTIME_EVENT_BLUEPRINT.getExecutionRuntimeEvent();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeEventBus を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Event Bus Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeEventBus(rule: DevelopmentRule): ExecutionRuntimeEventBus | undefined {
+    return EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT.getExecutionRuntimeEventBus();
   }
 }
 
