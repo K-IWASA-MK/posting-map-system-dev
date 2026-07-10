@@ -110,6 +110,7 @@ import { ExecutionRuntimeMessage, EXECUTION_RUNTIME_MESSAGE_BLUEPRINT } from '..
 import { ExecutionRuntimeEnvelope, EXECUTION_RUNTIME_ENVELOPE_BLUEPRINT } from '../execution/ExecutionRuntimeEnvelope';
 import { ExecutionRuntimeSecureChannel, EXECUTION_RUNTIME_SECURE_CHANNEL_BLUEPRINT } from '../execution/ExecutionRuntimeSecureChannel';
 import { ExecutionRuntimeIdentity, EXECUTION_RUNTIME_IDENTITY_BLUEPRINT } from '../execution/ExecutionRuntimeIdentity';
+import { ExecutionRuntimeSocket, EXECUTION_RUNTIME_SOCKET_BLUEPRINT } from '../execution/ExecutionRuntimeSocket';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1459,6 +1460,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeIdentity(rule: DevelopmentRule): ExecutionRuntimeIdentity | undefined {
     return EXECUTION_RUNTIME_IDENTITY_BLUEPRINT.getExecutionRuntimeIdentity();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeSocket を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Socket Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeSocket(rule: DevelopmentRule): ExecutionRuntimeSocket | undefined {
+    return EXECUTION_RUNTIME_SOCKET_BLUEPRINT.getExecutionRuntimeSocket();
   }
 }
 
