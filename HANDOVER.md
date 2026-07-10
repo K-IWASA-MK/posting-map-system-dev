@@ -7,9 +7,9 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Phase 209 (Execution Runtime Component Lifecycle & Lifecycle Management Foundation)`
-- **Current Phase**: `Phase 210`
-- **Next Action**: `Define specification and roadmap for Phase 210 (Execution Runtime Component Lifecycle Engine & State Machine)`
+- **Completed**: `Phase 210 (Execution Runtime Component Lifecycle Registry Foundation)`
+- **Current Phase**: `Phase 211`
+- **Next Action**: `Define specification and roadmap for Phase 211 (Execution Runtime Component Lifecycle Resolver Foundation)`
 - **Branch**: `main`
 
 ---
