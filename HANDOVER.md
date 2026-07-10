@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Phase 233 (Runtime Queue Foundation)`
+- **Completed**: `Phase 234 (Runtime Task Foundation)`
 - **Milestone**: `Dynamic Runtime Series (Phase 230-240) in progress`
 - **Tag**: `v4.31-runtime-foundation`
-- **Current Phase**: `Phase 234`
-- **Next Action**: `Phase 234 (Runtime Task Foundation)`
+- **Current Phase**: `Phase 235`
+- **Next Action**: `Phase 235 (Runtime Worker Foundation)`
 - **Branch**: `main`
 
 ---
@@ -123,6 +123,7 @@ Before starting development:
 | Runtime Thread Foundation | Phase 231 | - | ✅ Completed | 2026-07-10 |
 | Runtime Scheduler Foundation | Phase 232 | - | ✅ Completed | 2026-07-10 |
 | Runtime Queue Foundation | Phase 233 | - | ✅ Completed | 2026-07-10 |
+| Runtime Task Foundation | Phase 234 | - | ✅ Completed | 2026-07-10 |
 
 ---
 
@@ -163,4 +164,10 @@ Runtime Scheduler Foundation（Phase 232）完了。
 Runtime Queue Foundation（Phase 233）完了。
 
 静的 Blueprint（Queue Schema）の策定、不変定義（NO_PRIORITY, NO_SORT, NO_REORDER ポリシーおよび supportedQueuePolicies、queueSchemaVersion 追加）、および検証テストを実装。
-次のフェーズ（Phase 234：Runtime Task Foundation）へ安全に移行可能。
+
+### Runtime Task Foundation
+
+Runtime Task Foundation（Phase 234）完了。
+
+静的 Blueprint（Task Schema）の策定、不変定義（TaskCapability, TaskDependencyPolicy, supportedTaskPolicies, taskSchemaVersion 等の追加）、および検証テストを実装。
+次のフェーズ（Phase 235：Runtime Worker Foundation）へ安全に移行可能。
