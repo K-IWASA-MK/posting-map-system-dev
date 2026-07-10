@@ -101,6 +101,7 @@ import { ExecutionRuntimeDispatcher, EXECUTION_RUNTIME_DISPATCHER_BLUEPRINT } fr
 import { ExecutionRuntimeEvent, EXECUTION_RUNTIME_EVENT_BLUEPRINT } from '../execution/ExecutionRuntimeEvent';
 import { ExecutionRuntimeEventBus, EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT } from '../execution/ExecutionRuntimeEventBus';
 import { ExecutionRuntimeMessageRouter, EXECUTION_RUNTIME_MESSAGE_ROUTER_BLUEPRINT } from '../execution/ExecutionRuntimeMessageRouter';
+import { ExecutionRuntimeTransport, EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT } from '../execution/ExecutionRuntimeTransport';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1373,6 +1374,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeMessageRouter(rule: DevelopmentRule): ExecutionRuntimeMessageRouter | undefined {
     return EXECUTION_RUNTIME_MESSAGE_ROUTER_BLUEPRINT.getExecutionRuntimeMessageRouter();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeTransport を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Transport Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeTransport(rule: DevelopmentRule): ExecutionRuntimeTransport | undefined {
+    return EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
   }
 }
 
