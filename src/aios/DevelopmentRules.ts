@@ -80,6 +80,7 @@ import { ExecutionRuntimeComponentLifecycleScheduler, EXECUTION_RUNTIME_COMPONEN
 import { ExecutionRuntimeComponentLifecycleExecutor, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_EXECUTOR_BLUEPRINT } from '../runtime/execution/component/ExecutionRuntimeComponentLifecycleExecutor';
 import { ExecutionRuntimeBoot, EXECUTION_RUNTIME_BOOT_BLUEPRINT } from '../execution/ExecutionRuntimeBoot';
 import { ExecutionRuntimeOrchestrator, EXECUTION_RUNTIME_ORCHESTRATOR_BLUEPRINT } from '../execution/ExecutionRuntimeOrchestrator';
+import { ExecutionRuntimePipeline, EXECUTION_RUNTIME_PIPELINE_BLUEPRINT } from '../execution/ExecutionRuntimePipeline';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1098,5 +1099,20 @@ export class DevelopmentRules {
     // ExecutionRuntimeOrchestrator は静的配置された単一 of Blueprint として不変で解決される
     return EXECUTION_RUNTIME_ORCHESTRATOR_BLUEPRINT.getExecutionRuntimeOrchestrator();
   }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimePipeline を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Pipeline Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimePipeline(rule: DevelopmentRule): ExecutionRuntimePipeline | undefined {
+    const orchestrator = this.getExecutionRuntimeOrchestrator(rule);
+    if (!orchestrator) {
+      return undefined;
+    }
+    // ExecutionRuntimePipeline は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_PIPELINE_BLUEPRINT.getExecutionRuntimePipeline();
+  }
 }
+
 
