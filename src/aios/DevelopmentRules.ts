@@ -111,6 +111,7 @@ import { ExecutionRuntimeEnvelope, EXECUTION_RUNTIME_ENVELOPE_BLUEPRINT } from '
 import { ExecutionRuntimeSecureChannel, EXECUTION_RUNTIME_SECURE_CHANNEL_BLUEPRINT } from '../execution/ExecutionRuntimeSecureChannel';
 import { ExecutionRuntimeIdentity, EXECUTION_RUNTIME_IDENTITY_BLUEPRINT } from '../execution/ExecutionRuntimeIdentity';
 import { ExecutionRuntimeSocket, EXECUTION_RUNTIME_SOCKET_BLUEPRINT } from '../execution/ExecutionRuntimeSocket';
+import { ExecutionRuntimeStream, EXECUTION_RUNTIME_STREAM_BLUEPRINT } from '../execution/ExecutionRuntimeStream';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1469,6 +1470,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeSocket(rule: DevelopmentRule): ExecutionRuntimeSocket | undefined {
     return EXECUTION_RUNTIME_SOCKET_BLUEPRINT.getExecutionRuntimeSocket();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeStream を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Stream Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeStream(rule: DevelopmentRule): ExecutionRuntimeStream | undefined {
+    return EXECUTION_RUNTIME_STREAM_BLUEPRINT.getExecutionRuntimeStream();
   }
 }
 

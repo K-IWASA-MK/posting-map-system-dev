@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 250: Runtime Socket Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 251: Runtime Stream Foundation [現在のフェーズ]
+* **目的**: Execution Runtime Socket が提供する Socket Schema をもとに、Dynamic Runtime における Stream Schema を定義する Runtime Stream の静的 Blueprint を構築する。
+
+### 完了したスプリント: AIOS Phase 250: Runtime Socket Foundation
 * **目的**: Execution Runtime Identity が提供する Identity Schema をもとに、Dynamic Runtime における Socket Schema を定義する Runtime Socket の静的 Blueprint を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeSocket.md）
+  - ExecutionRuntimeSocket.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeSocket）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 249: Runtime Identity Foundation
 * **目的**: Runtime Secure Channel / Session / Connection / Protocol で利用される論理 Identity Schema を定義する Runtime Identity の静的 Blueprint を構築する。
