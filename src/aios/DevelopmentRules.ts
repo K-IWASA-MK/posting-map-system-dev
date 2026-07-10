@@ -81,6 +81,7 @@ import { ExecutionRuntimeComponentLifecycleExecutor, EXECUTION_RUNTIME_COMPONENT
 import { ExecutionRuntimeBoot, EXECUTION_RUNTIME_BOOT_BLUEPRINT } from '../execution/ExecutionRuntimeBoot';
 import { ExecutionRuntimeOrchestrator, EXECUTION_RUNTIME_ORCHESTRATOR_BLUEPRINT } from '../execution/ExecutionRuntimeOrchestrator';
 import { ExecutionRuntimePipeline, EXECUTION_RUNTIME_PIPELINE_BLUEPRINT } from '../execution/ExecutionRuntimePipeline';
+import { ExecutionRuntimeContextManager, EXECUTION_RUNTIME_CONTEXT_MANAGER_BLUEPRINT } from '../execution/ExecutionRuntimeContextManager';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1113,6 +1114,21 @@ export class DevelopmentRules {
     // ExecutionRuntimePipeline は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_PIPELINE_BLUEPRINT.getExecutionRuntimePipeline();
   }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeContextManager を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Context Manager Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeContextManager(rule: DevelopmentRule): ExecutionRuntimeContextManager | undefined {
+    const pipeline = this.getExecutionRuntimePipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    // ExecutionRuntimeContextManager は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_CONTEXT_MANAGER_BLUEPRINT.getExecutionRuntimeContextManager();
+  }
 }
+
 
 
