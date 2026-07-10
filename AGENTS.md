@@ -1434,3 +1434,36 @@ Execution Plan
 - **バージョン管理ルール**:
   - 新規ルールの追加は、本項目を変更せず「Version 1.x」として追加すること。
   - 既存項目の改変・削除は「Version 2.0」への移行を定義し、岩佐CEOの明示的なレビュー・承認を得ることを必須とする。
+
+---
+
+### 48. POSTING MAP Product Development Workflow Rule (Version 1.1)
+
+本ルールは、POSTING MAP のプロダクト開発（スプリント開発）における**開発フロー規約（バージョン 1.1）**である。AIOS開発プロセスと同一の承認ステップを強制する。
+
+1. **Implementation Plan 提出**: 開発開始前に必ず以下を明記した計画書を作成する。
+   - 目的 (Goal)
+   - 対象範囲 (Proposed Changes / Files)
+   - 変更内容 (Details of Changes)
+   - 非対象範囲 (Out of Scope)
+   - 検証計画 (Verification Plan)
+   - 成果物 (Deliverables)
+2. **User Review / Approval (承認必須)**: ユーザー（岩佐CEO）の明確な承認を得る前に実装・編集を開始することを禁止する。承認対象は以下を含む：
+   - アーキテクチャ設計 (Architecture)
+   - データ構造設計 (Data Structure)
+   - API設計 (API Design)
+   - UI/UXデザイン (UI Design)
+   - 責務境界 (Responsibility Boundary)
+3. **Implementation**: 承認された計画書に記載された範囲のみを厳格に実装する。
+4. **Verification (検証必須)**: 実装完了後、以下の検証を必ず成功させる。
+   - ビルドチェック (`npx tsc --noEmit` 等)
+   - 単体テスト実行 (`tests/` 配下)
+   - 回帰テスト実行 (`pytest` 等)
+   - アーキテクチャ検証・健全性チェック (`cie` ツール等)
+5. **Git Commit / Push**: すべての変更をコミットし、リモートブランチへプッシュする。
+6. **Completion Report**: 完了時に以下をまとめてチャットに報告する。
+   - 実装内容のまとめ
+   - 検証結果の詳細
+   - コミットハッシュ (Commit Hash)
+   - 次フェーズまたは次のタスクへの引き継ぎ内容
+
