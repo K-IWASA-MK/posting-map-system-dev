@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 252: Runtime Buffer Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 253: Runtime Pipe Foundation [現在のフェーズ]
+* **目的**: Execution Runtime Buffer が提供する Buffer Schema をもとに、Dynamic Runtime における Pipe Schema を定義する Runtime Pipe の静的 Blueprint を構築する。
+
+### 完了したスプリント: AIOS Phase 252: Runtime Buffer Foundation
 * **目的**: Execution Runtime Stream が提供する Stream Schema をもとに、Dynamic Runtime における Buffer Schema を定義する Runtime Buffer の静的 Blueprint を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeBuffer.md）
+  - ExecutionRuntimeBuffer.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimeBuffer）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 251: Runtime Stream Foundation
 * **目的**: Execution Runtime Socket が提供する Socket Schema をもとに、Dynamic Runtime における Stream Schema を定義する Runtime Stream の静的 Blueprint を構築する。

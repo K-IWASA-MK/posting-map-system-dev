@@ -113,6 +113,7 @@ import { ExecutionRuntimeIdentity, EXECUTION_RUNTIME_IDENTITY_BLUEPRINT } from '
 import { ExecutionRuntimeSocket, EXECUTION_RUNTIME_SOCKET_BLUEPRINT } from '../execution/ExecutionRuntimeSocket';
 import { ExecutionRuntimeStream, EXECUTION_RUNTIME_STREAM_BLUEPRINT } from '../execution/ExecutionRuntimeStream';
 import { ExecutionRuntimeBuffer, EXECUTION_RUNTIME_BUFFER_BLUEPRINT } from '../execution/ExecutionRuntimeBuffer';
+import { ExecutionRuntimePipe, EXECUTION_RUNTIME_PIPE_BLUEPRINT } from '../execution/ExecutionRuntimePipe';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1489,6 +1490,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeBuffer(rule: DevelopmentRule): ExecutionRuntimeBuffer | undefined {
     return EXECUTION_RUNTIME_BUFFER_BLUEPRINT.getExecutionRuntimeBuffer();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimePipe を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Pipe Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimePipe(rule: DevelopmentRule): ExecutionRuntimePipe | undefined {
+    return EXECUTION_RUNTIME_PIPE_BLUEPRINT.getExecutionRuntimePipe();
   }
 }
 
