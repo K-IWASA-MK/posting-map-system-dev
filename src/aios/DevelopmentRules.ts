@@ -103,6 +103,7 @@ import { ExecutionRuntimeEventBus, EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT } from 
 import { ExecutionRuntimeMessageRouter, EXECUTION_RUNTIME_MESSAGE_ROUTER_BLUEPRINT } from '../execution/ExecutionRuntimeMessageRouter';
 import { ExecutionRuntimeTransport, EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT } from '../execution/ExecutionRuntimeTransport';
 import { ExecutionRuntimeConnection, EXECUTION_RUNTIME_CONNECTION_BLUEPRINT } from '../execution/ExecutionRuntimeConnection';
+import { ExecutionRuntimeProtocol, EXECUTION_RUNTIME_PROTOCOL_BLUEPRINT } from '../execution/ExecutionRuntimeProtocol';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1393,6 +1394,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeConnection(rule: DevelopmentRule): ExecutionRuntimeConnection | undefined {
     return EXECUTION_RUNTIME_CONNECTION_BLUEPRINT.getExecutionRuntimeConnection();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeProtocol を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Protocol Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeProtocol(rule: DevelopmentRule): ExecutionRuntimeProtocol | undefined {
+    return EXECUTION_RUNTIME_PROTOCOL_BLUEPRINT.getExecutionRuntimeProtocol();
   }
 }
 
