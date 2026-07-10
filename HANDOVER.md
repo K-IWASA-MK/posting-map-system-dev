@@ -128,6 +128,7 @@ Before starting development:
 | Runtime Dispatcher Foundation | Phase 236 | - | ✅ Completed | 2026-07-10 |
 | Runtime Event Foundation | Phase 237 | - | ✅ Completed | 2026-07-10 |
 | Runtime Event Bus Foundation | Phase 238 | - | ✅ Completed | 2026-07-10 |
+| Runtime Message Router Foundation | Phase 239 | - | ✅ Completed | 2026-07-10 |
 
 ---
 
@@ -198,4 +199,10 @@ Runtime Event Foundation（Phase 237）完了。
 Runtime Event Bus Foundation（Phase 238）完了。
 
 静的 Blueprint（Event Bus Schema）の策定、不変定義（EventBusTopology, EventBusDeliveryPolicy, EventBusReliabilityPolicy, EventBusCategory, EventBusChannelPolicy, eventBusSchemaVersion 等の追加）、および検証テストを実装。
-次のフェーズ（Phase 239：Runtime Message Router Foundation）へ安全に移行可能。
+
+### Runtime Message Router Foundation
+
+Runtime Message Router Foundation（Phase 239）完了。
+
+静的 Blueprint（Message Router Schema）の策定、不変定義（RouterTopology, RouterReliabilityPolicy, RouterCategory, RouterSelectionPolicy, RouterTransportPolicy, RouterSecurityPolicy, routerSchemaVersion 等の追加）、および検証テストを実装。
+次のフェーズ（Phase 240：Runtime Transport Foundation）へ安全に移行可能。

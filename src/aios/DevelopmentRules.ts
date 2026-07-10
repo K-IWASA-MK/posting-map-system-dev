@@ -100,6 +100,7 @@ import { ExecutionRuntimeWorker, EXECUTION_RUNTIME_WORKER_BLUEPRINT } from '../e
 import { ExecutionRuntimeDispatcher, EXECUTION_RUNTIME_DISPATCHER_BLUEPRINT } from '../execution/ExecutionRuntimeDispatcher';
 import { ExecutionRuntimeEvent, EXECUTION_RUNTIME_EVENT_BLUEPRINT } from '../execution/ExecutionRuntimeEvent';
 import { ExecutionRuntimeEventBus, EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT } from '../execution/ExecutionRuntimeEventBus';
+import { ExecutionRuntimeMessageRouter, EXECUTION_RUNTIME_MESSAGE_ROUTER_BLUEPRINT } from '../execution/ExecutionRuntimeMessageRouter';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1363,6 +1364,15 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeEventBus(rule: DevelopmentRule): ExecutionRuntimeEventBus | undefined {
     return EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT.getExecutionRuntimeEventBus();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeMessageRouter を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Message Router Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeMessageRouter(rule: DevelopmentRule): ExecutionRuntimeMessageRouter | undefined {
+    return EXECUTION_RUNTIME_MESSAGE_ROUTER_BLUEPRINT.getExecutionRuntimeMessageRouter();
   }
 }
 
