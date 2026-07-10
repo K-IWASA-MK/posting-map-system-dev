@@ -13,8 +13,17 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Runtime Foundation Milestone 1 COMPLETED
-* **目的**: AIOS Runtime Foundation Milestone 1 (Phase 248 - Phase 259) が完了し、論理実行境界 Schema の静的 Blueprint Layer が完成した。次スプリントは Bridge Layer & POSTING MAP Field Event Runtime 接続。
+### 現在のスプリント: POSTING MAP Product Sprint 1 Phase S1-1: Spreadsheet Architecture Foundation [現在のフェーズ]
+* **目的**: POSTING MAP 商品版のすべてのデータを管理する Google Spreadsheet のアーキテクチャを再設計し、シート構造、データ責務、投票率履歴、命名・IDルール等を定義する。
+
+### 完了したスプリント: AIOS Runtime Foundation Milestone 1 COMPLETED
+* **目的**: AIOS Runtime Foundation Milestone 1 (Phase 248 - Phase 259) が完了し、論理実行境界 Schema の静的 Blueprint Layer が完成した。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimeRouting.md, etc）
+  - 各種 Runtime Boundary Blueprint（Identity, Socket, Stream, Buffer, Pipe, Protocol, Transport, Endpoint, Port, Queue, Routing）の実装
+  - DevelopmentRules.ts 各解決チェーン追加
+  - テストおよびビルド検証。
+  - AIOS Runtime Foundation Milestone 1 完了記録の作成。
 
 ### 完了したスプリント: AIOS Phase 259: Runtime Routing Foundation
 * **目的**: Runtime Message Queue Foundation が提供する Queue Schema をもとに、Dynamic Runtime における論理ルーティング境界（Routing Schema）を定義する Runtime Routing の静的 Blueprint を構築する。
