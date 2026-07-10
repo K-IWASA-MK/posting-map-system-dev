@@ -83,6 +83,7 @@ import { ExecutionRuntimeOrchestrator, EXECUTION_RUNTIME_ORCHESTRATOR_BLUEPRINT 
 import { ExecutionRuntimePipeline, EXECUTION_RUNTIME_PIPELINE_BLUEPRINT } from '../execution/ExecutionRuntimePipeline';
 import { ExecutionRuntimeContextManager, EXECUTION_RUNTIME_CONTEXT_MANAGER_BLUEPRINT } from '../execution/ExecutionRuntimeContextManager';
 import { ExecutionRuntimeStateManager, EXECUTION_RUNTIME_STATE_MANAGER_BLUEPRINT } from '../execution/ExecutionRuntimeStateManager';
+import { ExecutionRuntimeSessionManager, EXECUTION_RUNTIME_SESSION_MANAGER_BLUEPRINT } from '../execution/ExecutionRuntimeSessionManager';
 
 export interface DevelopmentRule {
   readonly ruleId: string;
@@ -1143,7 +1144,22 @@ export class DevelopmentRules {
     // ExecutionRuntimeStateManager は静的配置された単一の Blueprint として不変で解決される
     return EXECUTION_RUNTIME_STATE_MANAGER_BLUEPRINT.getExecutionRuntimeStateManager();
   }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeSessionManager を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Session Manager Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeSessionManager(rule: DevelopmentRule): ExecutionRuntimeSessionManager | undefined {
+    const stateManager = this.getExecutionRuntimeStateManager(rule);
+    if (!stateManager) {
+      return undefined;
+    }
+    // ExecutionRuntimeSessionManager は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SESSION_MANAGER_BLUEPRINT.getExecutionRuntimeSessionManager();
+  }
 }
+
 
 
 
