@@ -13,8 +13,14 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: POSTING MAP Product Sprint 1 Phase S1-2: GAS API Foundation [現在のフェーズ]
+### 現在のスプリント: POSTING MAP Product Sprint 1 Phase S1-3: Dashboard Data Integration Foundation [現在のフェーズ]
+* **目的**: Webダッシュボードが実データを取得・表示するためのデータ統合基盤を構築し、APIクライアント、マッパー、状態管理モデルを設計・実装する。
+
+### 完了したスプリント: POSTING MAP Product Sprint 1 Phase S1-2: GAS API Foundation
 * **目的**: 設計された Spreadsheet 構造をベースとして、GAS (Google Apps Script) の API 定義（エンドポイント、リクエスト/レスポンス形式、およびDBIマッパー）の Blueprint 策定を行う。
+* **実施したもの**:
+  - specifications 策定（GASApiArchitecture.md）
+  - API共通Request/Response定義、マッパー設計、Error Policy、および認証境界の設計。
 
 ### 完了したスプリント: POSTING MAP Product Sprint 1 Phase S1-1: Spreadsheet Architecture Foundation
 * **目的**: POSTING MAP 商品版のすべてのデータを管理する Google Spreadsheet のアーキテクチャを再設計し、シート構造、データ責務、投票率履歴、命名・IDルール等を定義する。
