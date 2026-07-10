@@ -13,8 +13,16 @@
 
 ## 📍 3. AIOS 開発ロードマップ (Roadmap)
 
-### 現在のスプリント: AIOS Phase 257: Runtime Port Foundation [現在のフェーズ]
+### 現在のスプリント: AIOS Phase 258: Runtime Message Queue Foundation [現在のフェーズ]
+* **目的**: Runtime Port Foundation が提供する Port Schema をもとに、Dynamic Runtime における論理メッセージ保留境界（Message Queue Schema）を定義する Runtime Message Queue の静的 Blueprint を構築する。
+
+### 完了したスプリント: AIOS Phase 257: Runtime Port Foundation
 * **目的**: Runtime Endpoint Foundation が提供する Endpoint Schema をもとに、Dynamic Runtime における論理ポート境界（Port Schema）を定義する Runtime Port の静的 Blueprint を構築する。
+* **実施したもの**:
+  - specifications 策定（ExecutionRuntimePort.md）
+  - ExecutionRuntimePort.ts の実装、不変シングルトン解決コンテナ定義
+  - DevelopmentRules.ts 解決チェーン（getExecutionRuntimePort）追加
+  - テストおよびビルド検証。
 
 ### 完了したスプリント: AIOS Phase 256: Runtime Endpoint Foundation
 * **目的**: Runtime Transport Foundation が提供する Transport Schema をもとに、Dynamic Runtime における論理通信終端境界（Endpoint Schema）を定義する Runtime Endpoint の静的 Blueprint を構築する。
