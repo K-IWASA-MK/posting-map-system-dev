@@ -43,10 +43,12 @@ build_bundle(["src/foundation/authentication", "src/foundation/authorization", "
 build_bundle(["src/platform"], "active/gas/03_platform.gs")
 build_bundle(["src/infrastructure/gas"], "active/gas/04_api.gs")
 build_bundle([
+    "src/domain/workspace",
     "src/domain/field",
     "src/application/events",
     "src/application/field",
     "src/infrastructure/spreadsheet",
+    "src/infrastructure/repository/workspace",
     "src/infrastructure/repository/field",
     "src/api/field",
     "src/api/registry",

@@ -2,26 +2,35 @@ import { EndpointHandler } from '@core/api/handlers/EndpointHandler';
 import { ApiRequest } from '@core/api/ApiRequest';
 import { ApiResponse } from '@core/api/ApiResponse';
 import { ApiExecutionContext } from '@infra/gas/ApiExecutionContext';
-import { DistributionApplicationService } from '@application/field/services/DistributionApplicationService';
+import { StaffApplicationService } from '@application/field/services/StaffApplicationService';
 import { FieldApiMapper } from './FieldApiMapper';
 import { ExceptionMapper } from '@core/exceptions/ExceptionMapper';
 
 export class DistributorHandler implements EndpointHandler {
-  constructor(private distributionAppService: DistributionApplicationService) {}
+  constructor(private staffAppService: StaffApplicationService) {}
 
   public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
     try {
-      const id = request.pathParams.id;
-      if (!id || id.trim().length === 0) {
+      const staffNo = request.pathParams.id;
+      if (!staffNo || staffNo.trim().length === 0) {
         throw new Error('id is required');
       }
 
-      const dto = await this.distributionAppService.getDistributor(id);
+      const dto = await this.staffAppService.getStaff(staffNo);
       if (!dto) {
-        throw new Error(`Distributor not found: ${id}`);
+        throw new Error(`Staff not found: ${staffNo}`);
       }
 
-      return FieldApiMapper.toSuccessResponse(dto, request, context);
+      // Convert StaffDto to backward-compatible DistributorDto shape
+      const distributorDto = {
+        id: dto.staffNo,
+        name: dto.displayName,
+        identityId: dto.lineUserId,
+        status: 'ACTIVE',
+        areaIds: ['default-area']
+      };
+
+      return FieldApiMapper.toSuccessResponse(distributorDto, request, context);
     } catch (error: any) {
       const apiException = FieldApiMapper.toApiException(error, request.requestId);
       return ExceptionMapper.toResponse(apiException, request, context);

@@ -5,38 +5,38 @@ export interface FieldEvent {
   readonly aggregateId: string;
 }
 
-export class FlyerStockCreatedEvent implements FieldEvent {
+export class FlyerHoldingCreatedEvent implements FieldEvent {
   public readonly eventId: string;
-  public readonly eventType = 'FlyerStockCreatedEvent';
+  public readonly eventType = 'FlyerHoldingCreatedEvent';
   public readonly occurredAt: Date;
   public readonly aggregateId: string;
 
   constructor(
-    public readonly flyerStockId: string,
-    public readonly ownerId: string,
-    public readonly areaId: string,
+    public readonly staffNo: string,
     public readonly initialQuantity: number
   ) {
-    this.aggregateId = flyerStockId;
+    this.aggregateId = staffNo;
     this.occurredAt = new Date();
-    this.eventId = `EV-FSC-${flyerStockId}-${this.occurredAt.getTime()}`;
+    this.eventId = `EV-FHC-${staffNo}-${this.occurredAt.getTime()}`;
   }
 }
 
-export class FlyerReservedEvent implements FieldEvent {
+export class DistributionActivityRecordedEvent implements FieldEvent {
   public readonly eventId: string;
-  public readonly eventType = 'FlyerReservedEvent';
+  public readonly eventType = 'DistributionActivityRecordedEvent';
   public readonly occurredAt: Date;
   public readonly aggregateId: string;
 
   constructor(
-    public readonly flyerStockId: string,
-    public readonly ownerId: string,
-    public readonly reservedAmount: number,
-    public readonly remainingAmount: number
+    public readonly activityId: string,
+    public readonly staffNo: string,
+    public readonly reportedQuantity: number,
+    public readonly photoUrl: string,
+    public readonly latitude: number,
+    public readonly longitude: number
   ) {
-    this.aggregateId = flyerStockId;
+    this.aggregateId = activityId;
     this.occurredAt = new Date();
-    this.eventId = `EV-FR-${flyerStockId}-${this.occurredAt.getTime()}`;
+    this.eventId = `EV-DAR-${activityId}-${this.occurredAt.getTime()}`;
   }
 }

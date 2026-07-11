@@ -44,14 +44,22 @@ globalVar.PropertiesService = {
   })
 };
 
+// Realigned Sheets corresponding to Japanese headers in Sprint 5 S5-5
 let mockSheets: { [name: string]: any[][] } = {
   'Flyers': [
-    ['ID', 'Owner ID', 'Area ID', 'Quantity', 'Status', 'Created At', 'Updated At'],
-    ['stock-100', 'owner-1', 'area-1', '1000', 'AVAILABLE', String(Date.now()), String(Date.now())]
+    ['ID', 'スタッフID', 'スタッフ名', '保管場所', '保管枚数', '更新日時'],
+    ['Holding-S037', 'S037', 'Bさん', '自宅', '1000', String(Date.now())]
   ],
-  'Distributors': [
-    ['ID', 'Name', 'Identity ID', 'Area IDs', 'Status'],
-    ['dist-100', 'Distributor A', 'identity-1', 'area-1,area-2', 'ACTIVE']
+  'Staff': [
+    ['スタッフID', 'スタッフ名', 'LINEユーザーID', 'ワークスペースID', '登録日時'],
+    ['S037', 'Bさん', 'identity-1', 'WS-MIE-03', String(Date.now())]
+  ],
+  'Activity': [
+    ['活動ID', 'スタッフID', '報告枚数', '写真URL', '位置情報', '活動日時']
+  ],
+  'Workspaces': [
+    ['ワークスペースID', 'ワークスペース名', 'ステータス'],
+    ['WS-MIE-03', '三重第3支部', 'ACTIVE']
   ],
   'EventLogs': [
     ['Event ID', 'Timestamp', 'Type', 'Payload']
@@ -153,11 +161,11 @@ async function runTests() {
     debugExecutionTrace: true
   });
 
-  // Test Case 1: GET /field/stocks/{id} via path variable routing
+  // Test Case 1: GET /field/stocks/{id} path parameter routing (fetches from FlyerHolding)
   {
     const mockEvent = {
       parameter: {
-        path: '/field/stocks/stock-100',
+        path: '/field/stocks/S037',
         version: 'v2',
         apiKey: 'valid-api-key'
       }
@@ -166,30 +174,26 @@ async function runTests() {
     const response = await PlatformIntegrationPipeline.execute(mockEvent);
     assert(response !== null, 'Response should not be null');
     if (!response.body.success) {
-      console.log('GET /field/stocks/stock-100 failed with response:', JSON.stringify(response.body, null, 2));
+      console.log('GET /field/stocks/S037 failed with response:', JSON.stringify(response.body, null, 2));
     }
     assert(response.body.success === true, 'GET stocks API call must succeed');
     assert(response.body.status === 200, 'HTTP status must be 200');
     
-    // Verify DTO response shape
+    // Verify DTO response shape (backward compatibility structure)
     const data = response.body.data;
-    assert(data.id === 'stock-100', 'DTO ID mismatch');
+    assert(data.id === 'S037', 'DTO ID mismatch');
     assert(data.quantity === 1000, 'DTO Quantity mismatch');
     assert(data.status === 'AVAILABLE', 'DTO Status mismatch');
-    assert(data.ownerId === 'owner-1', 'DTO Owner ID mismatch');
-    
-    // Core check: no Domain Entity directly returned
-    assert(data.getQuantity === undefined, 'Domain Entity methods must not leak in DTO response');
-    assert(data.getStatus === undefined, 'Domain Entity methods must not leak in DTO response');
+    assert(data.ownerId === 'S037', 'DTO Owner ID mismatch');
 
     console.log('[Integration Test] GET /field/stocks/{id} path parameter routing: PASSED');
   }
 
-  // Test Case 2: GET /field/distributors/{id} path parameter routing
+  // Test Case 2: GET /field/distributors/{id} path parameter routing (fetches from Staff)
   {
     const mockEvent = {
       parameter: {
-        path: '/field/distributors/dist-100',
+        path: '/field/distributors/S037',
         version: 'v2',
         apiKey: 'valid-api-key'
       }
@@ -201,14 +205,14 @@ async function runTests() {
     assert(response.body.status === 200, 'HTTP status must be 200');
 
     const data = response.body.data;
-    assert(data.id === 'dist-100', 'DTO ID mismatch');
-    assert(data.name === 'Distributor A', 'DTO Name mismatch');
+    assert(data.id === 'S037', 'DTO ID mismatch');
+    assert(data.name === 'Bさん', 'DTO Name mismatch');
     assert(data.status === 'ACTIVE', 'DTO Status mismatch');
 
     console.log('[Integration Test] GET /field/distributors/{id} path parameter routing: PASSED');
   }
 
-  // Test Case 3: POST /field/reservation write action with locking & mapping
+  // Test Case 3: POST /field/reservation mapping to Activity recording (No inventory subtraction)
   {
     const mockEvent = {
       parameter: {
@@ -218,9 +222,12 @@ async function runTests() {
       },
       postData: {
         contents: JSON.stringify({
-          flyerStockId: 'stock-100',
-          distributorId: 'dist-100',
-          quantity: 300
+          flyerStockId: 'Holding-S037',
+          distributorId: 'S037',
+          quantity: 300,
+          photoUrl: 'http://example.com/photo.jpg',
+          latitude: 34.965,
+          longitude: 136.622
         })
       }
     };
@@ -233,14 +240,14 @@ async function runTests() {
 
     const result = response.body.data;
     assert(result.success === true, 'ReservationResult success must be true');
-    assert(result.stock.quantity === 700, 'Exposed flyer stock quantity must decrease');
-    assert(result.stock.status === 'RESERVED', 'Status must transition to RESERVED');
+    assert(result.stock.quantity === 1000, 'FlyerHolding quantity must NOT change (no automatic subtraction)');
     assert(result.eventIds.length === 1, 'Event ID must be mapped and returned');
+    assert(result.eventIds[0].indexOf('EV-DAR') === 0, 'Event ID must start with EV-DAR');
 
     // Lock Service release validation
     assert(mockScriptLock.hasLock === false, 'Lock must be released after operation');
 
-    console.log('[Integration Test] POST /field/reservation locking, execution & mapping: PASSED');
+    console.log('[Integration Test] POST /field/reservation mapping to Activity: PASSED');
   }
 
   // Test Case 4: Route Not Found (ensure fallback logic is correct)

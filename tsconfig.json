@@ -18,5 +18,6 @@
       "@api/*": ["src/api/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["**/deprecated/**/*", "node_modules"]
 }

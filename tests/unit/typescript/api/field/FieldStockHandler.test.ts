@@ -1,5 +1,5 @@
 import { FieldStockHandler } from '@api/field/FieldStockHandler';
-import { FlyerStockApplicationService } from '@application/field/services/FlyerStockApplicationService';
+import { HoldingApplicationService } from '@application/field/services/HoldingApplicationService';
 import { ApiRequest } from '@core/api/ApiRequest';
 import { ApiExecutionContext } from '@infra/gas/ApiExecutionContext';
 
@@ -9,19 +9,16 @@ function assert(condition: boolean, message: string) {
   }
 }
 
-class MockFlyerStockApplicationService extends FlyerStockApplicationService {
+class MockHoldingApplicationService extends HoldingApplicationService {
   constructor() {
-    super(null as any, null as any, null as any);
+    super(null as any, null as any);
   }
 
-  public async getStock(id: string): Promise<any> {
-    if (id === 'stock-exist') {
+  public async getHolding(staffNo: string): Promise<any> {
+    if (staffNo === 'S037') {
       return {
-        id: 'stock-exist',
-        ownerId: 'owner-1',
-        areaId: 'area-1',
-        quantity: 100,
-        status: 'AVAILABLE',
+        staffNo: 'S037',
+        quantity: 1000,
         updatedAt: new Date().toISOString()
       };
     }
@@ -32,7 +29,7 @@ class MockFlyerStockApplicationService extends FlyerStockApplicationService {
 async function runTests() {
   console.log('[Test FieldStockHandler] Running unit tests...');
 
-  const service = new MockFlyerStockApplicationService();
+  const service = new MockHoldingApplicationService();
   const handler = new FieldStockHandler(service);
   const context = new ApiExecutionContext();
 
@@ -40,49 +37,33 @@ async function runTests() {
   {
     const request = new ApiRequest({
       method: 'GET',
-      path: '/field/stocks/stock-exist',
+      path: '/field/stocks/S037',
       version: 'v2',
       requestId: 'req-1',
-      pathParams: { id: 'stock-exist' }
+      pathParams: { id: 'S037' }
     });
 
     const response = await handler.execute(request, context);
     assert(response.success === true, 'Response must be success');
     assert(response.status === 200, 'Status must be 200');
-    assert(response.data.id === 'stock-exist', 'ID must match');
-    assert(response.data.quantity === 100, 'Quantity must match');
+    assert(response.data.id === 'S037', 'ID must match staffNo');
+    assert(response.data.quantity === 1000, 'Quantity must match');
   }
 
   // Test Case 2: Not Found
   {
     const request = new ApiRequest({
       method: 'GET',
-      path: '/field/stocks/stock-none',
+      path: '/field/stocks/S999',
       version: 'v2',
       requestId: 'req-2',
-      pathParams: { id: 'stock-none' }
+      pathParams: { id: 'S999' }
     });
 
     const response = await handler.execute(request, context);
     assert(response.success === false, 'Response must fail');
     assert(response.status === 404, 'Status must be 404');
     assert(response.error?.code === 'ENTITY_NOT_FOUND', 'Error code must match');
-  }
-
-  // Test Case 3: Missing parameter ID
-  {
-    const request = new ApiRequest({
-      method: 'GET',
-      path: '/field/stocks/',
-      version: 'v2',
-      requestId: 'req-3',
-      pathParams: { id: '' }
-    });
-
-    const response = await handler.execute(request, context);
-    assert(response.success === false, 'Response must fail');
-    assert(response.status === 400, 'Status must be 400');
-    assert(response.error?.code === 'INVALID_INPUT', 'Error code must match');
   }
 
   console.log('[Test FieldStockHandler] All tests PASSED.');

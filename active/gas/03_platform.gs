@@ -139,9 +139,9 @@ class PlatformIntegrationPipeline {
         }
       }
 
+      const action = (method === 'POST' ? (postData?.action || e.parameter.action) : e.parameter.action) || 'health';
       let path = (method === 'POST' ? (postData?.path || e.parameter.path) : e.parameter.path) || '';
       if (!path) {
-        const action = (method === 'POST' ? (postData?.action || e.parameter.action) : e.parameter.action) || 'health';
         path = '/' + action;
         if (action === 'getAppData') {
           path = '/dashboard';

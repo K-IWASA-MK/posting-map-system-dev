@@ -2,11 +2,12 @@ import { EndpointRegistry } from '@core/api/EndpointRegistry';
 import { FieldStockHandler } from '@api/field/FieldStockHandler';
 import { DistributorHandler } from '@api/field/DistributorHandler';
 import { ReservationHandler } from '@api/field/ReservationHandler';
-import { FlyerStockApplicationService } from '@application/field/services/FlyerStockApplicationService';
-import { DistributionApplicationService } from '@application/field/services/DistributionApplicationService';
-import { SpreadsheetFlyerRepository } from '@infra/repository/field/SpreadsheetFlyerRepository';
-import { SpreadsheetDistributorRepository } from '@infra/repository/field/SpreadsheetDistributorRepository';
-import { DistributionDomainService } from '@domain/field/services/DistributionDomainService';
+import { StaffApplicationService } from '@application/field/services/StaffApplicationService';
+import { HoldingApplicationService } from '@application/field/services/HoldingApplicationService';
+import { ActivityApplicationService } from '@application/field/services/ActivityApplicationService';
+import { SpreadsheetStaffRepository } from '@infra/repository/field/SpreadsheetStaffRepository';
+import { SpreadsheetFlyerHoldingRepository } from '@infra/repository/field/SpreadsheetFlyerHoldingRepository';
+import { SpreadsheetActivityRepository } from '@infra/repository/field/SpreadsheetActivityRepository';
 import { ApplicationEventPublisher } from '@application/events/ApplicationEventPublisher';
 import { FIELD_ENDPOINTS } from '@api/registry/FieldEndpoints';
 
@@ -17,23 +18,21 @@ export function bootstrapFieldApis(): void {
 
   const registry = EndpointRegistry.getInstance();
 
-  // Instantiate Concrete Infrastructure and Domain / Application services
-  const flyerRepo = new SpreadsheetFlyerRepository();
-  const distRepo = new SpreadsheetDistributorRepository();
-  const domainService = new DistributionDomainService();
+  const staffRepo = new SpreadsheetStaffRepository();
+  const holdingRepo = new SpreadsheetFlyerHoldingRepository();
+  const activityRepo = new SpreadsheetActivityRepository();
   const eventPublisher = new ApplicationEventPublisher();
 
-  const flyerStockAppService = new FlyerStockApplicationService(flyerRepo, domainService, eventPublisher);
-  const distributionAppService = new DistributionApplicationService(distRepo);
+  const staffAppService = new StaffApplicationService(staffRepo);
+  const holdingAppService = new HoldingApplicationService(holdingRepo, eventPublisher);
+  const activityAppService = new ActivityApplicationService(activityRepo, eventPublisher);
 
-  // Map of handlers for composition resolution
   const handlers: Record<string, any> = {
-    FieldStockHandler: new FieldStockHandler(flyerStockAppService),
-    DistributorHandler: new DistributorHandler(distributionAppService),
-    ReservationHandler: new ReservationHandler(flyerStockAppService)
+    FieldStockHandler: new FieldStockHandler(holdingAppService),
+    DistributorHandler: new DistributorHandler(staffAppService),
+    ReservationHandler: new ReservationHandler(activityAppService, holdingAppService)
   };
 
-  // Dynamic endpoint registration
   for (const config of FIELD_ENDPOINTS) {
     const handlerInstance = handlers[config.handler];
     if (!handlerInstance) {
