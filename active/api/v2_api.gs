@@ -108,6 +108,7 @@ function doGet(e) {
     AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
     AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
     LicensingPipeline.getInstance().execute(apiRequest, executionContext);
+    FeatureAccessPipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -311,6 +312,7 @@ function doPost(e) {
     AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
     AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
     LicensingPipeline.getInstance().execute(apiRequest, executionContext);
+    FeatureAccessPipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -3377,4 +3379,249 @@ class LicensingPipeline {
   }
 }
 LicensingPipeline.instance = null;
+
+// ==========================================
+// 🚀 FEATURE ACCESS CONTROL FOUNDATION CLASSES
+// ==========================================
+class FeatureContext {
+  constructor(params) {
+    this.feature = params.feature;
+    this.availability = params.availability;
+    this.enabled = params.enabled;
+    this.metadata = params.metadata || {};
+  }
+}
+
+class FeatureResult {
+  constructor(success, context, failureReason) {
+    this.success = success;
+    this.context = context;
+    this.failureReason = failureReason;
+  }
+  static successResult(context) {
+    return new FeatureResult(true, context, null);
+  }
+  static failureResult(reason) {
+    return new FeatureResult(false, null, reason);
+  }
+}
+
+class FeaturePolicy {
+  constructor(params) {
+    this.requiredEdition = params.requiredEdition || 'COMMUNITY';
+    this.requiredRole = params.requiredRole || null;
+    this.requiredPermission = params.requiredPermission || null;
+    this.requiredScope = params.requiredScope || null;
+    this.featureToggle = params.featureToggle || null;
+  }
+}
+
+class FeatureException extends ApiException {
+  constructor(codeOrMsg, internalMessageOrRequestId, requestIdOrDetails) {
+    let code;
+    let internalMessage;
+    let requestId;
+    let status = 403;
+    let externalMessage;
+
+    if (codeOrMsg.indexOf('PM-') === 0) {
+      code = codeOrMsg;
+      internalMessage = internalMessageOrRequestId;
+      requestId = requestIdOrDetails || '';
+      status = 403;
+      externalMessage = internalMessage;
+    } else {
+      // Old style backward compatibility
+      code = 'PM-FTR-001';
+      internalMessage = codeOrMsg;
+      requestId = internalMessageOrRequestId;
+      status = 422;
+      externalMessage = '指定された機能は現在無効化されています。';
+    }
+
+    super({
+      internalMessage: internalMessage,
+      externalMessage: externalMessage,
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'FeatureException',
+        exceptionCode: code,
+        source: 'FEATURE_ACCESS_PIPELINE'
+      }
+    });
+
+    this.category = 'FEATURE';
+    this.code = code;
+    this.status = status;
+  }
+}
+
+class FeatureRegistry {
+  static get(feature) {
+    return FeatureRegistry.registry[feature] || null;
+  }
+  static has(feature) {
+    return !!FeatureRegistry.registry[feature];
+  }
+}
+FeatureRegistry.registry = {
+  GOOGLE_MAPS: new FeaturePolicy({
+    requiredEdition: 'STANDARD',
+    requiredPermission: 'READ',
+    featureToggle: 'googleMaps'
+  }),
+  MAPBOX: new FeaturePolicy({
+    requiredEdition: 'STANDARD',
+    requiredPermission: 'READ',
+    featureToggle: 'mapbox'
+  }),
+  AIOS_BRIDGE: new FeaturePolicy({
+    requiredEdition: 'ENTERPRISE',
+    requiredRole: 'SYSTEM',
+    requiredPermission: 'ADMIN',
+    featureToggle: 'aiosBridge'
+  }),
+  REALTIME_DASHBOARD: new FeaturePolicy({
+    requiredEdition: 'STANDARD',
+    requiredPermission: 'READ',
+    featureToggle: 'flyerHolding'
+  }),
+  ANALYTICS: new FeaturePolicy({
+    requiredEdition: 'PROFESSIONAL',
+    requiredPermission: 'READ',
+    featureToggle: 'analytics'
+  }),
+  EXPORT: new FeaturePolicy({
+    requiredEdition: 'PROFESSIONAL',
+    requiredPermission: 'EXPORT'
+  })
+};
+
+class FeatureResolver {
+  static resolve(request) {
+    const feature = FeatureResolver.resolveFeature(request);
+    if (!feature) {
+      return null;
+    }
+    return FeatureRegistry.get(feature);
+  }
+  static resolveFeature(request) {
+    const path = request.path;
+    const action = request.query && request.query.action;
+    if (path === '/dashboard' || path === '/holding') {
+      return 'REALTIME_DASHBOARD';
+    }
+    if (action === 'export' || path === '/export') {
+      return 'EXPORT';
+    }
+    if (path === '/maps') {
+      return 'GOOGLE_MAPS';
+    }
+    if (path === '/aios') {
+      return 'AIOS_BRIDGE';
+    }
+    return null;
+  }
+}
+
+class FeatureAccessPipeline {
+  static getInstance() {
+    if (!FeatureAccessPipeline.instance) {
+      FeatureAccessPipeline.instance = new FeatureAccessPipeline();
+    }
+    return FeatureAccessPipeline.instance;
+  }
+  execute(request, context) {
+    const config = GasConfigurationProvider.getInstance();
+    const flags = config.getFeatureFlags();
+
+    const feature = FeatureResolver.resolveFeature(request);
+    if (!feature) {
+      return;
+    }
+
+    const policy = FeatureResolver.resolve(request);
+    if (!policy) {
+      return;
+    }
+
+    if (flags.featureAccessEnabled === false) {
+      const featContext = new FeatureContext({
+        feature: feature,
+        availability: 'AVAILABLE',
+        enabled: true
+      });
+      context.setFeatureContext(featContext);
+      return;
+    }
+
+    if (policy.featureToggle) {
+      const toggleState = flags[policy.featureToggle];
+      if (toggleState === false) {
+        throw new FeatureException(
+          'PM-FEA-001',
+          'Feature is currently disabled in system configuration: ' + policy.featureToggle,
+          request.requestId
+        );
+      }
+    }
+
+    const licenseContext = context.getLicenseContext();
+    if (flags.featureValidation !== false && licenseContext) {
+      const editionRank = {
+        COMMUNITY: 0,
+        STANDARD: 1,
+        PROFESSIONAL: 2,
+        ENTERPRISE: 3
+      };
+      const userRank = editionRank[licenseContext.edition] || 0;
+      const requiredRank = editionRank[policy.requiredEdition] || 0;
+      if (userRank < requiredRank) {
+        throw new FeatureException(
+          'PM-FEA-002',
+          'Feature requires subscription upgrade. Required: ' + policy.requiredEdition + ' (yours: ' + licenseContext.edition + ')',
+          request.requestId
+        );
+      }
+    }
+
+    const authzContext = context.getAuthorizationContext();
+    if (flags.featureValidation !== false && authzContext) {
+      if (policy.requiredRole && policy.requiredRole !== authzContext.role) {
+        throw new FeatureException(
+          'PM-FEA-003',
+          'Insufficient role access. Required: ' + policy.requiredRole,
+          request.requestId
+        );
+      }
+      if (policy.requiredPermission && authzContext.permissions.indexOf(policy.requiredPermission) === -1) {
+        throw new FeatureException(
+          'PM-FEA-003',
+          'Required permission missing. Required: ' + policy.requiredPermission,
+          request.requestId
+        );
+      }
+      if (policy.requiredScope && authzContext.scopes.indexOf(policy.requiredScope) === -1) {
+        throw new FeatureException(
+          'PM-FEA-003',
+          'Insufficient scope data boundaries. Required: ' + policy.requiredScope,
+          request.requestId
+        );
+      }
+    }
+
+    const featContext = new FeatureContext({
+      feature: feature,
+      availability: 'AVAILABLE',
+      enabled: true,
+      metadata: {
+        evaluationTime: Date.now(),
+        policyResolver: 'FeatureResolver'
+      }
+    });
+    context.setFeatureContext(featContext);
+  }
+}
+FeatureAccessPipeline.instance = null;
 

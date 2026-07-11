@@ -1,24 +1,47 @@
 import { ApiException } from './ApiException';
 import { ExceptionCategory } from './ExceptionCategory';
-import { ExceptionMetadata } from './ExceptionMetadata';
 
 export class FeatureException extends ApiException {
   public readonly category = ExceptionCategory.FEATURE;
-  public readonly code = 'PM-FTR-001';
-  public readonly status = 422;
+  public readonly code: string;
+  public readonly status: number;
 
-  constructor(internalMessage: string, requestId: string, details?: string) {
+  constructor(codeOrMsg: string, internalMessageOrRequestId: string, requestIdOrDetails?: string) {
+    let code: string;
+    let internalMessage: string;
+    let requestId: string;
+    let status = 403;
+    let externalMessage: string;
+
+    if (codeOrMsg.startsWith('PM-')) {
+      code = codeOrMsg;
+      internalMessage = internalMessageOrRequestId;
+      requestId = requestIdOrDetails || '';
+      status = 403;
+      externalMessage = internalMessage;
+    } else {
+      // Old style backward compatibility
+      code = 'PM-FTR-001';
+      internalMessage = codeOrMsg;
+      requestId = internalMessageOrRequestId;
+      status = 422;
+      externalMessage = '指定された機能は現在無効化されています。';
+    }
+
     super({
       internalMessage,
-      externalMessage: '指定された機能は現在無効化されています。',
+      externalMessage,
       metadata: {
         requestId,
         timestamp: Date.now(),
         exceptionType: 'FeatureException',
-        exceptionCode: 'PM-FTR-001',
-        source: 'FEATURE',
-        details
+        exceptionCode: code,
+        source: 'FEATURE_ACCESS_PIPELINE',
+        details: requestIdOrDetails
       }
     });
+
+    this.code = code;
+    this.status = status;
   }
 }

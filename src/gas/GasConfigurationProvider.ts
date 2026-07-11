@@ -17,6 +17,8 @@ export interface FeatureFlags {
   licensingEnabled: boolean;
   editionValidation: boolean;
   licenseValidation: boolean;
+  featureAccessEnabled: boolean;
+  featureValidation: boolean;
 }
 
 export class GasConfigurationProvider {
@@ -101,7 +103,9 @@ export class GasConfigurationProvider {
           permissionValidation: props.getProperty('FLAG_PERMISSION_VALIDATION') !== 'false',
           licensingEnabled: props.getProperty('FLAG_LICENSING_ENABLED') !== 'false',
           editionValidation: props.getProperty('FLAG_EDITION_VALIDATION') !== 'false',
-          licenseValidation: props.getProperty('FLAG_LICENSE_VALIDATION') !== 'false'
+          licenseValidation: props.getProperty('FLAG_LICENSE_VALIDATION') !== 'false',
+          featureAccessEnabled: props.getProperty('FLAG_FEATURE_ACCESS_ENABLED') !== 'false',
+          featureValidation: props.getProperty('FLAG_FEATURE_VALIDATION') !== 'false'
         };
       } catch (e) {
         // Fallback below
@@ -125,7 +129,9 @@ export class GasConfigurationProvider {
       permissionValidation: true,
       licensingEnabled: true,
       editionValidation: true,
-      licenseValidation: true
+      licenseValidation: true,
+      featureAccessEnabled: true,
+      featureValidation: true
     };
   }
 }

@@ -44,7 +44,9 @@ async function runTests() {
     permissionValidation: true,
     licensingEnabled: true,
     editionValidation: true,
-    licenseValidation: true
+    licenseValidation: true,
+    featureAccessEnabled: true,
+    featureValidation: true
   });
 
   // 1. Normal Request Verification (Passes Validation)
@@ -163,7 +165,9 @@ async function runTests() {
       permissionValidation: true,
       licensingEnabled: true,
       editionValidation: true,
-      licenseValidation: true
+      licenseValidation: true,
+      featureAccessEnabled: true,
+      featureValidation: true
     });
 
     const req = new ApiRequest({

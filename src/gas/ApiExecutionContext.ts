@@ -1,6 +1,7 @@
 import { AuthenticationContext } from '../authentication/AuthenticationContext';
 import { AuthorizationContext } from '../authorization/AuthorizationContext';
 import { LicenseContext } from '../licensing/LicenseContext';
+import { FeatureContext } from '../features/FeatureContext';
 
 export class ApiExecutionContext {
   private requestId: string;
@@ -10,6 +11,7 @@ export class ApiExecutionContext {
   private authContext: AuthenticationContext | null = null;
   private authzContext: AuthorizationContext | null = null;
   private licenseContext: LicenseContext | null = null;
+  private featureContext: FeatureContext | null = null;
 
   constructor() {
     this.startTimestamp = Date.now();
@@ -91,5 +93,13 @@ export class ApiExecutionContext {
 
   public getLicenseContext(): LicenseContext | null {
     return this.licenseContext;
+  }
+
+  public setFeatureContext(context: FeatureContext): void {
+    this.featureContext = context;
+  }
+
+  public getFeatureContext(): FeatureContext | null {
+    return this.featureContext;
   }
 }
