@@ -54,7 +54,8 @@ export class DashboardHandler implements EndpointHandler {
           newMembers: dashboard.newMembers,
           monthlyTrend: dashboard.monthlyTrend,
           lineAppUrl: dashboard.lineAppUrl,
-          dashboardUrl: dashboard.dashboardUrl
+          dashboardUrl: dashboard.dashboardUrl,
+          emailTemplates: dashboard.emailTemplates
         };
         return FieldApiMapper.toSuccessResponse(result, request, context);
       }

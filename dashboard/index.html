@@ -188,10 +188,15 @@
           
           <div class="space-y-4">
             <div>
+              <label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">テンプレートを選択</label>
+              <select id="email-template-select" onchange="onTemplateSelectChange()" class="w-full bg-white/5 border border-default rounded-xl px-4 py-3 text-sm font-bold text-white focus:outline-none focus:border-primary">
+                <!-- populated by manager.js -->
+              </select>
+            </div>
+
+            <div>
               <label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">件名</label>
-              <div class="w-full bg-white/5 border border-default rounded-xl px-4 py-3 text-sm font-bold" id="email-template-subject">
-                ポスティング活動に参加のお願い
-              </div>
+              <input type="text" id="email-template-subject" readonly class="w-full bg-white/5 border border-default rounded-xl px-4 py-3 text-sm font-bold text-white focus:outline-none" value="" />
             </div>
             
             <div>

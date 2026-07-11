@@ -1,3 +1,5 @@
+import { EmailTemplateDto } from '../email/EmailTemplateDto';
+
 export interface PersonalDashboardDto {
   staffNo: string;
   displayName: string;
@@ -37,6 +39,7 @@ export interface WorkspaceDashboardDto {
   monthlyTrend: { month: string; quantity: number }[];
   lineAppUrl: string;
   dashboardUrl: string;
+  emailTemplates: EmailTemplateDto[];
 }
 
 export interface RankingDto {

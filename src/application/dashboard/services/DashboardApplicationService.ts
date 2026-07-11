@@ -13,13 +13,19 @@ import {
   MonthlyActivitySummary 
 } from '../dto/DashboardDtos';
 
+import { EmailTemplateService } from '../email/EmailTemplateService';
+
 export class DashboardApplicationService {
+  private emailTemplateService: EmailTemplateService;
+
   constructor(
     private workspaceRepo: IWorkspaceRepository,
     private staffRepo: IStaffRepository,
     private holdingRepo: IFlyerHoldingRepository,
     private activityRepo: IActivityRepository
-  ) {}
+  ) {
+    this.emailTemplateService = new EmailTemplateService();
+  }
 
   public async getPersonalDashboardByLineUserId(lineUserId: string, yearMonth?: string | YearMonth): Promise<PersonalDashboardDto> {
     const staff = await this.staffRepo.findByLineUserId(lineUserId);
@@ -178,6 +184,7 @@ export class DashboardApplicationService {
     }
 
     const urls = WorkspaceUrl.generate(workspaceId);
+    const emailTemplates = await this.emailTemplateService.getActiveTemplates();
     return {
       workspaceId,
       workspaceName: wsName,
@@ -191,7 +198,8 @@ export class DashboardApplicationService {
       newMembers,
       monthlyTrend,
       lineAppUrl: urls.lineAppUrl,
-      dashboardUrl: urls.dashboardUrl
+      dashboardUrl: urls.dashboardUrl,
+      emailTemplates
     };
   }
 

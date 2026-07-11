@@ -225,46 +225,23 @@ function renderDashboard(data) {
     rankingContainer.innerHTML = '<p class="text-sm text-secondary py-2">活動ログがありません</p>';
   }
 
-  // 5. Render Invitation Email Template body preview with resolved placeholders
-  const templateBodyRaw = `党員さん、サポーターさんへ
-
-ポスティング活動へのご協力のお願いです。
-
-{{workspaceName}}では、
-地域で協力してポスティング活動を進めるため、
-POSTING MAPを導入しました。
-
-また、チラシを保管してご協力いただける方は、
-{{workspaceName}}までご連絡ください。
-
-POSTING MAPでは、
-
-「どこで」
-「誰が」
-  「何枚持っているか」
-
-を支部内で共有し、
-協力しながらポスティング活動を進めることができます。
-
-以下のLINE URLから登録をお願いします。
-
-▼POSTING MAP参加入口
-
-{{lineAppUrl}}
-
-登録後、POSTING MAPを利用して
-ポスティング活動に参加できます。
-
-皆さんで協力して、
-地域で継続できるポスティング活動を作っていきましょう。
-
-{{workspaceName}}`;
-
-  const templateBodyResolved = templateBodyRaw
-    .replace(/\{\{workspaceName\}\}/g, branchName)
-    .replace(/\{\{lineAppUrl\}\}/g, data.lineAppUrl || 'https://liff.line.me/...');
-
-  document.getElementById('email-template-body-preview').textContent = templateBodyResolved;
+  // 5. Render Invitation Email Template options in the dropdown
+  const select = document.getElementById('email-template-select');
+  select.innerHTML = '';
+  if (data.emailTemplates && data.emailTemplates.length > 0) {
+    data.emailTemplates.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.templateId;
+      opt.textContent = t.templateName;
+      opt.className = 'bg-black text-white';
+      select.appendChild(opt);
+    });
+    updateTemplatePreview();
+  } else {
+    select.innerHTML = '<option value="">テンプレートがありません</option>';
+    document.getElementById('email-template-subject').value = '';
+    document.getElementById('email-template-body-preview').textContent = '';
+  }
 
   // 6. Settings tab values
   document.getElementById('settings-workspace-name').textContent = branchName;
@@ -273,9 +250,31 @@ POSTING MAPでは、
   document.getElementById('settings-login-email').textContent = googleUser ? googleUser.email : '-';
 }
 
+function updateTemplatePreview() {
+  if (!dashboardData || !dashboardData.emailTemplates || dashboardData.emailTemplates.length === 0) return;
+  const select = document.getElementById('email-template-select');
+  const selectedId = select.value;
+  const template = dashboardData.emailTemplates.find(t => t.templateId === selectedId) || dashboardData.emailTemplates[0];
+
+  const branchName = dashboardData.name || workspaceId;
+  const lineAppUrl = dashboardData.lineAppUrl || 'https://liff.line.me/...';
+
+  const subject = template.subject || 'ポスティング活動に参加のお願い';
+  const bodyResolved = (template.body || '')
+    .replace(/\{\{workspaceName\}\}/g, branchName)
+    .replace(/\{\{lineAppUrl\}\}/g, lineAppUrl);
+
+  document.getElementById('email-template-subject').value = subject;
+  document.getElementById('email-template-body-preview').textContent = bodyResolved;
+}
+
+function onTemplateSelectChange() {
+  updateTemplatePreview();
+}
+
 function launchEmailClient() {
   if (!dashboardData) return;
-  const subject = "ポスティング活動に参加のお願い";
+  const subject = document.getElementById('email-template-subject').value;
   const body = document.getElementById('email-template-body-preview').textContent;
   
   const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
