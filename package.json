@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --noEmit",
     "build:gas": "python3 tools/build_gas.py",
-    "test:ts": "for file in tests/unit/typescript/*.ts; do npx ts-node -r tsconfig-paths/register \"$file\" || exit 1; done",
+    "test:ts": "for file in $(find tests/unit/typescript -name '*.ts'); do npx ts-node -r tsconfig-paths/register \"$file\" || exit 1; done",
     "test:py": ".venv/bin/pytest tests/unit/python",
     "test": "npm run build && npm run test:ts && npm run test:py",
     "architecture:test": "npx ts-node -r tsconfig-paths/register tools/architecture-check.ts",
