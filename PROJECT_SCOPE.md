@@ -30,10 +30,16 @@
   - カメラ制御用の `GoogleMapsCameraController` および独立した4レイヤー（Area, VoteTurnout, Activity, Marker）を管理する `GoogleMapsLayerManager` に処理を委譲。
   - 地図パネル `MapPanel` との結合を行い、設定に基づき `DOMMapEngine` と自動切り替え可能な後方互換性を担保。
 * **Phase S2-2: H-App Real Connection Foundation** ✅
-  - `HAppConnectionState` による 4 つの同期接続ステータス（CONNECTED, SYNCING, OFFLINE, ERROR）を定義・一元管理。
+  - `HAppConnectionState` による 4 つ of 同期接続ステータス（CONNECTED, SYNCING, OFFLINE, ERROR）を定義・一元管理。
   - `HAppSynchronizationController` にて `lastSyncTimestamp` と `lastEventId` を用いた高信頼性差分ポーリング、およびブラウザオフライン検知（Offline Policy）を制御。
   - `HAppEventSubscriber` と `EventLogDispatcher`（イベントバス）を介して、新着ログの UI への高速配信と map/detail パネルの部分更新を描画。
   - `DashboardStateModel.addIncomingEventLog` による重複イベント破棄（EventID一意性保証）および、地区進捗（doneCount / progressRate）と全体 Stats の不変（Immutable）再計算更新処理を実装。
+* **Phase S2-3: Real Data Synchronization Foundation** ✅
+  - `DeltaSynchronizationManager` にて、同期時刻（lastSyncTimestamp）とイベントID（lastEventId）の2軸管理による高信頼な重複排除と差分抽出判定フローを確立。
+  - `CacheManager` によるメモリキャッシュ TTL (Time-To-Live) および、設定オブジェクト（window.POSTING_MAP_CONFIG.CACHE_TTL）を考慮した動的引き当て・キャッシュ無効化（Invalidation）制御を実装。
+  - `RetryController` を用いた指数バックオフ（Exponential Backoff）および最大試行制限（Retry Limit）による通信エラー回復処理を導入。
+  - `ConflictResolver` による競合解決（EventLogの重複排除、AreaのdoneCountデグレード防止、Inventoryのタイムスタンプ優先）を Strategy パターンで拡張可能に設計。
+  - `SynchronizationScheduler` を実装し、6つの同期ステータスイベント（sync-start, sync-success, sync-failed, sync-skipped, sync-offline, sync-retry）の発行および、ネットワーク切断時の自発的一時停止ポリシーを統制。
 
 ### 主な今後の開発項目
 1. **Stripe自動契約・独占権管理の統合**:

@@ -15,6 +15,11 @@ import { HAppConnectionState } from './HAppConnectionState';
 import { EventLogDispatcher } from './EventLogDispatcher';
 import { HAppEventSubscriber } from './HAppEventSubscriber';
 import { HAppSynchronizationController } from './HAppSynchronizationController';
+import { CacheManager } from './sync/CacheManager';
+import { ConflictResolver } from './sync/ConflictResolver';
+import { DeltaSynchronizationManager } from './sync/DeltaSynchronizationManager';
+import { RetryController } from './sync/RetryController';
+import { SynchronizationScheduler } from './sync/SynchronizationScheduler';
 
 export class DashboardApplication {
   private static instance: DashboardApplication | null = null;
@@ -28,6 +33,10 @@ export class DashboardApplication {
   private eventLogDispatcher!: EventLogDispatcher;
   private eventSubscriber!: HAppEventSubscriber;
   private syncController!: HAppSynchronizationController;
+  private cacheManager!: CacheManager;
+  private conflictResolver!: ConflictResolver;
+  private refreshScheduler!: SynchronizationScheduler;
+  private appRetryController!: RetryController;
 
   private constructor() {}
 
@@ -52,6 +61,11 @@ export class DashboardApplication {
   ): Promise<void> {
     console.log('[DashboardApplication] Control station booting...');
 
+    // 0. 同期・キャッシュ共通基盤の構築
+    this.cacheManager = new CacheManager();
+    this.conflictResolver = new ConflictResolver();
+    this.appRetryController = new RetryController(3, 1000, 2);
+
     // 1. APIクライアント構築
     this.client = new DashboardApiClient(apiUrl);
 
@@ -64,17 +78,43 @@ export class DashboardApplication {
     // 4. イベントコーディネーター（メディエーター）構築
     this.eventCoordinator = new DashboardEventCoordinator(this.stateModel, this.layout);
 
-    // 5. データ更新（ポーリング）制御構築
-    this.refreshController = new DashboardRefreshController(this.stateModel, this.eventCoordinator);
-
-    // 5.5. H-App 同期モジュール群の構築
+    // 4.5. H-App 同期状態・ディスパッチャの構築
     this.connectionState = new HAppConnectionState();
     this.eventLogDispatcher = new EventLogDispatcher();
     this.eventSubscriber = new HAppEventSubscriber(this.stateModel, this.eventLogDispatcher);
+
+    // 4.6. 全体同期スケジューラの構築
+    this.refreshScheduler = new SynchronizationScheduler(this.connectionState, this.appRetryController);
+
+    // 4.7. スケジューライベントのコーディネーター転送設定
+    this.refreshScheduler.subscribe((event, details) => {
+      console.log(`[DashboardApplication] Refresh scheduler event: ${event}`);
+      this.eventCoordinator.emit(`scheduler-${event}`, details);
+    });
+
+    // 5. データ更新（ポーリング）制御構築
+    this.refreshController = new DashboardRefreshController(
+      this.stateModel,
+      this.eventCoordinator,
+      this.refreshScheduler
+    );
+
+    // 5.5. H-App 同期コントローラーの構築 (独自のdeltaManager/schedulerを介して動作)
+    const hapDeltaManager = new DeltaSynchronizationManager();
+    const hapRetryController = new RetryController(3, 1000, 2);
+    const hapScheduler = new SynchronizationScheduler(this.connectionState, hapRetryController);
+
+    hapScheduler.subscribe((event, details) => {
+      console.log(`[DashboardApplication] H-App scheduler event: ${event}`);
+      this.eventCoordinator.emit(`scheduler-${event}`, details);
+    });
+
     this.syncController = new HAppSynchronizationController(
       this.stateModel,
       this.eventSubscriber,
-      this.connectionState
+      this.connectionState,
+      hapDeltaManager,
+      hapScheduler
     );
 
     // 5.6. 同期された EventLog の UI 配信フックの定義

@@ -149,7 +149,11 @@ async function runTests() {
 
   fetchCallCount = 0;
   // 同期時刻をモックデータの前に初期設定
-  (syncController as any).lastSyncTimestamp = 1700000000000;
+  if ((syncController as any).deltaManager) {
+    (syncController as any).deltaManager.resetPointer(1700000000000);
+  } else {
+    (syncController as any).lastSyncTimestamp = 1700000000000;
+  }
 
   await syncController.syncNewEvents('MIE-03', 'MIE-03');
 
