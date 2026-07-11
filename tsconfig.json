@@ -13,7 +13,8 @@
       "@core/*": ["src/core/*"],
       "@foundation/*": ["src/foundation/*"],
       "@domain/*": ["src/domain/*"],
-      "@infra/*": ["src/infrastructure/*"]
+      "@infra/*": ["src/infrastructure/*"],
+      "@application/*": ["src/application/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"]

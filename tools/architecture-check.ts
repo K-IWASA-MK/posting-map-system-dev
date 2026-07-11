@@ -6,6 +6,7 @@ const allowedDependencies: Record<string, string[]> = {
   'core': [],
   'foundation': ['core'],
   'domain': ['core', 'foundation'],
+  'application': ['core', 'foundation', 'domain'],
   'infrastructure': ['core', 'foundation', 'domain']
 };
 
