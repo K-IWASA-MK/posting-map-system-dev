@@ -7,6 +7,7 @@
 
 import { AreaDetail } from '../DashboardStateModel';
 import { MapEngine, DOMMapEngine } from '../map/MapEngine';
+import { GoogleMapsEngine } from '../map/GoogleMapsEngine';
 
 export class MapPanel {
   private readonly element: HTMLDivElement;
@@ -48,12 +49,24 @@ export class MapPanel {
     this.element.appendChild(this.markerContainer);
 
     // Initialize Map Engine
-    this.mapEngine = mapEngine || new DOMMapEngine((areaId) => {
+    this.mapEngine = mapEngine || this.createDefaultMapEngine();
+    this.mapEngine.initialize(this.markerContainer);
+  }
+
+  private createDefaultMapEngine(): MapEngine {
+    const config = typeof window !== 'undefined' ? (window as any).POSTING_MAP_CONFIG : undefined;
+    const engineType = config ? config.MAP_ENGINE : 'dom';
+
+    const callback = (areaId: string) => {
       if (this.onAreaSelectedCallback) {
         this.onAreaSelectedCallback(areaId);
       }
-    });
-    this.mapEngine.initialize(this.markerContainer);
+    };
+
+    if (engineType === 'google_maps') {
+      return new GoogleMapsEngine(callback);
+    }
+    return new DOMMapEngine(callback);
   }
 
   private applyStyles() {

@@ -20,14 +20,20 @@
 ---
 
 ## 2. スプリント2 ロードマップ (Sprint 2 Roadmap)
-スプリント1完了後、実業務運用に向けた実働OSへの昇華を目指す「Sprint 2: Real Operation Foundation」へ移行します。
+実業務運用に向けた実働OSへの昇華を目指す「Sprint 2: Real Operation Foundation」です。
 
-### 主な開発項目
-1. **本格地図エンジンの統合**:
-   - `MapEngine` の Google Maps または Mapbox 実装を作成し、衛星写真やポリゴンレイヤーによる地理空間重ね合わせ表示を実現します。
-2. **LINE LIFF（Hアプリ）連携強化**:
+### 完了した開発項目
+* **Phase S2-1: Google Maps Engine Foundation** ✅
+  - `MapEngine` 抽象化インターフェースを実装した `GoogleMapsEngine` を構築。
+  - APIキーを `window.POSTING_MAP_CONFIG` から動的に引き当てる設定プロバイダー `GoogleMapsConfiguration` を実装。
+  - 地図スクリプトの多重ロードを防ぐ Promise 制御の `GoogleMapsScriptLoader` を導入。
+  - カメラ制御用の `GoogleMapsCameraController` および独立した4レイヤー（Area, VoteTurnout, Activity, Marker）を管理する `GoogleMapsLayerManager` に処理を委譲。
+  - 地図パネル `MapPanel` との結合を行い、設定に基づき `DOMMapEngine` と自動切り替え可能な後方互換性を担保。
+
+### 主な今後の開発項目
+1. **LINE LIFF（Hアプリ）連携強化 (Phase S2-2 ~)**:
    - 配布員アプリ（Hアプリ）が現場でGPS打刻および配布進捗を報告した際、ダッシュボード側へほぼリアルタイムに反映するデータ同期パイプライン。
-3. **Stripe自動契約・独占権管理の統合**:
+2. **Stripe自動契約・独占権管理の統合**:
    - Stripe決済情報をバインドし、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化。
-4. **GAS API 本実装およびキャッシュ高速化**:
+3. **GAS API 本実装およびキャッシュ高速化**:
    - 大量データアクセス時の `CacheService` 適用と、SpreadsheetApp 読み込み最小化のGAS側本実装。
