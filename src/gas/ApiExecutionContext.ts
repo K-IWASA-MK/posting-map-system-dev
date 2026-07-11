@@ -10,6 +10,10 @@ export class ApiExecutionContext {
     this.executionId = `exec-${Math.random().toString(36).substr(2, 9)}`;
   }
 
+  private validationTime: number = 0;
+  private routingTime: number = 0;
+  private handlerTime: number = 0;
+
   public getRequestId(): string {
     return this.requestId;
   }
@@ -32,5 +36,29 @@ export class ApiExecutionContext {
 
   public incrementRetry(): void {
     this.retryCount++;
+  }
+
+  public setValidationTime(ms: number): void {
+    this.validationTime = ms;
+  }
+
+  public getValidationTime(): number {
+    return this.validationTime;
+  }
+
+  public setRoutingTime(ms: number): void {
+    this.routingTime = ms;
+  }
+
+  public getRoutingTime(): number {
+    return this.routingTime;
+  }
+
+  public setHandlerTime(ms: number): void {
+    this.handlerTime = ms;
+  }
+
+  public getHandlerTime(): number {
+    return this.handlerTime;
   }
 }

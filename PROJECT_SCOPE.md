@@ -86,9 +86,18 @@
   - 全例外の一元処理と、S3-5 との接続用に拡張可能な `addListener` 方式の例外イベントフックを備えた `ExceptionHandler` を構築。
   - `doGet()` / `doPost()` を単一の try-catch に集約し、バリデーションやルーティングから投げられるすべての例外を一元処理。
 
-1. **Phase S3-5: Premium Feature Expansion & Edition Licensing**:
+* **Phase S3-5: Monitoring & Audit Foundation** ✅
+  - 監視イベント共通モデル `MonitoringEvent` を定義し、単調増加する `sequenceNumber` によるイベント発生順序保証およびカテゴリ（`AUDIT`, `METRICS`, `LIFECYCLE`, `EXCEPTION`）定義を実装。
+  - `EventDispatcher` による任意の `MonitoringListener`（`AuditCollector`, `MetricsCollector` 等）へのイベント駆動配信を構築。
+  - API ライフサイクル監視ステージ（`REQUEST_STARTED`, `VALIDATION_COMPLETED`, `ROUTING_COMPLETED`, `HANDLER_COMPLETED`, `REQUEST_COMPLETED`, `REQUEST_FAILED`）を統括する `MonitoringPipeline` および `ApiLifecycleObserver` を実装。
+  - `ExceptionHandler` にオブザーバーを接続し、例外発生時に `REQUEST_FAILED` 監査ログイベントを自動収集する仕組みを統合。
+  - `doGet()` / `doPost()` にライフサイクルオブザーバーフックを組み込み、処理時間計測および監査履歴収集を統合。
+
+1. **Phase S3-6: Production Hardening Foundation**:
+   - リトライ、タイムアウト制御、ヘルスチェック、サーキットブレーカー等を含む運用の耐障害性強化。
+2. **Phase S3-7: Premium Feature Expansion & Edition Licensing**:
    - Stripe 決済情報とのバインド、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化のライセンス管理。
    - Mapbox エンジンのランタイム動的切り替えの Premium 実装。
-2. **Phase S3-6: AIOS Integration & Automated Analytics**:
+3. **Phase S3-8: AIOS Integration & Automated Analytics**:
    - AIOS (AI組織) との安全なデータ通信ブリッジ（AIOS Bridge）の本格実装。
    - 支部比較や配布効率測定等を行う Analytics Engine の統合。

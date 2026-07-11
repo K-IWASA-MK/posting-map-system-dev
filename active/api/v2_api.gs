@@ -78,6 +78,9 @@ function doGet(e) {
   globalCacheHit = false;
   GasPerformanceMonitor.getInstance().reset();
 
+  ExceptionHandler.clearListeners();
+  ExceptionHandler.addListener(ApiLifecycleObserver.onException);
+
   const action = e.parameter.action || 'health';
   let path = '/' + action;
   if (action === 'getAppData') {
@@ -97,10 +100,26 @@ function doGet(e) {
     requestId: executionContext.getRequestId()
   });
 
+  ApiLifecycleObserver.onStart(apiRequest, executionContext);
+
   let apiResponse;
   try {
+    const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
+    executionContext.setValidationTime(Date.now() - valStart);
+    ApiLifecycleObserver.onValidationSuccess(apiRequest, executionContext);
+
+    const routeStart = Date.now();
+    ApiRouter.getInstance().registry.getHandler(apiRequest.method, apiRequest.version, apiRequest.path);
+    executionContext.setRoutingTime(Date.now() - routeStart);
+    ApiLifecycleObserver.onRoutingSuccess(apiRequest, executionContext);
+
+    const handlerStart = Date.now();
     apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
+    executionContext.setHandlerTime(Date.now() - handlerStart);
+    ApiLifecycleObserver.onHandlerSuccess(apiRequest, executionContext);
+
+    ApiLifecycleObserver.onComplete(apiRequest, apiResponse, executionContext);
   } catch (err) {
     apiResponse = ExceptionHandler.handle(err, apiRequest, executionContext);
   }
@@ -229,6 +248,9 @@ function doPost(e) {
   globalCacheHit = false;
   GasPerformanceMonitor.getInstance().reset();
 
+  ExceptionHandler.clearListeners();
+  ExceptionHandler.addListener(ApiLifecycleObserver.onException);
+
   let postData;
   try {
     if (e.postData && e.postData.contents) {
@@ -260,6 +282,8 @@ function doPost(e) {
     requestId: executionContext.getRequestId()
   });
 
+  ApiLifecycleObserver.onStart(apiRequest, executionContext);
+
   let apiResponse;
   const writeActions = [
     'submitDistribution',
@@ -278,13 +302,21 @@ function doPost(e) {
   ];
 
   try {
+    const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
+    executionContext.setValidationTime(Date.now() - valStart);
+    ApiLifecycleObserver.onValidationSuccess(apiRequest, executionContext);
 
+    const routeStart = Date.now();
+    ApiRouter.getInstance().registry.getHandler(apiRequest.method, apiRequest.version, apiRequest.path);
+    executionContext.setRoutingTime(Date.now() - routeStart);
+    ApiLifecycleObserver.onRoutingSuccess(apiRequest, executionContext);
+
+    const handlerStart = Date.now();
     if (writeActions.indexOf(action) !== -1) {
       apiResponse = LockServiceProvider.getInstance().executeWithLock(function() {
         return ApiRouter.getInstance().route(apiRequest, executionContext);
       });
-      // 更新系アクションが成功した場合は関連キャッシュを無効化 (Invalidate)
       if (apiResponse && apiResponse.success) {
         const cacheKey = CacheServiceProvider.getInstance().makeKey(
           postData.tenantId || e.parameter.tenantId || "DEFAULT",
@@ -296,6 +328,10 @@ function doPost(e) {
     } else {
       apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
     }
+    executionContext.setHandlerTime(Date.now() - handlerStart);
+    ApiLifecycleObserver.onHandlerSuccess(apiRequest, executionContext);
+
+    ApiLifecycleObserver.onComplete(apiRequest, apiResponse, executionContext);
   } catch (err) {
     apiResponse = ExceptionHandler.handle(err, apiRequest, executionContext);
   }
@@ -1481,6 +1517,9 @@ class ApiExecutionContext {
     this.requestId = "req-" + this.startTimestamp + "-" + Math.random().toString(36).substr(2, 9);
     this.executionId = "exec-" + Math.random().toString(36).substr(2, 9);
     this.retryCount = 0;
+    this.validationTime = 0;
+    this.routingTime = 0;
+    this.handlerTime = 0;
   }
   getRequestId() { return this.requestId; }
   getExecutionId() { return this.executionId; }
@@ -1488,6 +1527,12 @@ class ApiExecutionContext {
   getElapsedTime() { return Date.now() - this.startTimestamp; }
   getRetryCount() { return this.retryCount; }
   incrementRetry() { this.retryCount++; }
+  setValidationTime(ms) { this.validationTime = ms; }
+  getValidationTime() { return this.validationTime; }
+  setRoutingTime(ms) { this.routingTime = ms; }
+  getRoutingTime() { return this.routingTime; }
+  setHandlerTime(ms) { this.handlerTime = ms; }
+  getHandlerTime() { return this.handlerTime; }
 }
 
 class GasPerformanceMonitor {
@@ -2267,4 +2312,199 @@ class ExceptionHandler {
   }
 }
 ExceptionHandler.onExceptionListeners = [];
+
+// ==========================================
+// 🚀 MONITORING & AUDIT FOUNDATION CLASSES
+// ==========================================
+class EventDispatcher {
+  constructor() {
+    this.listeners = [];
+  }
+  static getInstance() {
+    if (!EventDispatcher.instance) {
+      EventDispatcher.instance = new EventDispatcher();
+    }
+    return EventDispatcher.instance;
+  }
+  addListener(listener) {
+    this.listeners.push(listener);
+  }
+  clearListeners() {
+    this.listeners.length = 0;
+  }
+  dispatch(event) {
+    for (let i = 0; i < this.listeners.length; i++) {
+      try {
+        this.listeners[i].onEvent(event);
+      } catch (err) {
+        console.error('[EventDispatcher Dispatch Error]', err);
+      }
+    }
+  }
+}
+EventDispatcher.instance = null;
+
+class AuditCollector {
+  constructor() {
+    this.events = [];
+  }
+  static getInstance() {
+    if (!AuditCollector.instance) {
+      AuditCollector.instance = new AuditCollector();
+    }
+    return AuditCollector.instance;
+  }
+  onEvent(event) {
+    if (
+      event.category === 'AUDIT' ||
+      event.category === 'LIFECYCLE' ||
+      event.category === 'EXCEPTION'
+    ) {
+      this.events.push(event);
+    }
+  }
+  getEvents() {
+    return this.events.slice();
+  }
+  clear() {
+    this.events.length = 0;
+  }
+}
+AuditCollector.instance = null;
+
+class MetricsCollector {
+  constructor() {
+    this.events = [];
+  }
+  static getInstance() {
+    if (!MetricsCollector.instance) {
+      MetricsCollector.instance = new MetricsCollector();
+    }
+    return MetricsCollector.instance;
+  }
+  onEvent(event) {
+    if (event.category === 'METRICS') {
+      this.events.push(event);
+    }
+  }
+  getEvents() {
+    return this.events.slice();
+  }
+  clear() {
+    this.events.length = 0;
+  }
+}
+MetricsCollector.instance = null;
+
+class MonitoringPipeline {
+  constructor() {
+    this.sequenceCounter = 0;
+    this.dispatcher = EventDispatcher.getInstance();
+    this.dispatcher.addListener(AuditCollector.getInstance());
+    this.dispatcher.addListener(MetricsCollector.getInstance());
+  }
+  static getInstance() {
+    if (!MonitoringPipeline.instance) {
+      MonitoringPipeline.instance = new MonitoringPipeline();
+    }
+    return MonitoringPipeline.instance;
+  }
+  resetSequence() {
+    this.sequenceCounter = 0;
+  }
+  createAndDispatch(eventType, category, requestId, source, payload) {
+    this.sequenceCounter++;
+    const eventId = 'EVT-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    const event = {
+      eventId: eventId,
+      eventType: eventType,
+      category: category,
+      sequenceNumber: this.sequenceCounter,
+      requestId: requestId,
+      timestamp: Date.now(),
+      source: source,
+      payload: payload
+    };
+    this.dispatcher.dispatch(event);
+  }
+}
+MonitoringPipeline.instance = null;
+
+class ApiLifecycleObserver {
+  static onStart(request, context) {
+    MonitoringPipeline.getInstance().resetSequence();
+    MonitoringPipeline.getInstance().createAndDispatch(
+      'REQUEST_STARTED',
+      'LIFECYCLE',
+      request.requestId,
+      'API_LIFECYCLE_OBSERVER',
+      { method: request.method, path: request.path }
+    );
+  }
+  static onValidationSuccess(request, context) {
+    MonitoringPipeline.getInstance().createAndDispatch(
+      'VALIDATION_COMPLETED',
+      'AUDIT',
+      request.requestId,
+      'API_LIFECYCLE_OBSERVER',
+      { path: request.path }
+    );
+  }
+  static onRoutingSuccess(request, context) {
+    MonitoringPipeline.getInstance().createAndDispatch(
+      'ROUTING_COMPLETED',
+      'AUDIT',
+      request.requestId,
+      'API_LIFECYCLE_OBSERVER',
+      { path: request.path }
+    );
+  }
+  static onHandlerSuccess(request, context) {
+    MonitoringPipeline.getInstance().createAndDispatch(
+      'HANDLER_COMPLETED',
+      'AUDIT',
+      request.requestId,
+      'API_LIFECYCLE_OBSERVER',
+      { path: request.path }
+    );
+  }
+  static onComplete(request, response, context) {
+    MonitoringPipeline.getInstance().createAndDispatch(
+      'REQUEST_COMPLETED',
+      'LIFECYCLE',
+      request.requestId,
+      'API_LIFECYCLE_OBSERVER',
+      { path: request.path, status: response.status }
+    );
+    const validationTime = context.getValidationTime();
+    const routingTime = context.getRoutingTime();
+    const handlerTime = context.getHandlerTime();
+    MonitoringPipeline.getInstance().createAndDispatch(
+      'METRICS_COLLECTED',
+      'METRICS',
+      request.requestId,
+      'API_LIFECYCLE_OBSERVER',
+      {
+        processingTime: context.getElapsedTime(),
+        validationTime: validationTime,
+        routingTime: routingTime,
+        handlerTime: handlerTime,
+        statusCode: response.status,
+        cacheStatus: 'NONE'
+      }
+    );
+  }
+  static onException(error, request, context) {
+    MonitoringPipeline.getInstance().createAndDispatch(
+      'REQUEST_FAILED',
+      'LIFECYCLE',
+      request.requestId,
+      'API_LIFECYCLE_OBSERVER',
+      {
+        path: request.path,
+        exceptionMessage: error.message || String(error)
+      }
+    );
+  }
+}
 
