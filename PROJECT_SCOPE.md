@@ -73,9 +73,15 @@
   - ルーティング解決のディスパッチテーブル `EndpointRegistry` とディスパッチャー `ApiRouter` を実装。
   - `doGet()` / `doPost()` を `ApiRouter` 経由のパイプラインに移行し、従来の action ベースのリクエストも `LegacyApiFallbackHandler` で処理する互換層を構築。
 
-1. **Phase S3-3: Premium Feature Expansion & Edition Licensing**:
+* **Phase S3-3: Validation Pipeline Foundation** ✅
+  - バリデーションエラーコード `ValidationError` および不変な `ValidationResult` / `ValidationException` の設計。
+  - バリデーターチェーンを構成する Validator ID 識別型共通インターフェース `Validator` と `ValidatorChain` エンジンの実装。
+  - 基本構造、HTTPメソッド、バージョン、ルートの存在、および機能トグルの各検証クラスを実装。
+  - `doGet()` / `doPost()` パイプラインの前段にバリデーションを結合し、不正入力をフェイルファストで防御する仕組みを構築。
+
+1. **Phase S3-4: Premium Feature Expansion & Edition Licensing**:
    - Stripe 決済情報とのバインド、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化のライセンス管理。
    - Mapbox エンジンのランタイム動的切り替えの Premium 実装。
-2. **Phase S3-4: AIOS Integration & Automated Analytics**:
+2. **Phase S3-5: AIOS Integration & Automated Analytics**:
    - AIOS (AI組織) との安全なデータ通信ブリッジ（AIOS Bridge）の本格実装。
    - 支部比較や配布効率測定等を行う Analytics Engine の統合。

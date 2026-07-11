@@ -97,7 +97,40 @@ function doGet(e) {
     requestId: executionContext.getRequestId()
   });
 
-  const apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
+  let apiResponse;
+  try {
+    ValidationPipeline.getInstance().validate(apiRequest, executionContext);
+    apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
+  } catch (err) {
+    if (err instanceof ValidationException) {
+      const metadata = {
+        requestId: apiRequest.requestId,
+        serverTimestamp: err.result.metadata.validatedAt,
+        processingTime: err.result.metadata.duration,
+        version: apiRequest.version
+      };
+      apiResponse = ApiResponse.errorResponse(
+        err.result.errors[0].code,
+        err.result.errors[0].message,
+        err.status,
+        metadata
+      );
+    } else {
+      const metadata = {
+        requestId: apiRequest.requestId,
+        serverTimestamp: Date.now(),
+        processingTime: executionContext.getElapsedTime(),
+        version: apiRequest.version
+      };
+      apiResponse = ApiResponse.errorResponse(
+        'INTERNAL_SERVER_ERROR',
+        err.message || String(err),
+        500,
+        metadata
+      );
+    }
+  }
+
   return createJsonResponseFromApiResponse(apiResponse);
 }
 
@@ -270,21 +303,53 @@ function doPost(e) {
     'resetAllSheets'
   ];
 
-  if (writeActions.indexOf(action) !== -1) {
-    apiResponse = LockServiceProvider.getInstance().executeWithLock(function() {
-      return ApiRouter.getInstance().route(apiRequest, executionContext);
-    });
-    // 更新系アクションが成功した場合は関連キャッシュを無効化 (Invalidate)
-    if (apiResponse && apiResponse.success) {
-      const cacheKey = CacheServiceProvider.getInstance().makeKey(
-        postData.tenantId || e.parameter.tenantId || "DEFAULT",
-        postData.branchId || e.parameter.branchId || "DEFAULT",
-        "appdata"
-      );
-      CacheServiceProvider.getInstance().remove(cacheKey);
+  try {
+    ValidationPipeline.getInstance().validate(apiRequest, executionContext);
+
+    if (writeActions.indexOf(action) !== -1) {
+      apiResponse = LockServiceProvider.getInstance().executeWithLock(function() {
+        return ApiRouter.getInstance().route(apiRequest, executionContext);
+      });
+      // 更新系アクションが成功した場合は関連キャッシュを無効化 (Invalidate)
+      if (apiResponse && apiResponse.success) {
+        const cacheKey = CacheServiceProvider.getInstance().makeKey(
+          postData.tenantId || e.parameter.tenantId || "DEFAULT",
+          postData.branchId || e.parameter.branchId || "DEFAULT",
+          "appdata"
+        );
+        CacheServiceProvider.getInstance().remove(cacheKey);
+      }
+    } else {
+      apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
     }
-  } else {
-    apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
+  } catch (err) {
+    if (err instanceof ValidationException) {
+      const metadata = {
+        requestId: apiRequest.requestId,
+        serverTimestamp: err.result.metadata.validatedAt,
+        processingTime: err.result.metadata.duration,
+        version: apiRequest.version
+      };
+      apiResponse = ApiResponse.errorResponse(
+        err.result.errors[0].code,
+        err.result.errors[0].message,
+        err.status,
+        metadata
+      );
+    } else {
+      const metadata = {
+        requestId: apiRequest.requestId,
+        serverTimestamp: Date.now(),
+        processingTime: executionContext.getElapsedTime(),
+        version: apiRequest.version
+      };
+      apiResponse = ApiResponse.errorResponse(
+        'INTERNAL_SERVER_ERROR',
+        err.message || String(err),
+        500,
+        metadata
+      );
+    }
   }
 
   return createJsonResponseFromApiResponse(apiResponse);
@@ -1849,4 +1914,227 @@ class ApiRouter {
   }
 }
 ApiRouter.instance = null;
+
+// ==========================================
+// 🚀 VALIDATION PIPELINE FOUNDATION CLASSES
+// ==========================================
+const ValidationError = {
+  INVALID_REQUEST: 'INVALID_REQUEST',
+  INVALID_METHOD: 'INVALID_METHOD',
+  INVALID_VERSION: 'INVALID_VERSION',
+  ROUTE_NOT_FOUND: 'ROUTE_NOT_FOUND',
+  FEATURE_DISABLED: 'FEATURE_DISABLED'
+};
+
+class ValidationResult {
+  constructor(params) {
+    this.valid = params.valid;
+    this.errors = params.errors || [];
+    this.warnings = params.warnings || [];
+    this.metadata = params.metadata;
+  }
+  static success(validatedAt, duration) {
+    return new ValidationResult({
+      valid: true,
+      metadata: { validatedAt: validatedAt, duration: duration }
+    });
+  }
+  static failure(errors, validatedAt, duration) {
+    return new ValidationResult({
+      valid: false,
+      errors: errors,
+      metadata: { validatedAt: validatedAt, duration: duration }
+    });
+  }
+}
+
+class ValidationException extends Error {
+  constructor(result) {
+    const mainError = result.errors[0];
+    const message = mainError
+      ? 'Validation failed at ' + mainError.validatorId + ': [' + mainError.code + '] ' + mainError.message
+      : 'Validation failed';
+    super(message);
+    this.name = 'ValidationException';
+    this.result = result;
+
+    const code = mainError ? mainError.code : 'INVALID_REQUEST';
+    const statusMap = {
+      INVALID_REQUEST: 400,
+      INVALID_METHOD: 405,
+      INVALID_VERSION: 422,
+      ROUTE_NOT_FOUND: 404,
+      FEATURE_DISABLED: 422
+    };
+    this.status = statusMap[code] || 400;
+  }
+}
+
+class RequestValidator {
+  constructor() {
+    this.id = 'REQUEST_VALIDATOR';
+  }
+  validate(request, context) {
+    const validatedAt = Date.now();
+    if (!request) {
+      return ValidationResult.failure(
+        [{ code: ValidationError.INVALID_REQUEST, message: 'Request object is null or undefined.', validatorId: this.id }],
+        validatedAt,
+        0
+      );
+    }
+    if (!request.method || !request.path || !request.requestId) {
+      return ValidationResult.failure(
+        [{ code: ValidationError.INVALID_REQUEST, message: 'Request method, path or requestId is missing.', validatorId: this.id }],
+        validatedAt,
+        0
+      );
+    }
+    return ValidationResult.success(validatedAt, 0);
+  }
+}
+
+class MethodValidator {
+  constructor() {
+    this.id = 'METHOD_VALIDATOR';
+  }
+  validate(request, context) {
+    const validatedAt = Date.now();
+    if (!RoutePolicy.isMethodAllowed(request.method)) {
+      return ValidationResult.failure(
+        [{ code: ValidationError.INVALID_METHOD, message: 'HTTP Method ' + request.method + ' is not allowed.', validatorId: this.id }],
+        validatedAt,
+        0
+      );
+    }
+    return ValidationResult.success(validatedAt, 0);
+  }
+}
+
+class VersionValidator {
+  constructor() {
+    this.id = 'VERSION_VALIDATOR';
+  }
+  validate(request, context) {
+    const validatedAt = Date.now();
+    const supported = { v1: true, v2: true, v3: true, future: true };
+    if (!supported[request.version]) {
+      return ValidationResult.failure(
+        [{ code: ValidationError.INVALID_VERSION, message: 'API Version ' + request.version + ' is not supported.', validatorId: this.id }],
+        validatedAt,
+        0
+      );
+    }
+    return ValidationResult.success(validatedAt, 0);
+  }
+}
+
+class RouteValidator {
+  constructor() {
+    this.id = 'ROUTE_VALIDATOR';
+  }
+  validate(request, context) {
+    const validatedAt = Date.now();
+    const registry = EndpointRegistry.getInstance();
+    const routeKey = RouteResolver.resolveKey(request.method, request.version, request.path);
+    
+    let hasRegisteredRoute = registry.routes[routeKey] !== undefined;
+    if (hasRegisteredRoute) {
+      return ValidationResult.success(validatedAt, 0);
+    }
+
+    const action = request.body.action || request.query.action;
+    if (action) {
+      return ValidationResult.success(validatedAt, 0);
+    }
+
+    return ValidationResult.failure(
+      [{ code: ValidationError.ROUTE_NOT_FOUND, message: 'Route "' + request.method + ' ' + request.path + '" was not found.', validatorId: this.id }],
+      validatedAt,
+      0
+    );
+  }
+}
+
+class FeatureValidator {
+  constructor() {
+    this.id = 'FEATURE_VALIDATOR';
+  }
+  validate(request, context) {
+    const validatedAt = Date.now();
+    const config = GasConfigurationProvider.getInstance();
+    const flags = config.getFeatureFlags();
+
+    if (request.path === '/holding' && !flags.flyerHolding) {
+      return ValidationResult.failure(
+        [{ code: ValidationError.FEATURE_DISABLED, message: 'Held Flyers feature is currently disabled.', validatorId: this.id }],
+        validatedAt,
+        0
+      );
+    }
+
+    if (request.path === '/dashboard' && !flags.googleMaps && !flags.mapbox) {
+      return ValidationResult.failure(
+        [{ code: ValidationError.FEATURE_DISABLED, message: 'Map engine feature is currently disabled.', validatorId: this.id }],
+        validatedAt,
+        0
+      );
+    }
+
+    return ValidationResult.success(validatedAt, 0);
+  }
+}
+
+class ValidatorChain {
+  constructor() {
+    this.id = 'VALIDATOR_CHAIN';
+    this.validators = [];
+  }
+  addValidator(validator) {
+    this.validators.push(validator);
+    return this;
+  }
+  validate(request, context) {
+    const start = Date.now();
+    for (let i = 0; i < this.validators.length; i++) {
+      const validator = this.validators[i];
+      const result = validator.validate(request, context);
+      if (!result.valid) {
+        const duration = Date.now() - start;
+        return ValidationResult.failure(result.errors, start, duration);
+      }
+    }
+    const duration = Date.now() - start;
+    return ValidationResult.success(start, duration);
+  }
+}
+
+class ValidationPipeline {
+  constructor() {
+    this.chain = new ValidatorChain();
+    this.registerValidators();
+  }
+  static getInstance() {
+    if (!ValidationPipeline.instance) {
+      ValidationPipeline.instance = new ValidationPipeline();
+    }
+    return ValidationPipeline.instance;
+  }
+  registerValidators() {
+    this.chain
+      .addValidator(new RequestValidator())
+      .addValidator(new MethodValidator())
+      .addValidator(new VersionValidator())
+      .addValidator(new RouteValidator())
+      .addValidator(new FeatureValidator());
+  }
+  validate(request, context) {
+    const result = this.chain.validate(request, context);
+    if (!result.valid) {
+      throw new ValidationException(result);
+    }
+    return result;
+  }
+}
+ValidationPipeline.instance = null;
 
