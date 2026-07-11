@@ -1,4 +1,5 @@
 import { AuthenticationContext } from '../authentication/AuthenticationContext';
+import { AuthorizationContext } from '../authorization/AuthorizationContext';
 
 export class ApiExecutionContext {
   private requestId: string;
@@ -6,6 +7,7 @@ export class ApiExecutionContext {
   private startTimestamp: number;
   private retryCount: number = 0;
   private authContext: AuthenticationContext | null = null;
+  private authzContext: AuthorizationContext | null = null;
 
   constructor() {
     this.startTimestamp = Date.now();
@@ -71,5 +73,13 @@ export class ApiExecutionContext {
 
   public getAuthenticationContext(): AuthenticationContext | null {
     return this.authContext;
+  }
+
+  public setAuthorizationContext(context: AuthorizationContext): void {
+    this.authzContext = context;
+  }
+
+  public getAuthorizationContext(): AuthorizationContext | null {
+    return this.authzContext;
   }
 }

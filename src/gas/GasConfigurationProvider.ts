@@ -10,6 +10,10 @@ export interface FeatureFlags {
   liffAuth: boolean;
   serviceAuth: boolean;
   anonymousAccess: boolean;
+  authorizationEnabled: boolean;
+  roleValidation: boolean;
+  scopeValidation: boolean;
+  permissionValidation: boolean;
 }
 
 export class GasConfigurationProvider {
@@ -87,7 +91,11 @@ export class GasConfigurationProvider {
           apiKeyAuth: props.getProperty('FLAG_API_KEY_AUTH') !== 'false',
           liffAuth: props.getProperty('FLAG_LIFF_AUTH') !== 'false',
           serviceAuth: props.getProperty('FLAG_SERVICE_AUTH') !== 'false',
-          anonymousAccess: props.getProperty('FLAG_ANONYMOUS_ACCESS') !== 'false'
+          anonymousAccess: props.getProperty('FLAG_ANONYMOUS_ACCESS') !== 'false',
+          authorizationEnabled: props.getProperty('FLAG_AUTHORIZATION_ENABLED') !== 'false',
+          roleValidation: props.getProperty('FLAG_ROLE_VALIDATION') !== 'false',
+          scopeValidation: props.getProperty('FLAG_SCOPE_VALIDATION') !== 'false',
+          permissionValidation: props.getProperty('FLAG_PERMISSION_VALIDATION') !== 'false'
         };
       } catch (e) {
         // Fallback below
@@ -104,7 +112,11 @@ export class GasConfigurationProvider {
       apiKeyAuth: true,
       liffAuth: true,
       serviceAuth: true,
-      anonymousAccess: true
+      anonymousAccess: true,
+      authorizationEnabled: true,
+      roleValidation: true,
+      scopeValidation: true,
+      permissionValidation: true
     };
   }
 }

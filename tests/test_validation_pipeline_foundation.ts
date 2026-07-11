@@ -37,7 +37,11 @@ async function runTests() {
     apiKeyAuth: true,
     liffAuth: true,
     serviceAuth: true,
-    anonymousAccess: true
+    anonymousAccess: true,
+    authorizationEnabled: true,
+    roleValidation: true,
+    scopeValidation: true,
+    permissionValidation: true
   });
 
   // 1. Normal Request Verification (Passes Validation)
@@ -149,7 +153,11 @@ async function runTests() {
       apiKeyAuth: true,
       liffAuth: true,
       serviceAuth: true,
-      anonymousAccess: true
+      anonymousAccess: true,
+      authorizationEnabled: true,
+      roleValidation: true,
+      scopeValidation: true,
+      permissionValidation: true
     });
 
     const req = new ApiRequest({

@@ -106,6 +106,7 @@ function doGet(e) {
   try {
     HardeningPipeline.getInstance().execute(apiRequest, executionContext);
     AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
+    AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -307,6 +308,7 @@ function doPost(e) {
   try {
     HardeningPipeline.getInstance().execute(apiRequest, executionContext);
     AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
+    AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -2961,4 +2963,235 @@ class AuthenticationPipeline {
   }
 }
 AuthenticationPipeline.instance = null;
+
+// ==========================================
+// 🚀 AUTHORIZATION FOUNDATION CLASSES
+// ==========================================
+class AuthorizationContext {
+  constructor(params) {
+    this.role = params.role;
+    this.permissions = params.permissions;
+    this.scopes = params.scopes;
+    this.authorized = params.authorized;
+    this.metadata = params.metadata || {};
+  }
+}
+
+class AuthorizationResult {
+  constructor(success, context, failureReason) {
+    this.success = success;
+    this.context = context;
+    this.failureReason = failureReason;
+  }
+  static successResult(context) {
+    return new AuthorizationResult(true, context, null);
+  }
+  static failureResult(reason) {
+    return new AuthorizationResult(false, null, reason);
+  }
+}
+
+class AuthorizationPolicy {
+  constructor(params) {
+    this.requiredRoles = params.requiredRoles || [];
+    this.requiredPermissions = params.requiredPermissions || [];
+    this.requiredScopes = params.requiredScopes || [];
+  }
+  static resolve(request) {
+    if (request.path === '/admin' || (request.query && request.query.action === 'resetAllSheets')) {
+      return new AuthorizationPolicy({
+        requiredRoles: ['ADMIN', 'SYSTEM'],
+        requiredPermissions: ['ADMIN']
+      });
+    }
+    if (request.method === 'POST') {
+      return new AuthorizationPolicy({
+        requiredRoles: ['SYSTEM', 'ADMIN', 'LEADER', 'MEMBER'],
+        requiredPermissions: ['WRITE']
+      });
+    }
+    if (request.path === '/health') {
+      return new AuthorizationPolicy({});
+    }
+    return new AuthorizationPolicy({
+      requiredPermissions: ['READ']
+    });
+  }
+}
+
+class AuthorizationException extends ApiException {
+  constructor(code, internalMessage, requestId) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: internalMessage,
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'AuthorizationException',
+        exceptionCode: code,
+        source: 'AUTHORIZATION_PIPELINE'
+      }
+    });
+    this.category = 'SYSTEM';
+    this.code = code;
+    this.status = 403;
+  }
+}
+
+class RoleResolver {
+  resolve(authContext) {
+    if (!authContext.authenticated) {
+      return 'VIEWER';
+    }
+    const id = authContext.identityId;
+    if (id === 'service-aios-bridge-stub') {
+      return 'SYSTEM';
+    }
+    if (id === 'user-api-key-stub') {
+      return 'ADMIN';
+    }
+    if (id === 'user-liff-stub-123') {
+      return 'MEMBER';
+    }
+    return 'VIEWER';
+  }
+}
+
+class PermissionResolver {
+  constructor() {
+    this.roleResolver = new RoleResolver();
+  }
+  resolve(authContext) {
+    const role = this.roleResolver.resolve(authContext);
+    if (role === 'SYSTEM' || role === 'ADMIN') {
+      return ['READ', 'WRITE', 'DELETE', 'EXPORT', 'ADMIN'];
+    }
+    if (role === 'LEADER') {
+      return ['READ', 'WRITE', 'EXPORT'];
+    }
+    if (role === 'MEMBER') {
+      return ['READ', 'WRITE'];
+    }
+    return ['READ'];
+  }
+}
+
+class ScopeResolver {
+  constructor() {
+    this.roleResolver = new RoleResolver();
+  }
+  resolve(authContext) {
+    const role = this.roleResolver.resolve(authContext);
+    if (role === 'SYSTEM') {
+      return ['SYSTEM'];
+    }
+    if (role === 'ADMIN') {
+      return ['ORGANIZATION'];
+    }
+    if (role === 'LEADER') {
+      return ['BRANCH'];
+    }
+    if (role === 'MEMBER') {
+      return ['AREA'];
+    }
+    return ['SELF'];
+  }
+}
+
+class AuthorizationPipeline {
+  constructor() {
+    this.roleResolver = new RoleResolver();
+    this.permissionResolver = new PermissionResolver();
+    this.scopeResolver = new ScopeResolver();
+  }
+  static getInstance() {
+    if (!AuthorizationPipeline.instance) {
+      AuthorizationPipeline.instance = new AuthorizationPipeline();
+    }
+    return AuthorizationPipeline.instance;
+  }
+  execute(request, context) {
+    const config = GasConfigurationProvider.getInstance();
+    const flags = config.getFeatureFlags();
+
+    let authContext = context.getAuthenticationContext();
+    if (!authContext) {
+      authContext = new AuthenticationContext({
+        identityId: 'anonymous',
+        identityType: 'ANONYMOUS',
+        authenticationMethod: 'NONE',
+        authenticated: false,
+        issuedAt: Date.now()
+      });
+    }
+
+    const role = this.roleResolver.resolve(authContext);
+    const permissions = this.permissionResolver.resolve(authContext);
+    const scopes = this.scopeResolver.resolve(authContext);
+
+    const authzContext = new AuthorizationContext({
+      role: role,
+      permissions: permissions,
+      scopes: scopes,
+      authorized: true,
+      metadata: {
+        decisionSource: 'AuthorizationPipeline',
+        evaluationTime: Date.now()
+      }
+    });
+
+    context.setAuthorizationContext(authzContext);
+
+    if (flags.authorizationEnabled === false) {
+      return;
+    }
+
+    const policy = AuthorizationPolicy.resolve(request);
+
+    if (flags.roleValidation !== false && policy.requiredRoles.length > 0) {
+      if (policy.requiredRoles.indexOf(role) === -1) {
+        throw new AuthorizationException(
+          'PM-AUTHZ-002',
+          'Required role not met. Allowed roles: ' + policy.requiredRoles.join(', '),
+          request.requestId
+        );
+      }
+    }
+
+    if (flags.permissionValidation !== false && policy.requiredPermissions.length > 0) {
+      let hasAllPermissions = true;
+      for (let i = 0; i < policy.requiredPermissions.length; i++) {
+        if (permissions.indexOf(policy.requiredPermissions[i]) === -1) {
+          hasAllPermissions = false;
+          break;
+        }
+      }
+      if (!hasAllPermissions) {
+        throw new AuthorizationException(
+          'PM-AUTHZ-003',
+          'Required permissions not met. Required: ' + policy.requiredPermissions.join(', '),
+          request.requestId
+        );
+      }
+    }
+
+    if (flags.scopeValidation !== false && policy.requiredScopes.length > 0) {
+      let hasAllScopes = true;
+      for (let i = 0; i < policy.requiredScopes.length; i++) {
+        if (scopes.indexOf(policy.requiredScopes[i]) === -1) {
+          hasAllScopes = false;
+          break;
+        }
+      }
+      if (!hasAllScopes) {
+        throw new AuthorizationException(
+          'PM-AUTHZ-004',
+          'Required data boundary scopes not met. Required: ' + policy.requiredScopes.join(', '),
+          request.requestId
+        );
+      }
+    }
+  }
+}
+AuthorizationPipeline.instance = null;
 
