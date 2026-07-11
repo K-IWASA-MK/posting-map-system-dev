@@ -7,7 +7,8 @@ const allowedDependencies: Record<string, string[]> = {
   'foundation': ['core'],
   'domain': ['core', 'foundation'],
   'application': ['core', 'foundation', 'domain'],
-  'infrastructure': ['core', 'foundation', 'domain']
+  'infrastructure': ['core', 'foundation', 'domain'],
+  'api': ['core', 'foundation', 'application']
 };
 
 function getFiles(dir: string, fileList: string[] = []): string[] {
@@ -16,6 +17,7 @@ function getFiles(dir: string, fileList: string[] = []): string[] {
   for (const file of files) {
     const filePath = path.join(dir, file);
     if (fs.statSync(filePath).isDirectory()) {
+      if (file === 'bootstrap') continue; // Skip composition roots (bootstrap)
       getFiles(filePath, fileList);
     } else if (filePath.endsWith('.ts')) {
       fileList.push(filePath);

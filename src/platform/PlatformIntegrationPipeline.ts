@@ -18,13 +18,17 @@ import { CacheServiceProvider } from '@infra/gas/CacheServiceProvider';
 import { ExceptionHandler } from '@core/exceptions/ExceptionHandler';
 import { ApiLifecycleObserver } from '@foundation/monitoring/ApiLifecycleObserver';
 import { ApiVersionResolver } from '@core/api/ApiVersionResolver';
+import { bootstrapFieldApis } from '../infrastructure/bootstrap/FieldApiBootstrap';
 
 declare function createJsonResponseFromApiResponse(apiResponse: any): any;
 
 export class PlatformIntegrationPipeline {
   public static lastContext: ApiExecutionContext | null = null;
 
-  public static execute(e: any): any {
+  public static async execute(e: any): Promise<any> {
+    // Bootstrap dynamic API registrations
+    bootstrapFieldApis();
+
     const start = Date.now();
     const apiContext = new ApiExecutionContext();
     PlatformIntegrationPipeline.lastContext = apiContext;
@@ -73,13 +77,16 @@ export class PlatformIntegrationPipeline {
       }
 
       const action = (method === 'POST' ? (postData?.action || e.parameter.action) : e.parameter.action) || 'health';
-      let path = '/' + action;
-      if (action === 'getAppData') {
-        path = '/dashboard';
-      } else if (action === 'getFlyerStock') {
-        path = '/holding';
-      } else if (action === 'updateFlyerStock') {
-        path = '/holding';
+      let path = (method === 'POST' ? (postData?.path || e.parameter.path) : e.parameter.path) || '';
+      if (!path) {
+        path = '/' + action;
+        if (action === 'getAppData') {
+          path = '/dashboard';
+        } else if (action === 'getFlyerStock') {
+          path = '/holding';
+        } else if (action === 'updateFlyerStock') {
+          path = '/holding';
+        }
       }
 
       const queryVersion = method === 'POST' ? (postData?.version || e.parameter.version || postData?.v) : (e.parameter.version || e.parameter.v);
@@ -167,7 +174,7 @@ export class PlatformIntegrationPipeline {
       apiContext.setCurrentStage(PlatformStage.ROUTING);
       PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.ROUTING);
       const startRoute = Date.now();
-      EndpointRegistry.getInstance().getHandler(apiRequest.method, apiRequest.version, apiRequest.path);
+      EndpointRegistry.getInstance().getHandler(apiRequest.method, apiRequest.version, apiRequest.path, apiRequest);
       apiContext.setRoutingTime(Date.now() - startRoute);
       ApiLifecycleObserver.onRoutingSuccess(apiRequest, apiContext);
       PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.ROUTING, Date.now() - startRoute);
@@ -195,9 +202,11 @@ export class PlatformIntegrationPipeline {
         'resetAllSheets'
       ];
 
-      if (method === 'POST' && writeActions.indexOf(action) !== -1) {
-        apiResponse = LockServiceProvider.getInstance().executeWithLock(() => {
-          return ApiRouter.getInstance().route(apiRequest!, apiContext);
+      const isWriteAction = (method === 'POST' && (writeActions.indexOf(action) !== -1 || path === '/field/reservation'));
+
+      if (isWriteAction) {
+        apiResponse = await LockServiceProvider.getInstance().executeWithLockAsync(async () => {
+          return await ApiRouter.getInstance().route(apiRequest!, apiContext);
         });
         if (apiResponse && apiResponse.success) {
           const cacheKey = CacheServiceProvider.getInstance().makeKey(
@@ -208,7 +217,7 @@ export class PlatformIntegrationPipeline {
           CacheServiceProvider.getInstance().remove(cacheKey);
         }
       } else {
-        apiResponse = ApiRouter.getInstance().route(apiRequest, apiContext);
+        apiResponse = await ApiRouter.getInstance().route(apiRequest, apiContext);
       }
 
       apiContext.setHandlerTime(Date.now() - startHandler);

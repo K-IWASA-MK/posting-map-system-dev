@@ -639,6 +639,7 @@ class ApiRequest {
   public readonly body: Record<string, any>;
   public readonly headers: Record<string, any>;
   public readonly requestId: string;
+  public readonly pathParams: Record<string, string>;
 
   constructor(params: {
     method: string;
@@ -648,6 +649,7 @@ class ApiRequest {
     body?: Record<string, any>;
     headers?: Record<string, any>;
     requestId: string;
+    pathParams?: Record<string, string>;
   }) {
     this.method = params.method.toUpperCase();
     this.path = params.path;
@@ -656,6 +658,7 @@ class ApiRequest {
     this.body = params.body || {};
     this.headers = params.headers || {};
     this.requestId = params.requestId;
+    this.pathParams = params.pathParams || {};
   }
 }
 
@@ -729,7 +732,7 @@ class ApiRouter {
     return ApiRouter.instance;
   }
 
-  public route(request: ApiRequest, context: ApiExecutionContext): ApiResponse {
+  public async route(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
     const metadata = {
       requestId: request.requestId,
       serverTimestamp: context.getStartTimestamp(),
@@ -749,10 +752,10 @@ class ApiRouter {
 
     try {
       // 2. Resolve handler
-      const handler = this.registry.getHandler(request.method, request.version, request.path);
+      const handler = this.registry.getHandler(request.method, request.version, request.path, request);
       
       // 3. Execute handler
-      return handler.execute(request, context);
+      return await handler.execute(request, context);
     } catch (err: any) {
       return ApiResponse.errorResponse(
         'INTERNAL_SERVER_ERROR',
@@ -798,6 +801,14 @@ class ApiVersionResolver {
 class EndpointRegistry {
   private static instance: EndpointRegistry | null = null;
   private readonly routes: Map<string, EndpointHandler> = new Map();
+  private readonly patternRoutes: Array<{
+    method: string;
+    version: string;
+    pattern: string;
+    regex: RegExp;
+    paramNames: string[];
+    handler: EndpointHandler;
+  }> = [];
   private readonly unknownHandler: EndpointHandler;
 
   private constructor() {
@@ -830,11 +841,68 @@ class EndpointRegistry {
   public register(method: string, version: string, path: string, handler: EndpointHandler): void {
     const key = RouteResolver.resolveKey(method, version, path);
     this.routes.set(key, handler);
+
+    // Dynamic pattern registration
+    if (path.includes('{')) {
+      const paramNames: string[] = [];
+      let regexStr = path.replace(/{([^}]+)}/g, (_, name) => {
+        paramNames.push(name);
+        return '([^/]+)';
+      });
+
+      if (!regexStr.startsWith('/')) {
+        regexStr = '/' + regexStr;
+      }
+      if (regexStr.endsWith('/') && regexStr.length > 1) {
+        regexStr = regexStr.slice(0, -1);
+      }
+
+      const regex = new RegExp(`^${regexStr}$`, 'i');
+      this.patternRoutes.push({
+        method: method.toUpperCase(),
+        version: version.toLowerCase(),
+        pattern: path,
+        regex,
+        paramNames,
+        handler
+      });
+    }
   }
 
-  public getHandler(method: string, version: string, path: string): EndpointHandler {
+  public getHandler(method: string, version: string, path: string, request?: ApiRequest): EndpointHandler {
+    // 1. Exact Match
     const key = RouteResolver.resolveKey(method, version, path);
-    return this.routes.get(key) || this.unknownHandler;
+    const exactHandler = this.routes.get(key);
+    if (exactHandler) {
+      return exactHandler;
+    }
+
+    // 2. Pattern Match
+    let normPath = path.trim();
+    if (!normPath.startsWith('/')) {
+      normPath = '/' + normPath;
+    }
+    if (normPath.endsWith('/') && normPath.length > 1) {
+      normPath = normPath.slice(0, -1);
+    }
+
+    for (const pr of this.patternRoutes) {
+      if (pr.method === method.toUpperCase() && pr.version === version.toLowerCase()) {
+        const match = normPath.match(pr.regex);
+        if (match) {
+          if (request) {
+            pr.paramNames.forEach((name, index) => {
+              const val = match[index + 1];
+              (request.pathParams as any)[name] = decodeURIComponent(val);
+            });
+          }
+          return pr.handler;
+        }
+      }
+    }
+
+    // 3. Legacy Fallback
+    return this.unknownHandler;
   }
 }
 
@@ -901,7 +969,7 @@ class DashboardHandler implements EndpointHandler {
 // --- Source: src/core/api/handlers/EndpointHandler.ts ---
 
 interface EndpointHandler {
-  execute(request: ApiRequest, context: ApiExecutionContext): ApiResponse;
+  execute(request: ApiRequest, context: ApiExecutionContext): ApiResponse | Promise<ApiResponse>;
 }
 
 

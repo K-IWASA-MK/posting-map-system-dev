@@ -6,6 +6,7 @@ export class ApiRequest {
   public readonly body: Record<string, any>;
   public readonly headers: Record<string, any>;
   public readonly requestId: string;
+  public readonly pathParams: Record<string, string>;
 
   constructor(params: {
     method: string;
@@ -15,6 +16,7 @@ export class ApiRequest {
     body?: Record<string, any>;
     headers?: Record<string, any>;
     requestId: string;
+    pathParams?: Record<string, string>;
   }) {
     this.method = params.method.toUpperCase();
     this.path = params.path;
@@ -23,5 +25,6 @@ export class ApiRequest {
     this.body = params.body || {};
     this.headers = params.headers || {};
     this.requestId = params.requestId;
+    this.pathParams = params.pathParams || {};
   }
 }

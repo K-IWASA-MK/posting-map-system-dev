@@ -13,18 +13,9 @@ export class RouteValidator implements Validator {
     const validatedAt = Date.now();
     const registry = EndpointRegistry.getInstance();
     
-    // Check if explicitly registered in registry
-    const routeKey = RouteResolver.resolveKey(request.method, request.version, request.path);
-    const routesMap = (registry as any).routes;
-    
-    let hasRegisteredRoute = false;
-    if (routesMap) {
-      if (typeof routesMap.has === 'function') {
-        hasRegisteredRoute = routesMap.has(routeKey);
-      } else {
-        hasRegisteredRoute = routesMap[routeKey] !== undefined;
-      }
-    }
+    // Check if resolved by the registry (handles exact and pattern matches)
+    const handler = registry.getHandler(request.method, request.version, request.path);
+    const hasRegisteredRoute = handler !== (registry as any).unknownHandler;
 
     if (hasRegisteredRoute) {
       return ValidationResult.success(validatedAt, 0);

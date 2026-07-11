@@ -92,7 +92,7 @@ async function runTests() {
       version: 'v2',
       requestId: context.getRequestId()
     });
-    const res1 = router.route(req1, context);
+    const res1 = await router.route(req1, context);
     assert(res1.status === 501, 'Dashboard stub should return 501 NotImplemented');
     assert(res1.error?.code === 'NOT_IMPLEMENTED', 'Expected code NOT_IMPLEMENTED');
 
@@ -103,7 +103,7 @@ async function runTests() {
       version: 'v2',
       requestId: context.getRequestId()
     });
-    const res2 = router.route(req2, context);
+    const res2 = await router.route(req2, context);
     assert(res2.status === 404, 'Unknown endpoint should return 404 Not Found');
     assert(res2.error?.code === 'ROUTE_NOT_FOUND', 'Expected error code ROUTE_NOT_FOUND');
 
@@ -114,7 +114,7 @@ async function runTests() {
       version: 'v2',
       requestId: context.getRequestId()
     });
-    const res3 = router.route(req3, context);
+    const res3 = await router.route(req3, context);
     assert(res3.status === 405, 'Disallowed HTTP method should return 405 Method Not Allowed');
     assert(res3.error?.code === 'METHOD_NOT_ALLOWED', 'Expected error code METHOD_NOT_ALLOWED');
 

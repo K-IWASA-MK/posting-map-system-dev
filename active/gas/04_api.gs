@@ -287,6 +287,14 @@ class GasConfigurationProvider {
     return 'MOCK_SPREADSHEET_ID';
   }
 
+  public getFieldRepositoryMode(): string {
+    if (typeof PropertiesService !== 'undefined') {
+      const mode = PropertiesService.getScriptProperties().getProperty('FIELD_REPOSITORY_MODE');
+      if (mode) return mode;
+    }
+    return 'SPREADSHEET';
+  }
+
   public getStorageParentFolderId(): string {
     if (typeof PropertiesService !== 'undefined') {
       const id = PropertiesService.getScriptProperties().getProperty('STORAGE_PARENT_ID');
@@ -468,6 +476,33 @@ class LockServiceProvider {
 
     try {
       return action();
+    } finally {
+      try {
+        lock.releaseLock();
+      } catch (releaseError) {
+        console.error('[LockServiceProvider] Error releasing lock:', releaseError);
+      }
+    }
+  }
+
+  /**
+   * 非同期でロックを取得してアクションを実行する。実行後は確実にロックを解放する。
+   */
+  public async executeWithLockAsync<T>(action: () => Promise<T>): Promise<T> {
+    if (typeof LockService === 'undefined') {
+      return await action();
+    }
+
+    const lock = LockService.getScriptLock();
+    const timeoutMs = this.configProvider.getLockTimeout();
+    const hasLock = lock.tryLock(timeoutMs);
+
+    if (!hasLock) {
+      throw new Error(`Lock Timeout: Failed to acquire script lock within ${timeoutMs}ms.`);
+    }
+
+    try {
+      return await action();
     } finally {
       try {
         lock.releaseLock();

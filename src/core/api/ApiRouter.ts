@@ -19,7 +19,7 @@ export class ApiRouter {
     return ApiRouter.instance;
   }
 
-  public route(request: ApiRequest, context: ApiExecutionContext): ApiResponse {
+  public async route(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
     const metadata = {
       requestId: request.requestId,
       serverTimestamp: context.getStartTimestamp(),
@@ -39,10 +39,10 @@ export class ApiRouter {
 
     try {
       // 2. Resolve handler
-      const handler = this.registry.getHandler(request.method, request.version, request.path);
+      const handler = this.registry.getHandler(request.method, request.version, request.path, request);
       
       // 3. Execute handler
-      return handler.execute(request, context);
+      return await handler.execute(request, context);
     } catch (err: any) {
       return ApiResponse.errorResponse(
         'INTERNAL_SERVER_ERROR',

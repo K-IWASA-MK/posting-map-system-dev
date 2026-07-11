@@ -14,7 +14,8 @@
       "@foundation/*": ["src/foundation/*"],
       "@domain/*": ["src/domain/*"],
       "@infra/*": ["src/infrastructure/*"],
-      "@application/*": ["src/application/*"]
+      "@application/*": ["src/application/*"],
+      "@api/*": ["src/api/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"]

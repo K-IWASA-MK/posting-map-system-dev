@@ -174,7 +174,7 @@ async function runTests() {
       }
     };
 
-    const response = PlatformIntegrationPipeline.execute(mockEvent);
+    const response = await PlatformIntegrationPipeline.execute(mockEvent);
 
     assert(response !== null, 'Should return a response');
     assert(response.body !== null, 'Response body should not be null');
@@ -228,7 +228,7 @@ async function runTests() {
     };
 
     mockScriptLock.hasLock = false;
-    const response = PlatformIntegrationPipeline.execute(mockPostEvent);
+    const response = await PlatformIntegrationPipeline.execute(mockPostEvent);
     // HoldingHandler returns 501 NotImplemented as a stub
     assert(response.body.status === 501, 'POST request should run handler to completion (501)');
     // Lock must have been acquired and then released
@@ -248,7 +248,7 @@ async function runTests() {
       }
     };
 
-    const response = PlatformIntegrationPipeline.execute(mockBadEvent);
+    const response = await PlatformIntegrationPipeline.execute(mockBadEvent);
     assert(response.body.success === false, 'Failure path response should have success: false');
     assert(response.body.status === 401, 'Failure path response status should be 401');
 
