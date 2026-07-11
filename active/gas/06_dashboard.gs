@@ -20,6 +20,8 @@ interface StaffSummary {
   displayName: string;
   holdingQuantity: number;
   monthlyDistributionQuantity: number;
+  activityDays: number;
+  activityIndex: number;
 }
 
 interface NewStaffDto {
@@ -27,15 +29,21 @@ interface NewStaffDto {
   displayName: string;
   registeredAt: string;
   holdingQuantity: number;
+  firstActivityDate: string;
 }
 
 interface WorkspaceDashboardDto {
   workspaceId: string;
   workspaceName: string;
-  members: StaffSummary[];
-  newMembers: NewStaffDto[];
+  memberCount: number;
+  newMemberCount: number;
   totalHoldingQuantity: number;
   monthlyDistributionQuantity: number;
+  previousMonthDistributionQuantity: number;
+  growthRate: string;
+  members: StaffSummary[];
+  newMembers: NewStaffDto[];
+  monthlyTrend: { month: string; quantity: number }[];
 }
 
 interface RankingDto {
@@ -43,6 +51,7 @@ interface RankingDto {
   staffNo: string;
   displayName: string;
   quantity: number;
+  activityIndex: number;
 }
 
 interface MonthlyActivitySummary {
@@ -82,7 +91,6 @@ class DashboardApplicationService {
 
     const yearMonthObj = typeof yearMonth === 'string' ? new YearMonth(yearMonth) : yearMonth;
 
-    // Calculate monthly activity from logs
     const { start, end } = yearMonthObj 
       ? { start: yearMonthObj.getStartDate(), end: yearMonthObj.getEndDate() }
       : this.getCurrentMonthRange();
@@ -104,70 +112,144 @@ class DashboardApplicationService {
     const wsName = ws ? ws.workspaceName : '不明な支部';
 
     const staffList = await this.staffRepo.findByWorkspace(workspaceId);
+    const staffIds = staffList.map(s => s.staffNo);
     const yearMonthObj = typeof yearMonth === 'string' ? new YearMonth(yearMonth) : (yearMonth || new YearMonth(new Date()));
 
+    // Current month range
     const { start, end } = { start: yearMonthObj.getStartDate(), end: yearMonthObj.getEndDate() };
     const allActivities = await this.activityRepo.findByPeriod(start, end);
+
+    // Previous month range
+    const prevMonthObj = yearMonthObj.getMonth() === 1
+      ? new YearMonth(`${yearMonthObj.getYear() - 1}12`)
+      : new YearMonth(`${yearMonthObj.getYear()}${String(yearMonthObj.getMonth() - 1).padStart(2, '0')}`);
+    const { start: pStart, end: pEnd } = { start: prevMonthObj.getStartDate(), end: prevMonthObj.getEndDate() };
+    const prevActivities = await this.activityRepo.findByPeriod(pStart, pEnd);
+
+    // Fetch all activities for firstActivityDate lookup
+    const allTimeActivities = await this.activityRepo.findByPeriod(new Date(2000, 0, 1), new Date(2100, 0, 1));
 
     const members: StaffSummary[] = [];
     let totalHolding = 0;
     let totalActivity = 0;
+    let totalPrevActivity = 0;
 
     for (const staff of staffList) {
       const holding = await this.holdingRepo.findByStaffNo(staff.staffNo);
       const holdingQty = holding ? holding.getQuantity().getValue() : 0;
 
+      // Current month activity
       const staffActivities = allActivities.filter(a => a.staffNo === staff.staffNo);
       const monthlyTotal = staffActivities.reduce((sum, a) => sum + a.reportedQuantity.getValue(), 0);
+
+      // Previous month activity
+      const staffPrevActivities = prevActivities.filter(a => a.staffNo === staff.staffNo);
+      const prevMonthlyTotal = staffPrevActivities.reduce((sum, a) => sum + a.reportedQuantity.getValue(), 0);
+
+      // Activity Index calculations
+      const uniqueDays = new Set(staffActivities.map(a => {
+        const d = a.occurredAt;
+        return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+      })).size;
+      const isNewStaff = staff.createdAt.getTime() >= start.getTime() && staff.createdAt.getTime() <= end.getTime();
+      const actIndex = monthlyTotal + (uniqueDays * 100) + (isNewStaff ? 500 : 0);
 
       members.push({
         staffNo: staff.staffNo,
         displayName: staff.displayName,
         holdingQuantity: holdingQty,
-        monthlyDistributionQuantity: monthlyTotal
+        monthlyDistributionQuantity: monthlyTotal,
+        activityDays: uniqueDays,
+        activityIndex: actIndex
       });
 
       totalHolding += holdingQty;
       totalActivity += monthlyTotal;
+      totalPrevActivity += prevMonthlyTotal;
     }
 
+    // Sort rankings by monthlyDistributionQuantity descending (criteria is distribution volume)
+    members.sort((a, b) => b.monthlyDistributionQuantity - a.monthlyDistributionQuantity);
+
+    // Calculate growth rate
+    let growthRate = '0%';
+    if (totalPrevActivity > 0) {
+      const rate = ((totalActivity - totalPrevActivity) / totalPrevActivity) * 100;
+      growthRate = rate >= 0 ? `+${Math.round(rate)}%` : `${Math.round(rate)}%`;
+    } else if (totalActivity > 0) {
+      growthRate = '+100%';
+    }
+
+    // New members compilation
     const newStaffList = await this.staffRepo.findNewStaffByMonth(workspaceId, yearMonthObj);
     const newMembers: NewStaffDto[] = [];
     
     for (const staff of newStaffList) {
       const holding = await this.holdingRepo.findByStaffNo(staff.staffNo);
       const holdingQty = holding ? holding.getQuantity().getValue() : 0;
+
+      // Find first activity date
+      const staffActs = allTimeActivities.filter(a => a.staffNo === staff.staffNo);
+      let firstActivityDate = 'なし';
+      if (staffActs.length > 0) {
+        const oldest = staffActs.reduce((oldestAct, currentAct) => {
+          return currentAct.occurredAt.getTime() < oldestAct.occurredAt.getTime() ? currentAct : oldestAct;
+        });
+        firstActivityDate = this.formatDate(oldest.occurredAt);
+      }
+
       newMembers.push({
         staffNo: staff.staffNo,
         displayName: staff.displayName,
         registeredAt: this.formatDate(staff.createdAt),
-        holdingQuantity: holdingQty
+        holdingQuantity: holdingQty,
+        firstActivityDate
       });
+    }
+
+    // 6-month monthly trend
+    const monthlyTrend: { month: string; quantity: number }[] = [];
+    let tempYM = yearMonthObj;
+    for (let i = 0; i < 6; i++) {
+      const { start: tStart, end: tEnd } = { start: tempYM.getStartDate(), end: tempYM.getEndDate() };
+      const tempActs = await this.activityRepo.findByPeriod(tStart, tEnd);
+      const wsTempActs = tempActs.filter(a => staffIds.indexOf(a.staffNo) !== -1);
+      const tempTotal = wsTempActs.reduce((sum, a) => sum + a.reportedQuantity.getValue(), 0);
+
+      monthlyTrend.unshift({
+        month: `${tempYM.getMonth()}月`,
+        quantity: tempTotal
+      });
+
+      // Move to previous month
+      tempYM = tempYM.getMonth() === 1
+        ? new YearMonth(`${tempYM.getYear() - 1}12`)
+        : new YearMonth(`${tempYM.getYear()}${String(tempYM.getMonth() - 1).padStart(2, '0')}`);
     }
 
     return {
       workspaceId,
       workspaceName: wsName,
+      memberCount: staffList.length,
+      newMemberCount: newMembers.length,
+      totalHoldingQuantity: totalHolding,
+      monthlyDistributionQuantity: totalActivity,
+      previousMonthDistributionQuantity: totalPrevActivity,
+      growthRate,
       members,
       newMembers,
-      totalHoldingQuantity: totalHolding,
-      monthlyDistributionQuantity: totalActivity
+      monthlyTrend
     };
   }
 
   public async getMonthlyRanking(workspaceId: string, yearMonth?: string | YearMonth): Promise<RankingDto[]> {
     const dashboard = await this.getWorkspaceDashboard(workspaceId, yearMonth);
-    
-    // Sort members based strictly on monthly distribution quantity descending
-    const sorted = [...dashboard.members].sort(
-      (a, b) => b.monthlyDistributionQuantity - a.monthlyDistributionQuantity
-    );
-
-    return sorted.map((item, idx) => ({
+    return dashboard.members.map((item, idx) => ({
       rank: idx + 1,
       staffNo: item.staffNo,
       displayName: item.displayName,
-      quantity: item.monthlyDistributionQuantity
+      quantity: item.monthlyDistributionQuantity,
+      activityIndex: item.activityIndex
     }));
   }
 
@@ -237,11 +319,17 @@ class DashboardHandler implements EndpointHandler {
 
         const dashboard = await this.dashboardAppService.getWorkspaceDashboard(workspaceId, yearMonthParam);
         const result = {
+          workspaceId: dashboard.workspaceId,
           name: dashboard.workspaceName,
+          memberCount: dashboard.memberCount,
+          newMemberCount: dashboard.newMemberCount,
           total: dashboard.totalHoldingQuantity,
           monthlyActivity: dashboard.monthlyDistributionQuantity,
+          previousMonthActivity: dashboard.previousMonthDistributionQuantity,
+          growthRate: dashboard.growthRate,
           members: dashboard.members,
-          newMembers: dashboard.newMembers
+          newMembers: dashboard.newMembers,
+          monthlyTrend: dashboard.monthlyTrend
         };
         return FieldApiMapper.toSuccessResponse(result, request, context);
       }
@@ -258,7 +346,8 @@ class DashboardHandler implements EndpointHandler {
         const result = rankings.map(r => ({
           rank: r.rank,
           name: r.displayName,
-          quantity: r.quantity
+          quantity: r.quantity,
+          activityIndex: r.activityIndex
         }));
         return FieldApiMapper.toSuccessResponse(result, request, context);
       }

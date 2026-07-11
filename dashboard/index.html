@@ -81,7 +81,7 @@
     <header class="flex justify-between items-center py-4 border-b border-default">
       <div>
         <h1 class="text-2xl font-extrabold tracking-tighter" id="title-workspace-name">支部ダッシュボード</h1>
-        <p class="text-[9px] font-bold text-secondary uppercase tracking-widest mt-1">Operational Environment</p>
+        <p class="text-[10px] font-bold text-primary tracking-widest mt-1" id="header-period-label">2026年8月</p>
       </div>
       <button onclick="logout()" class="text-xs font-bold text-secondary hover:text-white border border-default rounded-full px-4 py-2 hover:bg-white/5 transition-all">
         ログアウト
@@ -90,36 +90,54 @@
 
     <!-- KPI section -->
     <main class="space-y-6 flex-1">
-      <div class="grid grid-cols-2 gap-4">
-        <div class="glass-card p-6 flex flex-col justify-center">
-          <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-2">参加スタッフ</span>
-          <span class="text-3xl font-extrabold" id="kpi-staff-count">0人</span>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="glass-card p-5 flex flex-col justify-center">
+          <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">参加スタッフ</span>
+          <span class="text-2xl font-extrabold" id="kpi-staff-count">0人</span>
         </div>
-        <div class="glass-card p-6 flex flex-col justify-center">
-          <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-2">現在保有合計</span>
-          <span class="text-3xl font-extrabold" id="kpi-total-holding">0枚</span>
+        <div class="glass-card p-5 flex flex-col justify-center">
+          <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">現在保有</span>
+          <span class="text-2xl font-extrabold" id="kpi-total-holding">0枚</span>
+        </div>
+        <div class="glass-card p-5 flex flex-col justify-center position-relative">
+          <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">今月活動</span>
+          <span class="text-2xl font-extrabold" id="kpi-monthly-activity">0枚</span>
+          <div class="flex justify-between items-center mt-1 text-[9px] text-secondary">
+            <span id="kpi-prev-month">先月: 0枚</span>
+            <span class="font-extrabold text-emerald-400" id="kpi-growth-rate">+0%</span>
+          </div>
         </div>
       </div>
 
-      <!-- New members -->
+      <!-- Monthly Trend chart -->
       <section class="glass-card p-6 space-y-4">
-        <h3 class="text-sm font-bold tracking-tight">🆕 今月新規参加者</h3>
-        <div class="divide-y divide-default" id="new-members-list">
-          <p class="text-sm text-secondary py-2">今月の新規参加者はいません</p>
+        <h3 class="text-sm font-bold tracking-tight">📈 直近6ヶ月の配布量推移</h3>
+        <div class="flex items-end justify-between h-36 pt-4 px-2" id="monthly-trend-chart">
+          <!-- Bars are generated via manager.js -->
         </div>
       </section>
 
-      <!-- Ranking list -->
-      <section class="glass-card p-6 space-y-4">
-        <h3 class="text-sm font-bold tracking-tight">今月配布活動ランキング</h3>
-        <div class="divide-y divide-default" id="ranking-list">
-          <p class="text-sm text-secondary py-2">配布活動ログがありません</p>
-        </div>
-      </section>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- New members -->
+        <section class="glass-card p-6 space-y-4">
+          <h3 class="text-sm font-bold tracking-tight">🆕 今月新規参加者</h3>
+          <div class="divide-y divide-default" id="new-members-list">
+            <p class="text-sm text-secondary py-2">今月の新規参加者はいません</p>
+          </div>
+        </section>
+
+        <!-- Ranking list -->
+        <section class="glass-card p-6 space-y-4">
+          <h3 class="text-sm font-bold tracking-tight">🏆 配布活動ランキング</h3>
+          <div class="divide-y divide-default" id="ranking-list">
+            <p class="text-sm text-secondary py-2">配布活動ログがありません</p>
+          </div>
+        </section>
+      </div>
     </main>
 
     <!-- Footer -->
-    <footer class="py-6 text-center text-[9px] font-bold text-secondary uppercase tracking-widest">
+    <footer class="py-6 text-center text-[9px] font-bold text-secondary uppercase tracking-widest border-t border-default">
       Operational Environment
     </footer>
   </div>

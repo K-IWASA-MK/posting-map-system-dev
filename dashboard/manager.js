@@ -1,8 +1,9 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
 
-// Parse workspaceId from URL params or default
+// Parse workspaceId and yearMonth from URL params or default
 const urlParams = new URLSearchParams(window.location.search);
 const workspaceId = urlParams.get('workspaceId') || 'WS-MIE-03';
+const yearMonth = urlParams.get('yearMonth') || '';
 
 let googleUser = JSON.parse(localStorage.getItem('google_user')) || null;
 
@@ -42,7 +43,10 @@ async function checkAuth() {
 }
 
 async function fetchDashboardData(email) {
-  const url = `${API_URL}?action=getWorkspaceDashboard&workspaceId=${workspaceId}&googleEmail=${encodeURIComponent(email)}`;
+  let url = `${API_URL}?action=getWorkspaceDashboard&workspaceId=${workspaceId}&googleEmail=${encodeURIComponent(email)}`;
+  if (yearMonth) {
+    url += `&yearMonth=${yearMonth}`;
+  }
   try {
     const response = await fetch(url);
     return await response.json();
@@ -53,7 +57,6 @@ async function fetchDashboardData(email) {
 
 function handleGoogleLogin() {
   // Simulate Google OAuth flow by setting a dummy user for the demo client side
-  // In actual production deployment, this triggers GIS (Google Identity Services) popup.
   const email = prompt("Googleアカウントのメールアドレスを入力してください:", "manager@mie.example.com");
   if (email && email.includes('@')) {
     googleUser = { email: email, name: email.split('@')[0] };
@@ -65,11 +68,57 @@ function handleGoogleLogin() {
 }
 
 function renderDashboard(data) {
-  document.getElementById('title-workspace-name').textContent = data.workspaceName || workspaceId;
-  document.getElementById('kpi-staff-count').textContent = `${data.members ? data.members.length : 0}人`;
-  document.getElementById('kpi-total-holding').textContent = `${data.totalHoldingQuantity || 0}枚`;
+  document.getElementById('title-workspace-name').textContent = data.name || workspaceId;
+  
+  // Format period label
+  let displayPeriod = '今月';
+  if (yearMonth) {
+    const y = yearMonth.substring(0, 4);
+    const m = parseInt(yearMonth.substring(4, 6), 10);
+    displayPeriod = `${y}年${m}月`;
+  } else {
+    const now = new Date();
+    displayPeriod = `${now.getFullYear()}年${now.getMonth() + 1}月`;
+  }
+  document.getElementById('header-period-label').textContent = `${displayPeriod} 実績レポート`;
 
-  // Render new members
+  // KPIs
+  document.getElementById('kpi-staff-count').textContent = `${data.memberCount || 0}人`;
+  document.getElementById('kpi-total-holding').textContent = `${(data.total || 0).toLocaleString()}枚`;
+  document.getElementById('kpi-monthly-activity').textContent = `${(data.monthlyActivity || 0).toLocaleString()}枚`;
+  document.getElementById('kpi-prev-month').textContent = `先月: ${(data.previousMonthActivity || 0).toLocaleString()}枚`;
+  
+  // Growth rate coloring
+  const growthRateEl = document.getElementById('kpi-growth-rate');
+  growthRateEl.textContent = data.growthRate || '0%';
+  if (data.growthRate && data.growthRate.startsWith('-')) {
+    growthRateEl.className = 'font-extrabold text-red-400';
+  } else {
+    growthRateEl.className = 'font-extrabold text-emerald-400';
+  }
+
+  // Render 6-month chart
+  const chartContainer = document.getElementById('monthly-trend-chart');
+  chartContainer.innerHTML = '';
+  if (data.monthlyTrend && data.monthlyTrend.length > 0) {
+    const maxVal = Math.max(...data.monthlyTrend.map(t => t.quantity), 1);
+    data.monthlyTrend.forEach(t => {
+      // Calculate height in px (max 90px height for the bar)
+      const barHeight = Math.max(Math.round((t.quantity / maxVal) * 90), 4);
+      const barWrapper = document.createElement('div');
+      barWrapper.className = 'flex flex-col items-center flex-1 group';
+      barWrapper.innerHTML = `
+        <span class="text-[9px] font-bold text-secondary mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">${t.quantity.toLocaleString()}枚</span>
+        <div class="w-8 bg-primary/20 hover:bg-primary/80 border border-primary/40 rounded-t transition-all duration-300" style="height: ${barHeight}px;"></div>
+        <span class="text-[10px] font-bold text-secondary mt-2">${t.month}</span>
+      `;
+      chartContainer.appendChild(barWrapper);
+    });
+  } else {
+    chartContainer.innerHTML = '<p class="text-sm text-secondary py-2 w-full text-center">推移データがありません</p>';
+  }
+
+  // Render new members with registration, first activity, and holding
   const newMembersContainer = document.getElementById('new-members-list');
   newMembersContainer.innerHTML = '';
   if (data.newMembers && data.newMembers.length > 0) {
@@ -79,10 +128,13 @@ function renderDashboard(data) {
       item.innerHTML = `
         <div>
           <p class="font-bold">${m.displayName}</p>
-          <p class="text-xs text-secondary">参加日: ${m.registeredAt}</p>
+          <div class="flex gap-4 text-xs text-secondary mt-1">
+            <span>登録: ${m.registeredAt}</span>
+            <span>初活動: ${m.firstActivityDate}</span>
+          </div>
         </div>
         <div class="text-right">
-          <p class="font-extrabold text-primary">${m.holdingQuantity}枚</p>
+          <p class="font-extrabold text-primary">${m.holdingQuantity.toLocaleString()}枚</p>
           <p class="text-[9px] text-secondary uppercase tracking-widest">現在保有数</p>
         </div>
       `;
@@ -95,9 +147,9 @@ function renderDashboard(data) {
   // Render ranking list
   const rankingContainer = document.getElementById('ranking-list');
   rankingContainer.innerHTML = '';
-  const sortedMembers = data.members ? [...data.members].sort((a,b) => b.monthlyDistributionQuantity - a.monthlyDistributionQuantity) : [];
-  
-  if (sortedMembers && sortedMembers.length > 0) {
+  if (data.members && data.members.length > 0) {
+    // Sort ranking strictly by monthlyDistributionQuantity descending (criteria is distribution volume)
+    const sortedMembers = [...data.members].sort((a,b) => b.monthlyDistributionQuantity - a.monthlyDistributionQuantity);
     sortedMembers.forEach((m, idx) => {
       const item = document.createElement('div');
       item.className = 'py-4 flex justify-between items-center text-sm border-b border-default';
@@ -112,11 +164,14 @@ function renderDashboard(data) {
           <span class="text-lg font-black w-8 text-center">${rankBadge}</span>
           <div>
             <p class="font-bold">${m.displayName}</p>
-            <p class="text-[10px] text-secondary tracking-widest">ID: ${m.staffNo}</p>
+            <div class="flex gap-3 text-[10px] text-secondary mt-0.5">
+              <span>活動日: ${m.activityDays}日</span>
+              <span class="text-primary font-bold">Index: ${m.activityIndex}</span>
+            </div>
           </div>
         </div>
         <div class="text-right">
-          <p class="font-extrabold">${m.monthlyDistributionQuantity}枚</p>
+          <p class="font-extrabold">${m.monthlyDistributionQuantity.toLocaleString()}枚</p>
           <p class="text-[9px] text-secondary tracking-widest uppercase">今月の配布実績</p>
         </div>
       `;

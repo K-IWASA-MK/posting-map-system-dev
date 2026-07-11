@@ -42,11 +42,17 @@ export class DashboardHandler implements EndpointHandler {
 
         const dashboard = await this.dashboardAppService.getWorkspaceDashboard(workspaceId, yearMonthParam);
         const result = {
+          workspaceId: dashboard.workspaceId,
           name: dashboard.workspaceName,
+          memberCount: dashboard.memberCount,
+          newMemberCount: dashboard.newMemberCount,
           total: dashboard.totalHoldingQuantity,
           monthlyActivity: dashboard.monthlyDistributionQuantity,
+          previousMonthActivity: dashboard.previousMonthDistributionQuantity,
+          growthRate: dashboard.growthRate,
           members: dashboard.members,
-          newMembers: dashboard.newMembers
+          newMembers: dashboard.newMembers,
+          monthlyTrend: dashboard.monthlyTrend
         };
         return FieldApiMapper.toSuccessResponse(result, request, context);
       }
@@ -63,7 +69,8 @@ export class DashboardHandler implements EndpointHandler {
         const result = rankings.map(r => ({
           rank: r.rank,
           name: r.displayName,
-          quantity: r.quantity
+          quantity: r.quantity,
+          activityIndex: r.activityIndex
         }));
         return FieldApiMapper.toSuccessResponse(result, request, context);
       }

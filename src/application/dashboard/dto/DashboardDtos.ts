@@ -10,6 +10,8 @@ export interface StaffSummary {
   displayName: string;
   holdingQuantity: number;
   monthlyDistributionQuantity: number;
+  activityDays: number;
+  activityIndex: number;
 }
 
 export interface NewStaffDto {
@@ -17,15 +19,21 @@ export interface NewStaffDto {
   displayName: string;
   registeredAt: string;
   holdingQuantity: number;
+  firstActivityDate: string;
 }
 
 export interface WorkspaceDashboardDto {
   workspaceId: string;
   workspaceName: string;
-  members: StaffSummary[];
-  newMembers: NewStaffDto[];
+  memberCount: number;
+  newMemberCount: number;
   totalHoldingQuantity: number;
   monthlyDistributionQuantity: number;
+  previousMonthDistributionQuantity: number;
+  growthRate: string;
+  members: StaffSummary[];
+  newMembers: NewStaffDto[];
+  monthlyTrend: { month: string; quantity: number }[];
 }
 
 export interface RankingDto {
@@ -33,6 +41,7 @@ export interface RankingDto {
   staffNo: string;
   displayName: string;
   quantity: number;
+  activityIndex: number;
 }
 
 export interface MonthlyActivitySummary {

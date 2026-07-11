@@ -70,10 +70,15 @@ class MockDashboardApplicationService extends DashboardApplicationService {
       return {
         workspaceId: 'WS-MIE-03',
         workspaceName: '三重第3支部',
+        memberCount: 3,
+        newMemberCount: 0,
         totalHoldingQuantity: 2500,
         monthlyDistributionQuantity: 2500,
+        previousMonthDistributionQuantity: 2000,
+        growthRate: '+25%',
         members: [],
-        newMembers: []
+        newMembers: [],
+        monthlyTrend: []
       };
     }
     throw new Error('Workspace not found');
@@ -82,9 +87,9 @@ class MockDashboardApplicationService extends DashboardApplicationService {
   public async getMonthlyRanking(workspaceId: string, yearMonth?: any): Promise<any[]> {
     if (workspaceId === 'WS-MIE-03') {
       return [
-        { rank: 1, staffNo: 'S001', displayName: 'Aさん', quantity: 1200 },
-        { rank: 2, staffNo: 'S002', displayName: 'Bさん', quantity: 800 },
-        { rank: 3, staffNo: 'S003', displayName: 'Cさん', quantity: 500 }
+        { rank: 1, staffNo: 'S001', displayName: 'Aさん', quantity: 1200, activityIndex: 1400 },
+        { rank: 2, staffNo: 'S002', displayName: 'Bさん', quantity: 800, activityIndex: 900 },
+        { rank: 3, staffNo: 'S003', displayName: 'Cさん', quantity: 500, activityIndex: 600 }
       ];
     }
     return [];
@@ -131,6 +136,8 @@ async function runTests() {
     assert(response.status === 200, 'Status must be 200');
     assert(response.data.name === '三重第3支部', 'Workspace name must match');
     assert(response.data.total === 2500, 'Total holding must match');
+    assert(response.data.growthRate === '+25%', 'Growth rate must match');
+    assert(response.data.memberCount === 3, 'Member count must match');
   }
 
   // Test Case 3: GET /dashboard/ranking
@@ -150,6 +157,7 @@ async function runTests() {
     assert(response.data[0].rank === 1, 'Rank 1 must be correct');
     assert(response.data[0].name === 'Aさん', 'Rank 1 name must match');
     assert(response.data[0].quantity === 1200, 'Rank 1 quantity must match');
+    assert(response.data[0].activityIndex === 1400, 'Rank 1 activityIndex must match');
   }
 
   console.log('[Test DashboardHandler] All tests PASSED.');

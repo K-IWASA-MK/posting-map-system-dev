@@ -162,6 +162,14 @@ async function runIntegrationTest() {
     assert(body.data.total === 2500, `Total holding mismatch: expected 2500, got ${body.data.total}`); // 1200 + 800 + 500 = 2500
     assert(body.data.members.length === 3, 'Workspace members length should be 3');
     assert(body.data.newMembers.length === 3, 'Workspace new members length should be 3');
+    
+    // S5-9 verification
+    assert(body.data.memberCount === 3, 'memberCount must be 3');
+    assert(body.data.newMemberCount === 3, 'newMemberCount must be 3');
+    assert(body.data.growthRate !== undefined, 'growthRate must be defined');
+    assert(body.data.monthlyTrend.length === 6, 'monthlyTrend length must be 6');
+    assert(body.data.members[0].activityIndex !== undefined, 'activityIndex must be defined');
+    assert(body.data.newMembers[0].firstActivityDate !== undefined, 'firstActivityDate must be defined');
   }
 
   // Stage 3: GET /dashboard/ranking?workspaceId=WS-MIE-03
