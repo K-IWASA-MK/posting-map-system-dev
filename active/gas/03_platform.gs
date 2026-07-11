@@ -249,6 +249,12 @@ class PlatformIntegrationPipeline {
       PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.HANDLER);
       const startHandler = Date.now();
 
+      // Workspace Subscription Gate check
+      const subscriptionGate = WorkspaceSubscriptionGate.getInstance();
+      if (subscriptionGate) {
+        await subscriptionGate.pass(apiRequest);
+      }
+
       const writeActions = [
         'submitDistribution',
         'updateRecordWithGPSPhoto',

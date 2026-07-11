@@ -19,6 +19,7 @@ import { ExceptionHandler } from '@core/exceptions/ExceptionHandler';
 import { ApiLifecycleObserver } from '@foundation/monitoring/ApiLifecycleObserver';
 import { ApiVersionResolver } from '@core/api/ApiVersionResolver';
 import { bootstrapFieldApis } from '../infrastructure/bootstrap/FieldApiBootstrap';
+import { WorkspaceSubscriptionGate } from '../application/subscription/WorkspaceSubscriptionGate';
 
 declare function createJsonResponseFromApiResponse(apiResponse: any): any;
 
@@ -185,6 +186,12 @@ export class PlatformIntegrationPipeline {
       apiContext.setCurrentStage(PlatformStage.HANDLER);
       PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.HANDLER);
       const startHandler = Date.now();
+
+      // Workspace Subscription Gate check
+      const subscriptionGate = WorkspaceSubscriptionGate.getInstance();
+      if (subscriptionGate) {
+        await subscriptionGate.pass(apiRequest);
+      }
 
       const writeActions = [
         'submitDistribution',

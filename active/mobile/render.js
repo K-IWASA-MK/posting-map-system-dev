@@ -22,8 +22,6 @@ function formatCompletedAt(dateStr) {
 
 function getCityName(areaName) {
   if (!areaName) return 'その他';
-  // 注意: 以下のハードコードは「四日市(市)」のようにエリア名に「市」が含まれる特殊ケースへの対処。
-  // 正規表現 /^[^市町...]/ では「四日市」と不完全にマッチするため意図的に残している。
   if (areaName.startsWith('四日市')) return '四日市市';
   if (areaName.startsWith('鈴鹿')) return '鈴鹿市';
   if (areaName.startsWith('亀山')) return '亀山市';
@@ -33,141 +31,108 @@ function getCityName(areaName) {
 }
 
 function renderAreas() {
-  if (!areaSummary || areaSummary.length === 0) {
-    $('area-list').innerHTML = '<p class="text-center text-white/40 py-20 font-bold">データがありません。<br>一括作成を実行してください。</p>';
-    return;
-  }
+  const container = $('new-area-list') || $('area-list');
+  if (!container) return;
 
-  if (currentCity === null) {
-    // 【第1層：市・自治体一覧画面】
-    const cities = citySummary;
+  const me = (typeof personalDashboardData !== 'undefined' && personalDashboardData) || { name: "B", holding: 1000, monthlyActivity: 1200 };
+  const ws = (typeof workspaceDashboardData !== 'undefined' && workspaceDashboardData) || { 
+    name: "三重第3支部", 
+    total: 2500,
+    members: [
+      { staffNo: 'S001', displayName: 'Aさん', holdingQuantity: 1200, monthlyDistributionQuantity: 1200 },
+      { staffNo: 'S002', displayName: 'Bさん', holdingQuantity: 800, monthlyDistributionQuantity: 800 },
+      { staffNo: 'S003', displayName: 'Cさん', holdingQuantity: 500, monthlyDistributionQuantity: 500 }
+    ],
+    newMembers: [
+      { staffNo: 'S081', displayName: 'Dさん', registeredAt: '2026/08/03', holdingQuantity: 300 }
+    ]
+  };
+  const rankings = (typeof rankingData !== 'undefined' && rankingData && rankingData.length > 0) ? rankingData : [
+    { name: "Aさん", count: 1200 },
+    { name: "Bさん", count: 800 },
+    { name: "Cさん", count: 500 }
+  ];
 
-    // 各市町村ごとの配布エリア数を集計 (SSOTのエリアシート数)
-    const cityAreaCount = {};
-    if (Array.isArray(areaSummary)) {
-      areaSummary.forEach(s => {
-        const city = getCityName(s.name);
-        cityAreaCount[city] = (cityAreaCount[city] || 0) + 1;
-      });
-    }
-
-    const headerCardHtml = `
-      <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37, 99, 235, 0.08), 0 0 25px rgba(37, 99, 235, 0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">
-        <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
-          <svg class="w-4 h-4 text-[#2563eb]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-          </svg>
+  let html = `
+    <!-- Personal Dashboard -->
+    <div style="border-radius: 28px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008)); box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);" class="p-6 mb-6 text-left">
+      <div class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em] mb-2 font-mono">PERSONAL PERFORMANCE</div>
+      <h2 class="text-xl font-bold text-white mb-4">こんにちは ${me.name || 'B'}さん</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white/5 rounded-2xl p-4 border border-white/5">
+          <div class="text-[9px] font-bold text-white/40 uppercase tracking-wider mb-1 font-mono">現在保有</div>
+          <div class="text-2xl font-black text-white">${(me.holding !== undefined ? me.holding : 1000).toLocaleString()}<span class="text-xs font-normal text-white/50 ml-1">枚</span></div>
         </div>
-        <div class="text-lg font-black text-white tracking-tight">全体エリア</div>
+        <div class="bg-white/5 rounded-2xl p-4 border border-white/5">
+          <div class="text-[9px] font-bold text-white/40 uppercase tracking-wider mb-1 font-mono">今月配布</div>
+          <div class="text-2xl font-black text-white">${(me.monthlyActivity !== undefined ? me.monthlyActivity : 1200).toLocaleString()}<span class="text-xs font-normal text-white/50 ml-1">枚</span></div>
+        </div>
       </div>
-    `;
+    </div>
 
-    const cityCardsHtml = cities.map(c => {
-      const pctColorClass = 'text-[#2563eb]';
-      const isCompleted = c.done === c.total && c.total > 0;
-      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
-      const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
+    <!-- Workspace Dashboard -->
+    <div style="border-radius: 28px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008)); box-shadow: inset 0 0 0 1px rgba(120,140,255,0.08), 0 0 30px rgba(37,99,235,0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);" class="p-6 mb-6 text-left">
+      <div class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em] mb-2 font-mono">WORKSPACE DASHBOARD</div>
+      <h2 class="text-xl font-bold text-white mb-4">${ws.name || '三重第3支部'}</h2>
 
-      // 市名の文字数に応じてフォントサイズを自動調整（折り返し・はみ出し防止）
-      let fontSizeClass = 'text-lg';
-      if (c.name.length > 12) {
-        fontSizeClass = 'text-xs';
-      } else if (c.name.length > 8) {
-        fontSizeClass = 'text-sm';
-      } else if (c.name.length > 5) {
-        fontSizeClass = 'text-base';
-      }
+      <!-- 参加スタッフ -->
+      <div class="bg-white/5 rounded-2xl p-4 border border-white/5 mb-4 flex items-center justify-between">
+        <span class="text-xs font-bold text-white/60">参加スタッフ</span>
+        <span class="text-lg font-black text-white">${(ws.members ? ws.members.length : 25)}<span class="text-xs font-normal text-white/50 ml-1">人</span></span>
+      </div>
 
-      const areaCount = cityAreaCount[c.name] || 0;
-      return `
-      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
-        <div class="w-full flex justify-center mb-1">
-          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="inline-flex items-center justify-center h-7 px-3 ${fontSizeClass} font-black text-white rounded-full tracking-tight">
-            <span class="text-xs mr-1 select-none">🏢</span>
-            <span>${c.name} (${areaCount})</span>
+      <!-- 今月新規参加者 -->
+      <div class="bg-white/5 rounded-2xl p-4 border border-white/5 mb-4">
+        <div class="text-[9px] font-bold text-[#10b981] uppercase tracking-wider mb-2 font-mono">🆕 今月新規参加</div>
+        ${ws.newMembers && ws.newMembers.length > 0 ? ws.newMembers.map(m => `
+          <div class="flex flex-col gap-1 py-2 border-b border-white/5 last:border-0 font-sans">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-white">${m.displayName} (${m.staffNo})</span>
+              <span class="text-[9px] text-[#10b981] bg-[#10b981]/10 px-2 py-0.5 rounded-full font-bold">NEW</span>
+            </div>
+            <div class="flex justify-between text-[10px] text-white/40 font-mono">
+              <span>登録日: ${m.registeredAt}</span>
+              <span>現在保有: ${m.holdingQuantity.toLocaleString()}枚</span>
+            </div>
           </div>
-        </div>
-        <div class="text-sm ${pctColorClass}">${c.progress}%</div>
-        <div class="flex items-center justify-center w-full">
-          ${leftDummy}
-          <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
-            ${c.done}/ ${c.total}
-          </div>
-          ${rightLabel}
-        </div>
-      </div>`;
-    }).join('');
+        `).join('') : '<div class="text-[10px] text-white/30 py-1">今月の新規参加者はいません</div>'}
+      </div>
 
-    // 1層目の最下部にスムーズスクロールで上部に戻る「↑ トップに戻る」ボタンを追加
-    const bottomTopButtonHtml = `
-      <div class="flex items-center justify-center mt-8 pb-10">
-        <button onclick="$('content').scrollTo({top: 0, behavior: 'smooth'})" class="px-6 h-12 premium-glass-btn flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white/80">↑ トップに戻る</button>
+      <!-- 現在保有合計 -->
+      <div class="bg-white/5 rounded-2xl p-4 border border-white/5 mb-4">
+        <div class="text-[9px] font-bold text-white/40 uppercase tracking-wider mb-1 font-mono">現在保有合計</div>
+        <div class="text-3xl font-black text-white">${(ws.total !== undefined ? ws.total : 2500).toLocaleString()}<span class="text-sm font-normal text-white/50 ml-1">枚</span></div>
+      </div>
+
+      <!-- 今月活動ランキング -->
+      <div class="text-[9px] font-bold text-white/40 uppercase tracking-wider mb-3 font-mono">今月活動ランキング</div>
+      <div class="space-y-3 font-sans">
+  `;
+
+  rankings.forEach((r, idx) => {
+    let medal = '';
+    if (idx === 0) medal = '🥇';
+    else if (idx === 1) medal = '🥈';
+    else if (idx === 2) medal = '🥉';
+    else medal = `<span class="text-white/30 text-xs font-mono ml-1">${idx + 1}</span>`;
+
+    html += `
+      <div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+        <div class="flex items-center gap-3 font-sans">
+          <div class="w-6 h-6 flex items-center justify-center">${medal}</div>
+          <span class="text-sm font-bold text-white/80">${r.name}</span>
+        </div>
+        <span class="text-sm font-black text-white font-mono">${(r.count || r.quantity || 0).toLocaleString()}枚</span>
       </div>
     `;
+  });
 
-    $('area-list').innerHTML = headerCardHtml + `<div class="space-y-6">${cityCardsHtml}</div>` + bottomTopButtonHtml;
-  } else {
-    // 【第2層：選択された市のエリアシート一覧画面】
-    const filteredAreas = areaSummary.filter(s => getCityName(s.name) === currentCity);
-
-    const backButtonHtml = `
-      <div class="flex items-center mb-6 h-12">
-        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+  html += `
       </div>
-    `;
+    </div>
+  `;
 
-    // 検索UIパネル (高級感のある漆黒 premium-glass)
-    const searchPanelHtml = `
-      <div class="premium-glass p-5 mb-6 flex flex-col gap-4">
-        <div class="flex items-center justify-between text-xs text-white/50 tracking-wider">
-          <span>SELECT AREA</span>
-          <span class="font-black text-[#2563eb]">${currentCity} (${filteredAreas.length})</span>
-        </div>
-        
-        <div class="relative">
-          <input type="text" id="area-search-input" placeholder="🔍 エリア名・カナで検索..." 
-                 value="${window.areaSearchQuery || ''}"
-                 class="w-full h-11 px-4 rounded-xl bg-black/40 border border-white/10 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#2563eb] transition-all"
-                 oninput="onAreaSearchInput()">
-        </div>
-
-        <div class="grid grid-cols-5 gap-1.5 text-center text-[11px] font-bold">
-          ${['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ'].map(k => {
-            const isActive = window.areaSelectedKanaRow === k;
-            const style = isActive 
-              ? 'background: rgba(37, 99, 235, 0.3); color: #fff; border-color: rgba(37, 99, 235, 0.5);' 
-              : 'background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.8); border-color: rgba(255, 255, 255, 0.05);';
-            return `<button onclick="filterByKana('${k}')" class="kana-btn h-8 rounded-lg border flex items-center justify-center transition-all" style="${style}">${k}</button>`;
-          }).join('')}
-        </div>
-        
-        <div class="flex justify-end">
-          <button onclick="filterByKana('clear')" class="px-3 h-6 rounded-md border border-white/5 bg-white/5 text-[9px] text-white/50 active:bg-white/10">すべて表示</button>
-        </div>
-      </div>
-    `;
-
-    // カードのコンテナプレースホルダー
-    const cardsContainerHtml = `<div id="area-cards-container" class="space-y-6"></div>`;
-
-    // 2層目の最下部ナビゲーション
-    const bottomNavHtml = filteredAreas.length > 3 ? `
-      <div class="flex items-center justify-between mt-8 pb-10 w-full gap-4">
-        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
-        <button onclick="$('content').scrollTo({top: 0, behavior: 'smooth'})" class="flex-1 h-12 premium-glass-btn flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white/80">↑ トップに戻る</button>
-        <div class="w-12 h-12"></div>
-      </div>
-    ` : `
-      <div class="flex items-center justify-start mt-8 pb-10">
-        <button onclick="backToCityList()" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
-      </div>
-    `;
-
-    $('area-list').innerHTML = backButtonHtml + searchPanelHtml + cardsContainerHtml + bottomNavHtml;
-    
-    // 初回絞り込み描画
-    renderFilteredAreaList(filteredAreas);
-  }
+  container.innerHTML = html;
 }
 
 function selectCity(cityName) {

@@ -19,6 +19,18 @@ class MockActivityRepository implements IActivityRepository {
       .slice(0, limit);
   }
 
+  public async findByPeriod(start: Date, end: Date): Promise<DistributionActivity[]> {
+    const startTime = start.getTime();
+    const endTime = end.getTime();
+    return Array.from(this.db.values()).filter(
+      a => a.occurredAt.getTime() >= startTime && a.occurredAt.getTime() <= endTime
+    );
+  }
+
+  public async findByYearMonth(workspaceId: string, yearMonth: any): Promise<DistributionActivity[]> {
+    return [];
+  }
+
   public async save(activity: DistributionActivity): Promise<void> {
     this.db.set(activity.id, activity);
   }

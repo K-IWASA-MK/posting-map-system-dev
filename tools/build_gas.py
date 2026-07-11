@@ -43,6 +43,7 @@ build_bundle(["src/foundation/authentication", "src/foundation/authorization", "
 build_bundle(["src/platform"], "active/gas/03_platform.gs")
 build_bundle(["src/infrastructure/gas"], "active/gas/04_api.gs")
 build_bundle([
+    "src/domain/common",
     "src/domain/workspace",
     "src/domain/field",
     "src/application/events",
@@ -54,6 +55,11 @@ build_bundle([
     "src/api/registry",
     "src/infrastructure/bootstrap"
 ], "active/gas/05_field.gs")
+
+build_bundle([
+    "src/application/dashboard",
+    "src/api/dashboard"
+], "active/gas/06_dashboard.gs")
 
 entry_content = """// =========================================
 // Generated: active/gas/99_entry.gs

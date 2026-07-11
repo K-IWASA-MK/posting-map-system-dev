@@ -52,6 +52,14 @@ let mockSheets: { [name: string]: any[][] } = {
     ['Area ID', 'Name', 'City', 'Status', 'Done Count', 'Total Count'],
     ['A-1', 'Area 1', 'City A', 'NOT_STARTED', 0, 100]
   ],
+  'Workspaces': [
+    ['ワークスペースID', 'ワークスペース名', 'ステータス'],
+    ['WS-MIE-03', '三重第3支部', 'ACTIVE']
+  ],
+  'Subscriptions': [
+    ['ワークスペースID', 'ステータス', '開始日', '期限日'],
+    ['WS-MIE-03', 'ACTIVE', '2026-07-01T00:00:00.000Z', '2026-08-01T00:00:00.000Z']
+  ],
   'EventLogs': [
     ['Event ID', 'Timestamp', 'Type', 'Payload']
   ]

@@ -1,4 +1,4 @@
-export type WorkspaceStatus = 'ACTIVE' | 'INACTIVE';
+export type WorkspaceStatus = 'ACTIVE' | 'ARCHIVED';
 
 export class Workspace {
   public readonly workspaceId: string;
@@ -29,7 +29,7 @@ export class Workspace {
     this.status = 'ACTIVE';
   }
 
-  public deactivate(): void {
-    this.status = 'INACTIVE';
+  public archive(): void {
+    this.status = 'ARCHIVED';
   }
 }

@@ -11,12 +11,13 @@ const IdentityType = {
   ANONYMOUS: 'ANONYMOUS' as IdentityType
 };
 
-type AuthenticationMethod = 'API_KEY' | 'LIFF' | 'INTERNAL_SERVICE' | 'NONE';
+type AuthenticationMethod = 'API_KEY' | 'LIFF' | 'INTERNAL_SERVICE' | 'GOOGLE' | 'NONE';
 
 const AuthenticationMethod = {
   API_KEY: 'API_KEY' as AuthenticationMethod,
   LIFF: 'LIFF' as AuthenticationMethod,
   INTERNAL_SERVICE: 'INTERNAL_SERVICE' as AuthenticationMethod,
+  GOOGLE: 'GOOGLE' as AuthenticationMethod,
   NONE: 'NONE' as AuthenticationMethod
 };
 
@@ -194,6 +195,8 @@ interface IdentityProvider {
 
 // --- Source: src/foundation/authentication/IdentityResolver.ts ---
 
+declare const Session: any;
+
 class IdentityResolver {
   public static resolve(request: ApiRequest): IdentityProvider | null {
     // 1. Service Auth (Highest priority)
@@ -208,11 +211,24 @@ class IdentityResolver {
       return new ApiKeyIdentityProvider();
     }
 
-    // 3. LIFF Token (Lowest priority)
+    // 3. LIFF Token (Low priority)
     const hasQueryLiff = request.query && request.query.liffToken;
-    const hasHeaderLiff = request.headers && request.headers['authorization'];
+    const hasHeaderLiff = request.headers && request.headers['authorization'] && request.headers['authorization'].startsWith('Bearer ');
     if (hasQueryLiff || hasHeaderLiff) {
       return new LIFFIdentityProvider();
+    }
+
+    // 4. Google Auth (For Dashboard routes and active Google sessions)
+    let hasGoogleSession = false;
+    try {
+      if (typeof Session !== 'undefined' && Session.getActiveUser && Session.getActiveUser().getEmail()) {
+        hasGoogleSession = true;
+      }
+    } catch (e) {}
+
+    const isDashboardPath = request.path && request.path.includes('/dashboard/');
+    if (hasGoogleSession || isDashboardPath) {
+      return new GoogleIdentityProvider();
     }
 
     // No identity provider matched
@@ -251,6 +267,43 @@ class ApiKeyIdentityProvider implements IdentityProvider {
     }
 
     return AuthenticationResult.failureResult('Invalid API Key provided');
+  }
+}
+
+
+// --- Source: src/foundation/authentication/providers/GoogleIdentityProvider.ts ---
+
+declare const Session: any;
+
+class GoogleIdentityProvider implements IdentityProvider {
+  public authenticate(request: ApiRequest): AuthenticationResult {
+    let email = '';
+
+    try {
+      if (typeof Session !== 'undefined' && Session.getActiveUser) {
+        email = Session.getActiveUser().getEmail();
+      }
+    } catch (e) {
+      // Ignored
+    }
+
+    if (!email || email.trim().length === 0) {
+      return AuthenticationResult.failureResult('Google user is not authenticated via Session.');
+    }
+
+    const context = new AuthenticationContext({
+      identityId: email,
+      identityType: IdentityType.USER,
+      authenticationMethod: AuthenticationMethod.GOOGLE,
+      authenticated: true,
+      issuedAt: Date.now(),
+      metadata: {
+        provider: 'GoogleIdentityProvider',
+        email: email
+      }
+    });
+
+    return AuthenticationResult.successResult(context);
   }
 }
 

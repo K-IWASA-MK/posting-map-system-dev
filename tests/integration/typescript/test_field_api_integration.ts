@@ -61,6 +61,10 @@ let mockSheets: { [name: string]: any[][] } = {
     ['ワークスペースID', 'ワークスペース名', 'ステータス'],
     ['WS-MIE-03', '三重第3支部', 'ACTIVE']
   ],
+  'Subscriptions': [
+    ['ワークスペースID', 'ステータス', '開始日', '期限日'],
+    ['WS-MIE-03', 'ACTIVE', '2026-07-01T00:00:00.000Z', '2026-08-01T00:00:00.000Z']
+  ],
   'EventLogs': [
     ['Event ID', 'Timestamp', 'Type', 'Payload']
   ]

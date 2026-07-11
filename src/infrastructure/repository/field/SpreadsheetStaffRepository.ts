@@ -1,3 +1,4 @@
+import { YearMonth } from '../../../domain/common/valueobjects/YearMonth';
 import { IStaffRepository } from '@domain/field/staff/repositories/IStaffRepository';
 import { Staff } from '@domain/field/staff/entities/Staff';
 import { SpreadsheetReader } from '../../spreadsheet/SpreadsheetReader';
@@ -67,6 +68,45 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return undefined;
+  }
+
+  public async findByWorkspace(workspaceId: string): Promise<Staff[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const nameIdx = headers.indexOf('スタッフ名');
+    const lineIdx = headers.indexOf('LINEユーザーID');
+    const wsIdx = headers.indexOf('ワークスペースID');
+    const dateIdx = headers.indexOf('登録日時');
+
+    if (wsIdx === -1) return [];
+
+    const list: Staff[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (String(row[wsIdx]) === workspaceId) {
+        list.push(new Staff({
+          staffNo: staffIdIdx !== -1 ? String(row[staffIdIdx]) : '',
+          displayName: nameIdx !== -1 ? String(row[nameIdx]) : '',
+          lineUserId: lineIdx !== -1 ? String(row[lineIdx]) : '',
+          workspaceId: String(row[wsIdx]),
+          createdAt: dateIdx !== -1 ? new Date(Number(row[dateIdx]) || String(row[dateIdx])) : new Date()
+        }));
+      }
+    }
+    return list;
+  }
+
+  public async findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]> {
+    const list = await this.findByWorkspace(workspaceId);
+    const start = yearMonth.getStartDate().getTime();
+    const end = yearMonth.getEndDate().getTime();
+    return list.filter(staff => {
+      const t = staff.createdAt.getTime();
+      return t >= start && t <= end;
+    });
   }
 
   public async save(staff: Staff): Promise<void> {

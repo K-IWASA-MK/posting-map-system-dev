@@ -19,8 +19,8 @@ async function runTests() {
   assert(ws.workspaceName === '三重第3支部', 'workspaceName mismatch');
   assert(ws.getStatus() === 'ACTIVE', 'status mismatch');
 
-  ws.deactivate();
-  assert(ws.getStatus() === 'INACTIVE', 'should deactivate');
+  ws.archive();
+  assert(ws.getStatus() === 'ARCHIVED', 'should archive');
 
   ws.activate();
   assert(ws.getStatus() === 'ACTIVE', 'should activate');

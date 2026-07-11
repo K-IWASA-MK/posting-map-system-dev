@@ -6,12 +6,13 @@ export const IdentityType = {
   ANONYMOUS: 'ANONYMOUS' as IdentityType
 };
 
-export type AuthenticationMethod = 'API_KEY' | 'LIFF' | 'INTERNAL_SERVICE' | 'NONE';
+export type AuthenticationMethod = 'API_KEY' | 'LIFF' | 'INTERNAL_SERVICE' | 'GOOGLE' | 'NONE';
 
 export const AuthenticationMethod = {
   API_KEY: 'API_KEY' as AuthenticationMethod,
   LIFF: 'LIFF' as AuthenticationMethod,
   INTERNAL_SERVICE: 'INTERNAL_SERVICE' as AuthenticationMethod,
+  GOOGLE: 'GOOGLE' as AuthenticationMethod,
   NONE: 'NONE' as AuthenticationMethod
 };
 

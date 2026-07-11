@@ -2,6 +2,56 @@
 // Generated: active/gas/05_field.gs
 // =========================================
 
+// --- Source: src/domain/common/valueobjects/YearMonth.ts ---
+class YearMonth {
+  private readonly year: number;
+  private readonly month: number;
+
+  constructor(value: string | Date) {
+    if (value instanceof Date) {
+      this.year = value.getFullYear();
+      this.month = value.getMonth() + 1;
+    } else {
+      const clean = value.replace(/[-\s\/]/g, '');
+      if (clean.length !== 6 || isNaN(Number(clean))) {
+        throw new Error(`Invalid YearMonth format: ${value}`);
+      }
+      this.year = parseInt(clean.substring(0, 4), 10);
+      this.month = parseInt(clean.substring(4, 6), 10);
+    }
+
+    if (this.month < 1 || this.month > 12) {
+      throw new Error(`Invalid month value: ${this.month}`);
+    }
+  }
+
+  public getYear(): number {
+    return this.year;
+  }
+
+  public getMonth(): number {
+    return this.month;
+  }
+
+  public toString(): string {
+    const mm = String(this.month).padStart(2, '0');
+    return `${this.year}${mm}`;
+  }
+
+  public getStartDate(): Date {
+    return new Date(this.year, this.month - 1, 1, 0, 0, 0, 0);
+  }
+
+  public getEndDate(): Date {
+    return new Date(this.year, this.month, 0, 23, 59, 59, 999);
+  }
+
+  public equals(other: YearMonth): boolean {
+    return this.year === other.getYear() && this.month === other.getMonth();
+  }
+}
+
+
 // --- Source: src/domain/workspace/repositories/IWorkspaceRepository.ts ---
 
 interface IWorkspaceRepository {
@@ -10,8 +60,16 @@ interface IWorkspaceRepository {
 }
 
 
+// --- Source: src/domain/workspace/repositories/IWorkspaceSubscriptionRepository.ts ---
+
+interface IWorkspaceSubscriptionRepository {
+  findByWorkspaceId(workspaceId: string): Promise<WorkspaceSubscription | undefined>;
+  save(subscription: WorkspaceSubscription): Promise<void>;
+}
+
+
 // --- Source: src/domain/workspace/entities/Workspace.ts ---
-type WorkspaceStatus = 'ACTIVE' | 'INACTIVE';
+type WorkspaceStatus = 'ACTIVE' | 'ARCHIVED';
 
 class Workspace {
   public readonly workspaceId: string;
@@ -42,8 +100,62 @@ class Workspace {
     this.status = 'ACTIVE';
   }
 
-  public deactivate(): void {
-    this.status = 'INACTIVE';
+  public archive(): void {
+    this.status = 'ARCHIVED';
+  }
+}
+
+
+// --- Source: src/domain/workspace/entities/WorkspaceSubscription.ts ---
+type SubscriptionStatus = 'ACTIVE' | 'SUSPENDED' | 'CANCELLED';
+
+class WorkspaceSubscription {
+  public readonly workspaceId: string;
+  private status: SubscriptionStatus;
+  private readonly startedAt: Date;
+  private readonly expiresAt: Date;
+
+  constructor(params: {
+    workspaceId: string;
+    status: SubscriptionStatus;
+    startedAt: Date;
+    expiresAt: Date;
+  }) {
+    if (!params.workspaceId || params.workspaceId.trim().length === 0) {
+      throw new Error("WorkspaceId is required for subscription");
+    }
+    this.workspaceId = params.workspaceId;
+    this.status = params.status;
+    this.startedAt = params.startedAt;
+    this.expiresAt = params.expiresAt;
+  }
+
+  public getStatus(): SubscriptionStatus {
+    return this.status;
+  }
+
+  public getStartedAt(): Date {
+    return this.startedAt;
+  }
+
+  public getExpiresAt(): Date {
+    return this.expiresAt;
+  }
+
+  public isActive(): boolean {
+    return this.status === 'ACTIVE';
+  }
+
+  public suspend(): void {
+    this.status = 'SUSPENDED';
+  }
+
+  public cancel(): void {
+    this.status = 'CANCELLED';
+  }
+
+  public reactivate(): void {
+    this.status = 'ACTIVE';
   }
 }
 
@@ -52,6 +164,8 @@ class Workspace {
 
 interface IActivityRepository {
   findLatestByStaff(staffNo: string, limit: number): Promise<DistributionActivity[]>;
+  findByPeriod(start: Date, end: Date): Promise<DistributionActivity[]>;
+  findByYearMonth(workspaceId: string, yearMonth: YearMonth): Promise<DistributionActivity[]>;
   save(activity: DistributionActivity): Promise<void>;
 }
 
@@ -98,6 +212,8 @@ class DistributionActivity {
 interface IStaffRepository {
   findByStaffNo(staffNo: string): Promise<Staff | undefined>;
   findByLineUserId(lineUserId: string): Promise<Staff | undefined>;
+  findByWorkspace(workspaceId: string): Promise<Staff[]>;
+  findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]>;
   save(staff: Staff): Promise<void>;
 }
 
@@ -860,6 +976,81 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
 }
 
 
+// --- Source: src/infrastructure/repository/workspace/SpreadsheetWorkspaceSubscriptionRepository.ts ---
+
+class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscriptionRepository {
+  private reader: SpreadsheetReader;
+  private writer: SpreadsheetWriter;
+  private sheetName = 'Subscriptions';
+
+  constructor() {
+    this.reader = new SpreadsheetReader();
+    this.writer = new SpreadsheetWriter();
+  }
+
+  public async findByWorkspaceId(workspaceId: string): Promise<WorkspaceSubscription | undefined> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return undefined;
+
+    const headers = rows[0];
+    const wsIdIdx = headers.indexOf('ワークスペースID');
+    const statusIdx = headers.indexOf('ステータス');
+    const startedIdx = headers.indexOf('開始日');
+    const expiresIdx = headers.indexOf('期限日');
+
+    if (wsIdIdx === -1) return undefined;
+
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (String(row[wsIdIdx]) === workspaceId) {
+        return new WorkspaceSubscription({
+          workspaceId: String(row[wsIdIdx]),
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as SubscriptionStatus) : 'ACTIVE',
+          startedAt: startedIdx !== -1 && row[startedIdx] ? new Date(row[startedIdx]) : new Date(),
+          expiresAt: expiresIdx !== -1 && row[expiresIdx] ? new Date(row[expiresIdx]) : new Date()
+        });
+      }
+    }
+    return undefined;
+  }
+
+  public async save(subscription: WorkspaceSubscription): Promise<void> {
+    const rows = this.reader.readAll(this.sheetName);
+    const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ステータス', '開始日', '期限日'];
+
+    const wsIdIdx = headers.indexOf('ワークスペースID');
+
+    let rowIndex = -1;
+    if (wsIdIdx !== -1) {
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][wsIdIdx]) === subscription.workspaceId) {
+          rowIndex = i + 1;
+          break;
+        }
+      }
+    }
+
+    const rowValues = headers.map(h => {
+      if (h === 'ワークスペースID') return subscription.workspaceId;
+      if (h === 'ステータス') return subscription.getStatus();
+      if (h === '開始日') return subscription.getStartedAt().toISOString();
+      if (h === '期限日') return subscription.getExpiresAt().toISOString();
+      return '';
+    });
+
+    if (rowIndex !== -1) {
+      this.writer.updateRange(this.sheetName, rowIndex, 1, [rowValues]);
+    } else {
+      if (rows.length === 0) {
+        this.writer.appendRows(this.sheetName, [headers, rowValues]);
+      } else {
+        this.writer.appendRows(this.sheetName, [rowValues]);
+      }
+    }
+  }
+}
+
+
 // --- Source: src/infrastructure/repository/field/SpreadsheetActivityRepository.ts ---
 
 class SpreadsheetActivityRepository implements IActivityRepository {
@@ -913,6 +1104,74 @@ class SpreadsheetActivityRepository implements IActivityRepository {
     // Sort by occurredAt desc and limit
     list.sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime());
     return list.slice(0, limit);
+  }
+
+  public async findByPeriod(start: Date, end: Date): Promise<DistributionActivity[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const actIdIdx = headers.indexOf('活動ID');
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const qtyIdx = headers.indexOf('報告枚数');
+    const photoIdx = headers.indexOf('写真URL');
+    const locIdx = headers.indexOf('位置情報');
+    const dateIdx = headers.indexOf('活動日時');
+
+    if (dateIdx === -1) return [];
+
+    const list: DistributionActivity[] = [];
+    const startTime = start.getTime();
+    const endTime = end.getTime();
+
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      const timeVal = Number(row[dateIdx]);
+      if (timeVal >= startTime && timeVal <= endTime) {
+        let lat = 0;
+        let lng = 0;
+        if (locIdx !== -1) {
+          const parts = String(row[locIdx]).split(',');
+          lat = Number(parts[0]) || 0;
+          lng = Number(parts[1]) || 0;
+        }
+
+        list.push(new DistributionActivity({
+          id: actIdIdx !== -1 ? String(row[actIdIdx]) : '',
+          staffNo: staffIdIdx !== -1 ? String(row[staffIdIdx]) : '',
+          reportedQuantity: new Quantity(qtyIdx !== -1 ? Number(row[qtyIdx]) : 0),
+          photoUrl: photoIdx !== -1 ? String(row[photoIdx]) : '',
+          location: new Location(lat, lng, 0),
+          occurredAt: new Date(timeVal)
+        }));
+      }
+    }
+    return list;
+  }
+
+  public async findByYearMonth(workspaceId: string, yearMonth: YearMonth): Promise<DistributionActivity[]> {
+    const staffRows = this.reader.readAll('Staff');
+    if (staffRows.length <= 1) return [];
+    
+    const staffHeaders = staffRows[0];
+    const staffIdIdx = staffHeaders.indexOf('スタッフID');
+    const wsIdx = staffHeaders.indexOf('ワークスペースID');
+    if (staffIdIdx === -1 || wsIdx === -1) return [];
+
+    const allowedStaffNos = new Set<string>();
+    for (let i = 1; i < staffRows.length; i++) {
+      if (String(staffRows[i][wsIdx]) === workspaceId) {
+        allowedStaffNos.add(String(staffRows[i][staffIdIdx]));
+      }
+    }
+
+    if (allowedStaffNos.size === 0) return [];
+
+    const start = yearMonth.getStartDate();
+    const end = yearMonth.getEndDate();
+    const allPeriodActivities = await this.findByPeriod(start, end);
+
+    return allPeriodActivities.filter(a => allowedStaffNos.has(a.staffNo));
   }
 
   public async save(activity: DistributionActivity): Promise<void> {
@@ -1104,6 +1363,45 @@ class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return undefined;
+  }
+
+  public async findByWorkspace(workspaceId: string): Promise<Staff[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const nameIdx = headers.indexOf('スタッフ名');
+    const lineIdx = headers.indexOf('LINEユーザーID');
+    const wsIdx = headers.indexOf('ワークスペースID');
+    const dateIdx = headers.indexOf('登録日時');
+
+    if (wsIdx === -1) return [];
+
+    const list: Staff[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (String(row[wsIdx]) === workspaceId) {
+        list.push(new Staff({
+          staffNo: staffIdIdx !== -1 ? String(row[staffIdIdx]) : '',
+          displayName: nameIdx !== -1 ? String(row[nameIdx]) : '',
+          lineUserId: lineIdx !== -1 ? String(row[lineIdx]) : '',
+          workspaceId: String(row[wsIdx]),
+          createdAt: dateIdx !== -1 ? new Date(Number(row[dateIdx]) || String(row[dateIdx])) : new Date()
+        }));
+      }
+    }
+    return list;
+  }
+
+  public async findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]> {
+    const list = await this.findByWorkspace(workspaceId);
+    const start = yearMonth.getStartDate().getTime();
+    const end = yearMonth.getEndDate().getTime();
+    return list.filter(staff => {
+      const t = staff.createdAt.getTime();
+      return t >= start && t <= end;
+    });
   }
 
   public async save(staff: Staff): Promise<void> {
@@ -1390,6 +1688,30 @@ class ReservationHandler implements EndpointHandler {
 }
 
 
+// --- Source: src/api/registry/DashboardEndpoints.ts ---
+
+const DASHBOARD_ENDPOINTS: EndpointConfig[] = [
+  {
+    path: '/dashboard/me',
+    method: 'GET',
+    version: 'v2',
+    handler: 'DashboardHandler'
+  },
+  {
+    path: '/dashboard/workspace/{id}',
+    method: 'GET',
+    version: 'v2',
+    handler: 'DashboardHandler'
+  },
+  {
+    path: '/dashboard/ranking',
+    method: 'GET',
+    version: 'v2',
+    handler: 'DashboardHandler'
+  }
+];
+
+
 // --- Source: src/api/registry/FieldEndpoints.ts ---
 interface EndpointConfig {
   path: string;
@@ -1429,22 +1751,39 @@ function bootstrapFieldApis(): void {
 
   const registry = EndpointRegistry.getInstance();
 
+  const workspaceRepo = new SpreadsheetWorkspaceRepository();
+  const subscriptionRepo = new SpreadsheetWorkspaceSubscriptionRepository();
   const staffRepo = new SpreadsheetStaffRepository();
   const holdingRepo = new SpreadsheetFlyerHoldingRepository();
   const activityRepo = new SpreadsheetActivityRepository();
   const eventPublisher = new ApplicationEventPublisher();
 
+  // Register the Workspace Subscription Gate singleton
+  new WorkspaceSubscriptionGate(subscriptionRepo, staffRepo);
+
   const staffAppService = new StaffApplicationService(staffRepo);
   const holdingAppService = new HoldingApplicationService(holdingRepo, eventPublisher);
   const activityAppService = new ActivityApplicationService(activityRepo, eventPublisher);
+  const dashboardAppService = new DashboardApplicationService(workspaceRepo, staffRepo, holdingRepo, activityRepo);
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
     DistributorHandler: new DistributorHandler(staffAppService),
-    ReservationHandler: new ReservationHandler(activityAppService, holdingAppService)
+    ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
+    DashboardHandler: new DashboardHandler(dashboardAppService)
   };
 
+  // Register Field API Endpoints
   for (const config of FIELD_ENDPOINTS) {
+    const handlerInstance = handlers[config.handler];
+    if (!handlerInstance) {
+      throw new Error(`Bootstrap resolution failed: Handler class '${config.handler}' not mapped in FieldApiBootstrap`);
+    }
+    registry.register(config.method, config.version, config.path, handlerInstance);
+  }
+
+  // Register Dashboard API Endpoints
+  for (const config of DASHBOARD_ENDPOINTS) {
     const handlerInstance = handlers[config.handler];
     if (!handlerInstance) {
       throw new Error(`Bootstrap resolution failed: Handler class '${config.handler}' not mapped in FieldApiBootstrap`);
