@@ -14,6 +14,8 @@ export interface CacheEntry<T = any> {
 
 export class CacheManager {
   private cache = new Map<string, CacheEntry>();
+  private hitCount = 0;
+  private missCount = 0;
   
   // デフォルトのTTL設定 (ミリ秒)
   private readonly defaultTtlMap: Record<string, number> = {
@@ -31,16 +33,40 @@ export class CacheManager {
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
     if (!entry) {
+      this.missCount++;
       return null;
     }
 
     if (Date.now() > entry.expiresAt) {
       this.cache.delete(key);
+      this.missCount++;
       console.log(`[CacheManager] Cache expired for key: ${key}`);
       return null;
     }
 
+    this.hitCount++;
     return entry.data as T;
+  }
+
+  /**
+   * キャッシュ効率メトリクスを取得
+   */
+  getMetrics(): { hitCount: number; missCount: number; hitRate: number } {
+    const total = this.hitCount + this.missCount;
+    const hitRate = total > 0 ? Number((this.hitCount / total).toFixed(4)) : 0;
+    return {
+      hitCount: this.hitCount,
+      missCount: this.missCount,
+      hitRate
+    };
+  }
+
+  /**
+   * メトリクスのリセット
+   */
+  resetMetrics(): void {
+    this.hitCount = 0;
+    this.missCount = 0;
   }
 
   /**

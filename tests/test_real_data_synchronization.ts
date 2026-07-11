@@ -73,6 +73,13 @@ async function runTests() {
     cache.invalidate('area:test');
     const invalidated = cache.get<any>('area:test');
     assert(invalidated === null, 'Invalidated cache should return null');
+
+    // メトリクスの検証
+    const metrics = cache.getMetrics();
+    assert(metrics.hitCount === 1, 'Hit count should be 1');
+    assert(metrics.missCount === 2, 'Miss count should be 2'); // expired + invalidated
+    assert(metrics.hitRate === 0.3333, 'Hit rate should be 0.3333');
+
     console.log('[Test RealDataSynchronization] CacheManager: PASSED');
   }
 
@@ -183,6 +190,12 @@ async function runTests() {
     assert(eventsFired.includes('sync-start'), 'Event sync-start must be fired');
     assert(eventsFired.includes('sync-success'), 'Event sync-success must be fired');
     assert(connection.getState() === 'CONNECTED', 'Connection status must return to CONNECTED');
+
+    // メトリクスの検証
+    const schedMetrics = scheduler.getMetrics();
+    assert(schedMetrics.lastSyncTime > 0, 'lastSyncTime must be populated');
+    assert(schedMetrics.lastSyncDuration >= 0, 'lastSyncDuration must be populated');
+    assert(schedMetrics.lastRetryCount === 0, 'lastRetryCount must be 0 for direct success');
 
     // 定期スケジュールのオフラインポリシー検証
     globalVar.navigator.onLine = false;

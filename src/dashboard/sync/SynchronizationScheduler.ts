@@ -28,6 +28,11 @@ export class SynchronizationScheduler {
   private isSyncing = false;
   private listeners: SchedulerListener[] = [];
 
+  // 同期メトリクス
+  private lastSyncTime = 0;
+  private lastSyncDuration = 0;
+  private lastRetryCount = 0;
+
   constructor(connectionState: HAppConnectionState, retryController = new RetryController()) {
     this.connectionState = connectionState;
     this.retryController = retryController;
@@ -89,14 +94,22 @@ export class SynchronizationScheduler {
       this.isSyncing = true;
       this.emit('sync-start');
 
+      const startTime = Date.now();
+      let retryCount = 0;
+
       try {
         // 指数バックオフ付きリトライを実行
         const result = await this.retryController.execute(
           async () => await syncTask(),
           (error, attempt, nextDelayMs) => {
+            retryCount = attempt;
             this.emit('sync-retry', { error, attempt, nextDelayMs });
           }
         );
+
+        this.lastSyncTime = Date.now();
+        this.lastSyncDuration = Date.now() - startTime;
+        this.lastRetryCount = retryCount;
 
         if (result === false) {
           this.emit('sync-skipped');
@@ -104,6 +117,8 @@ export class SynchronizationScheduler {
           this.emit('sync-success');
         }
       } catch (err) {
+        this.lastSyncDuration = Date.now() - startTime;
+        this.lastRetryCount = retryCount;
         console.error('[SynchronizationScheduler] Periodic sync task failed after retries:', err);
         this.emit('sync-failed', err);
       } finally {
@@ -141,13 +156,21 @@ export class SynchronizationScheduler {
     this.isSyncing = true;
     this.emit('sync-start');
 
+    const startTime = Date.now();
+    let retryCount = 0;
+
     try {
       const result = await this.retryController.execute(
         async () => await syncTask(),
         (error, attempt, nextDelayMs) => {
+          retryCount = attempt;
           this.emit('sync-retry', { error, attempt, nextDelayMs });
         }
       );
+
+      this.lastSyncTime = Date.now();
+      this.lastSyncDuration = Date.now() - startTime;
+      this.lastRetryCount = retryCount;
 
       if (result === false) {
         this.emit('sync-skipped');
@@ -156,11 +179,24 @@ export class SynchronizationScheduler {
       }
       return true;
     } catch (err) {
+      this.lastSyncDuration = Date.now() - startTime;
+      this.lastRetryCount = retryCount;
       console.error('[SynchronizationScheduler] Immediate sync task failed:', err);
       this.emit('sync-failed', err);
       return false;
     } finally {
       this.isSyncing = false;
     }
+  }
+
+  /**
+   * 現在の同期動作のメトリクスを取得
+   */
+  getMetrics(): { lastSyncTime: number; lastSyncDuration: number; lastRetryCount: number } {
+    return {
+      lastSyncTime: this.lastSyncTime,
+      lastSyncDuration: this.lastSyncDuration,
+      lastRetryCount: this.lastRetryCount
+    };
   }
 }
