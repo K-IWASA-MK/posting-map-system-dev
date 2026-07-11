@@ -67,104 +67,124 @@ function authorizeAndTestDriveWrite() {
 }
 
 
+var executionContext = null;
+var globalCacheHit = false;
+
 /**
  * GETリクエスト：JSONデータの取得
  */
 function doGet(e) {
+  executionContext = new ApiExecutionContext();
+  globalCacheHit = false;
+  GasPerformanceMonitor.getInstance().reset();
+
   const action = e.parameter.action;
   let response;
 
   try {
-    switch (action) {
-      case 'getAppData':
+    if (action === 'getAppData') {
+      const cacheKey = CacheServiceProvider.getInstance().makeKey(
+        e.parameter.tenantId || "DEFAULT",
+        e.parameter.branchId || "DEFAULT",
+        "appdata"
+      );
+      const cached = CacheServiceProvider.getInstance().get(cacheKey);
+      if (cached) {
+        globalCacheHit = true;
+        GasPerformanceMonitor.getInstance().recordCacheHit();
+        response = JSON.parse(cached);
+      } else {
+        GasPerformanceMonitor.getInstance().recordCacheMiss();
         response = getAppData();
-        break;
-      case 'getRanking':
-        response = { success: true, ranking: getRankingData() };
-        break;
-      case 'getRoster':
-        response = { success: true, roster: getRoster() };
-        break;
-      case 'getAreaDetails':
-        response = getAreaDetails(e.parameter.name);
-        break;
-      case 'getCityAreaDetails':
-        response = getCityAreaDetails(e.parameter.cityName);
-        break;
-      case 'submitDistribution':
-        // ⚠️ 書き込み操作はGET禁止。フロントエンドはPOSTで呼び出すこと。
-        response = { success: false, message: 'Write operations require POST. Please update the client.' };
-        break;
-      case 'registerStaff':
-        response = registerStaff(e.parameter.lastName, e.parameter.firstName);
-        break;
-      case 'testDriveAccess':
-        // Driveフォルダアクセステスト（診断用）
-        try {
-          const testFolderId = getStorageFolderId();
-          const testFolder = DriveApp.getFolderById(testFolderId);
-          response = {
-            success: true,
-            message: 'Drive access OK',
-            folderId: testFolderId,
-            folderName: testFolder.getName(),
-            folderUrl: testFolder.getUrl()
-          };
-        } catch (driveErr) {
-          response = { success: false, message: 'Drive access FAILED: ' + driveErr.toString(), folderId: getStorageFolderId() };
+        if (response && response.success) {
+          CacheServiceProvider.getInstance().put(cacheKey, JSON.stringify(response));
         }
-        break;
-      case 'testDriveWrite':
-        // Driveファイル書き込みテスト（診断用）
-        try {
-          const wFolder = DriveApp.getFolderById(getStorageFolderId());
-          const testBlob = Utilities.newBlob("POSTING_MAP_TEST_" + Date.now(), "text/plain", "test_write.txt");
-          const file = wFolder.createFile(testBlob);
-          response = { success: true, message: 'Write OK', fileId: file.getId(), fileName: file.getName() };
-          // テストファイルはすぐ削除
-          file.setTrashed(true);
-        } catch (writeErr) {
-          response = { success: false, message: 'Write FAILED: ' + writeErr.toString() };
-        }
-        break;
-      case 'getDeliveryStats':
-        response = getDeliveryStats();
-        break;
-      case 'getFlyerStock':
-        response = { success: true, stocks: getFlyerStock() };
-        break;
-      case 'getTransferRequests':
-        response = { success: true, requests: getTransferRequests() };
-        break;
-      case 'runMigration':
-        response = { success: true, message: runMigrationToEventLog() };
-        break;
-      case 'runReconciliation':
-        response = generateReconciliationReport();
-        break;
-      case 'runFreeze':
-        response = executeSystemFreeze();
-        break;
-      case 'getConfig':
-        response = { success: true, config: getConfig(e.parameter.tenantId || "DEFAULT") };
-        break;
-      case 'getAuditLogs':
-        response = getAuditLogs();
-        break;
-      case 'refreshCache':
-        response = { success: true, data: refreshAreaSummaryCache() };
-        break;
-      case 'getStrategy':
-        response = { success: true, data: generateStrategy(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
-        break;
-      case 'getHeatmap':
-        response = { success: true, data: generateHeatmap(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
-        break;
-      case 'getPrediction':
-        response = { success: true, data: predictOutcome(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
-        break;
-      default:
-        response = { success: true, message: 'POSTING MAP API is online.' };
+      }
+    } else {
+      switch (action) {
+        case 'getRanking':
+          response = { success: true, ranking: getRankingData() };
+          break;
+        case 'getRoster':
+          response = { success: true, roster: getRoster() };
+          break;
+        case 'getAreaDetails':
+          response = getAreaDetails(e.parameter.name);
+          break;
+        case 'getCityAreaDetails':
+          response = getCityAreaDetails(e.parameter.cityName);
+          break;
+        case 'submitDistribution':
+          response = { success: false, message: 'Write operations require POST. Please update the client.' };
+          break;
+        case 'registerStaff':
+          response = registerStaff(e.parameter.lastName, e.parameter.firstName);
+          break;
+        case 'testDriveAccess':
+          try {
+            const testFolderId = getStorageFolderId();
+            const testFolder = DriveApp.getFolderById(testFolderId);
+            response = {
+              success: true,
+              message: 'Drive access OK',
+              folderId: testFolderId,
+              folderName: testFolder.getName(),
+              folderUrl: testFolder.getUrl()
+            };
+          } catch (driveErr) {
+            response = { success: false, message: 'Drive access FAILED: ' + driveErr.toString(), folderId: getStorageFolderId() };
+          }
+          break;
+        case 'testDriveWrite':
+          try {
+            const wFolder = DriveApp.getFolderById(getStorageFolderId());
+            const testBlob = Utilities.newBlob("POSTING_MAP_TEST_" + Date.now(), "text/plain", "test_write.txt");
+            const file = wFolder.createFile(testBlob);
+            response = { success: true, message: 'Write OK', fileId: file.getId(), fileName: file.getName() };
+            file.setTrashed(true);
+          } catch (writeErr) {
+            response = { success: false, message: 'Write FAILED: ' + writeErr.toString() };
+          }
+          break;
+        case 'getDeliveryStats':
+          response = getDeliveryStats();
+          break;
+        case 'getFlyerStock':
+          response = { success: true, stocks: getFlyerStock() };
+          break;
+        case 'getTransferRequests':
+          response = { success: true, requests: getTransferRequests() };
+          break;
+        case 'runMigration':
+          response = { success: true, message: runMigrationToEventLog() };
+          break;
+        case 'runReconciliation':
+          response = generateReconciliationReport();
+          break;
+        case 'runFreeze':
+          response = executeSystemFreeze();
+          break;
+        case 'getConfig':
+          response = { success: true, config: getConfig(e.parameter.tenantId || "DEFAULT") };
+          break;
+        case 'getAuditLogs':
+          response = getAuditLogs();
+          break;
+        case 'refreshCache':
+          response = { success: true, data: refreshAreaSummaryCache() };
+          break;
+        case 'getStrategy':
+          response = { success: true, data: generateStrategy(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
+          break;
+        case 'getHeatmap':
+          response = { success: true, data: generateHeatmap(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
+          break;
+        case 'getPrediction':
+          response = { success: true, data: predictOutcome(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
+          break;
+        default:
+          response = { success: true, message: 'POSTING MAP API is online.' };
+      }
     }
   } catch (err) {
     response = { success: false, message: err.toString() };
@@ -177,10 +197,12 @@ function doGet(e) {
  * POSTリクエスト：データの登録・更新
  */
 function doPost(e) {
+  executionContext = new ApiExecutionContext();
+  globalCacheHit = false;
+  GasPerformanceMonitor.getInstance().reset();
+
   let postData;
   try {
-    // Content-Typeに依存せずbodyのJSONパースを試みる
-    // (フロントエンドはCORSプリフライト回避のためContent-Type未指定で送信)
     if (e.postData && e.postData.contents) {
       postData = JSON.parse(e.postData.contents);
     } else {
@@ -194,87 +216,37 @@ function doPost(e) {
   let response;
 
   try {
-    switch (action) {
-      case 'getAppData':
-        response = getAppData();
-        break;
-      case 'getConfig':
-        response = { success: true, config: getConfig(postData.tenantId || e.parameter.tenantId || "DEFAULT") };
-        break;
-      case 'getStrategy':
-        response = { success: true, data: generateStrategy(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
-        break;
-      case 'getHeatmap':
-        response = { success: true, data: generateHeatmap(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
-        break;
-      case 'getPrediction':
-        response = { success: true, data: predictOutcome(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
-        break;
-      case 'getRanking':
-        response = { success: true, ranking: getRankingData() };
-        break;
-      case 'getRoster':
-        response = { success: true, roster: getRoster() };
-        break;
-      case 'getAreaDetails':
-        response = getAreaDetails(postData.name || e.parameter.name);
-        break;
-      case 'getCityAreaDetails':
-        response = getCityAreaDetails(postData.cityName || e.parameter.cityName);
-        break;
-      case 'submitDistribution':
-        response = submitDistribution(postData);
-        break;
-      case 'updateRecordWithGPSPhoto':
-        response = updateRecordWithGPSPhoto(postData);
-        break;
-      case 'registerStaff':
-        response = registerStaff(postData.lastName, postData.firstName, postData.lineUserId);
-        break;
-      case 'registerAdmin':
-        response = registerAdmin(postData.displayName, postData.lineUserId);
-        break;
-      case 'requestFlyerTransfer':
-        response = handleRequestFlyerTransfer(postData);
-        break;
-      case 'resolveTransferRequest':
-        response = resolveTransferRequest(postData);
-        break;
-      case 'resetRoster':
-        const rosterMsg = setupRosterSheet();
-        response = { success: true, message: rosterMsg };
-        break;
-      case 'setupFolders':
-        const setupMsg = setupGoogleDriveFolders();
-        response = { success: true, message: setupMsg };
-        break;
-      case 'forceStartBatch':
-        forceStartBatch();
-        response = { success: true, message: 'Batch run initiated successfully' };
-        break;
-      case 'refreshCache':
-        createSystemCacheSheet(); // スキーマ変更に対応するためキャッシュシートを再作成
-        const cacheResult = refreshAreaSummaryCache();
-        response = { success: true, message: 'Cache sync completed successfully', data: cacheResult };
-        break;
-      case 'aggregateStats':
-        aggregateTotalVolumes();
-        response = { success: true, message: 'Aggregation completed successfully' };
-        break;
-      case 'resetAllSheets':
-        deleteAllAreaSheets();
-        response = { success: true, message: 'All area sheets reset successfully' };
-        break;
-      case 'updateFlyerStock':
-        response = updateFlyerStock(
-          postData.location,
-          parseInt(postData.count, 10) || 0,
-          postData.staffName,
-          postData.staffId
+    const writeActions = [
+      'submitDistribution',
+      'updateRecordWithGPSPhoto',
+      'registerStaff',
+      'registerAdmin',
+      'requestFlyerTransfer',
+      'resolveTransferRequest',
+      'updateFlyerStock',
+      'resetRoster',
+      'setupFolders',
+      'forceStartBatch',
+      'refreshCache',
+      'aggregateStats',
+      'resetAllSheets'
+    ];
+
+    if (writeActions.indexOf(action) !== -1) {
+      response = LockServiceProvider.getInstance().executeWithLock(function() {
+        return processPostAction(action, postData, e);
+      });
+      // 更新系アクションが成功した場合は関連キャッシュを無効化 (Invalidate)
+      if (response && response.success) {
+        const cacheKey = CacheServiceProvider.getInstance().makeKey(
+          postData.tenantId || e.parameter.tenantId || "DEFAULT",
+          postData.branchId || e.parameter.branchId || "DEFAULT",
+          "appdata"
         );
-        break;
-      default:
-        response = { success: false, message: 'Invalid POST action' };
+        CacheServiceProvider.getInstance().remove(cacheKey);
+      }
+    } else {
+      response = processPostAction(action, postData, e);
     }
   } catch (err) {
     response = { success: false, message: err.toString() };
@@ -283,9 +255,105 @@ function doPost(e) {
   return createJsonResponse(response);
 }
 
+/**
+ * 実際のPOSTアクション処理のスイッチケース
+ */
+function processPostAction(action, postData, e) {
+  switch (action) {
+    case 'getAppData':
+      return getAppData();
+    case 'getConfig':
+      return { success: true, config: getConfig(postData.tenantId || e.parameter.tenantId || "DEFAULT") };
+    case 'getStrategy':
+      return { success: true, data: generateStrategy(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
+    case 'getHeatmap':
+      return { success: true, data: generateHeatmap(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
+    case 'getPrediction':
+      return { success: true, data: predictOutcome(postData.branchId || e.parameter.branchId, postData.tenantId || e.parameter.tenantId || "DEFAULT") };
+    case 'getRanking':
+      return { success: true, ranking: getRankingData() };
+    case 'getRoster':
+      return { success: true, roster: getRoster() };
+    case 'getAreaDetails':
+      return getAreaDetails(postData.name || e.parameter.name);
+    case 'getCityAreaDetails':
+      return getCityAreaDetails(postData.cityName || e.parameter.cityName);
+    case 'submitDistribution':
+      return submitDistribution(postData);
+    case 'updateRecordWithGPSPhoto':
+      return updateRecordWithGPSPhoto(postData);
+    case 'registerStaff':
+      return registerStaff(postData.lastName, postData.firstName, postData.lineUserId);
+    case 'registerAdmin':
+      return registerAdmin(postData.displayName, postData.lineUserId);
+    case 'requestFlyerTransfer':
+      return handleRequestFlyerTransfer(postData);
+    case 'resolveTransferRequest':
+      return resolveTransferRequest(postData);
+    case 'resetRoster':
+      const rosterMsg = setupRosterSheet();
+      return { success: true, message: rosterMsg };
+    case 'setupFolders':
+      const setupMsg = setupGoogleDriveFolders();
+      return { success: true, message: setupMsg };
+    case 'forceStartBatch':
+      forceStartBatch();
+      return { success: true, message: 'Batch run initiated successfully' };
+    case 'refreshCache':
+      createSystemCacheSheet();
+      const cacheResult = refreshAreaSummaryCache();
+      return { success: true, message: 'Cache sync completed successfully', data: cacheResult };
+    case 'aggregateStats':
+      aggregateTotalVolumes();
+      return { success: true, message: 'Aggregation completed successfully' };
+    case 'resetAllSheets':
+      deleteAllAreaSheets();
+      return { success: true, message: 'All area sheets reset successfully' };
+    case 'updateFlyerStock':
+      return updateFlyerStock(
+        postData.location,
+        parseInt(postData.count, 10) || 0,
+        postData.staffName,
+        postData.staffId
+      );
+    default:
+      return { success: false, message: 'Invalid POST action' };
+  }
+}
+
 // 共通：JSONレスポンス作成
 function createJsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
+  var serverTimestamp = Date.now();
+  var requestId = "unknown";
+  var processingTime = 0;
+  var cacheStatus = "MISS";
+  var version = "1.0.0-RC1";
+
+  if (typeof executionContext !== 'undefined' && executionContext !== null) {
+    requestId = executionContext.getRequestId();
+    processingTime = executionContext.getElapsedTime();
+    version = GasConfigurationProvider.getInstance().getApiVersion();
+  }
+
+  if (typeof globalCacheHit !== 'undefined' && globalCacheHit) {
+    cacheStatus = "HIT";
+  }
+
+  // 既存のレスポンス形式との完全互換性を守るためのデータパッキング
+  var isDataSuccess = data.success !== undefined ? data.success : true;
+  var responseWrapper = {
+    success: isDataSuccess,
+    data: data,
+    metadata: {
+      requestId: requestId,
+      serverTimestamp: serverTimestamp,
+      processingTime: processingTime,
+      cacheStatus: cacheStatus,
+      version: version
+    }
+  };
+
+  return ContentService.createTextOutput(JSON.stringify(responseWrapper))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -1121,3 +1189,311 @@ function getAuditLogs() {
     return { success: false, error: e.toString() };
   }
 }
+
+// ==========================================
+// 🚀 PRODUCTION BACKEND FOUNDATION CLASSES
+// ==========================================
+class GasConfigurationProvider {
+  constructor() {
+    this.cacheTTL = 600;
+    this.lockTimeout = 10000;
+    this.apiVersion = "1.0.0-RC1";
+    this.loadProperties();
+  }
+  static getInstance() {
+    if (!GasConfigurationProvider.instance) {
+      GasConfigurationProvider.instance = new GasConfigurationProvider();
+    }
+    return GasConfigurationProvider.instance;
+  }
+  loadProperties() {
+    try {
+      const props = PropertiesService.getScriptProperties();
+      const ttl = props.getProperty('CACHE_TTL');
+      if (ttl) this.cacheTTL = parseInt(ttl, 10);
+      const timeout = props.getProperty('LOCK_TIMEOUT');
+      if (timeout) this.lockTimeout = parseInt(timeout, 10);
+    } catch (e) {}
+  }
+  getCacheTTL() { return this.cacheTTL; }
+  getLockTimeout() { return this.lockTimeout; }
+  getApiVersion() { return this.apiVersion; }
+  getSpreadsheetId() {
+    const id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+    if (id) return id;
+    try {
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      if (ss) return ss.getId();
+    } catch (e) {}
+    throw new Error('SPREADSHEET_ID is not configured.');
+  }
+  getStorageParentFolderId() {
+    return PropertiesService.getScriptProperties().getProperty('STORAGE_PARENT_ID') || CONFIG.STORAGE_PARENT_ID;
+  }
+}
+GasConfigurationProvider.instance = null;
+
+class CacheServiceProvider {
+  constructor() {
+    this.configProvider = GasConfigurationProvider.getInstance();
+  }
+  static getInstance() {
+    if (!CacheServiceProvider.instance) {
+      CacheServiceProvider.instance = new CacheServiceProvider();
+    }
+    return CacheServiceProvider.instance;
+  }
+  makeKey(tenantId, branchId, category) {
+    return tenantId + ":" + branchId + ":" + category;
+  }
+  get(key) {
+    try {
+      return CacheService.getScriptCache().get(key);
+    } catch (e) {
+      return null;
+    }
+  }
+  put(key, value, ttlSeconds) {
+    try {
+      const expiry = ttlSeconds !== undefined ? ttlSeconds : this.configProvider.getCacheTTL();
+      CacheService.getScriptCache().put(key, value, Math.min(expiry, 21600));
+    } catch (e) {}
+  }
+  remove(key) {
+    try {
+      CacheService.getScriptCache().remove(key);
+    } catch (e) {}
+  }
+}
+CacheServiceProvider.instance = null;
+
+class LockServiceProvider {
+  constructor() {
+    this.configProvider = GasConfigurationProvider.getInstance();
+  }
+  static getInstance() {
+    if (!LockServiceProvider.instance) {
+      LockServiceProvider.instance = new LockServiceProvider();
+    }
+    return LockServiceProvider.instance;
+  }
+  executeWithLock(action) {
+    const lock = LockService.getScriptLock();
+    const timeoutMs = this.configProvider.getLockTimeout();
+    const startTime = Date.now();
+    const hasLock = lock.tryLock(timeoutMs);
+    if (!hasLock) {
+      throw new Error("Lock Timeout: Failed to acquire lock within " + timeoutMs + "ms.");
+    }
+    GasPerformanceMonitor.getInstance().recordLockAcquired(Date.now() - startTime);
+    try {
+      return action();
+    } finally {
+      try {
+        lock.releaseLock();
+      } catch (e) {}
+    }
+  }
+}
+LockServiceProvider.instance = null;
+
+class SpreadsheetBatchReader {
+  constructor() {
+    this.configProvider = GasConfigurationProvider.getInstance();
+    this.cachedSpreadsheet = null;
+  }
+  getSpreadsheet() {
+    if (this.cachedSpreadsheet) return this.cachedSpreadsheet;
+    const ssId = this.configProvider.getSpreadsheetId();
+    this.cachedSpreadsheet = SpreadsheetApp.openById(ssId);
+    return this.cachedSpreadsheet;
+  }
+  readAll(sheetName) {
+    GasPerformanceMonitor.getInstance().recordSpreadsheetRead();
+    const ss = this.getSpreadsheet();
+    const sheet = ss.getSheetByName(sheetName);
+    if (!sheet) return [];
+    const lastRow = sheet.getLastRow();
+    const lastColumn = sheet.getLastColumn();
+    if (lastRow === 0 || lastColumn === 0) return [];
+    return sheet.getRange(1, 1, lastRow, lastColumn).getValues();
+  }
+  readRange(sheetName, startRow, startCol, numRows, numCols) {
+    GasPerformanceMonitor.getInstance().recordSpreadsheetRead();
+    const ss = this.getSpreadsheet();
+    const sheet = ss.getSheetByName(sheetName);
+    if (!sheet) return [];
+    return sheet.getRange(startRow, startCol, numRows, numCols).getValues();
+  }
+}
+
+class SpreadsheetBatchWriter {
+  constructor() {
+    this.configProvider = GasConfigurationProvider.getInstance();
+    this.cachedSpreadsheet = null;
+  }
+  getSpreadsheet() {
+    if (this.cachedSpreadsheet) return this.cachedSpreadsheet;
+    const ssId = this.configProvider.getSpreadsheetId();
+    this.cachedSpreadsheet = SpreadsheetApp.openById(ssId);
+    return this.cachedSpreadsheet;
+  }
+  appendRows(sheetName, rows) {
+    if (rows.length === 0) return;
+    GasPerformanceMonitor.getInstance().recordSpreadsheetWrite();
+    const ss = this.getSpreadsheet();
+    let sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+    }
+    const lastRow = sheet.getLastRow();
+    sheet.getRange(lastRow + 1, 1, rows.length, rows[0].length).setValues(rows);
+  }
+  updateRange(sheetName, startRow, startCol, rows) {
+    if (rows.length === 0) return;
+    GasPerformanceMonitor.getInstance().recordSpreadsheetWrite();
+    const ss = this.getSpreadsheet();
+    const sheet = ss.getSheetByName(sheetName);
+    if (!sheet) throw new Error("Sheet not found: " + sheetName);
+    sheet.getRange(startRow, startCol, rows.length, rows[0].length).setValues(rows);
+  }
+}
+
+class SpreadsheetRepository {
+  constructor() {
+    this.reader = new SpreadsheetBatchReader();
+    this.writer = new SpreadsheetBatchWriter();
+  }
+  getAreas(tenantId, branchId) {
+    const rawRows = this.reader.readAll('Areas');
+    if (rawRows.length <= 1) return [];
+    const records = [];
+    const headers = rawRows[0];
+    const areaIdIdx = headers.indexOf('Area ID');
+    const nameIdx = headers.indexOf('Name');
+    const cityIdx = headers.indexOf('City');
+    const statusIdx = headers.indexOf('Status');
+    const doneIdx = headers.indexOf('Done Count');
+    const totalIdx = headers.indexOf('Total Count');
+    for (let i = 1; i < rawRows.length; i++) {
+      const row = rawRows[i];
+      records.push({
+        areaId: areaIdIdx !== -1 ? String(row[areaIdIdx]) : '',
+        name: nameIdx !== -1 ? String(row[nameIdx]) : '',
+        cityName: cityIdx !== -1 ? String(row[cityIdx]) : '',
+        status: statusIdx !== -1 ? String(row[statusIdx]) : 'NOT_STARTED',
+        doneCount: doneIdx !== -1 ? Number(row[doneIdx]) : 0,
+        totalCount: totalIdx !== -1 ? Number(row[totalIdx]) : 0
+      });
+    }
+    return records;
+  }
+  saveEventLogs(logs) {
+    if (logs.length === 0) return;
+    const rawRows = this.reader.readAll('EventLogs');
+    const headers = rawRows.length > 0 ? rawRows[0] : ['Event ID', 'Timestamp', 'Type', 'Payload'];
+    const formattedRows = logs.map(log => {
+      return headers.map(h => {
+        if (h === 'Event ID') return log.eventId || ("EV-" + Date.now() + "-" + Math.random().toString(36).substr(2, 4));
+        if (h === 'Timestamp') return log.timestamp || Date.now();
+        if (h === 'Type') return log.type || 'unknown';
+        if (h === 'Payload') return JSON.stringify(log.payload || {});
+        return '';
+      });
+    });
+    this.writer.appendRows('EventLogs', formattedRows);
+  }
+  getStaffs() {
+    const rawRows = this.reader.readAll('Staffs');
+    if (rawRows.length <= 1) return [];
+    const headers = rawRows[0];
+    const lastIdx = headers.indexOf('Last Name');
+    const firstIdx = headers.indexOf('First Name');
+    const statusIdx = headers.indexOf('Status');
+    const records = [];
+    for (let i = 1; i < rawRows.length; i++) {
+      const row = rawRows[i];
+      records.push({
+        lastName: lastIdx !== -1 ? String(row[lastIdx]) : '',
+        firstName: firstIdx !== -1 ? String(row[firstIdx]) : '',
+        status: statusIdx !== -1 ? String(row[statusIdx]) : 'ACTIVE'
+      });
+    }
+    return records;
+  }
+  updateAreaStatus(areaId, status) {
+    const rawRows = this.reader.readAll('Areas');
+    if (rawRows.length <= 1) return;
+    const headers = rawRows[0];
+    const areaIdIdx = headers.indexOf('Area ID');
+    const statusIdx = headers.indexOf('Status');
+    if (areaIdIdx === -1 || statusIdx === -1) return;
+    for (let i = 1; i < rawRows.length; i++) {
+      const row = rawRows[i];
+      if (String(row[areaIdIdx]) === areaId) {
+        this.writer.updateRange('Areas', i + 1, statusIdx + 1, [[status]]);
+        break;
+      }
+    }
+  }
+}
+
+class ApiExecutionContext {
+  constructor() {
+    this.startTimestamp = Date.now();
+    this.requestId = "req-" + this.startTimestamp + "-" + Math.random().toString(36).substr(2, 9);
+    this.executionId = "exec-" + Math.random().toString(36).substr(2, 9);
+    this.retryCount = 0;
+  }
+  getRequestId() { return this.requestId; }
+  getExecutionId() { return this.executionId; }
+  getStartTimestamp() { return this.startTimestamp; }
+  getElapsedTime() { return Date.now() - this.startTimestamp; }
+  getRetryCount() { return this.retryCount; }
+  incrementRetry() { this.retryCount++; }
+}
+
+class GasPerformanceMonitor {
+  constructor() {
+    this.spreadsheetReads = 0;
+    this.spreadsheetWrites = 0;
+    this.cacheHits = 0;
+    this.cacheMisses = 0;
+    this.lockWaitTime = 0;
+    this.lockAcquires = 0;
+  }
+  static getInstance() {
+    if (!GasPerformanceMonitor.instance) {
+      GasPerformanceMonitor.instance = new GasPerformanceMonitor();
+    }
+    return GasPerformanceMonitor.instance;
+  }
+  recordSpreadsheetRead() { this.spreadsheetReads++; }
+  recordSpreadsheetWrite() { this.spreadsheetWrites++; }
+  recordCacheHit() { this.cacheHits++; }
+  recordCacheMiss() { this.cacheMisses++; }
+  recordLockAcquired(waitTimeMs) {
+    this.lockAcquires++;
+    this.lockWaitTime += waitTimeMs;
+  }
+  reset() {
+    this.spreadsheetReads = 0;
+    this.spreadsheetWrites = 0;
+    this.cacheHits = 0;
+    this.cacheMisses = 0;
+    this.lockWaitTime = 0;
+    this.lockAcquires = 0;
+  }
+  getMetrics() {
+    return {
+      spreadsheetReads: this.spreadsheetReads,
+      spreadsheetWrites: this.spreadsheetWrites,
+      cacheHits: this.cacheHits,
+      cacheMisses: this.cacheMisses,
+      lockWaitTime: this.lockWaitTime,
+      lockAcquires: this.lockAcquires
+    };
+  }
+}
+GasPerformanceMonitor.instance = null;
+

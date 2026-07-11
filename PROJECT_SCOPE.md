@@ -60,11 +60,16 @@
   - バリデーション失敗時のプレミアム警告エラーオーバーレイ描画およびブートブロック処理を `DashboardBootstrap` / `DashboardApplication` へ統合。
 
 ### 主な今後の開発項目 (Sprint 3: Enterprise & AIOS Expansion)
-1. **Phase S3-1: Premium Feature Expansion & Edition Licensing**:
+* **Phase S3-1: GAS API Production Foundation** ✅
+  - `PropertiesService` から設定値（Cache TTL, Lock Timeout等）を取得する統一設定管理 `GasConfigurationProvider` を新設。
+  - スプレッドシート物理I/O（`SpreadsheetBatchReader`、`SpreadsheetBatchWriter`）を `SpreadsheetRepository` から完全分離し、キャッシュ・ロック連動型データアクセス層を実装。
+  - `ApiExecutionContext` および `GasPerformanceMonitor` によるAPI監査メタデータの算出。
+  - `Code.gs` (doGet/doPost) への実行コンテキスト・トランザクションパイプライン統合。
+
+1. **Phase S3-2: Premium Feature Expansion & Edition Licensing**:
    - Stripe 決済情報とのバインド、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化のライセンス管理。
    - Mapbox エンジンのランタイム動的切り替えの Premium 実装。
-2. **Phase S3-2: AIOS Integration & Automated Analytics**:
+2. **Phase S3-3: AIOS Integration & Automated Analytics**:
    - AIOS (AI組織) との安全なデータ通信ブリッジ（AIOS Bridge）の本格実装。
    - 支部比較や配布効率測定等を行う Analytics Engine の統合。
-3. **GAS API 本実装およびキャッシュ高速化**:
-   - 大量データアクセス時の `CacheService` 適用と、SpreadsheetApp 読み込み最小化のGAS側本実装。
+
