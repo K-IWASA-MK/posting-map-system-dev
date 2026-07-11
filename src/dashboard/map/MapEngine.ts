@@ -16,6 +16,9 @@ export interface MapEngine {
   addMarker(marker: any): void;
   removeMarker(markerId: string): void;
   updateLayer(layerId: string, options: any): void;
+  setTheme(theme: string): void;
+  resize(): void;
+  fitBounds(bounds: any): void;
 }
 
 export class DOMMapEngine implements MapEngine {
@@ -104,6 +107,18 @@ export class DOMMapEngine implements MapEngine {
 
   updateLayer(layerId: string, options: any): void {
     console.log(`[DOMMapEngine] updateLayer id=${layerId}`, options);
+  }
+
+  setTheme(theme: string): void {
+    console.log(`[DOMMapEngine] setTheme theme=${theme}`);
+  }
+
+  resize(): void {
+    console.log('[DOMMapEngine] resize called');
+  }
+
+  fitBounds(bounds: any): void {
+    console.log('[DOMMapEngine] fitBounds called', bounds);
   }
 
   private applyPinStyles(el: HTMLDivElement, progress: number) {

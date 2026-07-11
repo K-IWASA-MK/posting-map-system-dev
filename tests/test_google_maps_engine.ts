@@ -69,6 +69,9 @@ class MockMap {
   fitBounds(bounds: any) {
     // No-op for mock
   }
+  setOptions(options: any) {
+    this.options = { ...this.options, ...options };
+  }
 }
 
 class MockCircle {
@@ -131,6 +134,9 @@ globalVar.google = {
       addListener: (instance: any, eventName: string, handler: any) => {
         // テスト用のリスナー実行関数を追加
         instance[`__on_${eventName}`] = handler;
+      },
+      trigger: (instance: any, eventName: string) => {
+        instance[`__triggered_${eventName}`] = true;
       }
     }
   }
@@ -221,6 +227,13 @@ async function runTest() {
   ];
   engine.updateLayer('activity', { logs: mockLogs });
   assert(layerManager.activityOverlays.length === 1, 'Should render 1 activity overlay marker');
+
+  // 新規予約メソッド (setTheme, resize, fitBounds) 検証
+  engine.setTheme('dark');
+  assert((engine as any).map.options.styles !== undefined, 'Map style options should be set');
+  engine.resize();
+  assert((engine as any).map.__triggered_resize === true, 'Resize event trigger should be fired');
+  engine.fitBounds(new (window as any).google.maps.LatLngBounds());
 
   // destroy 検証
   engine.destroy();

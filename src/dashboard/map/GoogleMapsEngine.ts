@@ -195,4 +195,35 @@ export class GoogleMapsEngine implements MapEngine {
         console.warn(`[GoogleMapsEngine] Unsupported layer action: ${layerId}`);
     }
   }
+
+  /**
+   * テーマの動的切り替え
+   */
+  setTheme(theme: string): void {
+    if (!this.map) return;
+    if (theme === 'dark') {
+      this.map.setOptions({ styles: GoogleMapsConfiguration.getDarkMapStyle() });
+    } else {
+      this.map.setOptions({ styles: [] });
+    }
+  }
+
+  /**
+   * 地図のサイズ再計算トリガー
+   */
+  resize(): void {
+    const google = (window as any).google;
+    if (google && google.maps && this.map) {
+      google.maps.event.trigger(this.map, 'resize');
+    }
+  }
+
+  /**
+   * 指定境界（LatLngBounds）にカメラをフィット
+   */
+  fitBounds(bounds: any): void {
+    if (this.cameraController) {
+      this.cameraController.fitBounds(bounds);
+    }
+  }
 }
