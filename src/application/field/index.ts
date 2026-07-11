@@ -7,6 +7,7 @@ export * from './dto/ActivityDto';
 export * from './commands/RegisterStaffCommand';
 export * from './commands/DeclareHoldingCommand';
 export * from './commands/RecordActivityCommand';
+export * from './commands/RecordFieldActivityCommand';
 
 // Export Services
 export * from './services/StaffApplicationService';

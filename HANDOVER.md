@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Workspace Invitation Template Foundation`
-- **Milestone**: `Sprint 5 / Phase S5-13 COMPLETED`
-- **Tag**: `v5.13-workspace-invitation-template-completed`
+- **Completed**: `Posting Activity Integration Foundation`
+- **Milestone**: `Sprint 5 / Phase S5-16 COMPLETED`
+- **Tag**: `v5.16-posting-activity-integration-completed`
 - **Current Phase**: `Sprint 5`
-- **Next Action**: `Next Phase in Sprint 5`
+- **Next Action**: `Review with CEO`
 - **Branch**: `main`
 
 ---
@@ -389,5 +389,26 @@ Staff Registration Integration Foundation（Sprint 5 Phase S5-14）完了。
   - TSコンパイルエラー回避のため、テストファイル内の各 `MockStaffRepository` クラスに `getNextStaffNo` のダミーメソッドを実装。
 - 全ユニットテスト、統合テスト、および GAS ビルド検証をパス。
 
+### POSTING MAP Product Sprint 5 Phase S5-15: Flyer Holding Integration Foundation
+
+Flyer Holding Integration Foundation（Sprint 5 Phase S5-15）完了。
+
+- **`HoldingHandler` の新設**: `/holding` (GET & POST) を新設し、`HoldingApplicationService` に接続。
+- **リポジトリへの `findAllRaw` 実装**: `SpreadsheetFlyerHoldingRepository` で全チラシ在庫情報を抽出し、H-Appに適合する `stocks` 配列データをマッピング。保管場所列から市区町村名のみを抽出クリーニングする処理を統合。
+- **検証とビルド**: `HoldingHandler.test.ts` を追加し、全検証パス。
+
+### POSTING MAP Product Sprint 5 Phase S5-16: Posting Activity Integration Foundation
+
+Posting Activity Integration Foundation（Sprint 5 Phase S5-16）完了。
+
+- **`ActivityHandler` の新設**: `/field/distributors/activities` (POST) を新設し、`ActivityApplicationService` に接続。
+- **`RecordFieldActivityCommand` の新設**: 活動実績、位置、Base64写真などの詳細データをカプセル化するコマンドを追加。
+- **`ActivityApplicationService` への処理集約**:
+  - `recordFieldActivity` メソッドを実装し、Google DriveへのJPEGファイル保存（ファイルID取得）、地区シートの該当行更新（D〜J列に完了状態、枚数、GPS、写真IDなどを書き込み）、EventLogへの追記（`appendEventLog` 呼び出し）、および `Activity` シート（`SpreadsheetActivityRepository.save`）への追記処理を一元化してカプセル化。
+  - 写真がない活動報告時は、`photoUrl` を `"none"` に正規化して `DistributionActivity` ドメインモデルのバリデーションを通過させる仕組みを実装。
+- **APIルーティングの統合**: `PlatformIntegrationPipeline.ts` にて、レガシーアクション `'updateRecordWithGPSPhoto'` および `'submitDistribution'` を自動的に `/field/distributors/activities` に変換してルーティングするルールを追加。さらに、バージョン未指定時に `v2` へフォールバックする安全機構を追加。
+- **検証とビルド**: 新規統合テスト `test_activity_flow.ts` を追加し、全テストパスを確認。
+
 Quality Gate:
 - npm run quality:check PASS
+

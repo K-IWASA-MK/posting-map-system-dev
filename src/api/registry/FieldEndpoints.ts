@@ -19,6 +19,12 @@ export const FIELD_ENDPOINTS: EndpointConfig[] = [
     handler: 'ReservationHandler'
   },
   {
+    path: '/field/distributors/activities',
+    method: 'POST',
+    version: 'v2',
+    handler: 'ActivityHandler'
+  },
+  {
     path: '/field/distributors/{id}',
     method: 'GET',
     version: 'v2',

@@ -151,10 +151,15 @@ class PlatformIntegrationPipeline {
           path = '/holding';
         } else if (action === 'registerStaff') {
           path = '/field/distributors';
+        } else if (action === 'updateRecordWithGPSPhoto' || action === 'submitDistribution') {
+          path = '/field/distributors/activities';
         }
       }
 
-      const queryVersion = method === 'POST' ? (postData?.version || e.parameter.version || postData?.v) : (e.parameter.version || e.parameter.v);
+      let queryVersion = method === 'POST' ? (postData?.version || e.parameter.version || postData?.v) : (e.parameter.version || e.parameter.v);
+      if (!queryVersion && (action === 'updateRecordWithGPSPhoto' || action === 'submitDistribution' || action === 'getFlyerStock' || action === 'updateFlyerStock' || action === 'registerStaff')) {
+        queryVersion = 'v2';
+      }
       const version = ApiVersionResolver.resolve(undefined, queryVersion);
 
       apiRequest = new ApiRequest({

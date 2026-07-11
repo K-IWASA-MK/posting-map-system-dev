@@ -500,6 +500,7 @@ class ApplicationEventPublisher {
 * from './commands/RegisterStaffCommand';
 * from './commands/DeclareHoldingCommand';
 * from './commands/RecordActivityCommand';
+* from './commands/RecordFieldActivityCommand';
 
 // Export Services
 * from './services/StaffApplicationService';
@@ -578,6 +579,42 @@ class RecordActivityCommand {
 }
 
 
+// --- Source: src/application/field/commands/RecordFieldActivityCommand.ts ---
+class RecordFieldActivityCommand {
+  constructor(
+    public readonly action: string,
+    public readonly isDone: boolean,
+    public readonly count: number,
+    public readonly photoData: string,
+    public readonly latitude: number,
+    public readonly longitude: number,
+    public readonly accuracy: number,
+    public readonly staffId: string,
+    public readonly staffName: string,
+    public readonly areaName: string,
+    public readonly rowId: number,
+    public readonly tenantId?: string,
+    public readonly branchId?: string
+  ) {
+    if (!action || action.trim().length === 0) {
+      throw new Error("action is required");
+    }
+    if (count < 0) {
+      throw new Error("count must be non-negative");
+    }
+    if (!staffId || staffId.trim().length === 0) {
+      throw new Error("staffId is required");
+    }
+    if (!areaName || areaName.trim().length === 0) {
+      throw new Error("areaName is required");
+    }
+    if (rowId <= 0) {
+      throw new Error("rowId must be a positive integer");
+    }
+  }
+}
+
+
 // --- Source: src/application/field/commands/RegisterStaffCommand.ts ---
 class RegisterStaffCommand {
   constructor(
@@ -603,6 +640,10 @@ class RegisterStaffCommand {
 
 
 // --- Source: src/application/field/services/ActivityApplicationService.ts ---
+
+declare const DriveApp: any;
+declare const Utilities: any;
+declare const SpreadsheetApp: any;
 
 class ActivityApplicationService {
   constructor(
@@ -636,6 +677,131 @@ class ActivityApplicationService {
       command.longitude
     );
     this.eventPublisher.publish(event);
+
+    return this.toDto(activity);
+  }
+
+  public async recordFieldActivity(command: RecordFieldActivityCommand): Promise<ActivityDto> {
+    const isComplete = command.isDone;
+    const actType = command.action === 'updateRecordWithGPSPhoto'
+      ? (isComplete ? 'photo' : 'revert_photo')
+      : (isComplete ? 'distribute' : 'revert_distribute');
+    const actCount = isComplete ? command.count : -command.count;
+    
+    let photoUrl = '';
+
+    // 1. Google Drive Photo Save
+    if (isComplete && command.photoData && command.photoData.startsWith('data:image')) {
+      try {
+        const folderId = (globalThis as any).getStorageFolderId ? (globalThis as any).getStorageFolderId() : '';
+        if (folderId) {
+          const folder = DriveApp.getFolderById(folderId);
+          const now = new Date();
+          const timeStr = Utilities.formatDate(now, 'JST', 'HHmm');
+          const safeStaffName = command.staffName.replace(/[\s　]/g, '');
+          const fileName = `[${command.areaName}]_${safeStaffName}_${timeStr}.jpg`;
+          const base64Data = command.photoData.split(',')[1];
+          const decoded = Utilities.base64Decode(base64Data);
+          const blob = Utilities.newBlob(decoded, 'image/jpeg', fileName);
+          const file = folder.createFile(blob);
+          photoUrl = file.getId();
+        }
+      } catch (driveErr) {
+        console.error('[ActivityApplicationService] Google Drive Save Error:', driveErr);
+      }
+    }
+
+    const eventId = typeof Utilities !== 'undefined' && Utilities.getUuid ? Utilities.getUuid() : `EV-${Date.now()}`;
+    const timestamp = Date.now();
+    const tenantId = command.tenantId || ((globalThis as any).CONFIG ? (globalThis as any).CONFIG.get('DEFAULT_TENANT_ID') : 'DEFAULT_TENANT');
+    const branchId = command.branchId || ((globalThis as any).CONFIG ? (globalThis as any).CONFIG.get('DEFAULT_BRANCH_ID', tenantId) : 'DEFAULT_BRANCH');
+    const prefectureId = 'MIE';
+
+    const event = {
+      id: eventId,
+      timestamp,
+      tenantId,
+      branchId,
+      prefectureId,
+      blockId: command.areaName,
+      userId: command.staffId,
+      actionType: actType,
+      count: actCount,
+      lat: command.latitude || 0,
+      lng: command.longitude || 0,
+      meta: {
+        photoUrl: photoUrl || '',
+        legacyRow: command.rowId,
+        staffName: command.staffName,
+        legacySheetName: command.areaName
+      }
+    };
+
+    // 2. Update Area Sheet
+    if (typeof SpreadsheetApp !== 'undefined') {
+      try {
+        const ss = SpreadsheetClient.getInstance().getSpreadsheet();
+        const legacySheetName = command.areaName;
+        const legacySheet = ss.getSheetByName(legacySheetName);
+        if (legacySheet) {
+          const completedAt = Utilities.formatDate(new Date(timestamp), 'JST', 'MM/dd HH:mm');
+          legacySheet.getRange(command.rowId, 4, 1, 5).setValues([[
+            isComplete,
+            isComplete ? completedAt : '',
+            isComplete ? command.count : '',
+            isComplete ? command.staffName : '',
+            isComplete ? command.staffId : ''
+          ]]);
+
+          if (isComplete) {
+            const gpsStr = (event.lat && event.lng) ? `${event.lat},${event.lng}` : '';
+            legacySheet.getRange(command.rowId, 9).setValue(gpsStr);
+            if (photoUrl) {
+              legacySheet.getRange(command.rowId, 10).setValue(photoUrl);
+            }
+          } else {
+            legacySheet.getRange(command.rowId, 9, 1, 2).setValues([['', '']]);
+          }
+        }
+      } catch (sheetErr) {
+        console.error('[ActivityApplicationService] Sheet Update Error:', sheetErr);
+      }
+    }
+
+    // 3. Append Event Log
+    if ((globalThis as any).appendEventLog) {
+      try {
+        (globalThis as any).appendEventLog(event);
+      } catch (logErr) {
+        console.error('[ActivityApplicationService] appendEventLog Error:', logErr);
+      }
+    }
+
+    // 4. Save to Activity sheet via TS ActivityRepository
+    // Only record positive completed activities in the Activity sheet
+    const activityId = `ACT-${command.staffId}-${timestamp}`;
+    const normalizedPhotoUrl = photoUrl || 'none';
+    const activity = new DistributionActivity({
+      id: activityId,
+      staffNo: command.staffId,
+      reportedQuantity: new Quantity(isComplete ? command.count : 0),
+      photoUrl: normalizedPhotoUrl,
+      location: new Location(command.latitude || 0, command.longitude || 0, command.accuracy || 0)
+    });
+
+    if (isComplete) {
+      await this.activityRepository.save(activity);
+
+      const eventObj = new DistributionActivityRecordedEvent(
+        activityId,
+        command.staffId,
+        command.count,
+        normalizedPhotoUrl,
+        command.latitude,
+        command.longitude
+      );
+      this.eventPublisher.publish(eventObj);
+    }
 
     return this.toDto(activity);
   }
@@ -2013,6 +2179,67 @@ class SpreadsheetStaffRepository implements IStaffRepository {
 }
 
 
+// --- Source: src/api/field/ActivityHandler.ts ---
+
+class ActivityHandler implements EndpointHandler {
+  constructor(private activityAppService: ActivityApplicationService) {}
+
+  public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
+    try {
+      const data = request.body || {};
+      const action = data.action || request.query.action || 'updateRecordWithGPSPhoto';
+
+      // Type normalization and fallback matching legacy parameters
+      const isDoneVal = data.isDone === 'true' || data.isDone === true;
+      const countVal = Number(data.count || 0);
+      const photoDataVal = data.photoData || '';
+      
+      const latitudeVal = Number(data.latitude !== undefined ? data.latitude : (data.lat !== undefined ? data.lat : 0));
+      const longitudeVal = Number(data.longitude !== undefined ? data.longitude : (data.lng !== undefined ? data.lng : 0));
+      const accuracyVal = Number(data.accuracy !== undefined ? data.accuracy : 0);
+
+      const staffIdVal = String(data.staffId || data.userId || '');
+      const staffNameVal = String(data.staffName || 'Unknown');
+      const areaNameVal = String(data.areaName || data.legacySheetName || 'UnknownArea');
+      
+      const rawRowId = data.rowId !== undefined ? data.rowId : (data.legacyRow !== undefined ? data.legacyRow : 0);
+      const rowIdVal = Number(rawRowId);
+
+      const command = new RecordFieldActivityCommand(
+        action,
+        isDoneVal,
+        countVal,
+        photoDataVal,
+        latitudeVal,
+        longitudeVal,
+        accuracyVal,
+        staffIdVal,
+        staffNameVal,
+        areaNameVal,
+        rowIdVal,
+        data.tenantId,
+        data.branchId || data.branchCode
+      );
+
+      const dto = await this.activityAppService.recordFieldActivity(command);
+
+      // Return backward-compatible response format
+      const responsePayload = {
+        success: true,
+        status: 'ok',
+        id: dto.id,
+        photoUrl: dto.photoUrl !== 'none' ? dto.photoUrl : ''
+      };
+
+      return FieldApiMapper.toSuccessResponse(responsePayload, request, context);
+    } catch (error: any) {
+      const apiException = FieldApiMapper.toApiException(error, request.requestId);
+      return ExceptionMapper.toResponse(apiException, request, context);
+    }
+  }
+}
+
+
 // --- Source: src/api/field/DistributorHandler.ts ---
 
 class DistributorHandler implements EndpointHandler {
@@ -2504,6 +2731,12 @@ const FIELD_ENDPOINTS: EndpointConfig[] = [
     handler: 'ReservationHandler'
   },
   {
+    path: '/field/distributors/activities',
+    method: 'POST',
+    version: 'v2',
+    handler: 'ActivityHandler'
+  },
+  {
     path: '/field/distributors/{id}',
     method: 'GET',
     version: 'v2',
@@ -2598,6 +2831,7 @@ function bootstrapFieldApis(): void {
     HoldingHandler: new HoldingHandler(holdingAppService),
     DistributorHandler: new DistributorHandler(staffAppService),
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
+    ActivityHandler: new ActivityHandler(activityAppService),
     DashboardHandler: new DashboardHandler(dashboardAppService),
     SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
     OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService),

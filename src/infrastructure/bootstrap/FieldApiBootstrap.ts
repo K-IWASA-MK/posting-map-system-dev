@@ -3,6 +3,7 @@ import { FieldStockHandler } from '@api/field/FieldStockHandler';
 import { HoldingHandler } from '@api/field/HoldingHandler';
 import { DistributorHandler } from '@api/field/DistributorHandler';
 import { ReservationHandler } from '@api/field/ReservationHandler';
+import { ActivityHandler } from '@api/field/ActivityHandler';
 import { DashboardHandler } from '@api/dashboard/DashboardHandler';
 import { SubscriptionHandler } from '@api/subscription/SubscriptionHandler';
 import { OperationsDashboardHandler } from '@api/operations/OperationsDashboardHandler';
@@ -55,6 +56,7 @@ export function bootstrapFieldApis(): void {
     HoldingHandler: new HoldingHandler(holdingAppService),
     DistributorHandler: new DistributorHandler(staffAppService),
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
+    ActivityHandler: new ActivityHandler(activityAppService),
     DashboardHandler: new DashboardHandler(dashboardAppService),
     SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
     OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService),
