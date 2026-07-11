@@ -36,7 +36,7 @@ export class IdentityResolver {
       }
     } catch (e) {}
 
-    const isDashboardPath = request.path && request.path.includes('/dashboard/');
+    const isDashboardPath = request.path && (request.path.includes('/dashboard/') || request.path.includes('/operations/'));
     if (hasGoogleSession || isDashboardPath) {
       return new GoogleIdentityProvider();
     }

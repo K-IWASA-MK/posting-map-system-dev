@@ -56,6 +56,7 @@ class YearMonth {
 
 interface IWorkspaceRepository {
   findById(id: string): Promise<Workspace | undefined>;
+  findAll(): Promise<Workspace[]>;
   save(workspace: Workspace): Promise<void>;
 }
 
@@ -941,6 +942,31 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
     return undefined;
   }
 
+  public async findAll(): Promise<Workspace[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const wsIdIdx = headers.indexOf('ワークスペースID');
+    const nameIdx = headers.indexOf('ワークスペース名');
+    const statusIdx = headers.indexOf('ステータス');
+
+    if (wsIdIdx === -1) return [];
+
+    const list: Workspace[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[wsIdIdx]) {
+        list.push(new Workspace({
+          workspaceId: String(row[wsIdIdx]),
+          workspaceName: nameIdx !== -1 ? String(row[nameIdx]) : '',
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE'
+        }));
+      }
+    }
+    return list;
+  }
+
   public async save(workspace: Workspace): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ワークスペース名', 'ステータス'];
@@ -1784,6 +1810,12 @@ const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
     method: 'POST',
     version: 'v2',
     handler: 'SubscriptionHandler'
+  },
+  {
+    path: '/operations/dashboard/workspaces',
+    method: 'GET',
+    version: 'v2',
+    handler: 'OperationsDashboardHandler'
   }
 ];
 
@@ -1812,13 +1844,15 @@ function bootstrapFieldApis(): void {
   const activityAppService = new ActivityApplicationService(activityRepo, eventPublisher);
   const dashboardAppService = new DashboardApplicationService(workspaceRepo, staffRepo, holdingRepo, activityRepo);
   const subscriptionAppService = new SubscriptionApplicationService(subscriptionRepo);
+  const operationsDashboardAppService = new OperationsDashboardApplicationService(workspaceRepo, subscriptionRepo);
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
     DistributorHandler: new DistributorHandler(staffAppService),
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
     DashboardHandler: new DashboardHandler(dashboardAppService),
-    SubscriptionHandler: new SubscriptionHandler(subscriptionAppService)
+    SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
+    OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService)
   };
 
   // Register Field API Endpoints

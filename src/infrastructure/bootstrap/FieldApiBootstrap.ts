@@ -4,11 +4,13 @@ import { DistributorHandler } from '@api/field/DistributorHandler';
 import { ReservationHandler } from '@api/field/ReservationHandler';
 import { DashboardHandler } from '@api/dashboard/DashboardHandler';
 import { SubscriptionHandler } from '@api/subscription/SubscriptionHandler';
+import { OperationsDashboardHandler } from '@api/operations/OperationsDashboardHandler';
 import { StaffApplicationService } from '@application/field/services/StaffApplicationService';
 import { HoldingApplicationService } from '@application/field/services/HoldingApplicationService';
 import { ActivityApplicationService } from '@application/field/services/ActivityApplicationService';
 import { DashboardApplicationService } from '@application/dashboard/services/DashboardApplicationService';
 import { SubscriptionApplicationService } from '@application/subscription/SubscriptionApplicationService';
+import { OperationsDashboardApplicationService } from '@application/operations/services/OperationsDashboardApplicationService';
 import { SpreadsheetStaffRepository } from '@infra/repository/field/SpreadsheetStaffRepository';
 import { SpreadsheetFlyerHoldingRepository } from '@infra/repository/field/SpreadsheetFlyerHoldingRepository';
 import { SpreadsheetActivityRepository } from '@infra/repository/field/SpreadsheetActivityRepository';
@@ -42,13 +44,15 @@ export function bootstrapFieldApis(): void {
   const activityAppService = new ActivityApplicationService(activityRepo, eventPublisher);
   const dashboardAppService = new DashboardApplicationService(workspaceRepo, staffRepo, holdingRepo, activityRepo);
   const subscriptionAppService = new SubscriptionApplicationService(subscriptionRepo);
+  const operationsDashboardAppService = new OperationsDashboardApplicationService(workspaceRepo, subscriptionRepo);
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
     DistributorHandler: new DistributorHandler(staffAppService),
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
     DashboardHandler: new DashboardHandler(dashboardAppService),
-    SubscriptionHandler: new SubscriptionHandler(subscriptionAppService)
+    SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
+    OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService)
   };
 
   // Register Field API Endpoints

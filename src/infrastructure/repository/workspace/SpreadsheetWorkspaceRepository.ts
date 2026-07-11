@@ -37,6 +37,31 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
     return undefined;
   }
 
+  public async findAll(): Promise<Workspace[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const wsIdIdx = headers.indexOf('ワークスペースID');
+    const nameIdx = headers.indexOf('ワークスペース名');
+    const statusIdx = headers.indexOf('ステータス');
+
+    if (wsIdIdx === -1) return [];
+
+    const list: Workspace[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[wsIdIdx]) {
+        list.push(new Workspace({
+          workspaceId: String(row[wsIdIdx]),
+          workspaceName: nameIdx !== -1 ? String(row[nameIdx]) : '',
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE'
+        }));
+      }
+    }
+    return list;
+  }
+
   public async save(workspace: Workspace): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ワークスペース名', 'ステータス'];

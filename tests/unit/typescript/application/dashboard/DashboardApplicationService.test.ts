@@ -22,6 +22,9 @@ class MockWorkspaceRepository implements IWorkspaceRepository {
   async findById(id: string): Promise<Workspace | undefined> {
     return this.db.get(id);
   }
+  async findAll(): Promise<Workspace[]> {
+    return Array.from(this.db.values());
+  }
   async save(ws: Workspace): Promise<void> {
     this.db.set(ws.workspaceId, ws);
   }

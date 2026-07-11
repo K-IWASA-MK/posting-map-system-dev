@@ -12,5 +12,11 @@ export const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
     method: 'POST',
     version: 'v2',
     handler: 'SubscriptionHandler'
+  },
+  {
+    path: '/operations/dashboard/workspaces',
+    method: 'GET',
+    version: 'v2',
+    handler: 'OperationsDashboardHandler'
   }
 ];
