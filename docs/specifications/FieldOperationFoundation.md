@@ -1,14 +1,52 @@
 # Field Operation Foundation Specification (現場運用基盤仕様書)
 
-## 1. 現場運用アーキテクチャ (Field Operation Architecture)
-本仕様書は、現場配布員によるポスティング活動実績（配布状況、チラシ残数、GPS位置、写真データ）を安全かつ一元的に Dashboard で収集・可視化するための現場運用基盤（Field Operation Foundation）の仕様を規定します。
+## 0. 設計原則 (Design Principle)
+> [!IMPORTANT]
+> **POSTING MAP 設計原則**
+> POSTING MAPは活動管理システムではなく、「活動記録・可視化システム」である。
+> システムは配布員に対して、以下の項目を管理・決定しない：
+> - 担当地区 (Assigned Area)
+> - 配布順 (Delivery Order)
+> - 配布ルート (Delivery Route)
+> - ノルマ (Delivery Quotas)
+> - 優先順位 (Priority)
+> 
+> POSTING MAPが管理・記録する対象は以下の項目のみとする：
+> - 活動実績 (EventLog)
+> - GPS位置証跡 (GPS Evidence)
+> - 写真証跡 (Photo Evidence)
+> - 預かりチラシ (Held Flyers / Flyer Holding)
+> - 活動日時・履歴 (Activity History)
+
+---
+
+## 1. 機能トグル (Feature Flags)
+本現場運用基盤は、以下の Feature Flag によって各機能の有効化・無効化（ON/OFF）が動的に制御可能となるように設計されています。
+
+* **`Flyer Holding` (デフォルト: false)**:
+  - 預かりチラシ（手持ちチラシ残数、低在庫警告など）の管理機能。POSTING MAPではデフォルト無効とし、他業種向けや特別オプション時にのみ有効化されます。
+* **`Google Maps` (デフォルト: true)**:
+  - Google Maps Engine の有効化。
+* **`Mapbox` (デフォルト: false)**:
+  - 将来の Mapbox Engine 有効化。
+* **`GPS Evidence` (デフォルト: true)**:
+  - 配布員の位置情報、アクティブ状況の可視化。
+* **`Photo Evidence` (デフォルト: true)**:
+  - 提出されたエビデンス写真の時系列表示。
+* **`AIOS Bridge` (デフォルト: false)**:
+  - AIOS との自動情報連携ブリッジ機能。
+
+---
+
+## 2. 現場活動可視化アーキテクチャ (Field Operation Architecture)
+本仕様書は、現場配布員によるポスティング活動実績（活動状況、手持チラシ数、GPS位置、写真データ）を安全かつ一元的に Dashboard で収集・可視化するための現場運用基盤（Field Operation Foundation）の仕様を規定します。
 
 本アーキテクチャはデータの一方向フロー（Unidirectional Data Flow）を堅持し、指示や経路誘導は行わず「状態と証跡の可視化・監視」に専念します。
 
 ```
 [配布員 (H-App)]
       │
-      ├─► 配布実績打刻 ──► (EventLog) ──┐
+      ├─► 活動実績打刻 ──► (EventLog) ──┐
       ├─► GPS位置更新 ───► (GPS Log)  ──┼─► [GAS API] ─► [Spreadsheet]
       └─► 写真撮影 ──────► (Photo Log) ─┘        │
                                                 ▼
@@ -19,7 +57,7 @@
                                                 │
        ┌──────────────────┬─────────────────────┼─────────────────────┐
        ▼                  ▼                     ▼                     ▼
-[DistributionStatus] [InventoryMonitor] [GPSEvidenceMonitor] [PhotoEvidenceMonitor]
+[ActivityStatus]   [FlyerHoldingMonitor]  [GPSEvidenceMonitor] [PhotoEvidenceMonitor]
        │                  │                     │                     │
        └──────────────────┴───────────┬─────────┴─────────────────────┘
                                       ▼
@@ -31,15 +69,15 @@
 
 ---
 
-## 2. 配布ステータス管理ポリシー (Distribution Status Policy)
-各ポスティング対象地区（Area）の配布状態を以下の4つに定義し、リアルタイムに管理します。
+## 3. 活動状況管理ポリシー (Field Activity Status Policy)
+各ポスティング対象地区における配布活動状況（Field Activity Status）を以下の4つに定義し、リアルタイムに可視化します。地区の担当状態や配布担当の割り当て管理機能は持ちません。
 
-* **`NOT_STARTED` (未着手)**:
+* **`NOT_STARTED` (活動未着手)**:
   - 該当地区における累積配布完了数（`doneCount`）が `0` 枚である初期状態。
-* **`IN_PROGRESS` (配布中)**:
-  - 配布が開始され、かつ目標世帯数（`totalHouseholds`）に達していない状態。
+* **`IN_PROGRESS` (活動中)**:
+  - 配布活動が開始され、かつ目標世帯数（`totalHouseholds`）に達していない状態。
   - 条件: `0 < doneCount < totalHouseholds`
-* **`COMPLETED` (配布完了)**:
+* **`COMPLETED` (活動完了)**:
   - 配布完了数が目標世帯数に達した状態。
   - 条件: `doneCount >= totalHouseholds`
 * **`PAUSED` (一時中断)**:
@@ -47,10 +85,10 @@
 
 ---
 
-## 3. GPS証跡監視ポリシー (GPS Evidence Policy)
-配布員の位置情報および軌跡証跡を以下の基準で監視し、なりすましや不配などの不正抑止および安全確認に役立てます。
+## 4. GPS証跡監視ポリシー (GPS Evidence Policy)
+配布員の位置情報および軌跡証跡を以下の基準で可視化し、安全確認に役立てます。
 
-* **GPSログの収集項目**:
+* **GPSログ of 収集項目**:
   - `memberId`: 配布員ID
   - `latitude`, `longitude`: 座標（WGS84）
   - `timestamp`: 取得日時
@@ -62,8 +100,8 @@
 
 ---
 
-## 4. 写真証跡監視ポリシー (Photo Evidence Policy)
-ポスト投函やチラシ山積み放置等のエビデンス（証跡）として写真データを収集します。
+## 5. 写真証跡監視ポリシー (Photo Evidence Policy)
+投函エビデンス（証跡）として写真データを収集します。
 
 * **写真ログの収集項目**:
   - `photoId`: 写真一意ID
@@ -77,19 +115,19 @@
 
 ---
 
-## 5. 在庫監視フロー (Inventory Operation Flow)
-配布用チラシの持参部数残量と補充状況をリアルタイム監視し、チラシ切れによる活動停止を防ぎます。
+## 6. 手持ちチラシ監視フロー (Flyer Holding Monitor Flow)
+配布用チラシの持参部数残量（Remaining Held Flyers）をリアルタイムに集計可視化し、補充タイミングの把握を支援します。
 
 * **監視項目**:
-  - `remaining`: チラシ残数
-  - `threshold`: 在庫警告閾値（デフォルト: `100` 枚）
+  - `remaining`: 手持ちチラシ残数 (Remaining Held Flyers)
+  - `threshold`: 警告しきい値（デフォルト: `100` 枚）
 * **アラート検知**:
-  - `remaining < threshold` に達した場合、Dashboard 内部の `NotificationCenter` を介して「低在庫（Low Stock）」アラートを画面上にトースト通知。
+  - `remaining < threshold` に達した場合、Dashboard 内部の `NotificationCenter` を介して「手持ち僅少」アラートを画面上にトースト通知。
   - 外部への Push 通知やメール送信は本フェーズの範囲外（Out of Scope）。
 
 ---
 
-## 6. 手動リカバリポリシー (Manual Recovery Policy)
+## 7. 手動リカバリポリシー (Manual Recovery Policy)
 通信不安定環境やGAS障害発生時におけるデータ不整合および消失を防ぐため、以下のリカバリポリシーを規定します。
 
 * **H-App キャッシュ・再送キュー**:
@@ -99,10 +137,10 @@
 
 ---
 
-## 7. 現場運用監査ポリシー (Field Audit Policy)
+## 8. 現場運用監査ポリシー (Field Audit Policy)
 管理者による運用の健全性チェックのため、以下の監査指標を定義します。
 
 * **GPSカバレッジ**:
-  - 配布ログが存在する時間帯に、GPS座標の受信ログが正しく存在しているかの整合比率（不整合の監査ログ）。
+  - 活動ログが存在する時間帯に、GPS座標の受信ログが正しく存在しているかの整合比率。
 * **写真提出率**:
-  - 配布完了地区における写真提出率の算出。
+  - 活動完了地区における写真提出率の算出。

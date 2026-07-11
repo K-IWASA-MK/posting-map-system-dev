@@ -201,7 +201,7 @@ export class AreaDetailPanel {
       const threshold = invLog.meta.lowStockThreshold || 100;
       inventoryText = `${remaining} 枚`;
       if (remaining < threshold) {
-        inventoryText += ' (在庫僅少)';
+        inventoryText += ' (手持ち僅少)';
         isInventoryLow = true;
       }
     }
@@ -223,8 +223,8 @@ export class AreaDetailPanel {
     this.fieldContainer.innerHTML = '';
     
     const fieldRows = [
-      { label: '配布状況', val: distStatus, isBadge: true },
-      { label: '在庫状況', val: inventoryText, color: isInventoryLow ? '#ef4444' : '#ffffff' },
+      { label: '活動状況', val: distStatus, isBadge: true },
+      { label: '手持ちチラシ残数', val: inventoryText, color: isInventoryLow ? '#ef4444' : '#ffffff' },
       { label: '最新GPS位置取得', val: gpsText },
       { label: '最新写真証跡', val: photoText, link: photoUrl }
     ];

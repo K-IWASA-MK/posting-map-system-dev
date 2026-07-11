@@ -47,12 +47,12 @@
   - トースト表示およびインメモリ履歴制限（最大50件）を行う `NotificationCenter` および、ヘッダー用 `HealthIndicator` UIを実装。
   - ヘッダー内の「FORCE REFRESH」からイベント駆動（`refresh-requested`）によるキャッシュ全クリア＆強制再同期をDI統合。
 * **Phase S2-5: Field Operation Foundation** ✅
-  - 地区の配布ステータス（NOT_STARTED, IN_PROGRESS, COMPLETED, PAUSED）を自動・手動で管理する `DistributionStatusManager` を新設。
-  - チラシ残数と警告閾値監視による Dashboard-local アラートを検知する `InventoryMonitor` を構築。
-  - 配布員のGPS座標と最終測位からのアクティブ判定を行う `GPSEvidenceMonitor` を実装。
+  - 現場の活動状況（NOT_STARTED, IN_PROGRESS, COMPLETED, PAUSED）を自動・手動で管理する `DistributionStatusManager` を新設。
+  - 手持ちチラシ（Flyer Holding）残数と警告しきい値監視による Dashboard-local アラートを検知する `InventoryMonitor` を構築。
+  - 配布員（担当割り当てを持たない）のGPS座標と最終測位からのアクティブ判定を行う `GPSEvidenceMonitor` を実装。
   - アップロードされた証跡写真を地区単位で時系列管理する `PhotoEvidenceMonitor` を実装。
-  - 現場完了数、アクティブ人数、GPS・写真カバレッジ等のメトリクスを集約する `FieldOperationMetrics` および現場コントローラー `FieldOperationController` を DI 統合。
-  - `AreaDetailPanel` へ配布状況バッジ、在庫、最新GPS、写真証跡リンク表示を組み込み。
+  - 現場活動完了数、アクティブ人数、GPS・写真カバレッジ等のメトリクスを集約する `FieldOperationMetrics` および現場統制コントローラー `FieldOperationController` を DI 統合。
+  - `AreaDetailPanel` へ活動状況バッジ、手持ちチラシ残数、最新GPS、写真証跡リンク表示を組み込み。
 
 ### 主な今後の開発項目
 1. **Stripe自動契約・独占権管理の統合**:

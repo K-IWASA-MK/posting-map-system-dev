@@ -263,6 +263,6 @@ Dashboard Operational Foundation（Sprint 2 Phase S2-4）完了。
 
 Field Operation Foundation（Sprint 2 Phase S2-5）完了。
 
-地区配布ステータス管理（DistributionStatusManager）、低在庫アラート（InventoryMonitor）、GPS位置追跡（GPSEvidenceMonitor）、写真証跡（PhotoEvidenceMonitor）、現場統合メトリクス（FieldOperationMetrics）、現場統制（FieldOperationController）を構築し、AreaDetailPanelに証跡情報を統合可視化。
+活動状況管理（DistributionStatusManager）、手持ちチラシ僅少アラート（InventoryMonitor）、GPS位置追跡（GPSEvidenceMonitor）、写真証跡（PhotoEvidenceMonitor）、現場統合メトリクス（FieldOperationMetrics）、現場統制（FieldOperationController）を構築し、AreaDetailPanelに証跡情報を統合可視化。
 
 次のフェーズ（Sprint 2 Phase S2-6：Sprint 2 Release / Wrap-up）へ移行可能。
