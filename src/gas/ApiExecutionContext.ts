@@ -1,5 +1,6 @@
 import { AuthenticationContext } from '../authentication/AuthenticationContext';
 import { AuthorizationContext } from '../authorization/AuthorizationContext';
+import { LicenseContext } from '../licensing/LicenseContext';
 
 export class ApiExecutionContext {
   private requestId: string;
@@ -8,6 +9,7 @@ export class ApiExecutionContext {
   private retryCount: number = 0;
   private authContext: AuthenticationContext | null = null;
   private authzContext: AuthorizationContext | null = null;
+  private licenseContext: LicenseContext | null = null;
 
   constructor() {
     this.startTimestamp = Date.now();
@@ -81,5 +83,13 @@ export class ApiExecutionContext {
 
   public getAuthorizationContext(): AuthorizationContext | null {
     return this.authzContext;
+  }
+
+  public setLicenseContext(context: LicenseContext): void {
+    this.licenseContext = context;
+  }
+
+  public getLicenseContext(): LicenseContext | null {
+    return this.licenseContext;
   }
 }

@@ -14,6 +14,9 @@ export interface FeatureFlags {
   roleValidation: boolean;
   scopeValidation: boolean;
   permissionValidation: boolean;
+  licensingEnabled: boolean;
+  editionValidation: boolean;
+  licenseValidation: boolean;
 }
 
 export class GasConfigurationProvider {
@@ -95,7 +98,10 @@ export class GasConfigurationProvider {
           authorizationEnabled: props.getProperty('FLAG_AUTHORIZATION_ENABLED') !== 'false',
           roleValidation: props.getProperty('FLAG_ROLE_VALIDATION') !== 'false',
           scopeValidation: props.getProperty('FLAG_SCOPE_VALIDATION') !== 'false',
-          permissionValidation: props.getProperty('FLAG_PERMISSION_VALIDATION') !== 'false'
+          permissionValidation: props.getProperty('FLAG_PERMISSION_VALIDATION') !== 'false',
+          licensingEnabled: props.getProperty('FLAG_LICENSING_ENABLED') !== 'false',
+          editionValidation: props.getProperty('FLAG_EDITION_VALIDATION') !== 'false',
+          licenseValidation: props.getProperty('FLAG_LICENSE_VALIDATION') !== 'false'
         };
       } catch (e) {
         // Fallback below
@@ -116,7 +122,10 @@ export class GasConfigurationProvider {
       authorizationEnabled: true,
       roleValidation: true,
       scopeValidation: true,
-      permissionValidation: true
+      permissionValidation: true,
+      licensingEnabled: true,
+      editionValidation: true,
+      licenseValidation: true
     };
   }
 }

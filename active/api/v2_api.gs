@@ -107,6 +107,7 @@ function doGet(e) {
     HardeningPipeline.getInstance().execute(apiRequest, executionContext);
     AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
     AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
+    LicensingPipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -309,6 +310,7 @@ function doPost(e) {
     HardeningPipeline.getInstance().execute(apiRequest, executionContext);
     AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
     AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
+    LicensingPipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -3194,4 +3196,185 @@ class AuthorizationPipeline {
   }
 }
 AuthorizationPipeline.instance = null;
+
+// ==========================================
+// 🚀 LICENSING & EDITION FOUNDATION CLASSES
+// ==========================================
+class LicenseContext {
+  constructor(params) {
+    this.edition = params.edition;
+    this.status = params.status;
+    this.licensed = params.licensed;
+    this.expiresAt = params.expiresAt;
+    this.issuedAt = params.issuedAt;
+    this.metadata = params.metadata || {};
+  }
+}
+
+class LicenseResult {
+  constructor(success, context, failureReason) {
+    this.success = success;
+    this.context = context;
+    this.failureReason = failureReason;
+  }
+  static successResult(context) {
+    return new LicenseResult(true, context, null);
+  }
+  static failureResult(reason) {
+    return new LicenseResult(false, null, reason);
+  }
+}
+
+class LicensePolicy {
+  constructor(params) {
+    this.requiredEdition = params.requiredEdition || 'COMMUNITY';
+    this.requiredStatus = params.requiredStatus || 'ACTIVE';
+  }
+  static resolve(request) {
+    if (request.query && request.query.action === 'resetAllSheets') {
+      return new LicensePolicy({
+        requiredEdition: 'ENTERPRISE',
+        requiredStatus: 'ACTIVE'
+      });
+    }
+    if (request.path === '/dashboard') {
+      return new LicensePolicy({
+        requiredEdition: 'STANDARD',
+        requiredStatus: 'ACTIVE'
+      });
+    }
+    return new LicensePolicy({
+      requiredEdition: 'COMMUNITY',
+      requiredStatus: 'ACTIVE'
+    });
+  }
+}
+
+class LicenseException extends ApiException {
+  constructor(code, internalMessage, requestId) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: internalMessage,
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'LicenseException',
+        exceptionCode: code,
+        source: 'LICENSING_PIPELINE'
+      }
+    });
+    this.category = 'SYSTEM';
+    this.code = code;
+    this.status = 402;
+  }
+}
+
+class EditionResolver {
+  resolve(authContext) {
+    const id = authContext.identityId;
+    if (id === 'service-aios-bridge-stub') {
+      return 'ENTERPRISE';
+    }
+    if (id === 'user-api-key-stub') {
+      return 'PROFESSIONAL';
+    }
+    if (id === 'user-liff-stub-123') {
+      return 'STANDARD';
+    }
+    return 'COMMUNITY';
+  }
+}
+
+class LicenseResolver {
+  constructor() {
+    this.editionResolver = new EditionResolver();
+  }
+  resolve(authContext) {
+    const edition = this.editionResolver.resolve(authContext);
+    return new LicenseContext({
+      edition: edition,
+      status: 'ACTIVE',
+      licensed: true,
+      expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+      issuedAt: Date.now(),
+      metadata: {
+        licenseId: 'lic-stub-' + authContext.identityId,
+        contractId: 'ctr-stub-' + authContext.identityId
+      }
+    });
+  }
+}
+
+class LicensingPipeline {
+  constructor() {
+    this.licenseResolver = new LicenseResolver();
+  }
+  static getInstance() {
+    if (!LicensingPipeline.instance) {
+      LicensingPipeline.instance = new LicensingPipeline();
+    }
+    return LicensingPipeline.instance;
+  }
+  execute(request, context) {
+    const config = GasConfigurationProvider.getInstance();
+    const flags = config.getFeatureFlags();
+
+    let authContext = context.getAuthenticationContext();
+    if (!authContext) {
+      authContext = new AuthenticationContext({
+        identityId: 'anonymous',
+        identityType: 'ANONYMOUS',
+        authenticationMethod: 'NONE',
+        authenticated: false,
+        issuedAt: Date.now()
+      });
+    }
+
+    const licenseContext = this.licenseResolver.resolve(authContext);
+    context.setLicenseContext(licenseContext);
+
+    if (flags.licensingEnabled === false) {
+      return;
+    }
+
+    const policy = LicensePolicy.resolve(request);
+
+    if (flags.licenseValidation !== false) {
+      if (licenseContext.status !== 'ACTIVE' && licenseContext.status !== 'TRIAL') {
+        throw new LicenseException(
+          'PM-LIC-002',
+          'License is inactive or suspended. Current status: ' + licenseContext.status,
+          request.requestId
+        );
+      }
+      if (licenseContext.licensed === false) {
+        throw new LicenseException(
+          'PM-LIC-001',
+          'Feature requires a valid active license registration.',
+          request.requestId
+        );
+      }
+    }
+
+    if (flags.editionValidation !== false) {
+      const editionRank = {
+        COMMUNITY: 0,
+        STANDARD: 1,
+        PROFESSIONAL: 2,
+        ENTERPRISE: 3
+      };
+      const userRank = editionRank[licenseContext.edition] || 0;
+      const requiredRank = editionRank[policy.requiredEdition] || 0;
+
+      if (userRank < requiredRank) {
+        throw new LicenseException(
+          'PM-LIC-003',
+          'Insufficient subscription plan level. Requires ' + policy.requiredEdition + ' (yours: ' + licenseContext.edition + ').',
+          request.requestId
+        );
+      }
+    }
+  }
+}
+LicensingPipeline.instance = null;
 
