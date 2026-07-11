@@ -79,6 +79,8 @@ async function runTests() {
     assert(metrics.hitCount === 1, 'Hit count should be 1');
     assert(metrics.missCount === 2, 'Miss count should be 2'); // expired + invalidated
     assert(metrics.hitRate === 0.3333, 'Hit rate should be 0.3333');
+    assert(metrics.cacheSize === 0, 'Cache size should be 0');
+    assert(metrics.memoryUsageBytes === 0, 'Memory usage should be 0');
 
     console.log('[Test RealDataSynchronization] CacheManager: PASSED');
   }
@@ -164,6 +166,11 @@ async function runTests() {
     const customAreasMerged = resolver.mergeAreas(areasCur, areasInc);
     assert(customAreasMerged[0].doneCount === 40, 'Custom Strategy must apply the overridden merge behavior (40)');
 
+    // 競合メトリクスの検証
+    assert(resolver.getConflictCount() === 3, 'Conflict count must be 3');
+    resolver.resetMetrics();
+    assert(resolver.getConflictCount() === 0, 'Conflict count must reset to 0');
+
     console.log('[Test RealDataSynchronization] ConflictResolver: PASSED');
   }
 
@@ -192,20 +199,28 @@ async function runTests() {
     assert(connection.getState() === 'CONNECTED', 'Connection status must return to CONNECTED');
 
     // メトリクスの検証
-    const schedMetrics = scheduler.getMetrics();
+    let schedMetrics = scheduler.getMetrics();
     assert(schedMetrics.lastSyncTime > 0, 'lastSyncTime must be populated');
     assert(schedMetrics.lastSyncDuration >= 0, 'lastSyncDuration must be populated');
     assert(schedMetrics.lastRetryCount === 0, 'lastRetryCount must be 0 for direct success');
+    assert(schedMetrics.totalSyncCount === 1, 'totalSyncCount should be 1');
+    assert(schedMetrics.averageSyncTime >= 0, 'averageSyncTime should be >= 0');
+    assert(schedMetrics.maxSyncTime >= 0, 'maxSyncTime should be >= 0');
+    assert(schedMetrics.averageRetryCount === 0, 'averageRetryCount should be 0');
 
     // 定期スケジュールのオフラインポリシー検証
     globalVar.navigator.onLine = false;
     eventsFired.length = 0; // 配列クリア
 
     scheduler.startScheduler(async () => {}, 50);
-    await new Promise(resolve => setTimeout(resolve, 80));
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     assert(eventsFired.includes('sync-offline'), 'Event sync-offline must fire when browser is offline');
     assert(connection.getState() === 'OFFLINE', 'Connection status must transition to OFFLINE');
+
+    // オフライン時間計測の検証
+    schedMetrics = scheduler.getMetrics();
+    assert(schedMetrics.totalOfflineDuration >= 10, 'totalOfflineDuration must track offline time');
 
     scheduler.stopScheduler();
     console.log('[Test RealDataSynchronization] SynchronizationScheduler: PASSED');

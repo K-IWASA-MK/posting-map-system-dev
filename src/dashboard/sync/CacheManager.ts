@@ -51,13 +51,26 @@ export class CacheManager {
   /**
    * キャッシュ効率メトリクスを取得
    */
-  getMetrics(): { hitCount: number; missCount: number; hitRate: number } {
+  getMetrics(): { hitCount: number; missCount: number; hitRate: number; cacheSize: number; memoryUsageBytes: number } {
     const total = this.hitCount + this.missCount;
     const hitRate = total > 0 ? Number((this.hitCount / total).toFixed(4)) : 0;
+    
+    // 簡易的な概算メモリサイズ算出 (UTF-16文字列換算)
+    let memoryUsageBytes = 0;
+    this.cache.forEach((entry) => {
+      try {
+        memoryUsageBytes += JSON.stringify(entry.data).length * 2;
+      } catch (err) {
+        memoryUsageBytes += 1024; // フォールバック値
+      }
+    });
+
     return {
       hitCount: this.hitCount,
       missCount: this.missCount,
-      hitRate
+      hitRate,
+      cacheSize: this.cache.size,
+      memoryUsageBytes
     };
   }
 

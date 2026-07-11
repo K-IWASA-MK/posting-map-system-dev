@@ -33,6 +33,14 @@ export class SynchronizationScheduler {
   private lastSyncDuration = 0;
   private lastRetryCount = 0;
 
+  private totalSyncCount = 0;
+  private totalSyncDuration = 0;
+  private maxSyncTime = 0;
+  private totalRetryCount = 0;
+
+  private totalOfflineDuration = 0;
+  private offlineStartTime = 0;
+
   constructor(connectionState: HAppConnectionState, retryController = new RetryController()) {
     this.connectionState = connectionState;
     this.retryController = retryController;
@@ -49,11 +57,30 @@ export class SynchronizationScheduler {
   }
 
   /**
+   * オンライン復帰時のオフライン期間集計
+   */
+  private handleOnlineDetected(): void {
+    if (this.offlineStartTime > 0) {
+      this.totalOfflineDuration += Date.now() - this.offlineStartTime;
+      this.offlineStartTime = 0;
+    }
+  }
+
+  /**
    * イベントを発行し、リスナーおよび接続状態を更新する
    */
   private emit(event: SchedulerEvent, details?: any): void {
     console.log(`[SynchronizationScheduler] Event emitted: ${event}`, details || '');
     
+    // オフライン・オンライン監視とオフライン継続時間の集計
+    if (event === 'sync-offline') {
+      if (this.offlineStartTime === 0) {
+        this.offlineStartTime = Date.now();
+      }
+    } else {
+      this.handleOnlineDetected();
+    }
+
     // HAppConnectionState への状態バインド
     if (event === 'sync-offline') {
       this.connectionState.setState('OFFLINE');
@@ -107,8 +134,14 @@ export class SynchronizationScheduler {
           }
         );
 
+        const duration = Date.now() - startTime;
+        this.totalSyncCount++;
+        this.totalSyncDuration += duration;
+        this.maxSyncTime = Math.max(this.maxSyncTime, duration);
+        this.totalRetryCount += retryCount;
+
         this.lastSyncTime = Date.now();
-        this.lastSyncDuration = Date.now() - startTime;
+        this.lastSyncDuration = duration;
         this.lastRetryCount = retryCount;
 
         if (result === false) {
@@ -117,7 +150,13 @@ export class SynchronizationScheduler {
           this.emit('sync-success');
         }
       } catch (err) {
-        this.lastSyncDuration = Date.now() - startTime;
+        const duration = Date.now() - startTime;
+        this.totalSyncCount++;
+        this.totalSyncDuration += duration;
+        this.maxSyncTime = Math.max(this.maxSyncTime, duration);
+        this.totalRetryCount += retryCount;
+
+        this.lastSyncDuration = duration;
         this.lastRetryCount = retryCount;
         console.error('[SynchronizationScheduler] Periodic sync task failed after retries:', err);
         this.emit('sync-failed', err);
@@ -168,8 +207,14 @@ export class SynchronizationScheduler {
         }
       );
 
+      const duration = Date.now() - startTime;
+      this.totalSyncCount++;
+      this.totalSyncDuration += duration;
+      this.maxSyncTime = Math.max(this.maxSyncTime, duration);
+      this.totalRetryCount += retryCount;
+
       this.lastSyncTime = Date.now();
-      this.lastSyncDuration = Date.now() - startTime;
+      this.lastSyncDuration = duration;
       this.lastRetryCount = retryCount;
 
       if (result === false) {
@@ -179,7 +224,13 @@ export class SynchronizationScheduler {
       }
       return true;
     } catch (err) {
-      this.lastSyncDuration = Date.now() - startTime;
+      const duration = Date.now() - startTime;
+      this.totalSyncCount++;
+      this.totalSyncDuration += duration;
+      this.maxSyncTime = Math.max(this.maxSyncTime, duration);
+      this.totalRetryCount += retryCount;
+
+      this.lastSyncDuration = duration;
       this.lastRetryCount = retryCount;
       console.error('[SynchronizationScheduler] Immediate sync task failed:', err);
       this.emit('sync-failed', err);
@@ -192,11 +243,34 @@ export class SynchronizationScheduler {
   /**
    * 現在の同期動作のメトリクスを取得
    */
-  getMetrics(): { lastSyncTime: number; lastSyncDuration: number; lastRetryCount: number } {
+  getMetrics(): {
+    lastSyncTime: number;
+    lastSyncDuration: number;
+    lastRetryCount: number;
+    totalSyncCount: number;
+    averageSyncTime: number;
+    maxSyncTime: number;
+    averageRetryCount: number;
+    totalOfflineDuration: number;
+  } {
+    const avgSyncTime = this.totalSyncCount > 0 ? Number((this.totalSyncDuration / this.totalSyncCount).toFixed(2)) : 0;
+    const avgRetry = this.totalSyncCount > 0 ? Number((this.totalRetryCount / this.totalSyncCount).toFixed(2)) : 0;
+    
+    // 現在もオフライン中の場合、現在までのオフライン時間を加算して報告
+    let currentOfflineDuration = this.totalOfflineDuration;
+    if (this.offlineStartTime > 0) {
+      currentOfflineDuration += Date.now() - this.offlineStartTime;
+    }
+
     return {
       lastSyncTime: this.lastSyncTime,
       lastSyncDuration: this.lastSyncDuration,
-      lastRetryCount: this.lastRetryCount
+      lastRetryCount: this.lastRetryCount,
+      totalSyncCount: this.totalSyncCount,
+      averageSyncTime: avgSyncTime,
+      maxSyncTime: this.maxSyncTime,
+      averageRetryCount: avgRetry,
+      totalOfflineDuration: currentOfflineDuration
     };
   }
 }

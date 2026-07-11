@@ -79,6 +79,8 @@ export class ConflictResolver {
   private eventLogStrategy: EventLogMergeStrategy = new DefaultEventLogMergeStrategy();
   private inventoryStrategy: InventoryMergeStrategy = new DefaultInventoryMergeStrategy();
 
+  private conflictCount = 0;
+
   /**
    * 地区マージ戦略を差し替える
    */
@@ -101,12 +103,29 @@ export class ConflictResolver {
   }
 
   /**
+   * 競合検出回数を取得する
+   */
+  getConflictCount(): number {
+    return this.conflictCount;
+  }
+
+  /**
+   * メトリクスのリセット
+   */
+  resetMetrics(): void {
+    this.conflictCount = 0;
+  }
+
+  /**
    * 既存の地区情報と受信した新規地区情報をマージ（不変構造）
    */
   mergeAreas(current: readonly AreaDetail[], incoming: AreaDetail[]): readonly AreaDetail[] {
     return Object.freeze(current.map(curArea => {
       const incArea = incoming.find(a => a.areaId === curArea.areaId);
       if (!incArea) return curArea;
+      if (curArea.doneCount !== incArea.doneCount) {
+        this.conflictCount++;
+      }
       return this.areaStrategy.merge(curArea, incArea);
     }));
   }
@@ -130,6 +149,9 @@ export class ConflictResolver {
       if (!incItem) {
         merged.push(curItem);
       } else {
+        if (curItem.currentStock !== incItem.currentStock) {
+          this.conflictCount++;
+        }
         merged.push(this.inventoryStrategy.merge(curItem, incItem));
         incomingMap.delete(curItem.inventoryId);
       }
