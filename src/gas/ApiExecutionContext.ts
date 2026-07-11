@@ -3,6 +3,8 @@ import { AuthorizationContext } from '../authorization/AuthorizationContext';
 import { LicenseContext } from '../licensing/LicenseContext';
 import { FeatureContext } from '../features/FeatureContext';
 import { BridgeContext } from '../bridge/BridgeContext';
+import { PlatformExecutionContext } from '../platform/PlatformExecutionContext';
+import { PlatformStage } from '../platform/PlatformStage';
 
 export class ApiExecutionContext {
   private requestId: string;
@@ -14,6 +16,8 @@ export class ApiExecutionContext {
   private licenseContext: LicenseContext | null = null;
   private featureContext: FeatureContext | null = null;
   private bridgeContext: BridgeContext | null = null;
+  private platformCtx: PlatformExecutionContext | null = null;
+  private currentStage: PlatformStage = PlatformStage.INITIALIZING;
 
   constructor() {
     this.startTimestamp = Date.now();
@@ -111,5 +115,21 @@ export class ApiExecutionContext {
 
   public getBridgeContext(): BridgeContext | null {
     return this.bridgeContext;
+  }
+
+  public setPlatformContext(context: PlatformExecutionContext): void {
+    this.platformCtx = context;
+  }
+
+  public getPlatformContext(): PlatformExecutionContext | null {
+    return this.platformCtx;
+  }
+
+  public setCurrentStage(stage: PlatformStage): void {
+    this.currentStage = stage;
+  }
+
+  public getCurrentStage(): PlatformStage {
+    return this.currentStage;
   }
 }

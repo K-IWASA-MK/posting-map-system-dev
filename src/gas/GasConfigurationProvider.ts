@@ -23,6 +23,9 @@ export interface FeatureFlags {
   bridgeHeartbeat: boolean;
   bridgeTimeout: number;
   bridgeProvider: string;
+  platformIntegrationEnabled: boolean;
+  pipelineMode: string;
+  debugExecutionTrace: boolean;
 }
 
 export class GasConfigurationProvider {
@@ -114,7 +117,10 @@ export class GasConfigurationProvider {
           bridgeEnabled: props.getProperty('FLAG_BRIDGE_ENABLED') !== 'false',
           bridgeHeartbeat: props.getProperty('FLAG_BRIDGE_HEARTBEAT') !== 'false',
           bridgeTimeout: timeoutStr ? parseInt(timeoutStr, 10) : 5000,
-          bridgeProvider: props.getProperty('FLAG_BRIDGE_PROVIDER') || 'AIOSBridgeProvider'
+          bridgeProvider: props.getProperty('FLAG_BRIDGE_PROVIDER') || 'AIOSBridgeProvider',
+          platformIntegrationEnabled: props.getProperty('FLAG_PLATFORM_INTEGRATION_ENABLED') !== 'false',
+          pipelineMode: props.getProperty('FLAG_PIPELINE_MODE') || 'DETERMINISTIC',
+          debugExecutionTrace: props.getProperty('FLAG_DEBUG_EXECUTION_TRACE') !== 'false'
         };
       } catch (e) {
         // Fallback below
@@ -144,7 +150,10 @@ export class GasConfigurationProvider {
       bridgeEnabled: true,
       bridgeHeartbeat: true,
       bridgeTimeout: 5000,
-      bridgeProvider: 'AIOSBridgeProvider'
+      bridgeProvider: 'AIOSBridgeProvider',
+      platformIntegrationEnabled: true,
+      pipelineMode: 'DETERMINISTIC',
+      debugExecutionTrace: true
     };
   }
 }

@@ -74,64 +74,7 @@ var globalCacheHit = false;
  * GETリクエスト：JSONデータの取得
  */
 function doGet(e) {
-  executionContext = new ApiExecutionContext();
-  globalCacheHit = false;
-  GasPerformanceMonitor.getInstance().reset();
-
-  ExceptionHandler.clearListeners();
-  ExceptionHandler.addListener(ApiLifecycleObserver.onException);
-
-  const action = e.parameter.action || 'health';
-  let path = '/' + action;
-  if (action === 'getAppData') {
-    path = '/dashboard';
-  } else if (action === 'getFlyerStock') {
-    path = '/holding';
-  }
-
-  const queryVersion = e.parameter.version || e.parameter.v;
-  const version = ApiVersionResolver.resolve(undefined, queryVersion);
-
-  const apiRequest = new ApiRequest({
-    method: 'GET',
-    path: path,
-    version: version,
-    query: e.parameter,
-    requestId: executionContext.getRequestId()
-  });
-
-  ApiLifecycleObserver.onStart(apiRequest, executionContext);
-
-  let apiResponse;
-  try {
-    HardeningPipeline.getInstance().execute(apiRequest, executionContext);
-    AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
-    AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
-    LicensingPipeline.getInstance().execute(apiRequest, executionContext);
-    FeatureAccessPipeline.getInstance().execute(apiRequest, executionContext);
-    AIOSBridgePipeline.getInstance().execute(apiRequest, executionContext);
-
-    const valStart = Date.now();
-    ValidationPipeline.getInstance().validate(apiRequest, executionContext);
-    executionContext.setValidationTime(Date.now() - valStart);
-    ApiLifecycleObserver.onValidationSuccess(apiRequest, executionContext);
-
-    const routeStart = Date.now();
-    ApiRouter.getInstance().registry.getHandler(apiRequest.method, apiRequest.version, apiRequest.path);
-    executionContext.setRoutingTime(Date.now() - routeStart);
-    ApiLifecycleObserver.onRoutingSuccess(apiRequest, executionContext);
-
-    const handlerStart = Date.now();
-    apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
-    executionContext.setHandlerTime(Date.now() - handlerStart);
-    ApiLifecycleObserver.onHandlerSuccess(apiRequest, executionContext);
-
-    ApiLifecycleObserver.onComplete(apiRequest, apiResponse, executionContext);
-  } catch (err) {
-    apiResponse = ExceptionHandler.handle(err, apiRequest, executionContext);
-  }
-
-  return createJsonResponseFromApiResponse(apiResponse);
+  return PlatformIntegrationPipeline.execute(e);
 }
 
 /**
@@ -251,106 +194,7 @@ function processGetActionLegacy(action, e) {
  * POSTリクエスト：データの登録・更新
  */
 function doPost(e) {
-  executionContext = new ApiExecutionContext();
-  globalCacheHit = false;
-  GasPerformanceMonitor.getInstance().reset();
-
-  ExceptionHandler.clearListeners();
-  ExceptionHandler.addListener(ApiLifecycleObserver.onException);
-
-  let postData;
-  try {
-    if (e.postData && e.postData.contents) {
-      postData = JSON.parse(e.postData.contents);
-    } else {
-      postData = e.parameter;
-    }
-  } catch (f) {
-    postData = e.parameter;
-  }
-
-  const action = postData.action || e.parameter.action || 'health';
-  let path = '/' + action;
-  if (action === 'getAppData') {
-    path = '/dashboard';
-  } else if (action === 'updateFlyerStock') {
-    path = '/holding';
-  }
-
-  const queryVersion = postData.version || e.parameter.version || postData.v;
-  const version = ApiVersionResolver.resolve(undefined, queryVersion);
-
-  const apiRequest = new ApiRequest({
-    method: 'POST',
-    path: path,
-    version: version,
-    query: e.parameter,
-    body: postData,
-    requestId: executionContext.getRequestId()
-  });
-
-  ApiLifecycleObserver.onStart(apiRequest, executionContext);
-
-  let apiResponse;
-  const writeActions = [
-    'submitDistribution',
-    'updateRecordWithGPSPhoto',
-    'registerStaff',
-    'registerAdmin',
-    'requestFlyerTransfer',
-    'resolveTransferRequest',
-    'updateFlyerStock',
-    'resetRoster',
-    'setupFolders',
-    'forceStartBatch',
-    'refreshCache',
-    'aggregateStats',
-    'resetAllSheets'
-  ];
-
-  try {
-    HardeningPipeline.getInstance().execute(apiRequest, executionContext);
-    AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
-    AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
-    LicensingPipeline.getInstance().execute(apiRequest, executionContext);
-    FeatureAccessPipeline.getInstance().execute(apiRequest, executionContext);
-    AIOSBridgePipeline.getInstance().execute(apiRequest, executionContext);
-
-    const valStart = Date.now();
-    ValidationPipeline.getInstance().validate(apiRequest, executionContext);
-    executionContext.setValidationTime(Date.now() - valStart);
-    ApiLifecycleObserver.onValidationSuccess(apiRequest, executionContext);
-
-    const routeStart = Date.now();
-    ApiRouter.getInstance().registry.getHandler(apiRequest.method, apiRequest.version, apiRequest.path);
-    executionContext.setRoutingTime(Date.now() - routeStart);
-    ApiLifecycleObserver.onRoutingSuccess(apiRequest, executionContext);
-
-    const handlerStart = Date.now();
-    if (writeActions.indexOf(action) !== -1) {
-      apiResponse = LockServiceProvider.getInstance().executeWithLock(function() {
-        return ApiRouter.getInstance().route(apiRequest, executionContext);
-      });
-      if (apiResponse && apiResponse.success) {
-        const cacheKey = CacheServiceProvider.getInstance().makeKey(
-          postData.tenantId || e.parameter.tenantId || "DEFAULT",
-          postData.branchId || e.parameter.branchId || "DEFAULT",
-          "appdata"
-        );
-        CacheServiceProvider.getInstance().remove(cacheKey);
-      }
-    } else {
-      apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
-    }
-    executionContext.setHandlerTime(Date.now() - handlerStart);
-    ApiLifecycleObserver.onHandlerSuccess(apiRequest, executionContext);
-
-    ApiLifecycleObserver.onComplete(apiRequest, apiResponse, executionContext);
-  } catch (err) {
-    apiResponse = ExceptionHandler.handle(err, apiRequest, executionContext);
-  }
-
-  return createJsonResponseFromApiResponse(apiResponse);
+  return PlatformIntegrationPipeline.execute(e);
 }
 
 /**
@@ -1317,6 +1161,70 @@ class GasConfigurationProvider {
   getStorageParentFolderId() {
     return PropertiesService.getScriptProperties().getProperty('STORAGE_PARENT_ID') || CONFIG.STORAGE_PARENT_ID;
   }
+  getFeatureFlags() {
+    try {
+      const props = PropertiesService.getScriptProperties();
+      const timeoutStr = props.getProperty('BRIDGE_TIMEOUT');
+      return {
+        flyerHolding: props.getProperty('FLAG_FLYER_HOLDING') !== 'false',
+        googleMaps: props.getProperty('FLAG_GOOGLE_MAPS') !== 'false',
+        mapbox: props.getProperty('FLAG_MAPBOX') === 'true',
+        gpsEvidence: props.getProperty('FLAG_GPS_EVIDENCE') !== 'false',
+        photoEvidence: props.getProperty('FLAG_PHOTO_EVIDENCE') !== 'false',
+        aiosBridge: props.getProperty('FLAG_AIOS_BRIDGE') === 'true',
+        analytics: props.getProperty('FLAG_ANALYTICS') === 'true',
+        apiKeyAuth: props.getProperty('FLAG_API_KEY_AUTH') !== 'false',
+        liffAuth: props.getProperty('FLAG_LIFF_AUTH') !== 'false',
+        serviceAuth: props.getProperty('FLAG_SERVICE_AUTH') !== 'false',
+        anonymousAccess: props.getProperty('FLAG_ANONYMOUS_ACCESS') !== 'false',
+        authorizationEnabled: props.getProperty('FLAG_AUTHORIZATION_ENABLED') !== 'false',
+        roleValidation: props.getProperty('FLAG_ROLE_VALIDATION') !== 'false',
+        scopeValidation: props.getProperty('FLAG_SCOPE_VALIDATION') !== 'false',
+        permissionValidation: props.getProperty('FLAG_PERMISSION_VALIDATION') !== 'false',
+        licensingEnabled: props.getProperty('FLAG_LICENSING_ENABLED') !== 'false',
+        editionValidation: props.getProperty('FLAG_EDITION_VALIDATION') !== 'false',
+        licenseValidation: props.getProperty('FLAG_LICENSE_VALIDATION') !== 'false',
+        featureAccessEnabled: props.getProperty('FLAG_FEATURE_ACCESS_ENABLED') !== 'false',
+        featureValidation: props.getProperty('FLAG_FEATURE_VALIDATION') !== 'false',
+        bridgeEnabled: props.getProperty('FLAG_BRIDGE_ENABLED') !== 'false',
+        bridgeHeartbeat: props.getProperty('FLAG_BRIDGE_HEARTBEAT') !== 'false',
+        bridgeTimeout: timeoutStr ? parseInt(timeoutStr, 10) : 5000,
+        bridgeProvider: props.getProperty('FLAG_BRIDGE_PROVIDER') || 'AIOSBridgeProvider',
+        platformIntegrationEnabled: props.getProperty('FLAG_PLATFORM_INTEGRATION_ENABLED') !== 'false',
+        pipelineMode: props.getProperty('FLAG_PIPELINE_MODE') || 'DETERMINISTIC',
+        debugExecutionTrace: props.getProperty('FLAG_DEBUG_EXECUTION_TRACE') !== 'false'
+      };
+    } catch (e) {}
+    return {
+      flyerHolding: true,
+      googleMaps: true,
+      mapbox: false,
+      gpsEvidence: true,
+      photoEvidence: true,
+      aiosBridge: false,
+      analytics: false,
+      apiKeyAuth: true,
+      liffAuth: true,
+      serviceAuth: true,
+      anonymousAccess: true,
+      authorizationEnabled: true,
+      roleValidation: true,
+      scopeValidation: true,
+      permissionValidation: true,
+      licensingEnabled: true,
+      editionValidation: true,
+      licenseValidation: true,
+      featureAccessEnabled: true,
+      featureValidation: true,
+      bridgeEnabled: true,
+      bridgeHeartbeat: true,
+      bridgeTimeout: 5000,
+      bridgeProvider: 'AIOSBridgeProvider',
+      platformIntegrationEnabled: true,
+      pipelineMode: 'DETERMINISTIC',
+      debugExecutionTrace: true
+    };
+  }
 }
 GasConfigurationProvider.instance = null;
 
@@ -2123,7 +2031,6 @@ class ValidationPipeline {
     return result;
   }
 }
-}
 ValidationPipeline.instance = null;
 
 // ==========================================
@@ -2216,25 +2123,6 @@ class ConfigurationException extends ApiException {
   }
 }
 
-class FeatureException extends ApiException {
-  constructor(internalMessage, requestId, details) {
-    super({
-      internalMessage: internalMessage,
-      externalMessage: '指定された機能は現在無効化されています。',
-      metadata: {
-        requestId: requestId,
-        timestamp: Date.now(),
-        exceptionType: 'FeatureException',
-        exceptionCode: 'PM-FTR-001',
-        source: 'FEATURE',
-        details: details
-      }
-    });
-    this.category = ExceptionCategory.FEATURE;
-    this.code = 'PM-FTR-001';
-    this.status = 422;
-  }
-}
 
 class ValidationException extends ApiException {
   constructor(result) {
@@ -3906,4 +3794,372 @@ class AIOSBridgePipeline {
   }
 }
 AIOSBridgePipeline.instance = null;
+
+// ==========================================
+// 🚀 PLATFORM INTEGRATION FOUNDATION CLASSES
+// ==========================================
+
+const PlatformStage = {
+  INITIALIZING: 'INITIALIZING',
+  HARDENING: 'HARDENING',
+  AUTHENTICATION: 'AUTHENTICATION',
+  AUTHORIZATION: 'AUTHORIZATION',
+  LICENSING: 'LICENSING',
+  FEATURE_ACCESS: 'FEATURE_ACCESS',
+  AIOS_BRIDGE: 'AIOS_BRIDGE',
+  VALIDATION: 'VALIDATION',
+  ROUTING: 'ROUTING',
+  HANDLER: 'HANDLER',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+class PlatformExecutionContext {
+  constructor(params) {
+    this.requestId = params.requestId;
+    this.startedAt = params.startedAt;
+    this.completedAt = params.completedAt !== undefined ? params.completedAt : null;
+    this.status = params.status || 'RUNNING';
+    this.stage = params.stage || PlatformStage.INITIALIZING;
+    this.metadata = Object.freeze(Object.assign({}, params.metadata));
+    this.traceId = params.traceId !== undefined ? params.traceId : null;
+    this.correlationId = params.correlationId !== undefined ? params.correlationId : null;
+    this.executionVersion = params.executionVersion !== undefined ? params.executionVersion : null;
+  }
+  withStage(stage, status, completedAt) {
+    return new PlatformExecutionContext({
+      requestId: this.requestId,
+      startedAt: this.startedAt,
+      completedAt: completedAt !== undefined ? completedAt : this.completedAt,
+      status: status || this.status,
+      stage: stage,
+      metadata: this.metadata,
+      traceId: this.traceId,
+      correlationId: this.correlationId,
+      executionVersion: this.executionVersion
+    });
+  }
+  withMetadata(metadata) {
+    return new PlatformExecutionContext({
+      requestId: this.requestId,
+      startedAt: this.startedAt,
+      completedAt: this.completedAt,
+      status: this.status,
+      stage: this.stage,
+      metadata: Object.assign({}, this.metadata, metadata),
+      traceId: this.traceId,
+      correlationId: this.correlationId,
+      executionVersion: this.executionVersion
+    });
+  }
+  withAuditIdentifiers(identifiers) {
+    return new PlatformExecutionContext({
+      requestId: this.requestId,
+      startedAt: this.startedAt,
+      completedAt: this.completedAt,
+      status: this.status,
+      stage: this.stage,
+      metadata: this.metadata,
+      traceId: identifiers.traceId !== undefined ? identifiers.traceId : this.traceId,
+      correlationId: identifiers.correlationId !== undefined ? identifiers.correlationId : this.correlationId,
+      executionVersion: identifiers.executionVersion !== undefined ? identifiers.executionVersion : this.executionVersion
+    });
+  }
+}
+
+class PlatformException extends ApiException {
+  constructor(code, internalMessage, requestId) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: internalMessage,
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'PlatformException',
+        exceptionCode: code,
+        source: 'PLATFORM_INTEGRATION_PIPELINE'
+      }
+    });
+    this.category = 'SYSTEM';
+    this.code = code;
+    this.status = 500;
+  }
+}
+
+class PlatformLifecycleObserver {
+  static onPlatformStarted(context) {
+    PlatformLifecycleObserver.pipeline.resetSequence();
+    PlatformLifecycleObserver.pipeline.createAndDispatch(
+      'PLATFORM_STARTED',
+      'LIFECYCLE',
+      context.requestId,
+      'PLATFORM_INTEGRATION_PIPELINE',
+      { startedAt: context.startedAt }
+    );
+  }
+  static onStageStarted(context, stage) {
+    PlatformLifecycleObserver.pipeline.createAndDispatch(
+      'STAGE_STARTED',
+      'LIFECYCLE',
+      context.requestId,
+      'PLATFORM_INTEGRATION_PIPELINE',
+      { stage: stage }
+    );
+  }
+  static onStageCompleted(context, stage, durationMs) {
+    PlatformLifecycleObserver.pipeline.createAndDispatch(
+      'STAGE_COMPLETED',
+      'LIFECYCLE',
+      context.requestId,
+      'PLATFORM_INTEGRATION_PIPELINE',
+      { stage: stage, durationMs: durationMs }
+    );
+  }
+  static onPlatformCompleted(context, durationMs) {
+    PlatformLifecycleObserver.pipeline.createAndDispatch(
+      'PLATFORM_COMPLETED',
+      'LIFECYCLE',
+      context.requestId,
+      'PLATFORM_INTEGRATION_PIPELINE',
+      { durationMs: durationMs, status: context.status }
+    );
+  }
+  static onPlatformFailed(context, error, failedStage) {
+    PlatformLifecycleObserver.pipeline.createAndDispatch(
+      'PLATFORM_FAILED',
+      'LIFECYCLE',
+      context.requestId,
+      'PLATFORM_INTEGRATION_PIPELINE',
+      {
+        failedStage: failedStage,
+        errorMessage: error.message || String(error)
+      }
+    );
+  }
+}
+PlatformLifecycleObserver.pipeline = MonitoringPipeline.getInstance();
+
+class PlatformIntegrationPipeline {
+  static execute(e) {
+    const start = Date.now();
+    const apiContext = new ApiExecutionContext();
+    PlatformIntegrationPipeline.lastContext = apiContext;
+
+    let platformContext = new PlatformExecutionContext({
+      requestId: apiContext.getRequestId(),
+      startedAt: start
+    });
+    apiContext.setPlatformContext(platformContext);
+
+    // Set traceId and correlationId if present in query parameters for correlation tracing
+    const queryTraceId = e.parameter && (e.parameter.traceId || e.parameter.tId) || null;
+    const queryCorrId = e.parameter && (e.parameter.correlationId || e.parameter.cId) || null;
+    if (queryTraceId || queryCorrId) {
+      platformContext = platformContext.withAuditIdentifiers({
+        traceId: queryTraceId,
+        correlationId: queryCorrId,
+        executionVersion: '1.0.0'
+      });
+      apiContext.setPlatformContext(platformContext);
+    }
+
+    ExceptionHandler.clearListeners();
+    ExceptionHandler.addListener(ApiLifecycleObserver.onException);
+
+    let apiRequest = null;
+    let apiResponse;
+
+    try {
+      // Log platform started
+      PlatformLifecycleObserver.onPlatformStarted(platformContext);
+
+      // Resolve request fields
+      const method = e.postData ? 'POST' : 'GET';
+      let postData = null;
+      if (method === 'POST') {
+        try {
+          if (e.postData && e.postData.contents) {
+            postData = JSON.parse(e.postData.contents);
+          } else {
+            postData = e.parameter;
+          }
+        } catch (f) {
+          postData = e.parameter;
+        }
+      }
+
+      const action = (method === 'POST' ? (postData && postData.action || e.parameter.action) : e.parameter.action) || 'health';
+      let path = '/' + action;
+      if (action === 'getAppData') {
+        path = '/dashboard';
+      } else if (action === 'getFlyerStock') {
+        path = '/holding';
+      } else if (action === 'updateFlyerStock') {
+        path = '/holding';
+      }
+
+      const queryVersion = method === 'POST' ? (postData && postData.version || e.parameter.version || postData && postData.v) : (e.parameter.version || e.parameter.v);
+      const version = ApiVersionResolver.resolve(undefined, queryVersion);
+
+      apiRequest = new ApiRequest({
+        method: method,
+        path: path,
+        version: version,
+        query: e.parameter,
+        body: postData,
+        requestId: apiContext.getRequestId()
+      });
+
+      ApiLifecycleObserver.onStart(apiRequest, apiContext);
+
+      // 1. HARDENING
+      platformContext = platformContext.withStage(PlatformStage.HARDENING);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.HARDENING);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.HARDENING);
+      const startH = Date.now();
+      HardeningPipeline.getInstance().execute(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.HARDENING, Date.now() - startH);
+
+      // 2. AUTHENTICATION
+      platformContext = platformContext.withStage(PlatformStage.AUTHENTICATION);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.AUTHENTICATION);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.AUTHENTICATION);
+      const startAuth = Date.now();
+      AuthenticationPipeline.getInstance().execute(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.AUTHENTICATION, Date.now() - startAuth);
+
+      // 3. AUTHORIZATION
+      platformContext = platformContext.withStage(PlatformStage.AUTHORIZATION);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.AUTHORIZATION);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.AUTHORIZATION);
+      const startAuthz = Date.now();
+      AuthorizationPipeline.getInstance().execute(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.AUTHORIZATION, Date.now() - startAuthz);
+
+      // 4. LICENSING
+      platformContext = platformContext.withStage(PlatformStage.LICENSING);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.LICENSING);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.LICENSING);
+      const startLic = Date.now();
+      LicensingPipeline.getInstance().execute(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.LICENSING, Date.now() - startLic);
+
+      // 5. FEATURE ACCESS
+      platformContext = platformContext.withStage(PlatformStage.FEATURE_ACCESS);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.FEATURE_ACCESS);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.FEATURE_ACCESS);
+      const startFeat = Date.now();
+      FeatureAccessPipeline.getInstance().execute(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.FEATURE_ACCESS, Date.now() - startFeat);
+
+      // 6. AIOS BRIDGE
+      platformContext = platformContext.withStage(PlatformStage.AIOS_BRIDGE);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.AIOS_BRIDGE);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.AIOS_BRIDGE);
+      const startBridge = Date.now();
+      AIOSBridgePipeline.getInstance().execute(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.AIOS_BRIDGE, Date.now() - startBridge);
+
+      // 7. VALIDATION
+      platformContext = platformContext.withStage(PlatformStage.VALIDATION);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.VALIDATION);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.VALIDATION);
+      const startVal = Date.now();
+      ValidationPipeline.getInstance().validate(apiRequest, apiContext);
+      apiContext.setValidationTime(Date.now() - startVal);
+      ApiLifecycleObserver.onValidationSuccess(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.VALIDATION, Date.now() - startVal);
+
+      // 8. ROUTING
+      platformContext = platformContext.withStage(PlatformStage.ROUTING);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.ROUTING);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.ROUTING);
+      const startRoute = Date.now();
+      EndpointRegistry.getInstance().getHandler(apiRequest.method, apiRequest.version, apiRequest.path);
+      apiContext.setRoutingTime(Date.now() - startRoute);
+      ApiLifecycleObserver.onRoutingSuccess(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.ROUTING, Date.now() - startRoute);
+
+      // 9. HANDLER
+      platformContext = platformContext.withStage(PlatformStage.HANDLER);
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.HANDLER);
+      PlatformLifecycleObserver.onStageStarted(platformContext, PlatformStage.HANDLER);
+      const startHandler = Date.now();
+
+      const writeActions = [
+        'submitDistribution',
+        'updateRecordWithGPSPhoto',
+        'registerStaff',
+        'registerAdmin',
+        'requestFlyerTransfer',
+        'resolveTransferRequest',
+        'updateFlyerStock',
+        'resetRoster',
+        'setupFolders',
+        'forceStartBatch',
+        'refreshCache',
+        'aggregateStats',
+        'resetAllSheets'
+      ];
+
+      if (method === 'POST' && writeActions.indexOf(action) !== -1) {
+        apiResponse = LockServiceProvider.getInstance().executeWithLock(function() {
+          return ApiRouter.getInstance().route(apiRequest, apiContext);
+        });
+        if (apiResponse && apiResponse.success) {
+          const cacheKey = CacheServiceProvider.getInstance().makeKey(
+            postData && postData.tenantId || e.parameter.tenantId || "DEFAULT",
+            postData && postData.branchId || e.parameter.branchId || "DEFAULT",
+            "appdata"
+          );
+          CacheServiceProvider.getInstance().remove(cacheKey);
+        }
+      } else {
+        apiResponse = ApiRouter.getInstance().route(apiRequest, apiContext);
+      }
+
+      apiContext.setHandlerTime(Date.now() - startHandler);
+      ApiLifecycleObserver.onHandlerSuccess(apiRequest, apiContext);
+      PlatformLifecycleObserver.onStageCompleted(platformContext, PlatformStage.HANDLER, Date.now() - startHandler);
+
+      // Completed
+      platformContext = platformContext.withStage(PlatformStage.COMPLETED, 'COMPLETED', Date.now());
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.COMPLETED);
+      ApiLifecycleObserver.onComplete(apiRequest, apiResponse, apiContext);
+      PlatformLifecycleObserver.onPlatformCompleted(platformContext, Date.now() - start);
+
+    } catch (err) {
+      // Ensure we are in FAILED state
+      const activeStage = apiContext.getCurrentStage() || PlatformStage.INITIALIZING;
+      platformContext = platformContext.withStage(PlatformStage.FAILED, 'FAILED', Date.now());
+      apiContext.setPlatformContext(platformContext);
+      apiContext.setCurrentStage(PlatformStage.FAILED);
+
+      PlatformLifecycleObserver.onPlatformFailed(platformContext, err, activeStage);
+
+      const req = apiRequest || new ApiRequest({
+        method: e.postData ? 'POST' : 'GET',
+        path: '/unknown',
+        version: 'v2',
+        query: e.parameter,
+        requestId: apiContext.getRequestId()
+      });
+
+      apiResponse = ExceptionHandler.handle(err, req, apiContext);
+    }
+
+    return createJsonResponseFromApiResponse(apiResponse);
+  }
+}
+PlatformIntegrationPipeline.lastContext = null;
 

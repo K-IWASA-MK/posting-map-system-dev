@@ -50,7 +50,10 @@ async function runTests() {
     bridgeEnabled: true,
     bridgeHeartbeat: true,
     bridgeTimeout: 5000,
-    bridgeProvider: 'AIOSBridgeProvider'
+    bridgeProvider: 'AIOSBridgeProvider',
+    platformIntegrationEnabled: true,
+    pipelineMode: 'DETERMINISTIC',
+    debugExecutionTrace: true
   });
 
   // 1. Normal Request Verification (Passes Validation)
@@ -175,7 +178,10 @@ async function runTests() {
       bridgeEnabled: true,
       bridgeHeartbeat: true,
       bridgeTimeout: 5000,
-      bridgeProvider: 'AIOSBridgeProvider'
+      bridgeProvider: 'AIOSBridgeProvider',
+      platformIntegrationEnabled: true,
+      pipelineMode: 'DETERMINISTIC',
+      debugExecutionTrace: true
     });
 
     const req = new ApiRequest({
