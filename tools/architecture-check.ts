@@ -6,7 +6,7 @@ const allowedDependencies: Record<string, string[]> = {
   'core': [],
   'foundation': ['core'],
   'domain': ['core', 'foundation'],
-  'infrastructure': ['core', 'foundation']
+  'infrastructure': ['core', 'foundation', 'domain']
 };
 
 function getFiles(dir: string, fileList: string[] = []): string[] {
@@ -52,6 +52,16 @@ function checkDependencies() {
               console.error(`   Layer '${layer}' is not allowed to import from '${targetLayer}'`);
               console.error(`   Import: '${importPath}'`);
               hasErrors = true;
+            }
+
+            // Check S5-2 specific rule: infrastructure must not depend on domain services (business logic)
+            if (layer === 'infrastructure' && targetLayer === 'domain') {
+              if (importPath.includes('/services/') || importPath.includes('@domain/field/services')) {
+                console.error(`❌ [Domain Service Dependency Violation] ${file}`);
+                console.error(`   Infrastructure is not allowed to import domain services (business logic)`);
+                console.error(`   Import: '${importPath}'`);
+                hasErrors = true;
+              }
             }
           }
         }

@@ -80,6 +80,14 @@ export class GasConfigurationProvider {
     return 'MOCK_SPREADSHEET_ID';
   }
 
+  public getFieldRepositoryMode(): string {
+    if (typeof PropertiesService !== 'undefined') {
+      const mode = PropertiesService.getScriptProperties().getProperty('FIELD_REPOSITORY_MODE');
+      if (mode) return mode;
+    }
+    return 'SPREADSHEET';
+  }
+
   public getStorageParentFolderId(): string {
     if (typeof PropertiesService !== 'undefined') {
       const id = PropertiesService.getScriptProperties().getProperty('STORAGE_PARENT_ID');
