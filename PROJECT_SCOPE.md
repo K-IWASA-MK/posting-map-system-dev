@@ -54,8 +54,17 @@
   - 現場活動完了数、アクティブ人数、GPS・写真カバレッジ等のメトリクスを集約する `FieldOperationMetrics` および現場統制コントローラー `FieldOperationController` を DI 統合。
   - `AreaDetailPanel` へ活動状況バッジ、手持ちチラシ残数、最新GPS、写真証跡リンク表示を組み込み。
 
-### 主な今後の開発項目
-1. **Stripe自動契約・独占権管理の統合**:
-   - Stripe決済情報をバインドし、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化。
-2. **GAS API 本実装およびキャッシュ高速化**:
+* **Phase S2-6: Product Release Candidate** ✅
+  - `ProductConfiguration` および `FeatureToggle` による製品・機能フラグ統括制御クラスを実装。
+  - 起動前環境検証（API、DOM、Browser Compatibility、Edition Matrix、Feature Dependency）を行う `ProductRuntimeValidator` を構築。
+  - バリデーション失敗時のプレミアム警告エラーオーバーレイ描画およびブートブロック処理を `DashboardBootstrap` / `DashboardApplication` へ統合。
+
+### 主な今後の開発項目 (Sprint 3: Enterprise & AIOS Expansion)
+1. **Phase S3-1: Premium Feature Expansion & Edition Licensing**:
+   - Stripe 決済情報とのバインド、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化のライセンス管理。
+   - Mapbox エンジンのランタイム動的切り替えの Premium 実装。
+2. **Phase S3-2: AIOS Integration & Automated Analytics**:
+   - AIOS (AI組織) との安全なデータ通信ブリッジ（AIOS Bridge）の本格実装。
+   - 支部比較や配布効率測定等を行う Analytics Engine の統合。
+3. **GAS API 本実装およびキャッシュ高速化**:
    - 大量データアクセス時の `CacheService` 適用と、SpreadsheetApp 読み込み最小化のGAS側本実装。

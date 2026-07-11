@@ -30,6 +30,7 @@ import { GPSEvidenceMonitor } from './field/GPSEvidenceMonitor';
 import { PhotoEvidenceMonitor } from './field/PhotoEvidenceMonitor';
 import { FieldOperationMetrics } from './field/FieldOperationMetrics';
 import { FieldOperationController } from './field/FieldOperationController';
+import { ProductRuntimeValidator } from './ProductRuntimeValidator';
 
 export class DashboardApplication {
   private static instance: DashboardApplication | null = null;
@@ -84,6 +85,12 @@ export class DashboardApplication {
     branchId: string
   ): Promise<void> {
     console.log('[DashboardApplication] Control station booting...');
+
+    // 起動パラメータおよび環境整合性の検証
+    const validation = ProductRuntimeValidator.validate(apiUrl, tenantId, branchId, '');
+    if (!validation.success) {
+      throw new Error(`[DashboardApplication] Boot Validation Failure: ${validation.errors.join(', ')}`);
+    }
 
     // 0. 同期・キャッシュ共通基盤の構築
     this.cacheManager = new CacheManager();
