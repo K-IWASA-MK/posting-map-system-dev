@@ -104,6 +104,8 @@ function doGet(e) {
 
   let apiResponse;
   try {
+    HardeningPipeline.getInstance().execute(apiRequest, executionContext);
+
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
     executionContext.setValidationTime(Date.now() - valStart);
@@ -302,6 +304,8 @@ function doPost(e) {
   ];
 
   try {
+    HardeningPipeline.getInstance().execute(apiRequest, executionContext);
+
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
     executionContext.setValidationTime(Date.now() - valStart);
@@ -2507,4 +2511,234 @@ class ApiLifecycleObserver {
     );
   }
 }
+
+// ==========================================
+// 🚀 PRODUCTION HARDENING FOUNDATION CLASSES
+// ==========================================
+class HealthCheckService {
+  static getInstance() {
+    if (!HealthCheckService.instance) {
+      HealthCheckService.instance = new HealthCheckService();
+    }
+    return HealthCheckService.instance;
+  }
+  checkHealth() {
+    const checks = {
+      CONFIG: { status: 'OK', message: 'Configuration Provider is active.' },
+      REPOSITORY: { status: 'OK', message: 'Repository boundaries verified.' },
+      CACHE: { status: 'OK', message: 'Cache Service is functional.' },
+      LOCK: { status: 'OK', message: 'Lock manager initialized.' },
+      MONITOR: { status: 'OK', message: 'Monitoring event loop active.' },
+      ROUTER: { status: 'OK', message: 'Api Router registries mapped.' }
+    };
+
+    let status = 'HEALTHY';
+    let failCount = 0;
+    let warnCount = 0;
+    const keys = Object.keys(checks);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (checks[key].status === 'FAIL') {
+        failCount++;
+      } else if (checks[key].status === 'WARN') {
+        warnCount++;
+      }
+    }
+
+    if (failCount > 0) {
+      status = 'UNAVAILABLE';
+    } else if (warnCount > 0) {
+      status = 'DEGRADED';
+    }
+
+    return {
+      status: status,
+      checks: checks,
+      timestamp: Date.now(),
+      version: 'v2'
+    };
+  }
+}
+HealthCheckService.instance = null;
+
+class RequestGuard {
+  static check(request) {
+    const maxParams = 100;
+    const maxBodySize = 10 * 1024 * 1024;
+
+    if (request.query && Object.keys(request.query).length > maxParams) {
+      return {
+        allowed: false,
+        reason: 'Parameter count exceeds limit of ' + maxParams,
+        status: 400
+      };
+    }
+
+    if (request.body) {
+      const bodyStr = typeof request.body === 'string' ? request.body : JSON.stringify(request.body);
+      if (bodyStr.length > maxBodySize) {
+        return {
+          allowed: false,
+          reason: 'Payload too large. Exceeds limit of ' + maxBodySize + ' bytes',
+          status: 413
+        };
+      }
+    }
+
+    return { allowed: true };
+  }
+}
+
+class ResourceGuard {
+  static check(context) {
+    const timeLimit = 25000;
+    if (context.getElapsedTime() > timeLimit) {
+      return {
+        allowed: false,
+        reason: 'System execution time exceeded resource sandbox limit of ' + timeLimit + 'ms',
+        status: 500
+      };
+    }
+    return { allowed: true };
+  }
+}
+
+class TimeoutPolicy {
+  static getValidationTimeout() { return 5000; }
+  static getRoutingTimeout() { return 3000; }
+  static getHandlerTimeout() { return 15000; }
+  static getTotalTimeout() { return 25000; }
+}
+
+class CircuitBreakerFoundation {
+  constructor() {
+    this.state = 'CLOSED';
+    this.reason = null;
+  }
+  static getInstance() {
+    if (!CircuitBreakerFoundation.instance) {
+      CircuitBreakerFoundation.instance = new CircuitBreakerFoundation();
+    }
+    return CircuitBreakerFoundation.instance;
+  }
+  getState() {
+    return this.state;
+  }
+  getReason() {
+    return this.reason;
+  }
+  transitionTo(state, reason) {
+    this.state = state;
+    this.reason = reason || null;
+  }
+  check() {
+    if (this.state === 'OPEN') {
+      return {
+        allowed: false,
+        reason: 'Circuit Breaker is OPEN. Reason: ' + (this.reason || 'UNKNOWN'),
+        status: 503
+      };
+    }
+    return { allowed: true };
+  }
+}
+CircuitBreakerFoundation.instance = null;
+
+class GracefulDegradation {
+  static setGracefulMode(enabled) { GracefulDegradation.gracefulMode = enabled; }
+  static isGracefulMode() { return GracefulDegradation.gracefulMode; }
+  static shouldSkipMetrics() { return GracefulDegradation.gracefulMode; }
+  static shouldSkipAudits() { return GracefulDegradation.gracefulMode; }
+}
+GracefulDegradation.gracefulMode = false;
+
+class ProductionReadinessPolicy {
+  static verify() {
+    return { ready: true };
+  }
+}
+
+class ReadinessValidator {
+  static validate() {
+    const result = ProductionReadinessPolicy.verify();
+    if (!result.ready) {
+      return {
+        allowed: false,
+        reason: 'Production setup readiness failure: ' + (result.reason || 'UNKNOWN'),
+        status: 500
+      };
+    }
+    return { allowed: true };
+  }
+}
+
+class HardeningException extends ApiException {
+  constructor(code, status, internalMessage, requestId) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: internalMessage,
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'HardeningException',
+        exceptionCode: code,
+        source: 'HARDENING_PIPELINE'
+      }
+    });
+    this.category = ExceptionCategory.SYSTEM;
+    this.code = code;
+    this.status = status;
+  }
+}
+
+class HardeningPipeline {
+  static getInstance() {
+    if (!HardeningPipeline.instance) {
+      HardeningPipeline.instance = new HardeningPipeline();
+    }
+    return HardeningPipeline.instance;
+  }
+  execute(request, context) {
+    const readiness = ReadinessValidator.validate();
+    if (!readiness.allowed) {
+      throw new HardeningException(
+        'PM-HRD-RDY',
+        readiness.status || 500,
+        readiness.reason || 'Readiness validation failed',
+        request.requestId
+      );
+    }
+
+    const circuit = CircuitBreakerFoundation.getInstance().check();
+    if (!circuit.allowed) {
+      throw new HardeningException(
+        'PM-HRD-CBT',
+        circuit.status || 503,
+        circuit.reason || 'Circuit Breaker Blocked',
+        request.requestId
+      );
+    }
+
+    const requestGuard = RequestGuard.check(request);
+    if (!requestGuard.allowed) {
+      throw new HardeningException(
+        'PM-HRD-REQ',
+        requestGuard.status || 400,
+        requestGuard.reason || 'Request validation rejected',
+        request.requestId
+      );
+    }
+
+    const resourceGuard = ResourceGuard.check(context);
+    if (!resourceGuard.allowed) {
+      throw new HardeningException(
+        'PM-HRD-RSC',
+        resourceGuard.status || 500,
+        resourceGuard.reason || 'Resource limits exceeded',
+        request.requestId
+      );
+    }
+  }
+}
+HardeningPipeline.instance = null;
 

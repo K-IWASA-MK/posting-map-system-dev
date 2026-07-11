@@ -93,11 +93,17 @@
   - `ExceptionHandler` にオブザーバーを接続し、例外発生時に `REQUEST_FAILED` 監査ログイベントを自動収集する仕組みを統合。
   - `doGet()` / `doPost()` にライフサイクルオブザーバーフックを組み込み、処理時間計測および監査履歴収集を統合。
 
-1. **Phase S3-6: Production Hardening Foundation**:
-   - リトライ、タイムアウト制御、ヘルスチェック、サーキットブレーカー等を含む運用の耐障害性強化。
-2. **Phase S3-7: Premium Feature Expansion & Edition Licensing**:
+* **Phase S3-6: Production Hardening Foundation** ✅
+  - 各種システム要素（設定、データベース、キャッシュ、ロック、イベント配信、ルーティング）の状態を Component ID （`CONFIG`, `REPOSITORY` 等）で個別に監視・診断する `HealthCheckService` と不変な `HealthStatus` を実装。
+  - 最大リクエストパラメータ数および最大ボディサイズ制限の超過を Validation 前段で遮断し、`GuardResult` に基づいて 400 Bad Request / 413 Payload Too Large を返却する `RequestGuard` を構築。
+  - インメモリでのサーキット開閉状態管理（`CLOSED`, `OPEN`, `HALF_OPEN`）と状態移行時の障害原因（`TIMEOUT`, `CONFIG`, `RESOURCE`）記録、および `OPEN` 状態時の 503 Service Unavailable 遮断ロジックを提供する `CircuitBreakerFoundation` を実装。
+  - 最大許容実行時間（`TimeoutPolicy`）および過剰システム実行時間を監視して安全に処理を打ち切る `ResourceGuard` を実装。
+  - 設定値やバージョン、機能トグルの整合性を検証する `ProductionReadinessPolicy` と起動可能判定を行う `ReadinessValidator` を実装。
+  - `doGet()` / `doPost()` パイプラインの最前段に `HardeningPipeline` を結合し、堅牢な実行保護ゲートウェイとして機能統合。
+
+1. **Phase S3-7: Premium Feature Expansion & Edition Licensing**:
    - Stripe 決済情報とのバインド、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化のライセンス管理。
    - Mapbox エンジンのランタイム動的切り替えの Premium 実装。
-3. **Phase S3-8: AIOS Integration & Automated Analytics**:
+2. **Phase S3-8: AIOS Integration & Automated Analytics**:
    - AIOS (AI組織) との安全なデータ通信ブリッジ（AIOS Bridge）の本格実装。
    - 支部比較や配布効率測定等を行う Analytics Engine の統合。

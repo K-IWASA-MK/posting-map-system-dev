@@ -4,7 +4,10 @@ export type AuditEventType =
   | 'ROUTING_COMPLETED'
   | 'HANDLER_COMPLETED'
   | 'REQUEST_COMPLETED'
-  | 'REQUEST_FAILED';
+  | 'REQUEST_FAILED'
+  | 'REQUEST_REJECTED'
+  | 'CIRCUIT_OPEN'
+  | 'RESOURCE_LIMIT';
 
 export const AuditEvent = {
   REQUEST_STARTED: 'REQUEST_STARTED' as AuditEventType,
@@ -13,4 +16,7 @@ export const AuditEvent = {
   HANDLER_COMPLETED: 'HANDLER_COMPLETED' as AuditEventType,
   REQUEST_COMPLETED: 'REQUEST_COMPLETED' as AuditEventType,
   REQUEST_FAILED: 'REQUEST_FAILED' as AuditEventType,
+  REQUEST_REJECTED: 'REQUEST_REJECTED' as AuditEventType,
+  CIRCUIT_OPEN: 'CIRCUIT_OPEN' as AuditEventType,
+  RESOURCE_LIMIT: 'RESOURCE_LIMIT' as AuditEventType,
 };
