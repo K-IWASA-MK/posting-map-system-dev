@@ -20,6 +20,10 @@ import { ConflictResolver } from './sync/ConflictResolver';
 import { DeltaSynchronizationManager } from './sync/DeltaSynchronizationManager';
 import { RetryController } from './sync/RetryController';
 import { SynchronizationScheduler } from './sync/SynchronizationScheduler';
+import { SystemHealthMonitor } from './operations/SystemHealthMonitor';
+import { OperationalStatusManager } from './operations/OperationalStatusManager';
+import { MetricsAggregator } from './operations/MetricsAggregator';
+import { NotificationCenter } from './operations/NotificationCenter';
 
 export class DashboardApplication {
   private static instance: DashboardApplication | null = null;
@@ -37,6 +41,11 @@ export class DashboardApplication {
   private conflictResolver!: ConflictResolver;
   private refreshScheduler!: SynchronizationScheduler;
   private appRetryController!: RetryController;
+
+  private healthMonitor!: SystemHealthMonitor;
+  private statusManager!: OperationalStatusManager;
+  private metricsAggregator!: MetricsAggregator;
+  private notificationCenter!: NotificationCenter;
 
   private constructor() {}
 
@@ -86,10 +95,66 @@ export class DashboardApplication {
     // 4.6. 全体同期スケジューラの構築
     this.refreshScheduler = new SynchronizationScheduler(this.connectionState, this.appRetryController);
 
+    // 4.8. 運用管理モジュールの初期化とDI統合
+    this.statusManager = new OperationalStatusManager();
+    this.healthMonitor = new SystemHealthMonitor(this.statusManager);
+    this.metricsAggregator = new MetricsAggregator(this.cacheManager, this.refreshScheduler, this.conflictResolver);
+    this.notificationCenter = new NotificationCenter();
+
+    // 4.8.1. 運用状態・インジケータイベントの接続
+    this.statusManager.subscribe((status) => {
+      this.eventCoordinator.emit('health-changed', status);
+      const header = (this.layout as any).header;
+      if (header && typeof header.updateHealth === 'function') {
+        header.updateHealth(status);
+      }
+    });
+
+    this.notificationCenter.subscribe((item) => {
+      this.eventCoordinator.emit('notification-added', item);
+    });
+
+    const updateMetricsDisplay = () => {
+      const metrics = this.metricsAggregator.getMetrics();
+      this.eventCoordinator.emit('metrics-updated', metrics);
+      const header = (this.layout as any).header;
+      if (header && typeof header.updateMetrics === 'function') {
+        header.updateMetrics({
+          lastSyncTime: metrics.lastSyncTime,
+          lastSyncDuration: metrics.lastSyncDuration,
+          lastRetryCount: metrics.lastRetryCount
+        });
+      }
+    };
+
     // 4.7. スケジューライベントのコーディネーター転送設定
     this.refreshScheduler.subscribe((event, details) => {
       console.log(`[DashboardApplication] Refresh scheduler event: ${event}`);
       this.eventCoordinator.emit(`scheduler-${event}`, details);
+      
+      updateMetricsDisplay();
+      this.healthMonitor.updateSyncMetrics(
+        this.refreshScheduler.getMetrics().lastSyncTime,
+        this.refreshScheduler.getMetrics().lastRetryCount
+      );
+
+      if (event === 'sync-success') {
+        this.notificationCenter.addNotification('Sync Success', 'ダッシュボードの同期が正常に完了しました。');
+      } else if (event === 'sync-failed') {
+        this.notificationCenter.addNotification('Sync Failed', `同期エラーが発生しました: ${details || ''}`);
+      } else if (event === 'sync-retry') {
+        this.notificationCenter.addNotification('Retry Started', `接続リトライ中... (試行: ${details?.attempt || ''})`);
+      } else if (event === 'sync-offline') {
+        this.notificationCenter.addNotification('Offline', 'ネットワーク切断を検知しました。');
+        this.healthMonitor.setOffline(true);
+      }
+    });
+
+    this.connectionState.subscribe((state) => {
+      if (state === 'CONNECTED') {
+        this.healthMonitor.setOffline(false);
+        this.notificationCenter.addNotification('Recovery', 'ネットワーク接続が復旧しました。');
+      }
     });
 
     // 5. データ更新（ポーリング）制御構築
@@ -156,6 +221,30 @@ export class DashboardApplication {
       }
     }
 
+    // 6.5. ヘッダー連携およびイベントのバインド
+    const header = (this.layout as any).header;
+    if (header && typeof header.setCoordinator === 'function') {
+      header.setCoordinator(this.eventCoordinator);
+    }
+
+    // refresh-requested の処理登録
+    this.eventCoordinator.on('refresh-requested', async () => {
+      console.log('[DashboardApplication] Force Refresh requested via EventCoordinator.');
+      this.cacheManager.clear();
+      if (this.syncController && (this.syncController as any).deltaManager) {
+        (this.syncController as any).deltaManager.resetPointer(0);
+      }
+      this.notificationCenter.addNotification('Cache Cleared', 'キャッシュを完全に無効化し、再読み込みを実行します。');
+      try {
+        await this.refreshController.triggerManualRefresh(tenantId, branchId);
+      } catch (err) {
+        console.error('[DashboardApplication] Manual force refresh failed:', err);
+      }
+    });
+
+    // ヘルス監視の起動 (5秒周期)
+    this.healthMonitor.startMonitor(5000);
+
     // 7. DOMへのマウント
     container.innerHTML = ''; // コンテナのクリア
     container.appendChild(this.layout.getElement());
@@ -180,6 +269,9 @@ export class DashboardApplication {
    */
   destroy(): void {
     console.log('[DashboardApplication] Shutdown and cleanup...');
+    if (this.healthMonitor) {
+      this.healthMonitor.stopMonitor();
+    }
     if (this.syncController) {
       this.syncController.stopSyncLoop();
     }

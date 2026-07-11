@@ -20,6 +20,11 @@ export class DashboardEventCoordinator {
 
   /**
    * イベント購読
+   * サポートするイベント:
+   * - 'refresh-requested': 手動強制クリア＆同期要求
+   * - 'health-changed': システム健全状態の変更 (OperationalStatus)
+   * - 'metrics-updated': 統合メトリクスの更新 (AggregatedMetrics)
+   * - 'notification-added': 運用ポップアップの追加 (NotificationItem)
    */
   on(event: string, callback: (...args: any[]) => void): void {
     if (!this.listeners[event]) {
