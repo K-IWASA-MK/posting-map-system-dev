@@ -11,6 +11,10 @@ import { DashboardStateModel } from './DashboardStateModel';
 import { DashboardLayout } from './components/DashboardLayout';
 import { DashboardEventCoordinator } from './DashboardEventCoordinator';
 import { DashboardRefreshController } from './DashboardRefreshController';
+import { HAppConnectionState } from './HAppConnectionState';
+import { EventLogDispatcher } from './EventLogDispatcher';
+import { HAppEventSubscriber } from './HAppEventSubscriber';
+import { HAppSynchronizationController } from './HAppSynchronizationController';
 
 export class DashboardApplication {
   private static instance: DashboardApplication | null = null;
@@ -20,6 +24,10 @@ export class DashboardApplication {
   private layout!: DashboardLayout;
   private eventCoordinator!: DashboardEventCoordinator;
   private refreshController!: DashboardRefreshController;
+  private connectionState!: HAppConnectionState;
+  private eventLogDispatcher!: EventLogDispatcher;
+  private eventSubscriber!: HAppEventSubscriber;
+  private syncController!: HAppSynchronizationController;
 
   private constructor() {}
 
@@ -59,6 +67,36 @@ export class DashboardApplication {
     // 5. データ更新（ポーリング）制御構築
     this.refreshController = new DashboardRefreshController(this.stateModel, this.eventCoordinator);
 
+    // 5.5. H-App 同期モジュール群の構築
+    this.connectionState = new HAppConnectionState();
+    this.eventLogDispatcher = new EventLogDispatcher();
+    this.eventSubscriber = new HAppEventSubscriber(this.stateModel, this.eventLogDispatcher);
+    this.syncController = new HAppSynchronizationController(
+      this.stateModel,
+      this.eventSubscriber,
+      this.connectionState
+    );
+
+    // 5.6. 同期された EventLog の UI 配信フックの定義
+    this.eventLogDispatcher.subscribe((log) => {
+      const mapPanel = (this.layout as any).mapPanel;
+      if (mapPanel && (mapPanel as any).mapEngine) {
+        (mapPanel as any).mapEngine.updateLayer('activity', { logs: this.stateModel.getEventLogs() });
+        mapPanel.updateAreas(this.stateModel.getData()?.areas || []);
+      }
+
+      const detailPanel = (this.layout as any).detailPanel;
+      if (detailPanel && (detailPanel as any).currentAreaId === log.areaId) {
+        const area = this.stateModel.getData()?.areas.find(a => a.areaId === log.areaId);
+        if (area) {
+          detailPanel.updateDetails(area, this.stateModel.getVoteTurnouts(), this.stateModel.getEventLogs());
+        }
+      }
+
+      // RefreshController への通知
+      this.refreshController.handleHAppEventReceived();
+    });
+
     // 6. レイアウト構成コンポーネント間のイベント関係性をコーディネーターにバインド
     const mapPanel = (this.layout as any).mapPanel;
     if (mapPanel) {
@@ -92,6 +130,9 @@ export class DashboardApplication {
 
     // 9. 自動データリフレッシュ周期の起動 (1分周期)
     this.refreshController.startAutoPolling(tenantId, branchId);
+
+    // 10. H-App 同期ループの起動 (15秒周期)
+    this.syncController.startSyncLoop(tenantId, branchId, 15000);
   }
 
   /**
@@ -99,6 +140,9 @@ export class DashboardApplication {
    */
   destroy(): void {
     console.log('[DashboardApplication] Shutdown and cleanup...');
+    if (this.syncController) {
+      this.syncController.stopSyncLoop();
+    }
     if (this.refreshController) {
       this.refreshController.stopAutoPolling();
     }

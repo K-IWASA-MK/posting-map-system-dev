@@ -259,4 +259,58 @@ export class DashboardStateModel {
     this.isLoading = false;
     this.notify();
   }
+
+  /**
+   * 外部（H-App同期など）から直接イベントログを追加し、不変状態（Immutable）として状態を部分更新する。
+   * 重複受信時は破棄し false を返す。正常に追加された場合は true を返す。
+   */
+  addIncomingEventLog(log: EventLogItem): boolean {
+    // 1. 一意性のチェック (重複EventIDの破棄ポリシー)
+    if (this.eventLogs.some(l => l.id === log.id)) {
+      console.warn(`[DashboardStateModel] EventLog ID=${log.id} already exists. Skipping.`);
+      return false;
+    }
+
+    // 2. イベントログリストの不変追加（最新順に先頭に追加）
+    this.eventLogs = Object.freeze([log, ...this.eventLogs]);
+
+    // 3. エリア情報および全体統計の不変（Immutable）再計算更新
+    if (this.data) {
+      const updatedAreas = this.data.areas.map(area => {
+        if (area.areaId === log.areaId) {
+          const newDoneCount = area.doneCount + log.count;
+          const newProgressRate = area.totalHouseholds > 0
+            ? Math.min(100, Math.round((newDoneCount / area.totalHouseholds) * 100))
+            : 0;
+
+          return {
+            ...area,
+            doneCount: newDoneCount,
+            progressRate: newProgressRate
+          };
+        }
+        return area;
+      });
+
+      const totalCompleted = this.data.stats.totalCompleted + log.count;
+      const totalHouseholds = this.data.stats.totalHouseholds;
+      const progressRate = totalHouseholds > 0
+        ? Math.min(100, Math.round((totalCompleted / totalHouseholds) * 100))
+        : 0;
+
+      this.data = {
+        ...this.data,
+        stats: {
+          totalCompleted,
+          totalHouseholds,
+          progressRate
+        },
+        areas: Object.freeze(updatedAreas)
+      };
+    }
+
+    // 変更を通知
+    this.notify();
+    return true;
+  }
 }

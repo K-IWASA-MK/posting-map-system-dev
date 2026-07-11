@@ -26,14 +26,17 @@
 * **Phase S2-1: Google Maps Engine Foundation** ✅
   - `MapEngine` 抽象化インターフェースを実装した `GoogleMapsEngine` を構築。
   - APIキーを `window.POSTING_MAP_CONFIG` から動的に引き当てる設定プロバイダー `GoogleMapsConfiguration` を実装。
-  - 地図スクリプトの多重ロードを防ぐ Promise 制御の `GoogleMapsScriptLoader` を導入。
+  - 地図スクリプトの多重ロードを防ぐ Promise 制御 of `GoogleMapsScriptLoader` を導入。
   - カメラ制御用の `GoogleMapsCameraController` および独立した4レイヤー（Area, VoteTurnout, Activity, Marker）を管理する `GoogleMapsLayerManager` に処理を委譲。
   - 地図パネル `MapPanel` との結合を行い、設定に基づき `DOMMapEngine` と自動切り替え可能な後方互換性を担保。
+* **Phase S2-2: H-App Real Connection Foundation** ✅
+  - `HAppConnectionState` による 4 つの同期接続ステータス（CONNECTED, SYNCING, OFFLINE, ERROR）を定義・一元管理。
+  - `HAppSynchronizationController` にて `lastSyncTimestamp` と `lastEventId` を用いた高信頼性差分ポーリング、およびブラウザオフライン検知（Offline Policy）を制御。
+  - `HAppEventSubscriber` と `EventLogDispatcher`（イベントバス）を介して、新着ログの UI への高速配信と map/detail パネルの部分更新を描画。
+  - `DashboardStateModel.addIncomingEventLog` による重複イベント破棄（EventID一意性保証）および、地区進捗（doneCount / progressRate）と全体 Stats の不変（Immutable）再計算更新処理を実装。
 
 ### 主な今後の開発項目
-1. **LINE LIFF（Hアプリ）連携強化 (Phase S2-2 ~)**:
-   - 配布員アプリ（Hアプリ）が現場でGPS打刻および配布進捗を報告した際、ダッシュボード側へほぼリアルタイムに反映するデータ同期パイプライン。
-2. **Stripe自動契約・独占権管理の統合**:
+1. **Stripe自動契約・独占権管理の統合**:
    - Stripe決済情報をバインドし、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化。
-3. **GAS API 本実装およびキャッシュ高速化**:
+2. **GAS API 本実装およびキャッシュ高速化**:
    - 大量データアクセス時の `CacheService` 適用と、SpreadsheetApp 読み込み最小化のGAS側本実装。

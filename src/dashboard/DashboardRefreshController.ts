@@ -73,4 +73,12 @@ export class DashboardRefreshController {
       this.pollingTimer = null;
     }
   }
+
+  /**
+   * H-App イベント受信時の即時処理トリガー
+   */
+  handleHAppEventReceived(): void {
+    console.log('[DashboardRefreshController] H-App event received. Ensuring immediate view updates.');
+    this.coordinator.emit('happ-event-processed');
+  }
 }
