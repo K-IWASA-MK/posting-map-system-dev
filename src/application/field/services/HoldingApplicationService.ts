@@ -37,6 +37,10 @@ export class HoldingApplicationService {
     return this.toDto(holding);
   }
 
+  public async getAllRawHoldings(): Promise<any[]> {
+    return await this.holdingRepository.findAllRaw();
+  }
+
   private toDto(holding: FlyerHolding): HoldingDto {
     return {
       staffNo: holding.staffNo,

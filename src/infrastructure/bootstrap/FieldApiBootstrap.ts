@@ -1,5 +1,6 @@
 import { EndpointRegistry } from '@core/api/EndpointRegistry';
 import { FieldStockHandler } from '@api/field/FieldStockHandler';
+import { HoldingHandler } from '@api/field/HoldingHandler';
 import { DistributorHandler } from '@api/field/DistributorHandler';
 import { ReservationHandler } from '@api/field/ReservationHandler';
 import { DashboardHandler } from '@api/dashboard/DashboardHandler';
@@ -51,6 +52,7 @@ export function bootstrapFieldApis(): void {
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
+    HoldingHandler: new HoldingHandler(holdingAppService),
     DistributorHandler: new DistributorHandler(staffAppService),
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
     DashboardHandler: new DashboardHandler(dashboardAppService),

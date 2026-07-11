@@ -29,5 +29,17 @@ export const FIELD_ENDPOINTS: EndpointConfig[] = [
     method: 'POST',
     version: 'v2',
     handler: 'DistributorHandler'
+  },
+  {
+    path: '/holding',
+    method: 'GET',
+    version: 'v2',
+    handler: 'HoldingHandler'
+  },
+  {
+    path: '/holding',
+    method: 'POST',
+    version: 'v2',
+    handler: 'HoldingHandler'
   }
 ];

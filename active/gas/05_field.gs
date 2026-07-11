@@ -341,6 +341,7 @@ class DistributionActivityRecordedEvent implements FieldEvent {
 
 interface IFlyerHoldingRepository {
   findByStaffNo(staffNo: string): Promise<FlyerHolding | undefined>;
+  findAllRaw(): Promise<any[]>;
   save(holding: FlyerHolding): Promise<void>;
 }
 
@@ -752,6 +753,10 @@ class HoldingApplicationService {
 
     await this.holdingRepository.save(holding);
     return this.toDto(holding);
+  }
+
+  public async getAllRawHoldings(): Promise<any[]> {
+    return await this.holdingRepository.findAllRaw();
   }
 
   private toDto(holding: FlyerHolding): HoldingDto {
@@ -1741,6 +1746,49 @@ class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepository {
     return undefined;
   }
 
+  public async findAllRaw(): Promise<any[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const nameIdx = headers.indexOf('スタッフ名');
+    const locIdx = headers.indexOf('保管場所');
+    const qtyIdx = headers.indexOf('保管枚数');
+    const updatedIdx = headers.indexOf('更新日時');
+
+    if (staffIdIdx === -1) return [];
+
+    const list: any[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      const rawLoc = locIdx !== -1 ? String(row[locIdx]) : '-';
+      const rawName = nameIdx !== -1 ? String(row[nameIdx]) : '';
+      const qty = qtyIdx !== -1 ? Number(row[qtyIdx]) : 0;
+      const t = updatedIdx !== -1 ? Number(row[updatedIdx]) || 0 : 0;
+
+      let formattedDate = '';
+      if (t > 0) {
+        const date = new Date(t);
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        const hh = String(date.getHours()).padStart(2, '0');
+        const min = String(date.getMinutes()).padStart(2, '0');
+        formattedDate = `${mm}/${dd} ${hh}:${min}`;
+      }
+
+      list.push({
+        id: 'Holding-' + String(row[staffIdIdx]),
+        staffId: String(row[staffIdIdx]),
+        staffName: rawName,
+        location: rawLoc,
+        count: qty,
+        updatedAt: formattedDate
+      });
+    }
+    return list;
+  }
+
   public async save(holding: FlyerHolding): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ID', 'スタッフID', 'スタッフ名', '保管場所', '保管枚数', '更新日時'];
@@ -2171,6 +2219,51 @@ class FieldStockHandler implements EndpointHandler {
 }
 
 
+// --- Source: src/api/field/HoldingHandler.ts ---
+
+class HoldingHandler implements EndpointHandler {
+  constructor(private holdingAppService: HoldingApplicationService) {}
+
+  public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
+    try {
+      if (request.method === 'POST') {
+        const body = request.body || {};
+        const staffNo = body.staffId || '';
+        const quantity = Number(body.count || 0);
+
+        const command = new DeclareHoldingCommand(staffNo, quantity);
+        const dto = await this.holdingAppService.declareHolding(command);
+
+        return FieldApiMapper.toSuccessResponse({
+          staffNo: dto.staffNo,
+          quantity: dto.quantity,
+          updatedAt: dto.updatedAt
+        }, request, context);
+      }
+
+      // GET: Retrieve all stocks
+      const rawStocks = await this.holdingAppService.getAllRawHoldings();
+      const responsePayload = {
+        success: true,
+        stocks: rawStocks.map(s => ({
+          id: s.id,
+          staffId: s.staffId,
+          staffName: s.staffName,
+          location: s.location,
+          count: s.count,
+          updatedAt: s.updatedAt
+        }))
+      };
+
+      return FieldApiMapper.toSuccessResponse(responsePayload, request, context);
+    } catch (error: any) {
+      const apiException = FieldApiMapper.toApiException(error, request.requestId);
+      return ExceptionMapper.toResponse(apiException, request, context);
+    }
+  }
+}
+
+
 // --- Source: src/api/field/ReservationHandler.ts ---
 
 class ReservationHandler implements EndpointHandler {
@@ -2421,6 +2514,18 @@ const FIELD_ENDPOINTS: EndpointConfig[] = [
     method: 'POST',
     version: 'v2',
     handler: 'DistributorHandler'
+  },
+  {
+    path: '/holding',
+    method: 'GET',
+    version: 'v2',
+    handler: 'HoldingHandler'
+  },
+  {
+    path: '/holding',
+    method: 'POST',
+    version: 'v2',
+    handler: 'HoldingHandler'
   }
 ];
 
@@ -2490,6 +2595,7 @@ function bootstrapFieldApis(): void {
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
+    HoldingHandler: new HoldingHandler(holdingAppService),
     DistributorHandler: new DistributorHandler(staffAppService),
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
     DashboardHandler: new DashboardHandler(dashboardAppService),

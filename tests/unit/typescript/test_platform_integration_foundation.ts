@@ -62,6 +62,9 @@ let mockSheets: { [name: string]: any[][] } = {
   ],
   'EventLogs': [
     ['Event ID', 'Timestamp', 'Type', 'Payload']
+  ],
+  'Flyers': [
+    ['ID', 'スタッフID', 'スタッフ名', '保管場所', '保管枚数', '更新日時']
   ]
 };
 
@@ -230,15 +233,16 @@ async function runTests() {
           action: 'updateFlyerStock',
           tenantId: 'TENANT-1',
           branchId: 'BRANCH-1',
-          stocks: []
+          staffId: 'S037',
+          count: 1000
         })
       }
     };
 
     mockScriptLock.hasLock = false;
     const response = await PlatformIntegrationPipeline.execute(mockPostEvent);
-    // HoldingHandler returns 501 NotImplemented as a stub
-    assert(response.body.status === 501, 'POST request should run handler to completion (501)');
+    // HoldingHandler is fully implemented and returns 200 success status
+    assert(response.body.status === 200, 'POST request should run handler to completion (200)');
     // Lock must have been acquired and then released
     assert(mockScriptLock.hasLock === false, 'Lock must be released');
 

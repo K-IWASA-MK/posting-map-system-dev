@@ -62,6 +62,9 @@ class MockHoldingRepository implements IFlyerHoldingRepository {
   async findByStaffNo(staffNo: string): Promise<FlyerHolding | undefined> {
     return this.db.get(staffNo);
   }
+  async findAllRaw(): Promise<any[]> {
+    return [];
+  }
   async save(holding: FlyerHolding): Promise<void> {
     this.db.set(holding.staffNo, holding);
   }
