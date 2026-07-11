@@ -17,6 +17,12 @@ export class PhotoEvidenceMonitor {
    * 写真証跡データの追加
    */
   addPhoto(photoId: string, memberId: string, areaId: string, photoUrl: string, timestamp: number): void {
+    // 写真URLの簡易検証 (空文字や不正なURLを拒否)
+    if (!this.isValidUrl(photoUrl)) {
+      console.warn(`[PhotoEvidenceMonitor] Rejected invalid photo URL: ${photoUrl}`);
+      return;
+    }
+
     const record: PhotoRecord = {
       photoId,
       memberId,
@@ -70,5 +76,16 @@ export class PhotoEvidenceMonitor {
         this.listeners.splice(idx, 1);
       }
     };
+  }
+
+  private isValidUrl(url: string): boolean {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    // http://, https://, drive:// などの妥当なURLスキームまたは Google ドライブリンクを許容
+    return lower.startsWith('http://') || 
+           lower.startsWith('https://') || 
+           lower.startsWith('drive://') || 
+           lower.includes('drive.google.com') ||
+           lower.startsWith('content://');
   }
 }

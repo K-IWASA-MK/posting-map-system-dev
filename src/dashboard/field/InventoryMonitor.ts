@@ -21,14 +21,22 @@ export class InventoryMonitor {
   /**
    * チラシ残数の更新および低在庫の監視評価
    */
-  updateInventory(id: string, remaining: number, threshold = 100): void {
-    const isLowStock = remaining < threshold;
+  updateInventory(id: string, remaining: number, threshold?: number): void {
+    let finalThreshold: number;
+    if (threshold !== undefined) {
+      finalThreshold = threshold;
+    } else {
+      const globalConfig = typeof window !== 'undefined' ? (window as any).POSTING_MAP_CONFIG : null;
+      finalThreshold = globalConfig?.SETTINGS?.INVENTORY_THRESHOLD ?? globalConfig?.INVENTORY_THRESHOLD ?? 100;
+    }
+
+    const isLowStock = remaining < finalThreshold;
     const prev = this.inventoryMap.get(id);
 
     const updatedItem: InventoryItem = {
       id,
       remaining,
-      threshold,
+      threshold: finalThreshold,
       isLowStock
     };
 

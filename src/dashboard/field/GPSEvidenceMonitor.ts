@@ -9,7 +9,9 @@ export interface GPSRecord {
 export type GPSListener = (record: GPSRecord) => void;
 
 export class GPSEvidenceMonitor {
+  private static readonly MAX_GPS_HISTORY = 100;
   private readonly latestGPSMap = new Map<string, GPSRecord>();
+  private readonly historyGPSMap = new Map<string, GPSRecord[]>();
   private readonly listeners: GPSListener[] = [];
 
   /**
@@ -26,6 +28,14 @@ export class GPSEvidenceMonitor {
 
     this.latestGPSMap.set(memberId, record);
 
+    // 軌跡ヒストリ蓄積およびメモリ枯渇防止上限(MAX 100)の適用
+    const history = this.historyGPSMap.get(memberId) || [];
+    history.push(record);
+    if (history.length > GPSEvidenceMonitor.MAX_GPS_HISTORY) {
+      history.shift();
+    }
+    this.historyGPSMap.set(memberId, history);
+
     this.listeners.forEach(l => {
       try {
         l(record);
@@ -37,6 +47,10 @@ export class GPSEvidenceMonitor {
 
   getLocation(memberId: string): GPSRecord | undefined {
     return this.latestGPSMap.get(memberId);
+  }
+
+  getHistory(memberId: string): readonly GPSRecord[] {
+    return this.historyGPSMap.get(memberId) || [];
   }
 
   getAllLocations(): readonly GPSRecord[] {

@@ -243,6 +243,24 @@ async function runTests() {
     assert(summary.gpsCoverageRate === 0.5, 'GPS coverage rate mismatch');
     assert(summary.photoCoverageRate === 0.5, 'Photo coverage rate mismatch');
 
+    // GPS履歴制限の上限検証
+    for (let i = 0; i < 120; i++) {
+      gpsEvidenceMonitor.updateLocation('MEMBER-LIMIT-TEST', 34.0, 135.0, Date.now(), 5);
+    }
+    assert(gpsEvidenceMonitor.getHistory('MEMBER-LIMIT-TEST').length === 100, 'GPS history must be capped at 100');
+
+    // 不正写真URLの除外検証
+    photoEvidenceMonitor.addPhoto('PH-BAD', 'MEMBER-01', 'AREA-02', 'invalid-url-string', Date.now());
+    assert(photoEvidenceMonitor.getLatestPhoto('AREA-02')?.photoId !== 'PH-BAD', 'Invalid photo URL must be rejected');
+
+    // グローバル設定からのしきい値取得検証
+    (globalThis as any).window.POSTING_MAP_CONFIG = {
+      SETTINGS: { INVENTORY_THRESHOLD: 150 }
+    };
+    inventoryMonitor.updateInventory('FLYER-CONFIG-TEST', 140);
+    assert(inventoryMonitor.getInventory('FLYER-CONFIG-TEST')?.isLowStock === true, 'Low stock must be resolved using config settings');
+    assert(inventoryMonitor.getInventory('FLYER-CONFIG-TEST')?.threshold === 150, 'Threshold value must map to config setting value');
+
     console.log('[Test FieldOperation] Metrics & Controller integration: PASSED');
   }
 
