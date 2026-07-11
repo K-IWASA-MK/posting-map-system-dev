@@ -100,4 +100,8 @@ export class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSub
       }
     }
   }
+
+  public async create(subscription: WorkspaceSubscription): Promise<void> {
+    await this.save(subscription);
+  }
 }

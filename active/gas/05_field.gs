@@ -67,6 +67,7 @@ interface IWorkspaceSubscriptionRepository {
   findByWorkspaceId(workspaceId: string): Promise<WorkspaceSubscription | undefined>;
   findAll(): Promise<WorkspaceSubscription[]>;
   save(subscription: WorkspaceSubscription): Promise<void>;
+  create(subscription: WorkspaceSubscription): Promise<void>;
 }
 
 
@@ -158,6 +159,40 @@ class WorkspaceSubscription {
 
   public reactivate(): void {
     this.status = 'ACTIVE';
+  }
+}
+
+
+// --- Source: src/domain/workspace/valueobjects/WorkspaceUrl.ts ---
+class WorkspaceUrl {
+  public readonly dashboardUrl: string;
+  public readonly lineAppUrl: string;
+
+  constructor(params: { dashboardUrl: string; lineAppUrl: string }) {
+    if (!params.dashboardUrl || !this.isValidUrl(params.dashboardUrl)) {
+      throw new Error(`Invalid dashboardUrl: ${params.dashboardUrl}`);
+    }
+    if (!params.lineAppUrl || !this.isValidUrl(params.lineAppUrl)) {
+      throw new Error(`Invalid lineAppUrl: ${params.lineAppUrl}`);
+    }
+    this.dashboardUrl = params.dashboardUrl;
+    this.lineAppUrl = params.lineAppUrl;
+  }
+
+  public static generate(workspaceId: string): WorkspaceUrl {
+    const cleanId = encodeURIComponent(workspaceId);
+    return new WorkspaceUrl({
+      dashboardUrl: `https://posting-map.jp/dashboard/${cleanId}`,
+      lineAppUrl: `https://liff.line.me/2010177345-tXZIMAJK/${cleanId}`
+    });
+  }
+
+  private isValidUrl(url: string): boolean {
+    return url.startsWith('http://') || url.startsWith('https://');
+  }
+
+  public equals(other: WorkspaceUrl): boolean {
+    return this.dashboardUrl === other.dashboardUrl && this.lineAppUrl === other.lineAppUrl;
   }
 }
 
@@ -315,11 +350,13 @@ class FlyerHolding {
   public readonly staffNo: string;
   private quantity: Quantity;
   private updatedAt: Date;
+  public readonly cityName: string;
 
   constructor(params: {
     staffNo: string;
     quantity: Quantity;
     updatedAt?: Date;
+    cityName?: string;
   }) {
     if (!params.staffNo || params.staffNo.trim().length === 0) {
       throw new Error("staffNo is required");
@@ -327,6 +364,7 @@ class FlyerHolding {
     this.staffNo = params.staffNo;
     this.quantity = params.quantity;
     this.updatedAt = params.updatedAt || new Date();
+    this.cityName = params.cityName || '-';
   }
 
   public getQuantity(): Quantity {
@@ -771,6 +809,376 @@ class StaffApplicationService {
 }
 
 
+// --- Source: src/application/subscription/SubscriptionApplicationService.ts ---
+
+class SubscriptionApplicationService {
+  constructor(
+    private subscriptionRepo: IWorkspaceSubscriptionRepository
+  ) {}
+
+  public async getSubscription(workspaceId: string): Promise<WorkspaceSubscriptionDto | undefined> {
+    const sub = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
+    if (!sub) return undefined;
+    return this.toDto(sub);
+  }
+
+  public async getAllSubscriptions(): Promise<WorkspaceSubscriptionDto[]> {
+    const subs = await this.subscriptionRepo.findAll();
+    return subs.map(sub => this.toDto(sub));
+  }
+
+  public async updateSubscription(workspaceId: string, status: SubscriptionStatus, expiresAt: Date): Promise<void> {
+    const existing = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
+    const startedAt = existing ? existing.getStartedAt() : new Date();
+
+    const updated = new WorkspaceSubscription({
+      workspaceId,
+      status,
+      startedAt,
+      expiresAt
+    });
+    await this.subscriptionRepo.save(updated);
+  }
+
+  private toDto(sub: WorkspaceSubscription): WorkspaceSubscriptionDto {
+    return {
+      workspaceId: sub.workspaceId,
+      status: sub.getStatus(),
+      startedAt: sub.getStartedAt().toISOString(),
+      expiresAt: sub.getExpiresAt().toISOString()
+    };
+  }
+}
+
+
+// --- Source: src/application/subscription/WorkspaceSubscriptionGate.ts ---
+
+class WorkspaceSubscriptionGate {
+  private static instance: WorkspaceSubscriptionGate | null = null;
+
+  constructor(
+    private subscriptionRepo: IWorkspaceSubscriptionRepository,
+    private staffRepo: IStaffRepository
+  ) {
+    WorkspaceSubscriptionGate.instance = this;
+  }
+
+  public static getInstance(): WorkspaceSubscriptionGate | null {
+    return WorkspaceSubscriptionGate.instance;
+  }
+
+  public async pass(request: ApiRequest): Promise<void> {
+    // Bypass operations administrative requests
+    if (request.path.startsWith('/operations/')) {
+      return;
+    }
+
+    // 1. Resolve workspaceId
+    const workspaceId = await this.resolveWorkspaceId(request);
+    if (!workspaceId) {
+      // If we cannot resolve workspaceId (e.g. system setup/health check), allow access.
+      return;
+    }
+
+    // 2. Fetch subscription and check status
+    const subscription = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
+    if (!subscription) {
+      throw new SubscriptionException(
+        'PM-SUB-002',
+        `Subscription not found for Workspace: ${workspaceId}`,
+        request.requestId
+      );
+    }
+
+    if (!subscription.isActive()) {
+      throw new SubscriptionException(
+        'PM-SUB-001',
+        `Workspace subscription is currently ${subscription.getStatus()}. Access denied.`,
+        request.requestId
+      );
+    }
+  }
+
+  private async resolveWorkspaceId(request: ApiRequest): Promise<string | null> {
+    // Check path parameters (e.g. /dashboard/workspace/WS-MIE-03)
+    if (request.pathParams && request.pathParams.id && request.path.includes('/dashboard/workspace/')) {
+      return request.pathParams.id;
+    }
+
+    // Check query parameters
+    if (request.query && request.query.workspaceId) {
+      return request.query.workspaceId;
+    }
+
+    // Check request body
+    if (request.body && request.body.workspaceId) {
+      return request.body.workspaceId;
+    }
+
+    // Resolve via lineUserId if present in query/body
+    const lineUserId = request.query?.lineUserId || request.body?.lineUserId;
+    if (lineUserId) {
+      const staff = await this.staffRepo.findByLineUserId(lineUserId);
+      if (staff) return staff.workspaceId;
+    }
+
+    // Resolve via staffNo if present in query/body
+    const staffNo = request.query?.staffNo || request.body?.staffNo;
+    if (staffNo) {
+      const staff = await this.staffRepo.findByStaffNo(staffNo);
+      if (staff) return staff.workspaceId;
+    }
+
+    return null;
+  }
+}
+
+
+// --- Source: src/application/subscription/dto/WorkspaceSubscriptionDto.ts ---
+
+interface WorkspaceSubscriptionDto {
+  workspaceId: string;
+  status: SubscriptionStatus;
+  startedAt: string; // ISO 8601 string
+  expiresAt: string; // ISO 8601 string
+}
+
+
+// --- Source: src/application/operations/dto/OperationsDashboardDtos.ts ---
+interface WorkspaceSubscriptionOverviewDto {
+  workspaceId: string;
+  workspaceName: string;
+  status: string; // e.g. "ACTIVE", "SUSPENDED", "CANCELLED"
+  startedAt: string; // ISO format
+  expiresAt: string; // ISO format
+  remainingDays: number;
+}
+
+
+// --- Source: src/application/operations/services/OperationsDashboardApplicationService.ts ---
+
+class OperationsDashboardApplicationService {
+  constructor(
+    private workspaceRepo: IWorkspaceRepository,
+    private subscriptionRepo: IWorkspaceSubscriptionRepository
+  ) {}
+
+  public async getWorkspaceSubscriptionOverview(): Promise<WorkspaceSubscriptionOverviewDto[]> {
+    const workspaces = await this.workspaceRepo.findAll();
+    const list: WorkspaceSubscriptionOverviewDto[] = [];
+
+    for (const ws of workspaces) {
+      const sub = await this.subscriptionRepo.findByWorkspaceId(ws.workspaceId);
+      
+      const status = sub ? sub.getStatus() : 'INACTIVE';
+      const startedAt = sub ? sub.getStartedAt() : new Date();
+      const expiresAt = sub ? sub.getExpiresAt() : new Date(0); // Epoch start if not found
+
+      const remainingDays = this.calculateRemainingDays(expiresAt);
+
+      list.push({
+        workspaceId: ws.workspaceId,
+        workspaceName: ws.workspaceName,
+        status,
+        startedAt: startedAt.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+        remainingDays
+      });
+    }
+
+    return list;
+  }
+
+  private calculateRemainingDays(expiresAt: Date): number {
+    const today = new Date();
+    // Normalize to midnight to avoid timezone hour offset anomalies
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+    const startOfExpires = new Date(expiresAt.getFullYear(), expiresAt.getMonth(), expiresAt.getDate(), 0, 0, 0, 0);
+
+    if (startOfExpires.getTime() <= startOfToday.getTime()) {
+      return 0;
+    }
+
+    const diffTime = startOfExpires.getTime() - startOfToday.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  }
+}
+
+
+// --- Source: src/application/onboarding/dto/WorkspaceOnboardingDtos.ts ---
+interface WorkspaceProvisioningDto {
+  workspaceId: string;
+  workspaceName: string;
+  lineAppUrl: string;
+  dashboardUrl: string;
+  subscriptionStatus: string;
+  status: string; // Alias to subscriptionStatus for compatibility
+}
+
+
+// --- Source: src/application/onboarding/services/WorkspaceIdGenerator.ts ---
+class WorkspaceIdGenerator {
+  private static readonly prefectureMap: Record<string, string> = {
+    '北海道': 'hokkaido', '青森県': 'aomori', '岩手県': 'iwate', '宮城県': 'miyagi',
+    '秋田県': 'akita', '山形県': 'yamagata', '福島県': 'fukushima', '茨城県': 'ibaraki',
+    '栃木県': 'tochigi', '群馬県': 'gunma', '埼玉県': 'saitama', '千葉県': 'chiba',
+    '東京都': 'tokyo', '神奈川県': 'kanagawa', '新潟県': 'niigata', '富山県': 'toyama',
+    '石川県': 'ishikawa', '福井県': 'fukui', '山梨県': 'yamanashi', '長野県': 'nagano',
+    '岐阜県': 'gifu', '静岡県': 'shizuoka', '愛知県': 'aichi', '三重県': 'mie',
+    '滋賀県': 'shiga', '京都府': 'kyoto', '大阪府': 'osaka', '兵庫県': 'hyogo',
+    '奈良県': 'nara', '和歌山県': 'wakayama', '鳥取県': 'tottori', '島根県': 'shimane',
+    '岡山県': 'okayama', '広島県': 'hiroshima', '山口県': 'yamaguchi', '徳島県': 'tokushima',
+    '香川県': 'kagawa', '愛媛県': 'ehime', '高知県': 'kochi', '福岡県': 'fukuoka',
+    '佐賀県': 'saga', '長崎県': 'nagasaki', '熊本県': 'kumamoto', '大分県': 'oita',
+    '宮崎県': 'miyazaki', '鹿児島県': 'kagoshima', '沖縄県': 'okinawa'
+  };
+
+  private static readonly kanjiNumMap: Record<string, string> = {
+    '一': '1', '二': '2', '三': '3', '四': '4', '五': '5',
+    '六': '6', '七': '7', '八': '8', '九': '9', '十': '10'
+  };
+
+  public static generate(workspaceName: string): string {
+    // Find prefecture name in workspaceName
+    let prefix = '';
+    for (const [jpName, enName] of Object.entries(this.prefectureMap)) {
+      if (workspaceName.includes(jpName) || workspaceName.includes(jpName.replace(/[県府都]$/, ''))) {
+        prefix = enName;
+        break;
+      }
+    }
+
+    // Extract number
+    let num = '';
+    const numMatch = workspaceName.match(/[0-9０-９]+/);
+    if (numMatch) {
+      // Convert full-width digits to half-width digits
+      num = numMatch[0].replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+    } else {
+      for (const [k, v] of Object.entries(this.kanjiNumMap)) {
+        if (workspaceName.includes(k)) {
+          num = v;
+          break;
+        }
+      }
+    }
+
+    if (prefix && num) {
+      const paddedNum = num.padStart(2, '0');
+      return `${prefix}-${paddedNum}`;
+    }
+
+    // Fallback if no matching pattern: create unique ID
+    const timestamp = Date.now();
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return `workspace-${timestamp}-${random}`;
+  }
+}
+
+
+// --- Source: src/application/onboarding/services/WorkspaceOnboardingService.ts ---
+
+class WorkspaceOnboardingService {
+  constructor(
+    private workspaceRepo: IWorkspaceRepository,
+    private subscriptionRepo: IWorkspaceSubscriptionRepository
+  ) {}
+
+  public async createWorkspace(
+    workspaceName: string,
+    workspaceId?: string,
+    periodMonths: number = 1
+  ): Promise<WorkspaceProvisioningDto> {
+    if (!workspaceName || workspaceName.trim().length === 0) {
+      throw new Error('Workspace name is required');
+    }
+
+    // Resolve base workspace ID
+    let finalId = workspaceId ? workspaceId.trim() : WorkspaceIdGenerator.generate(workspaceName);
+    
+    // Ensure uniqueness by checking existence and appending counter suffix if necessary
+    const baseId = finalId;
+    let counter = 1;
+    while (await this.workspaceRepo.findById(finalId)) {
+      counter++;
+      finalId = `${baseId}-${counter}`;
+    }
+
+    // Create and save Workspace
+    const workspace = new Workspace({
+      workspaceId: finalId,
+      workspaceName,
+      status: 'ACTIVE'
+    });
+    await this.workspaceRepo.save(workspace);
+
+    // Create and save initial Subscription (ACTIVE, default duration 1 month)
+    const startedAt = new Date();
+    const expiresAt = new Date();
+    expiresAt.setMonth(startedAt.getMonth() + periodMonths);
+
+    const subscription = new WorkspaceSubscription({
+      workspaceId: finalId,
+      status: 'ACTIVE',
+      startedAt,
+      expiresAt
+    });
+    await this.subscriptionRepo.create(subscription);
+
+    // Generate Workspace URLs dynamically
+    const urls = WorkspaceUrl.generate(finalId);
+
+    return {
+      workspaceId: finalId,
+      workspaceName,
+      lineAppUrl: urls.lineAppUrl,
+      dashboardUrl: urls.dashboardUrl,
+      subscriptionStatus: 'ACTIVE',
+      status: 'ACTIVE'
+    };
+  }
+
+  public async activateWorkspace(workspaceId: string): Promise<void> {
+    const sub = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
+    if (!sub) {
+      throw new Error(`Subscription not found for workspaceId: ${workspaceId}`);
+    }
+    sub.reactivate();
+    await this.subscriptionRepo.save(sub);
+  }
+
+  public async suspendWorkspace(workspaceId: string): Promise<void> {
+    const sub = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
+    if (!sub) {
+      throw new Error(`Subscription not found for workspaceId: ${workspaceId}`);
+    }
+    sub.suspend();
+    await this.subscriptionRepo.save(sub);
+  }
+
+  public async getWorkspaceProvisioningStatus(workspaceId: string): Promise<WorkspaceProvisioningDto> {
+    const workspace = await this.workspaceRepo.findById(workspaceId);
+    if (!workspace) {
+      throw new Error(`Workspace not found: ${workspaceId}`);
+    }
+
+    const sub = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
+    const subStatus = sub ? sub.getStatus() : 'INACTIVE';
+    const urls = WorkspaceUrl.generate(workspaceId);
+
+    return {
+      workspaceId: workspace.workspaceId,
+      workspaceName: workspace.workspaceName,
+      lineAppUrl: urls.lineAppUrl,
+      dashboardUrl: urls.dashboardUrl,
+      subscriptionStatus: subStatus,
+      status: subStatus
+    };
+  }
+}
+
+
 // --- Source: src/infrastructure/spreadsheet/SpreadsheetClient.ts ---
 
 class SpreadsheetClient {
@@ -1102,6 +1510,10 @@ class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscripti
       }
     }
   }
+
+  public async create(subscription: WorkspaceSubscription): Promise<void> {
+    await this.save(subscription);
+  }
 }
 
 
@@ -1289,16 +1701,29 @@ class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepository {
     const staffIdIdx = headers.indexOf('スタッフID');
     const qtyIdx = headers.indexOf('保管枚数');
     const updatedIdx = headers.indexOf('更新日時');
+    const locIdx = headers.indexOf('保管場所');
 
     if (staffIdIdx === -1) return undefined;
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (String(row[staffIdIdx]) === staffNo) {
+        const rawLoc = locIdx !== -1 ? String(row[locIdx]) : '-';
+        let cleanedLoc = rawLoc.trim();
+        if (cleanedLoc === '自宅' || cleanedLoc.length === 0) {
+          cleanedLoc = '-';
+        } else {
+          const cityMatch = cleanedLoc.match(/^[^市区町村]+[市区町村]/);
+          if (cityMatch) {
+            cleanedLoc = cityMatch[0];
+          }
+        }
+
         return new FlyerHolding({
           staffNo: String(row[staffIdIdx]),
           quantity: new Quantity(qtyIdx !== -1 ? Number(row[qtyIdx]) : 0),
-          updatedAt: updatedIdx !== -1 ? new Date(Number(row[updatedIdx]) || String(row[updatedIdx])) : new Date()
+          updatedAt: updatedIdx !== -1 ? new Date(Number(row[updatedIdx]) || String(row[updatedIdx])) : new Date(),
+          cityName: cleanedLoc
         });
       }
     }
@@ -1742,6 +2167,140 @@ class ReservationHandler implements EndpointHandler {
 }
 
 
+// --- Source: src/api/subscription/SubscriptionHandler.ts ---
+
+class SubscriptionHandler implements EndpointHandler {
+  constructor(
+    private subscriptionAppService: SubscriptionApplicationService
+  ) {}
+
+  public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
+    try {
+      const path = request.path;
+
+      if (path.includes('/operations/subscriptions/update')) {
+        const { workspaceId, status, expiresAt } = request.body || {};
+        if (!workspaceId) {
+          throw new Error('workspaceId is required');
+        }
+        if (!status) {
+          throw new Error('status is required');
+        }
+        if (!expiresAt) {
+          throw new Error('expiresAt is required');
+        }
+
+        const expiresDate = new Date(expiresAt);
+        if (isNaN(expiresDate.getTime())) {
+          throw new Error('Invalid expiresAt date format');
+        }
+
+        await this.subscriptionAppService.updateSubscription(workspaceId, status as any, expiresDate);
+        return FieldApiMapper.toSuccessResponse({ success: true }, request, context);
+      }
+
+      if (path.includes('/operations/subscriptions')) {
+        const subs = await this.subscriptionAppService.getAllSubscriptions();
+        return FieldApiMapper.toSuccessResponse(subs, request, context);
+      }
+
+      throw new Error(`Unknown operations path: ${path}`);
+    } catch (error: any) {
+      const apiException = FieldApiMapper.toApiException(error, request.requestId);
+      return ExceptionMapper.toResponse(apiException, request, context);
+    }
+  }
+}
+
+
+// --- Source: src/api/operations/OperationsDashboardHandler.ts ---
+
+class OperationsDashboardHandler implements EndpointHandler {
+  constructor(
+    private operationsDashboardAppService: OperationsDashboardApplicationService
+  ) {}
+
+  public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
+    try {
+      const path = request.path;
+
+      if (path.includes('/operations/dashboard/workspaces')) {
+        const overview = await this.operationsDashboardAppService.getWorkspaceSubscriptionOverview();
+        const result = overview.map(o => ({
+          workspaceId: o.workspaceId,
+          workspaceName: o.workspaceName,
+          status: o.status,
+          startedAt: o.startedAt,
+          expiresAt: o.expiresAt,
+          remainingDays: o.remainingDays
+        }));
+        return FieldApiMapper.toSuccessResponse(result, request, context);
+      }
+
+      throw new Error(`Unknown operations path: ${path}`);
+    } catch (error: any) {
+      const apiException = FieldApiMapper.toApiException(error, request.requestId);
+      return ExceptionMapper.toResponse(apiException, request, context);
+    }
+  }
+}
+
+
+// --- Source: src/api/operations/WorkspaceOnboardingHandler.ts ---
+
+class WorkspaceOnboardingHandler implements EndpointHandler {
+  constructor(
+    private onboardingService: WorkspaceOnboardingService
+  ) {}
+
+  public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
+    try {
+      const path = request.path;
+
+      if (request.method === 'POST' && path.includes('/operations/workspaces')) {
+        const { workspaceName, workspaceId } = request.body || {};
+        if (!workspaceName) {
+          throw new Error('workspaceName is required');
+        }
+
+        const dto = await this.onboardingService.createWorkspace(workspaceName, workspaceId);
+        
+        // Exact API response shape required by spec:
+        // {
+        //   "workspaceId": "mie-4",
+        //   "lineAppUrl": "...",
+        //   "dashboardUrl": "...",
+        //   "status": "ACTIVE"
+        // }
+        const result = {
+          workspaceId: dto.workspaceId,
+          lineAppUrl: dto.lineAppUrl,
+          dashboardUrl: dto.dashboardUrl,
+          status: dto.status
+        };
+
+        return FieldApiMapper.toSuccessResponse(result, request, context);
+      }
+
+      if (request.method === 'GET' && path.includes('/operations/workspaces')) {
+        const workspaceId = (request.query && request.query.workspaceId) || (request.body && request.body.workspaceId);
+        if (!workspaceId) {
+          throw new Error('workspaceId is required');
+        }
+
+        const dto = await this.onboardingService.getWorkspaceProvisioningStatus(workspaceId);
+        return FieldApiMapper.toSuccessResponse(dto, request, context);
+      }
+
+      throw new Error(`Unsupported method or route: ${request.method} ${path}`);
+    } catch (error: any) {
+      const apiException = FieldApiMapper.toApiException(error, request.requestId);
+      return ExceptionMapper.toResponse(apiException, request, context);
+    }
+  }
+}
+
+
 // --- Source: src/api/registry/DashboardEndpoints.ts ---
 
 const DASHBOARD_ENDPOINTS: EndpointConfig[] = [
@@ -1816,6 +2375,18 @@ const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
     method: 'GET',
     version: 'v2',
     handler: 'OperationsDashboardHandler'
+  },
+  {
+    path: '/operations/workspaces',
+    method: 'POST',
+    version: 'v2',
+    handler: 'WorkspaceOnboardingHandler'
+  },
+  {
+    path: '/operations/workspaces',
+    method: 'GET',
+    version: 'v2',
+    handler: 'WorkspaceOnboardingHandler'
   }
 ];
 
@@ -1845,6 +2416,7 @@ function bootstrapFieldApis(): void {
   const dashboardAppService = new DashboardApplicationService(workspaceRepo, staffRepo, holdingRepo, activityRepo);
   const subscriptionAppService = new SubscriptionApplicationService(subscriptionRepo);
   const operationsDashboardAppService = new OperationsDashboardApplicationService(workspaceRepo, subscriptionRepo);
+  const workspaceOnboardingService = new WorkspaceOnboardingService(workspaceRepo, subscriptionRepo);
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
@@ -1852,7 +2424,8 @@ function bootstrapFieldApis(): void {
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
     DashboardHandler: new DashboardHandler(dashboardAppService),
     SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
-    OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService)
+    OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService),
+    WorkspaceOnboardingHandler: new WorkspaceOnboardingHandler(workspaceOnboardingService)
   };
 
   // Register Field API Endpoints

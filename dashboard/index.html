@@ -88,52 +88,153 @@
       </button>
     </header>
 
-    <!-- KPI section -->
-    <main class="space-y-6 flex-1">
-      <div class="grid grid-cols-3 gap-4">
-        <div class="glass-card p-5 flex flex-col justify-center">
-          <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">参加スタッフ</span>
-          <span class="text-2xl font-extrabold" id="kpi-staff-count">0人</span>
-        </div>
-        <div class="glass-card p-5 flex flex-col justify-center">
-          <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">現在保有</span>
-          <span class="text-2xl font-extrabold" id="kpi-total-holding">0枚</span>
-        </div>
-        <div class="glass-card p-5 flex flex-col justify-center position-relative">
-          <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">今月活動</span>
-          <span class="text-2xl font-extrabold" id="kpi-monthly-activity">0枚</span>
-          <div class="flex justify-between items-center mt-1 text-[9px] text-secondary">
-            <span id="kpi-prev-month">先月: 0枚</span>
-            <span class="font-extrabold text-emerald-400" id="kpi-growth-rate">+0%</span>
+    <!-- Navigation Menu -->
+    <nav class="flex gap-2 overflow-x-auto pb-2 border-b border-default" id="dashboard-nav">
+      <button onclick="switchTab('home')" id="nav-home" class="px-4 py-2 rounded-full text-xs font-bold transition-all bg-primary text-white shrink-0">ホーム</button>
+      <button onclick="switchTab('holding')" id="nav-holding" class="px-4 py-2 rounded-full text-xs font-bold transition-all text-secondary hover:text-white shrink-0">チラシ保有状況</button>
+      <button onclick="switchTab('activity')" id="nav-activity" class="px-4 py-2 rounded-full text-xs font-bold transition-all text-secondary hover:text-white shrink-0">活動状況</button>
+      <button onclick="switchTab('email-template')" id="nav-email-template" class="px-4 py-2 rounded-full text-xs font-bold transition-all text-secondary hover:text-white shrink-0">メールテンプレート</button>
+      <button onclick="switchTab('settings')" id="nav-settings" class="px-4 py-2 rounded-full text-xs font-bold transition-all text-secondary hover:text-white shrink-0">設定</button>
+    </nav>
+
+    <!-- Dashboard Main Content Wrapper -->
+    <main class="flex-1">
+      
+      <!-- ホーム (Home Tab View) -->
+      <div id="tab-content-home" class="space-y-6">
+        <div class="grid grid-cols-3 gap-4">
+          <div class="glass-card p-5 flex flex-col justify-center">
+            <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">党員さん・サポーターさん</span>
+            <span class="text-2xl font-extrabold" id="kpi-staff-count">0人</span>
+          </div>
+          <div class="glass-card p-5 flex flex-col justify-center">
+            <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">チラシ保有数</span>
+            <span class="text-2xl font-extrabold" id="kpi-total-holding">0枚</span>
+          </div>
+          <div class="glass-card p-5 flex flex-col justify-center position-relative">
+            <span class="text-[9px] font-bold text-secondary uppercase tracking-widest mb-1">今月の活動数</span>
+            <span class="text-2xl font-extrabold" id="kpi-monthly-activity">0枚</span>
+            <div class="flex justify-between items-center mt-1 text-[9px] text-secondary">
+              <span id="kpi-prev-month">先月: 0枚</span>
+              <span class="font-extrabold text-emerald-400" id="kpi-growth-rate">+0%</span>
+            </div>
           </div>
         </div>
+
+        <section class="glass-card p-6 space-y-4">
+          <h3 class="text-sm font-bold tracking-tight">支部ダッシュボードへお帰りなさい</h3>
+          <p class="text-xs text-secondary leading-relaxed">
+            このダッシュボードでは、支部内のポスティング活動の状況や、党員さん・サポーターさんのチラシ保有状況を確認できます。<br>
+            上のメニューから各画面へ移動してください。
+          </p>
+        </section>
       </div>
 
-      <!-- Monthly Trend chart -->
-      <section class="glass-card p-6 space-y-4">
-        <h3 class="text-sm font-bold tracking-tight">📈 直近6ヶ月の配布量推移</h3>
-        <div class="flex items-end justify-between h-36 pt-4 px-2" id="monthly-trend-chart">
-          <!-- Bars are generated via manager.js -->
-        </div>
-      </section>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- New members -->
+      <!-- チラシ保有状況 (Holding Tab View) -->
+      <div id="tab-content-holding" class="hidden space-y-6">
         <section class="glass-card p-6 space-y-4">
-          <h3 class="text-sm font-bold tracking-tight">🆕 今月新規参加者</h3>
-          <div class="divide-y divide-default" id="new-members-list">
-            <p class="text-sm text-secondary py-2">今月の新規参加者はいません</p>
+          <h3 class="text-sm font-bold tracking-tight">📦 党員さん・サポーターさんのチラシ保有状況</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="border-b border-default text-secondary text-xs uppercase tracking-wider">
+                  <th class="py-3 px-4">ID</th>
+                  <th class="py-3 px-4">氏名</th>
+                  <th class="py-3 px-4">市町村</th>
+                  <th class="py-3 px-4 text-right">チラシ枚数</th>
+                </tr>
+              </thead>
+              <tbody id="holding-list-table-body" class="divide-y divide-default">
+                <!-- populated by manager.js -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- 活動状況 (Activity Tab View) -->
+      <div id="tab-content-activity" class="hidden space-y-6">
+        <!-- Monthly Trend chart -->
+        <section class="glass-card p-6 space-y-4">
+          <h3 class="text-sm font-bold tracking-tight">📈 直近6ヶ月のポスティング推移</h3>
+          <div class="flex items-end justify-between h-36 pt-4 px-2" id="monthly-trend-chart">
+            <!-- Bars are generated via manager.js -->
           </div>
         </section>
 
-        <!-- Ranking list -->
-        <section class="glass-card p-6 space-y-4">
-          <h3 class="text-sm font-bold tracking-tight">🏆 配布活動ランキング</h3>
-          <div class="divide-y divide-default" id="ranking-list">
-            <p class="text-sm text-secondary py-2">配布活動ログがありません</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- New members -->
+          <section class="glass-card p-6 space-y-4">
+            <h3 class="text-sm font-bold tracking-tight">🆕 新規の党員さん・サポーターさん</h3>
+            <div class="divide-y divide-default" id="new-members-list">
+              <p class="text-sm text-secondary py-2">今月の新規登録はありません</p>
+            </div>
+          </section>
+
+          <!-- Ranking list -->
+          <section class="glass-card p-6 space-y-4">
+            <h3 class="text-sm font-bold tracking-tight">🏆 ポスティング活動ランキング</h3>
+            <div class="divide-y divide-default" id="ranking-list">
+              <p class="text-sm text-secondary py-2">活動ログがありません</p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- メールテンプレート (Email Template Tab View) -->
+      <div id="tab-content-email-template" class="hidden space-y-6">
+        <section class="glass-card p-6 space-y-6">
+          <h3 class="text-sm font-bold tracking-tight">✉️ 招待用メールテンプレート</h3>
+          
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">件名</label>
+              <div class="w-full bg-white/5 border border-default rounded-xl px-4 py-3 text-sm font-bold" id="email-template-subject">
+                ポスティング活動に参加のお願い
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">本文プレビュー</label>
+              <pre class="w-full bg-white/5 border border-default rounded-2xl p-4 text-xs font-sans whitespace-pre-wrap leading-relaxed text-secondary" id="email-template-body-preview"></pre>
+            </div>
+          </div>
+
+          <button onclick="launchEmailClient()" class="w-full bg-primary hover:bg-primary/95 text-white rounded-full py-4 text-sm font-bold shadow-lg shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            <span>✉️</span>
+            <span>メールソフトを起動する</span>
+          </button>
+          
+          <p class="text-[10px] text-secondary text-center">※ ボタンを押すと、お使いのデバイスの標準メールソフトが自動で起動します。</p>
+        </section>
+      </div>
+
+      <!-- 設定 (Settings Tab View) -->
+      <div id="tab-content-settings" class="hidden space-y-6">
+        <section class="glass-card p-6 space-y-6">
+          <h3 class="text-sm font-bold tracking-tight">⚙️ 支部設定</h3>
+          
+          <div class="divide-y divide-default text-sm">
+            <div class="py-4 flex justify-between">
+              <span class="text-secondary font-medium">支部名</span>
+              <span class="font-bold" id="settings-workspace-name">-</span>
+            </div>
+            <div class="py-4 flex justify-between">
+              <span class="text-secondary font-medium">支部ID</span>
+              <span class="font-mono font-bold" id="settings-workspace-id">-</span>
+            </div>
+            <div class="py-4 flex justify-between">
+              <span class="text-secondary font-medium">契約ステータス</span>
+              <span class="text-emerald-400 font-bold" id="settings-subscription-status">-</span>
+            </div>
+            <div class="py-4 flex justify-between">
+              <span class="text-secondary font-medium">ログインアカウント</span>
+              <span class="font-bold" id="settings-login-email">-</span>
+            </div>
           </div>
         </section>
       </div>
+
     </main>
 
     <!-- Footer -->

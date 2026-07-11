@@ -12,6 +12,7 @@ export interface StaffSummary {
   monthlyDistributionQuantity: number;
   activityDays: number;
   activityIndex: number;
+  cityName?: string;
 }
 
 export interface NewStaffDto {
@@ -34,6 +35,8 @@ export interface WorkspaceDashboardDto {
   members: StaffSummary[];
   newMembers: NewStaffDto[];
   monthlyTrend: { month: string; quantity: number }[];
+  lineAppUrl: string;
+  dashboardUrl: string;
 }
 
 export interface RankingDto {

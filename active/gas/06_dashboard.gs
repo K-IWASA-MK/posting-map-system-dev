@@ -22,6 +22,7 @@ interface StaffSummary {
   monthlyDistributionQuantity: number;
   activityDays: number;
   activityIndex: number;
+  cityName?: string;
 }
 
 interface NewStaffDto {
@@ -44,6 +45,8 @@ interface WorkspaceDashboardDto {
   members: StaffSummary[];
   newMembers: NewStaffDto[];
   monthlyTrend: { month: string; quantity: number }[];
+  lineAppUrl: string;
+  dashboardUrl: string;
 }
 
 interface RankingDto {
@@ -160,7 +163,8 @@ class DashboardApplicationService {
         holdingQuantity: holdingQty,
         monthlyDistributionQuantity: monthlyTotal,
         activityDays: uniqueDays,
-        activityIndex: actIndex
+        activityIndex: actIndex,
+        cityName: holding ? holding.cityName : '-'
       });
 
       totalHolding += holdingQty;
@@ -227,6 +231,7 @@ class DashboardApplicationService {
         : new YearMonth(`${tempYM.getYear()}${String(tempYM.getMonth() - 1).padStart(2, '0')}`);
     }
 
+    const urls = WorkspaceUrl.generate(workspaceId);
     return {
       workspaceId,
       workspaceName: wsName,
@@ -238,7 +243,9 @@ class DashboardApplicationService {
       growthRate,
       members,
       newMembers,
-      monthlyTrend
+      monthlyTrend,
+      lineAppUrl: urls.lineAppUrl,
+      dashboardUrl: urls.dashboardUrl
     };
   }
 
@@ -329,7 +336,9 @@ class DashboardHandler implements EndpointHandler {
           growthRate: dashboard.growthRate,
           members: dashboard.members,
           newMembers: dashboard.newMembers,
-          monthlyTrend: dashboard.monthlyTrend
+          monthlyTrend: dashboard.monthlyTrend,
+          lineAppUrl: dashboard.lineAppUrl,
+          dashboardUrl: dashboard.dashboardUrl
         };
         return FieldApiMapper.toSuccessResponse(result, request, context);
       }

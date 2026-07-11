@@ -48,10 +48,15 @@ build_bundle([
     "src/domain/field",
     "src/application/events",
     "src/application/field",
+    "src/application/subscription",
+    "src/application/operations",
+    "src/application/onboarding",
     "src/infrastructure/spreadsheet",
     "src/infrastructure/repository/workspace",
     "src/infrastructure/repository/field",
     "src/api/field",
+    "src/api/subscription",
+    "src/api/operations",
     "src/api/registry",
     "src/infrastructure/bootstrap"
 ], "active/gas/05_field.gs")

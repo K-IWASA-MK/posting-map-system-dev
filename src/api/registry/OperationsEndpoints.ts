@@ -18,5 +18,17 @@ export const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
     method: 'GET',
     version: 'v2',
     handler: 'OperationsDashboardHandler'
+  },
+  {
+    path: '/operations/workspaces',
+    method: 'POST',
+    version: 'v2',
+    handler: 'WorkspaceOnboardingHandler'
+  },
+  {
+    path: '/operations/workspaces',
+    method: 'GET',
+    version: 'v2',
+    handler: 'WorkspaceOnboardingHandler'
   }
 ];

@@ -91,6 +91,39 @@
         </div>
       </div>
 
+      <!-- Workspace Onboarding Card -->
+      <section class="glass-card p-6 space-y-4">
+        <h3 class="text-sm font-bold tracking-tight">新規ワークスペース導入 (Onboarding)</h3>
+        <form id="onboarding-form" onsubmit="handleOnboarding(event)" class="space-y-4">
+          <div class="flex flex-col space-y-2">
+            <label for="onboard-name-input" class="text-xs text-secondary font-bold uppercase tracking-wider">支部名 (新規作成)</label>
+            <div class="flex gap-3">
+              <input type="text" id="onboard-name-input" placeholder="例: 三重県 第4支部" required class="bg-white/5 border border-default rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-primary flex-1">
+              <button type="submit" class="bg-primary hover:bg-primary/95 text-white text-xs font-bold rounded-full px-6 py-2 transition-all">作成</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Result Box -->
+        <div id="onboarding-result" class="hidden border border-emerald-400/20 bg-emerald-400/5 rounded-2xl p-4 space-y-3">
+          <p class="text-xs font-bold text-emerald-400">✓ Workspace Created</p>
+          <div class="grid grid-cols-1 gap-2 text-xs font-mono text-white">
+            <div class="flex justify-between items-center py-1 border-b border-default">
+              <span class="text-secondary uppercase tracking-widest text-[9px]">Workspace ID</span>
+              <span id="result-id" class="font-bold text-emerald-400">-</span>
+            </div>
+            <div class="flex flex-col py-1 border-b border-default">
+              <span class="text-secondary uppercase tracking-widest text-[9px] mb-1">LINE URL</span>
+              <a id="result-line" href="#" target="_blank" class="text-primary hover:underline break-all">-</a>
+            </div>
+            <div class="flex flex-col py-1">
+              <span class="text-secondary uppercase tracking-widest text-[9px] mb-1">Dashboard URL</span>
+              <a id="result-dashboard" href="#" target="_blank" class="text-primary hover:underline break-all">-</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Search Box -->
       <div class="glass-card p-4 flex gap-4 items-center">
         <span class="text-lg">🔍</span>

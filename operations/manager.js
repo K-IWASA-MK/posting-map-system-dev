@@ -149,3 +149,45 @@ function handleSearch() {
   );
   renderDashboard(filtered);
 }
+
+async function handleOnboarding(event) {
+  event.preventDefault();
+  const nameInput = document.getElementById('onboard-name-input');
+  const workspaceName = nameInput.value.trim();
+  if (!workspaceName) return;
+
+  showLoading(true);
+  try {
+    const url = `${API_URL}`;
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'operations/workspaces',
+        version: 'v2',
+        workspaceName: workspaceName
+      })
+    });
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+    const resData = await response.json();
+    const payload = resData.data || resData;
+
+    // Show result
+    document.getElementById('result-id').textContent = payload.workspaceId || '-';
+    document.getElementById('result-line').textContent = payload.lineAppUrl || '-';
+    document.getElementById('result-line').href = payload.lineAppUrl || '#';
+    document.getElementById('result-dashboard').textContent = payload.dashboardUrl || '-';
+    document.getElementById('result-dashboard').href = payload.dashboardUrl || '#';
+    document.getElementById('onboarding-result').classList.remove('hidden');
+
+    // Reset input and reload list
+    nameInput.value = '';
+    await loadDashboardData();
+  } catch (error) {
+    console.error('Failed to create workspace:', error);
+    alert('ワークスペースの作成に失敗しました。');
+  } finally {
+    showLoading(false);
+  }
+}

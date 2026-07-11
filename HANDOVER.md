@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Architecture Migration Complete`
-- **Milestone**: `Sprint 4 / Architecture Migration COMPLETED`
-- **Tag**: `v4.66-architecture-migration-completed`
+- **Completed**: `Workspace Invitation Template Foundation`
+- **Milestone**: `Sprint 5 / Phase S5-13 COMPLETED`
+- **Tag**: `v5.13-workspace-invitation-template-completed`
 - **Current Phase**: `Sprint 5`
-- **Next Action**: `Sprint 5 Domain Development`
+- **Next Action**: `Next Phase in Sprint 5`
 - **Branch**: `main`
 
 ---
@@ -336,6 +336,32 @@ Completed:
 - Dependency Rules
 - Architecture Enforcement
 - Regression Integrity Fix
+
+Quality Gate:
+- npm run quality:check PASS
+
+### POSTING MAP Product Sprint 5 Phase S5-12: Workspace Onboarding Foundation
+
+Workspace Onboarding Foundation（Sprint 5 Phase S5-12）完了。
+
+- アクセス経路情報である `WorkspaceUrl`（LINE URL / Dashboard URL）を値オブジェクトとして独立定義。`Workspace` エンティティはドメイン情報の保持に特化。
+- ローマ字対応マッピング、漢数字対応、および1桁の支部番号を2桁にゼロ埋めする正規化（例: `mie-04`, `tokyo-02`, `aichi-14`）を行う `WorkspaceIdGenerator` を Application サービスとして実装。
+- ID生成時の重複存在チェックロジックをリポジトリ経由で実装し、存在時は `-2`, `-3` のように動的にサフィックスをインクリメント（例: `mie-04` ➔ `mie-04-2`）。
+- 初期サブスクリプション有効期間を設定値化し、デフォルト1ヶ月（既存ビジネスルールに準拠）として活性化。
+- `POST /operations/workspaces`（新規作成）および `GET /operations/workspaces`（プロビジョニング状況確認）の API エンドポイントを追加。
+- 運営ダッシュボード（`operations/index.html`, `manager.js`）へ新規作成フォームおよびプロビジョニング結果表示枠を設置。
+- 全ユニットテスト、統合テスト、および GAS ビルド検証をパス。
+
+### POSTING MAP Product Sprint 5 Phase S5-13: Workspace Invitation Template Foundation
+
+Workspace Invitation Template Foundation（Sprint 5 Phase S5-13）完了。
+
+- **5分割ナビゲーションメニュー実装**: 支部ダッシュボード（Dashboard）に「ホーム」「チラシ保有状況」「活動状況」「メールテンプレート」「設定」の5つのタブ表示領域を実装し、ナビゲーションメニューで切り替える機能を追加。
+- **UI表示における禁止用語の完全排除**: 「Kアプリ」「配布員」「参加者」「スタッフ」等の表記をUI上から完全排除。支部内のメンバーを「党員さん・サポーターさん」、活動状況を「ポスティング活動」等に統一。
+- **チラシ保有状況の一覧表示**: テーブルカラムを「ID」「氏名」「市町村」「チラシ枚数」に統一。詳細な番地や自宅情報、自宅といった個人情報の保持および表示を排除。
+- **市町村名の抽出クリーニング**: `SpreadsheetFlyerHoldingRepository` において、`保管場所`列のデータから市町村（例：「桑名市」「伊勢市」等）のみを正規表現で抽出し、詳細な地番や「自宅」等の不要な情報をクリーニングして `cityName` にマッピングするロジックを実装。
+- **メール招待テンプレートの構築**: 宛先・件名・本文の固定招待テンプレート（置換プレースホルダー `{{workspaceName}}`, `{{lineAppUrl}}` つき）を配置。プレースホルダーがバインドされたプレビューを表示し、「メールソフトを起動する」ボタンから `mailto:` スキームを介して下書きを標準メールアプリにシームレスに引き渡す基盤を整備。
+- 全ユニットテスト、統合テスト、および GAS ビルド検証をパス。
 
 Quality Gate:
 - npm run quality:check PASS

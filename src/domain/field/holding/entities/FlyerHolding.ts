@@ -4,11 +4,13 @@ export class FlyerHolding {
   public readonly staffNo: string;
   private quantity: Quantity;
   private updatedAt: Date;
+  public readonly cityName: string;
 
   constructor(params: {
     staffNo: string;
     quantity: Quantity;
     updatedAt?: Date;
+    cityName?: string;
   }) {
     if (!params.staffNo || params.staffNo.trim().length === 0) {
       throw new Error("staffNo is required");
@@ -16,6 +18,7 @@ export class FlyerHolding {
     this.staffNo = params.staffNo;
     this.quantity = params.quantity;
     this.updatedAt = params.updatedAt || new Date();
+    this.cityName = params.cityName || '-';
   }
 
   public getQuantity(): Quantity {

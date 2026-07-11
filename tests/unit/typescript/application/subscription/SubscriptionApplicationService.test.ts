@@ -27,6 +27,10 @@ class MockWorkspaceSubscriptionRepository implements IWorkspaceSubscriptionRepos
   async save(subscription: WorkspaceSubscription): Promise<void> {
     this.db.set(subscription.workspaceId, subscription);
   }
+
+  async create(subscription: WorkspaceSubscription): Promise<void> {
+    this.db.set(subscription.workspaceId, subscription);
+  }
 }
 
 class MockStaffRepository implements IStaffRepository {

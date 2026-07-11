@@ -6,6 +6,8 @@ const workspaceId = urlParams.get('workspaceId') || 'WS-MIE-03';
 const yearMonth = urlParams.get('yearMonth') || '';
 
 let googleUser = JSON.parse(localStorage.getItem('google_user')) || null;
+let activeTab = 'home';
+let dashboardData = null;
 
 async function checkAuth() {
   showLoading(true);
@@ -56,7 +58,6 @@ async function fetchDashboardData(email) {
 }
 
 function handleGoogleLogin() {
-  // Simulate Google OAuth flow by setting a dummy user for the demo client side
   const email = prompt("Googleアカウントのメールアドレスを入力してください:", "manager@mie.example.com");
   if (email && email.includes('@')) {
     googleUser = { email: email, name: email.split('@')[0] };
@@ -67,8 +68,30 @@ function handleGoogleLogin() {
   }
 }
 
+function switchTab(tabName) {
+  activeTab = tabName;
+  const tabs = ['home', 'holding', 'activity', 'email-template', 'settings'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`nav-${t}`);
+    const content = document.getElementById(`tab-content-${t}`);
+    if (t === tabName) {
+      btn.classList.add('bg-primary', 'text-white');
+      btn.classList.remove('text-secondary', 'hover:text-white');
+      content.classList.remove('hidden');
+    } else {
+      btn.classList.remove('bg-primary', 'text-white');
+      btn.classList.add('text-secondary', 'hover:text-white');
+      content.classList.add('hidden');
+    }
+  });
+}
+
 function renderDashboard(data) {
-  document.getElementById('title-workspace-name').textContent = data.name || workspaceId;
+  dashboardData = data;
+  
+  // Set header branch name
+  const branchName = data.name || workspaceId;
+  document.getElementById('title-workspace-name').textContent = branchName;
   
   // Format period label
   let displayPeriod = '今月';
@@ -82,7 +105,7 @@ function renderDashboard(data) {
   }
   document.getElementById('header-period-label').textContent = `${displayPeriod} 実績レポート`;
 
-  // KPIs
+  // KPIs (Terms sanitized)
   document.getElementById('kpi-staff-count').textContent = `${data.memberCount || 0}人`;
   document.getElementById('kpi-total-holding').textContent = `${(data.total || 0).toLocaleString()}枚`;
   document.getElementById('kpi-monthly-activity').textContent = `${(data.monthlyActivity || 0).toLocaleString()}枚`;
@@ -97,13 +120,35 @@ function renderDashboard(data) {
     growthRateEl.className = 'font-extrabold text-emerald-400';
   }
 
-  // Render 6-month chart
+  // 1. Render Flyer Holding Status Table (No home/address info, only ID, name, city, count)
+  const holdingTableBody = document.getElementById('holding-list-table-body');
+  holdingTableBody.innerHTML = '';
+  if (data.members && data.members.length > 0) {
+    data.members.forEach(m => {
+      const row = document.createElement('tr');
+      row.className = 'border-b border-default text-xs';
+      row.innerHTML = `
+        <td class="py-3 px-4 font-mono font-bold">${m.staffNo}</td>
+        <td class="py-3 px-4 font-bold">${m.displayName}</td>
+        <td class="py-3 px-4 text-secondary">${m.cityName || '-'}</td>
+        <td class="py-3 px-4 text-right font-extrabold text-primary">${(m.holdingQuantity || 0).toLocaleString()}枚</td>
+      `;
+      holdingTableBody.appendChild(row);
+    });
+  } else {
+    holdingTableBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="py-4 text-center text-secondary text-xs">登録されている党員さん・サポーターさんがいません</td>
+      </tr>
+    `;
+  }
+
+  // 2. Render Activity Trend chart
   const chartContainer = document.getElementById('monthly-trend-chart');
   chartContainer.innerHTML = '';
   if (data.monthlyTrend && data.monthlyTrend.length > 0) {
     const maxVal = Math.max(...data.monthlyTrend.map(t => t.quantity), 1);
     data.monthlyTrend.forEach(t => {
-      // Calculate height in px (max 90px height for the bar)
       const barHeight = Math.max(Math.round((t.quantity / maxVal) * 90), 4);
       const barWrapper = document.createElement('div');
       barWrapper.className = 'flex flex-col items-center flex-1 group';
@@ -118,7 +163,7 @@ function renderDashboard(data) {
     chartContainer.innerHTML = '<p class="text-sm text-secondary py-2 w-full text-center">推移データがありません</p>';
   }
 
-  // Render new members with registration, first activity, and holding
+  // 3. Render New Members list (Term sanitized to "新規の党員さん・サポーターさん")
   const newMembersContainer = document.getElementById('new-members-list');
   newMembersContainer.innerHTML = '';
   if (data.newMembers && data.newMembers.length > 0) {
@@ -135,20 +180,19 @@ function renderDashboard(data) {
         </div>
         <div class="text-right">
           <p class="font-extrabold text-primary">${m.holdingQuantity.toLocaleString()}枚</p>
-          <p class="text-[9px] text-secondary uppercase tracking-widest">現在保有数</p>
+          <p class="text-[9px] text-secondary uppercase tracking-widest">チラシ保有数</p>
         </div>
       `;
       newMembersContainer.appendChild(item);
     });
   } else {
-    newMembersContainer.innerHTML = '<p class="text-sm text-secondary py-2">今月の新規参加者はいません</p>';
+    newMembersContainer.innerHTML = '<p class="text-sm text-secondary py-2">今月の新規登録はありません</p>';
   }
 
-  // Render ranking list
+  // 4. Render Ranking list (Term sanitized to "ポスティング活動実績")
   const rankingContainer = document.getElementById('ranking-list');
   rankingContainer.innerHTML = '';
   if (data.members && data.members.length > 0) {
-    // Sort ranking strictly by monthlyDistributionQuantity descending (criteria is distribution volume)
     const sortedMembers = [...data.members].sort((a,b) => b.monthlyDistributionQuantity - a.monthlyDistributionQuantity);
     sortedMembers.forEach((m, idx) => {
       const item = document.createElement('div');
@@ -172,14 +216,70 @@ function renderDashboard(data) {
         </div>
         <div class="text-right">
           <p class="font-extrabold">${m.monthlyDistributionQuantity.toLocaleString()}枚</p>
-          <p class="text-[9px] text-secondary tracking-widest uppercase">今月の配布実績</p>
+          <p class="text-[9px] text-secondary tracking-widest uppercase">今月のポスティング実績</p>
         </div>
       `;
       rankingContainer.appendChild(item);
     });
   } else {
-    rankingContainer.innerHTML = '<p class="text-sm text-secondary py-2">配布活動ログがありません</p>';
+    rankingContainer.innerHTML = '<p class="text-sm text-secondary py-2">活動ログがありません</p>';
   }
+
+  // 5. Render Invitation Email Template body preview with resolved placeholders
+  const templateBodyRaw = `党員さん、サポーターさんへ
+
+ポスティング活動へのご協力のお願いです。
+
+{{workspaceName}}では、
+地域で協力してポスティング活動を進めるため、
+POSTING MAPを導入しました。
+
+また、チラシを保管してご協力いただける方は、
+{{workspaceName}}までご連絡ください。
+
+POSTING MAPでは、
+
+「どこで」
+「誰が」
+  「何枚持っているか」
+
+を支部内で共有し、
+協力しながらポスティング活動を進めることができます。
+
+以下のLINE URLから登録をお願いします。
+
+▼POSTING MAP参加入口
+
+{{lineAppUrl}}
+
+登録後、POSTING MAPを利用して
+ポスティング活動に参加できます。
+
+皆さんで協力して、
+地域で継続できるポスティング活動を作っていきましょう。
+
+{{workspaceName}}`;
+
+  const templateBodyResolved = templateBodyRaw
+    .replace(/\{\{workspaceName\}\}/g, branchName)
+    .replace(/\{\{lineAppUrl\}\}/g, data.lineAppUrl || 'https://liff.line.me/...');
+
+  document.getElementById('email-template-body-preview').textContent = templateBodyResolved;
+
+  // 6. Settings tab values
+  document.getElementById('settings-workspace-name').textContent = branchName;
+  document.getElementById('settings-workspace-id').textContent = data.workspaceId || workspaceId;
+  document.getElementById('settings-subscription-status').textContent = 'ACTIVE';
+  document.getElementById('settings-login-email').textContent = googleUser ? googleUser.email : '-';
+}
+
+function launchEmailClient() {
+  if (!dashboardData) return;
+  const subject = "ポスティング活動に参加のお願い";
+  const body = document.getElementById('email-template-body-preview').textContent;
+  
+  const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoUrl;
 }
 
 function showScreen(id) {

@@ -2,6 +2,7 @@ import { IStaffRepository } from '@domain/field/staff/repositories/IStaffReposit
 import { IFlyerHoldingRepository } from '@domain/field/holding/repositories/IFlyerHoldingRepository';
 import { IActivityRepository } from '@domain/field/activity/repositories/IActivityRepository';
 import { IWorkspaceRepository } from '@domain/workspace/repositories/IWorkspaceRepository';
+import { WorkspaceUrl } from '@domain/workspace/valueobjects/WorkspaceUrl';
 import { YearMonth } from '../../../domain/common/valueobjects/YearMonth';
 import { 
   PersonalDashboardDto, 
@@ -108,7 +109,8 @@ export class DashboardApplicationService {
         holdingQuantity: holdingQty,
         monthlyDistributionQuantity: monthlyTotal,
         activityDays: uniqueDays,
-        activityIndex: actIndex
+        activityIndex: actIndex,
+        cityName: holding ? holding.cityName : '-'
       });
 
       totalHolding += holdingQty;
@@ -175,6 +177,7 @@ export class DashboardApplicationService {
         : new YearMonth(`${tempYM.getYear()}${String(tempYM.getMonth() - 1).padStart(2, '0')}`);
     }
 
+    const urls = WorkspaceUrl.generate(workspaceId);
     return {
       workspaceId,
       workspaceName: wsName,
@@ -186,7 +189,9 @@ export class DashboardApplicationService {
       growthRate,
       members,
       newMembers,
-      monthlyTrend
+      monthlyTrend,
+      lineAppUrl: urls.lineAppUrl,
+      dashboardUrl: urls.dashboardUrl
     };
   }
 

@@ -22,16 +22,29 @@ export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepositor
     const staffIdIdx = headers.indexOf('スタッフID');
     const qtyIdx = headers.indexOf('保管枚数');
     const updatedIdx = headers.indexOf('更新日時');
+    const locIdx = headers.indexOf('保管場所');
 
     if (staffIdIdx === -1) return undefined;
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (String(row[staffIdIdx]) === staffNo) {
+        const rawLoc = locIdx !== -1 ? String(row[locIdx]) : '-';
+        let cleanedLoc = rawLoc.trim();
+        if (cleanedLoc === '自宅' || cleanedLoc.length === 0) {
+          cleanedLoc = '-';
+        } else {
+          const cityMatch = cleanedLoc.match(/^[^市区町村]+[市区町村]/);
+          if (cityMatch) {
+            cleanedLoc = cityMatch[0];
+          }
+        }
+
         return new FlyerHolding({
           staffNo: String(row[staffIdIdx]),
           quantity: new Quantity(qtyIdx !== -1 ? Number(row[qtyIdx]) : 0),
-          updatedAt: updatedIdx !== -1 ? new Date(Number(row[updatedIdx]) || String(row[updatedIdx])) : new Date()
+          updatedAt: updatedIdx !== -1 ? new Date(Number(row[updatedIdx]) || String(row[updatedIdx])) : new Date(),
+          cityName: cleanedLoc
         });
       }
     }
