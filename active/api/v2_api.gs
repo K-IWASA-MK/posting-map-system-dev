@@ -105,6 +105,7 @@ function doGet(e) {
   let apiResponse;
   try {
     HardeningPipeline.getInstance().execute(apiRequest, executionContext);
+    AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -305,6 +306,7 @@ function doPost(e) {
 
   try {
     HardeningPipeline.getInstance().execute(apiRequest, executionContext);
+    AuthenticationPipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -2741,4 +2743,222 @@ class HardeningPipeline {
   }
 }
 HardeningPipeline.instance = null;
+
+// ==========================================
+// 🚀 AUTHENTICATION FOUNDATION CLASSES
+// ==========================================
+class AuthenticationContext {
+  constructor(params) {
+    this.identityId = params.identityId;
+    this.identityType = params.identityType;
+    this.authenticationMethod = params.authenticationMethod;
+    this.authenticated = params.authenticated;
+    this.issuedAt = params.issuedAt;
+    this.metadata = params.metadata || {};
+  }
+}
+
+class AuthenticationResult {
+  constructor(success, context, failureReason) {
+    this.success = success;
+    this.context = context;
+    this.failureReason = failureReason;
+  }
+  static successResult(context) {
+    return new AuthenticationResult(true, context, null);
+  }
+  static failureResult(reason) {
+    return new AuthenticationResult(false, null, reason);
+  }
+}
+
+class ApiKeyIdentityProvider {
+  authenticate(request) {
+    const apiKey = (request.query && (request.query.apiKey || request.query['x-api-key'])) || (request.headers && request.headers['x-api-key']);
+    if (!apiKey) {
+      return AuthenticationResult.failureResult('API Key missing in query or headers');
+    }
+    if (apiKey === 'valid-api-key') {
+      const context = new AuthenticationContext({
+        identityId: 'user-api-key-stub',
+        identityType: 'USER',
+        authenticationMethod: 'API_KEY',
+        authenticated: true,
+        issuedAt: Date.now(),
+        metadata: { provider: 'ApiKeyIdentityProvider', stub: true }
+      });
+      return AuthenticationResult.successResult(context);
+    }
+    return AuthenticationResult.failureResult('Invalid API Key provided');
+  }
+}
+
+class LIFFIdentityProvider {
+  authenticate(request) {
+    const token = (request.query && request.query.liffToken) || (request.headers && request.headers['authorization']);
+    if (!token) {
+      return AuthenticationResult.failureResult('LIFF token or authorization header missing');
+    }
+    const cleanToken = token.indexOf('Bearer ') === 0 ? token.substring(7) : token;
+    if (cleanToken === 'valid-liff-token') {
+      const context = new AuthenticationContext({
+        identityId: 'user-liff-stub-123',
+        identityType: 'USER',
+        authenticationMethod: 'LIFF',
+        authenticated: true,
+        issuedAt: Date.now(),
+        metadata: { provider: 'LIFFIdentityProvider', stub: true }
+      });
+      return AuthenticationResult.successResult(context);
+    }
+    return AuthenticationResult.failureResult('Invalid LIFF ID Token');
+  }
+}
+
+class ServiceIdentityProvider {
+  authenticate(request) {
+    const serviceAuth = request.headers && request.headers['x-service-auth'];
+    if (!serviceAuth) {
+      return AuthenticationResult.failureResult('Service auth header missing');
+    }
+    if (serviceAuth === 'valid-service-key') {
+      const context = new AuthenticationContext({
+        identityId: 'service-aios-bridge-stub',
+        identityType: 'SERVICE',
+        authenticationMethod: 'INTERNAL_SERVICE',
+        authenticated: true,
+        issuedAt: Date.now(),
+        metadata: { provider: 'ServiceIdentityProvider', stub: true }
+      });
+      return AuthenticationResult.successResult(context);
+    }
+    return AuthenticationResult.failureResult('Invalid Service Auth Key');
+  }
+}
+
+class IdentityResolver {
+  static resolve(request) {
+    if (request.headers && request.headers['x-service-auth']) {
+      return new ServiceIdentityProvider();
+    }
+    const hasQueryApiKey = request.query && (request.query.apiKey || request.query['x-api-key']);
+    const hasHeaderApiKey = request.headers && request.headers['x-api-key'];
+    if (hasQueryApiKey || hasHeaderApiKey) {
+      return new ApiKeyIdentityProvider();
+    }
+    const hasQueryLiff = request.query && request.query.liffToken;
+    const hasHeaderLiff = request.headers && request.headers['authorization'];
+    if (hasQueryLiff || hasHeaderLiff) {
+      return new LIFFIdentityProvider();
+    }
+    return null;
+  }
+}
+
+class AuthenticationPolicy {
+  static isAnonymousAllowed(request) {
+    if (request.path === '/health') {
+      return true;
+    }
+    return false;
+  }
+  static isInternalOnly(request) {
+    if (request.path === '/batch' || request.path === '/admin') {
+      return true;
+    }
+    return false;
+  }
+}
+
+class AuthenticationException extends ApiException {
+  constructor(code, internalMessage, requestId) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: internalMessage,
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'AuthenticationException',
+        exceptionCode: code,
+        source: 'AUTHENTICATION_PIPELINE'
+      }
+    });
+    this.category = 'AUTHENTICATION';
+    this.code = code;
+    this.status = 401;
+  }
+}
+
+class AuthenticationPipeline {
+  static getInstance() {
+    if (!AuthenticationPipeline.instance) {
+      AuthenticationPipeline.instance = new AuthenticationPipeline();
+    }
+    return AuthenticationPipeline.instance;
+  }
+  execute(request, context) {
+    const config = GasConfigurationProvider.getInstance();
+    const flags = config.getFeatureFlags();
+    const provider = IdentityResolver.resolve(request);
+
+    if (provider) {
+      const isApiKey = provider instanceof ApiKeyIdentityProvider;
+      const isLiff = provider instanceof LIFFIdentityProvider;
+      const isService = provider instanceof ServiceIdentityProvider;
+
+      if ((isApiKey && flags.apiKeyAuth === false) ||
+          (isLiff && flags.liffAuth === false) ||
+          (isService && flags.serviceAuth === false)) {
+        this.handleNoCredentials(request, context, flags.anonymousAccess);
+        return;
+      }
+
+      const result = provider.authenticate(request);
+      if (result.success && result.context) {
+        context.setAuthenticationContext(result.context);
+      } else {
+        const allowAnonymous = flags.anonymousAccess && AuthenticationPolicy.isAnonymousAllowed(request);
+        if (allowAnonymous) {
+          const anonContext = new AuthenticationContext({
+            identityId: 'anonymous',
+            identityType: 'ANONYMOUS',
+            authenticationMethod: 'NONE',
+            authenticated: false,
+            issuedAt: Date.now()
+          });
+          context.setAuthenticationContext(anonContext);
+        } else {
+          const errCode = isApiKey ? 'PM-AUT-002' : isLiff ? 'PM-AUT-003' : 'PM-AUT-004';
+          throw new AuthenticationException(
+            errCode,
+            result.failureReason || 'Authentication verification failed',
+            request.requestId
+          );
+        }
+      }
+    } else {
+      this.handleNoCredentials(request, context, flags.anonymousAccess);
+    }
+  }
+  handleNoCredentials(request, context, anonymousFlag) {
+    const allowAnonymous = anonymousFlag && AuthenticationPolicy.isAnonymousAllowed(request);
+    if (allowAnonymous) {
+      const anonContext = new AuthenticationContext({
+        identityId: 'anonymous',
+        identityType: 'ANONYMOUS',
+        authenticationMethod: 'NONE',
+        authenticated: false,
+        issuedAt: Date.now()
+      });
+      context.setAuthenticationContext(anonContext);
+    } else {
+      throw new AuthenticationException(
+        'PM-AUT-001',
+        'Authentication required. No valid credentials provided.',
+        request.requestId
+      );
+    }
+  }
+}
+AuthenticationPipeline.instance = null;
 

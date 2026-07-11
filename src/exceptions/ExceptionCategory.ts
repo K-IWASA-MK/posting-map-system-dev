@@ -3,7 +3,8 @@ export type ExceptionCategory =
   | 'ROUTING'
   | 'SYSTEM'
   | 'CONFIGURATION'
-  | 'FEATURE';
+  | 'FEATURE'
+  | 'AUTHENTICATION';
 
 export const ExceptionCategory = {
   VALIDATION: 'VALIDATION' as ExceptionCategory,
@@ -11,4 +12,5 @@ export const ExceptionCategory = {
   SYSTEM: 'SYSTEM' as ExceptionCategory,
   CONFIGURATION: 'CONFIGURATION' as ExceptionCategory,
   FEATURE: 'FEATURE' as ExceptionCategory,
+  AUTHENTICATION: 'AUTHENTICATION' as ExceptionCategory,
 };

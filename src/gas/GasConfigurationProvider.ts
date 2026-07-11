@@ -6,6 +6,10 @@ export interface FeatureFlags {
   photoEvidence: boolean;
   aiosBridge: boolean;
   analytics: boolean;
+  apiKeyAuth: boolean;
+  liffAuth: boolean;
+  serviceAuth: boolean;
+  anonymousAccess: boolean;
 }
 
 export class GasConfigurationProvider {
@@ -69,6 +73,26 @@ export class GasConfigurationProvider {
   }
 
   public getFeatureFlags(): FeatureFlags {
+    if (typeof PropertiesService !== 'undefined') {
+      try {
+        const props = PropertiesService.getScriptProperties();
+        return {
+          flyerHolding: props.getProperty('FLAG_FLYER_HOLDING') !== 'false',
+          googleMaps: props.getProperty('FLAG_GOOGLE_MAPS') !== 'false',
+          mapbox: props.getProperty('FLAG_MAPBOX') === 'true',
+          gpsEvidence: props.getProperty('FLAG_GPS_EVIDENCE') !== 'false',
+          photoEvidence: props.getProperty('FLAG_PHOTO_EVIDENCE') !== 'false',
+          aiosBridge: props.getProperty('FLAG_AIOS_BRIDGE') === 'true',
+          analytics: props.getProperty('FLAG_ANALYTICS') === 'true',
+          apiKeyAuth: props.getProperty('FLAG_API_KEY_AUTH') !== 'false',
+          liffAuth: props.getProperty('FLAG_LIFF_AUTH') !== 'false',
+          serviceAuth: props.getProperty('FLAG_SERVICE_AUTH') !== 'false',
+          anonymousAccess: props.getProperty('FLAG_ANONYMOUS_ACCESS') !== 'false'
+        };
+      } catch (e) {
+        // Fallback below
+      }
+    }
     return {
       flyerHolding: true,
       googleMaps: true,
@@ -76,7 +100,11 @@ export class GasConfigurationProvider {
       gpsEvidence: true,
       photoEvidence: true,
       aiosBridge: false,
-      analytics: false
+      analytics: false,
+      apiKeyAuth: true,
+      liffAuth: true,
+      serviceAuth: true,
+      anonymousAccess: true
     };
   }
 }

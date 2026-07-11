@@ -33,7 +33,11 @@ async function runTests() {
     gpsEvidence: true,
     photoEvidence: true,
     aiosBridge: false,
-    analytics: false
+    analytics: false,
+    apiKeyAuth: true,
+    liffAuth: true,
+    serviceAuth: true,
+    anonymousAccess: true
   });
 
   // 1. Normal Request Verification (Passes Validation)
@@ -141,7 +145,11 @@ async function runTests() {
       gpsEvidence: true,
       photoEvidence: true,
       aiosBridge: false,
-      analytics: false
+      analytics: false,
+      apiKeyAuth: true,
+      liffAuth: true,
+      serviceAuth: true,
+      anonymousAccess: true
     });
 
     const req = new ApiRequest({

@@ -1,8 +1,11 @@
+import { AuthenticationContext } from '../authentication/AuthenticationContext';
+
 export class ApiExecutionContext {
   private requestId: string;
   private executionId: string;
   private startTimestamp: number;
   private retryCount: number = 0;
+  private authContext: AuthenticationContext | null = null;
 
   constructor() {
     this.startTimestamp = Date.now();
@@ -60,5 +63,13 @@ export class ApiExecutionContext {
 
   public getHandlerTime(): number {
     return this.handlerTime;
+  }
+
+  public setAuthenticationContext(context: AuthenticationContext): void {
+    this.authContext = context;
+  }
+
+  public getAuthenticationContext(): AuthenticationContext | null {
+    return this.authContext;
   }
 }
