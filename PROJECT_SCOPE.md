@@ -66,10 +66,16 @@
   - `ApiExecutionContext` および `GasPerformanceMonitor` によるAPI監査メタデータの算出。
   - `Code.gs` (doGet/doPost) への実行コンテキスト・トランザクションパイプライン統合。
 
-1. **Phase S3-2: Premium Feature Expansion & Edition Licensing**:
+* **Phase S3-2: API Routing & Endpoint Foundation** ✅
+  - HTTP環境の依存を隔離する不変な `ApiRequest` と `ApiResponse` 構造モデルを定義。
+  - ルート解決用の一意キー解決（`RouteKey` / `${method}:${version}:${path}` 形式）を実装。
+  - エンドポイントハンドラーの共通インターフェース `EndpointHandler` とスタブ群を構築。
+  - ルーティング解決のディスパッチテーブル `EndpointRegistry` とディスパッチャー `ApiRouter` を実装。
+  - `doGet()` / `doPost()` を `ApiRouter` 経由のパイプラインに移行し、従来の action ベースのリクエストも `LegacyApiFallbackHandler` で処理する互換層を構築。
+
+1. **Phase S3-3: Premium Feature Expansion & Edition Licensing**:
    - Stripe 決済情報とのバインド、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化のライセンス管理。
    - Mapbox エンジンのランタイム動的切り替えの Premium 実装。
-2. **Phase S3-3: AIOS Integration & Automated Analytics**:
+2. **Phase S3-4: AIOS Integration & Automated Analytics**:
    - AIOS (AI組織) との安全なデータ通信ブリッジ（AIOS Bridge）の本格実装。
    - 支部比較や配布効率測定等を行う Analytics Engine の統合。
-

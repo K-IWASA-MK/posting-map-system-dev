@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `POSTING MAP Product Sprint 3 Phase S3-1: GAS API Production Foundation`
+- **Completed**: `POSTING MAP Product Sprint 3 Phase S3-2: API Routing & Endpoint Foundation`
 - **Milestone**: `POSTING MAP Product Sprint 3 IN PROGRESS`
-- **Tag**: `v4.60-sprint-3-phase-s3-1-completed`
-- **Current Phase**: `Sprint 3 Phase S3-2`
-- **Next Action**: `Phase S3-2 (Premium Feature Expansion & Edition Licensing)`
+- **Tag**: `v4.61-sprint-3-phase-s3-2-completed`
+- **Current Phase**: `Sprint 3 Phase S3-3`
+- **Next Action**: `Phase S3-3 (Premium Feature Expansion & Edition Licensing)`
 - **Branch**: `main`
 
 ---
@@ -277,4 +277,11 @@ GAS API Production Foundation（Sprint 3 Phase S3-1）完了。
 
 設定管理（GasConfigurationProvider）、一方向決定論的キャッシュ（CacheServiceProvider）、タイムアウト付再試行型直列排他ロック（LockServiceProvider）、物理一括読み書き（SpreadsheetBatchReader, SpreadsheetBatchWriter）、物理I/O分離リポジトリ（SpreadsheetRepository）、実行コンテキスト監査（ApiExecutionContext）、および性能メトリクス（GasPerformanceMonitor）の全TSクラスと Code.gs への統合を完了。全11件のテストが完全パス。
 
-次のフェーズ（Sprint 3 Phase S3-2：Premium Feature Expansion & Edition Licensing）へ移行可能。
+### POSTING MAP Product Sprint 3 Phase S3-2: API Routing & Endpoint Foundation
+
+API Routing & Endpoint Foundation（Sprint 3 Phase S3-2）完了。
+
+不変オブジェクト `ApiRequest` (HTTP抽象)、`ApiResponse` (標準レスポンスラッパー)、`RoutePolicy` (メソッド制限ポリシー)、`ApiVersionResolver` (APIバージョン解決)、および `RouteKey` (一意キー形式 `METHOD:VERSION:PATH`) を構築。`EndpointRegistry` (ルーティング定義テーブル) と `ApiRouter` (ディスパッチャー) によるルーティング基盤の実装を完了。
+`doGet` / `doPost` を `ApiRouter` 経由のパイプラインに移行し、レガシーパラメータを自動変換・委譲する `LegacyApiFallbackHandler` を通じた100%の後方互換性を達成。全12件のテストが完全パス。
+
+次のフェーズ（Sprint 3 Phase S3-3：Premium Feature Expansion & Edition Licensing）へ移行可能。

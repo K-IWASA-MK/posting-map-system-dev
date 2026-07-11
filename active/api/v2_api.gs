@@ -78,119 +78,140 @@ function doGet(e) {
   globalCacheHit = false;
   GasPerformanceMonitor.getInstance().reset();
 
-  const action = e.parameter.action;
-  let response;
-
-  try {
-    if (action === 'getAppData') {
-      const cacheKey = CacheServiceProvider.getInstance().makeKey(
-        e.parameter.tenantId || "DEFAULT",
-        e.parameter.branchId || "DEFAULT",
-        "appdata"
-      );
-      const cached = CacheServiceProvider.getInstance().get(cacheKey);
-      if (cached) {
-        globalCacheHit = true;
-        GasPerformanceMonitor.getInstance().recordCacheHit();
-        response = JSON.parse(cached);
-      } else {
-        GasPerformanceMonitor.getInstance().recordCacheMiss();
-        response = getAppData();
-        if (response && response.success) {
-          CacheServiceProvider.getInstance().put(cacheKey, JSON.stringify(response));
-        }
-      }
-    } else {
-      switch (action) {
-        case 'getRanking':
-          response = { success: true, ranking: getRankingData() };
-          break;
-        case 'getRoster':
-          response = { success: true, roster: getRoster() };
-          break;
-        case 'getAreaDetails':
-          response = getAreaDetails(e.parameter.name);
-          break;
-        case 'getCityAreaDetails':
-          response = getCityAreaDetails(e.parameter.cityName);
-          break;
-        case 'submitDistribution':
-          response = { success: false, message: 'Write operations require POST. Please update the client.' };
-          break;
-        case 'registerStaff':
-          response = registerStaff(e.parameter.lastName, e.parameter.firstName);
-          break;
-        case 'testDriveAccess':
-          try {
-            const testFolderId = getStorageFolderId();
-            const testFolder = DriveApp.getFolderById(testFolderId);
-            response = {
-              success: true,
-              message: 'Drive access OK',
-              folderId: testFolderId,
-              folderName: testFolder.getName(),
-              folderUrl: testFolder.getUrl()
-            };
-          } catch (driveErr) {
-            response = { success: false, message: 'Drive access FAILED: ' + driveErr.toString(), folderId: getStorageFolderId() };
-          }
-          break;
-        case 'testDriveWrite':
-          try {
-            const wFolder = DriveApp.getFolderById(getStorageFolderId());
-            const testBlob = Utilities.newBlob("POSTING_MAP_TEST_" + Date.now(), "text/plain", "test_write.txt");
-            const file = wFolder.createFile(testBlob);
-            response = { success: true, message: 'Write OK', fileId: file.getId(), fileName: file.getName() };
-            file.setTrashed(true);
-          } catch (writeErr) {
-            response = { success: false, message: 'Write FAILED: ' + writeErr.toString() };
-          }
-          break;
-        case 'getDeliveryStats':
-          response = getDeliveryStats();
-          break;
-        case 'getFlyerStock':
-          response = { success: true, stocks: getFlyerStock() };
-          break;
-        case 'getTransferRequests':
-          response = { success: true, requests: getTransferRequests() };
-          break;
-        case 'runMigration':
-          response = { success: true, message: runMigrationToEventLog() };
-          break;
-        case 'runReconciliation':
-          response = generateReconciliationReport();
-          break;
-        case 'runFreeze':
-          response = executeSystemFreeze();
-          break;
-        case 'getConfig':
-          response = { success: true, config: getConfig(e.parameter.tenantId || "DEFAULT") };
-          break;
-        case 'getAuditLogs':
-          response = getAuditLogs();
-          break;
-        case 'refreshCache':
-          response = { success: true, data: refreshAreaSummaryCache() };
-          break;
-        case 'getStrategy':
-          response = { success: true, data: generateStrategy(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
-          break;
-        case 'getHeatmap':
-          response = { success: true, data: generateHeatmap(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
-          break;
-        case 'getPrediction':
-          response = { success: true, data: predictOutcome(e.parameter.branchId, e.parameter.tenantId || "DEFAULT") };
-          break;
-        default:
-          response = { success: true, message: 'POSTING MAP API is online.' };
-      }
-    }
-  } catch (err) {
-    response = { success: false, message: err.toString() };
+  const action = e.parameter.action || 'health';
+  let path = '/' + action;
+  if (action === 'getAppData') {
+    path = '/dashboard';
+  } else if (action === 'getFlyerStock') {
+    path = '/holding';
   }
 
-  return createJsonResponse(response);
+  const queryVersion = e.parameter.version || e.parameter.v;
+  const version = ApiVersionResolver.resolve(undefined, queryVersion);
+
+  const apiRequest = new ApiRequest({
+    method: 'GET',
+    path: path,
+    version: version,
+    query: e.parameter,
+    requestId: executionContext.getRequestId()
+  });
+
+  const apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
+  return createJsonResponseFromApiResponse(apiResponse);
+}
+
+/**
+ * 従来のGETリクエストの処理（後方互換用）
+ */
+function processGetActionLegacy(action, e) {
+  let response;
+  if (action === 'getAppData') {
+    const cacheKey = CacheServiceProvider.getInstance().makeKey(
+      e.tenantId || "DEFAULT",
+      e.branchId || "DEFAULT",
+      "appdata"
+    );
+    const cached = CacheServiceProvider.getInstance().get(cacheKey);
+    if (cached) {
+      globalCacheHit = true;
+      GasPerformanceMonitor.getInstance().recordCacheHit();
+      response = JSON.parse(cached);
+    } else {
+      globalCacheHit = false;
+      GasPerformanceMonitor.getInstance().recordCacheMiss();
+      response = getAppData();
+      if (response && response.success) {
+        CacheServiceProvider.getInstance().put(cacheKey, JSON.stringify(response));
+      }
+    }
+  } else {
+    switch (action) {
+      case 'getRanking':
+        response = { success: true, ranking: getRankingData() };
+        break;
+      case 'getRoster':
+        response = { success: true, roster: getRoster() };
+        break;
+      case 'getAreaDetails':
+        response = getAreaDetails(e.name);
+        break;
+      case 'getCityAreaDetails':
+        response = getCityAreaDetails(e.cityName);
+        break;
+      case 'submitDistribution':
+        response = { success: false, message: 'Write operations require POST. Please update the client.' };
+        break;
+      case 'registerStaff':
+        response = registerStaff(e.lastName, e.firstName);
+        break;
+      case 'testDriveAccess':
+        try {
+          const testFolderId = getStorageFolderId();
+          const testFolder = DriveApp.getFolderById(testFolderId);
+          response = {
+            success: true,
+            message: 'Drive access OK',
+            folderId: testFolderId,
+            folderName: testFolder.getName(),
+            folderUrl: testFolder.getUrl()
+          };
+        } catch (driveErr) {
+          response = { success: false, message: 'Drive access FAILED: ' + driveErr.toString(), folderId: getStorageFolderId() };
+        }
+        break;
+      case 'testDriveWrite':
+        try {
+          const wFolder = DriveApp.getFolderById(getStorageFolderId());
+          const testBlob = Utilities.newBlob("POSTING_MAP_TEST_" + Date.now(), "text/plain", "test_write.txt");
+          const file = wFolder.createFile(testBlob);
+          response = { success: true, message: 'Write OK', fileId: file.getId(), fileName: file.getName() };
+          file.setTrashed(true);
+        } catch (writeErr) {
+          response = { success: false, message: 'Write FAILED: ' + writeErr.toString() };
+        }
+        break;
+      case 'getDeliveryStats':
+        response = getDeliveryStats();
+        break;
+      case 'getFlyerStock':
+        response = { success: true, stocks: getFlyerStock() };
+        break;
+      case 'getTransferRequests':
+        response = { success: true, requests: getTransferRequests() };
+        break;
+      case 'runMigration':
+        response = { success: true, message: runMigrationToEventLog() };
+        break;
+      case 'runReconciliation':
+        response = generateReconciliationReport();
+        break;
+      case 'runFreeze':
+        response = executeSystemFreeze();
+        break;
+      case 'getConfig':
+        response = { success: true, config: getConfig(e.tenantId || "DEFAULT") };
+        break;
+      case 'getAuditLogs':
+        response = getAuditLogs();
+        break;
+      case 'refreshCache':
+        response = { success: true, data: refreshAreaSummaryCache() };
+        break;
+      case 'getStrategy':
+        response = { success: true, data: generateStrategy(e.branchId, e.tenantId || "DEFAULT") };
+        break;
+      case 'getHeatmap':
+        response = { success: true, data: generateHeatmap(e.branchId, e.tenantId || "DEFAULT") };
+        break;
+      case 'getPrediction':
+        response = { success: true, data: predictOutcome(e.branchId, e.tenantId || "DEFAULT") };
+        break;
+      default:
+        response = { success: true, message: 'POSTING MAP API is online.' };
+    }
+  }
+  return response;
 }
 
 /**
@@ -212,47 +233,61 @@ function doPost(e) {
     postData = e.parameter;
   }
 
-  const action = postData.action || e.parameter.action;
-  let response;
-
-  try {
-    const writeActions = [
-      'submitDistribution',
-      'updateRecordWithGPSPhoto',
-      'registerStaff',
-      'registerAdmin',
-      'requestFlyerTransfer',
-      'resolveTransferRequest',
-      'updateFlyerStock',
-      'resetRoster',
-      'setupFolders',
-      'forceStartBatch',
-      'refreshCache',
-      'aggregateStats',
-      'resetAllSheets'
-    ];
-
-    if (writeActions.indexOf(action) !== -1) {
-      response = LockServiceProvider.getInstance().executeWithLock(function() {
-        return processPostAction(action, postData, e);
-      });
-      // 更新系アクションが成功した場合は関連キャッシュを無効化 (Invalidate)
-      if (response && response.success) {
-        const cacheKey = CacheServiceProvider.getInstance().makeKey(
-          postData.tenantId || e.parameter.tenantId || "DEFAULT",
-          postData.branchId || e.parameter.branchId || "DEFAULT",
-          "appdata"
-        );
-        CacheServiceProvider.getInstance().remove(cacheKey);
-      }
-    } else {
-      response = processPostAction(action, postData, e);
-    }
-  } catch (err) {
-    response = { success: false, message: err.toString() };
+  const action = postData.action || e.parameter.action || 'health';
+  let path = '/' + action;
+  if (action === 'getAppData') {
+    path = '/dashboard';
+  } else if (action === 'updateFlyerStock') {
+    path = '/holding';
   }
 
-  return createJsonResponse(response);
+  const queryVersion = postData.version || e.parameter.version || postData.v;
+  const version = ApiVersionResolver.resolve(undefined, queryVersion);
+
+  const apiRequest = new ApiRequest({
+    method: 'POST',
+    path: path,
+    version: version,
+    query: e.parameter,
+    body: postData,
+    requestId: executionContext.getRequestId()
+  });
+
+  let apiResponse;
+  const writeActions = [
+    'submitDistribution',
+    'updateRecordWithGPSPhoto',
+    'registerStaff',
+    'registerAdmin',
+    'requestFlyerTransfer',
+    'resolveTransferRequest',
+    'updateFlyerStock',
+    'resetRoster',
+    'setupFolders',
+    'forceStartBatch',
+    'refreshCache',
+    'aggregateStats',
+    'resetAllSheets'
+  ];
+
+  if (writeActions.indexOf(action) !== -1) {
+    apiResponse = LockServiceProvider.getInstance().executeWithLock(function() {
+      return ApiRouter.getInstance().route(apiRequest, executionContext);
+    });
+    // 更新系アクションが成功した場合は関連キャッシュを無効化 (Invalidate)
+    if (apiResponse && apiResponse.success) {
+      const cacheKey = CacheServiceProvider.getInstance().makeKey(
+        postData.tenantId || e.parameter.tenantId || "DEFAULT",
+        postData.branchId || e.parameter.branchId || "DEFAULT",
+        "appdata"
+      );
+      CacheServiceProvider.getInstance().remove(cacheKey);
+    }
+  } else {
+    apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
+  }
+
+  return createJsonResponseFromApiResponse(apiResponse);
 }
 
 /**
@@ -321,35 +356,24 @@ function processPostAction(action, postData, e) {
   }
 }
 
-// 共通：JSONレスポンス作成
-function createJsonResponse(data) {
-  var serverTimestamp = Date.now();
-  var requestId = "unknown";
-  var processingTime = 0;
+// 共通：ApiResponseオブジェクトからJSONレスポンスを作成
+function createJsonResponseFromApiResponse(apiResponse) {
   var cacheStatus = "MISS";
-  var version = "1.0.0-RC1";
-
-  if (typeof executionContext !== 'undefined' && executionContext !== null) {
-    requestId = executionContext.getRequestId();
-    processingTime = executionContext.getElapsedTime();
-    version = GasConfigurationProvider.getInstance().getApiVersion();
-  }
-
   if (typeof globalCacheHit !== 'undefined' && globalCacheHit) {
     cacheStatus = "HIT";
   }
 
-  // 既存のレスポンス形式との完全互換性を守るためのデータパッキング
-  var isDataSuccess = data.success !== undefined ? data.success : true;
+  // クライアント互換性のためのラップ
   var responseWrapper = {
-    success: isDataSuccess,
-    data: data,
+    success: apiResponse.success,
+    data: apiResponse.data,
+    error: apiResponse.error,
     metadata: {
-      requestId: requestId,
-      serverTimestamp: serverTimestamp,
-      processingTime: processingTime,
+      requestId: apiResponse.metadata.requestId,
+      serverTimestamp: apiResponse.metadata.serverTimestamp,
+      processingTime: apiResponse.metadata.processingTime,
       cacheStatus: cacheStatus,
-      version: version
+      version: apiResponse.metadata.version
     }
   };
 
@@ -1496,4 +1520,333 @@ class GasPerformanceMonitor {
   }
 }
 GasPerformanceMonitor.instance = null;
+
+// ==========================================
+// 🚀 API ROUTING & ENDPOINT FOUNDATION CLASSES
+// ==========================================
+class ApiRequest {
+  constructor(params) {
+    this.method = params.method.toUpperCase();
+    this.path = params.path;
+    this.version = params.version.toLowerCase();
+    this.query = params.query || {};
+    this.body = params.body || {};
+    this.headers = params.headers || {};
+    this.requestId = params.requestId;
+  }
+}
+
+class ApiResponse {
+  constructor(params) {
+    this.status = params.status;
+    this.success = params.success;
+    this.data = params.data || null;
+    this.error = params.error || null;
+    this.metadata = params.metadata;
+  }
+  static successResponse(data, status, metadata) {
+    return new ApiResponse({
+      status: status,
+      success: true,
+      data: data,
+      metadata: metadata
+    });
+  }
+  static errorResponse(code, message, status, metadata) {
+    return new ApiResponse({
+      status: status,
+      success: false,
+      error: { code: code, message: message },
+      metadata: metadata
+    });
+  }
+}
+
+class RoutePolicy {
+  static isMethodAllowed(method) {
+    const m = method.toUpperCase();
+    return m === 'GET' || m === 'POST' || m === 'PUT' || m === 'DELETE';
+  }
+}
+
+class ApiVersionResolver {
+  static resolve(pathVersion, queryVersion) {
+    if (pathVersion && (pathVersion === 'v1' || pathVersion === 'v2' || pathVersion === 'v3' || pathVersion === 'future')) {
+      return pathVersion.toLowerCase();
+    }
+    if (queryVersion) {
+      const normalized = queryVersion.startsWith('v') ? queryVersion.toLowerCase() : 'v' + queryVersion;
+      if (normalized === 'v1' || normalized === 'v2' || normalized === 'v3' || normalized === 'future') {
+        return normalized;
+      }
+    }
+    const defaultVersion = GasConfigurationProvider.getInstance().getApiVersion();
+    const resolvedDefault = defaultVersion.split('-')[0].split('.')[0];
+    const finalDefault = resolvedDefault.startsWith('v') ? resolvedDefault.toLowerCase() : 'v' + resolvedDefault;
+    if (finalDefault === 'v1' || finalDefault === 'v2' || finalDefault === 'v3' || finalDefault === 'future') {
+      return finalDefault;
+    }
+    return 'v2';
+  }
+}
+
+class RouteKey {
+  constructor(method, version, path) {
+    let normalizedPath = path.trim().toLowerCase();
+    if (!normalizedPath.startsWith('/')) {
+      normalizedPath = '/' + normalizedPath;
+    }
+    if (normalizedPath.endsWith('/') && normalizedPath.length > 1) {
+      normalizedPath = normalizedPath.slice(0, -1);
+    }
+    this.key = method.toUpperCase() + ":" + version.toLowerCase() + ":" + normalizedPath;
+  }
+  toString() {
+    return this.key;
+  }
+}
+
+class RouteResolver {
+  static resolveKey(method, version, path) {
+    return new RouteKey(method, version, path).toString();
+  }
+}
+
+class DashboardHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+    return ApiResponse.errorResponse(
+      'NOT_IMPLEMENTED',
+      'DashboardHandler is currently a placeholder stub in S3-2 Routing Foundation.',
+      501,
+      metadata
+    );
+  }
+}
+
+class HoldingHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+    return ApiResponse.errorResponse(
+      'NOT_IMPLEMENTED',
+      'HoldingHandler is currently a placeholder stub in S3-2 Routing Foundation.',
+      501,
+      metadata
+    );
+  }
+}
+
+class HealthHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+    return ApiResponse.errorResponse(
+      'NOT_IMPLEMENTED',
+      'HealthHandler is currently a placeholder stub in S3-2 Routing Foundation.',
+      501,
+      metadata
+    );
+  }
+}
+
+class VersionHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+    return ApiResponse.errorResponse(
+      'NOT_IMPLEMENTED',
+      'VersionHandler is currently a placeholder stub in S3-2 Routing Foundation.',
+      501,
+      metadata
+    );
+  }
+}
+
+class UnknownEndpointHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+    if (!RoutePolicy.isMethodAllowed(request.method)) {
+      return ApiResponse.errorResponse(
+        'METHOD_NOT_ALLOWED',
+        'HTTP Method ' + request.method + ' is not allowed.',
+        405,
+        metadata
+      );
+    }
+    return ApiResponse.errorResponse(
+      'ROUTE_NOT_FOUND',
+      'API Route "' + request.method + ' ' + request.path + '" under version ' + request.version + ' was not found.',
+      404,
+      metadata
+    );
+  }
+}
+
+class LegacyDashboardHandler {
+  execute(request, context) {
+    const result = processGetActionLegacy('getAppData', request.query);
+    const isSuccess = (result && result.success !== undefined) ? result.success : true;
+    return new ApiResponse({
+      status: isSuccess ? 200 : 400,
+      success: isSuccess,
+      data: result,
+      metadata: {
+        requestId: request.requestId,
+        serverTimestamp: context.getStartTimestamp(),
+        processingTime: context.getElapsedTime(),
+        version: request.version
+      }
+    });
+  }
+}
+
+class LegacyHoldingHandler {
+  execute(request, context) {
+    let result;
+    if (request.method === 'GET') {
+      result = processGetActionLegacy('getFlyerStock', request.query);
+    } else {
+      result = processPostAction('updateFlyerStock', request.body, request);
+    }
+    const isSuccess = (result && result.success !== undefined) ? result.success : true;
+    return new ApiResponse({
+      status: isSuccess ? 200 : 400,
+      success: isSuccess,
+      data: result,
+      metadata: {
+        requestId: request.requestId,
+        serverTimestamp: context.getStartTimestamp(),
+        processingTime: context.getElapsedTime(),
+        version: request.version
+      }
+    });
+  }
+}
+
+class LegacyApiFallbackHandler {
+  execute(request, context) {
+    let result;
+    const action = request.body.action || request.query.action;
+    if (request.method === 'GET') {
+      result = processGetActionLegacy(action, request.query);
+    } else {
+      result = processPostAction(action, request.body, request);
+    }
+    const isSuccess = (result && result.success !== undefined) ? result.success : true;
+    return new ApiResponse({
+      status: isSuccess ? 200 : 400,
+      success: isSuccess,
+      data: result,
+      metadata: {
+        requestId: request.requestId,
+        serverTimestamp: context.getStartTimestamp(),
+        processingTime: context.getElapsedTime(),
+        version: request.version
+      }
+    });
+  }
+}
+
+class EndpointRegistry {
+  constructor() {
+    this.routes = {};
+    this.unknownHandler = new UnknownEndpointHandler();
+    this.legacyHandler = new LegacyApiFallbackHandler();
+    this.registerDefaultRoutes();
+  }
+  static getInstance() {
+    if (!EndpointRegistry.instance) {
+      EndpointRegistry.instance = new EndpointRegistry();
+    }
+    return EndpointRegistry.instance;
+  }
+  registerDefaultRoutes() {
+    const flags = GasConfigurationProvider.getInstance().getFeatureFlags();
+    const dashboard = flags.mapbox ? new DashboardHandler() : new LegacyDashboardHandler();
+    const holding = flags.mapbox ? new HoldingHandler() : new LegacyHoldingHandler();
+    const health = new HealthHandler();
+    const version = new VersionHandler();
+
+    this.register('GET', 'v2', '/dashboard', dashboard);
+    this.register('POST', 'v2', '/dashboard', dashboard);
+    this.register('GET', 'v2', '/holding', holding);
+    this.register('POST', 'v2', '/holding', holding);
+    this.register('GET', 'v2', '/health', health);
+    this.register('GET', 'v2', '/version', version);
+  }
+  register(method, version, path, handler) {
+    const key = RouteResolver.resolveKey(method, version, path);
+    this.routes[key] = handler;
+  }
+  getHandler(method, version, path) {
+    const key = RouteResolver.resolveKey(method, version, path);
+    return this.routes[key] || this.legacyHandler;
+  }
+}
+EndpointRegistry.instance = null;
+
+class ApiRouter {
+  constructor() {
+    this.registry = EndpointRegistry.getInstance();
+  }
+  static getInstance() {
+    if (!ApiRouter.instance) {
+      ApiRouter.instance = new ApiRouter();
+    }
+    return ApiRouter.instance;
+  }
+  route(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+
+    if (!RoutePolicy.isMethodAllowed(request.method)) {
+      return ApiResponse.errorResponse(
+        'METHOD_NOT_ALLOWED',
+        'HTTP Method ' + request.method + ' is not allowed by RoutePolicy.',
+        405,
+        metadata
+      );
+    }
+
+    try {
+      const handler = this.registry.getHandler(request.method, request.version, request.path);
+      return handler.execute(request, context);
+    } catch (err) {
+      return ApiResponse.errorResponse(
+        'INTERNAL_SERVER_ERROR',
+        err.message || String(err),
+        500,
+        metadata
+      );
+    }
+  }
+}
+ApiRouter.instance = null;
 
