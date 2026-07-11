@@ -46,7 +46,11 @@ async function runTests() {
     editionValidation: true,
     licenseValidation: true,
     featureAccessEnabled: true,
-    featureValidation: true
+    featureValidation: true,
+    bridgeEnabled: true,
+    bridgeHeartbeat: true,
+    bridgeTimeout: 5000,
+    bridgeProvider: 'AIOSBridgeProvider'
   });
 
   // 1. Normal Request Verification (Passes Validation)
@@ -167,7 +171,11 @@ async function runTests() {
       editionValidation: true,
       licenseValidation: true,
       featureAccessEnabled: true,
-      featureValidation: true
+      featureValidation: true,
+      bridgeEnabled: true,
+      bridgeHeartbeat: true,
+      bridgeTimeout: 5000,
+      bridgeProvider: 'AIOSBridgeProvider'
     });
 
     const req = new ApiRequest({

@@ -109,6 +109,7 @@ function doGet(e) {
     AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
     LicensingPipeline.getInstance().execute(apiRequest, executionContext);
     FeatureAccessPipeline.getInstance().execute(apiRequest, executionContext);
+    AIOSBridgePipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -313,6 +314,7 @@ function doPost(e) {
     AuthorizationPipeline.getInstance().execute(apiRequest, executionContext);
     LicensingPipeline.getInstance().execute(apiRequest, executionContext);
     FeatureAccessPipeline.getInstance().execute(apiRequest, executionContext);
+    AIOSBridgePipeline.getInstance().execute(apiRequest, executionContext);
 
     const valStart = Date.now();
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
@@ -3624,4 +3626,284 @@ class FeatureAccessPipeline {
   }
 }
 FeatureAccessPipeline.instance = null;
+
+// ==========================================
+// 🚀 AIOS BRIDGE FOUNDATION CLASSES
+// ==========================================
+class BridgeMessage {
+  constructor(params) {
+    this.messageId = params.messageId;
+    this.messageType = params.messageType;
+    this.timestamp = params.timestamp;
+    this.source = params.source;
+    this.destination = params.destination;
+    this.payload = params.payload;
+    this.protocolVersion = params.protocolVersion || '1.0';
+    this.correlationId = params.correlationId || ('corr-' + params.messageId);
+  }
+}
+
+class BridgeResult {
+  constructor(success, response, failureReason) {
+    this.success = success;
+    this.response = response;
+    this.failureReason = failureReason;
+  }
+  static successResult(response) {
+    return new BridgeResult(true, response, null);
+  }
+  static failureResult(reason) {
+    return new BridgeResult(false, null, reason);
+  }
+}
+
+class BridgePolicy {
+  constructor(params) {
+    this.bridgeEnabled = params.bridgeEnabled !== false;
+    this.timeout = params.timeout || 5000;
+    this.heartbeatEnabled = params.heartbeatEnabled !== false;
+  }
+}
+
+class BridgeEvent {
+  constructor(params) {
+    this.eventId = params.eventId;
+    this.eventType = params.eventType;
+    this.timestamp = params.timestamp;
+    this.metadata = params.metadata || {};
+  }
+}
+
+class BridgeEventDispatcher {
+  static addListener(listener) {
+    if (BridgeEventDispatcher.listeners.indexOf(listener) === -1) {
+      BridgeEventDispatcher.listeners.push(listener);
+    }
+  }
+  static removeListener(listener) {
+    const idx = BridgeEventDispatcher.listeners.indexOf(listener);
+    if (idx !== -1) {
+      BridgeEventDispatcher.listeners.splice(idx, 1);
+    }
+  }
+  static dispatch(event) {
+    for (let i = 0; i < BridgeEventDispatcher.listeners.length; i++) {
+      try {
+        BridgeEventDispatcher.listeners[i].onEvent(event);
+      } catch (e) {}
+    }
+  }
+  static clear() {
+    BridgeEventDispatcher.listeners = [];
+  }
+}
+BridgeEventDispatcher.listeners = [];
+
+class BridgeMessageMapper {
+  static toBridgeMessage(request) {
+    return new BridgeMessage({
+      messageId: request.requestId || ('msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)),
+      messageType: 'API_EXECUTION_REQUEST',
+      timestamp: Date.now(),
+      source: 'POSTING_MAP',
+      destination: 'AIOS',
+      payload: {
+        method: request.method,
+        path: request.path,
+        query: request.query || {},
+        body: request.body || {}
+      },
+      protocolVersion: '1.0',
+      correlationId: request.requestId
+    });
+  }
+  static fromBridgeMessage(message) {
+    return {
+      success: true,
+      responseCode: 'OK',
+      payload: message.payload
+    };
+  }
+}
+
+class BridgeContext {
+  constructor(params) {
+    this.provider = params.provider;
+    this.status = params.status;
+    this.lastHeartbeat = params.lastHeartbeat;
+    this.metadata = params.metadata || {};
+  }
+}
+
+class BridgeException extends ApiException {
+  constructor(code, internalMessage, requestId) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: internalMessage,
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'BridgeException',
+        exceptionCode: code,
+        source: 'AIOS_BRIDGE_PIPELINE'
+      }
+    });
+    this.category = 'SYSTEM';
+    this.code = code;
+    this.status = 503;
+  }
+}
+
+class AIOSBridgeProvider {
+  constructor() {
+    this.lastReceivedMessage = null;
+    this.currentStatus = 'CONNECTED';
+  }
+  send(message) {
+    const reply = new BridgeMessage({
+      messageId: 'rep-' + message.messageId,
+      messageType: message.messageType + '.reply',
+      timestamp: Date.now(),
+      source: 'AIOS',
+      destination: 'POSTING_MAP',
+      payload: {
+        echo: message.payload,
+        status: 'PROPOSAL_RECEIVED',
+        details: 'Stub acknowledgment successfully generated'
+      },
+      protocolVersion: message.protocolVersion,
+      correlationId: message.correlationId
+    });
+    this.lastReceivedMessage = reply;
+    return BridgeResult.successResult(reply);
+  }
+  receive() {
+    const msg = this.lastReceivedMessage;
+    this.lastReceivedMessage = null;
+    return msg;
+  }
+  health() {
+    return this.currentStatus === 'CONNECTED';
+  }
+  status() {
+    return this.currentStatus;
+  }
+  setMockStatus(status) {
+    this.currentStatus = status;
+  }
+}
+
+class AIOSBridgePipeline {
+  constructor() {
+    this.provider = new AIOSBridgeProvider();
+  }
+  static getInstance() {
+    if (!AIOSBridgePipeline.instance) {
+      AIOSBridgePipeline.instance = new AIOSBridgePipeline();
+    }
+    return AIOSBridgePipeline.instance;
+  }
+  getProvider() {
+    return this.provider;
+  }
+  execute(request, context) {
+    const config = GasConfigurationProvider.getInstance();
+    const flags = config.getFeatureFlags();
+
+    const policy = new BridgePolicy({
+      bridgeEnabled: flags.bridgeEnabled !== false,
+      timeout: config.getLockTimeout() / 2,
+      heartbeatEnabled: flags.bridgeHeartbeat !== false
+    });
+
+    if (!policy.bridgeEnabled) {
+      const bridgeCtx = new BridgeContext({
+        provider: 'AIOSBridgeProvider',
+        status: 'DISCONNECTED',
+        lastHeartbeat: 0
+      });
+      context.setBridgeContext(bridgeCtx);
+
+      if (request.path === '/aios') {
+        throw new BridgeException(
+          'PM-BRG-001',
+          'AIOS Bridge connectivity disabled in system settings.',
+          request.requestId
+        );
+      }
+      return;
+    }
+
+    const status = this.provider.status();
+    if (status !== 'CONNECTED') {
+      const bridgeCtx = new BridgeContext({
+        provider: 'AIOSBridgeProvider',
+        status: status,
+        lastHeartbeat: 0
+      });
+      context.setBridgeContext(bridgeCtx);
+
+      BridgeEventDispatcher.dispatch(new BridgeEvent({
+        eventId: 'ev-fail-' + request.requestId,
+        eventType: 'FAILED',
+        timestamp: Date.now(),
+        metadata: { status: status, reason: 'Provider not connected' }
+      }));
+
+      throw new BridgeException(
+        'PM-BRG-002',
+        'AIOS Bridge connection is unavailable. Status: ' + status,
+        request.requestId
+      );
+    }
+
+    if (policy.heartbeatEnabled) {
+      BridgeEventDispatcher.dispatch(new BridgeEvent({
+        eventId: 'ev-hb-' + request.requestId,
+        eventType: 'HEARTBEAT',
+        timestamp: Date.now()
+      }));
+    }
+
+    if (request.path === '/aios') {
+      try {
+        const msg = BridgeMessageMapper.toBridgeMessage(request);
+
+        BridgeEventDispatcher.dispatch(new BridgeEvent({
+          eventId: 'ev-snd-' + request.requestId,
+          eventType: 'SEND',
+          timestamp: Date.now(),
+          metadata: { messageId: msg.messageId }
+        }));
+
+        const result = this.provider.send(msg);
+
+        if (!result.success || !result.response) {
+          throw new Error(result.failureReason || 'Delivery Timeout');
+        }
+
+        BridgeEventDispatcher.dispatch(new BridgeEvent({
+          eventId: 'ev-rcv-' + request.requestId,
+          eventType: 'RECEIVE',
+          timestamp: Date.now(),
+          metadata: { correlationId: result.response.correlationId }
+        }));
+      } catch (e) {
+        throw new BridgeException(
+          'PM-BRG-003',
+          'AIOS communication failure: ' + e.message,
+          request.requestId
+        );
+      }
+    }
+
+    const bridgeCtx = new BridgeContext({
+      provider: 'AIOSBridgeProvider',
+      status: 'CONNECTED',
+      lastHeartbeat: Date.now()
+    });
+    context.setBridgeContext(bridgeCtx);
+  }
+}
+AIOSBridgePipeline.instance = null;
 

@@ -19,6 +19,10 @@ export interface FeatureFlags {
   licenseValidation: boolean;
   featureAccessEnabled: boolean;
   featureValidation: boolean;
+  bridgeEnabled: boolean;
+  bridgeHeartbeat: boolean;
+  bridgeTimeout: number;
+  bridgeProvider: string;
 }
 
 export class GasConfigurationProvider {
@@ -85,6 +89,7 @@ export class GasConfigurationProvider {
     if (typeof PropertiesService !== 'undefined') {
       try {
         const props = PropertiesService.getScriptProperties();
+        const timeoutStr = props.getProperty('BRIDGE_TIMEOUT');
         return {
           flyerHolding: props.getProperty('FLAG_FLYER_HOLDING') !== 'false',
           googleMaps: props.getProperty('FLAG_GOOGLE_MAPS') !== 'false',
@@ -105,7 +110,11 @@ export class GasConfigurationProvider {
           editionValidation: props.getProperty('FLAG_EDITION_VALIDATION') !== 'false',
           licenseValidation: props.getProperty('FLAG_LICENSE_VALIDATION') !== 'false',
           featureAccessEnabled: props.getProperty('FLAG_FEATURE_ACCESS_ENABLED') !== 'false',
-          featureValidation: props.getProperty('FLAG_FEATURE_VALIDATION') !== 'false'
+          featureValidation: props.getProperty('FLAG_FEATURE_VALIDATION') !== 'false',
+          bridgeEnabled: props.getProperty('FLAG_BRIDGE_ENABLED') !== 'false',
+          bridgeHeartbeat: props.getProperty('FLAG_BRIDGE_HEARTBEAT') !== 'false',
+          bridgeTimeout: timeoutStr ? parseInt(timeoutStr, 10) : 5000,
+          bridgeProvider: props.getProperty('FLAG_BRIDGE_PROVIDER') || 'AIOSBridgeProvider'
         };
       } catch (e) {
         // Fallback below
@@ -131,7 +140,11 @@ export class GasConfigurationProvider {
       editionValidation: true,
       licenseValidation: true,
       featureAccessEnabled: true,
-      featureValidation: true
+      featureValidation: true,
+      bridgeEnabled: true,
+      bridgeHeartbeat: true,
+      bridgeTimeout: 5000,
+      bridgeProvider: 'AIOSBridgeProvider'
     };
   }
 }

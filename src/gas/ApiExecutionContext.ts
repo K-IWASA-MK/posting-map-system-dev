@@ -2,6 +2,7 @@ import { AuthenticationContext } from '../authentication/AuthenticationContext';
 import { AuthorizationContext } from '../authorization/AuthorizationContext';
 import { LicenseContext } from '../licensing/LicenseContext';
 import { FeatureContext } from '../features/FeatureContext';
+import { BridgeContext } from '../bridge/BridgeContext';
 
 export class ApiExecutionContext {
   private requestId: string;
@@ -12,6 +13,7 @@ export class ApiExecutionContext {
   private authzContext: AuthorizationContext | null = null;
   private licenseContext: LicenseContext | null = null;
   private featureContext: FeatureContext | null = null;
+  private bridgeContext: BridgeContext | null = null;
 
   constructor() {
     this.startTimestamp = Date.now();
@@ -101,5 +103,13 @@ export class ApiExecutionContext {
 
   public getFeatureContext(): FeatureContext | null {
     return this.featureContext;
+  }
+
+  public setBridgeContext(context: BridgeContext): void {
+    this.bridgeContext = context;
+  }
+
+  public getBridgeContext(): BridgeContext | null {
+    return this.bridgeContext;
   }
 }
