@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `POSTING MAP Product Sprint 3 Phase S3-3: Validation Pipeline Foundation`
+- **Completed**: `POSTING MAP Product Sprint 3 Phase S3-4: Exception Framework Foundation`
 - **Milestone**: `POSTING MAP Product Sprint 3 IN PROGRESS`
-- **Tag**: `v4.62-sprint-3-phase-s3-3-completed`
-- **Current Phase**: `Sprint 3 Phase S3-4`
-- **Next Action**: `Phase S3-4 (Premium Feature Expansion & Edition Licensing)`
+- **Tag**: `v4.63-sprint-3-phase-s3-4-completed`
+- **Current Phase**: `Sprint 3 Phase S3-5`
+- **Next Action**: `Phase S3-5 (Premium Feature Expansion & Edition Licensing)`
 - **Branch**: `main`
 
 ---
@@ -292,4 +292,13 @@ Validation Pipeline Foundation（Sprint 3 Phase S3-3）完了。
 最初のエラーで処理を遮断するフェイルファスト（Fail-Fast）チェインエンジン `ValidatorChain` を構築。バリデーションエラーを標準 HTTP ステータスコード（400/404/405/422）へマッピングする不変オブジェクト `ValidationResult` / `ValidationException` を定義。
 `doGet` / `doPost` の最前段にパイプラインを差し込み、レガシー互換マッピングを通過させた上で一律にバリデーションを通過させるよう結合完了。全13件のテストが完全パス。
 
-次のフェーズ（Sprint 3 Phase S3-4：Premium Feature Expansion & Edition Licensing）へ移行可能。
+### POSTING MAP Product Sprint 3 Phase S3-4: Exception Framework Foundation
+
+Exception Framework Foundation（Sprint 3 Phase S3-4）完了。
+
+共通基底例外 `ApiException` と例外発生時の診断情報 `ExceptionMetadata` / `ExceptionCategory` を定義。
+カスタム例外（`SystemException`, `RoutingException`, `ConfigurationException`, `FeatureException`）の一意エラーコード（`PM-SYS-001` 等）および外部（ユーザー向け安全な文言）・内部（デバッグ用トレース）メッセージ分離（External/Internal Message Separation）を実装。
+例外を不変な `ApiResponse` に決定論的に変換する `ExceptionMapper` と、S3-5 で予定されている Monitoring & Audit 向けに拡張可能なイベント通知リスナー（`addListener`）を備えた `ExceptionHandler` を構築。
+`doGet()` / `doPost()` を単一の try-catch に集約し、例外発生時は一元処理を行う構造にリファクタリング。全14件のテストが完全パス。
+
+次のフェーズ（Sprint 3 Phase S3-5：Monitoring & Audit Foundation）へ移行可能。

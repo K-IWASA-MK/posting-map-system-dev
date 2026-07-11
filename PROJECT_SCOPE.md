@@ -79,9 +79,16 @@
   - 基本構造、HTTPメソッド、バージョン、ルートの存在、および機能トグルの各検証クラスを実装。
   - `doGet()` / `doPost()` パイプラインの前段にバリデーションを結合し、不正入力をフェイルファストで防御する仕組みを構築。
 
-1. **Phase S3-4: Premium Feature Expansion & Edition Licensing**:
+* **Phase S3-4: Exception Framework Foundation** ✅
+  - 共通基底例外 `ApiException` と例外発生時の診断情報 `ExceptionMetadata` / `ExceptionCategory` を定義。
+  - カスタム例外（`SystemException`, `RoutingException`, `ConfigurationException`, `FeatureException`）の一意エラーコード設計（`PM-SYS-001` 等）。
+  - 例外を不変な `ApiResponse` に決定論的に変換する `ExceptionMapper` と、内部・外部メッセージ分離（External/Internal Message Separation）を実装。
+  - 全例外の一元処理と、S3-5 との接続用に拡張可能な `addListener` 方式の例外イベントフックを備えた `ExceptionHandler` を構築。
+  - `doGet()` / `doPost()` を単一の try-catch に集約し、バリデーションやルーティングから投げられるすべての例外を一元処理。
+
+1. **Phase S3-5: Premium Feature Expansion & Edition Licensing**:
    - Stripe 決済情報とのバインド、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化のライセンス管理。
    - Mapbox エンジンのランタイム動的切り替えの Premium 実装。
-2. **Phase S3-5: AIOS Integration & Automated Analytics**:
+2. **Phase S3-6: AIOS Integration & Automated Analytics**:
    - AIOS (AI組織) との安全なデータ通信ブリッジ（AIOS Bridge）の本格実装。
    - 支部比較や配布効率測定等を行う Analytics Engine の統合。

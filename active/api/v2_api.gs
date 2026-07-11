@@ -102,33 +102,7 @@ function doGet(e) {
     ValidationPipeline.getInstance().validate(apiRequest, executionContext);
     apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
   } catch (err) {
-    if (err instanceof ValidationException) {
-      const metadata = {
-        requestId: apiRequest.requestId,
-        serverTimestamp: err.result.metadata.validatedAt,
-        processingTime: err.result.metadata.duration,
-        version: apiRequest.version
-      };
-      apiResponse = ApiResponse.errorResponse(
-        err.result.errors[0].code,
-        err.result.errors[0].message,
-        err.status,
-        metadata
-      );
-    } else {
-      const metadata = {
-        requestId: apiRequest.requestId,
-        serverTimestamp: Date.now(),
-        processingTime: executionContext.getElapsedTime(),
-        version: apiRequest.version
-      };
-      apiResponse = ApiResponse.errorResponse(
-        'INTERNAL_SERVER_ERROR',
-        err.message || String(err),
-        500,
-        metadata
-      );
-    }
+    apiResponse = ExceptionHandler.handle(err, apiRequest, executionContext);
   }
 
   return createJsonResponseFromApiResponse(apiResponse);
@@ -323,33 +297,7 @@ function doPost(e) {
       apiResponse = ApiRouter.getInstance().route(apiRequest, executionContext);
     }
   } catch (err) {
-    if (err instanceof ValidationException) {
-      const metadata = {
-        requestId: apiRequest.requestId,
-        serverTimestamp: err.result.metadata.validatedAt,
-        processingTime: err.result.metadata.duration,
-        version: apiRequest.version
-      };
-      apiResponse = ApiResponse.errorResponse(
-        err.result.errors[0].code,
-        err.result.errors[0].message,
-        err.status,
-        metadata
-      );
-    } else {
-      const metadata = {
-        requestId: apiRequest.requestId,
-        serverTimestamp: Date.now(),
-        processingTime: executionContext.getElapsedTime(),
-        version: apiRequest.version
-      };
-      apiResponse = ApiResponse.errorResponse(
-        'INTERNAL_SERVER_ERROR',
-        err.message || String(err),
-        500,
-        metadata
-      );
-    }
+    apiResponse = ExceptionHandler.handle(err, apiRequest, executionContext);
   }
 
   return createJsonResponseFromApiResponse(apiResponse);
@@ -1948,27 +1896,7 @@ class ValidationResult {
   }
 }
 
-class ValidationException extends Error {
-  constructor(result) {
-    const mainError = result.errors[0];
-    const message = mainError
-      ? 'Validation failed at ' + mainError.validatorId + ': [' + mainError.code + '] ' + mainError.message
-      : 'Validation failed';
-    super(message);
-    this.name = 'ValidationException';
-    this.result = result;
-
-    const code = mainError ? mainError.code : 'INVALID_REQUEST';
-    const statusMap = {
-      INVALID_REQUEST: 400,
-      INVALID_METHOD: 405,
-      INVALID_VERSION: 422,
-      ROUTE_NOT_FOUND: 404,
-      FEATURE_DISABLED: 422
-    };
-    this.status = statusMap[code] || 400;
-  }
-}
+// Legacy ValidationException placeholder (replaced by S3-4 Exception Framework version below)
 
 class RequestValidator {
   constructor() {
@@ -2136,5 +2064,207 @@ class ValidationPipeline {
     return result;
   }
 }
+}
 ValidationPipeline.instance = null;
+
+// ==========================================
+// 🚀 EXCEPTION FRAMEWORK FOUNDATION CLASSES
+// ==========================================
+const ExceptionCategory = {
+  VALIDATION: 'VALIDATION',
+  ROUTING: 'ROUTING',
+  SYSTEM: 'SYSTEM',
+  CONFIGURATION: 'CONFIGURATION',
+  FEATURE: 'FEATURE'
+};
+
+class ApiException extends Error {
+  constructor(params) {
+    super(params.internalMessage);
+    this.name = this.constructor.name;
+    this.internalMessage = params.internalMessage;
+    this.externalMessage = params.externalMessage;
+    this.metadata = params.metadata;
+  }
+}
+
+class SystemException extends ApiException {
+  constructor(internalMessage, requestId, details) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: '予期しないシステムエラーが発生しました。',
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'SystemException',
+        exceptionCode: 'PM-SYS-001',
+        source: 'SYSTEM',
+        details: details
+      }
+    });
+    this.category = ExceptionCategory.SYSTEM;
+    this.code = 'PM-SYS-001';
+    this.status = 500;
+  }
+}
+
+class RoutingException extends ApiException {
+  constructor(code, status, internalMessage, requestId, details) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage:
+        status === 404
+          ? '指定された API ルートが見つかりません。'
+          : '指定された HTTP メソッドは許可されていません。',
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'RoutingException',
+        exceptionCode: code,
+        source: 'ROUTING',
+        details: details
+      }
+    });
+    this.category = ExceptionCategory.ROUTING;
+    this.code = code;
+    this.status = status;
+  }
+  static notFound(internalMessage, requestId, details) {
+    return new RoutingException('PM-RTE-001', 404, internalMessage, requestId, details);
+  }
+  static methodNotAllowed(internalMessage, requestId, details) {
+    return new RoutingException('PM-RTE-002', 405, internalMessage, requestId, details);
+  }
+}
+
+class ConfigurationException extends ApiException {
+  constructor(internalMessage, requestId, details) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: 'システム設定エラーが発生しました。',
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'ConfigurationException',
+        exceptionCode: 'PM-CFG-001',
+        source: 'CONFIGURATION',
+        details: details
+      }
+    });
+    this.category = ExceptionCategory.CONFIGURATION;
+    this.code = 'PM-CFG-001';
+    this.status = 500;
+  }
+}
+
+class FeatureException extends ApiException {
+  constructor(internalMessage, requestId, details) {
+    super({
+      internalMessage: internalMessage,
+      externalMessage: '指定された機能は現在無効化されています。',
+      metadata: {
+        requestId: requestId,
+        timestamp: Date.now(),
+        exceptionType: 'FeatureException',
+        exceptionCode: 'PM-FTR-001',
+        source: 'FEATURE',
+        details: details
+      }
+    });
+    this.category = ExceptionCategory.FEATURE;
+    this.code = 'PM-FTR-001';
+    this.status = 422;
+  }
+}
+
+class ValidationException extends ApiException {
+  constructor(result) {
+    const mainError = result.errors[0];
+    const internalMessage = mainError
+      ? 'Validation failed at ' + mainError.validatorId + ': [' + mainError.code + '] ' + mainError.message
+      : 'Validation failed';
+
+    const errCode = mainError ? mainError.code : 'INVALID_REQUEST';
+    const statusMap = {
+      INVALID_REQUEST: 400,
+      INVALID_METHOD: 405,
+      INVALID_VERSION: 422,
+      ROUTE_NOT_FOUND: 404,
+      FEATURE_DISABLED: 422
+    };
+    const status = statusMap[errCode] || 422;
+
+    super({
+      internalMessage: internalMessage,
+      externalMessage: '入力パラメータの検証に失敗しました。',
+      metadata: {
+        requestId: result.metadata.validatedAt.toString(),
+        timestamp: result.metadata.validatedAt,
+        exceptionType: 'ValidationException',
+        exceptionCode: 'PM-VAL-001',
+        source: mainError ? mainError.validatorId : 'VALIDATOR_CHAIN',
+        details: mainError ? mainError.message : undefined
+      }
+    });
+
+    this.category = ExceptionCategory.VALIDATION;
+    this.code = 'PM-VAL-001';
+    this.status = status;
+    this.result = result;
+  }
+}
+
+class ExceptionMapper {
+  static toResponse(error, request, context) {
+    let apiException;
+    if (error instanceof ApiException) {
+      apiException = error;
+    } else {
+      apiException = new SystemException(
+        error.message || String(error),
+        request.requestId,
+        error.stack
+      );
+    }
+
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: apiException.metadata.timestamp,
+      processingTime: context.getElapsedTime(),
+      version: request.version,
+      exception: {
+        category: apiException.category,
+        code: apiException.code,
+        internalMessage: apiException.internalMessage
+      }
+    };
+
+    return ApiResponse.errorResponse(
+      apiException.code,
+      apiException.externalMessage,
+      apiException.status,
+      metadata
+    );
+  }
+}
+
+class ExceptionHandler {
+  static addListener(listener) {
+    ExceptionHandler.onExceptionListeners.push(listener);
+  }
+  static clearListeners() {
+    ExceptionHandler.onExceptionListeners = [];
+  }
+  static handle(error, request, context) {
+    for (let i = 0; i < ExceptionHandler.onExceptionListeners.length; i++) {
+      try {
+        ExceptionHandler.onExceptionListeners[i](error, request, context);
+      } catch (hookErr) {
+        console.error('[ExceptionHandler Hook Error]', hookErr);
+      }
+    }
+    return ExceptionMapper.toResponse(error, request, context);
+  }
+}
+ExceptionHandler.onExceptionListeners = [];
 
