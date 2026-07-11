@@ -268,10 +268,11 @@ class PlatformIntegrationPipeline {
         'forceStartBatch',
         'refreshCache',
         'aggregateStats',
-        'resetAllSheets'
+        'resetAllSheets',
+        'updateSubscription'
       ];
 
-      const isWriteAction = (method === 'POST' && (writeActions.indexOf(action) !== -1 || path === '/field/reservation'));
+      const isWriteAction = (method === 'POST' && (writeActions.indexOf(action) !== -1 || path === '/field/reservation' || path === '/operations/subscriptions/update'));
 
       if (isWriteAction) {
         apiResponse = await LockServiceProvider.getInstance().executeWithLockAsync(async () => {

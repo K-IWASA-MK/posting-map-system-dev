@@ -18,6 +18,11 @@ export class WorkspaceSubscriptionGate {
   }
 
   public async pass(request: ApiRequest): Promise<void> {
+    // Bypass operations administrative requests
+    if (request.path.startsWith('/operations/')) {
+      return;
+    }
+
     // 1. Resolve workspaceId
     const workspaceId = await this.resolveWorkspaceId(request);
     if (!workspaceId) {

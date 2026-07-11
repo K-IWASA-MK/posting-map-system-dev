@@ -37,6 +37,10 @@ class MockWorkspaceSubscriptionRepository implements IWorkspaceSubscriptionRepos
     return this.db.get(workspaceId);
   }
 
+  async findAll(): Promise<WorkspaceSubscription[]> {
+    return Array.from(this.db.values());
+  }
+
   async save(subscription: WorkspaceSubscription): Promise<void> {
     this.db.set(subscription.workspaceId, subscription);
   }

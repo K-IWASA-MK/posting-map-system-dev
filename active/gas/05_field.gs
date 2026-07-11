@@ -64,6 +64,7 @@ interface IWorkspaceRepository {
 
 interface IWorkspaceSubscriptionRepository {
   findByWorkspaceId(workspaceId: string): Promise<WorkspaceSubscription | undefined>;
+  findAll(): Promise<WorkspaceSubscription[]>;
   save(subscription: WorkspaceSubscription): Promise<void>;
 }
 
@@ -1014,6 +1015,33 @@ class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscripti
     return undefined;
   }
 
+  public async findAll(): Promise<WorkspaceSubscription[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const wsIdIdx = headers.indexOf('ワークスペースID');
+    const statusIdx = headers.indexOf('ステータス');
+    const startedIdx = headers.indexOf('開始日');
+    const expiresIdx = headers.indexOf('期限日');
+
+    if (wsIdIdx === -1) return [];
+
+    const list: WorkspaceSubscription[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[wsIdIdx]) {
+        list.push(new WorkspaceSubscription({
+          workspaceId: String(row[wsIdIdx]),
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as SubscriptionStatus) : 'ACTIVE',
+          startedAt: startedIdx !== -1 && row[startedIdx] ? new Date(row[startedIdx]) : new Date(),
+          expiresAt: expiresIdx !== -1 && row[expiresIdx] ? new Date(row[expiresIdx]) : new Date()
+        }));
+      }
+    }
+    return list;
+  }
+
   public async save(subscription: WorkspaceSubscription): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ステータス', '開始日', '期限日'];
@@ -1742,6 +1770,24 @@ const FIELD_ENDPOINTS: EndpointConfig[] = [
 ];
 
 
+// --- Source: src/api/registry/OperationsEndpoints.ts ---
+
+const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
+  {
+    path: '/operations/subscriptions',
+    method: 'GET',
+    version: 'v2',
+    handler: 'SubscriptionHandler'
+  },
+  {
+    path: '/operations/subscriptions/update',
+    method: 'POST',
+    version: 'v2',
+    handler: 'SubscriptionHandler'
+  }
+];
+
+
 // --- Source: src/infrastructure/bootstrap/FieldApiBootstrap.ts ---
 
 let initialized = false;
@@ -1765,12 +1811,14 @@ function bootstrapFieldApis(): void {
   const holdingAppService = new HoldingApplicationService(holdingRepo, eventPublisher);
   const activityAppService = new ActivityApplicationService(activityRepo, eventPublisher);
   const dashboardAppService = new DashboardApplicationService(workspaceRepo, staffRepo, holdingRepo, activityRepo);
+  const subscriptionAppService = new SubscriptionApplicationService(subscriptionRepo);
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
     DistributorHandler: new DistributorHandler(staffAppService),
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
-    DashboardHandler: new DashboardHandler(dashboardAppService)
+    DashboardHandler: new DashboardHandler(dashboardAppService),
+    SubscriptionHandler: new SubscriptionHandler(subscriptionAppService)
   };
 
   // Register Field API Endpoints
@@ -1784,6 +1832,15 @@ function bootstrapFieldApis(): void {
 
   // Register Dashboard API Endpoints
   for (const config of DASHBOARD_ENDPOINTS) {
+    const handlerInstance = handlers[config.handler];
+    if (!handlerInstance) {
+      throw new Error(`Bootstrap resolution failed: Handler class '${config.handler}' not mapped in FieldApiBootstrap`);
+    }
+    registry.register(config.method, config.version, config.path, handlerInstance);
+  }
+
+  // Register Operations API Endpoints
+  for (const config of OPERATIONS_ENDPOINTS) {
     const handlerInstance = handlers[config.handler];
     if (!handlerInstance) {
       throw new Error(`Bootstrap resolution failed: Handler class '${config.handler}' not mapped in FieldApiBootstrap`);

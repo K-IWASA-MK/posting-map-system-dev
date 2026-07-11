@@ -39,6 +39,33 @@ export class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSub
     return undefined;
   }
 
+  public async findAll(): Promise<WorkspaceSubscription[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const wsIdIdx = headers.indexOf('ワークスペースID');
+    const statusIdx = headers.indexOf('ステータス');
+    const startedIdx = headers.indexOf('開始日');
+    const expiresIdx = headers.indexOf('期限日');
+
+    if (wsIdIdx === -1) return [];
+
+    const list: WorkspaceSubscription[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[wsIdIdx]) {
+        list.push(new WorkspaceSubscription({
+          workspaceId: String(row[wsIdIdx]),
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as SubscriptionStatus) : 'ACTIVE',
+          startedAt: startedIdx !== -1 && row[startedIdx] ? new Date(row[startedIdx]) : new Date(),
+          expiresAt: expiresIdx !== -1 && row[expiresIdx] ? new Date(row[expiresIdx]) : new Date()
+        }));
+      }
+    }
+    return list;
+  }
+
   public async save(subscription: WorkspaceSubscription): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ステータス', '開始日', '期限日'];
