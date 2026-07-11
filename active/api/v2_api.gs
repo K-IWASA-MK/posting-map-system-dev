@@ -284,6 +284,18 @@ function createJsonResponseFromApiResponse(apiResponse) {
     }
   };
 
+  if (apiResponse.data && typeof apiResponse.data === 'object') {
+    if (apiResponse.data.id !== undefined) {
+      responseWrapper.id = apiResponse.data.id;
+    }
+    if (apiResponse.data.name !== undefined) {
+      responseWrapper.name = apiResponse.data.name;
+    }
+    if (apiResponse.data.message !== undefined) {
+      responseWrapper.message = apiResponse.data.message;
+    }
+  }
+
   return ContentService.createTextOutput(JSON.stringify(responseWrapper))
     .setMimeType(ContentService.MimeType.JSON);
 }

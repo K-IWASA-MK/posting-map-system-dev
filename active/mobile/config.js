@@ -12,8 +12,8 @@ const CONFIG = {
 
   // デフォルトのテナント情報 (Scope統制)
   DEFAULT_TENANT_ID: "MIE-03",
-  DEFAULT_BRANCH_ID: "MIE-03",
-  DEFAULT_BRANCH_NAME: "三重第3支部",
+  DEFAULT_BRANCH_ID: "mie-04",
+  DEFAULT_BRANCH_NAME: "三重第4支部",
 
   // 論理マップ（必要に応じて拡張）
   MAP: {

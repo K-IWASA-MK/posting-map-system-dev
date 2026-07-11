@@ -251,6 +251,7 @@ interface IStaffRepository {
   findByLineUserId(lineUserId: string): Promise<Staff | undefined>;
   findByWorkspace(workspaceId: string): Promise<Staff[]>;
   findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]>;
+  getNextStaffNo(workspaceId: string): Promise<string>;
   save(staff: Staff): Promise<void>;
 }
 
@@ -579,13 +580,13 @@ class RecordActivityCommand {
 // --- Source: src/application/field/commands/RegisterStaffCommand.ts ---
 class RegisterStaffCommand {
   constructor(
-    public readonly staffNo: string,
+    public readonly staffNo: string | undefined,
     public readonly displayName: string,
     public readonly lineUserId: string,
     public readonly workspaceId: string
   ) {
-    if (!staffNo || staffNo.trim().length === 0) {
-      throw new Error("staffNo is required");
+    if (staffNo !== undefined && staffNo.trim().length === 0) {
+      throw new Error("staffNo cannot be empty");
     }
     if (!displayName || displayName.trim().length === 0) {
       throw new Error("displayName is required");
@@ -781,13 +782,23 @@ class StaffApplicationService {
   }
 
   public async registerStaff(command: RegisterStaffCommand): Promise<StaffDto> {
-    const existing = await this.staffRepository.findByStaffNo(command.staffNo);
-    if (existing) {
-      throw new Error(`Staff with number ${command.staffNo} already exists`);
+    const existingByLine = await this.staffRepository.findByLineUserId(command.lineUserId);
+    if (existingByLine) {
+      return this.toDto(existingByLine);
+    }
+
+    let staffNo = command.staffNo;
+    if (!staffNo) {
+      staffNo = await this.staffRepository.getNextStaffNo(command.workspaceId);
+    } else {
+      const existing = await this.staffRepository.findByStaffNo(staffNo);
+      if (existing) {
+        throw new Error(`Staff with number ${staffNo} already exists`);
+      }
     }
 
     const staff = new Staff({
-      staffNo: command.staffNo,
+      staffNo: staffNo,
       displayName: command.displayName,
       lineUserId: command.lineUserId,
       workspaceId: command.workspaceId
@@ -1883,6 +1894,39 @@ class SpreadsheetStaffRepository implements IStaffRepository {
     });
   }
 
+  public async getNextStaffNo(workspaceId: string): Promise<string> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) {
+      return 'S001';
+    }
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const wsIdx = headers.indexOf('ワークスペースID');
+
+    if (staffIdIdx === -1 || wsIdx === -1) {
+      return 'S001';
+    }
+
+    let maxNum = 0;
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (String(row[wsIdx]) === workspaceId) {
+        const staffIdVal = String(row[staffIdIdx]);
+        const match = staffIdVal.match(/^S(\d+)$/i);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxNum) {
+            maxNum = num;
+          }
+        }
+      }
+    }
+
+    const nextNum = maxNum + 1;
+    return 'S' + String(nextNum).padStart(3, '0');
+  }
+
   public async save(staff: Staff): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['スタッフID', 'スタッフ名', 'LINEユーザーID', 'ワークスペースID', '登録日時'];
@@ -1928,6 +1972,26 @@ class DistributorHandler implements EndpointHandler {
 
   public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
     try {
+      if (request.method === 'POST') {
+        const body = request.body || {};
+        const displayName = body.lastName || body.displayName || '';
+        const lineUserId = body.lineUserId || '';
+        const workspaceId = body.workspaceId || '';
+        const staffNo = body.staffNo;
+
+        const command = new RegisterStaffCommand(staffNo, displayName, lineUserId, workspaceId);
+        const dto = await this.staffAppService.registerStaff(command);
+
+        const result = {
+          id: dto.staffNo,
+          name: dto.displayName,
+          identityId: dto.lineUserId,
+          status: 'ACTIVE',
+          areaIds: ['default-area']
+        };
+        return FieldApiMapper.toSuccessResponse(result, request, context);
+      }
+
       const staffNo = request.pathParams.id;
       if (!staffNo || staffNo.trim().length === 0) {
         throw new Error('id is required');
@@ -2349,6 +2413,12 @@ const FIELD_ENDPOINTS: EndpointConfig[] = [
   {
     path: '/field/distributors/{id}',
     method: 'GET',
+    version: 'v2',
+    handler: 'DistributorHandler'
+  },
+  {
+    path: '/field/distributors',
+    method: 'POST',
     version: 'v2',
     handler: 'DistributorHandler'
   }

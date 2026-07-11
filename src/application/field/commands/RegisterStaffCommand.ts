@@ -1,12 +1,12 @@
 export class RegisterStaffCommand {
   constructor(
-    public readonly staffNo: string,
+    public readonly staffNo: string | undefined,
     public readonly displayName: string,
     public readonly lineUserId: string,
     public readonly workspaceId: string
   ) {
-    if (!staffNo || staffNo.trim().length === 0) {
-      throw new Error("staffNo is required");
+    if (staffNo !== undefined && staffNo.trim().length === 0) {
+      throw new Error("staffNo cannot be empty");
     }
     if (!displayName || displayName.trim().length === 0) {
       throw new Error("displayName is required");

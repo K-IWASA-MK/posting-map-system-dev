@@ -19,13 +19,23 @@ export class StaffApplicationService {
   }
 
   public async registerStaff(command: RegisterStaffCommand): Promise<StaffDto> {
-    const existing = await this.staffRepository.findByStaffNo(command.staffNo);
-    if (existing) {
-      throw new Error(`Staff with number ${command.staffNo} already exists`);
+    const existingByLine = await this.staffRepository.findByLineUserId(command.lineUserId);
+    if (existingByLine) {
+      return this.toDto(existingByLine);
+    }
+
+    let staffNo = command.staffNo;
+    if (!staffNo) {
+      staffNo = await this.staffRepository.getNextStaffNo(command.workspaceId);
+    } else {
+      const existing = await this.staffRepository.findByStaffNo(staffNo);
+      if (existing) {
+        throw new Error(`Staff with number ${staffNo} already exists`);
+      }
     }
 
     const staff = new Staff({
-      staffNo: command.staffNo,
+      staffNo: staffNo,
       displayName: command.displayName,
       lineUserId: command.lineUserId,
       workspaceId: command.workspaceId

@@ -368,5 +368,26 @@ Workspace Invitation Template Foundation（Sprint 5 Phase S5-13）完了。
   - 「メールソフトを起動する」ボタンから `mailto:` スキームを介して下書きを標準メールアプリにシームレスに引き渡す基盤を整備。
 - 全ユニットテスト、統合テスト、および GAS ビルド検証をパス。
 
+### POSTING MAP Product Sprint 5 Phase S5-14: Staff Registration Integration Foundation
+
+Staff Registration Integration Foundation（Sprint 5 Phase S5-14）完了。
+
+- **`RegisterStaffCommand` の拡張**: `staffNo` をオプショナル (`string | undefined`) に変更。
+- **支部単位での自動ID採番 (`S001`～) 実装**:
+  - `IStaffRepository` に `getNextStaffNo(workspaceId)` インフェースを追加。
+  - `SpreadsheetStaffRepository` にて特定の `workspaceId` に属するスタッフID (`S\d+`) の中から最大値を取得し、支部ごとに独立した順序で `S001` からインクリメントして自動採番するロジックを実装。
+  - `StaffApplicationService.registerStaff` にて `staffNo` が指定されていない場合は動的にIDを採番する処理、および同一 `lineUserId` での二重登録要求の際に既存データを返却して重複を防止する安全ロジックを実装。
+- **APIルーティングおよびハンドラー統合**:
+  - `PlatformIntegrationPipeline.ts` にて、レガシーアクション `'registerStaff'` を `/field/distributors` (POST) へマッピング。
+  - `DistributorHandler.ts` に `POST` 処理ルーティングを追加し、受け取ったリクエストから `RegisterStaffCommand` を構築して登録処理を実行。結果をレガシー互換の `DistributorDto` 構造へマッピング。
+- **H-App 互換性および API レスポンス変換保証**:
+  - `v2_api.gs` の `createJsonResponseFromApiResponse()` にて、レスポンスデータ内の `id`, `name`, `message` をレスポンスオブジェクトのルートレベルへコピーする処理を追加。これによりモバイルアプリ側での `res.id` の直接参照動作を保証。
+- **モバイルアプリ（H-App）の動的 ID 適用**:
+  - `active/mobile/config.js` のデフォルト支部IDを、S5-12仕様に適合した小文字ゼロ埋め形式の `"mie-04"` に更新。
+  - `active/mobile/app.js` の `WS-MIE-03` ハードコーディングを `CONFIG.DEFAULT_BRANCH_ID` 参照へ置き換え、登録 API 呼び出し時にワークスペースIDを正しく渡すよう修正。
+- **テストスイートの追従**:
+  - TSコンパイルエラー回避のため、テストファイル内の各 `MockStaffRepository` クラスに `getNextStaffNo` のダミーメソッドを実装。
+- 全ユニットテスト、統合テスト、および GAS ビルド検証をパス。
+
 Quality Gate:
 - npm run quality:check PASS

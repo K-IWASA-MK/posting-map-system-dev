@@ -382,7 +382,7 @@ async function loadData(skipSync = false) {
     }
 
     try {
-      const wsId = 'WS-MIE-03';
+      const wsId = CONFIG.DEFAULT_BRANCH_ID;
       const wsData = await callApi('dashboard/workspace/' + wsId);
       if (wsData && wsData.success) {
         workspaceDashboardData = wsData.data;
@@ -439,7 +439,7 @@ async function loadData(skipSync = false) {
 
 // ランキングデータのバックグラウンド先読み関数
 function prefetchRanking() {
-  const workspaceId = 'WS-MIE-03';
+  const workspaceId = CONFIG.DEFAULT_BRANCH_ID;
   window.activeRankingPromise = callApi('dashboard/ranking', { workspaceId })
     .then(data => {
       if (data && data.success) {
@@ -1397,7 +1397,8 @@ async function safeInitApp() {
             const res = await callApiPost('registerStaff', { 
               lastName: profile.displayName, 
               firstName: "(LINE)",
-              lineUserId: profile.userId
+              lineUserId: profile.userId,
+              workspaceId: CONFIG.DEFAULT_BRANCH_ID
             });
             logDebug("API OK");
             if (res && res.success) {
@@ -1423,7 +1424,8 @@ async function safeInitApp() {
             callApiPost('registerStaff', {
               lastName: userInfo.last,
               firstName: userInfo.first || '(LINE)',
-              lineUserId: profile.userId
+              lineUserId: profile.userId,
+              workspaceId: CONFIG.DEFAULT_BRANCH_ID
             }).catch(() => {});
           }
 

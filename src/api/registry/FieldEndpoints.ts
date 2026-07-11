@@ -23,5 +23,11 @@ export const FIELD_ENDPOINTS: EndpointConfig[] = [
     method: 'GET',
     version: 'v2',
     handler: 'DistributorHandler'
+  },
+  {
+    path: '/field/distributors',
+    method: 'POST',
+    version: 'v2',
+    handler: 'DistributorHandler'
   }
 ];

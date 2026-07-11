@@ -109,6 +109,39 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     });
   }
 
+  public async getNextStaffNo(workspaceId: string): Promise<string> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) {
+      return 'S001';
+    }
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const wsIdx = headers.indexOf('ワークスペースID');
+
+    if (staffIdIdx === -1 || wsIdx === -1) {
+      return 'S001';
+    }
+
+    let maxNum = 0;
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (String(row[wsIdx]) === workspaceId) {
+        const staffIdVal = String(row[staffIdIdx]);
+        const match = staffIdVal.match(/^S(\d+)$/i);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxNum) {
+            maxNum = num;
+          }
+        }
+      }
+    }
+
+    const nextNum = maxNum + 1;
+    return 'S' + String(nextNum).padStart(3, '0');
+  }
+
   public async save(staff: Staff): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['スタッフID', 'スタッフ名', 'LINEユーザーID', 'ワークスペースID', '登録日時'];

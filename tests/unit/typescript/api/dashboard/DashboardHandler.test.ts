@@ -33,6 +33,9 @@ class MockStaffRepository implements IStaffRepository {
   async findNewStaffByMonth(workspaceId: string, yearMonth: any): Promise<Staff[]> {
     return [];
   }
+  async getNextStaffNo(workspaceId: string): Promise<string> {
+    return 'S001';
+  }
   async save(staff: Staff): Promise<void> {}
 }
 

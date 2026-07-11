@@ -91,6 +91,10 @@ class MockStaffRepository implements IStaffRepository {
     return [];
   }
 
+  async getNextStaffNo(workspaceId: string): Promise<string> {
+    return 'S001';
+  }
+
   async save(staff: Staff): Promise<void> {}
 }
 

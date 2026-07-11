@@ -149,6 +149,8 @@ class PlatformIntegrationPipeline {
           path = '/holding';
         } else if (action === 'updateFlyerStock') {
           path = '/holding';
+        } else if (action === 'registerStaff') {
+          path = '/field/distributors';
         }
       }
 

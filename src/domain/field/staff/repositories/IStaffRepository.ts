@@ -6,5 +6,6 @@ export interface IStaffRepository {
   findByLineUserId(lineUserId: string): Promise<Staff | undefined>;
   findByWorkspace(workspaceId: string): Promise<Staff[]>;
   findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]>;
+  getNextStaffNo(workspaceId: string): Promise<string>;
   save(staff: Staff): Promise<void>;
 }

@@ -48,6 +48,10 @@ class MockStaffRepository implements IStaffRepository {
       s => s.workspaceId === workspaceId && s.createdAt.getTime() >= start && s.createdAt.getTime() <= end
     );
   }
+  async getNextStaffNo(workspaceId: string): Promise<string> {
+    const nextNum = this.db.size + 1;
+    return 'S' + String(nextNum).padStart(3, '0');
+  }
   async save(staff: Staff): Promise<void> {
     this.db.set(staff.staffNo, staff);
   }
