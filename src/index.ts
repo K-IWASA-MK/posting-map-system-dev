@@ -35,13 +35,13 @@ export * from "./resume/ResumeScopeEngine";
 export * from "./resume/ResumeScopeRegistry";
 export * from "./resume/ResumeScopeManager";
 
-export * from "./eventbus/GovernanceEventType";
-export * from "./eventbus/GovernanceEventPriority";
-export * from "./eventbus/GovernanceEvent";
-export * from "./eventbus/GovernanceEventContext";
-export * from "./eventbus/GovernanceEventBusEngine";
-export * from "./eventbus/GovernanceEventRegistry";
-export * from "./eventbus/GovernanceEventDispatcher";
+export * from '@core/eventbus/GovernanceEventType';
+export * from '@core/eventbus/GovernanceEventPriority';
+export * from '@core/eventbus/GovernanceEvent';
+export * from '@core/eventbus/GovernanceEventContext';
+export * from '@core/eventbus/GovernanceEventBusEngine';
+export * from '@core/eventbus/GovernanceEventRegistry';
+export * from '@core/eventbus/GovernanceEventDispatcher';
 
 export * from "./orchestrator/ExecutionStatus";
 export * from "./orchestrator/ExecutionType";
@@ -52,14 +52,14 @@ export * from "./orchestrator/ExecutionOrchestratorEngine";
 export * from "./orchestrator/ExecutionRegistry";
 export * from "./orchestrator/ExecutionManager";
 
-export * from "./api/APISchemaType";
-export * from "./api/APISchema";
-export * from "./api/APIEndpoint";
-export * from "./api/APISchemaAnalyzerContext";
-export * from "./api/APISchemaAnalyzerEngine";
-export * from "./api/APISchemaRegistry";
-export * from "./api/APISchemaMapper";
-export * from "./api/APISchemaAnalyzerManager";
+export * from '@core/api/APISchemaType';
+export * from '@core/api/APISchema';
+export * from '@core/api/APIEndpoint';
+export * from '@core/api/APISchemaAnalyzerContext';
+export * from '@core/api/APISchemaAnalyzerEngine';
+export * from '@core/api/APISchemaRegistry';
+export * from '@core/api/APISchemaMapper';
+export * from '@core/api/APISchemaAnalyzerManager';
 
 export * from "./graph/ExecutionGraphNodeType";
 export * from "./graph/ExecutionGraphNode";

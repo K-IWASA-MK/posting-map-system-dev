@@ -1,4 +1,4 @@
-import { ApiResponse } from '../api/ApiResponse';
+import { ApiResponse } from '@core/api/ApiResponse';
 import { PlatformStage } from './PlatformStage';
 import { PlatformExecutionContext } from './PlatformExecutionContext';
 

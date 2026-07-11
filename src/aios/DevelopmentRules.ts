@@ -627,7 +627,7 @@ export class DevelopmentRules {
    */
   static getExecutionRuntimeSession(rule: DevelopmentRule): ExecutionRuntimeSession | undefined {
     // ExecutionRuntimeSession は完全静的解決 (Static Direct Resolver) として不変で解決される
-    return EXECUTION_RUNTIME_SESSION_BLUEPRINT.getExecutionRuntimeSession();
+    const context = this.getExecutionRuntimeContext(rule); if (!context) return undefined; return EXECUTION_RUNTIME_SESSION_BLUEPRINT.getExecutionRuntimeSession();
   }
 
   /**
@@ -1314,6 +1314,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Thread Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeThread(rule: DevelopmentRule): ExecutionRuntimeThread | undefined {
+    // 依存性検証のため kernelEngine の解決可能性のみ確認
+    const kernelEngine = this.getExecutionRuntimeKernelEngine(rule);
+    if (!kernelEngine) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_THREAD_BLUEPRINT.getExecutionRuntimeThread();
   }
 
@@ -1323,6 +1328,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Scheduler Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeScheduler(rule: DevelopmentRule): ExecutionRuntimeScheduler | undefined {
+    // 依存性検証のため thread の解決可能性のみ確認
+    const thread = this.getExecutionRuntimeThread(rule);
+    if (!thread) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler();
   }
 
@@ -1332,6 +1342,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Queue Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeQueue(rule: DevelopmentRule): ExecutionRuntimeQueue | undefined {
+    // 依存性検証のため scheduler の解決可能性のみ確認
+    const scheduler = this.getExecutionRuntimeScheduler(rule);
+    if (!scheduler) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_QUEUE_BLUEPRINT.getExecutionRuntimeQueue();
   }
 
@@ -1341,6 +1356,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Task Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeTask(rule: DevelopmentRule): ExecutionRuntimeTask | undefined {
+    // 依存性検証のため queue の解決可能性のみ確認
+    const queue = this.getExecutionRuntimeQueue(rule);
+    if (!queue) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_TASK_BLUEPRINT.getExecutionRuntimeTask();
   }
 
@@ -1350,6 +1370,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Worker Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeWorker(rule: DevelopmentRule): ExecutionRuntimeWorker | undefined {
+    // 依存性検証のため task の解決可能性のみ確認
+    const task = this.getExecutionRuntimeTask(rule);
+    if (!task) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_WORKER_BLUEPRINT.getExecutionRuntimeWorker();
   }
 
@@ -1359,6 +1384,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Dispatcher Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeDispatcher(rule: DevelopmentRule): ExecutionRuntimeDispatcher | undefined {
+    // 依存性検証のため worker の解決可能性のみ確認
+    const worker = this.getExecutionRuntimeWorker(rule);
+    if (!worker) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_DISPATCHER_BLUEPRINT.getExecutionRuntimeDispatcher();
   }
 
@@ -1368,6 +1398,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Event Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeEvent(rule: DevelopmentRule): ExecutionRuntimeEvent | undefined {
+    // 依存性検証のため dispatcher の解決可能性のみ確認
+    const dispatcher = this.getExecutionRuntimeDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_EVENT_BLUEPRINT.getExecutionRuntimeEvent();
   }
 
@@ -1377,6 +1412,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Event Bus Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeEventBus(rule: DevelopmentRule): ExecutionRuntimeEventBus | undefined {
+    // 依存性検証のため event の解決可能性のみ確認
+    const event = this.getExecutionRuntimeEvent(rule);
+    if (!event) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT.getExecutionRuntimeEventBus();
   }
 
@@ -1386,6 +1426,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Message Router Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeMessageRouter(rule: DevelopmentRule): ExecutionRuntimeMessageRouter | undefined {
+    // 依存性検証のため eventBus の解決可能性のみ確認
+    const eventBus = this.getExecutionRuntimeEventBus(rule);
+    if (!eventBus) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_MESSAGE_ROUTER_BLUEPRINT.getExecutionRuntimeMessageRouter();
   }
 
@@ -1395,6 +1440,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Transport Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeTransport(rule: DevelopmentRule): ExecutionRuntimeTransport | undefined {
+    // 依存性検証のため messageRouter の解決可能性のみ確認
+    const messageRouter = this.getExecutionRuntimeMessageRouter(rule);
+    if (!messageRouter) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
   }
 
@@ -1404,6 +1454,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Connection Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeConnection(rule: DevelopmentRule): ExecutionRuntimeConnection | undefined {
+    // 依存性検証のため transport の解決可能性のみ確認
+    const transport = this.getExecutionRuntimeTransport(rule);
+    if (!transport) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_CONNECTION_BLUEPRINT.getExecutionRuntimeConnection();
   }
 
@@ -1413,6 +1468,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Protocol Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeProtocol(rule: DevelopmentRule): ExecutionRuntimeProtocol | undefined {
+    // 依存性検証のため connection の解決可能性のみ確認
+    const connection = this.getExecutionRuntimeConnection(rule);
+    if (!connection) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_PROTOCOL_BLUEPRINT.getExecutionRuntimeProtocol();
   }
 
@@ -1422,6 +1482,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Packet Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimePacket(rule: DevelopmentRule): ExecutionRuntimePacket | undefined {
+    // 依存性検証のため protocol の解決可能性のみ確認
+    const protocol = this.getExecutionRuntimeProtocol(rule);
+    if (!protocol) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_PACKET_BLUEPRINT.getExecutionRuntimePacket();
   }
 
@@ -1431,6 +1496,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Frame Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeFrame(rule: DevelopmentRule): ExecutionRuntimeFrame | undefined {
+    // 依存性検証のため packet の解決可能性のみ確認
+    const packet = this.getExecutionRuntimePacket(rule);
+    if (!packet) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_FRAME_BLUEPRINT.getExecutionRuntimeFrame();
   }
 
@@ -1440,6 +1510,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Message Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeMessage(rule: DevelopmentRule): ExecutionRuntimeMessage | undefined {
+    // 依存性検証のため frame の解決可能性のみ確認
+    const frame = this.getExecutionRuntimeFrame(rule);
+    if (!frame) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_MESSAGE_BLUEPRINT.getExecutionRuntimeMessage();
   }
 
@@ -1449,6 +1524,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Envelope Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeEnvelope(rule: DevelopmentRule): ExecutionRuntimeEnvelope | undefined {
+    // 依存性検証のため message の解決可能性のみ確認
+    const message = this.getExecutionRuntimeMessage(rule);
+    if (!message) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_ENVELOPE_BLUEPRINT.getExecutionRuntimeEnvelope();
   }
 
@@ -1458,6 +1538,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Secure Channel Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeSecureChannel(rule: DevelopmentRule): ExecutionRuntimeSecureChannel | undefined {
+    // 依存性検証のため envelope の解決可能性のみ確認
+    const envelope = this.getExecutionRuntimeEnvelope(rule);
+    if (!envelope) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_SECURE_CHANNEL_BLUEPRINT.getExecutionRuntimeSecureChannel();
   }
 
@@ -1467,6 +1552,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Identity Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeIdentity(rule: DevelopmentRule): ExecutionRuntimeIdentity | undefined {
+    // 依存性検証のため secureChannel の解決可能性のみ確認
+    const secureChannel = this.getExecutionRuntimeSecureChannel(rule);
+    if (!secureChannel) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_IDENTITY_BLUEPRINT.getExecutionRuntimeIdentity();
   }
 
@@ -1476,6 +1566,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Socket Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeSocket(rule: DevelopmentRule): ExecutionRuntimeSocket | undefined {
+    // 依存性検証のため identity の解決可能性のみ確認
+    const identity = this.getExecutionRuntimeIdentity(rule);
+    if (!identity) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_SOCKET_BLUEPRINT.getExecutionRuntimeSocket();
   }
 
@@ -1485,6 +1580,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Stream Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeStream(rule: DevelopmentRule): ExecutionRuntimeStream | undefined {
+    // 依存性検証のため socket の解決可能性のみ確認
+    const socket = this.getExecutionRuntimeSocket(rule);
+    if (!socket) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_STREAM_BLUEPRINT.getExecutionRuntimeStream();
   }
 
@@ -1494,6 +1594,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Buffer Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeBuffer(rule: DevelopmentRule): ExecutionRuntimeBuffer | undefined {
+    // 依存性検証のため stream の解決可能性のみ確認
+    const stream = this.getExecutionRuntimeStream(rule);
+    if (!stream) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_BUFFER_BLUEPRINT.getExecutionRuntimeBuffer();
   }
 
@@ -1503,6 +1608,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Pipe Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimePipe(rule: DevelopmentRule): ExecutionRuntimePipe | undefined {
+    // 依存性検証のため buffer の解決可能性のみ確認
+    const buffer = this.getExecutionRuntimeBuffer(rule);
+    if (!buffer) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_PIPE_BLUEPRINT.getExecutionRuntimePipe();
   }
 
@@ -1512,6 +1622,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Protocol Data Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeProtocolData(rule: DevelopmentRule): ExecutionRuntimeProtocolData | undefined {
+    // 依存性検証のため pipe の解決可能性のみ確認
+    const pipe = this.getExecutionRuntimePipe(rule);
+    if (!pipe) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_PROTOCOL_DATA_BLUEPRINT.getExecutionRuntimeProtocolData();
   }
 
@@ -1521,6 +1636,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Endpoint Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeEndpoint(rule: DevelopmentRule): ExecutionRuntimeEndpoint | undefined {
+    // 依存性検証のため protocolData の解決可能性のみ確認
+    const protocolData = this.getExecutionRuntimeProtocolData(rule);
+    if (!protocolData) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_ENDPOINT_BLUEPRINT.getExecutionRuntimeEndpoint();
   }
 
@@ -1530,6 +1650,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Port Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimePort(rule: DevelopmentRule): ExecutionRuntimePort | undefined {
+    // 依存性検証のため endpoint の解決可能性のみ確認
+    const endpoint = this.getExecutionRuntimeEndpoint(rule);
+    if (!endpoint) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_PORT_BLUEPRINT.getExecutionRuntimePort();
   }
 
@@ -1539,6 +1664,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Message Queue Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeMessageQueue(rule: DevelopmentRule): ExecutionRuntimeMessageQueue | undefined {
+    // 依存性検証のため port の解決可能性のみ確認
+    const port = this.getExecutionRuntimePort(rule);
+    if (!port) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_MESSAGE_QUEUE_BLUEPRINT.getExecutionRuntimeMessageQueue();
   }
 
@@ -1548,6 +1678,11 @@ export class DevelopmentRules {
    * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Routing Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
    */
   static getExecutionRuntimeRouting(rule: DevelopmentRule): ExecutionRuntimeRouting | undefined {
+    // 依存性検証のため messageQueue の解決可能性のみ確認
+    const messageQueue = this.getExecutionRuntimeMessageQueue(rule);
+    if (!messageQueue) {
+      return undefined;
+    }
     return EXECUTION_RUNTIME_ROUTING_BLUEPRINT.getExecutionRuntimeRouting();
   }
 }

@@ -1,6 +1,6 @@
 import { PlatformExecutionContext } from './PlatformExecutionContext';
 import { PlatformStage } from './PlatformStage';
-import { MonitoringPipeline } from '../monitoring/MonitoringPipeline';
+import { MonitoringPipeline } from '@foundation/monitoring/MonitoringPipeline';
 
 export class PlatformLifecycleObserver {
   private static readonly pipeline = MonitoringPipeline.getInstance();
