@@ -11,6 +11,7 @@ export class AreaDetailPanel {
   private readonly element: HTMLDivElement;
   private readonly titleElement: HTMLHeadingElement;
   private readonly specContainer: HTMLDivElement;
+  private readonly fieldContainer: HTMLDivElement;
   private readonly turnoutContainer: HTMLDivElement;
   private readonly eventContainer: HTMLDivElement;
   private readonly closeButton: HTMLButtonElement;
@@ -43,6 +44,13 @@ export class AreaDetailPanel {
     this.specContainer = document.createElement('div');
     this.specContainer.style.marginBottom = '24px';
     this.element.appendChild(this.specContainer);
+
+    // Section 1.5: Field Operations
+    const fieldHeader = this.createSectionHeader('FIELD EVIDENCE (現場運用・証跡)');
+    this.element.appendChild(fieldHeader);
+    this.fieldContainer = document.createElement('div');
+    this.fieldContainer.style.marginBottom = '24px';
+    this.element.appendChild(this.fieldContainer);
 
     // Section 2: Turnout (過去3回選挙履歴)
     const turnoutHeader = this.createSectionHeader('HISTORICAL TURNOUT (直近3回国政選挙)');
@@ -165,6 +173,129 @@ export class AreaDetailPanel {
       this.specContainer.appendChild(row);
     });
 
+    // 1.5. Field Operations Spec Rendering
+    const areaLogs = logs.filter(l => l.areaId === area.areaId);
+
+    let distStatus = 'NOT_STARTED';
+    if (area.doneCount >= area.totalHouseholds) {
+      distStatus = 'COMPLETED';
+    } else if (area.doneCount > 0) {
+      distStatus = 'IN_PROGRESS';
+    }
+    
+    try {
+      const app = (globalThis as any).window?.DashboardApplication?.getInstance?.();
+      if (app) {
+        const ctrl = app.getFieldOperationController?.();
+        if (ctrl) {
+          distStatus = ctrl.statusManager.getStatus(area.areaId, area);
+        }
+      }
+    } catch (e) {}
+
+    let inventoryText = '情報なし';
+    let isInventoryLow = false;
+    const invLog = areaLogs.find(l => l.meta && (l.meta.remainingSheets !== undefined || l.meta.remaining !== undefined));
+    if (invLog) {
+      const remaining = invLog.meta.remainingSheets !== undefined ? invLog.meta.remainingSheets : invLog.meta.remaining;
+      const threshold = invLog.meta.lowStockThreshold || 100;
+      inventoryText = `${remaining} 枚`;
+      if (remaining < threshold) {
+        inventoryText += ' (在庫僅少)';
+        isInventoryLow = true;
+      }
+    }
+
+    let gpsText = '測位なし';
+    const gpsLog = areaLogs.find(l => typeof l.latitude === 'number' && typeof l.longitude === 'number' && l.latitude !== 0 && l.longitude !== 0);
+    if (gpsLog) {
+      gpsText = new Date(gpsLog.timestamp).toLocaleTimeString('ja-JP');
+    }
+
+    let photoText = '提出なし';
+    let photoUrl = '';
+    const photoLog = areaLogs.find(l => l.meta && (l.meta.photoUrl || l.meta.photo_url));
+    if (photoLog) {
+      photoText = new Date(photoLog.timestamp).toLocaleTimeString('ja-JP');
+      photoUrl = photoLog.meta.photoUrl || photoLog.meta.photo_url;
+    }
+
+    this.fieldContainer.innerHTML = '';
+    
+    const fieldRows = [
+      { label: '配布状況', val: distStatus, isBadge: true },
+      { label: '在庫状況', val: inventoryText, color: isInventoryLow ? '#ef4444' : '#ffffff' },
+      { label: '最新GPS位置取得', val: gpsText },
+      { label: '最新写真証跡', val: photoText, link: photoUrl }
+    ];
+
+    fieldRows.forEach(row => {
+      const el = document.createElement('div');
+      el.style.display = 'flex';
+      el.style.justifyContent = 'space-between';
+      el.style.alignItems = 'center';
+      el.style.fontSize = '13px';
+      el.style.marginBottom = '10px';
+      el.style.background = 'rgba(255,255,255,0.01)';
+      el.style.padding = '8px 12px';
+      el.style.borderRadius = '8px';
+      el.style.border = '1px solid rgba(255,255,255,0.02)';
+
+      const label = document.createElement('span');
+      label.style.color = 'rgba(255, 255, 255, 0.5)';
+      label.innerText = row.label;
+
+      const valContainer = document.createElement('span');
+      
+      if (row.isBadge) {
+        const badge = document.createElement('span');
+        badge.innerText = row.val;
+        badge.style.fontSize = '10px';
+        badge.style.fontWeight = '800';
+        badge.style.padding = '3px 8px';
+        badge.style.borderRadius = '9999px';
+        badge.style.letterSpacing = '0.05em';
+        
+        let bg = 'rgba(107, 114, 128, 0.1)';
+        let fg = '#6b7280';
+        if (row.val === 'IN_PROGRESS') {
+          bg = 'rgba(245, 158, 11, 0.1)';
+          fg = '#f59e0b';
+        } else if (row.val === 'COMPLETED') {
+          bg = 'rgba(16, 185, 129, 0.1)';
+          fg = '#10b981';
+        } else if (row.val === 'PAUSED') {
+          bg = 'rgba(59, 130, 246, 0.1)';
+          fg = '#3b82f6';
+        }
+        badge.style.background = bg;
+        badge.style.color = fg;
+        badge.style.border = `1px solid rgba(${this.hexToRgb(fg)}, 0.2)`;
+        valContainer.appendChild(badge);
+      } else if (row.link) {
+        const link = document.createElement('a');
+        link.href = row.link;
+        link.target = '_blank';
+        link.innerText = `表示 (${row.val})`;
+        link.style.color = '#3b82f6';
+        link.style.textDecoration = 'none';
+        link.style.fontWeight = '700';
+        link.addEventListener('mouseover', () => link.style.textDecoration = 'underline');
+        link.addEventListener('mouseout', () => link.style.textDecoration = 'none');
+        valContainer.appendChild(link);
+      } else {
+        valContainer.style.fontWeight = '700';
+        if (row.color) {
+          valContainer.style.color = row.color;
+        }
+        valContainer.innerText = row.val;
+      }
+
+      el.appendChild(label);
+      el.appendChild(valContainer);
+      this.fieldContainer.appendChild(el);
+    });
+
     // 2. Turnouts (過去3回選挙履歴)
     this.turnoutContainer.innerHTML = '';
     const filteredTurnouts = turnouts.filter(t => t.areaId === area.areaId);
@@ -250,5 +381,13 @@ export class AreaDetailPanel {
 
   getElement(): HTMLDivElement {
     return this.element;
+  }
+
+  private hexToRgb(hex: string): string {
+    const cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
+    const r = parseInt(cleanHex.slice(0, 2), 16);
+    const g = parseInt(cleanHex.slice(2, 4), 16);
+    const b = parseInt(cleanHex.slice(4, 6), 16);
+    return `${r},${g},${b}`;
   }
 }

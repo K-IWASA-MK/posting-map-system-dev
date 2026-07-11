@@ -41,6 +41,19 @@
   - `ConflictResolver` による競合解決（EventLogの重複排除、AreaのdoneCountデグレード防止、Inventoryのタイムスタンプ優先）を Strategy パターンで拡張可能に設計。
   - `SynchronizationScheduler` を実装し、6つの同期ステータスイベント（sync-start, sync-success, sync-failed, sync-skipped, sync-offline, sync-retry）の発行および、ネットワーク切断時の自発的一時停止ポリシーを統制。
 
+* **Phase S2-4: Dashboard Operational Foundation** ✅
+  - システム健全性を評価する `SystemHealthMonitor` とステートマシン遷移の `OperationalStatusManager` を新設。
+  - キャッシュ/同期/競合状態のメトリクスを収集・集約する `MetricsAggregator` を構築。
+  - トースト表示およびインメモリ履歴制限（最大50件）を行う `NotificationCenter` および、ヘッダー用 `HealthIndicator` UIを実装。
+  - ヘッダー内の「FORCE REFRESH」からイベント駆動（`refresh-requested`）によるキャッシュ全クリア＆強制再同期をDI統合。
+* **Phase S2-5: Field Operation Foundation** ✅
+  - 地区の配布ステータス（NOT_STARTED, IN_PROGRESS, COMPLETED, PAUSED）を自動・手動で管理する `DistributionStatusManager` を新設。
+  - チラシ残数と警告閾値監視による Dashboard-local アラートを検知する `InventoryMonitor` を構築。
+  - 配布員のGPS座標と最終測位からのアクティブ判定を行う `GPSEvidenceMonitor` を実装。
+  - アップロードされた証跡写真を地区単位で時系列管理する `PhotoEvidenceMonitor` を実装。
+  - 現場完了数、アクティブ人数、GPS・写真カバレッジ等のメトリクスを集約する `FieldOperationMetrics` および現場コントローラー `FieldOperationController` を DI 統合。
+  - `AreaDetailPanel` へ配布状況バッジ、在庫、最新GPS、写真証跡リンク表示を組み込み。
+
 ### 主な今後の開発項目
 1. **Stripe自動契約・独占権管理の統合**:
    - Stripe決済情報をバインドし、支部別独占ライセンス（`TOKYO-01` 等）の自動停止・有効化。

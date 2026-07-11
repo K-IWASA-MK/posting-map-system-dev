@@ -25,6 +25,11 @@ export class DashboardEventCoordinator {
    * - 'health-changed': システム健全状態の変更 (OperationalStatus)
    * - 'metrics-updated': 統合メトリクスの更新 (AggregatedMetrics)
    * - 'notification-added': 運用ポップアップの追加 (NotificationItem)
+   * - 'distribution-updated': 配布進捗状況の更新
+   * - 'inventory-updated': チラシ在庫状況の更新
+   * - 'gps-updated': 配布員のGPS座標の更新
+   * - 'photo-updated': 写真提出の更新
+   * - 'field-status-changed': 現場運用全体のメトリクス更新
    */
   on(event: string, callback: (...args: any[]) => void): void {
     if (!this.listeners[event]) {

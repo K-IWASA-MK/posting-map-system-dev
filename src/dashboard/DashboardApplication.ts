@@ -24,6 +24,12 @@ import { SystemHealthMonitor } from './operations/SystemHealthMonitor';
 import { OperationalStatusManager } from './operations/OperationalStatusManager';
 import { MetricsAggregator } from './operations/MetricsAggregator';
 import { NotificationCenter } from './operations/NotificationCenter';
+import { DistributionStatusManager } from './field/DistributionStatusManager';
+import { InventoryMonitor } from './field/InventoryMonitor';
+import { GPSEvidenceMonitor } from './field/GPSEvidenceMonitor';
+import { PhotoEvidenceMonitor } from './field/PhotoEvidenceMonitor';
+import { FieldOperationMetrics } from './field/FieldOperationMetrics';
+import { FieldOperationController } from './field/FieldOperationController';
 
 export class DashboardApplication {
   private static instance: DashboardApplication | null = null;
@@ -47,7 +53,16 @@ export class DashboardApplication {
   private metricsAggregator!: MetricsAggregator;
   private notificationCenter!: NotificationCenter;
 
+  private fieldOperationController!: FieldOperationController;
+
   private constructor() {}
+
+  /**
+   * 現場運用コントローラーの取得
+   */
+  getFieldOperationController(): FieldOperationController {
+    return this.fieldOperationController;
+  }
 
   /**
    * シングルトンインスタンスの取得
@@ -100,6 +115,23 @@ export class DashboardApplication {
     this.healthMonitor = new SystemHealthMonitor(this.statusManager);
     this.metricsAggregator = new MetricsAggregator(this.cacheManager, this.refreshScheduler, this.conflictResolver);
     this.notificationCenter = new NotificationCenter();
+
+    // 4.9. 現場運用管理モジュールの初期化とDI統合
+    const distStatusMgr = new DistributionStatusManager();
+    const invMonitor = new InventoryMonitor(this.notificationCenter);
+    const gpsMonitor = new GPSEvidenceMonitor();
+    const photoMonitor = new PhotoEvidenceMonitor();
+    const fieldMetrics = new FieldOperationMetrics(distStatusMgr, invMonitor, gpsMonitor, photoMonitor, this.stateModel);
+    
+    this.fieldOperationController = new FieldOperationController(
+      distStatusMgr,
+      invMonitor,
+      gpsMonitor,
+      photoMonitor,
+      fieldMetrics,
+      this.eventCoordinator,
+      this.stateModel
+    );
 
     // 4.8.1. 運用状態・インジケータイベントの接続
     this.statusManager.subscribe((status) => {
@@ -184,6 +216,11 @@ export class DashboardApplication {
 
     // 5.6. 同期された EventLog の UI 配信フックの定義
     this.eventLogDispatcher.subscribe((log) => {
+      // 現場運用コントローラーで新着ログを処理・分配
+      if (this.fieldOperationController) {
+        this.fieldOperationController.processIncomingLog(log);
+      }
+
       const mapPanel = (this.layout as any).mapPanel;
       if (mapPanel && (mapPanel as any).mapEngine) {
         (mapPanel as any).mapEngine.updateLayer('activity', { logs: this.stateModel.getEventLogs() });
@@ -252,6 +289,14 @@ export class DashboardApplication {
     // 8. 初期データ同期 (Real Data First)
     try {
       await this.stateModel.loadDashboard(tenantId, branchId, true);
+
+      // 既にある履歴ログを現場運用コントローラーへ流し込んで初期化
+      const initialLogs = this.stateModel.getEventLogs();
+      if (initialLogs && this.fieldOperationController) {
+        const sortedLogs = [...initialLogs].sort((a, b) => a.timestamp - b.timestamp);
+        sortedLogs.forEach(log => this.fieldOperationController.processIncomingLog(log));
+      }
+
       console.log('[DashboardApplication] Boot process complete. Initial state mapped.');
     } catch (err) {
       console.error('[DashboardApplication] Failed to complete initial synchronisation', err);
