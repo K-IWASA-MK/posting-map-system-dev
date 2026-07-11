@@ -23,8 +23,8 @@
 ## 1. 機能トグル (Feature Flags)
 本現場運用基盤は、以下の Feature Flag によって各機能の有効化・無効化（ON/OFF）が動的に制御可能となるように設計されています。
 
-* **`Flyer Holding` (デフォルト: false)**:
-  - 預かりチラシ（手持ちチラシ残数、低在庫警告など）の管理機能。POSTING MAPではデフォルト無効とし、他業種向けや特別オプション時にのみ有効化されます。
+* **`Flyer Holding` (デフォルト: true)**:
+  - 預かりチラシ（手持ちチラシ残数、低在庫警告など）の管理機能。POSTING MAPの標準機能として有効化されます。
 * **`Google Maps` (デフォルト: true)**:
   - Google Maps Engine の有効化。
 * **`Mapbox` (デフォルト: false)**:
