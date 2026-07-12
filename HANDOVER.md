@@ -514,3 +514,17 @@ AIOS Core の「プロセス空間」の基礎となる S7-1 が完了しまし�
   - `DevelopmentContextBuilder` を導入。必須チェックに加え、`build()` メソッド内で `Object.freeze()` を行い、プラグインからの変更を完全に防止する「Immutable 設計」を確立。
 - **検証**:
   - `DevelopmentContextBuilder.test.ts` を作成し、必須項目のバリデーションおよび生成されたオブジェクトに対する Runtime 上での変更（Strict mode における `TypeError`）が適切にブロックされることをテストで保証。
+
+### AIOS Core Sprint 7 Phase S7-2: Development Rule Plugin Interface Foundation
+
+AIOS Core が Plugin を管理・実行するための標準契約（Contract）となる S7-2 の実装が完了しました。
+
+- **Plugin 識別子と能力の定義**:
+  - `DevelopmentPluginId`, `DevelopmentCapability` (Validation, Governance, Audit など) の Enum を実装。
+- **Immutable Metadata と API 互換性**:
+  - `DevelopmentPluginMetadata` インターフェースを定義し、`apiVersion` を導入。テストにて `Object.freeze()` による不変性の保証と、Strict モードでの意図しないプロパティ変更のガードを確認しました。
+- **実行結果の契約拡張**:
+  - `DevelopmentPluginResult` に `confidence` を追加し、Governance フェーズでの意思決定精度を高める構造としました。
+- **OS の責務としての Lifecycle 管理**:
+  - 「Plugin は機能のみを持つ」という設計原則に則り、`IDevelopmentPlugin` から状態遷移の責務を完全に排除し、`initialize`, `validate` 等の契約のみを定義しました。
+  - 状態遷移のバリデーションは、OS 側の責務として `PluginLifecycleManager` に集約しました。テストにおいて `UNLOADED -> DISCOVERED` 等の許可遷移と、`UNLOADED -> RUNNING` 等の不正遷移のブロックが機能することを実証済みです。
