@@ -5,3 +5,4 @@ export * from './PatternEvaluation';
 export * from './LearningPattern';
 export * from './LearningRequest';
 export * from './LearningResult';
+export * from './LearningDataset';

@@ -5,5 +5,5 @@ export interface PatternEvaluation {
   readonly confidence: number;
   readonly qualityScore: number;
   readonly trustLevel: string;
-  readonly approvedAt: Date;
+  readonly approvedAt: string;
 }

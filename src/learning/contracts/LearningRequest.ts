@@ -6,8 +6,8 @@ export interface LearningRequest {
   readonly sourceType: string;
   readonly targetComponent?: string;
   readonly timeRange?: {
-    readonly start: Date;
-    readonly end: Date;
+    readonly start: string;
+    readonly end: string;
   };
   readonly filters: ReadonlyArray<string>;
 }

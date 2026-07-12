@@ -16,7 +16,7 @@ export interface LearningPattern {
   readonly patternId: string;       // Identity (e.g. PAT-SEQ-001)
   readonly version: number;         // Immutable Version
   readonly status: PatternStatus;   // Lifecycle state
-  readonly createdAt: Date;
+  readonly createdAt: string;
 
   // --- Objective Data (Engine Output) ---
   readonly sourceDatasetIds: ReadonlyArray<string>; // Supports aggregation across multiple executions
