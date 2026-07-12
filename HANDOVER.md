@@ -704,3 +704,18 @@ ProjectionRepository と MetricsRepository から現在の稼働状態および�
   - ヘルス状態を `UNKNOWN`, `READY`, `RUNNING`, `WARNING`, `ERROR`, `SHUTDOWN` に統一し、エラー時の詳細追跡用の `reason` を `HealthMonitor` に予約設計しました。
 - **仕様書の作成**:
   - `docs/specifications/` 配下に `LiveMonitor.md`, `MonitorSnapshot.md`, `HealthMonitor.md`, `SessionMonitor.md`, `MetricsMonitor.md`, `MonitorConfiguration.md` の6つの仕様書を作成しました。
+
+### AIOS Observability OS Sprint 8 Phase S8-7: Learning Source Foundation
+
+Sprint 9 の Learning Engine のインプットとなる不変な学習データを抽出・マージするデータアクセス層（Learning Source）を構築しました。
+
+- **学習・推論のないデータ取得層の徹底**:
+  - `LearningSource.md` にて「学習・推論・知識生成は一切行わないリポジトリ駆動データ取得層」と定義。
+- **型安全モデル `LearningRecord` と `LearningDatasetBuilder`**:
+  - `any` を排し型安全なレコード構造 `LearningRecord` を定義。`LearningDatasetBuilder` を用いて、メタデータ（`datasetVersion` を含む `LearningDatasetMetadata`）の付与と `Object.freeze()` による完全不変データセットの生成を担当させました。
+- **`LearningSourceCapability` と `ResolverResult`**:
+  - 各ソースが対応するフィルタ（実行ID、時間窓等）を Capability として自己宣言し、`LearningSourceResolver` が最適なソースを自動ルートして詳細結果を `ResolverResult` に含める仕組みを実装しました。
+- **優先度順 Composite 統合**:
+  - `CompositeLearningSource` により、Ledger (100)、Telemetry (80)、Metrics (60) の子ソースを Registry の Priority に基づいて決定論的な順序でロードし、同一 `recordId` をキーにマージ・重複排除する構造を構築しました。
+- **仕様書の作成**:
+  - `docs/specifications/` 配下に `LearningSource.md`, `LearningDataset.md`, `LearningRequest.md`, `LearningSourceResolver.md`, `LearningSourceRegistry.md`, `LearningSourceConfiguration.md` の6つの仕様書を作成しました。
