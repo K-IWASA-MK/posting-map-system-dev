@@ -528,3 +528,16 @@ AIOS Core が Plugin を管理・実行するための標準契約（Contract）
 - **OS の責務としての Lifecycle 管理**:
   - 「Plugin は機能のみを持つ」という設計原則に則り、`IDevelopmentPlugin` から状態遷移の責務を完全に排除し、`initialize`, `validate` 等の契約のみを定義しました。
   - 状態遷移のバリデーションは、OS 側の責務として `PluginLifecycleManager` に集約しました。テストにおいて `UNLOADED -> DISCOVERED` 等の許可遷移と、`UNLOADED -> RUNNING` 等の不正遷移のブロックが機能することを実証済みです。
+
+### AIOS Core Sprint 7 Phase S7-3: Development Rule Engine Foundation
+
+AIOS の「心臓部」であり、Plugin を自律的に実行・管理する Development Rule Engine の構築が完了しました。
+
+- **`ExecutionSession` & `PluginExecutionContext` の導入**:
+  - 実行全体を管理する `ExecutionSession` (将来の並列・リトライ・分散実行への布石) を導入。
+  - プラグインの入力 IF を `PluginExecutionContext` に一本化し、`DevelopmentContext` や `PluginExecutionPlan` との依存を綺麗にラップしました（Rule-009）。
+- **`PluginRegistry` & `PluginLoader` の連携**:
+  - `Registry` に `findSupported(context)` を実装し、`Loader` が `supports()` 判定に基づき該当プラグインのみを自動抽出するルーティング基盤を確立しました。将来の Manifest 駆動への移行準備が整っています。
+- **`DevelopmentRuleEngine` の実装**:
+  - Engine は特定の Plugin を一切知らず、`Context` を起点として `Discovery -> Loader -> Execution Plan -> Lifecycle Orchestration` を実行する完全な OS オーケストレーターとして完成しました。
+  - テストにおいて、Context の種類に応じて対象プラグインのみが自律的に選択され、全 Lifecycle が回ることを実証しました。

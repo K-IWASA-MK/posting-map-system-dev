@@ -7,6 +7,8 @@ import { DevelopmentContext } from '../../../../../../src/core/aios/context/Deve
 import { DevelopmentContextBuilder } from '../../../../../../src/core/aios/context/DevelopmentContextBuilder';
 import { DevelopmentContextType } from '../../../../../../src/core/aios/context/DevelopmentContextType';
 import { PluginLifecycleManager } from '../../../../../../src/core/aios/plugin/PluginLifecycleManager';
+import { PluginExecutionContext } from '../../../../../../src/core/aios/engine/PluginExecutionContext';
+import { ExecutionSessionBuilder } from '../../../../../../src/core/aios/engine/ExecutionSession';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -15,7 +17,6 @@ function assert(condition: boolean, message: string) {
 }
 
 // A simple mock plugin that adheres strictly to the interface.
-// It also simulates an OS-side status update by the manager (Engine).
 class MockPlugin implements IDevelopmentPlugin {
   public metadata: DevelopmentPluginMetadata;
   public status: DevelopmentPluginStatus = DevelopmentPluginStatus.UNLOADED;
@@ -36,7 +37,6 @@ class MockPlugin implements IDevelopmentPlugin {
     });
   }
 
-  // Helper to change state simulating the Engine's work
   public setStatus(newStatus: DevelopmentPluginStatus) {
     PluginLifecycleManager.validateTransition(this.status, newStatus);
     this.status = newStatus;
@@ -46,31 +46,31 @@ class MockPlugin implements IDevelopmentPlugin {
     return this.metadata.supportedContexts.includes(context.contextType);
   }
 
-  public async initialize(context: DevelopmentContext): Promise<void> {
+  public async initialize(pluginContext: PluginExecutionContext): Promise<void> {
     this.trace.push('initialize');
   }
 
-  public async beforeValidate(context: DevelopmentContext): Promise<void> {
+  public async beforeValidate(pluginContext: PluginExecutionContext): Promise<void> {
     this.trace.push('beforeValidate');
   }
 
-  public async validate(context: DevelopmentContext): Promise<void> {
+  public async validate(pluginContext: PluginExecutionContext): Promise<void> {
     this.trace.push('validate');
   }
 
-  public async afterValidate(context: DevelopmentContext): Promise<void> {
+  public async afterValidate(pluginContext: PluginExecutionContext): Promise<void> {
     this.trace.push('afterValidate');
   }
 
-  public async review(context: DevelopmentContext): Promise<void> {
+  public async review(pluginContext: PluginExecutionContext): Promise<void> {
     this.trace.push('review');
   }
 
-  public async govern(context: DevelopmentContext): Promise<void> {
+  public async govern(pluginContext: PluginExecutionContext): Promise<void> {
     this.trace.push('govern');
   }
 
-  public async report(context: DevelopmentContext): Promise<DevelopmentPluginResult> {
+  public async report(pluginContext: PluginExecutionContext): Promise<DevelopmentPluginResult> {
     this.trace.push('report');
     return {
       pluginId: this.metadata.id,
@@ -95,6 +95,15 @@ async function runTests() {
     .setProject('mock-project')
     .build();
 
+  const session = new ExecutionSessionBuilder().build();
+
+  const pluginContext: PluginExecutionContext = Object.freeze({
+    context,
+    session,
+    plan: { planId: 'test-plan', nodes: [], createdAt: new Date().toISOString() },
+    sharedState: Object.freeze({})
+  });
+
   // Test supports
   assert(plugin.supports(context), 'Mock plugin should support RepositoryReview');
 
@@ -102,17 +111,17 @@ async function runTests() {
   plugin.setStatus(DevelopmentPluginStatus.DISCOVERED);
   plugin.setStatus(DevelopmentPluginStatus.LOADED);
   
-  await plugin.initialize(context);
+  await plugin.initialize(pluginContext);
   plugin.setStatus(DevelopmentPluginStatus.INITIALIZED);
   plugin.setStatus(DevelopmentPluginStatus.READY);
 
   plugin.setStatus(DevelopmentPluginStatus.RUNNING);
-  await plugin.beforeValidate(context);
-  await plugin.validate(context);
-  await plugin.afterValidate(context);
-  await plugin.review(context);
-  await plugin.govern(context);
-  const result = await plugin.report(context);
+  await plugin.beforeValidate(pluginContext);
+  await plugin.validate(pluginContext);
+  await plugin.afterValidate(pluginContext);
+  await plugin.review(pluginContext);
+  await plugin.govern(pluginContext);
+  const result = await plugin.report(pluginContext);
   
   assert(result.pluginId === DevelopmentPluginId.Testing, 'Report should have correct plugin ID');
   
