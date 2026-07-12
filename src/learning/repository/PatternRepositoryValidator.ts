@@ -18,6 +18,12 @@ export class PatternRepositoryValidator {
       throw new PatternRepositoryError(`Cannot save pattern. Evaluation data is missing.`);
     }
 
+    if (pattern.version < 1) {
+      throw new PatternRepositoryError(
+        `Pattern ${pattern.patternId} has version ${pattern.version}. Only patterns with version >= 1 can be saved to the repository.`
+      );
+    }
+
     if (!Object.isFrozen(pattern)) {
       throw new PatternRepositoryError(`Cannot save pattern. The pattern object must be immutable (frozen).`);
     }

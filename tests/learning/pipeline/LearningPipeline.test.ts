@@ -2,8 +2,9 @@ import { LearningPipelineFactory } from '../../../src/learning/pipeline/Learning
 import { LearningEngine } from '../../../src/learning/pipeline/LearningEngine';
 import { ILearningSourceResolver } from '../../../src/learning/source';
 import { IPatternDiscovery, PatternDiscoveryResult } from '../../../src/learning/discovery';
-import { LearningDataset, LearningRequest } from '../../../src/learning/contracts';
+import { LearningDataset, LearningRequest, LearningPattern, PatternStatus } from '../../../src/learning/contracts';
 import { PipelineStatus } from '../../../src/learning/pipeline/PipelineStatus';
+import { IGovernanceOrchestrator, GovernanceResult } from '../../../src/learning/governance';
 
 async function runTests() {
   function assertEqual(actual: any, expected: any, message: string) {
@@ -46,10 +47,30 @@ async function runTests() {
     }
   }
 
+  // Mock Orchestrator
+  class MockOrchestrator implements IGovernanceOrchestrator {
+    public async evaluateAndStore(patterns: ReadonlyArray<LearningPattern>): Promise<GovernanceResult> {
+      // Simulate that all DISCOVERED patterns get APPROVED and version 1
+      const approvedPatterns = patterns.map(p => ({
+        ...p,
+        version: 1,
+        status: PatternStatus.APPROVED,
+        evaluation: { confidence: 0.9, qualityScore: 90, trustLevel: 'HIGH', approvedAt: '' }
+      }));
+      return Object.freeze({
+        approvedPatterns,
+        rejectedPatterns: [],
+        decisions: [],
+        durationMs: 5
+      });
+    }
+  }
+
   const discovery = new MockDiscovery();
   const engine = new LearningEngine(discovery);
   const resolver = new MockResolver();
-  const pipeline = LearningPipelineFactory.create({ resolver, engine });
+  const orchestrator = new MockOrchestrator();
+  const pipeline = LearningPipelineFactory.create({ resolver, engine, orchestrator });
 
   const request: LearningRequest = {
     schemaVersion: '1.0.0',
@@ -65,8 +86,9 @@ async function runTests() {
   assertEqual(result.requestId, 'REQ-123', "Pipeline should preserve requestId");
   assertEqual(result.datasetId, 'DS-MOCK-1', "Pipeline should extract datasetId from resolver");
   assertEqual(result.patternCount, 2, "Pipeline should extract 2 patterns");
-  assertEqual(result.patterns.length, 2, "Pipeline should return 2 DISCOVERED patterns");
-  assertEqual(result.patterns[0].status, 'DISCOVERED', "Patterns must be in DISCOVERED status");
+  assertEqual(result.patterns.length, 2, "Pipeline should return 2 APPROVED patterns");
+  assertEqual(result.patterns[0].status, 'APPROVED', "Patterns must be in APPROVED status");
+  assertEqual(result.patterns[0].version, 1, "Patterns must be version 1");
   assertEqual(result.patterns[0].patternType, 'SEQUENCE', "Pattern type should match discovery output");
 
   // Test 2: Failure Handling

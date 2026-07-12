@@ -4,6 +4,6 @@ import { LearningPipelineConfiguration } from './LearningPipelineConfiguration';
 
 export class LearningPipelineFactory {
   public static create(config: LearningPipelineConfiguration): ILearningPipeline {
-    return new LearningPipeline(config.resolver, config.engine);
+    return new LearningPipeline(config.resolver, config.engine, config.orchestrator);
   }
 }

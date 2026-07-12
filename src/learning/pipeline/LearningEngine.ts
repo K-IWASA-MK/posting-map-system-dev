@@ -14,7 +14,7 @@ export class LearningEngine implements ILearningEngine {
       return Object.freeze({
         schemaVersion: '1.0.0',
         patternId,
-        version: 1,
+        version: 0,
         status: PatternStatus.DISCOVERED,
         createdAt: new Date().toISOString(),
         sourceDatasetIds: [dataset.datasetId],

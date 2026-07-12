@@ -5,10 +5,13 @@ import { ILearningPipeline } from './ILearningPipeline';
 import { LearningPipelineResult } from './LearningPipelineResult';
 import { PipelineStatus } from './PipelineStatus';
 
+import { IGovernanceOrchestrator } from '../governance';
+
 export class LearningPipeline implements ILearningPipeline {
   constructor(
     private readonly resolver: ILearningSourceResolver,
-    private readonly engine: ILearningEngine
+    private readonly engine: ILearningEngine,
+    private readonly orchestrator: IGovernanceOrchestrator
   ) {}
 
   public async run(request: LearningRequest): Promise<LearningPipelineResult> {
@@ -19,10 +22,14 @@ export class LearningPipeline implements ILearningPipeline {
       // 1. Resolve Source to Dataset
       const dataset = await this.resolver.resolve(request);
 
-      // 2. Extract Patterns via Learning Engine
-      const patterns = await this.engine.learn(dataset);
+      // 2. Extract Patterns via Learning Engine (version=0)
+      const discoveredPatterns = await this.engine.learn(dataset);
 
-      // 3. Return Pipeline Result (NO REPOSITORY SAVE)
+      // 3. Evaluate and Store via Governance Orchestrator (returns version>=1 APPROVED patterns)
+      const governanceResult = await this.orchestrator.evaluateAndStore(discoveredPatterns);
+      const approvedPatterns = governanceResult.approvedPatterns;
+
+      // 4. Return Pipeline Result
       return Object.freeze({
         requestId: request.requestId,
         datasetId: dataset.datasetId,
@@ -31,8 +38,8 @@ export class LearningPipeline implements ILearningPipeline {
         startedAt,
         completedAt: new Date().toISOString(),
         durationMs: Date.now() - startTime,
-        patternCount: patterns.length,
-        patterns: Object.freeze(patterns)
+        patternCount: approvedPatterns.length,
+        patterns: Object.freeze(approvedPatterns)
       });
     } catch (error: any) {
       // Handle failures gracefully in the pipeline
