@@ -658,3 +658,19 @@ EventBus からのイベント伝送を受け、AIOS 内の定量的メトリク
   - インターフェースに `exists()` と `count()` を追加。5,000 件以上のレコード追加・取得（Capacity Test）においても高速・正確に連動する `InMemoryTelemetryRepository` を実装しました。
 - **仕様書の作成**:
   - `docs/specifications/` 配下に `Telemetry.md`, `TelemetryRecord.md`, `TelemetryCollector.md`, `TelemetryRepository.md`, `TelemetryDispatcher.md`, `MetricCategory.md`, `MetricUnit.md` の7つの仕様書を作成しました。
+
+### AIOS Observability OS Sprint 8 Phase S8-4: Projection Foundation
+
+EventBus からのイベントストリームを受け、AIOS 内の現在状態（Current State）をリアルタイムに再構築・投影する Projection 基盤を構築しました。
+
+- **現在状態（Current State）への特化と上書き更新**:
+  - 履歴は Ledger に委ね、Projection は常に最新状態のスナップショット（`ProjectionSnapshot`）を `executionId` キーで上書き（Replace）保持するキャッシュビューとして設計しました。
+- **不整合を排除する `ProjectionStateMachine`**:
+  - 状態遷移のバリデーションをビルダーから切り離し、単一責任モジュールとして独立させました。
+  - 状態遷移表に基づき、不当な逆行遷移（例: `COMPLETED -> RUNNING`）を拒否し、以前の正常状態を維持・バージョンインクリメントをブロックする仕様をテストで検証しました。
+- **更新回数カウンタ (`projectionVersion`) の導入**:
+  - Snapshot に `projectionVersion` を持たせることで、Live Monitor などの外部 Query Model が効率的に変更検知を行えるようにしました。
+- **`ITelemetryRepository` と同様の拡張**:
+  - インターフェースに `exists()` と `count()` を実装し、効率的なデータ取得を可能にしました。
+- **仕様書の作成**:
+  - `docs/specifications/` 配下に `Projection.md`, `ProjectionBuilder.md`, `ProjectionRepository.md`, `ProjectionModel.md`, `ProjectionSnapshot.md`, `ProjectionConfiguration.md` の6つの仕様書を作成しました。
