@@ -7,14 +7,14 @@ import { ActivityHandler } from '@api/field/ActivityHandler';
 import { DashboardHandler } from '@api/dashboard/DashboardHandler';
 import { SubscriptionHandler } from '@api/subscription/SubscriptionHandler';
 import { OperationsDashboardHandler } from '@api/operations/OperationsDashboardHandler';
-import { WorkspaceOnboardingHandler } from '@api/operations/WorkspaceOnboardingHandler';
+import { WorkspaceHandler } from '@api/operations/WorkspaceHandler';
 import { StaffApplicationService } from '@application/field/services/StaffApplicationService';
 import { HoldingApplicationService } from '@application/field/services/HoldingApplicationService';
 import { ActivityApplicationService } from '@application/field/services/ActivityApplicationService';
 import { DashboardApplicationService } from '@application/dashboard/services/DashboardApplicationService';
 import { SubscriptionApplicationService } from '@application/subscription/SubscriptionApplicationService';
 import { OperationsDashboardApplicationService } from '@application/operations/services/OperationsDashboardApplicationService';
-import { WorkspaceOnboardingService } from '@application/onboarding/services/WorkspaceOnboardingService';
+import { WorkspaceApplicationService } from '@application/workspace/services/WorkspaceApplicationService';
 import { SpreadsheetStaffRepository } from '@infra/repository/field/SpreadsheetStaffRepository';
 import { SpreadsheetFlyerHoldingRepository } from '@infra/repository/field/SpreadsheetFlyerHoldingRepository';
 import { SpreadsheetActivityRepository } from '@infra/repository/field/SpreadsheetActivityRepository';
@@ -49,7 +49,7 @@ export function bootstrapFieldApis(): void {
   const dashboardAppService = new DashboardApplicationService(workspaceRepo, staffRepo, holdingRepo, activityRepo);
   const subscriptionAppService = new SubscriptionApplicationService(subscriptionRepo);
   const operationsDashboardAppService = new OperationsDashboardApplicationService(workspaceRepo, subscriptionRepo);
-  const workspaceOnboardingService = new WorkspaceOnboardingService(workspaceRepo, subscriptionRepo);
+  const workspaceService = new WorkspaceApplicationService(workspaceRepo, subscriptionRepo);
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
@@ -60,7 +60,7 @@ export function bootstrapFieldApis(): void {
     DashboardHandler: new DashboardHandler(dashboardAppService),
     SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
     OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService),
-    WorkspaceOnboardingHandler: new WorkspaceOnboardingHandler(workspaceOnboardingService)
+    WorkspaceHandler: new WorkspaceHandler(workspaceService)
   };
 
   // Register Field API Endpoints

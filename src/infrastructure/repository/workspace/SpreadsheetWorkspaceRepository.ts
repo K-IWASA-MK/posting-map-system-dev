@@ -21,16 +21,23 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
     const wsIdIdx = headers.indexOf('ワークスペースID');
     const nameIdx = headers.indexOf('ワークスペース名');
     const statusIdx = headers.indexOf('ステータス');
+    const goalIdx = headers.indexOf('月間配布目標');
+    const updatedAtIdx = headers.indexOf('目標更新日時');
+    const updatedByIdx = headers.indexOf('最終更新者');
 
     if (wsIdIdx === -1) return undefined;
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (String(row[wsIdIdx]) === id) {
+        const goalVal = goalIdx !== -1 && row[goalIdx] !== undefined && row[goalIdx] !== '' ? Number(row[goalIdx]) : null;
         return new Workspace({
           workspaceId: String(row[wsIdIdx]),
           workspaceName: nameIdx !== -1 ? String(row[nameIdx]) : '',
-          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE'
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE',
+          distributionGoal: goalVal,
+          goalUpdatedAt: updatedAtIdx !== -1 && row[updatedAtIdx] !== undefined ? String(row[updatedAtIdx]) : null,
+          goalUpdatedBy: updatedByIdx !== -1 && row[updatedByIdx] !== undefined ? String(row[updatedByIdx]) : null
         });
       }
     }
@@ -45,6 +52,9 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
     const wsIdIdx = headers.indexOf('ワークスペースID');
     const nameIdx = headers.indexOf('ワークスペース名');
     const statusIdx = headers.indexOf('ステータス');
+    const goalIdx = headers.indexOf('月間配布目標');
+    const updatedAtIdx = headers.indexOf('目標更新日時');
+    const updatedByIdx = headers.indexOf('最終更新者');
 
     if (wsIdIdx === -1) return [];
 
@@ -52,10 +62,14 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (row[wsIdIdx]) {
+        const goalVal = goalIdx !== -1 && row[goalIdx] !== undefined && row[goalIdx] !== '' ? Number(row[goalIdx]) : null;
         list.push(new Workspace({
           workspaceId: String(row[wsIdIdx]),
           workspaceName: nameIdx !== -1 ? String(row[nameIdx]) : '',
-          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE'
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE',
+          distributionGoal: goalVal,
+          goalUpdatedAt: updatedAtIdx !== -1 && row[updatedAtIdx] !== undefined ? String(row[updatedAtIdx]) : null,
+          goalUpdatedBy: updatedByIdx !== -1 && row[updatedByIdx] !== undefined ? String(row[updatedByIdx]) : null
         }));
       }
     }
@@ -64,7 +78,7 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
 
   public async save(workspace: Workspace): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
-    const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ワークスペース名', 'ステータス'];
+    const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ワークスペース名', 'ステータス', '月間配布目標', '目標更新日時', '最終更新者'];
 
     const wsIdIdx = headers.indexOf('ワークスペースID');
 
@@ -82,6 +96,9 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       if (h === 'ワークスペースID') return workspace.workspaceId;
       if (h === 'ワークスペース名') return workspace.workspaceName;
       if (h === 'ステータス') return workspace.getStatus();
+      if (h === '月間配布目標') return workspace.getDistributionGoal() !== null ? workspace.getDistributionGoal() : '';
+      if (h === '目標更新日時') return workspace.getGoalUpdatedAt() || '';
+      if (h === '最終更新者') return workspace.getGoalUpdatedBy() || '';
       return '';
     });
 
@@ -95,4 +112,5 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       }
     }
   }
+
 }

@@ -354,6 +354,33 @@ function renderDashboard(data) {
   document.getElementById('settings-workspace-id').textContent = data.workspaceId || workspaceId;
   document.getElementById('settings-subscription-status').textContent = 'ACTIVE';
   document.getElementById('settings-login-email').textContent = googleUser ? googleUser.email : '-';
+
+  // Goal configuration in settings
+  const goalInput = document.getElementById('settings-goal-input');
+  const metaContainer = document.getElementById('settings-goal-meta-container');
+  const updatedAtEl = document.getElementById('settings-goal-updated-at');
+  const updatedByEl = document.getElementById('settings-goal-updated-by');
+
+  if (goalInput && metaContainer && updatedAtEl && updatedByEl) {
+    goalInput.value = data.distributionGoal !== undefined && data.distributionGoal !== null ? data.distributionGoal : '';
+    if (data.goalUpdatedAt) {
+      try {
+        const d = new Date(data.goalUpdatedAt);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const date = String(d.getDate()).padStart(2, '0');
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        updatedAtEl.textContent = `${y}/${m}/${date} ${hh}:${mm}`;
+      } catch (e) {
+        updatedAtEl.textContent = data.goalUpdatedAt;
+      }
+      updatedByEl.textContent = data.goalUpdatedBy || '-';
+      metaContainer.style.display = 'flex';
+    } else {
+      metaContainer.style.display = 'none';
+    }
+  }
 }
 
 function updateTemplatePreview() {
@@ -415,5 +442,56 @@ function showError(msg) {
   alert(msg);
 }
 
+// Save goal to backend
+async function saveGoal() {
+  if (!googleUser || !dashboardData) return;
+  const goalInput = document.getElementById('settings-goal-input');
+  const goalVal = goalInput.value.trim();
+
+  if (goalVal === '') {
+    alert('目標枚数を入力してください。');
+    return;
+  }
+
+  const goalNum = Number(goalVal);
+  if (isNaN(goalNum) || goalNum < 0) {
+    alert('正しい目標枚数を入力してください。');
+    return;
+  }
+
+  showLoading(true);
+
+  const url = `${API_URL}`;
+  const bodyPayload = {
+    action: 'updateWorkspaceGoal',
+    workspaceId: dashboardData.workspaceId || workspaceId,
+    distributionGoal: goalNum,
+    updatedBy: googleUser.email
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(bodyPayload)
+    });
+    const result = await response.json();
+
+    if (result && result.success) {
+      const freshData = await fetchDashboardData(googleUser.email);
+      if (freshData) {
+        renderDashboard(freshData.data || freshData);
+      }
+      alert('目標を設定しました。');
+    } else {
+      alert('目標の保存に失敗しました。: ' + (result.message || 'エラー'));
+    }
+  } catch (e) {
+    alert('通信エラーが発生しました。: ' + e.message);
+  } finally {
+    showLoading(false);
+  }
+}
+
 // Start checks
 checkAuth();
+

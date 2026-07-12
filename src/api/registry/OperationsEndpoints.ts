@@ -23,12 +23,12 @@ export const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
     path: '/operations/workspaces',
     method: 'POST',
     version: 'v2',
-    handler: 'WorkspaceOnboardingHandler'
+    handler: 'WorkspaceHandler'
   },
   {
     path: '/operations/workspaces',
     method: 'GET',
     version: 'v2',
-    handler: 'WorkspaceOnboardingHandler'
+    handler: 'WorkspaceHandler'
   }
 ];

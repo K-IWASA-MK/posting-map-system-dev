@@ -6,12 +6,12 @@
 
 ## 📍 1. Current Location (現在地)
 
-- **Platform**: `CIE Platform v2.3.0-alpha.0`
-- **Completed**: `Posting Activity Integration Foundation`
-- **Milestone**: `Sprint 5 / Phase S5-16 COMPLETED`
-- **Tag**: `v5.16-posting-activity-integration-completed`
+- **Platform**: `CIE Platform v2.4.0-alpha.0`
+- **Completed**: `Workspace Goal Management Foundation`
+- **Milestone**: `Sprint 5 / Phase S5-19 COMPLETED`
+- **Tag**: `v5.19-workspace-goal-management-completed`
 - **Current Phase**: `Sprint 5`
-- **Next Action**: `Review with CEO`
+- **Next Action**: `Sprint 5 Next Phase`
 - **Branch**: `main`
 
 ---
@@ -412,3 +412,15 @@ Posting Activity Integration Foundation（Sprint 5 Phase S5-16）完了。
 Quality Gate:
 - npm run quality:check PASS
 
+
+### POSTING MAP Product Sprint 5 Phase S5-19: Workspace Goal Management Foundation
+
+Workspace Goal Management Foundation（Sprint 5 Phase S5-19）完了。
+
+- **Workspace ドメインの拡張**: `Workspace` エンティティへ `distributionGoal`（目標値）、`goalUpdatedAt`（更新日時）、`goalUpdatedBy`（更新者）のフィールドを追加し、値の更新時にメタ情報を自動設定するドメインロジックを実装。
+- **Spreadsheet永続化の拡張**: `SpreadsheetWorkspaceRepository` を拡張し、`Workspaces` シートに「月間配布目標」「目標更新日時」「最終更新者」列を追加・対応。
+- **DTOおよびサービスの移行・進化**: 旧 `WorkspaceOnboardingService` とオンボーディング用 DTO を廃止し、目標管理機能も内包した `WorkspaceApplicationService` と `WorkspaceDto` へリファクタリング。`WorkspaceIdGenerator` も `workspace` ディレクトリへ移行（MOVE）。
+- **APIおよびルーティング更新**: エンドポイント `/operations/workspaces` (GET / POST) のハンドラーを `WorkspaceHandler` に統合。目標更新のアクション（`updateWorkspaceGoal`）および取得アクション（`getWorkspaceDashboard`）を適切にRESTパスにマッピングする処理を `PlatformIntegrationPipeline.ts` に追加し、目標更新処理をトランザクション書込ロック対象に指定。
+- **Dashboard 連携**: `DashboardApplicationService` の `getWorkspaceDashboard` から目標引数を削除し、Workspace の目標設定値に基づいて達成率と目標値を自動算出する正式設計へ移行。
+- **フロントエンド UI の更新**: 設定タブに「月間配布目標」の入力フォーム（保存ボタン含む）と、最終更新日・更新者の表示要素を追加。目標更新時に即座にデータを再取得してホームの達成率を更新するフローを `manager.js` に実装（※履歴表示一覧は Sprint 6 へ延期）。
+- 全ユニットテスト、統合テスト、および GAS ビルド検証をパス。

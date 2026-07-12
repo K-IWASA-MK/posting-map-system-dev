@@ -64,11 +64,11 @@ export class DashboardApplicationService {
 
   public async getWorkspaceDashboard(
     workspaceId: string,
-    yearMonth?: string | YearMonth,
-    distributionGoal?: number
+    yearMonth?: string | YearMonth
   ): Promise<WorkspaceDashboardDto> {
     const ws = await this.workspaceRepo.findById(workspaceId);
     const wsName = ws ? ws.workspaceName : '不明な支部';
+    const distributionGoal = ws ? (ws.getDistributionGoal() ?? undefined) : undefined;
 
     const staffList = await this.staffRepo.findByWorkspace(workspaceId);
     const staffIds = staffList.map(s => s.staffNo);

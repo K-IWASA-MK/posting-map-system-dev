@@ -78,11 +78,17 @@ class Workspace {
   public readonly workspaceId: string;
   public readonly workspaceName: string;
   private status: WorkspaceStatus;
+  private distributionGoal: number | null;
+  private goalUpdatedAt: string | null;
+  private goalUpdatedBy: string | null;
 
   constructor(params: {
     workspaceId: string;
     workspaceName: string;
     status: WorkspaceStatus;
+    distributionGoal?: number | null;
+    goalUpdatedAt?: string | null;
+    goalUpdatedBy?: string | null;
   }) {
     if (!params.workspaceId || params.workspaceId.trim().length === 0) {
       throw new Error("WorkspaceId is required");
@@ -93,6 +99,9 @@ class Workspace {
     this.workspaceId = params.workspaceId;
     this.workspaceName = params.workspaceName;
     this.status = params.status;
+    this.distributionGoal = params.distributionGoal !== undefined ? params.distributionGoal : null;
+    this.goalUpdatedAt = params.goalUpdatedAt || null;
+    this.goalUpdatedBy = params.goalUpdatedBy || null;
   }
 
   public getStatus(): WorkspaceStatus {
@@ -106,7 +115,29 @@ class Workspace {
   public archive(): void {
     this.status = 'ARCHIVED';
   }
+
+  public getDistributionGoal(): number | null {
+    return this.distributionGoal;
+  }
+
+  public getGoalUpdatedAt(): string | null {
+    return this.goalUpdatedAt;
+  }
+
+  public getGoalUpdatedBy(): string | null {
+    return this.goalUpdatedBy;
+  }
+
+  public updateGoal(goal: number, updatedBy: string): void {
+    if (goal < 0) {
+      throw new Error("Goal must be a positive number");
+    }
+    this.distributionGoal = goal;
+    this.goalUpdatedAt = new Date().toISOString();
+    this.goalUpdatedBy = updatedBy;
+  }
 }
+
 
 
 // --- Source: src/domain/workspace/entities/WorkspaceSubscription.ts ---
@@ -1188,179 +1219,6 @@ class OperationsDashboardApplicationService {
 }
 
 
-// --- Source: src/application/onboarding/dto/WorkspaceOnboardingDtos.ts ---
-interface WorkspaceProvisioningDto {
-  workspaceId: string;
-  workspaceName: string;
-  lineAppUrl: string;
-  dashboardUrl: string;
-  subscriptionStatus: string;
-  status: string; // Alias to subscriptionStatus for compatibility
-}
-
-
-// --- Source: src/application/onboarding/services/WorkspaceIdGenerator.ts ---
-class WorkspaceIdGenerator {
-  private static readonly prefectureMap: Record<string, string> = {
-    '北海道': 'hokkaido', '青森県': 'aomori', '岩手県': 'iwate', '宮城県': 'miyagi',
-    '秋田県': 'akita', '山形県': 'yamagata', '福島県': 'fukushima', '茨城県': 'ibaraki',
-    '栃木県': 'tochigi', '群馬県': 'gunma', '埼玉県': 'saitama', '千葉県': 'chiba',
-    '東京都': 'tokyo', '神奈川県': 'kanagawa', '新潟県': 'niigata', '富山県': 'toyama',
-    '石川県': 'ishikawa', '福井県': 'fukui', '山梨県': 'yamanashi', '長野県': 'nagano',
-    '岐阜県': 'gifu', '静岡県': 'shizuoka', '愛知県': 'aichi', '三重県': 'mie',
-    '滋賀県': 'shiga', '京都府': 'kyoto', '大阪府': 'osaka', '兵庫県': 'hyogo',
-    '奈良県': 'nara', '和歌山県': 'wakayama', '鳥取県': 'tottori', '島根県': 'shimane',
-    '岡山県': 'okayama', '広島県': 'hiroshima', '山口県': 'yamaguchi', '徳島県': 'tokushima',
-    '香川県': 'kagawa', '愛媛県': 'ehime', '高知県': 'kochi', '福岡県': 'fukuoka',
-    '佐賀県': 'saga', '長崎県': 'nagasaki', '熊本県': 'kumamoto', '大分県': 'oita',
-    '宮崎県': 'miyazaki', '鹿児島県': 'kagoshima', '沖縄県': 'okinawa'
-  };
-
-  private static readonly kanjiNumMap: Record<string, string> = {
-    '一': '1', '二': '2', '三': '3', '四': '4', '五': '5',
-    '六': '6', '七': '7', '八': '8', '九': '9', '十': '10'
-  };
-
-  public static generate(workspaceName: string): string {
-    // Find prefecture name in workspaceName
-    let prefix = '';
-    for (const [jpName, enName] of Object.entries(this.prefectureMap)) {
-      if (workspaceName.includes(jpName) || workspaceName.includes(jpName.replace(/[県府都]$/, ''))) {
-        prefix = enName;
-        break;
-      }
-    }
-
-    // Extract number
-    let num = '';
-    const numMatch = workspaceName.match(/[0-9０-９]+/);
-    if (numMatch) {
-      // Convert full-width digits to half-width digits
-      num = numMatch[0].replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
-    } else {
-      for (const [k, v] of Object.entries(this.kanjiNumMap)) {
-        if (workspaceName.includes(k)) {
-          num = v;
-          break;
-        }
-      }
-    }
-
-    if (prefix && num) {
-      const paddedNum = num.padStart(2, '0');
-      return `${prefix}-${paddedNum}`;
-    }
-
-    // Fallback if no matching pattern: create unique ID
-    const timestamp = Date.now();
-    const random = Math.floor(1000 + Math.random() * 9000);
-    return `workspace-${timestamp}-${random}`;
-  }
-}
-
-
-// --- Source: src/application/onboarding/services/WorkspaceOnboardingService.ts ---
-
-class WorkspaceOnboardingService {
-  constructor(
-    private workspaceRepo: IWorkspaceRepository,
-    private subscriptionRepo: IWorkspaceSubscriptionRepository
-  ) {}
-
-  public async createWorkspace(
-    workspaceName: string,
-    workspaceId?: string,
-    periodMonths: number = 1
-  ): Promise<WorkspaceProvisioningDto> {
-    if (!workspaceName || workspaceName.trim().length === 0) {
-      throw new Error('Workspace name is required');
-    }
-
-    // Resolve base workspace ID
-    let finalId = workspaceId ? workspaceId.trim() : WorkspaceIdGenerator.generate(workspaceName);
-    
-    // Ensure uniqueness by checking existence and appending counter suffix if necessary
-    const baseId = finalId;
-    let counter = 1;
-    while (await this.workspaceRepo.findById(finalId)) {
-      counter++;
-      finalId = `${baseId}-${counter}`;
-    }
-
-    // Create and save Workspace
-    const workspace = new Workspace({
-      workspaceId: finalId,
-      workspaceName,
-      status: 'ACTIVE'
-    });
-    await this.workspaceRepo.save(workspace);
-
-    // Create and save initial Subscription (ACTIVE, default duration 1 month)
-    const startedAt = new Date();
-    const expiresAt = new Date();
-    expiresAt.setMonth(startedAt.getMonth() + periodMonths);
-
-    const subscription = new WorkspaceSubscription({
-      workspaceId: finalId,
-      status: 'ACTIVE',
-      startedAt,
-      expiresAt
-    });
-    await this.subscriptionRepo.create(subscription);
-
-    // Generate Workspace URLs dynamically
-    const urls = WorkspaceUrl.generate(finalId);
-
-    return {
-      workspaceId: finalId,
-      workspaceName,
-      lineAppUrl: urls.lineAppUrl,
-      dashboardUrl: urls.dashboardUrl,
-      subscriptionStatus: 'ACTIVE',
-      status: 'ACTIVE'
-    };
-  }
-
-  public async activateWorkspace(workspaceId: string): Promise<void> {
-    const sub = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
-    if (!sub) {
-      throw new Error(`Subscription not found for workspaceId: ${workspaceId}`);
-    }
-    sub.reactivate();
-    await this.subscriptionRepo.save(sub);
-  }
-
-  public async suspendWorkspace(workspaceId: string): Promise<void> {
-    const sub = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
-    if (!sub) {
-      throw new Error(`Subscription not found for workspaceId: ${workspaceId}`);
-    }
-    sub.suspend();
-    await this.subscriptionRepo.save(sub);
-  }
-
-  public async getWorkspaceProvisioningStatus(workspaceId: string): Promise<WorkspaceProvisioningDto> {
-    const workspace = await this.workspaceRepo.findById(workspaceId);
-    if (!workspace) {
-      throw new Error(`Workspace not found: ${workspaceId}`);
-    }
-
-    const sub = await this.subscriptionRepo.findByWorkspaceId(workspaceId);
-    const subStatus = sub ? sub.getStatus() : 'INACTIVE';
-    const urls = WorkspaceUrl.generate(workspaceId);
-
-    return {
-      workspaceId: workspace.workspaceId,
-      workspaceName: workspace.workspaceName,
-      lineAppUrl: urls.lineAppUrl,
-      dashboardUrl: urls.dashboardUrl,
-      subscriptionStatus: subStatus,
-      status: subStatus
-    };
-  }
-}
-
-
 // --- Source: src/infrastructure/spreadsheet/SpreadsheetClient.ts ---
 
 class SpreadsheetClient {
@@ -1516,16 +1374,23 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
     const wsIdIdx = headers.indexOf('ワークスペースID');
     const nameIdx = headers.indexOf('ワークスペース名');
     const statusIdx = headers.indexOf('ステータス');
+    const goalIdx = headers.indexOf('月間配布目標');
+    const updatedAtIdx = headers.indexOf('目標更新日時');
+    const updatedByIdx = headers.indexOf('最終更新者');
 
     if (wsIdIdx === -1) return undefined;
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (String(row[wsIdIdx]) === id) {
+        const goalVal = goalIdx !== -1 && row[goalIdx] !== undefined && row[goalIdx] !== '' ? Number(row[goalIdx]) : null;
         return new Workspace({
           workspaceId: String(row[wsIdIdx]),
           workspaceName: nameIdx !== -1 ? String(row[nameIdx]) : '',
-          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE'
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE',
+          distributionGoal: goalVal,
+          goalUpdatedAt: updatedAtIdx !== -1 && row[updatedAtIdx] !== undefined ? String(row[updatedAtIdx]) : null,
+          goalUpdatedBy: updatedByIdx !== -1 && row[updatedByIdx] !== undefined ? String(row[updatedByIdx]) : null
         });
       }
     }
@@ -1540,6 +1405,9 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
     const wsIdIdx = headers.indexOf('ワークスペースID');
     const nameIdx = headers.indexOf('ワークスペース名');
     const statusIdx = headers.indexOf('ステータス');
+    const goalIdx = headers.indexOf('月間配布目標');
+    const updatedAtIdx = headers.indexOf('目標更新日時');
+    const updatedByIdx = headers.indexOf('最終更新者');
 
     if (wsIdIdx === -1) return [];
 
@@ -1547,10 +1415,14 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (row[wsIdIdx]) {
+        const goalVal = goalIdx !== -1 && row[goalIdx] !== undefined && row[goalIdx] !== '' ? Number(row[goalIdx]) : null;
         list.push(new Workspace({
           workspaceId: String(row[wsIdIdx]),
           workspaceName: nameIdx !== -1 ? String(row[nameIdx]) : '',
-          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE'
+          status: statusIdx !== -1 ? (String(row[statusIdx]).toUpperCase() as WorkspaceStatus) : 'ACTIVE',
+          distributionGoal: goalVal,
+          goalUpdatedAt: updatedAtIdx !== -1 && row[updatedAtIdx] !== undefined ? String(row[updatedAtIdx]) : null,
+          goalUpdatedBy: updatedByIdx !== -1 && row[updatedByIdx] !== undefined ? String(row[updatedByIdx]) : null
         }));
       }
     }
@@ -1559,7 +1431,7 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
 
   public async save(workspace: Workspace): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
-    const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ワークスペース名', 'ステータス'];
+    const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ワークスペース名', 'ステータス', '月間配布目標', '目標更新日時', '最終更新者'];
 
     const wsIdIdx = headers.indexOf('ワークスペースID');
 
@@ -1577,6 +1449,9 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       if (h === 'ワークスペースID') return workspace.workspaceId;
       if (h === 'ワークスペース名') return workspace.workspaceName;
       if (h === 'ステータス') return workspace.getStatus();
+      if (h === '月間配布目標') return workspace.getDistributionGoal() !== null ? workspace.getDistributionGoal() : '';
+      if (h === '目標更新日時') return workspace.getGoalUpdatedAt() || '';
+      if (h === '最終更新者') return workspace.getGoalUpdatedBy() || '';
       return '';
     });
 
@@ -1590,6 +1465,7 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       }
     }
   }
+
 }
 
 
@@ -2630,11 +2506,11 @@ class OperationsDashboardHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/operations/WorkspaceOnboardingHandler.ts ---
+// --- Source: src/api/operations/WorkspaceHandler.ts ---
 
-class WorkspaceOnboardingHandler implements EndpointHandler {
+class WorkspaceHandler implements EndpointHandler {
   constructor(
-    private onboardingService: WorkspaceOnboardingService
+    private workspaceService: WorkspaceApplicationService
   ) {}
 
   public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
@@ -2642,20 +2518,24 @@ class WorkspaceOnboardingHandler implements EndpointHandler {
       const path = request.path;
 
       if (request.method === 'POST' && path.includes('/operations/workspaces')) {
-        const { workspaceName, workspaceId } = request.body || {};
+        const body = request.body || {};
+        const { workspaceId, distributionGoal, updatedBy, workspaceName } = body;
+
+        // If goal settings parameters are present, process as Update Goal
+        if (distributionGoal !== undefined && workspaceId) {
+          const author = updatedBy || (request.query && request.query.googleEmail) || 'システム管理者';
+          const dto = await this.workspaceService.updateWorkspaceGoal(workspaceId, Number(distributionGoal), String(author));
+          return FieldApiMapper.toSuccessResponse(dto, request, context);
+        }
+
+        // Otherwise process as Create Workspace (Onboarding)
         if (!workspaceName) {
           throw new Error('workspaceName is required');
         }
 
-        const dto = await this.onboardingService.createWorkspace(workspaceName, workspaceId);
+        const dto = await this.workspaceService.createWorkspace(workspaceName, workspaceId);
         
-        // Exact API response shape required by spec:
-        // {
-        //   "workspaceId": "mie-4",
-        //   "lineAppUrl": "...",
-        //   "dashboardUrl": "...",
-        //   "status": "ACTIVE"
-        // }
+        // Match compatibility shape
         const result = {
           workspaceId: dto.workspaceId,
           lineAppUrl: dto.lineAppUrl,
@@ -2672,7 +2552,7 @@ class WorkspaceOnboardingHandler implements EndpointHandler {
           throw new Error('workspaceId is required');
         }
 
-        const dto = await this.onboardingService.getWorkspaceProvisioningStatus(workspaceId);
+        const dto = await this.workspaceService.getWorkspace(workspaceId);
         return FieldApiMapper.toSuccessResponse(dto, request, context);
       }
 
@@ -2788,13 +2668,13 @@ const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
     path: '/operations/workspaces',
     method: 'POST',
     version: 'v2',
-    handler: 'WorkspaceOnboardingHandler'
+    handler: 'WorkspaceHandler'
   },
   {
     path: '/operations/workspaces',
     method: 'GET',
     version: 'v2',
-    handler: 'WorkspaceOnboardingHandler'
+    handler: 'WorkspaceHandler'
   }
 ];
 
@@ -2824,7 +2704,7 @@ function bootstrapFieldApis(): void {
   const dashboardAppService = new DashboardApplicationService(workspaceRepo, staffRepo, holdingRepo, activityRepo);
   const subscriptionAppService = new SubscriptionApplicationService(subscriptionRepo);
   const operationsDashboardAppService = new OperationsDashboardApplicationService(workspaceRepo, subscriptionRepo);
-  const workspaceOnboardingService = new WorkspaceOnboardingService(workspaceRepo, subscriptionRepo);
+  const workspaceService = new WorkspaceApplicationService(workspaceRepo, subscriptionRepo);
 
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
@@ -2835,7 +2715,7 @@ function bootstrapFieldApis(): void {
     DashboardHandler: new DashboardHandler(dashboardAppService),
     SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
     OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService),
-    WorkspaceOnboardingHandler: new WorkspaceOnboardingHandler(workspaceOnboardingService)
+    WorkspaceHandler: new WorkspaceHandler(workspaceService)
   };
 
   // Register Field API Endpoints

@@ -306,6 +306,23 @@
               <span class="text-secondary font-medium">ログインアカウント</span>
               <span class="font-bold" id="settings-login-email">-</span>
             </div>
+            <div class="py-4 space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-secondary font-medium">月間配布目標 (枚)</span>
+                <div class="flex items-center gap-3">
+                  <input type="number" id="settings-goal-input" class="bg-white/5 border border-default rounded-xl px-4 py-2 text-right font-bold text-white focus:outline-none focus:border-primary w-32" placeholder="未設定" min="0" />
+                  <button onclick="saveGoal()" id="settings-goal-save-btn" class="bg-primary hover:bg-primary/95 text-white rounded-full px-5 py-2 text-xs font-bold shadow-md shadow-primary/10 active:scale-[0.98] transition-all">
+                    保存
+                  </button>
+                </div>
+              </div>
+              <div class="flex justify-end text-[10px] text-secondary gap-1" id="settings-goal-meta-container" style="display: none;">
+                <span>最終更新:</span>
+                <span class="font-bold" id="settings-goal-updated-at">-</span>
+                <span class="ml-2">更新者:</span>
+                <span class="font-bold" id="settings-goal-updated-by">-</span>
+              </div>
+            </div>
           </div>
         </section>
       </div>

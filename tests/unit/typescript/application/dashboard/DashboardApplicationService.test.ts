@@ -156,14 +156,19 @@ async function runTests() {
   assert(julyDashboard.cityActivities[0].cityName === '-', 'July city name mismatch');
   assert(julyDashboard.cityActivities[0].quantity === 2000, 'July city quantity mismatch');
 
-  // July Goal Achievement Rate (goal = 10000 -> achievement = 20%)
-  const julyWithGoal = await service.getWorkspaceDashboard(workspaceId, july, 10000);
-  assert(julyWithGoal.distributionGoal === 10000, 'July goal mismatch');
-  assert(julyWithGoal.achievementRate === 20, `July achievement rate mismatch: expected 20, got ${julyWithGoal.achievementRate}`);
-
   // July Goal Unset (no goal -> undefined)
   assert(julyDashboard.distributionGoal === undefined, 'July unset goal mismatch');
   assert(julyDashboard.achievementRate === undefined, 'July unset achievement rate mismatch');
+
+  // Set Goal to 10000 via repository
+  const wsToUpdate = await wsRepo.findById(workspaceId);
+  wsToUpdate!.updateGoal(10000, 'tester');
+  await wsRepo.save(wsToUpdate!);
+
+  // July Goal Achievement Rate (goal = 10000 -> achievement = 20%)
+  const julyWithGoal = await service.getWorkspaceDashboard(workspaceId, july);
+  assert(julyWithGoal.distributionGoal === 10000, 'July goal mismatch');
+  assert(julyWithGoal.achievementRate === 20, `July achievement rate mismatch: expected 20, got ${julyWithGoal.achievementRate}`);
 
   const julyRankings = await service.getMonthlyRanking(workspaceId, july);
   assert(julyRankings.length === 2, 'July ranking length mismatch');

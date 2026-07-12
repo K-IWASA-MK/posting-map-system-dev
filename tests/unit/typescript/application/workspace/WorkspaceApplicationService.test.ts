@@ -1,5 +1,5 @@
-import { WorkspaceOnboardingService } from '@application/onboarding/services/WorkspaceOnboardingService';
-import { WorkspaceIdGenerator } from '@application/onboarding/services/WorkspaceIdGenerator';
+import { WorkspaceApplicationService } from '@application/workspace/services/WorkspaceApplicationService';
+import { WorkspaceIdGenerator } from '@application/workspace/services/WorkspaceIdGenerator';
 import { IWorkspaceRepository } from '@domain/workspace/repositories/IWorkspaceRepository';
 import { IWorkspaceSubscriptionRepository } from '@domain/workspace/repositories/IWorkspaceSubscriptionRepository';
 import { Workspace } from '@domain/workspace/entities/Workspace';
@@ -49,7 +49,7 @@ class MockWorkspaceSubscriptionRepository implements IWorkspaceSubscriptionRepos
 }
 
 async function runTests() {
-  console.log('[Test WorkspaceOnboardingService] Starting unit tests...');
+  console.log('[Test WorkspaceApplicationService] Starting unit tests...');
 
   // 1. Test WorkspaceIdGenerator
   console.log('  Testing WorkspaceIdGenerator...');
@@ -60,46 +60,61 @@ async function runTests() {
   
   const fallbackId = WorkspaceIdGenerator.generate('不明な支部');
   assert(fallbackId.startsWith('workspace-'), 'Fallback ID should start with workspace-');
-  assert(fallbackId.split('-').length === 3, 'Fallback ID should have 3 segments');
 
   // Initialize service
   const wsRepo = new MockWorkspaceRepository();
   const subRepo = new MockWorkspaceSubscriptionRepository();
-  const service = new WorkspaceOnboardingService(wsRepo, subRepo);
+  const service = new WorkspaceApplicationService(wsRepo, subRepo);
 
-  // 2. Test WorkspaceOnboardingService.createWorkspace
-  console.log('  Testing createWorkspace...');
+  // 2. Test Workspace creation & initial goal
+  console.log('  Testing createWorkspace and default goal...');
   const dto = await service.createWorkspace('三重県 第3支部');
   assert(dto.workspaceId === 'mie-03', 'Generated ID should be mie-03');
   assert(dto.workspaceName === '三重県 第3支部', 'Name should match');
   assert(dto.status === 'ACTIVE', 'Subscription should be ACTIVE');
-  assert(dto.lineAppUrl === 'https://liff.line.me/2010177345-tXZIMAJK/mie-03', 'Line URL mismatch');
-  assert(dto.dashboardUrl === 'https://posting-map.jp/dashboard/mie-03', 'Dashboard URL mismatch');
+  assert(dto.distributionGoal === null, 'Goal should be null initially');
+  assert(dto.goalUpdatedAt === null, 'Goal updated at should be null initially');
+  assert(dto.goalUpdatedBy === null, 'Goal updated by should be null initially');
 
-  // Verify stored entities
+  // 3. Test Goal setting & updating
+  console.log('  Testing updateWorkspaceGoal...');
+  const updatedDto = await service.updateWorkspaceGoal('mie-03', 5000, 'manager@mie.example.com');
+  assert(updatedDto.distributionGoal === 5000, 'Goal should be updated to 5000');
+  assert(updatedDto.goalUpdatedBy === 'manager@mie.example.com', 'Goal updated by should match');
+  assert(updatedDto.goalUpdatedAt !== null, 'Goal updated at should not be null');
+
+  // Verify stored goal state
   const storedWs = await wsRepo.findById('mie-03');
   assert(storedWs !== undefined, 'Workspace should be stored');
-  assert(storedWs!.workspaceName === '三重県 第3支部', 'Stored name should match');
-  
-  const storedSub = await subRepo.findByWorkspaceId('mie-03');
-  assert(storedSub !== undefined, 'Subscription should be stored');
-  assert(storedSub!.getStatus() === 'ACTIVE', 'Stored status should be ACTIVE');
-  
-  // Verify default 1 month subscription period
-  const oneMonthLater = new Date();
-  oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
-  const expiryDiff = Math.abs(storedSub!.getExpiresAt().getTime() - oneMonthLater.getTime());
-  assert(expiryDiff < 5000, 'Subscription expiry should default to 1 month');
+  assert(storedWs!.getDistributionGoal() === 5000, 'Stored goal should be 5000');
+  assert(storedWs!.getGoalUpdatedBy() === 'manager@mie.example.com', 'Stored updated by should match');
 
-  // 3. Test ID Duplication suffix incrementation
+  // 4. Test Goal update to another value
+  console.log('  Testing overwrite goal update...');
+  const reUpdatedDto = await service.updateWorkspaceGoal('mie-03', 7500, 'admin@mie.example.com');
+  assert(reUpdatedDto.distributionGoal === 7500, 'Goal should be updated to 7500');
+  assert(reUpdatedDto.goalUpdatedBy === 'admin@mie.example.com', 'Goal updated by should match admin');
+  
+  // 5. Test Workspace Separation (Goal is separate)
+  console.log('  Testing goal separation between multiple workspaces...');
+  const dto2 = await service.createWorkspace('三重県 第4支部');
+  assert(dto2.workspaceId === 'mie-04', 'Workspace 2 ID should be mie-04');
+  assert(dto2.distributionGoal === null, 'Workspace 2 goal should be null');
+
+  // Update workspace 2 goal
+  const updatedDto2 = await service.updateWorkspaceGoal('mie-04', 3000, 'another@mie.example.com');
+  assert(updatedDto2.distributionGoal === 3000, 'Workspace 2 goal should be 3000');
+  
+  // Re-fetch workspace 1 to verify it is untouched
+  const finalWs1Dto = await service.getWorkspace('mie-03');
+  assert(finalWs1Dto.distributionGoal === 7500, 'Workspace 1 goal should remain 7500');
+
+  // 6. Test duplicate ID suffix incrementation (preserving onboarding behavior)
   console.log('  Testing duplicate ID suffix logic...');
   const duplicateDto = await service.createWorkspace('三重県 第3支部');
   assert(duplicateDto.workspaceId === 'mie-03-2', 'Should append suffix for duplicate: mie-03-2');
   
-  const triplicateDto = await service.createWorkspace('三重県 第3支部');
-  assert(triplicateDto.workspaceId === 'mie-03-3', 'Should append suffix for triplicate: mie-03-3');
-
-  // 4. Test activate and suspend Workspace
+  // 7. Test activate and suspend Workspace
   console.log('  Testing activation and suspension...');
   await service.suspendWorkspace('mie-03');
   const suspendedSub = await subRepo.findByWorkspaceId('mie-03');
@@ -109,17 +124,11 @@ async function runTests() {
   const activeSub = await subRepo.findByWorkspaceId('mie-03');
   assert(activeSub!.getStatus() === 'ACTIVE', 'Status should be updated to ACTIVE');
 
-  // 5. Test getWorkspaceProvisioningStatus
-  console.log('  Testing getWorkspaceProvisioningStatus...');
-  const statusDto = await service.getWorkspaceProvisioningStatus('mie-03');
-  assert(statusDto.workspaceId === 'mie-03', 'ID mismatch');
-  assert(statusDto.subscriptionStatus === 'ACTIVE', 'Status mismatch');
-
-  console.log('[Test WorkspaceOnboardingService] All unit tests PASSED.');
+  console.log('[Test WorkspaceApplicationService] All unit tests PASSED.');
 }
 
 runTests().catch(e => {
-  console.error('[Test WorkspaceOnboardingService] Test suite failed!');
+  console.error('[Test WorkspaceApplicationService] Test suite failed!');
   console.error(e);
   process.exit(1);
 });

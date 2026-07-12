@@ -39,6 +39,7 @@ interface WorkspaceDashboardDto {
   workspaceName: string;
   memberCount: number;
   newMemberCount: number;
+  activeMemberCount: number;
   totalHoldingQuantity: number;
   monthlyDistributionQuantity: number;
   previousMonthDistributionQuantity: number;
@@ -46,6 +47,17 @@ interface WorkspaceDashboardDto {
   members: StaffSummary[];
   newMembers: NewStaffDto[];
   monthlyTrend: { month: string; quantity: number }[];
+  cityActivities: { cityName: string; quantity: number }[];
+  distributionGoal?: number;
+  achievementRate?: number;
+  prevActiveMemberCount: number;
+  volumeDifference: number;
+  volumeGrowthRate: number;
+  memberDifference: number;
+  memberGrowthRate: number;
+  topCityName: string;
+  topCityQuantity: number;
+  activeCityCount: number;
   lineAppUrl: string;
   dashboardUrl: string;
   emailTemplates: EmailTemplateDto[];
@@ -252,9 +264,13 @@ class DashboardApplicationService {
     };
   }
 
-  public async getWorkspaceDashboard(workspaceId: string, yearMonth?: string | YearMonth): Promise<WorkspaceDashboardDto> {
+  public async getWorkspaceDashboard(
+    workspaceId: string,
+    yearMonth?: string | YearMonth
+  ): Promise<WorkspaceDashboardDto> {
     const ws = await this.workspaceRepo.findById(workspaceId);
     const wsName = ws ? ws.workspaceName : '不明な支部';
+    const distributionGoal = ws ? (ws.getDistributionGoal() ?? undefined) : undefined;
 
     const staffList = await this.staffRepo.findByWorkspace(workspaceId);
     const staffIds = staffList.map(s => s.staffNo);
@@ -278,10 +294,13 @@ class DashboardApplicationService {
     let totalHolding = 0;
     let totalActivity = 0;
     let totalPrevActivity = 0;
+    let activeMemberCount = 0;
+    const cityMap = new Map<string, number>();
 
     for (const staff of staffList) {
       const holding = await this.holdingRepo.findByStaffNo(staff.staffNo);
       const holdingQty = holding ? holding.getQuantity().getValue() : 0;
+      const cityName = holding ? holding.cityName : '-';
 
       // Current month activity
       const staffActivities = allActivities.filter(a => a.staffNo === staff.staffNo);
@@ -306,12 +325,18 @@ class DashboardApplicationService {
         monthlyDistributionQuantity: monthlyTotal,
         activityDays: uniqueDays,
         activityIndex: actIndex,
-        cityName: holding ? holding.cityName : '-'
+        cityName
       });
 
       totalHolding += holdingQty;
       totalActivity += monthlyTotal;
       totalPrevActivity += prevMonthlyTotal;
+
+      if (monthlyTotal > 0) {
+        activeMemberCount++;
+        const currentCityQty = cityMap.get(cityName) || 0;
+        cityMap.set(cityName, currentCityQty + monthlyTotal);
+      }
     }
 
     // Sort rankings by monthlyDistributionQuantity descending (criteria is distribution volume)
@@ -325,6 +350,51 @@ class DashboardApplicationService {
     } else if (totalActivity > 0) {
       growthRate = '+100%';
     }
+
+    // Convert cityMap to sorted array
+    const cityActivities = Array.from(cityMap.entries())
+      .map(([name, qty]) => ({ cityName: name, quantity: qty }))
+      .sort((a, b) => b.quantity - a.quantity);
+
+    // 1. Calculate Monthly Goal Achievement Rate
+    let achievementRate: number | undefined = undefined;
+    if (distributionGoal && distributionGoal > 0) {
+      achievementRate = Math.round((totalActivity / distributionGoal) * 100);
+    }
+
+    // 2. Calculate Month-over-Month comparison for active members
+    const prevActiveStaffs = new Set<string>();
+    prevActivities.forEach(a => {
+      if (a.reportedQuantity.getValue() > 0 && staffIds.indexOf(a.staffNo) !== -1) {
+        prevActiveStaffs.add(a.staffNo);
+      }
+    });
+    const prevActiveMemberCount = prevActiveStaffs.size;
+
+    // 3. Month-over-Month volume difference and growth rate
+    const volumeDifference = totalActivity - totalPrevActivity;
+    let volumeGrowthRate = 0;
+    if (totalPrevActivity > 0) {
+      volumeGrowthRate = Math.round((volumeDifference / totalPrevActivity) * 100);
+    } else if (totalActivity > 0) {
+      volumeGrowthRate = 100;
+    }
+
+    // 4. Month-over-Month member difference and growth rate
+    const memberDifference = activeMemberCount - prevActiveMemberCount;
+    let memberGrowthRate = 0;
+    if (prevActiveMemberCount > 0) {
+      memberGrowthRate = Math.round((memberDifference / prevActiveMemberCount) * 100);
+    } else if (activeMemberCount > 0) {
+      memberGrowthRate = 100;
+    }
+
+    // 5. Identify top active city
+    const topCityName = cityActivities.length > 0 ? cityActivities[0].cityName : '-';
+    const topCityQuantity = cityActivities.length > 0 ? cityActivities[0].quantity : 0;
+
+    // 6. Active city count
+    const activeCityCount = cityActivities.length;
 
     // New members compilation
     const newStaffList = await this.staffRepo.findNewStaffByMonth(workspaceId, yearMonthObj);
@@ -380,6 +450,7 @@ class DashboardApplicationService {
       workspaceName: wsName,
       memberCount: staffList.length,
       newMemberCount: newMembers.length,
+      activeMemberCount,
       totalHoldingQuantity: totalHolding,
       monthlyDistributionQuantity: totalActivity,
       previousMonthDistributionQuantity: totalPrevActivity,
@@ -387,6 +458,17 @@ class DashboardApplicationService {
       members,
       newMembers,
       monthlyTrend,
+      cityActivities,
+      distributionGoal,
+      achievementRate,
+      prevActiveMemberCount,
+      volumeDifference,
+      volumeGrowthRate,
+      memberDifference,
+      memberGrowthRate,
+      topCityName,
+      topCityQuantity,
+      activeCityCount,
       lineAppUrl: urls.lineAppUrl,
       dashboardUrl: urls.dashboardUrl,
       emailTemplates
@@ -474,6 +556,7 @@ class DashboardHandler implements EndpointHandler {
           name: dashboard.workspaceName,
           memberCount: dashboard.memberCount,
           newMemberCount: dashboard.newMemberCount,
+          activeMemberCount: dashboard.activeMemberCount,
           total: dashboard.totalHoldingQuantity,
           monthlyActivity: dashboard.monthlyDistributionQuantity,
           previousMonthActivity: dashboard.previousMonthDistributionQuantity,
@@ -481,6 +564,17 @@ class DashboardHandler implements EndpointHandler {
           members: dashboard.members,
           newMembers: dashboard.newMembers,
           monthlyTrend: dashboard.monthlyTrend,
+          cityActivities: dashboard.cityActivities,
+          distributionGoal: dashboard.distributionGoal,
+          achievementRate: dashboard.achievementRate,
+          prevActiveMemberCount: dashboard.prevActiveMemberCount,
+          volumeDifference: dashboard.volumeDifference,
+          volumeGrowthRate: dashboard.volumeGrowthRate,
+          memberDifference: dashboard.memberDifference,
+          memberGrowthRate: dashboard.memberGrowthRate,
+          topCityName: dashboard.topCityName,
+          topCityQuantity: dashboard.topCityQuantity,
+          activeCityCount: dashboard.activeCityCount,
           lineAppUrl: dashboard.lineAppUrl,
           dashboardUrl: dashboard.dashboardUrl,
           emailTemplates: dashboard.emailTemplates

@@ -39,9 +39,8 @@ export class DashboardHandler implements EndpointHandler {
         }
 
         const yearMonthParam = request.query.yearMonth;
-        const goalParam = request.query.distributionGoal ? Number(request.query.distributionGoal) : undefined;
 
-        const dashboard = await this.dashboardAppService.getWorkspaceDashboard(workspaceId, yearMonthParam, goalParam);
+        const dashboard = await this.dashboardAppService.getWorkspaceDashboard(workspaceId, yearMonthParam);
         const result = {
           workspaceId: dashboard.workspaceId,
           name: dashboard.workspaceName,

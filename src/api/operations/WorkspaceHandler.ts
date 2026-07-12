@@ -2,13 +2,13 @@ import { EndpointHandler } from '@core/api/handlers/EndpointHandler';
 import { ApiRequest } from '@core/api/ApiRequest';
 import { ApiResponse } from '@core/api/ApiResponse';
 import { ApiExecutionContext } from '@infra/gas/ApiExecutionContext';
-import { WorkspaceOnboardingService } from '@application/onboarding/services/WorkspaceOnboardingService';
+import { WorkspaceApplicationService } from '@application/workspace/services/WorkspaceApplicationService';
 import { FieldApiMapper } from '../field/FieldApiMapper';
 import { ExceptionMapper } from '@core/exceptions/ExceptionMapper';
 
-export class WorkspaceOnboardingHandler implements EndpointHandler {
+export class WorkspaceHandler implements EndpointHandler {
   constructor(
-    private onboardingService: WorkspaceOnboardingService
+    private workspaceService: WorkspaceApplicationService
   ) {}
 
   public async execute(request: ApiRequest, context: ApiExecutionContext): Promise<ApiResponse> {
@@ -16,20 +16,24 @@ export class WorkspaceOnboardingHandler implements EndpointHandler {
       const path = request.path;
 
       if (request.method === 'POST' && path.includes('/operations/workspaces')) {
-        const { workspaceName, workspaceId } = request.body || {};
+        const body = request.body || {};
+        const { workspaceId, distributionGoal, updatedBy, workspaceName } = body;
+
+        // If goal settings parameters are present, process as Update Goal
+        if (distributionGoal !== undefined && workspaceId) {
+          const author = updatedBy || (request.query && request.query.googleEmail) || 'システム管理者';
+          const dto = await this.workspaceService.updateWorkspaceGoal(workspaceId, Number(distributionGoal), String(author));
+          return FieldApiMapper.toSuccessResponse(dto, request, context);
+        }
+
+        // Otherwise process as Create Workspace (Onboarding)
         if (!workspaceName) {
           throw new Error('workspaceName is required');
         }
 
-        const dto = await this.onboardingService.createWorkspace(workspaceName, workspaceId);
+        const dto = await this.workspaceService.createWorkspace(workspaceName, workspaceId);
         
-        // Exact API response shape required by spec:
-        // {
-        //   "workspaceId": "mie-4",
-        //   "lineAppUrl": "...",
-        //   "dashboardUrl": "...",
-        //   "status": "ACTIVE"
-        // }
+        // Match compatibility shape
         const result = {
           workspaceId: dto.workspaceId,
           lineAppUrl: dto.lineAppUrl,
@@ -46,7 +50,7 @@ export class WorkspaceOnboardingHandler implements EndpointHandler {
           throw new Error('workspaceId is required');
         }
 
-        const dto = await this.onboardingService.getWorkspaceProvisioningStatus(workspaceId);
+        const dto = await this.workspaceService.getWorkspace(workspaceId);
         return FieldApiMapper.toSuccessResponse(dto, request, context);
       }
 

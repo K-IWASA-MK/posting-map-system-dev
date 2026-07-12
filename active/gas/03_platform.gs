@@ -145,6 +145,11 @@ class PlatformIntegrationPipeline {
         path = '/' + action;
         if (action === 'getAppData') {
           path = '/dashboard';
+        } else if (action === 'getWorkspaceDashboard') {
+          const wsId = e.parameter.workspaceId || postData?.workspaceId || '';
+          path = `/dashboard/workspace/${wsId}`;
+        } else if (action === 'updateWorkspaceGoal') {
+          path = '/operations/workspaces';
         } else if (action === 'getFlyerStock') {
           path = '/holding';
         } else if (action === 'updateFlyerStock') {
@@ -276,7 +281,8 @@ class PlatformIntegrationPipeline {
         'refreshCache',
         'aggregateStats',
         'resetAllSheets',
-        'updateSubscription'
+        'updateSubscription',
+        'updateWorkspaceGoal'
       ];
 
       const isWriteAction = (method === 'POST' && (writeActions.indexOf(action) !== -1 || path === '/field/reservation' || path === '/operations/subscriptions/update'));
