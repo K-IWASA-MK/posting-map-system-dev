@@ -689,3 +689,18 @@ EventBus からのイベントストリームを受け、AIOS 内の現在状態
   - 同一の集計キーに対しては **Replace** 方式で上書き更新。10,000 件以上のレコード集計（Large Dataset Test）においても、メモリ破綻を起こさず 10ms 以下の高速性で処理を完了できることを確認しました。
 - **仕様書の作成**:
   - `docs/specifications/` 配下に `Metrics.md`, `MetricRecord.md`, `MetricAggregator.md`, `MetricsRepository.md`, `MetricsWindow.md`, `MetricDefinition.md`, `MetricsConfiguration.md` の7つの仕様書を作成しました。
+
+### AIOS Observability OS Sprint 8 Phase S8-6: Live Monitor Foundation
+
+ProjectionRepository と MetricsRepository から現在の稼働状態および分析メトリクスを統合・参照する読み取り専用 Query Facade 基盤（Live Monitor）を構築しました。
+
+- **読み取り専用クエリ Facade の徹底**:
+  - EventBus の購読や状態保持・更新ロジックを排除し、リポジトリから Snapshot を組み立てることに特化した Read Only 設計を `LiveMonitor.md` で明文化しました。
+- **`MonitorRegistry` による Composite パターン**:
+  - `IMonitorService` を介して個別モニター（Health, Session, Metrics）を Composite に取りまとめ、レジストリで登録。`SnapshotBuilder` が結果のキーを動的に複合化するため、既存コードを一切破壊せず新規のカスタムモニターを追加できる Open/Closed な設計を実証しました。
+- **内容変更時のみ更新される `snapshotVersion`**:
+  - クエリ結果に差分がない限り `snapshotVersion` は据え置き、変更が検知されたときのみインクリメントされる効率的な差分更新ロジックを実装しました。
+- **`MonitorStatus` と Reserved Field**:
+  - ヘルス状態を `UNKNOWN`, `READY`, `RUNNING`, `WARNING`, `ERROR`, `SHUTDOWN` に統一し、エラー時の詳細追跡用の `reason` を `HealthMonitor` に予約設計しました。
+- **仕様書の作成**:
+  - `docs/specifications/` 配下に `LiveMonitor.md`, `MonitorSnapshot.md`, `HealthMonitor.md`, `SessionMonitor.md`, `MetricsMonitor.md`, `MonitorConfiguration.md` の6つの仕様書を作成しました。
