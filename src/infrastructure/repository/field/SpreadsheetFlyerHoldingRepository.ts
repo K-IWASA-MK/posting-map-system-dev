@@ -94,6 +94,44 @@ export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepositor
     return list;
   }
 
+  public async findAll(): Promise<FlyerHolding[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const qtyIdx = headers.indexOf('保管枚数');
+    const updatedIdx = headers.indexOf('更新日時');
+    const locIdx = headers.indexOf('保管場所');
+
+    if (staffIdIdx === -1) return [];
+
+    const list: FlyerHolding[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[staffIdIdx]) {
+        const rawLoc = locIdx !== -1 ? String(row[locIdx]) : '-';
+        let cleanedLoc = rawLoc.trim();
+        if (cleanedLoc === '自宅' || cleanedLoc.length === 0) {
+          cleanedLoc = '-';
+        } else {
+          const cityMatch = cleanedLoc.match(/^[^市区町村]+[市区町村]/);
+          if (cityMatch) {
+            cleanedLoc = cityMatch[0];
+          }
+        }
+
+        list.push(new FlyerHolding({
+          staffNo: String(row[staffIdIdx]),
+          quantity: new Quantity(qtyIdx !== -1 ? Number(row[qtyIdx]) : 0),
+          updatedAt: updatedIdx !== -1 ? new Date(Number(row[updatedIdx]) || String(row[updatedIdx])) : new Date(),
+          cityName: cleanedLoc
+        }));
+      }
+    }
+    return list;
+  }
+
   public async save(holding: FlyerHolding): Promise<void> {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ID', 'スタッフID', 'スタッフ名', '保管場所', '保管枚数', '更新日時'];

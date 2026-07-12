@@ -109,6 +109,35 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     });
   }
 
+  public async findAll(): Promise<Staff[]> {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const nameIdx = headers.indexOf('スタッフ名');
+    const lineIdx = headers.indexOf('LINEユーザーID');
+    const wsIdx = headers.indexOf('ワークスペースID');
+    const dateIdx = headers.indexOf('登録日時');
+
+    if (staffIdIdx === -1) return [];
+
+    const list: Staff[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[staffIdIdx]) {
+        list.push(new Staff({
+          staffNo: String(row[staffIdIdx]),
+          displayName: nameIdx !== -1 ? String(row[nameIdx]) : '',
+          lineUserId: lineIdx !== -1 ? String(row[lineIdx]) : '',
+          workspaceId: wsIdx !== -1 ? String(row[wsIdx]) : '',
+          createdAt: dateIdx !== -1 ? new Date(Number(row[dateIdx]) || String(row[dateIdx])) : new Date()
+        }));
+      }
+    }
+    return list;
+  }
+
   public async getNextStaffNo(workspaceId: string): Promise<string> {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) {

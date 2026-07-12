@@ -7,5 +7,6 @@ export interface IStaffRepository {
   findByWorkspace(workspaceId: string): Promise<Staff[]>;
   findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]>;
   getNextStaffNo(workspaceId: string): Promise<string>;
+  findAll(): Promise<Staff[]>;
   save(staff: Staff): Promise<void>;
 }

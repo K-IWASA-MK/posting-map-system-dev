@@ -52,6 +52,9 @@ class MockStaffRepository implements IStaffRepository {
     const nextNum = this.db.size + 1;
     return 'S' + String(nextNum).padStart(3, '0');
   }
+  async findAll(): Promise<Staff[]> {
+    return Array.from(this.db ? this.db.values() : []);
+  }
   async save(staff: Staff): Promise<void> {
     this.db.set(staff.staffNo, staff);
   }
@@ -64,6 +67,9 @@ class MockHoldingRepository implements IFlyerHoldingRepository {
   }
   async findAllRaw(): Promise<any[]> {
     return [];
+  }
+  async findAll(): Promise<FlyerHolding[]> {
+    return Array.from(this.db ? this.db.values() : []);
   }
   async save(holding: FlyerHolding): Promise<void> {
     this.db.set(holding.staffNo, holding);
@@ -90,6 +96,9 @@ class MockActivityRepository implements IActivityRepository {
     return Array.from(this.db.values()).filter(
       a => a.occurredAt.getTime() >= start && a.occurredAt.getTime() <= end
     );
+  }
+  async findAll(): Promise<DistributionActivity[]> {
+    return Array.from(this.db ? this.db.values() : []);
   }
   async save(activity: DistributionActivity): Promise<void> {
     this.db.set(activity.id, activity);

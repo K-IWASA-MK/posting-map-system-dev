@@ -36,12 +36,16 @@ export class DashboardApplicationService {
   }
 
   public async getPersonalDashboard(staffNo: string, yearMonth?: string | YearMonth): Promise<PersonalDashboardDto> {
+    const t0 = Date.now();
+    let stats = { staffRead: 1, holdingRead: 1, activityRead: 1, totalAccess: 3 };
+
     const staff = await this.staffRepo.findByStaffNo(staffNo);
     if (!staff) {
       throw new Error(`Staff not found: ${staffNo}`);
     }
 
-    const holding = await this.holdingRepo.findByStaffNo(staffNo);
+    const allHoldings = await this.holdingRepo.findAll();
+    const holding = allHoldings.find(h => h.staffNo === staffNo);
     const holdingQty = holding ? holding.getQuantity().getValue() : 0;
 
     const yearMonthObj = typeof yearMonth === 'string' ? new YearMonth(yearMonth) : yearMonth;
@@ -50,9 +54,14 @@ export class DashboardApplicationService {
       ? { start: yearMonthObj.getStartDate(), end: yearMonthObj.getEndDate() }
       : this.getCurrentMonthRange();
 
-    const allActivities = await this.activityRepo.findByPeriod(start, end);
+    const allActivitiesRaw = await this.activityRepo.findAll();
+    const allActivities = allActivitiesRaw.filter(a => a.occurredAt.getTime() >= start.getTime() && a.occurredAt.getTime() <= end.getTime());
+    
     const staffActivities = allActivities.filter(a => a.staffNo === staffNo);
     const monthlyTotal = staffActivities.reduce((sum, a) => sum + a.reportedQuantity.getValue(), 0);
+
+    const t1 = Date.now();
+    console.log(`[Personal Dashboard Performance] Activity Read : ${stats.activityRead}, Holding Read : ${stats.holdingRead}, Staff Read : ${stats.staffRead}, Spreadsheet Access : ${stats.totalAccess}, Processing Time : ${t1 - t0}ms`);
 
     return {
       staffNo: staff.staffNo,
@@ -66,6 +75,9 @@ export class DashboardApplicationService {
     workspaceId: string,
     yearMonth?: string | YearMonth
   ): Promise<WorkspaceDashboardDto> {
+    const t0 = Date.now();
+    const stats = { workspaceRead: 1, staffRead: 1, holdingRead: 1, activityRead: 1, totalAccess: 4 };
+
     const ws = await this.workspaceRepo.findById(workspaceId);
     const wsName = ws ? ws.workspaceName : '不明な支部';
     const distributionGoal = ws ? (ws.getDistributionGoal() ?? undefined) : undefined;
@@ -74,19 +86,28 @@ export class DashboardApplicationService {
     const staffIds = staffList.map(s => s.staffNo);
     const yearMonthObj = typeof yearMonth === 'string' ? new YearMonth(yearMonth) : (yearMonth || new YearMonth(new Date()));
 
+    // --- Performance Foundation: 一括取得とメモリ処理への移行 ---
+    const allHoldings = await this.holdingRepo.findAll();
+    const holdingMap = new Map<string, any>();
+    for (const h of allHoldings) {
+      holdingMap.set(h.staffNo, h);
+    }
+
+    const allActivitiesRaw = await this.activityRepo.findAll();
+
     // Current month range
     const { start, end } = { start: yearMonthObj.getStartDate(), end: yearMonthObj.getEndDate() };
-    const allActivities = await this.activityRepo.findByPeriod(start, end);
+    const allActivities = allActivitiesRaw.filter(a => a.occurredAt.getTime() >= start.getTime() && a.occurredAt.getTime() <= end.getTime());
 
     // Previous month range
     const prevMonthObj = yearMonthObj.getMonth() === 1
       ? new YearMonth(`${yearMonthObj.getYear() - 1}12`)
       : new YearMonth(`${yearMonthObj.getYear()}${String(yearMonthObj.getMonth() - 1).padStart(2, '0')}`);
     const { start: pStart, end: pEnd } = { start: prevMonthObj.getStartDate(), end: prevMonthObj.getEndDate() };
-    const prevActivities = await this.activityRepo.findByPeriod(pStart, pEnd);
+    const prevActivities = allActivitiesRaw.filter(a => a.occurredAt.getTime() >= pStart.getTime() && a.occurredAt.getTime() <= pEnd.getTime());
 
     // Fetch all activities for firstActivityDate lookup
-    const allTimeActivities = await this.activityRepo.findByPeriod(new Date(2000, 0, 1), new Date(2100, 0, 1));
+    const allTimeActivities = allActivitiesRaw;
 
     const members: StaffSummary[] = [];
     let totalHolding = 0;
@@ -96,7 +117,7 @@ export class DashboardApplicationService {
     const cityMap = new Map<string, number>();
 
     for (const staff of staffList) {
-      const holding = await this.holdingRepo.findByStaffNo(staff.staffNo);
+      const holding = holdingMap.get(staff.staffNo);
       const holdingQty = holding ? holding.getQuantity().getValue() : 0;
       const cityName = holding ? holding.cityName : '-';
 
@@ -194,12 +215,12 @@ export class DashboardApplicationService {
     // 6. Active city count
     const activeCityCount = cityActivities.length;
 
-    // New members compilation
-    const newStaffList = await this.staffRepo.findNewStaffByMonth(workspaceId, yearMonthObj);
+    // New members compilation (Avoid N+1 Database Queries by filtering in memory)
+    const newStaffList = staffList.filter(s => s.createdAt.getTime() >= start.getTime() && s.createdAt.getTime() <= end.getTime());
     const newMembers: NewStaffDto[] = [];
     
     for (const staff of newStaffList) {
-      const holding = await this.holdingRepo.findByStaffNo(staff.staffNo);
+      const holding = holdingMap.get(staff.staffNo);
       const holdingQty = holding ? holding.getQuantity().getValue() : 0;
 
       // Find first activity date
@@ -226,7 +247,7 @@ export class DashboardApplicationService {
     let tempYM = yearMonthObj;
     for (let i = 0; i < 6; i++) {
       const { start: tStart, end: tEnd } = { start: tempYM.getStartDate(), end: tempYM.getEndDate() };
-      const tempActs = await this.activityRepo.findByPeriod(tStart, tEnd);
+      const tempActs = allActivitiesRaw.filter(a => a.occurredAt.getTime() >= tStart.getTime() && a.occurredAt.getTime() <= tEnd.getTime());
       const wsTempActs = tempActs.filter(a => staffIds.indexOf(a.staffNo) !== -1);
       const tempTotal = wsTempActs.reduce((sum, a) => sum + a.reportedQuantity.getValue(), 0);
 
@@ -243,6 +264,10 @@ export class DashboardApplicationService {
 
     const urls = WorkspaceUrl.generate(workspaceId);
     const emailTemplates = await this.emailTemplateService.getActiveTemplates();
+    
+    const t1 = Date.now();
+    console.log(`[Dashboard Performance] Activity Read : ${stats.activityRead}, Holding Read : ${stats.holdingRead}, Staff Read : ${stats.staffRead}, Workspace Read : ${stats.workspaceRead}, Spreadsheet Access : ${stats.totalAccess}, Processing Time : ${t1 - t0}ms`);
+
     return {
       workspaceId,
       workspaceName: wsName,

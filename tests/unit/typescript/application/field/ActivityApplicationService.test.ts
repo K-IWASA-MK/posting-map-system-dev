@@ -31,6 +31,9 @@ class MockActivityRepository implements IActivityRepository {
     return [];
   }
 
+  public async findAll(): Promise<DistributionActivity[]> {
+    return Array.from(this.db ? this.db.values() : []);
+  }
   public async save(activity: DistributionActivity): Promise<void> {
     this.db.set(activity.id, activity);
   }

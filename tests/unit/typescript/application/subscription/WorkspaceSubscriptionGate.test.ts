@@ -95,6 +95,9 @@ class MockStaffRepository implements IStaffRepository {
     return 'S001';
   }
 
+  async findAll(): Promise<Staff[]> {
+    return [];
+  }
   async save(staff: Staff): Promise<void> {}
 }
 

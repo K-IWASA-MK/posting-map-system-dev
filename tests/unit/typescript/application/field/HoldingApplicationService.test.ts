@@ -28,7 +28,10 @@ class MockFlyerHoldingRepository implements IFlyerHoldingRepository {
     }));
   }
 
-  public async save(holding: FlyerHolding): Promise<void> {
+  public async findAll(): Promise<FlyerHolding[]> {
+    return Array.from(this.db ? this.db.values() : []);
+  }
+  async save(holding: FlyerHolding): Promise<void> {
     this.db.set(holding.staffNo, holding);
   }
 }
