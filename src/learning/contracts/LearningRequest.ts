@@ -3,6 +3,7 @@
  */
 export interface LearningRequest {
   readonly schemaVersion: string;
+  readonly requestId: string;
   readonly sourceType: string;
   readonly targetComponent?: string;
   readonly timeRange?: {

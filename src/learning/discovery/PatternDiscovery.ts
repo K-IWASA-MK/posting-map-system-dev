@@ -2,12 +2,14 @@ import { LearningDataset } from '../contracts/LearningDataset';
 import { PatternRegistry } from './PatternRegistry';
 import { PatternDiscoveryResult, DiscoveredPatternItem } from './PatternDiscoveryResult';
 
+import { IPatternDiscovery } from './IPatternDiscovery';
+
 /**
  * Facade for the Learning Engine.
  * Encapsulates the Registry and Plugin complexity so the Engine
  * only needs to call discoverAll() with a Dataset.
  */
-export class PatternDiscovery {
+export class PatternDiscovery implements IPatternDiscovery {
   constructor(private readonly registry: PatternRegistry) {}
 
   public discoverAll(dataset: LearningDataset): PatternDiscoveryResult {
