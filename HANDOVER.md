@@ -455,3 +455,16 @@ Repository Performance Foundation（Sprint 6 Phase S6-3）完了。
 - **ライフサイクル管理**:
   - `DashboardHandler` の `finally` ブロックにて明示的に `reset()` を呼び出し、リクエストを跨いだメトリクスの混在を防止。
 - 全テスト（ユニット、統合）および GAS ビルド検証をパス。
+
+### POSTING MAP Product Sprint 6 Phase S6-4: Performance Policy Foundation
+
+Performance Policy Foundation（Sprint 6 Phase S6-4）完了。
+
+- **`PerformancePolicy` 基盤の実装**:
+  - `src/core/performance/policy/` 配下に `PerformancePolicyEngine`, `PerformancePolicyRegistry`, `PerformancePolicyResult`, `PerformancePolicyReport` などを構築。
+  - Profiler との依存は「Profiler → Engine」への単方向とし、Engine側で静的コードとメトリクス情報をまとめて評価する設計とした。
+  - レポートには新たに `INFO` ステータスと `Performance Score` (100点満点減点方式) を追加。Developer 向けに `PerformancePolicyReport.json` への出力スクリプトを整備した。
+- **ルールチェッカーの実装**:
+  - AST に依存せず、軽量な Regex でループ内 Read/Write や不適切なレイヤーからの Spreadsheet へのアクセスを禁止するルール（RULE-001〜RULE-006）を実装。
+  - リポジトリの API 一貫性確認（RULE-007）、および Profiler 使用の義務化（RULE-008）を追加し、実装者の努力に依存しないパフォーマンスとアーキテクチャの担保基盤を導入した。
+- 全テストおよび品質ゲート検証をパス。
