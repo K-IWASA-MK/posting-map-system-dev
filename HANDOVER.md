@@ -719,3 +719,18 @@ Sprint 9 の Learning Engine のインプットとなる不変な学習データ
   - `CompositeLearningSource` により、Ledger (100)、Telemetry (80)、Metrics (60) の子ソースを Registry の Priority に基づいて決定論的な順序でロードし、同一 `recordId` をキーにマージ・重複排除する構造を構築しました。
 - **仕様書の作成**:
   - `docs/specifications/` 配下に `LearningSource.md`, `LearningDataset.md`, `LearningRequest.md`, `LearningSourceResolver.md`, `LearningSourceRegistry.md`, `LearningSourceConfiguration.md` の6つの仕様書を作成しました。
+
+### AIOS Observability OS Sprint 8 Phase S8-8: Observability OS Bootstrap Foundation
+
+Sprint 8 の仕上げとして、EventBus、Telemetry、Projection、Metrics、Live Monitor、Learning Source を統合し、オーケストレーションする `ObservabilityOS`（サブシステムエントリポイント）を構築しました。
+
+- **公開 API 抽象化と対称性**:
+  - `IObservabilityOS` インターフェースを定義し、内部ランタイムの実装詳細を隠蔽。Development OS と対称的なエントリポイントを構成しました。
+- **決定論的起動・逆順終了 (Deterministic Sequencing)**:
+  - 起動順（EventBus -> Telemetry -> Projection -> Metrics -> LiveMonitor -> LearningSource）およびシャットダウンの逆順（LearningSource -> LiveMonitor -> Metrics -> Projection -> Telemetry -> EventBus）を保証。
+- **監査レポートとコンテキストの一元化**:
+  - `BootstrapReport` / `ShutdownReport` による所要時間等の監査情報の返却、および `ComponentDescriptor` によるヘルス通知、`runtimeId` 等の SSOT コンテキストを `ObservabilityRuntime` に一元化しました。
+- **ライフサイクルと冪等性 (Idempotency) の保証**:
+  - `ObservabilityLifecycleManager` で状態定義を統一。複数回の初期化・終了指示に対する安全なスキップ（冪等性ガード）をテストにて実証しました。
+- **仕様書の作成**:
+  - `docs/specifications/` 配下に `ObservabilityOS.md`, `ObservabilityBootstrap.md`, `ObservabilityRuntime.md`, `ObservabilityConfiguration.md`, `ObservabilityLifecycle.md`, `ObservabilityHealth.md`, `ObservabilityVersion.md` の7つの仕様書を作成しました。
