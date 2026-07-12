@@ -4,5 +4,5 @@
  */
 export interface IPatternStatistics {
   readonly sampleCount: number;
-  readonly occurrence: number;
+  readonly occurrenceCount: number;
 }
