@@ -1,0 +1,7 @@
+export enum EventChannel {
+  SYSTEM = 'SYSTEM',
+  EXECUTION = 'EXECUTION',
+  TELEMETRY = 'TELEMETRY',
+  MONITOR = 'MONITOR',
+  LEARNING = 'LEARNING',
+}

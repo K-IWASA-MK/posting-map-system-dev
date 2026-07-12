@@ -612,3 +612,18 @@ Sprint 7 の全フェーズ（S7-1〜S7-8）における実装、検証、そし
   - リモート `origin-dev` へ正常に Push 完了。
 
 これをもって、AIOS の起動・状態管理・実行オーケストレーションを担うコアアーキテクチャが完成しました。
+
+### AIOS Observability OS Sprint 8 Phase S8-1: Event Contract Foundation
+
+AIOS の Observability OS (神経系) を規定するための「イベント契約 (Event Contract) 基盤」を構築しました。
+
+- **Event Envelope の定義と標準化**:
+  - `EventEnvelope` に `source`、`schemaVersion`、`payloadType` を持たせることで、あらゆるイベントを不変かつ同一形式で流す準備を完了しました。
+- **EventType の SSOT 化**:
+  - 各種ライフサイクル（`Started`, `Completed`, `Failed`, `Cancelled`）とシステム状態を網羅する `EventType` 型を確立。
+- **乱数生成の Adapter 化**:
+  - UUIDやID生成を `IEventIdProvider` として抽象化し、デフォルト実装 (`DefaultEventIdProvider`) を定義。
+- **Event Contract (Payloadの静的型定義)**:
+  - 各種イベントペイロードの厳格な構造を定義。
+
+これをもって、将来の EventBus、Telemetry、Projection が共通して参照する「イベント契約 (SSOT)」が完成しました。
