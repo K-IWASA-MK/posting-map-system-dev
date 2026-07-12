@@ -574,3 +574,14 @@ Validation（事実）と Reviewer（推論）の統合結果を受け取り、A
   - Policy クラスにて、Validation の失敗数や Reviewer の確信度（Confidence）をもとに、人間へのエスカレーション（`ESCALATE`）やブロック（`BLOCK`）といった意思決定を再現可能な形で自動判定する仕組みを実装しました。
 - **複数レビュアーの Consensus ロジック**:
   - 複数のレビュアーが参加した場合、最も高い確信度を出したレビュアーの結論を優先し、`Consensus(ReviewerId)` として Source を明記する合意形成ロジックを確立しました。
+
+### AIOS Core Sprint 7 Phase S7-7: Execution Ledger Foundation
+
+AIOS の全実行履歴を単なるログとしてではなく、「イベントグラフ（ツリー）」として永続化する基盤を構築しました。
+
+- **Event Sourcing の実装 (`ExecutionLedgerEntry`)**:
+  - 各イベント（Entry）に `sequenceNo`, `parentEntryId`, `correlationId` を持たせることで、実行プロセスの階層的な連鎖（Context -> Plugin -> Validation -> Review -> Governance）を完全に追跡・再現できるデータ構造を確立しました。
+- **Adapter によるインフラの抽象化**:
+  - `IExecutionLedgerWriter` と `IExecutionLedgerReader` を定義し、今回は JSON 保存モック実装である `JsonExecutionLedgerAdapter` を導入しました。これにより、将来的な Storage の差し替えが AIOS Core に影響を与えず行えます。
+- **`ExecutionRecorder` (Facade) の導入**:
+  - Engine 側からの保存要求を受け付け、`sequenceNo` の管理と親子紐づけを隠蔽し透過的に行う Recorder を用意しました。

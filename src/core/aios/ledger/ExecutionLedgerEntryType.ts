@@ -1,0 +1,10 @@
+export enum ExecutionLedgerEntryType {
+  SYSTEM = 'SYSTEM',
+  CONTEXT = 'CONTEXT',
+  PLUGIN = 'PLUGIN',
+  VALIDATION = 'VALIDATION',
+  REVIEW = 'REVIEW',
+  GOVERNANCE = 'GOVERNANCE',
+  DECISION = 'DECISION',
+  ARTIFACT = 'ARTIFACT',
+}
