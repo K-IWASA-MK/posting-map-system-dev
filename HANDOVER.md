@@ -468,3 +468,18 @@ Performance Policy Foundation（Sprint 6 Phase S6-4）完了。
   - AST に依存せず、軽量な Regex でループ内 Read/Write や不適切なレイヤーからの Spreadsheet へのアクセスを禁止するルール（RULE-001〜RULE-006）を実装。
   - リポジトリの API 一貫性確認（RULE-007）、および Profiler 使用の義務化（RULE-008）を追加し、実装者の努力に依存しないパフォーマンスとアーキテクチャの担保基盤を導入した。
 - 全テストおよび品質ゲート検証をパス。
+
+### POSTING MAP Product Sprint 6 Phase S6-5: Performance Validation Foundation
+
+Performance Validation Foundation（Sprint 6 Phase S6-5）完了。
+
+- **Validation 責務の分離とデータ構造の構築**:
+  - `src/core/performance/validation/` に `PerformanceValidationSummary`, `PerformanceValidationResult` を作成。
+  - `Result` は `metadata` (`toolVersion`, `schemaVersion`, `runtime`, `generatedAt`), `summary` (全体の `status` 含む), `metrics` (Optional), `report` (Policyの違反情報) の4ブロック構成とした。
+- **Runner と Exporter の実装**:
+  - `PerformanceValidationRunner.ts`: ソースコードの収集から Engine への受け渡し、Result の構築（静的解析時は Profiler `metrics` を `undefined` として許容）を一元管理。
+  - `PerformanceValidationExporter.ts`: Console および JSON への出力を担当。
+- **既存基盤の統合整理**:
+  - `PerformancePolicyEngine.ts` から `exportReportToJson` を削除し、責務を分離。
+  - エントリーポイント `run_policy_validation.ts` を Runner を使用するシンプルな構造へリファクタリング。
+- 全テストおよび品質ゲート検証をパス。これにより CI/CD や Governance Foundation への接続基盤が整った。

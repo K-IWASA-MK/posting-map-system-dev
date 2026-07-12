@@ -70,7 +70,4 @@ export class PerformancePolicyEngine {
     };
   }
 
-  public exportReportToJson(report: PerformancePolicyReport, outputPath: string): void {
-    fs.writeFileSync(outputPath, JSON.stringify(report, null, 2), 'utf-8');
-  }
 }
