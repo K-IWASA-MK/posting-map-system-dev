@@ -6,6 +6,7 @@ export interface KnowledgeDatasetMetadata {
   readonly sourceCount: number;
   readonly generatedAt: string; // ISO8601
   readonly schemaVersion: string;
+  readonly patternTypes: ReadonlyArray<string>;
 }
 
 export interface KnowledgeDataset {
