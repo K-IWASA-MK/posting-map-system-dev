@@ -541,3 +541,15 @@ AIOS の「心臓部」であり、Plugin を自律的に実行・管理する D
 - **`DevelopmentRuleEngine` の実装**:
   - Engine は特定の Plugin を一切知らず、`Context` を起点として `Discovery -> Loader -> Execution Plan -> Lifecycle Orchestration` を実行する完全な OS オーケストレーターとして完成しました。
   - テストにおいて、Context の種類に応じて対象プラグインのみが自律的に選択され、全 Lifecycle が回ることを実証しました。
+
+### AIOS Core Sprint 7 Phase S7-4: Validation Pipeline Foundation
+
+AIOS の「推論エンジン」となる 5-Layer Validation Pipeline (Regex -> AST -> Semantic -> Context -> AI Review) の骨格実装を完了しました。
+
+- **Immutable Artifacts (`ValidationArtifact`)**:
+  - Functional Programming パターンを採用し、各 Validation Stage は前段の Artifact をミューテートせず、抽出データを付与した新しい Artifact を返す仕組みとしました。
+- **コスト・パフォーマンス指標の充実 (`ValidationStageMetadata` & `ValidationPipelineResult`)**:
+  - 各 Stage のメタデータに `estimatedCost` (Regex:1, AST:10, AI:1000 等) を設定しました。
+  - Pipeline 実行結果に `executedStages`, `skippedStages`, `estimatedCost`, `actualCost` などのメトリクスを保持させ、S7-6 で実装予定の Governance が「今回は高コストな推論が走ったか」などを判断するための強力な基礎を築きました。
+- **5-Layer Mock Stages の確立**:
+  - Regex, AST, Semantic, Context, AI_REVIEW の5つのレイヤーを `IValidationStage` の実装（モック）として構築し、Pipeline Builder を用いたソートと一連のバケツリレーが正常に稼働することをテストで実証しました。
