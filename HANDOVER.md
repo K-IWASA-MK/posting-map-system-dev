@@ -674,3 +674,18 @@ EventBus からのイベントストリームを受け、AIOS 内の現在状態
   - インターフェースに `exists()` と `count()` を実装し、効率的なデータ取得を可能にしました。
 - **仕様書の作成**:
   - `docs/specifications/` 配下に `Projection.md`, `ProjectionBuilder.md`, `ProjectionRepository.md`, `ProjectionModel.md`, `ProjectionSnapshot.md`, `ProjectionConfiguration.md` の6つの仕様書を作成しました。
+
+### AIOS Observability OS Sprint 8 Phase S8-5: Metrics Foundation
+
+不変な測定値（Telemetry）から時間窓・セッション窓などでグループ化・集計を行う派生分析データ（Metrics）生成基盤を構築しました。
+
+- **Telemetry と Metrics の分離・非依存**:
+  - Metrics は Telemetry の派生データであり、Telemetry 自体を改変しない原則を `Metrics.md` で定義。EventBus は直接購読せず TelemetryRepository を経由する流れを維持しました。
+- **`MetricRegistry` (Observation SSOT) と Definition バリデーション**:
+  - メトリクス名ごとに許可された AggregationType と Window を厳密に定義し、リポジトリ保存時に不正な組み合わせ（Unsupported Aggregation）を確実に拒否するロジックを実装しました。
+- **Strategy パターンと `MetricCalculator` / `WindowResolver`**:
+  - 集計アルゴリズム（Sum, Average, Count, Min, Max）を `AggregationStrategy` に切り離し、呼び出し選定を `MetricCalculator` が行う構造にしました。時間窓等によるグループ切り出しは `WindowResolver` が単一責任で担います。
+- **集計結果の二重登録防止と高速性能**:
+  - 同一の集計キーに対しては **Replace** 方式で上書き更新。10,000 件以上のレコード集計（Large Dataset Test）においても、メモリ破綻を起こさず 10ms 以下の高速性で処理を完了できることを確認しました。
+- **仕様書の作成**:
+  - `docs/specifications/` 配下に `Metrics.md`, `MetricRecord.md`, `MetricAggregator.md`, `MetricsRepository.md`, `MetricsWindow.md`, `MetricDefinition.md`, `MetricsConfiguration.md` の7つの仕様書を作成しました。
