@@ -381,6 +381,25 @@ function renderDashboard(data) {
       metaContainer.style.display = 'none';
     }
   }
+
+  // 7. Performance Panel (Developer Mode)
+  const isDevUrl = urlParams.get('dev') === 'true';
+  const isAdmin = googleUser && (googleUser.email.includes('iwasa') || googleUser.email.includes('manager') || googleUser.email.includes('admin') || googleUser.email.includes('system'));
+  const perfPanel = document.getElementById('performance-panel');
+  
+  if (isDevUrl && isAdmin && data.performanceMetrics && perfPanel) {
+    const pm = data.performanceMetrics;
+    perfPanel.classList.remove('hidden');
+    document.getElementById('perf-generated-at').textContent = pm.generatedAt || '-';
+    document.getElementById('perf-response-time').textContent = pm.responseTimeMs !== undefined ? `${pm.responseTimeMs}ms` : '-';
+    document.getElementById('perf-ss-read').textContent = pm.spreadsheetReadCount !== undefined ? `${pm.spreadsheetReadCount}` : '-';
+    document.getElementById('perf-repo-calls').textContent = pm.repositoryCallCount !== undefined ? `${pm.repositoryCallCount}` : '-';
+    
+    const loadedCount = (pm.activityRecordCount || 0) + (pm.holdingRecordCount || 0) + (pm.staffRecordCount || 0);
+    document.getElementById('perf-loaded-records').textContent = `${loadedCount}`;
+  } else if (perfPanel) {
+    perfPanel.classList.add('hidden');
+  }
 }
 
 function updateTemplatePreview() {

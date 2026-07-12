@@ -102,6 +102,32 @@
       
       <!-- ホーム (Home Tab View) -->
       <div id="tab-content-home" class="space-y-6">
+
+        <!-- Performance Panel (Developer Mode Only) -->
+        <div id="performance-panel" class="hidden glass-card p-4 border border-blue-500/30 bg-blue-900/10">
+          <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-blue-400">System Performance Metrics</span>
+            <span class="text-[9px] text-secondary font-mono" id="perf-generated-at">-</span>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-[11px]">
+            <div>
+              <div class="text-secondary text-[9px] mb-1">Response Time</div>
+              <div class="text-white" id="perf-response-time">-</div>
+            </div>
+            <div>
+              <div class="text-secondary text-[9px] mb-1">Spreadsheet Read</div>
+              <div class="text-white" id="perf-ss-read">-</div>
+            </div>
+            <div>
+              <div class="text-secondary text-[9px] mb-1">Repository Calls</div>
+              <div class="text-white" id="perf-repo-calls">-</div>
+            </div>
+            <div>
+              <div class="text-secondary text-[9px] mb-1">Loaded Records</div>
+              <div class="text-white" id="perf-loaded-records">-</div>
+            </div>
+          </div>
+        </div>
         
         <!-- 分析パネル (Analytics Section) -->
         <div class="glass-card p-6">

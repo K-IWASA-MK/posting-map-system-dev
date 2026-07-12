@@ -266,6 +266,19 @@ export class DashboardApplicationService {
     const emailTemplates = await this.emailTemplateService.getActiveTemplates();
     
     const t1 = Date.now();
+    const performanceMetrics = {
+      responseTimeMs: t1 - t0,
+      spreadsheetReadCount: stats.totalAccess,
+      spreadsheetWriteCount: 0,
+      repositoryCallCount: 4,
+      activityRecordCount: allActivitiesRaw.length,
+      holdingRecordCount: allHoldings.length,
+      staffRecordCount: staffList.length,
+      generatedAt: new Date().toISOString(),
+      apiVersion: '1.0',
+      dashboardVersion: 'v2.4'
+    };
+
     console.log(`[Dashboard Performance] Activity Read : ${stats.activityRead}, Holding Read : ${stats.holdingRead}, Staff Read : ${stats.staffRead}, Workspace Read : ${stats.workspaceRead}, Spreadsheet Access : ${stats.totalAccess}, Processing Time : ${t1 - t0}ms`);
 
     return {
@@ -294,7 +307,8 @@ export class DashboardApplicationService {
       activeCityCount,
       lineAppUrl: urls.lineAppUrl,
       dashboardUrl: urls.dashboardUrl,
-      emailTemplates
+      emailTemplates,
+      performanceMetrics
     };
   }
 

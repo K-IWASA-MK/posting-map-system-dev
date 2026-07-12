@@ -1,4 +1,5 @@
 import { EmailTemplateDto } from '../email/EmailTemplateDto';
+import { PerformanceMetricsDto } from './PerformanceMetricsDto';
 
 export interface PersonalDashboardDto {
   staffNo: string;
@@ -52,6 +53,7 @@ export interface WorkspaceDashboardDto {
   lineAppUrl: string;
   dashboardUrl: string;
   emailTemplates: EmailTemplateDto[];
+  performanceMetrics?: PerformanceMetricsDto;
 }
 
 export interface RankingDto {

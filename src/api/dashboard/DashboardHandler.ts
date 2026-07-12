@@ -67,7 +67,8 @@ export class DashboardHandler implements EndpointHandler {
           activeCityCount: dashboard.activeCityCount,
           lineAppUrl: dashboard.lineAppUrl,
           dashboardUrl: dashboard.dashboardUrl,
-          emailTemplates: dashboard.emailTemplates
+          emailTemplates: dashboard.emailTemplates,
+          performanceMetrics: dashboard.performanceMetrics
         };
         return FieldApiMapper.toSuccessResponse(result, request, context);
       }
