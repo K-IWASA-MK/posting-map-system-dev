@@ -77,6 +77,8 @@ class MockHoldingRepository implements IFlyerHoldingRepository {
 }
 
 class MockActivityRepository implements IActivityRepository {
+  public async findById(id: string): Promise<DistributionActivity | undefined> { return undefined; }
+  public activities: DistributionActivity[] = [];
   public db = new Map<string, DistributionActivity>();
   async findLatestByStaff(staffNo: string, limit: number): Promise<DistributionActivity[]> {
     return Array.from(this.db.values())

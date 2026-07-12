@@ -5,6 +5,7 @@ import { ApiExecutionContext } from '@infra/gas/ApiExecutionContext';
 import { DashboardApplicationService } from '@application/dashboard/services/DashboardApplicationService';
 import { FieldApiMapper } from '../field/FieldApiMapper';
 import { ExceptionMapper } from '@core/exceptions/ExceptionMapper';
+import { RepositoryPerformanceProfiler } from '@infra/repository/profiler/RepositoryPerformanceProfiler';
 
 export class DashboardHandler implements EndpointHandler {
   constructor(
@@ -95,6 +96,8 @@ export class DashboardHandler implements EndpointHandler {
     } catch (error: any) {
       const apiException = FieldApiMapper.toApiException(error, request.requestId);
       return ExceptionMapper.toResponse(apiException, request, context);
+    } finally {
+      RepositoryPerformanceProfiler.getInstance().reset();
     }
   }
 }

@@ -1,4 +1,5 @@
 import { SpreadsheetClient } from './SpreadsheetClient';
+import { RepositoryPerformanceProfiler } from '../repository/profiler/RepositoryPerformanceProfiler';
 
 export class SpreadsheetWriter {
   private client: SpreadsheetClient;
@@ -14,6 +15,8 @@ export class SpreadsheetWriter {
     try {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) return;
+
+      RepositoryPerformanceProfiler.getInstance().incrementWrite(sheetName);
 
       const lastRow = sheet.getLastRow();
       
@@ -34,6 +37,8 @@ export class SpreadsheetWriter {
     try {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) return;
+
+      RepositoryPerformanceProfiler.getInstance().incrementWrite(sheetName);
 
       if (values.length === 0) return;
       sheet.getRange(startRow, startCol, values.length, values[0].length).setValues(values);

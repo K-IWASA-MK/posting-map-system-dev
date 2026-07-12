@@ -2,6 +2,7 @@ import { IWorkspaceSubscriptionRepository } from '@domain/workspace/repositories
 import { WorkspaceSubscription, SubscriptionStatus } from '@domain/workspace/entities/WorkspaceSubscription';
 import { SpreadsheetReader } from '../../spreadsheet/SpreadsheetReader';
 import { SpreadsheetWriter } from '../../spreadsheet/SpreadsheetWriter';
+import { RepositoryPerformanceProfiler } from '../profiler/RepositoryPerformanceProfiler';
 
 export class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscriptionRepository {
   private reader: SpreadsheetReader;
@@ -14,6 +15,11 @@ export class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSub
   }
 
   public async findByWorkspaceId(workspaceId: string): Promise<WorkspaceSubscription | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceSubscriptionRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -37,9 +43,17 @@ export class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSub
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAll(): Promise<WorkspaceSubscription[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceSubscriptionRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -64,9 +78,17 @@ export class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSub
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(subscription: WorkspaceSubscription): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceSubscriptionRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ステータス', '開始日', '期限日'];
 
@@ -99,9 +121,20 @@ export class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSub
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
     }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async create(subscription: WorkspaceSubscription): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceSubscriptionRepository');
+    const startTime = Date.now();
+
+    try {
     await this.save(subscription);
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 }

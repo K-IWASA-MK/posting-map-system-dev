@@ -2,6 +2,7 @@ import { IWorkspaceRepository } from '@domain/workspace/repositories/IWorkspaceR
 import { Workspace, WorkspaceStatus } from '@domain/workspace/entities/Workspace';
 import { SpreadsheetReader } from '../../spreadsheet/SpreadsheetReader';
 import { SpreadsheetWriter } from '../../spreadsheet/SpreadsheetWriter';
+import { RepositoryPerformanceProfiler } from '../profiler/RepositoryPerformanceProfiler';
 
 export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
   private reader: SpreadsheetReader;
@@ -14,6 +15,11 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
   }
 
   public async findById(id: string): Promise<Workspace | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -42,9 +48,17 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAll(): Promise<Workspace[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -74,9 +88,17 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(workspace: Workspace): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ワークスペース名', 'ステータス', '月間配布目標', '目標更新日時', '最終更新者'];
 
@@ -110,6 +132,9 @@ export class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       } else {
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
+    }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
     }
   }
 

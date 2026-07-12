@@ -11,6 +11,7 @@ function assert(condition: boolean, message: string) {
 }
 
 class MockActivityRepository implements IActivityRepository {
+  async findById(id: string): Promise<DistributionActivity | undefined> { return undefined; }
   public db = new Map<string, DistributionActivity>();
 
   public async findLatestByStaff(staffNo: string, limit: number): Promise<DistributionActivity[]> {

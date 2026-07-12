@@ -1,4 +1,5 @@
 import { SpreadsheetClient } from './SpreadsheetClient';
+import { RepositoryPerformanceProfiler } from '../repository/profiler/RepositoryPerformanceProfiler';
 
 export class SpreadsheetReader {
   private client: SpreadsheetClient;
@@ -14,6 +15,8 @@ export class SpreadsheetReader {
     try {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) return [];
+
+      RepositoryPerformanceProfiler.getInstance().incrementRead(sheetName);
 
       const lastRow = sheet.getLastRow();
       const lastCol = sheet.getLastColumn();
@@ -33,6 +36,8 @@ export class SpreadsheetReader {
     try {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) return [];
+
+      RepositoryPerformanceProfiler.getInstance().incrementRead(sheetName);
 
       return sheet.getRange(startRow, startCol, numRows, numCols).getValues();
     } catch (e) {

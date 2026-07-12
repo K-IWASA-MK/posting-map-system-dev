@@ -3,6 +3,7 @@ import { IFlyerHoldingRepository } from '@domain/field/holding/repositories/IFly
 import { IActivityRepository } from '@domain/field/activity/repositories/IActivityRepository';
 import { IWorkspaceRepository } from '@domain/workspace/repositories/IWorkspaceRepository';
 import { WorkspaceUrl } from '@domain/workspace/valueobjects/WorkspaceUrl';
+import { RepositoryPerformanceProfiler } from '../../../infrastructure/repository/profiler/RepositoryPerformanceProfiler';
 import { YearMonth } from '../../../domain/common/valueobjects/YearMonth';
 import { 
   PersonalDashboardDto, 
@@ -266,11 +267,14 @@ export class DashboardApplicationService {
     const emailTemplates = await this.emailTemplateService.getActiveTemplates();
     
     const t1 = Date.now();
+    const profilerMetrics = RepositoryPerformanceProfiler.getInstance().getMetrics();
     const performanceMetrics = {
       responseTimeMs: t1 - t0,
-      spreadsheetReadCount: stats.totalAccess,
-      spreadsheetWriteCount: 0,
-      repositoryCallCount: 4,
+      spreadsheetReadCount: profilerMetrics.spreadsheetReadCount,
+      spreadsheetWriteCount: profilerMetrics.spreadsheetWriteCount,
+      repositoryCallCount: profilerMetrics.repositoryCallCount,
+      repositoryExecutionCount: profilerMetrics.repositoryExecutionCount,
+      sheetMetrics: profilerMetrics.sheetMetrics,
       activityRecordCount: allActivitiesRaw.length,
       holdingRecordCount: allHoldings.length,
       staffRecordCount: staffList.length,
@@ -279,7 +283,7 @@ export class DashboardApplicationService {
       dashboardVersion: 'v2.4'
     };
 
-    console.log(`[Dashboard Performance] Activity Read : ${stats.activityRead}, Holding Read : ${stats.holdingRead}, Staff Read : ${stats.staffRead}, Workspace Read : ${stats.workspaceRead}, Spreadsheet Access : ${stats.totalAccess}, Processing Time : ${t1 - t0}ms`);
+    console.log(`[Dashboard Performance] Activity Read : ${profilerMetrics.sheetMetrics.find(m => m.sheetName === 'Activity')?.readCount || 0}, Holding Read : ${profilerMetrics.sheetMetrics.find(m => m.sheetName === 'Flyers')?.readCount || 0}, Staff Read : ${profilerMetrics.sheetMetrics.find(m => m.sheetName === 'Staff')?.readCount || 0}, Workspace Read : ${profilerMetrics.sheetMetrics.find(m => m.sheetName === 'Workspaces')?.readCount || 0}, Spreadsheet Access : ${profilerMetrics.spreadsheetReadCount + profilerMetrics.spreadsheetWriteCount}, Processing Time : ${t1 - t0}ms`);
 
     return {
       workspaceId,

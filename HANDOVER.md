@@ -424,3 +424,34 @@ Workspace Goal Management Foundation（Sprint 5 Phase S5-19）完了。
 - **Dashboard 連携**: `DashboardApplicationService` の `getWorkspaceDashboard` から目標引数を削除し、Workspace の目標設定値に基づいて達成率と目標値を自動算出する正式設計へ移行。
 - **フロントエンド UI の更新**: 設定タブに「月間配布目標」の入力フォーム（保存ボタン含む）と、最終更新日・更新者の表示要素を追加。目標更新時に即座にデータを再取得してホームの達成率を更新するフローを `manager.js` に実装（※履歴表示一覧は Sprint 6 へ延期）。
 - 全ユニットテスト、統合テスト、および GAS ビルド検証をパス。
+
+### POSTING MAP Product Sprint 6 Phase S6-1: Performance Foundation (Dashboard API Optimization)
+
+Performance Foundation（Sprint 6 Phase S6-1）完了。
+
+- **Spreadsheet 読み込み最適化**: 各リポジトリ（Staff, Holding, Activity）で `findAll` メソッドを整備し、全データを一括取得してメモリ上でキャッシュ（Map化）するように変更。
+- **O(1) ルックアップ**: DashboardApplicationService 内での N+1 問題（`findByStaffNo` などをループで呼び出す問題）を解消し、Map からの取得へ切り替え。
+- 実行時間と Spreadsheet API の呼び出し回数を劇的に削減。
+
+### POSTING MAP Product Sprint 6 Phase S6-2: Performance Metrics Foundation
+
+Performance Metrics Foundation（Sprint 6 Phase S6-2）完了。
+
+- **DTO 化**: `PerformanceMetricsDto.ts` を定義し、レスポンスにパフォーマンス情報を含める仕組みを実装。
+- **可視化**: Spreadsheet アクセス回数、処理時間などを計測し、フロントエンド側へ返却。
+
+### POSTING MAP Product Sprint 6 Phase S6-3: Repository Performance Foundation
+
+Repository Performance Foundation（Sprint 6 Phase S6-3）完了。
+
+- **`RepositoryPerformanceProfiler` の実装**:
+  - Request Scope Singleton として振る舞うプロファイラを新規作成。
+  - リポジトリ別呼び出し回数、シート別 Read/Write 回数、合計実行時間を管理。
+- **各リポジトリへの組み込み**:
+  - `SpreadsheetReader`, `SpreadsheetWriter` および各 `SpreadsheetXXXRepository` の全パブリックメソッドへ Profiler 計測ロジックを追加。
+  - `IActivityRepository` および実装へ `findById` を追加し、API の完全性を確保。
+- **DashboardApplicationService の SSOT（Single Source of Truth）化**:
+  - これまで独自の stats 変数で管理していたメトリクス集計を廃止し、Profiler から取得した値をそのまま DTO へ流し込む形へリファクタリング。
+- **ライフサイクル管理**:
+  - `DashboardHandler` の `finally` ブロックにて明示的に `reset()` を呼び出し、リクエストを跨いだメトリクスの混在を防止。
+- 全テスト（ユニット、統合）および GAS ビルド検証をパス。

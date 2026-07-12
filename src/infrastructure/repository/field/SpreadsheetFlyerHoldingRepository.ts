@@ -3,6 +3,7 @@ import { FlyerHolding } from '@domain/field/holding/entities/FlyerHolding';
 import { Quantity } from '@domain/field/valueobjects/Quantity';
 import { SpreadsheetReader } from '../../spreadsheet/SpreadsheetReader';
 import { SpreadsheetWriter } from '../../spreadsheet/SpreadsheetWriter';
+import { RepositoryPerformanceProfiler } from '../profiler/RepositoryPerformanceProfiler';
 
 export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepository {
   private reader: SpreadsheetReader;
@@ -15,6 +16,11 @@ export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepositor
   }
 
   public async findByStaffNo(staffNo: string): Promise<FlyerHolding | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -49,9 +55,17 @@ export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepositor
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAllRaw(): Promise<any[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -92,9 +106,17 @@ export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepositor
       });
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAll(): Promise<FlyerHolding[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -130,9 +152,17 @@ export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepositor
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(holding: FlyerHolding): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ID', 'スタッフID', 'スタッフ名', '保管場所', '保管枚数', '更新日時'];
 
@@ -173,6 +203,9 @@ export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepositor
       } else {
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
+    }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
     }
   }
 }

@@ -5,6 +5,7 @@ import { Quantity } from '@domain/field/valueobjects/Quantity';
 import { Location } from '@domain/field/valueobjects/Location';
 import { SpreadsheetReader } from '../../spreadsheet/SpreadsheetReader';
 import { SpreadsheetWriter } from '../../spreadsheet/SpreadsheetWriter';
+import { RepositoryPerformanceProfiler } from '../profiler/RepositoryPerformanceProfiler';
 
 export class SpreadsheetActivityRepository implements IActivityRepository {
   private reader: SpreadsheetReader;
@@ -16,7 +17,58 @@ export class SpreadsheetActivityRepository implements IActivityRepository {
     this.writer = new SpreadsheetWriter();
   }
 
+  public async findById(id: string): Promise<DistributionActivity | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return undefined;
+
+    const headers = rows[0];
+    const actIdIdx = headers.indexOf('活動ID');
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const qtyIdx = headers.indexOf('報告枚数');
+    const photoIdx = headers.indexOf('写真URL');
+    const locIdx = headers.indexOf('位置情報');
+    const dateIdx = headers.indexOf('活動日時');
+
+    if (actIdIdx === -1) return undefined;
+
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (String(row[actIdIdx]) === id) {
+        let lat = 0;
+        let lng = 0;
+        if (locIdx !== -1) {
+          const parts = String(row[locIdx]).split(',');
+          lat = Number(parts[0]) || 0;
+          lng = Number(parts[1]) || 0;
+        }
+
+        return new DistributionActivity({
+          id: String(row[actIdIdx]),
+          staffNo: staffIdIdx !== -1 ? String(row[staffIdIdx]) : '',
+          reportedQuantity: new Quantity(qtyIdx !== -1 ? Number(row[qtyIdx]) : 0),
+          photoUrl: photoIdx !== -1 ? String(row[photoIdx]) : '',
+          location: new Location(lat, lng, 0),
+          occurredAt: dateIdx !== -1 ? new Date(Number(row[dateIdx]) || String(row[dateIdx])) : new Date()
+        });
+      }
+    }
+    return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
+  }
+
   public async findLatestByStaff(staffNo: string, limit: number): Promise<DistributionActivity[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -57,9 +109,17 @@ export class SpreadsheetActivityRepository implements IActivityRepository {
     // Sort by occurredAt desc and limit
     list.sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime());
     return list.slice(0, limit);
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAll(): Promise<DistributionActivity[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -93,9 +153,17 @@ export class SpreadsheetActivityRepository implements IActivityRepository {
       }));
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findByPeriod(start: Date, end: Date): Promise<DistributionActivity[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -136,9 +204,17 @@ export class SpreadsheetActivityRepository implements IActivityRepository {
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findByYearMonth(workspaceId: string, yearMonth: YearMonth): Promise<DistributionActivity[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const staffRows = this.reader.readAll('Staff');
     if (staffRows.length <= 1) return [];
     
@@ -161,9 +237,17 @@ export class SpreadsheetActivityRepository implements IActivityRepository {
     const allPeriodActivities = await this.findByPeriod(start, end);
 
     return allPeriodActivities.filter(a => allowedStaffNos.has(a.staffNo));
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(activity: DistributionActivity): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['活動ID', 'スタッフID', '報告枚数', '写真URL', '位置情報', '活動日時'];
 
@@ -199,6 +283,9 @@ export class SpreadsheetActivityRepository implements IActivityRepository {
       } else {
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
+    }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
     }
   }
 }

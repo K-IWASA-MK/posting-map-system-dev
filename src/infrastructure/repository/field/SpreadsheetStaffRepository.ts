@@ -3,6 +3,7 @@ import { IStaffRepository } from '@domain/field/staff/repositories/IStaffReposit
 import { Staff } from '@domain/field/staff/entities/Staff';
 import { SpreadsheetReader } from '../../spreadsheet/SpreadsheetReader';
 import { SpreadsheetWriter } from '../../spreadsheet/SpreadsheetWriter';
+import { RepositoryPerformanceProfiler } from '../profiler/RepositoryPerformanceProfiler';
 
 export class SpreadsheetStaffRepository implements IStaffRepository {
   private reader: SpreadsheetReader;
@@ -15,6 +16,11 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
   }
 
   public async findByStaffNo(staffNo: string): Promise<Staff | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -40,9 +46,17 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findByLineUserId(lineUserId: string): Promise<Staff | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -68,9 +82,17 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findByWorkspace(workspaceId: string): Promise<Staff[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -97,9 +119,17 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const list = await this.findByWorkspace(workspaceId);
     const start = yearMonth.getStartDate().getTime();
     const end = yearMonth.getEndDate().getTime();
@@ -107,9 +137,17 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
       const t = staff.createdAt.getTime();
       return t >= start && t <= end;
     });
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAll(): Promise<Staff[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -136,9 +174,17 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async getNextStaffNo(workspaceId: string): Promise<string> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) {
       return 'S001';
@@ -169,9 +215,17 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
 
     const nextNum = maxNum + 1;
     return 'S' + String(nextNum).padStart(3, '0');
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(staff: Staff): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['スタッフID', 'スタッフ名', 'LINEユーザーID', 'ワークスペースID', '登録日時'];
 
@@ -204,6 +258,9 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
       } else {
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
+    }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
     }
   }
 }
