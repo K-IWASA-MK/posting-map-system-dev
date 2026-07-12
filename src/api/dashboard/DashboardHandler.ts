@@ -39,13 +39,15 @@ export class DashboardHandler implements EndpointHandler {
         }
 
         const yearMonthParam = request.query.yearMonth;
+        const goalParam = request.query.distributionGoal ? Number(request.query.distributionGoal) : undefined;
 
-        const dashboard = await this.dashboardAppService.getWorkspaceDashboard(workspaceId, yearMonthParam);
+        const dashboard = await this.dashboardAppService.getWorkspaceDashboard(workspaceId, yearMonthParam, goalParam);
         const result = {
           workspaceId: dashboard.workspaceId,
           name: dashboard.workspaceName,
           memberCount: dashboard.memberCount,
           newMemberCount: dashboard.newMemberCount,
+          activeMemberCount: dashboard.activeMemberCount,
           total: dashboard.totalHoldingQuantity,
           monthlyActivity: dashboard.monthlyDistributionQuantity,
           previousMonthActivity: dashboard.previousMonthDistributionQuantity,
@@ -53,6 +55,17 @@ export class DashboardHandler implements EndpointHandler {
           members: dashboard.members,
           newMembers: dashboard.newMembers,
           monthlyTrend: dashboard.monthlyTrend,
+          cityActivities: dashboard.cityActivities,
+          distributionGoal: dashboard.distributionGoal,
+          achievementRate: dashboard.achievementRate,
+          prevActiveMemberCount: dashboard.prevActiveMemberCount,
+          volumeDifference: dashboard.volumeDifference,
+          volumeGrowthRate: dashboard.volumeGrowthRate,
+          memberDifference: dashboard.memberDifference,
+          memberGrowthRate: dashboard.memberGrowthRate,
+          topCityName: dashboard.topCityName,
+          topCityQuantity: dashboard.topCityQuantity,
+          activeCityCount: dashboard.activeCityCount,
           lineAppUrl: dashboard.lineAppUrl,
           dashboardUrl: dashboard.dashboardUrl,
           emailTemplates: dashboard.emailTemplates

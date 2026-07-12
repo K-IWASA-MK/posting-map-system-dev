@@ -108,6 +108,7 @@ function renderDashboard(data) {
   // KPIs (Terms sanitized)
   document.getElementById('kpi-staff-count').textContent = `${data.memberCount || 0}人`;
   document.getElementById('kpi-total-holding').textContent = `${(data.total || 0).toLocaleString()}枚`;
+  document.getElementById('kpi-active-member-count').textContent = `${data.activeMemberCount || 0}人`;
   document.getElementById('kpi-monthly-activity').textContent = `${(data.monthlyActivity || 0).toLocaleString()}枚`;
   document.getElementById('kpi-prev-month').textContent = `先月: ${(data.previousMonthActivity || 0).toLocaleString()}枚`;
   
@@ -118,6 +119,88 @@ function renderDashboard(data) {
     growthRateEl.className = 'font-extrabold text-red-400';
   } else {
     growthRateEl.className = 'font-extrabold text-emerald-400';
+  }
+
+  // --- S5-18 Analytics & Summaries ---
+  // 1. Goal & Achievement Rate
+  const goalLabel = document.getElementById('analytics-goal-label');
+  const achievementRateEl = document.getElementById('analytics-achievement-rate');
+  const achievementSuffix = document.getElementById('analytics-achievement-suffix');
+  const progressBar = document.getElementById('analytics-progress-bar');
+  
+  if (goalLabel && achievementRateEl && achievementSuffix && progressBar) {
+    if (data.distributionGoal && data.distributionGoal > 0) {
+      goalLabel.textContent = `目標: ${(data.distributionGoal).toLocaleString()}枚`;
+      achievementRateEl.textContent = `${data.achievementRate || 0}%`;
+      achievementSuffix.textContent = '達成';
+      progressBar.style.width = `${Math.min(data.achievementRate || 0, 100)}%`;
+    } else {
+      goalLabel.textContent = '目標: 未設定';
+      achievementRateEl.textContent = '-%';
+      achievementSuffix.textContent = '';
+      progressBar.style.width = '0%';
+    }
+  }
+
+  // 2. Month-over-Month Comparisons
+  const volumeDiffEl = document.getElementById('analytics-volume-diff');
+  const volumeRateEl = document.getElementById('analytics-volume-rate');
+  const memberDiffEl = document.getElementById('analytics-member-diff');
+  const memberRateEl = document.getElementById('analytics-member-rate');
+
+  if (volumeDiffEl && volumeRateEl) {
+    const diff = data.volumeDifference || 0;
+    const rate = data.volumeGrowthRate || 0;
+    volumeDiffEl.textContent = diff >= 0 ? `+${diff.toLocaleString()}枚` : `${diff.toLocaleString()}枚`;
+    volumeRateEl.textContent = rate >= 0 ? `(+${rate}%)` : `(${rate}%)`;
+    
+    if (diff > 0) {
+      volumeDiffEl.className = 'text-lg font-extrabold text-emerald-400';
+      volumeRateEl.className = 'text-[10px] font-extrabold text-emerald-400';
+    } else if (diff < 0) {
+      volumeDiffEl.className = 'text-lg font-extrabold text-red-400';
+      volumeRateEl.className = 'text-[10px] font-extrabold text-red-400';
+    } else {
+      volumeDiffEl.className = 'text-lg font-extrabold text-secondary';
+      volumeRateEl.className = 'text-[10px] font-extrabold text-secondary';
+    }
+  }
+
+  if (memberDiffEl && memberRateEl) {
+    const diff = data.memberDifference || 0;
+    const rate = data.memberGrowthRate || 0;
+    memberDiffEl.textContent = diff >= 0 ? `+${diff.toLocaleString()}人` : `${diff.toLocaleString()}人`;
+    memberRateEl.textContent = rate >= 0 ? `(+${rate}%)` : `(${rate}%)`;
+
+    if (diff > 0) {
+      memberDiffEl.className = 'text-lg font-extrabold text-emerald-400';
+      memberRateEl.className = 'text-[10px] font-extrabold text-emerald-400';
+    } else if (diff < 0) {
+      memberDiffEl.className = 'text-lg font-extrabold text-red-400';
+      memberRateEl.className = 'text-[10px] font-extrabold text-red-400';
+    } else {
+      memberDiffEl.className = 'text-lg font-extrabold text-secondary';
+      memberRateEl.className = 'text-[10px] font-extrabold text-secondary';
+    }
+  }
+
+  // 3. Activity Summary Text & Top Active City
+  const summaryTextEl = document.getElementById('analytics-summary-text');
+  const topCityEl = document.getElementById('analytics-top-city');
+
+  if (summaryTextEl) {
+    const vol = (data.monthlyActivity || 0).toLocaleString();
+    const membersCount = data.activeMemberCount || 0;
+    const citiesCount = data.activeCityCount || 0;
+    summaryTextEl.innerHTML = `今月は <span class="text-primary font-extrabold text-sm">${vol}枚</span> のチラシが、<span class="text-primary font-extrabold text-sm">${membersCount}人</span> の手によって、<span class="text-primary font-extrabold text-sm">${citiesCount}つ</span> の地域で配布されました。`;
+  }
+
+  if (topCityEl) {
+    if (data.topCityName && data.topCityName !== '-') {
+      topCityEl.textContent = `${data.topCityName} (${(data.topCityQuantity || 0).toLocaleString()}枚)`;
+    } else {
+      topCityEl.textContent = '- (0枚)';
+    }
   }
 
   // 1. Render Flyer Holding Status Table (No home/address info, only ID, name, city, count)
@@ -141,6 +224,29 @@ function renderDashboard(data) {
         <td colspan="4" class="py-4 text-center text-secondary text-xs">登録されている党員さん・サポーターさんがいません</td>
       </tr>
     `;
+  }
+
+  // 1.5. Render City Posting Activity Status Table
+  const cityTableBody = document.getElementById('city-activity-table-body');
+  if (cityTableBody) {
+    cityTableBody.innerHTML = '';
+    if (data.cityActivities && data.cityActivities.length > 0) {
+      data.cityActivities.forEach(c => {
+        const row = document.createElement('tr');
+        row.className = 'border-b border-default text-xs';
+        row.innerHTML = `
+          <td class="py-3 px-4 font-bold">${c.cityName}</td>
+          <td class="py-3 px-4 text-right font-extrabold text-primary">${(c.quantity || 0).toLocaleString()}枚</td>
+        `;
+        cityTableBody.appendChild(row);
+      });
+    } else {
+      cityTableBody.innerHTML = `
+        <tr>
+          <td colspan="2" class="py-4 text-center text-secondary text-xs">市町村別の活動実績がありません</td>
+        </tr>
+      `;
+    }
   }
 
   // 2. Render Activity Trend chart
