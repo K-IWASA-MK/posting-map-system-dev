@@ -553,3 +553,14 @@ AIOS の「推論エンジン」となる 5-Layer Validation Pipeline (Regex -> 
   - Pipeline 実行結果に `executedStages`, `skippedStages`, `estimatedCost`, `actualCost` などのメトリクスを保持させ、S7-6 で実装予定の Governance が「今回は高コストな推論が走ったか」などを判断するための強力な基礎を築きました。
 - **5-Layer Mock Stages の確立**:
   - Regex, AST, Semantic, Context, AI_REVIEW の5つのレイヤーを `IValidationStage` の実装（モック）として構築し、Pipeline Builder を用いたソートと一連のバケツリレーが正常に稼働することをテストで実証しました。
+
+### AIOS Core Sprint 7 Phase S7-5: Reviewer Adapter Foundation
+
+AIOS 最大の差別化ポイントとなる「LLM/AI の完全な抽象化と Driver 化」を実現するレイヤー構築が完了しました。
+
+- **AI と Human の統一契約化 (`ReviewRequest` / `ReviewResult`)**:
+  - `instructions` プロパティの導入により Prompt の概念を一般化し、人間にも AI にも全く同じ DTO で入力・出力の受け渡しができる体制を構築しました。
+  - レビュー成果物（コード修正提案など）を独立した `ReviewArtifact` オブジェクトに切り離し、将来の多様な出力形式に対応可能な Single Source of Truth として確立しました。
+- **動的ルーティングと堅牢な Fallback 機構 (`ReviewerLoader` & `AIReviewValidationStage`)**:
+  - メタデータの `priority` と `weight` に基づいて最適なレビュアーを自動ソート抽出し、`selectionReason` を付与する仕組みを構築。
+  - メインの AI（例: Gemini）がダウンしていた際に自動的に代替 AI（例: Claude）や人間（Human）へフォールバックして処理を完遂させる強固なフェイルオーバー機構を実装し、テストで実証しました。
