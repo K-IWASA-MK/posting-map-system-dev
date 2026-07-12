@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Performance Metrics Foundation`
-- **Milestone**: `Sprint 6 / Phase S6-2 COMPLETED`
-- **Tag**: `v6.2-performance-metrics-completed`
-- **Current Phase**: `Sprint 6`
-- **Next Action**: `Sprint 6 Next Phase`
+- **Completed**: `Sprint 8 Observability OS Foundation`
+- **Milestone**: `Sprint 8 COMPLETED`
+- **Tag**: `v5.8.0`
+- **Current Phase**: `Sprint 8`
+- **Next Action**: `Sprint 9 Learning Engine Foundation`
 - **Branch**: `main`
 
 ---
@@ -104,6 +104,7 @@ Before starting development:
 
 | Milestone | Phase Range | Tag | Status | Date |
 | :--- | :--- | :--- | :--- | :--- |
+| Observability OS Foundation | Sprint 8 | `v5.8.0` | ✅ Completed | 2026-07-12 |
 | Execution Runtime Foundation | Phase 206 – 229 | `v4.31-runtime-foundation` | ✅ Completed | 2026-07-10 |
 | Runtime Boot Foundation | Phase 216 | - | ✅ Completed | 2026-07-10 |
 | Runtime Orchestrator Foundation | Phase 217 | - | ✅ Completed | 2026-07-10 |
