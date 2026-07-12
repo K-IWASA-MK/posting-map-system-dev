@@ -1,0 +1,142 @@
+{
+  "metadata": {
+    "toolVersion": "1.0.0",
+    "schemaVersion": "v1",
+    "runtime": "Node.js",
+    "generatedAt": "2026-07-12T11:13:10.494Z"
+  },
+  "decision": {
+    "status": "FAILED",
+    "score": 31,
+    "action": "BLOCK",
+    "recommendation": "Performance violations must be resolved before release.",
+    "generatedAt": "2026-07-12T11:13:10.617Z"
+  },
+  "validationResult": {
+    "metadata": {
+      "toolVersion": "1.0.0",
+      "schemaVersion": "v1",
+      "runtime": "Node.js",
+      "generatedAt": "2026-07-12T11:13:10.494Z"
+    },
+    "summary": {
+      "status": "FAILED",
+      "validationCount": 8,
+      "passed": 5,
+      "warning": 3,
+      "failed": 6,
+      "info": 5,
+      "score": 31,
+      "durationMs": 123,
+      "generatedAt": "2026-07-12T11:13:10.494Z"
+    },
+    "report": {
+      "policyCount": 8,
+      "score": 31,
+      "pass": 5,
+      "warning": 3,
+      "failed": 6,
+      "info": 5,
+      "violations": [
+        {
+          "ruleId": "RULE-002",
+          "ruleName": "No Loop Write",
+          "status": "FAILED",
+          "message": "Spreadsheet write operation (updateRange/appendRows) detected inside a loop. Consolidate data into arrays and write once.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/gas/SpreadsheetRepository.ts"
+        },
+        {
+          "ruleId": "RULE-003",
+          "ruleName": "Repository Isolation",
+          "status": "FAILED",
+          "message": "SpreadsheetReader/Writer must only be used within the Repository or Infrastructure layer.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/application/dashboard/email/EmailTemplateService.ts"
+        },
+        {
+          "ruleId": "RULE-003",
+          "ruleName": "Repository Isolation",
+          "status": "FAILED",
+          "message": "SpreadsheetReader/Writer must only be used within the Repository or Infrastructure layer.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/core/performance/policy/rules/Rule003RepositoryIsolation.ts"
+        },
+        {
+          "ruleId": "RULE-003",
+          "ruleName": "Repository Isolation",
+          "status": "FAILED",
+          "message": "SpreadsheetReader/Writer must only be used within the Repository or Infrastructure layer.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/core/performance/policy/rules/Rule005SpreadsheetAccess.ts"
+        },
+        {
+          "ruleId": "RULE-005",
+          "ruleName": "Spreadsheet Access Restrict",
+          "status": "FAILED",
+          "message": "Spreadsheet usage must be encapsulated within the Infrastructure/Repository layer.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/core/performance/policy/rules/Rule004ApplicationSpreadsheetBan.ts"
+        },
+        {
+          "ruleId": "RULE-005",
+          "ruleName": "Spreadsheet Access Restrict",
+          "status": "FAILED",
+          "message": "Spreadsheet usage must be encapsulated within the Infrastructure/Repository layer.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/core/performance/policy/rules/Rule005SpreadsheetAccess.ts"
+        },
+        {
+          "ruleId": "RULE-006",
+          "ruleName": "Memory Processing Required",
+          "status": "WARNING",
+          "message": "Repository uses readAll but lacks standard memory processing patterns (Map/filter/reduce). Ensure operations are done in-memory.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/repository/field/SpreadsheetFlyerHoldingRepository.ts"
+        },
+        {
+          "ruleId": "RULE-006",
+          "ruleName": "Memory Processing Required",
+          "status": "WARNING",
+          "message": "Repository uses readAll but lacks standard memory processing patterns (Map/filter/reduce). Ensure operations are done in-memory.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/repository/workspace/SpreadsheetWorkspaceRepository.ts"
+        },
+        {
+          "ruleId": "RULE-006",
+          "ruleName": "Memory Processing Required",
+          "status": "WARNING",
+          "message": "Repository uses readAll but lacks standard memory processing patterns (Map/filter/reduce). Ensure operations are done in-memory.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/repository/workspace/SpreadsheetWorkspaceSubscriptionRepository.ts"
+        },
+        {
+          "ruleId": "RULE-007",
+          "ruleName": "Repository API Consistency",
+          "status": "INFO",
+          "message": "Repository exposes public methods: . Ensure all are defined in IActivityRepository.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/repository/field/SpreadsheetActivityRepository.ts"
+        },
+        {
+          "ruleId": "RULE-007",
+          "ruleName": "Repository API Consistency",
+          "status": "INFO",
+          "message": "Repository exposes public methods: . Ensure all are defined in IFlyerHoldingRepository.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/repository/field/SpreadsheetFlyerHoldingRepository.ts"
+        },
+        {
+          "ruleId": "RULE-007",
+          "ruleName": "Repository API Consistency",
+          "status": "INFO",
+          "message": "Repository exposes public methods: . Ensure all are defined in IStaffRepository.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/repository/field/SpreadsheetStaffRepository.ts"
+        },
+        {
+          "ruleId": "RULE-007",
+          "ruleName": "Repository API Consistency",
+          "status": "INFO",
+          "message": "Repository exposes public methods: . Ensure all are defined in IWorkspaceRepository.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/repository/workspace/SpreadsheetWorkspaceRepository.ts"
+        },
+        {
+          "ruleId": "RULE-007",
+          "ruleName": "Repository API Consistency",
+          "status": "INFO",
+          "message": "Repository exposes public methods: . Ensure all are defined in IWorkspaceSubscriptionRepository.",
+          "targetFile": "/Volumes/SSD_DATA/posting-map-system/src/infrastructure/repository/workspace/SpreadsheetWorkspaceSubscriptionRepository.ts"
+        }
+      ]
+    }
+  }
+}

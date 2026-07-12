@@ -9,7 +9,9 @@ import { Rule006MemoryProcessing } from './src/core/performance/policy/rules/Rul
 import { Rule007RepositoryApiConsistency } from './src/core/performance/policy/rules/Rule007RepositoryApiConsistency';
 import { Rule008ProfilerMandatory } from './src/core/performance/policy/rules/Rule008ProfilerMandatory';
 import { PerformanceValidationRunner } from './src/core/performance/validation/PerformanceValidationRunner';
-import { PerformanceValidationExporter } from './src/core/performance/validation/PerformanceValidationExporter';
+import { PerformanceGovernanceEngine } from './src/core/performance/governance/PerformanceGovernanceEngine';
+import { PerformanceGovernanceExporter } from './src/core/performance/governance/PerformanceGovernanceExporter';
+import { PerformanceGovernanceAction } from './src/core/performance/governance/PerformanceGovernanceDecision';
 
 // 1. Setup Registry
 const registry = PerformancePolicyRegistry.getInstance();
@@ -22,21 +24,25 @@ registry.register(new Rule006MemoryProcessing());
 registry.register(new Rule007RepositoryApiConsistency());
 registry.register(new Rule008ProfilerMandatory());
 
-// 2. Initialize Runner
+// 2. Initialize Runner & Run Validation
 const runner = new PerformanceValidationRunner();
 const srcDirectory = path.join(__dirname, 'src');
+const validationResult = runner.run(srcDirectory);
 
-// 3. Run Validation
-const result = runner.run(srcDirectory);
+// 3. Initialize Governance & Evaluate
+const governanceEngine = new PerformanceGovernanceEngine();
+const governanceResult = governanceEngine.evaluate(validationResult);
 
 // 4. Export Results
-const exporter = new PerformanceValidationExporter();
-const outputPath = path.join(__dirname, 'PerformanceValidationResult.json');
+const exporter = new PerformanceGovernanceExporter();
+const outputPath = path.join(__dirname, 'PerformanceGovernanceResult.json');
 
-exporter.exportToConsole(result);
-exporter.exportToJson(result, outputPath);
+exporter.exportToConsole(governanceResult);
+exporter.exportToJson(governanceResult, outputPath);
 
-// If validation fails, exit with error code (useful for CI)
-if (result.summary.status === 'FAILED') {
+// 5. Exit based on Governance Action (useful for CI)
+// Although not strictly enforcing BLOCK in S6-6, we exit with error code if BLOCK is decided
+// so the process correctly reflects the governance status.
+if (governanceResult.decision.action === PerformanceGovernanceAction.BLOCK) {
     process.exit(1);
 }

@@ -483,3 +483,20 @@ Performance Validation Foundation（Sprint 6 Phase S6-5）完了。
   - `PerformancePolicyEngine.ts` から `exportReportToJson` を削除し、責務を分離。
   - エントリーポイント `run_policy_validation.ts` を Runner を使用するシンプルな構造へリファクタリング。
 - 全テストおよび品質ゲート検証をパス。これにより CI/CD や Governance Foundation への接続基盤が整った。
+
+### POSTING MAP Product Sprint 6 Phase S6-6: Performance Governance Foundation
+
+Performance Governance Foundation（Sprint 6 Phase S6-6）完了。
+これにて Sprint 6 の Performance Architecture が完成。
+
+- **Governance 基盤の実装**:
+  - `src/core/performance/governance/` に `PerformanceGovernancePolicy`, `PerformanceGovernanceEngine`, `PerformanceGovernanceDecision` などを構築。
+  - Validation 層は事実（Failed, Warningの数など）をそのまま出力し、Governance 層が独自の基準（PASS=90点以上等）と「FAILED優先ルール（1つでもFailedがあればBLOCK）」で最終判定を下す責務分離を確立。
+  - アクションとして拡張性の高い Enum `PerformanceGovernanceAction` (`PROCEED`, `REVIEW_REQUIRED`, `BLOCK`) を導入。
+- **データ構造の整理**:
+  - `PerformanceGovernanceResult` は `metadata` -> `decision` -> `validationResult` の順に構成。意思決定内容が最上位にくるように整備。
+- **Exporter の統合**:
+  - `PerformanceGovernanceExporter` が Console および JSON に `STATUS`, `ACTION`, `RECOMMENDATION` と共に全情報を出力する仕組みを実装。
+- **エントリーポイントの統合**:
+  - `run_policy_validation.ts` を Governance エンジンによる評価と Exporter を利用する構造へ拡張し、最終的な品質ゲート判定を出力できるように対応。
+- 追加の Unit Test を実装し、全てのテストがパスすることを確認。これにより Sprint 7 以降の各種自動化連携への接続準備が完了。
