@@ -564,3 +564,13 @@ AIOS 最大の差別化ポイントとなる「LLM/AI の完全な抽象化と D
 - **動的ルーティングと堅牢な Fallback 機構 (`ReviewerLoader` & `AIReviewValidationStage`)**:
   - メタデータの `priority` と `weight` に基づいて最適なレビュアーを自動ソート抽出し、`selectionReason` を付与する仕組みを構築。
   - メインの AI（例: Gemini）がダウンしていた際に自動的に代替 AI（例: Claude）や人間（Human）へフォールバックして処理を完遂させる強固なフェイルオーバー機構を実装し、テストで実証しました。
+
+### AIOS Core Sprint 7 Phase S7-6: Development Governance Foundation
+
+Validation（事実）と Reviewer（推論）の統合結果を受け取り、AIOS の最終的な意思決定を下す Governance カーネルを構築しました。
+
+- **`DevelopmentGovernanceDecision` と Immutable Policy**:
+  - Decision に `decisionId`, `decisionVersion`, `confidenceSource` を持たせることで、次フェーズの Execution Ledger への連携基盤を確立しました。
+  - Policy クラスにて、Validation の失敗数や Reviewer の確信度（Confidence）をもとに、人間へのエスカレーション（`ESCALATE`）やブロック（`BLOCK`）といった意思決定を再現可能な形で自動判定する仕組みを実装しました。
+- **複数レビュアーの Consensus ロジック**:
+  - 複数のレビュアーが参加した場合、最も高い確信度を出したレビュアーの結論を優先し、`Consensus(ReviewerId)` として Source を明記する合意形成ロジックを確立しました。
