@@ -627,3 +627,18 @@ AIOS の Observability OS (神経系) を規定するための「イベント契
   - 各種イベントペイロードの厳格な構造を定義。
 
 これをもって、将来の EventBus、Telemetry、Projection が共通して参照する「イベント契約 (SSOT)」が完成しました。
+
+### AIOS Observability OS Sprint 8 Phase S8-2: EventBus Foundation
+
+S8-1 のイベント契約（Event Contract）に準拠した同期的なイベント伝送バス（`EventBus`）を構築しました。
+
+- **EventBus の機能に特化した設計**:
+  - イベントの配送のみを同期的に行い、状態、履歴、集計を一切持たない純粋な伝送機構として実装しました。
+- **再入（Nested Publish）の許可**:
+  - Subscriber 内からさらなる `publish()` の実行を同期スタック上でサポートし、動作仕様を明文化しました。
+- **例外の確実な伝播**:
+  - Subscriber 内部で生じた例外を隠蔽せずに送信元まで安全に伝播させ、OSの LifecycleManager 等が正常にエラー状態へ遷移できるように担保しました。
+- **優先度（Priority）制御**:
+  - `priority()`（デフォルト値 100）に基づき、高い優先度の Subscriber から順に通知するディスパッチ機構を実装しました。
+- **観測補助機能の拡張**:
+  - `DispatchContext` による実行コンテキストおよび `EventDispatchResult` による通知結果（件数、所要時間、成功可否）の返却をサポートしました。
