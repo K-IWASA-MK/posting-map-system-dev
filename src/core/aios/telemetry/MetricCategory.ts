@@ -1,0 +1,8 @@
+export enum MetricCategory {
+  SYSTEM = 'SYSTEM',
+  EXECUTION = 'EXECUTION',
+  RESOURCE = 'RESOURCE',
+  QUALITY = 'QUALITY',
+  BUSINESS = 'BUSINESS',
+  CUSTOM = 'CUSTOM',
+}

@@ -642,3 +642,19 @@ S8-1 のイベント契約（Event Contract）に準拠した同期的なイベ�
   - `priority()`（デフォルト値 100）に基づき、高い優先度の Subscriber から順に通知するディスパッチ機構を実装しました。
 - **観測補助機能の拡張**:
   - `DispatchContext` による実行コンテキストおよび `EventDispatchResult` による通知結果（件数、所要時間、成功可否）の返却をサポートしました。
+
+### AIOS Observability OS Sprint 8 Phase S8-3: Telemetry Foundation
+
+EventBus からのイベント伝送を受け、AIOS 内の定量的メトリクス（Measurement）を抽出・標準化する Telemetry 基盤を構築しました。
+
+- **Fact (Ledger) と Measure (Telemetry) の分離**:
+  - Telemetry 側は数値（`value: number`）のみを扱い、詳細な文字列や構造体データは保持しない原則を徹底しました。
+- **`TelemetryMapper` による1対多の変換と安全なスキップ**:
+  - イベントからメトリクスへのマッピング責務を Dispatcher から切り離しました。
+  - 1つのイベントから複数のレコード（例: duration と cost）を同時に抽出可能とし、マッピングが未定義の未知イベント受信時は例外を吐かずに安全にスキップ（Unknown Event Test で検証）する構造としました。
+- **検証機能付き `TelemetryCollector`**:
+  - 収集レコードが `number` であること、およびオブジェクトが不変（`Object.isFrozen`）であることを Collector レベルで厳格に検証するロジックを実装しました。
+- **大容量対応型 `ITelemetryRepository`**:
+  - インターフェースに `exists()` と `count()` を追加。5,000 件以上のレコード追加・取得（Capacity Test）においても高速・正確に連動する `InMemoryTelemetryRepository` を実装しました。
+- **仕様書の作成**:
+  - `docs/specifications/` 配下に `Telemetry.md`, `TelemetryRecord.md`, `TelemetryCollector.md`, `TelemetryRepository.md`, `TelemetryDispatcher.md`, `MetricCategory.md`, `MetricUnit.md` の7つの仕様書を作成しました。
