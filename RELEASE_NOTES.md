@@ -1,3 +1,16 @@
+# Release Notes - v4.5.0-alpha.0
+
+## 🚀 New Features & Enhancements
+
+### 1. Self Evolution Runtime Foundation (Sprint X-19)
+- **Evolution Orchestration**: Developed the final Generation 4 component bridging the gap to Generation 5, orchestrating safe self-improvement workflows for the AIOS.
+- **Strict Simulation & Approval Separation**: Implemented a state machine that rigidly separates the safety verification (`SIMULATING`) phase from the governance authorization (`APPROVAL`) phase.
+- **Advanced Metadata Models**: Introduced extensible `EvolutionCandidate` and `EvolutionPlan` models holding deep trace data, risk assessments, quality deltas, and expected outcomes to seed future ML-based strategy selection.
+- **Simulation Facade Architecture**: Created the `EvolutionSimulationService` facade, decoupling discrete estimations into `ImpactEstimator`, `RiskEstimator`, `BenefitEstimator`, and `CompatibilityEstimator`.
+- **Comprehensive Lifecycle Eventing**: Outfitted the `SelfEvolutionRuntime` with granular `EvolutionEventBus` events and tracking ledgers spanning from `CREATED` down through to `EVOLVED` and `REJECTED`.
+
+---
+
 # Release Notes - v4.4.0-alpha.0
 
 ## 🚀 New Features & Enhancements
