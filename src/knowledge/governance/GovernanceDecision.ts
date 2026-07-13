@@ -6,4 +6,6 @@ export interface GovernanceDecision {
   readonly reason: string;
   readonly policyId: string;
   readonly ruleResults: ReadonlyArray<GovernanceRuleResult>;
+  readonly ruleCount: number;
+  readonly passedRuleCount: number;
 }
