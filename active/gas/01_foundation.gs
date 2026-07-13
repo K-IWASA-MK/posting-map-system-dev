@@ -2,7 +2,7 @@
 // Generated: active/gas/01_foundation.gs
 // =========================================
 
-// --- Source: src/foundation/features/Feature.ts ---
+// --- Source: src/plugins/posting-map/foundation/features/Feature.ts ---
 type Feature =
   | 'GOOGLE_MAPS'
   | 'MAPBOX'
@@ -25,7 +25,7 @@ const Feature = {
 };
 
 
-// --- Source: src/foundation/features/FeatureAccessPipeline.ts ---
+// --- Source: src/plugins/posting-map/foundation/features/FeatureAccessPipeline.ts ---
 
 class FeatureAccessPipeline {
   private static instance: FeatureAccessPipeline | null = null;
@@ -140,7 +140,7 @@ class FeatureAccessPipeline {
 }
 
 
-// --- Source: src/foundation/features/FeatureAvailability.ts ---
+// --- Source: src/plugins/posting-map/foundation/features/FeatureAvailability.ts ---
 type FeatureAvailability =
   | 'AVAILABLE'
   | 'DISABLED'
@@ -157,7 +157,7 @@ const FeatureAvailability = {
 };
 
 
-// --- Source: src/foundation/features/FeatureContext.ts ---
+// --- Source: src/plugins/posting-map/foundation/features/FeatureContext.ts ---
 
 interface FeatureMetadata {
   readonly policyVersion?: string;
@@ -186,7 +186,7 @@ class FeatureContext {
 }
 
 
-// --- Source: src/foundation/features/FeaturePolicy.ts ---
+// --- Source: src/plugins/posting-map/foundation/features/FeaturePolicy.ts ---
 
 class FeaturePolicy {
   public readonly requiredEdition: Edition;
@@ -211,7 +211,7 @@ class FeaturePolicy {
 }
 
 
-// --- Source: src/foundation/features/FeatureRegistry.ts ---
+// --- Source: src/plugins/posting-map/foundation/features/FeatureRegistry.ts ---
 
 class FeatureRegistry {
   private static registry = new Map<Feature, FeaturePolicy>();
@@ -270,7 +270,7 @@ class FeatureRegistry {
 }
 
 
-// --- Source: src/foundation/features/FeatureResolver.ts ---
+// --- Source: src/plugins/posting-map/foundation/features/FeatureResolver.ts ---
 
 class FeatureResolver {
   public static resolve(request: ApiRequest): FeaturePolicy | null {
@@ -306,7 +306,7 @@ class FeatureResolver {
 }
 
 
-// --- Source: src/foundation/features/FeatureResult.ts ---
+// --- Source: src/plugins/posting-map/foundation/features/FeatureResult.ts ---
 
 class FeatureResult {
   public readonly success: boolean;
@@ -329,7 +329,7 @@ class FeatureResult {
 }
 
 
-// --- Source: src/foundation/licensing/Edition.ts ---
+// --- Source: src/plugins/posting-map/foundation/licensing/Edition.ts ---
 type Edition = 'COMMUNITY' | 'STANDARD' | 'PROFESSIONAL' | 'ENTERPRISE';
 
 const Edition = {
@@ -348,7 +348,7 @@ const EditionRank: Record<Edition, number> = {
 };
 
 
-// --- Source: src/foundation/licensing/EditionResolver.ts ---
+// --- Source: src/plugins/posting-map/foundation/licensing/EditionResolver.ts ---
 
 /**
  * EditionResolver - 開発用エディション解決スタブ (Stub Only)
@@ -372,7 +372,7 @@ class EditionResolver implements Resolver<Edition> {
 }
 
 
-// --- Source: src/foundation/licensing/LicenseContext.ts ---
+// --- Source: src/plugins/posting-map/foundation/licensing/LicenseContext.ts ---
 
 interface LicenseMetadata {
   readonly licenseId?: string;
@@ -408,7 +408,7 @@ class LicenseContext {
 }
 
 
-// --- Source: src/foundation/licensing/LicensePolicy.ts ---
+// --- Source: src/plugins/posting-map/foundation/licensing/LicensePolicy.ts ---
 
 class LicensePolicy {
   public readonly requiredEdition: Edition;
@@ -451,7 +451,7 @@ class LicensePolicy {
 }
 
 
-// --- Source: src/foundation/licensing/LicenseResolver.ts ---
+// --- Source: src/plugins/posting-map/foundation/licensing/LicenseResolver.ts ---
 
 /**
  * LicenseResolver - 開発用ライセンス解決スタブ (Stub Only)
@@ -478,7 +478,7 @@ class LicenseResolver implements Resolver<LicenseContext> {
 }
 
 
-// --- Source: src/foundation/licensing/LicenseResult.ts ---
+// --- Source: src/plugins/posting-map/foundation/licensing/LicenseResult.ts ---
 
 class LicenseResult {
   public readonly success: boolean;
@@ -501,7 +501,7 @@ class LicenseResult {
 }
 
 
-// --- Source: src/foundation/licensing/LicenseStatus.ts ---
+// --- Source: src/plugins/posting-map/foundation/licensing/LicenseStatus.ts ---
 type LicenseStatus = 'ACTIVE' | 'EXPIRED' | 'SUSPENDED' | 'TRIAL' | 'NONE';
 
 const LicenseStatus = {
@@ -513,7 +513,7 @@ const LicenseStatus = {
 };
 
 
-// --- Source: src/foundation/licensing/LicensingPipeline.ts ---
+// --- Source: src/plugins/posting-map/foundation/licensing/LicensingPipeline.ts ---
 
 class LicensingPipeline {
   private static instance: LicensingPipeline | null = null;
@@ -590,7 +590,7 @@ class LicensingPipeline {
 }
 
 
-// --- Source: src/foundation/validation/ValidationError.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/ValidationError.ts ---
 type ValidationErrorCode =
   | 'INVALID_REQUEST'
   | 'INVALID_METHOD'
@@ -607,7 +607,7 @@ const ValidationError = {
 };
 
 
-// --- Source: src/foundation/validation/ValidationException.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/ValidationException.ts ---
 
 class ValidationException extends ApiException {
   public readonly category = ExceptionCategory.VALIDATION;
@@ -651,7 +651,7 @@ class ValidationException extends ApiException {
 }
 
 
-// --- Source: src/foundation/validation/ValidationPipeline.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/ValidationPipeline.ts ---
 
 class ValidationPipeline {
   private static instance: ValidationPipeline | null = null;
@@ -688,7 +688,7 @@ class ValidationPipeline {
 }
 
 
-// --- Source: src/foundation/validation/ValidationResult.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/ValidationResult.ts ---
 
 class ValidationResult {
   public readonly valid: boolean;
@@ -735,7 +735,7 @@ class ValidationResult {
 }
 
 
-// --- Source: src/foundation/validation/Validator.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/Validator.ts ---
 
 interface Validator {
   readonly id: string;
@@ -743,7 +743,7 @@ interface Validator {
 }
 
 
-// --- Source: src/foundation/validation/ValidatorChain.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/ValidatorChain.ts ---
 
 class ValidatorChain implements Validator {
   public readonly id = 'VALIDATOR_CHAIN';
@@ -772,7 +772,7 @@ class ValidatorChain implements Validator {
 }
 
 
-// --- Source: src/foundation/validation/validators/FeatureValidator.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/validators/FeatureValidator.ts ---
 
 class FeatureValidator implements Validator {
   public readonly id = 'FEATURE_VALIDATOR';
@@ -805,7 +805,7 @@ class FeatureValidator implements Validator {
 }
 
 
-// --- Source: src/foundation/validation/validators/MethodValidator.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/validators/MethodValidator.ts ---
 
 class MethodValidator implements Validator {
   public readonly id = 'METHOD_VALIDATOR';
@@ -826,7 +826,7 @@ class MethodValidator implements Validator {
 }
 
 
-// --- Source: src/foundation/validation/validators/RequestValidator.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/validators/RequestValidator.ts ---
 
 class RequestValidator implements Validator {
   public readonly id = 'REQUEST_VALIDATOR';
@@ -855,7 +855,7 @@ class RequestValidator implements Validator {
 }
 
 
-// --- Source: src/foundation/validation/validators/RouteValidator.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/validators/RouteValidator.ts ---
 
 class RouteValidator implements Validator {
   public readonly id = 'ROUTE_VALIDATOR';
@@ -887,7 +887,7 @@ class RouteValidator implements Validator {
 }
 
 
-// --- Source: src/foundation/validation/validators/VersionValidator.ts ---
+// --- Source: src/plugins/posting-map/foundation/validation/validators/VersionValidator.ts ---
 
 class VersionValidator implements Validator {
   public readonly id = 'VERSION_VALIDATOR';
@@ -909,7 +909,7 @@ class VersionValidator implements Validator {
 }
 
 
-// --- Source: src/foundation/monitoring/ApiLifecycleObserver.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/ApiLifecycleObserver.ts ---
 
 class ApiLifecycleObserver {
   private static readonly pipeline = MonitoringPipeline.getInstance();
@@ -1011,7 +1011,7 @@ class ApiLifecycleObserver {
 }
 
 
-// --- Source: src/foundation/monitoring/AuditCollector.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/AuditCollector.ts ---
 
 class AuditCollector implements MonitoringListener {
   private static instance: AuditCollector | null = null;
@@ -1046,7 +1046,7 @@ class AuditCollector implements MonitoringListener {
 }
 
 
-// --- Source: src/foundation/monitoring/AuditEvent.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/AuditEvent.ts ---
 type AuditEventType =
   | 'REQUEST_STARTED'
   | 'VALIDATION_COMPLETED'
@@ -1071,7 +1071,7 @@ const AuditEvent = {
 };
 
 
-// --- Source: src/foundation/monitoring/EventDispatcher.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/EventDispatcher.ts ---
 
 class EventDispatcher {
   private static instance: EventDispatcher | null = null;
@@ -1106,7 +1106,7 @@ class EventDispatcher {
 }
 
 
-// --- Source: src/foundation/monitoring/MetricsCollector.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/MetricsCollector.ts ---
 
 class MetricsCollector implements MonitoringListener {
   private static instance: MetricsCollector | null = null;
@@ -1137,7 +1137,7 @@ class MetricsCollector implements MonitoringListener {
 }
 
 
-// --- Source: src/foundation/monitoring/MetricsEvent.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/MetricsEvent.ts ---
 interface MetricsEvent {
   readonly processingTime: number;
   readonly validationTime: number;
@@ -1148,7 +1148,7 @@ interface MetricsEvent {
 }
 
 
-// --- Source: src/foundation/monitoring/MonitoringEvent.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/MonitoringEvent.ts ---
 type EventCategory = 'AUDIT' | 'METRICS' | 'LIFECYCLE' | 'EXCEPTION';
 
 interface MonitoringEvent {
@@ -1163,14 +1163,14 @@ interface MonitoringEvent {
 }
 
 
-// --- Source: src/foundation/monitoring/MonitoringListener.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/MonitoringListener.ts ---
 
 interface MonitoringListener {
   onEvent(event: MonitoringEvent): void;
 }
 
 
-// --- Source: src/foundation/monitoring/MonitoringPipeline.ts ---
+// --- Source: src/plugins/posting-map/foundation/monitoring/MonitoringPipeline.ts ---
 
 class MonitoringPipeline {
   private static instance: MonitoringPipeline | null = null;
@@ -1221,7 +1221,7 @@ class MonitoringPipeline {
 }
 
 
-// --- Source: src/foundation/bridge/AIOSBridgePipeline.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/AIOSBridgePipeline.ts ---
 
 class AIOSBridgePipeline {
   private static instance: AIOSBridgePipeline | null = null;
@@ -1350,7 +1350,7 @@ class AIOSBridgePipeline {
 }
 
 
-// --- Source: src/foundation/bridge/AIOSBridgeProvider.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/AIOSBridgeProvider.ts ---
 
 class AIOSBridgeProvider implements BridgeProvider {
   private lastReceivedMessage: BridgeMessage | null = null;
@@ -1398,7 +1398,7 @@ class AIOSBridgeProvider implements BridgeProvider {
 }
 
 
-// --- Source: src/foundation/bridge/BridgeContext.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeContext.ts ---
 
 class BridgeContext {
   public readonly provider: string;
@@ -1420,7 +1420,7 @@ class BridgeContext {
 }
 
 
-// --- Source: src/foundation/bridge/BridgeDirection.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeDirection.ts ---
 type BridgeDirection = 'POSTING_MAP_TO_AIOS' | 'AIOS_TO_POSTING_MAP';
 
 const BridgeDirection = {
@@ -1429,7 +1429,7 @@ const BridgeDirection = {
 };
 
 
-// --- Source: src/foundation/bridge/BridgeEvent.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeEvent.ts ---
 type BridgeEventType = 'CONNECTED' | 'DISCONNECTED' | 'SEND' | 'RECEIVE' | 'HEARTBEAT' | 'FAILED';
 
 const BridgeEventType = {
@@ -1461,7 +1461,7 @@ class BridgeEvent {
 }
 
 
-// --- Source: src/foundation/bridge/BridgeEventDispatcher.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeEventDispatcher.ts ---
 
 class BridgeEventDispatcher {
   private static listeners: BridgeListener[] = [];
@@ -1495,14 +1495,14 @@ class BridgeEventDispatcher {
 }
 
 
-// --- Source: src/foundation/bridge/BridgeListener.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeListener.ts ---
 
 interface BridgeListener {
   onEvent(event: BridgeEvent): void;
 }
 
 
-// --- Source: src/foundation/bridge/BridgeMessage.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeMessage.ts ---
 class BridgeMessage {
   public readonly messageId: string;
   public readonly messageType: string;
@@ -1535,7 +1535,7 @@ class BridgeMessage {
 }
 
 
-// --- Source: src/foundation/bridge/BridgeMessageMapper.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeMessageMapper.ts ---
 
 class BridgeMessageMapper {
   /**
@@ -1572,7 +1572,7 @@ class BridgeMessageMapper {
 }
 
 
-// --- Source: src/foundation/bridge/BridgePolicy.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgePolicy.ts ---
 class BridgePolicy {
   public readonly bridgeEnabled: boolean;
   public readonly timeout: number;
@@ -1590,7 +1590,7 @@ class BridgePolicy {
 }
 
 
-// --- Source: src/foundation/bridge/BridgeProvider.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeProvider.ts ---
 
 interface BridgeProvider {
   send(message: BridgeMessage): BridgeResult;
@@ -1600,7 +1600,7 @@ interface BridgeProvider {
 }
 
 
-// --- Source: src/foundation/bridge/BridgeResult.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeResult.ts ---
 
 class BridgeResult {
   public readonly success: boolean;
@@ -1623,7 +1623,7 @@ class BridgeResult {
 }
 
 
-// --- Source: src/foundation/bridge/BridgeStatus.ts ---
+// --- Source: src/plugins/posting-map/foundation/bridge/BridgeStatus.ts ---
 type BridgeStatus = 'CONNECTED' | 'DISCONNECTED' | 'DEGRADED' | 'UNKNOWN' | 'INITIALIZING';
 
 const BridgeStatus = {

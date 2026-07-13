@@ -8,16 +8,18 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@core/*": ["src/core/*"],
-      "@foundation/*": ["src/foundation/*"],
-      "@domain/*": ["src/domain/*"],
-      "@infra/*": ["src/infrastructure/*"],
-      "@application/*": ["src/application/*"],
-      "@api/*": ["src/api/*"]
+      "@kiwasa/aios-core": ["../AI Development OS/aios-core/src/index.ts"],
+      "@core/*": ["src/plugins/posting-map/core/*"],
+      "@foundation/*": ["src/plugins/posting-map/foundation/*"],
+      "@domain/*": ["src/plugins/posting-map/domain/*"],
+      "@infra/*": ["src/plugins/posting-map/infrastructure/*"],
+      "@application/*": ["src/plugins/posting-map/application/*"],
+      "@api/*": ["src/plugins/posting-map/api/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["**/deprecated/**/*", "node_modules"]
+  "include": ["src/plugins/**/*", "src/index.ts"],
+  "exclude": ["**/deprecated/**/*", "node_modules", "tests/**/*", "src/adaptive", "src/auditgate", "src/evolution", "src/graph", "src/healing", "src/kernel", "src/metagovernance", "src/optimization", "src/orchestrator", "src/planning", "src/resume", "src/review", "src/safety", "src/selfoptimization", "src/selfregulation", "src/simulation", "src/stabilization", "src/systemkernel"]
 }

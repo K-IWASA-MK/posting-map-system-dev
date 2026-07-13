@@ -2,7 +2,7 @@
 // Generated: active/gas/05_field.gs
 // =========================================
 
-// --- Source: src/domain/common/valueobjects/YearMonth.ts ---
+// --- Source: src/plugins/posting-map/domain/common/valueobjects/YearMonth.ts ---
 class YearMonth {
   private readonly year: number;
   private readonly month: number;
@@ -52,7 +52,7 @@ class YearMonth {
 }
 
 
-// --- Source: src/domain/workspace/repositories/IWorkspaceRepository.ts ---
+// --- Source: src/plugins/posting-map/domain/workspace/repositories/IWorkspaceRepository.ts ---
 
 interface IWorkspaceRepository {
   findById(id: string): Promise<Workspace | undefined>;
@@ -61,7 +61,7 @@ interface IWorkspaceRepository {
 }
 
 
-// --- Source: src/domain/workspace/repositories/IWorkspaceSubscriptionRepository.ts ---
+// --- Source: src/plugins/posting-map/domain/workspace/repositories/IWorkspaceSubscriptionRepository.ts ---
 
 interface IWorkspaceSubscriptionRepository {
   findByWorkspaceId(workspaceId: string): Promise<WorkspaceSubscription | undefined>;
@@ -71,7 +71,7 @@ interface IWorkspaceSubscriptionRepository {
 }
 
 
-// --- Source: src/domain/workspace/entities/Workspace.ts ---
+// --- Source: src/plugins/posting-map/domain/workspace/entities/Workspace.ts ---
 type WorkspaceStatus = 'ACTIVE' | 'ARCHIVED';
 
 class Workspace {
@@ -140,7 +140,7 @@ class Workspace {
 
 
 
-// --- Source: src/domain/workspace/entities/WorkspaceSubscription.ts ---
+// --- Source: src/plugins/posting-map/domain/workspace/entities/WorkspaceSubscription.ts ---
 type SubscriptionStatus = 'ACTIVE' | 'SUSPENDED' | 'CANCELLED';
 
 class WorkspaceSubscription {
@@ -194,7 +194,7 @@ class WorkspaceSubscription {
 }
 
 
-// --- Source: src/domain/workspace/valueobjects/WorkspaceUrl.ts ---
+// --- Source: src/plugins/posting-map/domain/workspace/valueobjects/WorkspaceUrl.ts ---
 class WorkspaceUrl {
   public readonly dashboardUrl: string;
   public readonly lineAppUrl: string;
@@ -228,17 +228,19 @@ class WorkspaceUrl {
 }
 
 
-// --- Source: src/domain/field/activity/repositories/IActivityRepository.ts ---
+// --- Source: src/plugins/posting-map/domain/field/activity/repositories/IActivityRepository.ts ---
 
 interface IActivityRepository {
+  findById(id: string): Promise<DistributionActivity | undefined>;
   findLatestByStaff(staffNo: string, limit: number): Promise<DistributionActivity[]>;
   findByPeriod(start: Date, end: Date): Promise<DistributionActivity[]>;
   findByYearMonth(workspaceId: string, yearMonth: YearMonth): Promise<DistributionActivity[]>;
+  findAll(): Promise<DistributionActivity[]>;
   save(activity: DistributionActivity): Promise<void>;
 }
 
 
-// --- Source: src/domain/field/activity/entities/DistributionActivity.ts ---
+// --- Source: src/plugins/posting-map/domain/field/activity/entities/DistributionActivity.ts ---
 
 class DistributionActivity {
   public readonly id: string;
@@ -275,7 +277,7 @@ class DistributionActivity {
 }
 
 
-// --- Source: src/domain/field/staff/repositories/IStaffRepository.ts ---
+// --- Source: src/plugins/posting-map/domain/field/staff/repositories/IStaffRepository.ts ---
 
 interface IStaffRepository {
   findByStaffNo(staffNo: string): Promise<Staff | undefined>;
@@ -283,11 +285,12 @@ interface IStaffRepository {
   findByWorkspace(workspaceId: string): Promise<Staff[]>;
   findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]>;
   getNextStaffNo(workspaceId: string): Promise<string>;
+  findAll(): Promise<Staff[]>;
   save(staff: Staff): Promise<void>;
 }
 
 
-// --- Source: src/domain/field/staff/entities/Staff.ts ---
+// --- Source: src/plugins/posting-map/domain/field/staff/entities/Staff.ts ---
 class Staff {
   public readonly staffNo: string;
   public readonly displayName: string;
@@ -323,7 +326,7 @@ class Staff {
 }
 
 
-// --- Source: src/domain/field/events/FieldEvent.ts ---
+// --- Source: src/plugins/posting-map/domain/field/events/FieldEvent.ts ---
 interface FieldEvent {
   readonly eventId: string;
   readonly eventType: string;
@@ -368,16 +371,18 @@ class DistributionActivityRecordedEvent implements FieldEvent {
 }
 
 
-// --- Source: src/domain/field/holding/repositories/IFlyerHoldingRepository.ts ---
+// --- Source: src/plugins/posting-map/domain/field/holding/repositories/IFlyerHoldingRepository.ts ---
 
 interface IFlyerHoldingRepository {
   findByStaffNo(staffNo: string): Promise<FlyerHolding | undefined>;
+  /** @deprecated Backward Compatibility */
   findAllRaw(): Promise<any[]>;
+  findAll(): Promise<FlyerHolding[]>;
   save(holding: FlyerHolding): Promise<void>;
 }
 
 
-// --- Source: src/domain/field/holding/entities/FlyerHolding.ts ---
+// --- Source: src/plugins/posting-map/domain/field/holding/entities/FlyerHolding.ts ---
 
 class FlyerHolding {
   public readonly staffNo: string;
@@ -419,7 +424,7 @@ class FlyerHolding {
 }
 
 
-// --- Source: src/domain/field/valueobjects/AreaId.ts ---
+// --- Source: src/plugins/posting-map/domain/field/valueobjects/AreaId.ts ---
 class AreaId {
   private readonly value: string;
 
@@ -444,7 +449,7 @@ class AreaId {
 }
 
 
-// --- Source: src/domain/field/valueobjects/Location.ts ---
+// --- Source: src/plugins/posting-map/domain/field/valueobjects/Location.ts ---
 class Location {
   public readonly latitude: number;
   public readonly longitude: number;
@@ -473,7 +478,7 @@ class Location {
 }
 
 
-// --- Source: src/domain/field/valueobjects/Quantity.ts ---
+// --- Source: src/plugins/posting-map/domain/field/valueobjects/Quantity.ts ---
 class Quantity {
   private readonly value: number;
 
@@ -508,7 +513,7 @@ class Quantity {
 }
 
 
-// --- Source: src/application/events/ApplicationEventPublisher.ts ---
+// --- Source: src/plugins/posting-map/application/events/ApplicationEventPublisher.ts ---
 
 class ApplicationEventPublisher {
   public readonly publishedEvents: FieldEvent[] = [];
@@ -521,7 +526,7 @@ class ApplicationEventPublisher {
 }
 
 
-// --- Source: src/application/field/index.ts ---
+// --- Source: src/plugins/posting-map/application/field/index.ts ---
 // Export DTOs
 * from './dto/StaffDto';
 * from './dto/HoldingDto';
@@ -540,7 +545,7 @@ class ApplicationEventPublisher {
 * from './services/DashboardApplicationService';
 
 
-// --- Source: src/application/field/dto/ActivityDto.ts ---
+// --- Source: src/plugins/posting-map/application/field/dto/ActivityDto.ts ---
 interface ActivityDto {
   id: string;
   staffNo: string;
@@ -553,7 +558,7 @@ interface ActivityDto {
 }
 
 
-// --- Source: src/application/field/dto/HoldingDto.ts ---
+// --- Source: src/plugins/posting-map/application/field/dto/HoldingDto.ts ---
 interface HoldingDto {
   staffNo: string;
   quantity: number;
@@ -561,7 +566,7 @@ interface HoldingDto {
 }
 
 
-// --- Source: src/application/field/dto/StaffDto.ts ---
+// --- Source: src/plugins/posting-map/application/field/dto/StaffDto.ts ---
 interface StaffDto {
   staffNo: string;
   displayName: string;
@@ -571,7 +576,7 @@ interface StaffDto {
 }
 
 
-// --- Source: src/application/field/commands/DeclareHoldingCommand.ts ---
+// --- Source: src/plugins/posting-map/application/field/commands/DeclareHoldingCommand.ts ---
 class DeclareHoldingCommand {
   constructor(
     public readonly staffNo: string,
@@ -587,7 +592,7 @@ class DeclareHoldingCommand {
 }
 
 
-// --- Source: src/application/field/commands/RecordActivityCommand.ts ---
+// --- Source: src/plugins/posting-map/application/field/commands/RecordActivityCommand.ts ---
 class RecordActivityCommand {
   constructor(
     public readonly staffNo: string,
@@ -610,7 +615,7 @@ class RecordActivityCommand {
 }
 
 
-// --- Source: src/application/field/commands/RecordFieldActivityCommand.ts ---
+// --- Source: src/plugins/posting-map/application/field/commands/RecordFieldActivityCommand.ts ---
 class RecordFieldActivityCommand {
   constructor(
     public readonly action: string,
@@ -646,7 +651,7 @@ class RecordFieldActivityCommand {
 }
 
 
-// --- Source: src/application/field/commands/RegisterStaffCommand.ts ---
+// --- Source: src/plugins/posting-map/application/field/commands/RegisterStaffCommand.ts ---
 class RegisterStaffCommand {
   constructor(
     public readonly staffNo: string | undefined,
@@ -670,7 +675,7 @@ class RegisterStaffCommand {
 }
 
 
-// --- Source: src/application/field/services/ActivityApplicationService.ts ---
+// --- Source: src/plugins/posting-map/application/field/services/ActivityApplicationService.ts ---
 
 declare const DriveApp: any;
 declare const Utilities: any;
@@ -852,7 +857,7 @@ class ActivityApplicationService {
 }
 
 
-// --- Source: src/application/field/services/DashboardApplicationService.ts ---
+// --- Source: src/plugins/posting-map/application/field/services/DashboardApplicationService.ts ---
 interface IndividualSummary {
   staffNo: string;
   monthlyQuantity: number;
@@ -919,7 +924,7 @@ class DashboardApplicationService {
 }
 
 
-// --- Source: src/application/field/services/HoldingApplicationService.ts ---
+// --- Source: src/plugins/posting-map/application/field/services/HoldingApplicationService.ts ---
 
 class HoldingApplicationService {
   constructor(
@@ -966,7 +971,7 @@ class HoldingApplicationService {
 }
 
 
-// --- Source: src/application/field/services/StaffApplicationService.ts ---
+// --- Source: src/plugins/posting-map/application/field/services/StaffApplicationService.ts ---
 
 class StaffApplicationService {
   constructor(private staffRepository: IStaffRepository) {}
@@ -1022,7 +1027,7 @@ class StaffApplicationService {
 }
 
 
-// --- Source: src/application/subscription/SubscriptionApplicationService.ts ---
+// --- Source: src/plugins/posting-map/application/subscription/SubscriptionApplicationService.ts ---
 
 class SubscriptionApplicationService {
   constructor(
@@ -1064,7 +1069,7 @@ class SubscriptionApplicationService {
 }
 
 
-// --- Source: src/application/subscription/WorkspaceSubscriptionGate.ts ---
+// --- Source: src/plugins/posting-map/application/subscription/WorkspaceSubscriptionGate.ts ---
 
 class WorkspaceSubscriptionGate {
   private static instance: WorkspaceSubscriptionGate | null = null;
@@ -1147,7 +1152,7 @@ class WorkspaceSubscriptionGate {
 }
 
 
-// --- Source: src/application/subscription/dto/WorkspaceSubscriptionDto.ts ---
+// --- Source: src/plugins/posting-map/application/subscription/dto/WorkspaceSubscriptionDto.ts ---
 
 interface WorkspaceSubscriptionDto {
   workspaceId: string;
@@ -1157,7 +1162,7 @@ interface WorkspaceSubscriptionDto {
 }
 
 
-// --- Source: src/application/operations/dto/OperationsDashboardDtos.ts ---
+// --- Source: src/plugins/posting-map/application/operations/dto/OperationsDashboardDtos.ts ---
 interface WorkspaceSubscriptionOverviewDto {
   workspaceId: string;
   workspaceName: string;
@@ -1168,7 +1173,7 @@ interface WorkspaceSubscriptionOverviewDto {
 }
 
 
-// --- Source: src/application/operations/services/OperationsDashboardApplicationService.ts ---
+// --- Source: src/plugins/posting-map/application/operations/services/OperationsDashboardApplicationService.ts ---
 
 class OperationsDashboardApplicationService {
   constructor(
@@ -1219,7 +1224,7 @@ class OperationsDashboardApplicationService {
 }
 
 
-// --- Source: src/infrastructure/spreadsheet/SpreadsheetClient.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/spreadsheet/SpreadsheetClient.ts ---
 
 class SpreadsheetClient {
   private static instance: SpreadsheetClient | null = null;
@@ -1263,7 +1268,7 @@ class SpreadsheetClient {
 declare const SpreadsheetApp: any;
 
 
-// --- Source: src/infrastructure/spreadsheet/SpreadsheetReader.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/spreadsheet/SpreadsheetReader.ts ---
 
 class SpreadsheetReader {
   private client: SpreadsheetClient;
@@ -1279,6 +1284,8 @@ class SpreadsheetReader {
     try {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) return [];
+
+      RepositoryPerformanceProfiler.getInstance().incrementRead(sheetName);
 
       const lastRow = sheet.getLastRow();
       const lastCol = sheet.getLastColumn();
@@ -1299,6 +1306,8 @@ class SpreadsheetReader {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) return [];
 
+      RepositoryPerformanceProfiler.getInstance().incrementRead(sheetName);
+
       return sheet.getRange(startRow, startCol, numRows, numCols).getValues();
     } catch (e) {
       console.error(`[SpreadsheetReader] Error reading range from ${sheetName}:`, e);
@@ -1308,7 +1317,7 @@ class SpreadsheetReader {
 }
 
 
-// --- Source: src/infrastructure/spreadsheet/SpreadsheetWriter.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/spreadsheet/SpreadsheetWriter.ts ---
 
 class SpreadsheetWriter {
   private client: SpreadsheetClient;
@@ -1324,6 +1333,8 @@ class SpreadsheetWriter {
     try {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) return;
+
+      RepositoryPerformanceProfiler.getInstance().incrementWrite(sheetName);
 
       const lastRow = sheet.getLastRow();
       
@@ -1345,6 +1356,8 @@ class SpreadsheetWriter {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) return;
 
+      RepositoryPerformanceProfiler.getInstance().incrementWrite(sheetName);
+
       if (values.length === 0) return;
       sheet.getRange(startRow, startCol, values.length, values[0].length).setValues(values);
     } catch (e) {
@@ -1354,7 +1367,7 @@ class SpreadsheetWriter {
 }
 
 
-// --- Source: src/infrastructure/repository/workspace/SpreadsheetWorkspaceRepository.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/repository/workspace/SpreadsheetWorkspaceRepository.ts ---
 
 class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
   private reader: SpreadsheetReader;
@@ -1367,6 +1380,11 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
   }
 
   public async findById(id: string): Promise<Workspace | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -1395,9 +1413,17 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAll(): Promise<Workspace[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -1427,9 +1453,17 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(workspace: Workspace): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ワークスペース名', 'ステータス', '月間配布目標', '目標更新日時', '最終更新者'];
 
@@ -1464,12 +1498,15 @@ class SpreadsheetWorkspaceRepository implements IWorkspaceRepository {
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
     }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
 }
 
 
-// --- Source: src/infrastructure/repository/workspace/SpreadsheetWorkspaceSubscriptionRepository.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/repository/workspace/SpreadsheetWorkspaceSubscriptionRepository.ts ---
 
 class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscriptionRepository {
   private reader: SpreadsheetReader;
@@ -1482,6 +1519,11 @@ class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscripti
   }
 
   public async findByWorkspaceId(workspaceId: string): Promise<WorkspaceSubscription | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceSubscriptionRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -1505,9 +1547,17 @@ class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscripti
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAll(): Promise<WorkspaceSubscription[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceSubscriptionRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -1532,9 +1582,17 @@ class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscripti
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(subscription: WorkspaceSubscription): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceSubscriptionRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ワークスペースID', 'ステータス', '開始日', '期限日'];
 
@@ -1567,15 +1625,26 @@ class SpreadsheetWorkspaceSubscriptionRepository implements IWorkspaceSubscripti
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
     }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async create(subscription: WorkspaceSubscription): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('WorkspaceSubscriptionRepository');
+    const startTime = Date.now();
+
+    try {
     await this.save(subscription);
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 }
 
 
-// --- Source: src/infrastructure/repository/field/SpreadsheetActivityRepository.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/repository/field/SpreadsheetActivityRepository.ts ---
 
 class SpreadsheetActivityRepository implements IActivityRepository {
   private reader: SpreadsheetReader;
@@ -1587,7 +1656,58 @@ class SpreadsheetActivityRepository implements IActivityRepository {
     this.writer = new SpreadsheetWriter();
   }
 
+  public async findById(id: string): Promise<DistributionActivity | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return undefined;
+
+    const headers = rows[0];
+    const actIdIdx = headers.indexOf('活動ID');
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const qtyIdx = headers.indexOf('報告枚数');
+    const photoIdx = headers.indexOf('写真URL');
+    const locIdx = headers.indexOf('位置情報');
+    const dateIdx = headers.indexOf('活動日時');
+
+    if (actIdIdx === -1) return undefined;
+
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (String(row[actIdIdx]) === id) {
+        let lat = 0;
+        let lng = 0;
+        if (locIdx !== -1) {
+          const parts = String(row[locIdx]).split(',');
+          lat = Number(parts[0]) || 0;
+          lng = Number(parts[1]) || 0;
+        }
+
+        return new DistributionActivity({
+          id: String(row[actIdIdx]),
+          staffNo: staffIdIdx !== -1 ? String(row[staffIdIdx]) : '',
+          reportedQuantity: new Quantity(qtyIdx !== -1 ? Number(row[qtyIdx]) : 0),
+          photoUrl: photoIdx !== -1 ? String(row[photoIdx]) : '',
+          location: new Location(lat, lng, 0),
+          occurredAt: dateIdx !== -1 ? new Date(Number(row[dateIdx]) || String(row[dateIdx])) : new Date()
+        });
+      }
+    }
+    return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
+  }
+
   public async findLatestByStaff(staffNo: string, limit: number): Promise<DistributionActivity[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -1628,9 +1748,61 @@ class SpreadsheetActivityRepository implements IActivityRepository {
     // Sort by occurredAt desc and limit
     list.sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime());
     return list.slice(0, limit);
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
+  }
+
+  public async findAll(): Promise<DistributionActivity[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const actIdIdx = headers.indexOf('活動ID');
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const qtyIdx = headers.indexOf('報告枚数');
+    const photoIdx = headers.indexOf('写真URL');
+    const locIdx = headers.indexOf('位置情報');
+    const dateIdx = headers.indexOf('活動日時');
+
+    const list: DistributionActivity[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      // Parse location: "lat,lng"
+      let lat = 0;
+      let lng = 0;
+      if (locIdx !== -1) {
+        const parts = String(row[locIdx]).split(',');
+        lat = Number(parts[0]) || 0;
+        lng = Number(parts[1]) || 0;
+      }
+
+      list.push(new DistributionActivity({
+        id: actIdIdx !== -1 ? String(row[actIdIdx]) : '',
+        staffNo: staffIdIdx !== -1 ? String(row[staffIdIdx]) : '',
+        reportedQuantity: new Quantity(qtyIdx !== -1 ? Number(row[qtyIdx]) : 0),
+        photoUrl: photoIdx !== -1 ? String(row[photoIdx]) : '',
+        location: new Location(lat, lng, 0),
+        occurredAt: dateIdx !== -1 ? new Date(Number(row[dateIdx]) || String(row[dateIdx])) : new Date()
+      }));
+    }
+    return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findByPeriod(start: Date, end: Date): Promise<DistributionActivity[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -1671,9 +1843,17 @@ class SpreadsheetActivityRepository implements IActivityRepository {
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findByYearMonth(workspaceId: string, yearMonth: YearMonth): Promise<DistributionActivity[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const staffRows = this.reader.readAll('Staff');
     if (staffRows.length <= 1) return [];
     
@@ -1696,9 +1876,17 @@ class SpreadsheetActivityRepository implements IActivityRepository {
     const allPeriodActivities = await this.findByPeriod(start, end);
 
     return allPeriodActivities.filter(a => allowedStaffNos.has(a.staffNo));
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(activity: DistributionActivity): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('ActivityRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['活動ID', 'スタッフID', '報告枚数', '写真URL', '位置情報', '活動日時'];
 
@@ -1735,11 +1923,14 @@ class SpreadsheetActivityRepository implements IActivityRepository {
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
     }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 }
 
 
-// --- Source: src/infrastructure/repository/field/SpreadsheetFlyerHoldingRepository.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/repository/field/SpreadsheetFlyerHoldingRepository.ts ---
 
 class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepository {
   private reader: SpreadsheetReader;
@@ -1752,6 +1943,11 @@ class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepository {
   }
 
   public async findByStaffNo(staffNo: string): Promise<FlyerHolding | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -1786,9 +1982,17 @@ class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepository {
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findAllRaw(): Promise<any[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -1829,9 +2033,63 @@ class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepository {
       });
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
+  }
+
+  public async findAll(): Promise<FlyerHolding[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository');
+    const startTime = Date.now();
+
+    try {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const qtyIdx = headers.indexOf('保管枚数');
+    const updatedIdx = headers.indexOf('更新日時');
+    const locIdx = headers.indexOf('保管場所');
+
+    if (staffIdIdx === -1) return [];
+
+    const list: FlyerHolding[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[staffIdIdx]) {
+        const rawLoc = locIdx !== -1 ? String(row[locIdx]) : '-';
+        let cleanedLoc = rawLoc.trim();
+        if (cleanedLoc === '自宅' || cleanedLoc.length === 0) {
+          cleanedLoc = '-';
+        } else {
+          const cityMatch = cleanedLoc.match(/^[^市区町村]+[市区町村]/);
+          if (cityMatch) {
+            cleanedLoc = cityMatch[0];
+          }
+        }
+
+        list.push(new FlyerHolding({
+          staffNo: String(row[staffIdIdx]),
+          quantity: new Quantity(qtyIdx !== -1 ? Number(row[qtyIdx]) : 0),
+          updatedAt: updatedIdx !== -1 ? new Date(Number(row[updatedIdx]) || String(row[updatedIdx])) : new Date(),
+          cityName: cleanedLoc
+        }));
+      }
+    }
+    return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(holding: FlyerHolding): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['ID', 'スタッフID', 'スタッフ名', '保管場所', '保管枚数', '更新日時'];
 
@@ -1873,11 +2131,14 @@ class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepository {
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
     }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 }
 
 
-// --- Source: src/infrastructure/repository/field/SpreadsheetStaffRepository.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/repository/field/SpreadsheetStaffRepository.ts ---
 
 class SpreadsheetStaffRepository implements IStaffRepository {
   private reader: SpreadsheetReader;
@@ -1890,6 +2151,11 @@ class SpreadsheetStaffRepository implements IStaffRepository {
   }
 
   public async findByStaffNo(staffNo: string): Promise<Staff | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -1915,9 +2181,17 @@ class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findByLineUserId(lineUserId: string): Promise<Staff | undefined> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return undefined;
 
@@ -1943,9 +2217,17 @@ class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return undefined;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findByWorkspace(workspaceId: string): Promise<Staff[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) return [];
 
@@ -1972,9 +2254,17 @@ class SpreadsheetStaffRepository implements IStaffRepository {
       }
     }
     return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async findNewStaffByMonth(workspaceId: string, yearMonth: YearMonth): Promise<Staff[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const list = await this.findByWorkspace(workspaceId);
     const start = yearMonth.getStartDate().getTime();
     const end = yearMonth.getEndDate().getTime();
@@ -1982,9 +2272,54 @@ class SpreadsheetStaffRepository implements IStaffRepository {
       const t = staff.createdAt.getTime();
       return t >= start && t <= end;
     });
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
+  }
+
+  public async findAll(): Promise<Staff[]> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
+    const rows = this.reader.readAll(this.sheetName);
+    if (rows.length <= 1) return [];
+
+    const headers = rows[0];
+    const staffIdIdx = headers.indexOf('スタッフID');
+    const nameIdx = headers.indexOf('スタッフ名');
+    const lineIdx = headers.indexOf('LINEユーザーID');
+    const wsIdx = headers.indexOf('ワークスペースID');
+    const dateIdx = headers.indexOf('登録日時');
+
+    if (staffIdIdx === -1) return [];
+
+    const list: Staff[] = [];
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row[staffIdIdx]) {
+        list.push(new Staff({
+          staffNo: String(row[staffIdIdx]),
+          displayName: nameIdx !== -1 ? String(row[nameIdx]) : '',
+          lineUserId: lineIdx !== -1 ? String(row[lineIdx]) : '',
+          workspaceId: wsIdx !== -1 ? String(row[wsIdx]) : '',
+          createdAt: dateIdx !== -1 ? new Date(Number(row[dateIdx]) || String(row[dateIdx])) : new Date()
+        }));
+      }
+    }
+    return list;
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async getNextStaffNo(workspaceId: string): Promise<string> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     if (rows.length <= 1) {
       return 'S001';
@@ -2015,9 +2350,17 @@ class SpreadsheetStaffRepository implements IStaffRepository {
 
     const nextNum = maxNum + 1;
     return 'S' + String(nextNum).padStart(3, '0');
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 
   public async save(staff: Staff): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('StaffRepository');
+    const startTime = Date.now();
+
+    try {
     const rows = this.reader.readAll(this.sheetName);
     const headers = rows.length > 0 ? rows[0] : ['スタッフID', 'スタッフ名', 'LINEユーザーID', 'ワークスペースID', '登録日時'];
 
@@ -2051,11 +2394,14 @@ class SpreadsheetStaffRepository implements IStaffRepository {
         this.writer.appendRows(this.sheetName, [rowValues]);
       }
     }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
   }
 }
 
 
-// --- Source: src/api/field/ActivityHandler.ts ---
+// --- Source: src/plugins/posting-map/api/field/ActivityHandler.ts ---
 
 class ActivityHandler implements EndpointHandler {
   constructor(private activityAppService: ActivityApplicationService) {}
@@ -2116,7 +2462,7 @@ class ActivityHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/field/DistributorHandler.ts ---
+// --- Source: src/plugins/posting-map/api/field/DistributorHandler.ts ---
 
 class DistributorHandler implements EndpointHandler {
   constructor(private staffAppService: StaffApplicationService) {}
@@ -2171,7 +2517,7 @@ class DistributorHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/field/FieldApiException.ts ---
+// --- Source: src/plugins/posting-map/api/field/FieldApiException.ts ---
 
 class FieldApiException extends ApiException {
   public readonly category: ExceptionCategory;
@@ -2204,7 +2550,7 @@ class FieldApiException extends ApiException {
 }
 
 
-// --- Source: src/api/field/FieldApiMapper.ts ---
+// --- Source: src/plugins/posting-map/api/field/FieldApiMapper.ts ---
 
 class FieldApiMapper {
   /**
@@ -2285,7 +2631,7 @@ class FieldApiMapper {
 }
 
 
-// --- Source: src/api/field/FieldStockHandler.ts ---
+// --- Source: src/plugins/posting-map/api/field/FieldStockHandler.ts ---
 
 class FieldStockHandler implements EndpointHandler {
   constructor(private holdingAppService: HoldingApplicationService) {}
@@ -2322,7 +2668,7 @@ class FieldStockHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/field/HoldingHandler.ts ---
+// --- Source: src/plugins/posting-map/api/field/HoldingHandler.ts ---
 
 class HoldingHandler implements EndpointHandler {
   constructor(private holdingAppService: HoldingApplicationService) {}
@@ -2367,7 +2713,7 @@ class HoldingHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/field/ReservationHandler.ts ---
+// --- Source: src/plugins/posting-map/api/field/ReservationHandler.ts ---
 
 class ReservationHandler implements EndpointHandler {
   constructor(
@@ -2427,7 +2773,7 @@ class ReservationHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/subscription/SubscriptionHandler.ts ---
+// --- Source: src/plugins/posting-map/api/subscription/SubscriptionHandler.ts ---
 
 class SubscriptionHandler implements EndpointHandler {
   constructor(
@@ -2473,7 +2819,7 @@ class SubscriptionHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/operations/OperationsDashboardHandler.ts ---
+// --- Source: src/plugins/posting-map/api/operations/OperationsDashboardHandler.ts ---
 
 class OperationsDashboardHandler implements EndpointHandler {
   constructor(
@@ -2506,7 +2852,7 @@ class OperationsDashboardHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/operations/WorkspaceHandler.ts ---
+// --- Source: src/plugins/posting-map/api/operations/WorkspaceHandler.ts ---
 
 class WorkspaceHandler implements EndpointHandler {
   constructor(
@@ -2565,7 +2911,7 @@ class WorkspaceHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/api/registry/DashboardEndpoints.ts ---
+// --- Source: src/plugins/posting-map/api/registry/DashboardEndpoints.ts ---
 
 const DASHBOARD_ENDPOINTS: EndpointConfig[] = [
   {
@@ -2589,7 +2935,7 @@ const DASHBOARD_ENDPOINTS: EndpointConfig[] = [
 ];
 
 
-// --- Source: src/api/registry/FieldEndpoints.ts ---
+// --- Source: src/plugins/posting-map/api/registry/FieldEndpoints.ts ---
 interface EndpointConfig {
   path: string;
   method: string;
@@ -2643,7 +2989,7 @@ const FIELD_ENDPOINTS: EndpointConfig[] = [
 ];
 
 
-// --- Source: src/api/registry/OperationsEndpoints.ts ---
+// --- Source: src/plugins/posting-map/api/registry/OperationsEndpoints.ts ---
 
 const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
   {
@@ -2679,7 +3025,7 @@ const OPERATIONS_ENDPOINTS: EndpointConfig[] = [
 ];
 
 
-// --- Source: src/infrastructure/bootstrap/FieldApiBootstrap.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/bootstrap/FieldApiBootstrap.ts ---
 
 let initialized = false;
 

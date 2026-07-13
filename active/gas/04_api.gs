@@ -2,7 +2,7 @@
 // Generated: active/gas/04_api.gs
 // =========================================
 
-// --- Source: src/infrastructure/gas/ApiExecutionContext.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/gas/ApiExecutionContext.ts ---
 
 class ApiExecutionContext {
   private requestId: string;
@@ -133,7 +133,7 @@ class ApiExecutionContext {
 }
 
 
-// --- Source: src/infrastructure/gas/CacheServiceProvider.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/gas/CacheServiceProvider.ts ---
 
 class CacheServiceProvider {
   private static instance: CacheServiceProvider | null = null;
@@ -204,7 +204,7 @@ class CacheServiceProvider {
 declare const CacheService: any;
 
 
-// --- Source: src/infrastructure/gas/GasConfigurationProvider.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/gas/GasConfigurationProvider.ts ---
 interface FeatureFlags {
   flyerHolding: boolean;
   googleMaps: boolean;
@@ -377,7 +377,7 @@ class GasConfigurationProvider {
 declare const PropertiesService: any;
 
 
-// --- Source: src/infrastructure/gas/GasPerformanceMonitor.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/gas/GasPerformanceMonitor.ts ---
 class GasPerformanceMonitor {
   private static instance: GasPerformanceMonitor | null = null;
 
@@ -440,7 +440,7 @@ class GasPerformanceMonitor {
 }
 
 
-// --- Source: src/infrastructure/gas/LockServiceProvider.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/gas/LockServiceProvider.ts ---
 
 class LockServiceProvider {
   private static instance: LockServiceProvider | null = null;
@@ -517,7 +517,7 @@ class LockServiceProvider {
 declare const LockService: any;
 
 
-// --- Source: src/infrastructure/gas/SpreadsheetBatchReader.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/gas/SpreadsheetBatchReader.ts ---
 
 class SpreadsheetBatchReader {
   private configProvider: GasConfigurationProvider;
@@ -583,7 +583,7 @@ class SpreadsheetBatchReader {
 declare const SpreadsheetApp: any;
 
 
-// --- Source: src/infrastructure/gas/SpreadsheetBatchWriter.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/gas/SpreadsheetBatchWriter.ts ---
 
 class SpreadsheetBatchWriter {
   private configProvider: GasConfigurationProvider;
@@ -656,7 +656,7 @@ class SpreadsheetBatchWriter {
 declare const SpreadsheetApp: any;
 
 
-// --- Source: src/infrastructure/gas/SpreadsheetRepository.ts ---
+// --- Source: src/plugins/posting-map/infrastructure/gas/SpreadsheetRepository.ts ---
 
 interface AreaRecord {
   areaId: string;

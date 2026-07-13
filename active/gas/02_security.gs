@@ -2,7 +2,7 @@
 // Generated: active/gas/02_security.gs
 // =========================================
 
-// --- Source: src/foundation/authentication/AuthenticationContext.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/AuthenticationContext.ts ---
 type IdentityType = 'USER' | 'SERVICE' | 'ANONYMOUS';
 
 const IdentityType = {
@@ -55,7 +55,7 @@ class AuthenticationContext {
 }
 
 
-// --- Source: src/foundation/authentication/AuthenticationPipeline.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/AuthenticationPipeline.ts ---
 
 class AuthenticationPipeline {
   private static instance: AuthenticationPipeline | null = null;
@@ -141,7 +141,7 @@ class AuthenticationPipeline {
 }
 
 
-// --- Source: src/foundation/authentication/AuthenticationPolicy.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/AuthenticationPolicy.ts ---
 
 class AuthenticationPolicy {
   public static isAnonymousAllowed(request: ApiRequest): boolean {
@@ -163,7 +163,7 @@ class AuthenticationPolicy {
 }
 
 
-// --- Source: src/foundation/authentication/AuthenticationResult.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/AuthenticationResult.ts ---
 
 class AuthenticationResult {
   public readonly success: boolean;
@@ -186,14 +186,14 @@ class AuthenticationResult {
 }
 
 
-// --- Source: src/foundation/authentication/IdentityProvider.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/IdentityProvider.ts ---
 
 interface IdentityProvider {
   authenticate(request: ApiRequest): AuthenticationResult;
 }
 
 
-// --- Source: src/foundation/authentication/IdentityResolver.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/IdentityResolver.ts ---
 
 declare const Session: any;
 
@@ -237,7 +237,7 @@ class IdentityResolver {
 }
 
 
-// --- Source: src/foundation/authentication/providers/ApiKeyIdentityProvider.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/providers/ApiKeyIdentityProvider.ts ---
 
 /**
  * ApiKeyIdentityProvider - API Key 認証用の開発用スタブ (Stub Only)
@@ -271,7 +271,7 @@ class ApiKeyIdentityProvider implements IdentityProvider {
 }
 
 
-// --- Source: src/foundation/authentication/providers/GoogleIdentityProvider.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/providers/GoogleIdentityProvider.ts ---
 
 declare const Session: any;
 
@@ -308,7 +308,7 @@ class GoogleIdentityProvider implements IdentityProvider {
 }
 
 
-// --- Source: src/foundation/authentication/providers/LIFFIdentityProvider.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/providers/LIFFIdentityProvider.ts ---
 
 /**
  * LIFFIdentityProvider - LINE LIFF 認証用の開発用スタブ (Stub Only)
@@ -344,7 +344,7 @@ class LIFFIdentityProvider implements IdentityProvider {
 }
 
 
-// --- Source: src/foundation/authentication/providers/ServiceIdentityProvider.ts ---
+// --- Source: src/plugins/posting-map/foundation/authentication/providers/ServiceIdentityProvider.ts ---
 
 /**
  * ServiceIdentityProvider - 内部サービス認証用の開発用スタブ (Stub Only)
@@ -378,7 +378,7 @@ class ServiceIdentityProvider implements IdentityProvider {
 }
 
 
-// --- Source: src/foundation/authorization/AuthorizationContext.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/AuthorizationContext.ts ---
 
 interface AuthorizationMetadata {
   readonly evaluatedPolicy?: string;
@@ -410,7 +410,7 @@ class AuthorizationContext {
 }
 
 
-// --- Source: src/foundation/authorization/AuthorizationPipeline.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/AuthorizationPipeline.ts ---
 
 class AuthorizationPipeline {
   private static instance: AuthorizationPipeline | null = null;
@@ -508,7 +508,7 @@ class AuthorizationPipeline {
 }
 
 
-// --- Source: src/foundation/authorization/AuthorizationPolicy.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/AuthorizationPolicy.ts ---
 
 class AuthorizationPolicy {
   public readonly requiredRoles: Role[];
@@ -559,7 +559,7 @@ class AuthorizationPolicy {
 }
 
 
-// --- Source: src/foundation/authorization/AuthorizationResult.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/AuthorizationResult.ts ---
 
 class AuthorizationResult {
   public readonly success: boolean;
@@ -582,7 +582,7 @@ class AuthorizationResult {
 }
 
 
-// --- Source: src/foundation/authorization/Permission.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/Permission.ts ---
 type Permission = 'READ' | 'WRITE' | 'DELETE' | 'EXPORT' | 'ADMIN';
 
 const Permission = {
@@ -594,7 +594,7 @@ const Permission = {
 };
 
 
-// --- Source: src/foundation/authorization/PermissionResolver.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/PermissionResolver.ts ---
 
 /**
  * PermissionResolver - ロールに応じた権限割り当てスタブ (Stub Only)
@@ -620,14 +620,14 @@ class PermissionResolver implements Resolver<Permission[]> {
 }
 
 
-// --- Source: src/foundation/authorization/Resolver.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/Resolver.ts ---
 
 interface Resolver<T> {
   resolve(authContext: AuthenticationContext): T;
 }
 
 
-// --- Source: src/foundation/authorization/Role.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/Role.ts ---
 type Role = 'SYSTEM' | 'ADMIN' | 'LEADER' | 'MEMBER' | 'VIEWER';
 
 const Role = {
@@ -639,7 +639,7 @@ const Role = {
 };
 
 
-// --- Source: src/foundation/authorization/RoleResolver.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/RoleResolver.ts ---
 
 /**
  * RoleResolver - 開発用ロールマッピングスタブ (Stub Only)
@@ -667,7 +667,7 @@ class RoleResolver implements Resolver<Role> {
 }
 
 
-// --- Source: src/foundation/authorization/Scope.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/Scope.ts ---
 type Scope = 'SYSTEM' | 'ORGANIZATION' | 'BRANCH' | 'AREA' | 'SELF';
 
 const Scope = {
@@ -679,7 +679,7 @@ const Scope = {
 };
 
 
-// --- Source: src/foundation/authorization/ScopeResolver.ts ---
+// --- Source: src/plugins/posting-map/foundation/authorization/ScopeResolver.ts ---
 
 /**
  * ScopeResolver - ロールに応じた管轄データ範囲割り当てスタブ (Stub Only)
@@ -708,7 +708,7 @@ class ScopeResolver implements Resolver<Scope[]> {
 }
 
 
-// --- Source: src/foundation/hardening/CircuitBreakerFoundation.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/CircuitBreakerFoundation.ts ---
 
 type CircuitState = 'CLOSED' | 'OPEN' | 'HALF_OPEN';
 
@@ -752,7 +752,7 @@ class CircuitBreakerFoundation {
 }
 
 
-// --- Source: src/foundation/hardening/GracefulDegradation.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/GracefulDegradation.ts ---
 class GracefulDegradation {
   private static gracefulMode: boolean = false;
 
@@ -774,7 +774,7 @@ class GracefulDegradation {
 }
 
 
-// --- Source: src/foundation/hardening/HardeningPipeline.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/HardeningPipeline.ts ---
 
 class HardeningException extends ApiException {
   public readonly category = ExceptionCategory.SYSTEM;
@@ -858,7 +858,7 @@ class HardeningPipeline {
 }
 
 
-// --- Source: src/foundation/hardening/HealthCheckService.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/HealthCheckService.ts ---
 
 class HealthCheckService {
   private static instance: HealthCheckService | null = null;
@@ -911,7 +911,7 @@ class HealthCheckService {
 }
 
 
-// --- Source: src/foundation/hardening/HealthStatus.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/HealthStatus.ts ---
 interface HealthStatus {
   readonly status: 'HEALTHY' | 'DEGRADED' | 'UNAVAILABLE';
   readonly checks: Record<string, { status: 'OK' | 'WARN' | 'FAIL'; message?: string }>;
@@ -920,7 +920,7 @@ interface HealthStatus {
 }
 
 
-// --- Source: src/foundation/hardening/ProductionReadinessPolicy.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/ProductionReadinessPolicy.ts ---
 interface ReadinessCheckResult {
   readonly ready: boolean;
   readonly reason?: string;
@@ -939,7 +939,7 @@ class ProductionReadinessPolicy {
 }
 
 
-// --- Source: src/foundation/hardening/ReadinessValidator.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/ReadinessValidator.ts ---
 
 class ReadinessValidator {
   public static validate(): GuardResult {
@@ -956,7 +956,7 @@ class ReadinessValidator {
 }
 
 
-// --- Source: src/foundation/hardening/RequestGuard.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/RequestGuard.ts ---
 
 interface GuardResult {
   readonly allowed: boolean;
@@ -995,7 +995,7 @@ class RequestGuard {
 }
 
 
-// --- Source: src/foundation/hardening/ResourceGuard.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/ResourceGuard.ts ---
 
 class ResourceGuard {
   // Max default execution time limit before premature exit (e.g. 25 seconds for GAS 30-sec execution sandbox limit)
@@ -1014,7 +1014,7 @@ class ResourceGuard {
 }
 
 
-// --- Source: src/foundation/hardening/TimeoutPolicy.ts ---
+// --- Source: src/plugins/posting-map/foundation/hardening/TimeoutPolicy.ts ---
 class TimeoutPolicy {
   public static getValidationTimeout(): number {
     return 5000; // 5 seconds

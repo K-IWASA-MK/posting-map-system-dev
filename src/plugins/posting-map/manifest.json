@@ -1,0 +1,18 @@
+{
+  "pluginId": "posting-map",
+  "name": "Posting Map",
+  "version": "1.0.0",
+  "requiredAIOS": ">=1.0.0-alpha.0",
+  "permissions": [
+    "KNOWLEDGE_READ",
+    "KNOWLEDGE_WRITE",
+    "OBSERVABILITY_WRITE"
+  ],
+  "capabilities": [
+    "distribution",
+    "mapping",
+    "field-operation"
+  ],
+  "modules": [],
+  "events": []
+}

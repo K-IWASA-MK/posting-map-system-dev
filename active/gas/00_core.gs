@@ -2,105 +2,7 @@
 // Generated: active/gas/00_core.gs
 // =========================================
 
-// --- Source: src/core/eventbus/GovernanceEvent.ts ---
-
-interface GovernanceEvent {
-  id: string;
-  type: GovernanceEventType;
-  source: string;
-  payload: Record<string, any>;
-  timestamp: Date;
-  priority: GovernanceEventPriority;
-  context: GovernanceEventContext;
-}
-
-
-// --- Source: src/core/eventbus/GovernanceEventBusEngine.ts ---
-
-interface IGovernanceEventBusEngine {
-  publish(event: GovernanceEvent): Promise<boolean>;
-  subscribe(type: GovernanceEventType, listener: Function): Promise<boolean>;
-  unsubscribe(type: GovernanceEventType, listener: Function): Promise<boolean>;
-  emit(event: GovernanceEvent): Promise<boolean>;
-}
-
-abstract class BaseGovernanceEventBusEngine implements IGovernanceEventBusEngine {
-  abstract publish(event: GovernanceEvent): Promise<boolean>;
-  abstract subscribe(type: GovernanceEventType, listener: Function): Promise<boolean>;
-  abstract unsubscribe(type: GovernanceEventType, listener: Function): Promise<boolean>;
-  abstract emit(event: GovernanceEvent): Promise<boolean>;
-}
-
-
-// --- Source: src/core/eventbus/GovernanceEventContext.ts ---
-interface GovernanceEventContext {
-  runtimeId: string;
-  phase: string;
-  module: string;
-  correlationId: string;
-}
-
-
-// --- Source: src/core/eventbus/GovernanceEventDispatcher.ts ---
-
-class GovernanceEventDispatcher {
-  public async dispatch(event: GovernanceEvent): Promise<boolean> {
-    return true;
-  }
-
-  public async route(event: GovernanceEvent, target: Function): Promise<boolean> {
-    return true;
-  }
-
-  public async resolveTarget(event: GovernanceEvent): Promise<Function[]> {
-    return [];
-  }
-}
-
-
-// --- Source: src/core/eventbus/GovernanceEventPriority.ts ---
-enum GovernanceEventPriority {
-  LOW = "LOW",
-  NORMAL = "NORMAL",
-  HIGH = "HIGH",
-  CRITICAL = "CRITICAL"
-}
-
-
-// --- Source: src/core/eventbus/GovernanceEventRegistry.ts ---
-
-class GovernanceEventRegistry {
-  private listeners: Map<GovernanceEventType, Function[]> = new Map();
-
-  public async addListener(type: GovernanceEventType, listener: Function): Promise<boolean> {
-    return true;
-  }
-
-  public async removeListener(type: GovernanceEventType, listener: Function): Promise<boolean> {
-    return true;
-  }
-
-  public async getListeners(type: GovernanceEventType): Promise<Function[]> {
-    return [];
-  }
-
-  public async listEvents(): Promise<string[]> {
-    return [];
-  }
-}
-
-
-// --- Source: src/core/eventbus/GovernanceEventType.ts ---
-enum GovernanceEventType {
-  KNOWLEDGE_EVENT = "KNOWLEDGE_EVENT",
-  POLICY_EVENT = "POLICY_EVENT",
-  REVIEW_EVENT = "REVIEW_EVENT",
-  SCOPE_EVENT = "SCOPE_EVENT",
-  SYSTEM_EVENT = "SYSTEM_EVENT"
-}
-
-
-// --- Source: src/core/exceptions/ApiException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/ApiException.ts ---
 
 abstract class ApiException extends Error {
   public abstract readonly category: ExceptionCategory;
@@ -127,7 +29,7 @@ abstract class ApiException extends Error {
 }
 
 
-// --- Source: src/core/exceptions/AuthenticationException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/AuthenticationException.ts ---
 
 class AuthenticationException extends ApiException {
   public readonly category = ExceptionCategory.AUTHENTICATION;
@@ -151,7 +53,7 @@ class AuthenticationException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/AuthorizationException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/AuthorizationException.ts ---
 
 class AuthorizationException extends ApiException {
   public readonly category = ExceptionCategory.SYSTEM; // We map it as standard exception lifecycle
@@ -175,7 +77,7 @@ class AuthorizationException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/BridgeException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/BridgeException.ts ---
 
 class BridgeException extends ApiException {
   public readonly category = ExceptionCategory.SYSTEM;
@@ -199,7 +101,7 @@ class BridgeException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/ConfigurationException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/ConfigurationException.ts ---
 
 class ConfigurationException extends ApiException {
   public readonly category = ExceptionCategory.CONFIGURATION;
@@ -223,7 +125,7 @@ class ConfigurationException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/ExceptionCategory.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/ExceptionCategory.ts ---
 type ExceptionCategory =
   | 'VALIDATION'
   | 'ROUTING'
@@ -242,7 +144,7 @@ const ExceptionCategory = {
 };
 
 
-// --- Source: src/core/exceptions/ExceptionHandler.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/ExceptionHandler.ts ---
 
 class ExceptionHandler {
   // S3-5 Integration: Event hook point for monitoring and audit logging
@@ -280,7 +182,7 @@ class ExceptionHandler {
 }
 
 
-// --- Source: src/core/exceptions/ExceptionMapper.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/ExceptionMapper.ts ---
 
 class ExceptionMapper {
   public static toResponse(
@@ -324,7 +226,7 @@ class ExceptionMapper {
 }
 
 
-// --- Source: src/core/exceptions/ExceptionMetadata.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/ExceptionMetadata.ts ---
 interface ExceptionMetadata {
   readonly requestId: string;
   readonly timestamp: number;
@@ -335,7 +237,7 @@ interface ExceptionMetadata {
 }
 
 
-// --- Source: src/core/exceptions/FeatureException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/FeatureException.ts ---
 
 class FeatureException extends ApiException {
   public readonly category = ExceptionCategory.FEATURE;
@@ -383,7 +285,7 @@ class FeatureException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/LicenseException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/LicenseException.ts ---
 
 class LicenseException extends ApiException {
   public readonly category = ExceptionCategory.SYSTEM;
@@ -407,7 +309,7 @@ class LicenseException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/PlatformException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/PlatformException.ts ---
 
 class PlatformException extends ApiException {
   public readonly category: ExceptionCategory = 'SYSTEM';
@@ -431,7 +333,7 @@ class PlatformException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/RoutingException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/RoutingException.ts ---
 
 class RoutingException extends ApiException {
   public readonly category = ExceptionCategory.ROUTING;
@@ -474,7 +376,7 @@ class RoutingException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/SubscriptionException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/SubscriptionException.ts ---
 
 class SubscriptionException extends ApiException {
   public readonly category = ExceptionCategory.SYSTEM;
@@ -498,7 +400,7 @@ class SubscriptionException extends ApiException {
 }
 
 
-// --- Source: src/core/exceptions/SystemException.ts ---
+// --- Source: src/plugins/posting-map/core/exceptions/SystemException.ts ---
 
 class SystemException extends ApiException {
   public readonly category = ExceptionCategory.SYSTEM;
@@ -522,7 +424,7 @@ class SystemException extends ApiException {
 }
 
 
-// --- Source: src/core/api/APIEndpoint.ts ---
+// --- Source: src/plugins/posting-map/core/api/APIEndpoint.ts ---
 interface APIEndpoint {
   path: string;
   method: string;
@@ -534,7 +436,7 @@ interface APIEndpoint {
 }
 
 
-// --- Source: src/core/api/APISchema.ts ---
+// --- Source: src/plugins/posting-map/core/api/APISchema.ts ---
 
 interface APISchema {
   id: string;
@@ -545,7 +447,7 @@ interface APISchema {
 }
 
 
-// --- Source: src/core/api/APISchemaAnalyzerContext.ts ---
+// --- Source: src/plugins/posting-map/core/api/APISchemaAnalyzerContext.ts ---
 interface APISchemaAnalyzerContext {
   source: string;
   schemaId: string;
@@ -555,7 +457,7 @@ interface APISchemaAnalyzerContext {
 }
 
 
-// --- Source: src/core/api/APISchemaAnalyzerEngine.ts ---
+// --- Source: src/plugins/posting-map/core/api/APISchemaAnalyzerEngine.ts ---
 
 interface IAPISchemaAnalyzerEngine {
   analyze(schema: APISchema, context: APISchemaAnalyzerContext): Promise<boolean>;
@@ -572,7 +474,7 @@ abstract class BaseAPISchemaAnalyzerEngine implements IAPISchemaAnalyzerEngine {
 }
 
 
-// --- Source: src/core/api/APISchemaAnalyzerManager.ts ---
+// --- Source: src/plugins/posting-map/core/api/APISchemaAnalyzerManager.ts ---
 
 class APISchemaAnalyzerManager {
   private active: boolean = false;
@@ -600,7 +502,7 @@ class APISchemaAnalyzerManager {
 }
 
 
-// --- Source: src/core/api/APISchemaMapper.ts ---
+// --- Source: src/plugins/posting-map/core/api/APISchemaMapper.ts ---
 
 class APISchemaMapper {
   public async mapEndpoints(schema: APISchema): Promise<APIEndpoint[]> {
@@ -617,7 +519,7 @@ class APISchemaMapper {
 }
 
 
-// --- Source: src/core/api/APISchemaRegistry.ts ---
+// --- Source: src/plugins/posting-map/core/api/APISchemaRegistry.ts ---
 
 class APISchemaRegistry {
   private registry: Map<string, APISchema> = new Map();
@@ -644,7 +546,7 @@ class APISchemaRegistry {
 }
 
 
-// --- Source: src/core/api/APISchemaType.ts ---
+// --- Source: src/plugins/posting-map/core/api/APISchemaType.ts ---
 enum APISchemaType {
   OPENAPI = "OPENAPI",
   GRAPHQL = "GRAPHQL",
@@ -654,7 +556,7 @@ enum APISchemaType {
 }
 
 
-// --- Source: src/core/api/ApiRequest.ts ---
+// --- Source: src/plugins/posting-map/core/api/ApiRequest.ts ---
 class ApiRequest {
   public readonly method: string;
   public readonly path: string;
@@ -687,7 +589,7 @@ class ApiRequest {
 }
 
 
-// --- Source: src/core/api/ApiResponse.ts ---
+// --- Source: src/plugins/posting-map/core/api/ApiResponse.ts ---
 class ApiResponse {
   public readonly status: number;
   public readonly success: boolean;
@@ -739,7 +641,7 @@ class ApiResponse {
 }
 
 
-// --- Source: src/core/api/ApiRouter.ts ---
+// --- Source: src/plugins/posting-map/core/api/ApiRouter.ts ---
 
 class ApiRouter {
   private static instance: ApiRouter | null = null;
@@ -792,7 +694,7 @@ class ApiRouter {
 }
 
 
-// --- Source: src/core/api/ApiVersionResolver.ts ---
+// --- Source: src/plugins/posting-map/core/api/ApiVersionResolver.ts ---
 
 class ApiVersionResolver {
   private static readonly SUPPORTED_VERSIONS: Set<string> = new Set(['v1', 'v2', 'v3', 'future']);
@@ -820,7 +722,7 @@ class ApiVersionResolver {
 }
 
 
-// --- Source: src/core/api/EndpointRegistry.ts ---
+// --- Source: src/plugins/posting-map/core/api/EndpointRegistry.ts ---
 
 class EndpointRegistry {
   private static instance: EndpointRegistry | null = null;
@@ -931,7 +833,7 @@ class EndpointRegistry {
 }
 
 
-// --- Source: src/core/api/RoutePolicy.ts ---
+// --- Source: src/plugins/posting-map/core/api/RoutePolicy.ts ---
 class RoutePolicy {
   private static readonly ALLOWED_METHODS: Set<string> = new Set(['GET', 'POST', 'PUT', 'DELETE']);
 
@@ -941,7 +843,7 @@ class RoutePolicy {
 }
 
 
-// --- Source: src/core/api/RouteResolver.ts ---
+// --- Source: src/plugins/posting-map/core/api/RouteResolver.ts ---
 class RouteKey {
   private readonly key: string;
 
@@ -970,7 +872,7 @@ class RouteResolver {
 }
 
 
-// --- Source: src/core/api/handlers/DashboardHandler.ts ---
+// --- Source: src/plugins/posting-map/core/api/handlers/DashboardHandler.ts ---
 
 class DashboardHandler implements EndpointHandler {
   public execute(request: ApiRequest, context: ApiExecutionContext): ApiResponse {
@@ -990,14 +892,14 @@ class DashboardHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/core/api/handlers/EndpointHandler.ts ---
+// --- Source: src/plugins/posting-map/core/api/handlers/EndpointHandler.ts ---
 
 interface EndpointHandler {
   execute(request: ApiRequest, context: ApiExecutionContext): ApiResponse | Promise<ApiResponse>;
 }
 
 
-// --- Source: src/core/api/handlers/HealthHandler.ts ---
+// --- Source: src/plugins/posting-map/core/api/handlers/HealthHandler.ts ---
 
 class HealthHandler implements EndpointHandler {
   public execute(request: ApiRequest, context: ApiExecutionContext): ApiResponse {
@@ -1017,7 +919,7 @@ class HealthHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/core/api/handlers/HoldingHandler.ts ---
+// --- Source: src/plugins/posting-map/core/api/handlers/HoldingHandler.ts ---
 
 class HoldingHandler implements EndpointHandler {
   public execute(request: ApiRequest, context: ApiExecutionContext): ApiResponse {
@@ -1037,7 +939,7 @@ class HoldingHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/core/api/handlers/UnknownEndpointHandler.ts ---
+// --- Source: src/plugins/posting-map/core/api/handlers/UnknownEndpointHandler.ts ---
 
 class UnknownEndpointHandler implements EndpointHandler {
   public execute(request: ApiRequest, context: ApiExecutionContext): ApiResponse {
@@ -1067,7 +969,7 @@ class UnknownEndpointHandler implements EndpointHandler {
 }
 
 
-// --- Source: src/core/api/handlers/VersionHandler.ts ---
+// --- Source: src/plugins/posting-map/core/api/handlers/VersionHandler.ts ---
 
 class VersionHandler implements EndpointHandler {
   public execute(request: ApiRequest, context: ApiExecutionContext): ApiResponse {
@@ -1083,6 +985,759 @@ class VersionHandler implements EndpointHandler {
       501,
       metadata
     );
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/governance/PerformanceGovernanceDecision.ts ---
+type PerformanceGovernanceStatus = 'PASS' | 'WARNING' | 'FAILED';
+
+enum PerformanceGovernanceAction {
+  PROCEED = 'PROCEED',
+  REVIEW_REQUIRED = 'REVIEW_REQUIRED',
+  BLOCK = 'BLOCK'
+}
+
+interface PerformanceGovernanceDecision {
+  status: PerformanceGovernanceStatus;
+  score: number;
+  action: PerformanceGovernanceAction;
+  recommendation: string;
+  generatedAt: string;
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/governance/PerformanceGovernanceEngine.ts ---
+
+class PerformanceGovernanceEngine {
+  private policy: PerformanceGovernancePolicy;
+
+  constructor() {
+    this.policy = new PerformanceGovernancePolicy();
+  }
+
+  public evaluate(validationResult: PerformanceValidationResult): PerformanceGovernanceResult {
+    const decision = this.policy.evaluate(validationResult.summary);
+
+    return {
+      metadata: validationResult.metadata,
+      decision,
+      validationResult
+    };
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/governance/PerformanceGovernanceExporter.ts ---
+
+class PerformanceGovernanceExporter {
+  public exportToJson(result: PerformanceGovernanceResult, outputPath: string): void {
+    const jsonString = JSON.stringify(result, null, 2);
+    fs.writeFileSync(outputPath, jsonString, 'utf-8');
+    console.log(`[Governance Exporter] JSON report written to: ${outputPath}`);
+  }
+
+  public exportToConsole(result: PerformanceGovernanceResult): void {
+    const { decision, validationResult } = result;
+    const { summary, report } = validationResult;
+
+    // Build the report format
+    const governanceReport: PerformanceGovernanceReport = {
+      overallStatus: decision.status,
+      action: decision.action,
+      score: decision.score,
+      recommendation: decision.recommendation,
+      violations: report.violations,
+      generatedAt: decision.generatedAt
+    };
+
+    console.log('\n==================================================');
+    console.log('       PERFORMANCE GOVERNANCE DECISION');
+    console.log('==================================================');
+    console.log(`STATUS         : ${governanceReport.overallStatus}`);
+    console.log(`ACTION         : ${governanceReport.action}`);
+    console.log(`SCORE          : ${governanceReport.score} / 100`);
+    console.log(`RECOMMENDATION : ${governanceReport.recommendation}`);
+    console.log(`GENERATED AT   : ${governanceReport.generatedAt}`);
+    console.log('--------------------------------------------------');
+    console.log(`[Validation Stats] PASS: ${summary.passed} | INFO: ${summary.info} | WARNING: ${summary.warning} | FAILED: ${summary.failed}`);
+    console.log('==================================================\n');
+
+    if (governanceReport.violations && governanceReport.violations.length > 0) {
+      console.log('Violations:');
+      governanceReport.violations.forEach(v => {
+        console.log(`  [${v.status}] ${v.ruleId} (${v.ruleName})`);
+        console.log(`    File   : ${v.targetFile}`);
+        console.log(`    Message: ${v.message}`);
+        console.log('');
+      });
+      console.log('==================================================\n');
+    }
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/governance/PerformanceGovernancePolicy.ts ---
+
+class PerformanceGovernancePolicy {
+  public static readonly PASS_SCORE = 90;
+  public static readonly WARNING_SCORE = 70;
+  public static readonly MAX_WARNING = 3;
+
+  public evaluate(summary: PerformanceValidationSummary): PerformanceGovernanceDecision {
+    let status: PerformanceGovernanceStatus;
+    let action: PerformanceGovernanceAction;
+    let recommendation: string;
+
+    const { failed, warning, score } = summary;
+
+    // FAILED: Any failures, or score below WARNING_SCORE
+    if (failed > 0 || score < PerformanceGovernancePolicy.WARNING_SCORE) {
+      status = 'FAILED';
+      action = PerformanceGovernanceAction.BLOCK;
+      recommendation = 'Performance violations must be resolved before release.';
+    } 
+    // WARNING: No failures, but too many warnings or score is between WARNING_SCORE and PASS_SCORE
+    else if (warning > PerformanceGovernancePolicy.MAX_WARNING || score < PerformanceGovernancePolicy.PASS_SCORE) {
+      status = 'WARNING';
+      action = PerformanceGovernanceAction.REVIEW_REQUIRED;
+      recommendation = 'Performance improvements recommended.';
+    } 
+    // PASS: No failures, warnings within limit, and score >= PASS_SCORE
+    else {
+      status = 'PASS';
+      action = PerformanceGovernanceAction.PROCEED;
+      recommendation = 'No action required.';
+    }
+
+    return {
+      status,
+      score,
+      action,
+      recommendation,
+      generatedAt: new Date().toISOString()
+    };
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/governance/PerformanceGovernanceReport.ts ---
+
+interface PerformanceGovernanceReport {
+  overallStatus: PerformanceGovernanceStatus;
+  action: PerformanceGovernanceAction;
+  score: number;
+  recommendation: string;
+  violations: PerformancePolicyResult[];
+  generatedAt: string;
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/governance/PerformanceGovernanceResult.ts ---
+
+interface PerformanceGovernanceResult {
+  metadata: PerformanceValidationMetadata;
+  decision: PerformanceGovernanceDecision;
+  validationResult: PerformanceValidationResult;
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/validation/PerformanceValidationExporter.ts ---
+
+class PerformanceValidationExporter {
+  public exportToJson(result: PerformanceValidationResult, outputPath: string): void {
+    const jsonString = JSON.stringify(result, null, 2);
+    fs.writeFileSync(outputPath, jsonString, 'utf-8');
+    console.log(`[Validation Exporter] JSON report written to: ${outputPath}`);
+  }
+
+  public exportToConsole(result: PerformanceValidationResult): void {
+    const summary = result.summary;
+    console.log('\n==================================================');
+    console.log('       PERFORMANCE VALIDATION REPORT');
+    console.log('==================================================');
+    console.log(`Status        : ${summary.status}`);
+    console.log(`Score         : ${summary.score} / 100`);
+    console.log(`Policies      : ${summary.validationCount}`);
+    console.log(`Duration      : ${summary.durationMs} ms`);
+    console.log(`Generated At  : ${summary.generatedAt}`);
+    console.log('--------------------------------------------------');
+    console.log(`PASS: ${summary.passed} | INFO: ${summary.info} | WARNING: ${summary.warning} | FAILED: ${summary.failed}`);
+    console.log('==================================================\n');
+
+    if (result.report.violations && result.report.violations.length > 0) {
+      console.log('Violations:');
+      result.report.violations.forEach(v => {
+        console.log(`  [${v.status}] ${v.ruleId} (${v.ruleName})`);
+        console.log(`    File   : ${v.targetFile}`);
+        console.log(`    Message: ${v.message}`);
+        console.log('');
+      });
+      console.log('==================================================\n');
+    }
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/validation/PerformanceValidationResult.ts ---
+
+interface PerformanceValidationMetadata {
+  toolVersion: string;
+  schemaVersion: string;
+  runtime: string;
+  generatedAt: string;
+}
+
+interface PerformanceValidationResult {
+  metadata: PerformanceValidationMetadata;
+  summary: PerformanceValidationSummary;
+  metrics?: RepositoryPerformanceMetrics;
+  report: PerformancePolicyReport;
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/validation/PerformanceValidationRunner.ts ---
+
+class PerformanceValidationRunner {
+  private engine: PerformancePolicyEngine;
+
+  constructor() {
+    this.engine = new PerformancePolicyEngine();
+  }
+
+  /**
+   * Run the validation process for the given source directory.
+   */
+  public run(sourceDirectory: string): PerformanceValidationResult {
+    const startTime = Date.now();
+    const generatedAt = new Date().toISOString();
+
+    // 1. Gather contexts
+    const contexts = this.gatherContexts(sourceDirectory);
+
+    // 2. Try to get metrics from profiler (if executed in a runtime flow, otherwise it might be 0)
+    let metrics: RepositoryPerformanceMetrics | undefined = undefined;
+    try {
+      const profiler = RepositoryPerformanceProfiler.getInstance();
+      metrics = profiler.getMetrics();
+      // Only include metrics if there is some activity
+      if (metrics.totalExecutionTimeMs === 0 && metrics.repositoryCallCount === 0) {
+        metrics = undefined;
+      }
+    } catch (e) {
+      metrics = undefined; // Profiler not initialized or error
+    }
+
+    // Attach metrics to contexts if available (Policy can use them)
+    if (metrics) {
+      for (const ctx of contexts) {
+        ctx.metrics = metrics;
+      }
+    }
+
+    // 3. Execute Engine
+    const report = this.engine.validate(contexts);
+
+    // 4. Generate Summary
+    const durationMs = Date.now() - startTime;
+    let status: PerformanceValidationStatus = 'PASS';
+    if (report.failed > 0) {
+      status = 'FAILED';
+    } else if (report.warning > 0) {
+      status = 'WARNING';
+    }
+
+    const summary: PerformanceValidationSummary = {
+      status,
+      validationCount: report.policyCount,
+      passed: report.pass,
+      warning: report.warning,
+      failed: report.failed,
+      info: report.info,
+      score: report.score,
+      durationMs,
+      generatedAt
+    };
+
+    // 5. Generate Metadata
+    const metadata: PerformanceValidationMetadata = {
+      toolVersion: '1.0.0',
+      schemaVersion: 'v1',
+      runtime: 'Node.js',
+      generatedAt
+    };
+
+    // 6. Return Result
+    return {
+      metadata,
+      summary,
+      metrics,
+      report
+    };
+  }
+
+  private gatherContexts(dir: string): PolicyContext[] {
+    const contexts: PolicyContext[] = [];
+    const walkDir = (currentDir: string) => {
+      if (!fs.existsSync(currentDir)) return;
+      const files = fs.readdirSync(currentDir);
+      for (const file of files) {
+        const fullPath = path.join(currentDir, file);
+        if (fs.statSync(fullPath).isDirectory()) {
+          walkDir(fullPath);
+        } else if (fullPath.endsWith('.ts') && !fullPath.includes('.test.ts')) {
+          const sourceCode = fs.readFileSync(fullPath, 'utf8');
+          contexts.push({ filePath: fullPath, sourceCode });
+        }
+      }
+    };
+    walkDir(dir);
+    return contexts;
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/validation/PerformanceValidationSummary.ts ---
+type PerformanceValidationStatus = 'PASS' | 'WARNING' | 'FAILED';
+
+interface PerformanceValidationSummary {
+  status: PerformanceValidationStatus;
+  validationCount: number;
+  passed: number;
+  warning: number;
+  failed: number;
+  info: number;
+  score: number;
+  durationMs: number;
+  generatedAt: string;
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/PerformancePolicy.ts ---
+
+interface PolicyContext {
+  sourceCode: string;
+  filePath: string;
+  metrics?: RepositoryPerformanceMetrics;
+}
+
+interface IPerformancePolicy {
+  get id(): string;
+  get name(): string;
+  
+  validate(context: PolicyContext): PerformancePolicyResult[];
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/PerformancePolicyEngine.ts ---
+
+class PerformancePolicyEngine {
+  private registry: PerformancePolicyRegistry;
+
+  constructor() {
+    this.registry = PerformancePolicyRegistry.getInstance();
+  }
+
+  public validate(contexts: PolicyContext[]): PerformancePolicyReport {
+    const policies = this.registry.getPolicies();
+    let allResults: PerformancePolicyResult[] = [];
+
+    for (const policy of policies) {
+      for (const context of contexts) {
+        const results = policy.validate(context);
+        allResults = allResults.concat(results);
+      }
+    }
+
+    return this.generateReport(policies.length, allResults);
+  }
+
+  private generateReport(policyCount: number, results: PerformancePolicyResult[]): PerformancePolicyReport {
+    let pass = 0;
+    let warning = 0;
+    let failed = 0;
+    let info = 0;
+
+    const violations: PerformancePolicyResult[] = [];
+
+    for (const res of results) {
+      switch (res.status) {
+        case 'PASS':
+          pass++;
+          break;
+        case 'WARNING':
+          warning++;
+          violations.push(res);
+          break;
+        case 'FAILED':
+          failed++;
+          violations.push(res);
+          break;
+        case 'INFO':
+          info++;
+          violations.push(res);
+          break;
+      }
+    }
+
+    // Default perfect score is 100.
+    // Deduct 10 points for each FAILED, 3 points for each WARNING.
+    // Minimum score is 0.
+    let score = 100 - (failed * 10) - (warning * 3);
+    if (score < 0) score = 0;
+
+    return {
+      policyCount,
+      score,
+      pass,
+      warning,
+      failed,
+      info,
+      violations
+    };
+  }
+
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/PerformancePolicyRegistry.ts ---
+
+class PerformancePolicyRegistry {
+  private static instance: PerformancePolicyRegistry;
+  private policies: IPerformancePolicy[] = [];
+
+  private constructor() {}
+
+  public static getInstance(): PerformancePolicyRegistry {
+    if (!PerformancePolicyRegistry.instance) {
+      PerformancePolicyRegistry.instance = new PerformancePolicyRegistry();
+    }
+    return PerformancePolicyRegistry.instance;
+  }
+
+  public register(policy: IPerformancePolicy): void {
+    if (!this.policies.some(p => p.id === policy.id)) {
+      this.policies.push(policy);
+    }
+  }
+
+  public clear(): void {
+    this.policies = [];
+  }
+
+  public getPolicies(): IPerformancePolicy[] {
+    return [...this.policies];
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/PerformancePolicyReport.ts ---
+
+interface PerformancePolicyReport {
+  policyCount: number;
+  score: number;
+  pass: number;
+  warning: number;
+  failed: number;
+  info: number;
+  violations: PerformancePolicyResult[];
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/PerformancePolicyResult.ts ---
+type PolicyStatus = 'PASS' | 'WARNING' | 'FAILED' | 'INFO';
+
+interface PerformancePolicyResult {
+  ruleId: string;
+  ruleName: string;
+  status: PolicyStatus;
+  message: string;
+  targetFile?: string;
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/rules/Rule001NoLoopRead.ts ---
+
+class Rule001NoLoopRead implements IPerformancePolicy {
+  public get id(): string { return 'RULE-001'; }
+  public get name(): string { return 'No Loop Read'; }
+
+  public validate(context: PolicyContext): PerformancePolicyResult[] {
+    const results: PerformancePolicyResult[] = [];
+    
+    // Very basic static check using regex
+    // Looks for `for ` or `while ` followed eventually by `.readAll` or `.readRange` within a rough block.
+    // This is a naive check since AST is not allowed for now.
+    const loopRegex = /(for\s*\(|while\s*\()[\s\S]{0,200}?\.(readAll|readRange)\s*\(/;
+
+    if (loopRegex.test(context.sourceCode)) {
+      results.push({
+        ruleId: this.id,
+        ruleName: this.name,
+        status: 'FAILED',
+        message: 'Spreadsheet read operation (readAll/readRange) detected inside a loop. This causes severe performance degradation.',
+        targetFile: context.filePath
+      });
+    }
+
+    return results;
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/rules/Rule002NoLoopWrite.ts ---
+
+class Rule002NoLoopWrite implements IPerformancePolicy {
+  public get id(): string { return 'RULE-002'; }
+  public get name(): string { return 'No Loop Write'; }
+
+  public validate(context: PolicyContext): PerformancePolicyResult[] {
+    const results: PerformancePolicyResult[] = [];
+    
+    const loopRegex = /(for\s*\(|while\s*\()[\s\S]{0,300}?\.(updateRange|appendRows|setValue|setValues)\s*\(/;
+
+    if (loopRegex.test(context.sourceCode)) {
+      results.push({
+        ruleId: this.id,
+        ruleName: this.name,
+        status: 'FAILED',
+        message: 'Spreadsheet write operation (updateRange/appendRows) detected inside a loop. Consolidate data into arrays and write once.',
+        targetFile: context.filePath
+      });
+    }
+
+    return results;
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/rules/Rule003RepositoryIsolation.ts ---
+
+class Rule003RepositoryIsolation implements IPerformancePolicy {
+  public get id(): string { return 'RULE-003'; }
+  public get name(): string { return 'Repository Isolation'; }
+
+  public validate(context: PolicyContext): PerformancePolicyResult[] {
+    const results: PerformancePolicyResult[] = [];
+    
+    // Check if non-repository code is trying to import SpreadsheetReader/Writer
+    const isRepositoryFolder = context.filePath.includes('/repository/');
+    const isInfrastructureFolder = context.filePath.includes('/infrastructure/');
+    
+    if (!isRepositoryFolder && !isInfrastructureFolder) {
+      if (context.sourceCode.includes('SpreadsheetReader') || context.sourceCode.includes('SpreadsheetWriter')) {
+        results.push({
+          ruleId: this.id,
+          ruleName: this.name,
+          status: 'FAILED',
+          message: 'SpreadsheetReader/Writer must only be used within the Repository or Infrastructure layer.',
+          targetFile: context.filePath
+        });
+      }
+    }
+
+    return results;
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/rules/Rule004ApplicationSpreadsheetBan.ts ---
+
+class Rule004ApplicationSpreadsheetBan implements IPerformancePolicy {
+  public get id(): string { return 'RULE-004'; }
+  public get name(): string { return 'Application Spreadsheet Ban'; }
+
+  public validate(context: PolicyContext): PerformancePolicyResult[] {
+    const results: PerformancePolicyResult[] = [];
+    
+    // Check if Application layer files directly access SpreadsheetApp
+    const isApplicationFolder = context.filePath.includes('/application/');
+    
+    if (isApplicationFolder) {
+      if (context.sourceCode.includes('SpreadsheetApp.') || context.sourceCode.includes('SpreadsheetApp(')) {
+        results.push({
+          ruleId: this.id,
+          ruleName: this.name,
+          status: 'FAILED',
+          message: 'Direct usage of SpreadsheetApp is prohibited in the Application layer. Use Repository interfaces.',
+          targetFile: context.filePath
+        });
+      }
+    }
+
+    return results;
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/rules/Rule005SpreadsheetAccess.ts ---
+
+class Rule005SpreadsheetAccess implements IPerformancePolicy {
+  public get id(): string { return 'RULE-005'; }
+  public get name(): string { return 'Spreadsheet Access Restrict'; }
+
+  public validate(context: PolicyContext): PerformancePolicyResult[] {
+    const results: PerformancePolicyResult[] = [];
+    
+    // Check if Spreadsheet is being used without going through SpreadsheetReader/Writer or Repository
+    const isGasOrSpreadsheet = context.sourceCode.includes('SpreadsheetApp.');
+    const isInfrastructure = context.filePath.includes('/infrastructure/');
+    
+    if (isGasOrSpreadsheet && !isInfrastructure) {
+      results.push({
+        ruleId: this.id,
+        ruleName: this.name,
+        status: 'FAILED',
+        message: 'Spreadsheet usage must be encapsulated within the Infrastructure/Repository layer.',
+        targetFile: context.filePath
+      });
+    }
+
+    return results;
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/rules/Rule006MemoryProcessing.ts ---
+
+class Rule006MemoryProcessing implements IPerformancePolicy {
+  public get id(): string { return 'RULE-006'; }
+  public get name(): string { return 'Memory Processing Required'; }
+
+  public validate(context: PolicyContext): PerformancePolicyResult[] {
+    const results: PerformancePolicyResult[] = [];
+    
+    // If it's a Repository and it reads data, we expect to see Map, array functions, etc.
+    const isRepository = context.filePath.includes('/repository/') && context.filePath.endsWith('Repository.ts');
+    
+    if (isRepository && context.sourceCode.includes('readAll(')) {
+      const hasMemoryProcessing = context.sourceCode.includes('new Map') || 
+                                  context.sourceCode.includes('.filter(') ||
+                                  context.sourceCode.includes('.find(') ||
+                                  context.sourceCode.includes('.reduce(');
+                                  
+      if (!hasMemoryProcessing) {
+        results.push({
+          ruleId: this.id,
+          ruleName: this.name,
+          status: 'WARNING',
+          message: 'Repository uses readAll but lacks standard memory processing patterns (Map/filter/reduce). Ensure operations are done in-memory.',
+          targetFile: context.filePath
+        });
+      }
+      
+      if (context.metrics && context.metrics.totalExecutionTimeMs > 0) {
+          const reads = context.metrics.sheetMetrics.reduce((acc, m) => acc + m.readCount, 0);
+          if (reads > 10) {
+              results.push({
+                ruleId: this.id,
+                ruleName: this.name,
+                status: 'INFO',
+                message: `Repository performed ${reads} spreadsheet reads during this context. Optimization candidate for data consolidation.`,
+                targetFile: context.filePath
+              });
+          }
+      }
+    }
+
+    return results;
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/rules/Rule007RepositoryApiConsistency.ts ---
+
+class Rule007RepositoryApiConsistency implements IPerformancePolicy {
+  public get id(): string { return 'RULE-007'; }
+  public get name(): string { return 'Repository API Consistency'; }
+
+  public validate(context: PolicyContext): PerformancePolicyResult[] {
+    const results: PerformancePolicyResult[] = [];
+    
+    // Only check repository classes
+    if (!context.filePath.includes('/repository/') || !context.filePath.endsWith('Repository.ts')) {
+      return results;
+    }
+
+    // Attempt to find implements I...Repository
+    const implementsMatch = context.sourceCode.match(/implements\s+(I[A-Za-z0-9]+Repository)/);
+    if (!implementsMatch) {
+      return results;
+    }
+
+    const interfaceName = implementsMatch[1];
+    
+    // Fallback naive search for the interface file in the same directory or common domain dirs
+    // Since AST is disabled, this is a basic string matching mechanism.
+    const searchDirs = [
+      path.dirname(context.filePath),
+      path.join(path.dirname(context.filePath), '../../domain') // Rough guess for domain interfaces
+    ];
+    
+    let interfaceContent = '';
+    
+    // Extract public methods from the current class
+    // Naive regex: public methodName(
+    const publicMethodRegex = /public\s+([a-zA-Z0-9_]+)\s*\(/g;
+    let match;
+    const publicMethods: string[] = [];
+    while ((match = publicMethodRegex.exec(context.sourceCode)) !== null) {
+      publicMethods.push(match[1]);
+    }
+
+    // Since reading interface file precisely without AST is hard, we will yield INFO 
+    // or WARNING if we detect public methods that are typically not in generic repos
+    // Alternatively, if we know common repo methods: findById, findAll, save, getNextStaffNo, etc.
+    // For now, we will just log an INFO to verify repository interface consistency.
+    results.push({
+      ruleId: this.id,
+      ruleName: this.name,
+      status: 'INFO',
+      message: `Repository exposes public methods: ${publicMethods.join(', ')}. Ensure all are defined in ${interfaceName}.`,
+      targetFile: context.filePath
+    });
+
+    return results;
+  }
+}
+
+
+// --- Source: src/plugins/posting-map/core/performance/policy/rules/Rule008ProfilerMandatory.ts ---
+
+class Rule008ProfilerMandatory implements IPerformancePolicy {
+  public get id(): string { return 'RULE-008'; }
+  public get name(): string { return 'Profiler Mandatory'; }
+
+  public validate(context: PolicyContext): PerformancePolicyResult[] {
+    const results: PerformancePolicyResult[] = [];
+    
+    // Only check SpreadsheetRepository implementations
+    if (!context.filePath.includes('/repository/') || !context.filePath.includes('Spreadsheet') || !context.filePath.endsWith('Repository.ts')) {
+      return results;
+    }
+
+    const hasProfilerImport = context.sourceCode.includes('RepositoryPerformanceProfiler');
+    const usesProfiler = context.sourceCode.includes('.incrementRepositoryCall(') || context.sourceCode.includes('.recordExecutionTime(');
+
+    if (!hasProfilerImport || !usesProfiler) {
+      results.push({
+        ruleId: this.id,
+        ruleName: this.name,
+        status: 'FAILED',
+        message: 'SpreadsheetRepository must use RepositoryPerformanceProfiler to record metrics.',
+        targetFile: context.filePath
+      });
+    } else {
+        results.push({
+            ruleId: this.id,
+            ruleName: this.name,
+            status: 'PASS',
+            message: 'Profiler is correctly utilized in this repository.',
+            targetFile: context.filePath
+        });
+    }
+
+    return results;
   }
 }
 

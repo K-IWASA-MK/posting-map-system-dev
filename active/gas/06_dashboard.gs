@@ -2,12 +2,12 @@
 // Generated: active/gas/06_dashboard.gs
 // =========================================
 
-// --- Source: src/application/dashboard/index.ts ---
+// --- Source: src/plugins/posting-map/application/dashboard/index.ts ---
 * from './dto/DashboardDtos';
 * from './services/DashboardApplicationService';
 
 
-// --- Source: src/application/dashboard/dto/DashboardDtos.ts ---
+// --- Source: src/plugins/posting-map/application/dashboard/dto/DashboardDtos.ts ---
 
 interface PersonalDashboardDto {
   staffNo: string;
@@ -61,6 +61,7 @@ interface WorkspaceDashboardDto {
   lineAppUrl: string;
   dashboardUrl: string;
   emailTemplates: EmailTemplateDto[];
+  performanceMetrics?: PerformanceMetricsDto;
 }
 
 interface RankingDto {
@@ -79,7 +80,24 @@ interface MonthlyActivitySummary {
 }
 
 
-// --- Source: src/application/dashboard/email/EmailTemplateDto.ts ---
+// --- Source: src/plugins/posting-map/application/dashboard/dto/PerformanceMetricsDto.ts ---
+interface PerformanceMetricsDto {
+  responseTimeMs: number;
+  spreadsheetReadCount: number;
+  spreadsheetWriteCount: number;
+  repositoryCallCount: number;
+  repositoryExecutionCount: Array<{ repositoryName: string; executionCount: number }>;
+  sheetMetrics: Array<{ sheetName: string; readCount: number; writeCount: number }>;
+  activityRecordCount: number;
+  holdingRecordCount: number;
+  staffRecordCount: number;
+  generatedAt: string;
+  apiVersion: string;
+  dashboardVersion: string;
+}
+
+
+// --- Source: src/plugins/posting-map/application/dashboard/email/EmailTemplateDto.ts ---
 interface EmailTemplateDto {
   templateId: string;
   templateName: string;
@@ -89,7 +107,7 @@ interface EmailTemplateDto {
 }
 
 
-// --- Source: src/application/dashboard/email/EmailTemplateService.ts ---
+// --- Source: src/plugins/posting-map/application/dashboard/email/EmailTemplateService.ts ---
 
 class EmailTemplateService {
   private reader: SpreadsheetReader;
@@ -214,7 +232,7 @@ POSTING MAPでは、
 }
 
 
-// --- Source: src/application/dashboard/services/DashboardApplicationService.ts ---
+// --- Source: src/plugins/posting-map/application/dashboard/services/DashboardApplicationService.ts ---
 
 
 class DashboardApplicationService {
@@ -238,12 +256,16 @@ class DashboardApplicationService {
   }
 
   public async getPersonalDashboard(staffNo: string, yearMonth?: string | YearMonth): Promise<PersonalDashboardDto> {
+    const t0 = Date.now();
+    let stats = { staffRead: 1, holdingRead: 1, activityRead: 1, totalAccess: 3 };
+
     const staff = await this.staffRepo.findByStaffNo(staffNo);
     if (!staff) {
       throw new Error(`Staff not found: ${staffNo}`);
     }
 
-    const holding = await this.holdingRepo.findByStaffNo(staffNo);
+    const allHoldings = await this.holdingRepo.findAll();
+    const holding = allHoldings.find(h => h.staffNo === staffNo);
     const holdingQty = holding ? holding.getQuantity().getValue() : 0;
 
     const yearMonthObj = typeof yearMonth === 'string' ? new YearMonth(yearMonth) : yearMonth;
@@ -252,9 +274,14 @@ class DashboardApplicationService {
       ? { start: yearMonthObj.getStartDate(), end: yearMonthObj.getEndDate() }
       : this.getCurrentMonthRange();
 
-    const allActivities = await this.activityRepo.findByPeriod(start, end);
+    const allActivitiesRaw = await this.activityRepo.findAll();
+    const allActivities = allActivitiesRaw.filter(a => a.occurredAt.getTime() >= start.getTime() && a.occurredAt.getTime() <= end.getTime());
+    
     const staffActivities = allActivities.filter(a => a.staffNo === staffNo);
     const monthlyTotal = staffActivities.reduce((sum, a) => sum + a.reportedQuantity.getValue(), 0);
+
+    const t1 = Date.now();
+    console.log(`[Personal Dashboard Performance] Activity Read : ${stats.activityRead}, Holding Read : ${stats.holdingRead}, Staff Read : ${stats.staffRead}, Spreadsheet Access : ${stats.totalAccess}, Processing Time : ${t1 - t0}ms`);
 
     return {
       staffNo: staff.staffNo,
@@ -268,6 +295,9 @@ class DashboardApplicationService {
     workspaceId: string,
     yearMonth?: string | YearMonth
   ): Promise<WorkspaceDashboardDto> {
+    const t0 = Date.now();
+    const stats = { workspaceRead: 1, staffRead: 1, holdingRead: 1, activityRead: 1, totalAccess: 4 };
+
     const ws = await this.workspaceRepo.findById(workspaceId);
     const wsName = ws ? ws.workspaceName : '不明な支部';
     const distributionGoal = ws ? (ws.getDistributionGoal() ?? undefined) : undefined;
@@ -276,19 +306,28 @@ class DashboardApplicationService {
     const staffIds = staffList.map(s => s.staffNo);
     const yearMonthObj = typeof yearMonth === 'string' ? new YearMonth(yearMonth) : (yearMonth || new YearMonth(new Date()));
 
+    // --- Performance Foundation: 一括取得とメモリ処理への移行 ---
+    const allHoldings = await this.holdingRepo.findAll();
+    const holdingMap = new Map<string, any>();
+    for (const h of allHoldings) {
+      holdingMap.set(h.staffNo, h);
+    }
+
+    const allActivitiesRaw = await this.activityRepo.findAll();
+
     // Current month range
     const { start, end } = { start: yearMonthObj.getStartDate(), end: yearMonthObj.getEndDate() };
-    const allActivities = await this.activityRepo.findByPeriod(start, end);
+    const allActivities = allActivitiesRaw.filter(a => a.occurredAt.getTime() >= start.getTime() && a.occurredAt.getTime() <= end.getTime());
 
     // Previous month range
     const prevMonthObj = yearMonthObj.getMonth() === 1
       ? new YearMonth(`${yearMonthObj.getYear() - 1}12`)
       : new YearMonth(`${yearMonthObj.getYear()}${String(yearMonthObj.getMonth() - 1).padStart(2, '0')}`);
     const { start: pStart, end: pEnd } = { start: prevMonthObj.getStartDate(), end: prevMonthObj.getEndDate() };
-    const prevActivities = await this.activityRepo.findByPeriod(pStart, pEnd);
+    const prevActivities = allActivitiesRaw.filter(a => a.occurredAt.getTime() >= pStart.getTime() && a.occurredAt.getTime() <= pEnd.getTime());
 
     // Fetch all activities for firstActivityDate lookup
-    const allTimeActivities = await this.activityRepo.findByPeriod(new Date(2000, 0, 1), new Date(2100, 0, 1));
+    const allTimeActivities = allActivitiesRaw;
 
     const members: StaffSummary[] = [];
     let totalHolding = 0;
@@ -298,7 +337,7 @@ class DashboardApplicationService {
     const cityMap = new Map<string, number>();
 
     for (const staff of staffList) {
-      const holding = await this.holdingRepo.findByStaffNo(staff.staffNo);
+      const holding = holdingMap.get(staff.staffNo);
       const holdingQty = holding ? holding.getQuantity().getValue() : 0;
       const cityName = holding ? holding.cityName : '-';
 
@@ -396,12 +435,12 @@ class DashboardApplicationService {
     // 6. Active city count
     const activeCityCount = cityActivities.length;
 
-    // New members compilation
-    const newStaffList = await this.staffRepo.findNewStaffByMonth(workspaceId, yearMonthObj);
+    // New members compilation (Avoid N+1 Database Queries by filtering in memory)
+    const newStaffList = staffList.filter(s => s.createdAt.getTime() >= start.getTime() && s.createdAt.getTime() <= end.getTime());
     const newMembers: NewStaffDto[] = [];
     
     for (const staff of newStaffList) {
-      const holding = await this.holdingRepo.findByStaffNo(staff.staffNo);
+      const holding = holdingMap.get(staff.staffNo);
       const holdingQty = holding ? holding.getQuantity().getValue() : 0;
 
       // Find first activity date
@@ -428,7 +467,7 @@ class DashboardApplicationService {
     let tempYM = yearMonthObj;
     for (let i = 0; i < 6; i++) {
       const { start: tStart, end: tEnd } = { start: tempYM.getStartDate(), end: tempYM.getEndDate() };
-      const tempActs = await this.activityRepo.findByPeriod(tStart, tEnd);
+      const tempActs = allActivitiesRaw.filter(a => a.occurredAt.getTime() >= tStart.getTime() && a.occurredAt.getTime() <= tEnd.getTime());
       const wsTempActs = tempActs.filter(a => staffIds.indexOf(a.staffNo) !== -1);
       const tempTotal = wsTempActs.reduce((sum, a) => sum + a.reportedQuantity.getValue(), 0);
 
@@ -445,6 +484,26 @@ class DashboardApplicationService {
 
     const urls = WorkspaceUrl.generate(workspaceId);
     const emailTemplates = await this.emailTemplateService.getActiveTemplates();
+    
+    const t1 = Date.now();
+    const profilerMetrics = RepositoryPerformanceProfiler.getInstance().getMetrics();
+    const performanceMetrics = {
+      responseTimeMs: t1 - t0,
+      spreadsheetReadCount: profilerMetrics.spreadsheetReadCount,
+      spreadsheetWriteCount: profilerMetrics.spreadsheetWriteCount,
+      repositoryCallCount: profilerMetrics.repositoryCallCount,
+      repositoryExecutionCount: profilerMetrics.repositoryExecutionCount,
+      sheetMetrics: profilerMetrics.sheetMetrics,
+      activityRecordCount: allActivitiesRaw.length,
+      holdingRecordCount: allHoldings.length,
+      staffRecordCount: staffList.length,
+      generatedAt: new Date().toISOString(),
+      apiVersion: '1.0',
+      dashboardVersion: 'v2.4'
+    };
+
+    console.log(`[Dashboard Performance] Activity Read : ${profilerMetrics.sheetMetrics.find(m => m.sheetName === 'Activity')?.readCount || 0}, Holding Read : ${profilerMetrics.sheetMetrics.find(m => m.sheetName === 'Flyers')?.readCount || 0}, Staff Read : ${profilerMetrics.sheetMetrics.find(m => m.sheetName === 'Staff')?.readCount || 0}, Workspace Read : ${profilerMetrics.sheetMetrics.find(m => m.sheetName === 'Workspaces')?.readCount || 0}, Spreadsheet Access : ${profilerMetrics.spreadsheetReadCount + profilerMetrics.spreadsheetWriteCount}, Processing Time : ${t1 - t0}ms`);
+
     return {
       workspaceId,
       workspaceName: wsName,
@@ -471,7 +530,8 @@ class DashboardApplicationService {
       activeCityCount,
       lineAppUrl: urls.lineAppUrl,
       dashboardUrl: urls.dashboardUrl,
-      emailTemplates
+      emailTemplates,
+      performanceMetrics
     };
   }
 
@@ -514,7 +574,7 @@ class DashboardApplicationService {
 }
 
 
-// --- Source: src/api/dashboard/DashboardHandler.ts ---
+// --- Source: src/plugins/posting-map/api/dashboard/DashboardHandler.ts ---
 
 class DashboardHandler implements EndpointHandler {
   constructor(
@@ -577,7 +637,8 @@ class DashboardHandler implements EndpointHandler {
           activeCityCount: dashboard.activeCityCount,
           lineAppUrl: dashboard.lineAppUrl,
           dashboardUrl: dashboard.dashboardUrl,
-          emailTemplates: dashboard.emailTemplates
+          emailTemplates: dashboard.emailTemplates,
+          performanceMetrics: dashboard.performanceMetrics
         };
         return FieldApiMapper.toSuccessResponse(result, request, context);
       }
@@ -604,6 +665,8 @@ class DashboardHandler implements EndpointHandler {
     } catch (error: any) {
       const apiException = FieldApiMapper.toApiException(error, request.requestId);
       return ExceptionMapper.toResponse(apiException, request, context);
+    } finally {
+      RepositoryPerformanceProfiler.getInstance().reset();
     }
   }
 }

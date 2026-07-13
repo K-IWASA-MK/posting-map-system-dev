@@ -1,6 +1,0 @@
-export enum SourceType {
-  LEDGER = 'LEDGER',
-  TELEMETRY = 'TELEMETRY',
-  METRICS = 'METRICS',
-  COMPOSITE = 'COMPOSITE',
-}
