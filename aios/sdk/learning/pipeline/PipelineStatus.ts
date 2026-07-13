@@ -1,0 +1,7 @@
+export enum PipelineStatus {
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  PARTIAL_SUCCESS = 'PARTIAL_SUCCESS',
+  TIMEOUT = 'TIMEOUT'
+}

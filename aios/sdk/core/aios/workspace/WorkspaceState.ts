@@ -1,0 +1,7 @@
+export enum WorkspaceState {
+  INITIALIZING = 'INITIALIZING',
+  READY = 'READY',
+  SCANNING = 'SCANNING',
+  ERROR = 'ERROR',
+  ARCHIVED = 'ARCHIVED'
+}

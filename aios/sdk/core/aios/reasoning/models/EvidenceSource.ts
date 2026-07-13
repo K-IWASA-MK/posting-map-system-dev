@@ -1,0 +1,11 @@
+export enum EvidenceSource {
+    MEMORY = 'MEMORY',
+    KNOWLEDGE = 'KNOWLEDGE',
+    WORKFLOW = 'WORKFLOW',
+    REPOSITORY = 'REPOSITORY',
+    PROJECT = 'PROJECT',
+    DEPLOYMENT = 'DEPLOYMENT',
+    HUMAN = 'HUMAN',
+    EXTERNAL = 'EXTERNAL',
+    LLM = 'LLM'
+}

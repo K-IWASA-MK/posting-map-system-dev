@@ -1,0 +1,10 @@
+export enum ProjectionStage {
+  CONTEXT = 'CONTEXT',
+  PLUGIN = 'PLUGIN',
+  VALIDATION = 'VALIDATION',
+  REVIEW = 'REVIEW',
+  GOVERNANCE = 'GOVERNANCE',
+  LEDGER = 'LEDGER',
+  COMPLETED = 'COMPLETED',
+  NONE = 'NONE',
+}

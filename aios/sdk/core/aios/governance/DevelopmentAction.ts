@@ -1,0 +1,7 @@
+export enum DevelopmentAction {
+  PROCEED = 'PROCEED',
+  REVIEW_REQUIRED = 'REVIEW_REQUIRED',
+  RETRY = 'RETRY',
+  ESCALATE = 'ESCALATE',
+  BLOCK = 'BLOCK',
+}

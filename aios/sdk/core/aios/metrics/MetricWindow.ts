@@ -1,0 +1,7 @@
+export enum MetricWindow {
+  EXECUTION = 'EXECUTION',
+  SESSION = 'SESSION',
+  ONE_MINUTE = 'ONE_MINUTE',
+  FIVE_MINUTES = 'FIVE_MINUTES',
+  ONE_HOUR = 'ONE_HOUR',
+}

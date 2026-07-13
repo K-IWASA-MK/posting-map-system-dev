@@ -1,0 +1,11 @@
+export enum KnowledgeSource {
+    REVIEW = 'REVIEW',
+    PLANNING = 'PLANNING',
+    WORKFLOW = 'WORKFLOW',
+    DEPLOYMENT = 'DEPLOYMENT',
+    PROJECT = 'PROJECT',
+    REPOSITORY = 'REPOSITORY',
+    AI_AGENT = 'AI_AGENT',
+    HUMAN = 'HUMAN',
+    IMPORT = 'IMPORT'
+}

@@ -1,0 +1,8 @@
+export enum MemoryState {
+    CREATED = 'CREATED',
+    ACTIVE = 'ACTIVE',
+    REFERENCED = 'REFERENCED',
+    COMPRESSED = 'COMPRESSED',
+    ARCHIVED = 'ARCHIVED',
+    EXPIRED = 'EXPIRED'
+}

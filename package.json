@@ -1,14 +1,20 @@
 {
-  "name": "cie-knowledge-engine",
-  "version": "1.0.0",
-  "description": "CIE Knowledge Engine Foundation",
+  "name": "aios-workspace",
+  "version": "5.0.0-alpha.0",
+  "private": true,
+  "workspaces": [
+    "aios",
+    "products/*",
+    "shared"
+  ],
+  "description": "AIOS Platform and Products Workspace",
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc --noEmit",
     "build:gas": "python3 tools/build_gas.py",
-    "test:ts": "for file in $(find tests/unit/typescript -name '*.ts'); do npx ts-node -r tsconfig-paths/register \"$file\" || exit 1; done",
-    "test:integration": "for file in $(find tests/integration -name '*.ts'); do npx ts-node -r tsconfig-paths/register \"$file\" || exit 1; done",
-    "test:py": ".venv/bin/pytest tests/unit/python",
+    "test:ts": "for file in $(find aios/tests/unit/typescript products/posting-map/tests/unit/typescript -name '*.ts'); do npx ts-node -r tsconfig-paths/register \"$file\" || exit 1; done",
+    "test:integration": "for file in $(find aios/tests/integration products/posting-map/tests/integration -name '*.ts'); do npx ts-node -r tsconfig-paths/register \"$file\" || exit 1; done",
+    "test:py": "PYTHONPATH=aios .venv/bin/pytest aios/tests/unit/python",
     "test": "npm run build && npm run test:ts && npm run test:integration && npm run test:py",
     "architecture:test": "npx ts-node -r tsconfig-paths/register tools/architecture-check.ts",
     "quality:check": "npm run build && npm run architecture:test && npm run test:ts && npm run test:integration && npm run test:py"
