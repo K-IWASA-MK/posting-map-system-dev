@@ -33,9 +33,9 @@ export class SemanticGraphBuilder {
 
     GraphValidator.validate(nodesArray, edgesArray);
 
-    return {
+    return Object.freeze({
       nodes: Object.freeze(nodesArray.map(n => Object.freeze(n))),
       edges: Object.freeze(edgesArray.map(e => Object.freeze(e)))
-    };
+    });
   }
 }
