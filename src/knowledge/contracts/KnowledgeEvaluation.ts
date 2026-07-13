@@ -5,4 +5,5 @@ export interface KnowledgeEvaluation {
   readonly quality: number;
   readonly trustLevel: string;
   readonly ruleResults: ReadonlyArray<GovernanceRuleResult>;
+  readonly policyVersion?: string;
 }

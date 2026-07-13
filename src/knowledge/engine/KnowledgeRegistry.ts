@@ -19,4 +19,12 @@ export class KnowledgeRegistry {
   public getAll(): IKnowledgePlugin[] {
     return [...this.plugins];
   }
+
+  public count(): number {
+    return this.plugins.length;
+  }
+
+  public listIds(): ReadonlyArray<string> {
+    return Object.freeze(this.plugins.map(p => p.pluginId));
+  }
 }

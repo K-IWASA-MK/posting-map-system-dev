@@ -13,4 +13,12 @@ export class KnowledgeRuleRegistry {
   public getAllRules(): IGovernanceRule[] {
     return Array.from(this.rules.values());
   }
+
+  public count(): number {
+    return this.rules.size;
+  }
+
+  public listIds(): ReadonlyArray<string> {
+    return Object.freeze(Array.from(this.rules.keys()));
+  }
 }
