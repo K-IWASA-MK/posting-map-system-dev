@@ -1,3 +1,16 @@
+# Release Notes - v4.4.0-alpha.0
+
+## 🚀 New Features & Enhancements
+
+### 1. Knowledge Promotion Runtime Foundation (Sprint X-18)
+- **Promotion Orchestration**: Developed the final Generation 4 Runtime bridging Validation to Knowledge, executing the promotion cycle completely independently from the Knowledge Runtime.
+- **KnowledgeMergeEngine Facade**: Implemented a highly decoupled merge pipeline: `MergePlanner` → `ConflictDetector` → `MergeSimulator` → `VersionGenerator` → `LineageUpdater` → `PromotionWriter`.
+- **DAG-based Lineage Tracking**: Implemented Lineage tracking using an explicit `LineageGraph` with separated `LineageNode` and `LineageEdge` definitions to support future Knowledge Fusion.
+- **Advanced State Machine**: Extended the Promotion State Machine with a dedicated `VERSIONING` state, supporting transitions from `CREATED` down to `PROMOTED` and `ARCHIVED`, including `REJECTED` edge cases.
+- **Mock Simulation Framework**: Developed full in-memory foundations for Candidate Assessment, Semantic/Duplicate Conflict Detection, and Version assignment without triggering real storage writes (Blueprint Only).
+
+---
+
 # Release Notes - v4.3.0-alpha.0
 
 ## 🚀 New Features & Enhancements
