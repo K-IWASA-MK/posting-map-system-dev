@@ -1,3 +1,16 @@
+# Release Notes - v4.3.0-alpha.0
+
+## 🚀 New Features & Enhancements
+
+### 1. Validation Orchestration Runtime Foundation (Sprint X-17)
+- **DAG-based Validation Pipeline**: Implemented a topological sort execution strategy supporting DAG structures for complex validation dependencies.
+- **Score-based Aggregation (3 Axes)**: Advanced aggregation returning `aggregatedScore`, `aggregatedSeverity`, and `overallConfidence`, enabling granular validation evaluation.
+- **Isolated Retry Mechanism**: Validation specific flaky-test / network timeout retries, isolating retry bounds purely to the validation phase instead of repeating the entire execution loop.
+- **Strict 9-Layer Architecture Compliance**: Implemented `Manifest`, `Policy`, `Registry`, `Services`, `State Machine`, `Ledger`, `Metrics`, `Observability`, and `Runtime` inside `src/core/aios/validation/` to perfectly align with Generation 4 Autonomous Runtimes structure.
+- **Mock Validator Simulation**: Built Foundation with `MockSuccess`, `MockFailure`, `MockWarning`, and `MockTimeout` (Flaky) validators demonstrating complete state transitions from `CREATED` to `ARCHIVED`.
+
+---
+
 # Release Notes - v4.21-auth-immutable
 
 ## 🚀 New Features & Enhancements
