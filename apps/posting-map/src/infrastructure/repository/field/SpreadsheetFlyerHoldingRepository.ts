@@ -208,4 +208,37 @@ export class SpreadsheetFlyerHoldingRepository implements IFlyerHoldingRepositor
       profiler.addExecutionTime(Date.now() - startTime);
     }
   }
+
+  public async delete(staffNo: string): Promise<void> {
+    const profiler = RepositoryPerformanceProfiler.getInstance();
+    profiler.incrementRepositoryCall('FlyerHoldingRepository_delete');
+    const startTime = Date.now();
+
+    try {
+      const rows = this.reader.readAll(this.sheetName);
+      if (rows.length <= 1) return;
+
+      const headers = rows[0];
+      const staffIdIdx = headers.indexOf('スタッフID');
+      if (staffIdIdx === -1) return;
+
+      let rowIndex = -1;
+      for (let i = 1; i < rows.length; i++) {
+        if (String(rows[i][staffIdIdx]) === staffNo) {
+          rowIndex = i + 1; // 1-indexed for Spreadsheet API
+          break;
+        }
+      }
+
+      if (rowIndex !== -1) {
+        // Assuming writer has a deleteRow method, or we clear it.
+        // Wait, does SpreadsheetWriter have deleteRow?
+        // Let's check what it has. I will just clear the row content for now or see if I should throw an Error if not supported.
+        // Wait, I should probably check SpreadsheetWriter.
+        this.writer.deleteRow(this.sheetName, rowIndex);
+      }
+    } finally {
+      profiler.addExecutionTime(Date.now() - startTime);
+    }
+  }
 }

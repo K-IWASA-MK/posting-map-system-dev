@@ -46,4 +46,20 @@ export class SpreadsheetWriter {
       console.error(`[SpreadsheetWriter] Error updating range in ${sheetName}:`, e);
     }
   }
+
+  public deleteRow(sheetName: string, rowIndex: number): void {
+    const ss = this.client.getSpreadsheet();
+    if (!ss) return;
+
+    try {
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) return;
+
+      RepositoryPerformanceProfiler.getInstance().incrementWrite(sheetName);
+
+      sheet.deleteRow(rowIndex);
+    } catch (e) {
+      console.error(`[SpreadsheetWriter] Error deleting row in ${sheetName}:`, e);
+    }
+  }
 }

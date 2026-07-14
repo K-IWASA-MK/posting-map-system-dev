@@ -6,4 +6,5 @@ export interface IFlyerHoldingRepository {
   findAllRaw(): Promise<any[]>;
   findAll(): Promise<FlyerHolding[]>;
   save(holding: FlyerHolding): Promise<void>;
+  delete(staffNo: string): Promise<void>;
 }
