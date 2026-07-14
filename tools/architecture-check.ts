@@ -45,6 +45,30 @@ function checkDependencies() {
       while ((match = importRegex.exec(content)) !== null) {
         const importPath = match[1];
 
+        // Prevent application from importing directly from platform internals
+        if (importPath.startsWith('.')) {
+          const resolvedPath = path.resolve(path.dirname(file), importPath);
+          const relativeToRoot = path.relative(path.join(__dirname, '..'), resolvedPath);
+          
+          if (relativeToRoot.startsWith('aios/') && 
+              !relativeToRoot.startsWith('aios/kernel/') && 
+              !relativeToRoot.startsWith('aios/sdk/')) {
+            console.error(`❌ [Internal Platform Import Violation] ${file}`);
+            console.error(`   Application is not allowed to import directly from platform internals`);
+            console.error(`   Import: '${importPath}' (resolves to '${relativeToRoot}')`);
+            hasErrors = true;
+          }
+        }
+        
+        if (importPath.startsWith('aios/') && 
+            !importPath.startsWith('aios/kernel/') && 
+            !importPath.startsWith('aios/sdk/')) {
+          console.error(`❌ [Internal Platform Import Violation] ${file}`);
+          console.error(`   Application is not allowed to import directly from platform internals`);
+          console.error(`   Import: '${importPath}'`);
+          hasErrors = true;
+        }
+
         // Only check alias imports like @domain, @core, etc.
         // We assume paths are properly aliased
         for (const targetLayer of layers) {

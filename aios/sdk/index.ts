@@ -3,5 +3,6 @@ export * from './contracts';
 export * from './builder/AIOSBuilder';
 export * from './bootstrap/AIOSBootstrap';
 export * from './plugin/PluginManager';
+export * from './plugin/AIOSPluginBase';
 
 // Internal modules should NOT be exported here.

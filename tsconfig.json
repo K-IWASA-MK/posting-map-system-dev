@@ -16,9 +16,11 @@
       "@domain/*": ["apps/posting-map/src/domain/*"],
       "@infra/*": ["apps/posting-map/src/infrastructure/*"],
       "@application/*": ["apps/posting-map/src/application/*"],
-      "@api/*": ["apps/posting-map/src/api/*"]
+      "@api/*": ["apps/posting-map/src/api/*"],
+      "@kernel/*": ["aios/kernel/*"],
+      "@shared/*": ["shared/*"]
     }
   },
   "include": ["apps/posting-map/src/**/*", "aios/**/*", "shared/**/*"],
-  "exclude": ["**/deprecated/**/*", "node_modules", "aios/tests/**/*", "aios/transformation/**/*", "aios/aios-core/**/*", "aios/adaptive", "aios/auditgate", "aios/evolution", "aios/graph", "aios/healing", "aios/kernel", "aios/metagovernance", "aios/optimization", "aios/orchestrator", "aios/planning", "aios/resume", "aios/review", "aios/safety", "aios/selfoptimization", "aios/selfregulation", "aios/audit", "aios/stabilization", "aios/systemkernel"]
+  "exclude": ["**/deprecated/**/*", "node_modules", "aios/tests/**/*", "aios/transformation/**/*"]
 }
