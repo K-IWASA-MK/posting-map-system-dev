@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Snapshot Determinism Test should generate identical Output across 100 iterations (Determinism Audit) 1`] = `
+[
+  {
+    "contractId": "C_SNAP",
+    "id": "EU-C_SNAP-REQ_1",
+    "mappedAction": "EXECUTE_REQUIRED_FIX_UI",
+    "requirementId": "REQ_1",
+    "targetRequirement": {
+      "description": "Fix UI",
+      "evidenceTypes": [
+        "TEST",
+      ],
+      "id": "REQ_1",
+      "type": "REQUIRED",
+    },
+  },
+  {
+    "contractId": "C_SNAP",
+    "id": "EU-C_SNAP-REQ_2",
+    "mappedAction": "EXECUTE_OPTIONAL_ADD_LOG",
+    "requirementId": "REQ_2",
+    "targetRequirement": {
+      "description": "Add Log",
+      "evidenceTypes": [],
+      "id": "REQ_2",
+      "type": "OPTIONAL",
+    },
+  },
+]
+`;

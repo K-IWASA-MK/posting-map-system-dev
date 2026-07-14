@@ -1,0 +1,36 @@
+export enum TaskState {
+  CREATED = 'CREATED',
+  READY = 'READY',
+  RUNNING = 'RUNNING',
+  WAITING = 'WAITING',
+  FAILED = 'FAILED',
+  RECOVERING = 'RECOVERING',
+  DONE = 'DONE',
+  ARCHIVED = 'ARCHIVED'
+}
+
+export enum RequirementType {
+  REQUIRED = 'REQUIRED',
+  OPTIONAL = 'OPTIONAL',
+  PROHIBITED = 'PROHIBITED'
+}
+
+export enum EvidenceType {
+  TEST = 'TEST',
+  BUILD = 'BUILD',
+  LINT = 'LINT',
+  STATIC_ANALYSIS = 'STATIC_ANALYSIS',
+  SECURITY = 'SECURITY',
+  PERFORMANCE = 'PERFORMANCE',
+  COVERAGE = 'COVERAGE'
+}
+
+export enum RecoveryAction {
+  RETRY = 'RETRY',
+  SPLIT = 'SPLIT',
+  MERGE = 'MERGE',
+  REPLAN = 'REPLAN',
+  RECONTRACT = 'RECONTRACT',
+  ESCALATE = 'ESCALATE',
+  ABANDON = 'ABANDON'
+}
