@@ -12,6 +12,8 @@ import { StaffApplicationService } from '@application/field/services/StaffApplic
 import { HoldingApplicationService } from '@application/field/services/HoldingApplicationService';
 import { ActivityApplicationService } from '@application/field/services/ActivityApplicationService';
 import { DashboardApplicationService } from '@application/dashboard/services/DashboardApplicationService';
+import { DashboardFactService } from '@application/dashboard/services/DashboardFactService';
+import { DashboardFactHandler } from '@api/dashboard/DashboardFactHandler';
 import { SubscriptionApplicationService } from '@application/subscription/SubscriptionApplicationService';
 import { OperationsDashboardApplicationService } from '@application/operations/services/OperationsDashboardApplicationService';
 import { WorkspaceApplicationService } from '@application/workspace/services/WorkspaceApplicationService';
@@ -58,6 +60,7 @@ export function bootstrapFieldApis(): void {
     ReservationHandler: new ReservationHandler(activityAppService, holdingAppService),
     ActivityHandler: new ActivityHandler(activityAppService),
     DashboardHandler: new DashboardHandler(dashboardAppService),
+    DashboardFactHandler: new DashboardFactHandler(new DashboardFactService(activityRepo, holdingRepo)),
     SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
     OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService),
     WorkspaceHandler: new WorkspaceHandler(workspaceService)

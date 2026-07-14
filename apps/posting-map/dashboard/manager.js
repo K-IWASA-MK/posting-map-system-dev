@@ -9,11 +9,16 @@ let googleUser = JSON.parse(localStorage.getItem('google_user')) || null;
 let activeTab = 'home';
 let dashboardData = null;
 
+// Pagination state for facts
+let currentFactPage = 1;
+let currentFactLimit = 10;
+let currentFactsData = null;
+
 async function checkAuth() {
   showLoading(true);
   
   // Set Auth display label
-  document.getElementById('auth-workspace-name').textContent = `${workspaceId} ダッシュボード`;
+  document.getElementById('auth-workspace-name').textContent = `${workspaceId} 支部運営システム`;
 
   if (!googleUser) {
     showScreen('auth-screen');
@@ -33,6 +38,9 @@ async function checkAuth() {
       } else {
         renderDashboard(data.data || data);
         showScreen('dashboard-app');
+        // Initial fetch for facts and holdings
+        fetchFacts();
+        fetchHoldings();
       }
     } else {
       showError('データの取得に失敗しました。');
@@ -70,10 +78,12 @@ function handleGoogleLogin() {
 
 function switchTab(tabName) {
   activeTab = tabName;
-  const tabs = ['home', 'holding', 'activity', 'email-template', 'settings'];
+  const tabs = ['home', 'holding', 'activity', 'settings'];
   tabs.forEach(t => {
     const btn = document.getElementById(`nav-${t}`);
     const content = document.getElementById(`tab-content-${t}`);
+    if (!btn || !content) return;
+    
     if (t === tabName) {
       btn.classList.add('bg-primary', 'text-white');
       btn.classList.remove('text-secondary', 'hover:text-white');
@@ -105,14 +115,14 @@ function renderDashboard(data) {
   }
   document.getElementById('header-period-label').textContent = `${displayPeriod} 実績レポート`;
 
-  // KPIs (Terms sanitized)
+  // KPIs
   document.getElementById('kpi-staff-count').textContent = `${data.memberCount || 0}人`;
   document.getElementById('kpi-total-holding').textContent = `${(data.total || 0).toLocaleString()}枚`;
   document.getElementById('kpi-active-member-count').textContent = `${data.activeMemberCount || 0}人`;
   document.getElementById('kpi-monthly-activity').textContent = `${(data.monthlyActivity || 0).toLocaleString()}枚`;
   document.getElementById('kpi-prev-month').textContent = `先月: ${(data.previousMonthActivity || 0).toLocaleString()}枚`;
   
-  // Growth rate coloring
+  // Growth rate
   const growthRateEl = document.getElementById('kpi-growth-rate');
   growthRateEl.textContent = data.growthRate || '0%';
   if (data.growthRate && data.growthRate.startsWith('-')) {
@@ -121,8 +131,7 @@ function renderDashboard(data) {
     growthRateEl.className = 'font-extrabold text-emerald-400';
   }
 
-  // --- S5-18 Analytics & Summaries ---
-  // 1. Goal & Achievement Rate
+  // 1. Goal & Achievement
   const goalLabel = document.getElementById('analytics-goal-label');
   const achievementRateEl = document.getElementById('analytics-achievement-rate');
   const achievementSuffix = document.getElementById('analytics-achievement-suffix');
@@ -142,214 +151,7 @@ function renderDashboard(data) {
     }
   }
 
-  // 2. Month-over-Month Comparisons
-  const volumeDiffEl = document.getElementById('analytics-volume-diff');
-  const volumeRateEl = document.getElementById('analytics-volume-rate');
-  const memberDiffEl = document.getElementById('analytics-member-diff');
-  const memberRateEl = document.getElementById('analytics-member-rate');
-
-  if (volumeDiffEl && volumeRateEl) {
-    const diff = data.volumeDifference || 0;
-    const rate = data.volumeGrowthRate || 0;
-    volumeDiffEl.textContent = diff >= 0 ? `+${diff.toLocaleString()}枚` : `${diff.toLocaleString()}枚`;
-    volumeRateEl.textContent = rate >= 0 ? `(+${rate}%)` : `(${rate}%)`;
-    
-    if (diff > 0) {
-      volumeDiffEl.className = 'text-lg font-extrabold text-emerald-400';
-      volumeRateEl.className = 'text-[10px] font-extrabold text-emerald-400';
-    } else if (diff < 0) {
-      volumeDiffEl.className = 'text-lg font-extrabold text-red-400';
-      volumeRateEl.className = 'text-[10px] font-extrabold text-red-400';
-    } else {
-      volumeDiffEl.className = 'text-lg font-extrabold text-secondary';
-      volumeRateEl.className = 'text-[10px] font-extrabold text-secondary';
-    }
-  }
-
-  if (memberDiffEl && memberRateEl) {
-    const diff = data.memberDifference || 0;
-    const rate = data.memberGrowthRate || 0;
-    memberDiffEl.textContent = diff >= 0 ? `+${diff.toLocaleString()}人` : `${diff.toLocaleString()}人`;
-    memberRateEl.textContent = rate >= 0 ? `(+${rate}%)` : `(${rate}%)`;
-
-    if (diff > 0) {
-      memberDiffEl.className = 'text-lg font-extrabold text-emerald-400';
-      memberRateEl.className = 'text-[10px] font-extrabold text-emerald-400';
-    } else if (diff < 0) {
-      memberDiffEl.className = 'text-lg font-extrabold text-red-400';
-      memberRateEl.className = 'text-[10px] font-extrabold text-red-400';
-    } else {
-      memberDiffEl.className = 'text-lg font-extrabold text-secondary';
-      memberRateEl.className = 'text-[10px] font-extrabold text-secondary';
-    }
-  }
-
-  // 3. Activity Summary Text & Top Active City
-  const summaryTextEl = document.getElementById('analytics-summary-text');
-  const topCityEl = document.getElementById('analytics-top-city');
-
-  if (summaryTextEl) {
-    const vol = (data.monthlyActivity || 0).toLocaleString();
-    const membersCount = data.activeMemberCount || 0;
-    const citiesCount = data.activeCityCount || 0;
-    summaryTextEl.innerHTML = `今月は <span class="text-primary font-extrabold text-sm">${vol}枚</span> のチラシが、<span class="text-primary font-extrabold text-sm">${membersCount}人</span> の手によって、<span class="text-primary font-extrabold text-sm">${citiesCount}つ</span> の地域で配布されました。`;
-  }
-
-  if (topCityEl) {
-    if (data.topCityName && data.topCityName !== '-') {
-      topCityEl.textContent = `${data.topCityName} (${(data.topCityQuantity || 0).toLocaleString()}枚)`;
-    } else {
-      topCityEl.textContent = '- (0枚)';
-    }
-  }
-
-  // 1. Render Flyer Holding Status Table (No home/address info, only ID, name, city, count)
-  const holdingTableBody = document.getElementById('holding-list-table-body');
-  holdingTableBody.innerHTML = '';
-  if (data.members && data.members.length > 0) {
-    data.members.forEach(m => {
-      const row = document.createElement('tr');
-      row.className = 'border-b border-default text-xs';
-      row.innerHTML = `
-        <td class="py-3 px-4 font-mono font-bold">${m.staffNo}</td>
-        <td class="py-3 px-4 font-bold">${m.displayName}</td>
-        <td class="py-3 px-4 text-secondary">${m.cityName || '-'}</td>
-        <td class="py-3 px-4 text-right font-extrabold text-primary">${(m.holdingQuantity || 0).toLocaleString()}枚</td>
-      `;
-      holdingTableBody.appendChild(row);
-    });
-  } else {
-    holdingTableBody.innerHTML = `
-      <tr>
-        <td colspan="4" class="py-4 text-center text-secondary text-xs">登録されている党員さん・サポーターさんがいません</td>
-      </tr>
-    `;
-  }
-
-  // 1.5. Render City Posting Activity Status Table
-  const cityTableBody = document.getElementById('city-activity-table-body');
-  if (cityTableBody) {
-    cityTableBody.innerHTML = '';
-    if (data.cityActivities && data.cityActivities.length > 0) {
-      data.cityActivities.forEach(c => {
-        const row = document.createElement('tr');
-        row.className = 'border-b border-default text-xs';
-        row.innerHTML = `
-          <td class="py-3 px-4 font-bold">${c.cityName}</td>
-          <td class="py-3 px-4 text-right font-extrabold text-primary">${(c.quantity || 0).toLocaleString()}枚</td>
-        `;
-        cityTableBody.appendChild(row);
-      });
-    } else {
-      cityTableBody.innerHTML = `
-        <tr>
-          <td colspan="2" class="py-4 text-center text-secondary text-xs">市町村別の活動実績がありません</td>
-        </tr>
-      `;
-    }
-  }
-
-  // 2. Render Activity Trend chart
-  const chartContainer = document.getElementById('monthly-trend-chart');
-  chartContainer.innerHTML = '';
-  if (data.monthlyTrend && data.monthlyTrend.length > 0) {
-    const maxVal = Math.max(...data.monthlyTrend.map(t => t.quantity), 1);
-    data.monthlyTrend.forEach(t => {
-      const barHeight = Math.max(Math.round((t.quantity / maxVal) * 90), 4);
-      const barWrapper = document.createElement('div');
-      barWrapper.className = 'flex flex-col items-center flex-1 group';
-      barWrapper.innerHTML = `
-        <span class="text-[9px] font-bold text-secondary mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">${t.quantity.toLocaleString()}枚</span>
-        <div class="w-8 bg-primary/20 hover:bg-primary/80 border border-primary/40 rounded-t transition-all duration-300" style="height: ${barHeight}px;"></div>
-        <span class="text-[10px] font-bold text-secondary mt-2">${t.month}</span>
-      `;
-      chartContainer.appendChild(barWrapper);
-    });
-  } else {
-    chartContainer.innerHTML = '<p class="text-sm text-secondary py-2 w-full text-center">推移データがありません</p>';
-  }
-
-  // 3. Render New Members list (Term sanitized to "新規の党員さん・サポーターさん")
-  const newMembersContainer = document.getElementById('new-members-list');
-  newMembersContainer.innerHTML = '';
-  if (data.newMembers && data.newMembers.length > 0) {
-    data.newMembers.forEach(m => {
-      const item = document.createElement('div');
-      item.className = 'py-4 flex justify-between items-center text-sm border-b border-default';
-      item.innerHTML = `
-        <div>
-          <p class="font-bold">${m.displayName}</p>
-          <div class="flex gap-4 text-xs text-secondary mt-1">
-            <span>登録: ${m.registeredAt}</span>
-            <span>初活動: ${m.firstActivityDate}</span>
-          </div>
-        </div>
-        <div class="text-right">
-          <p class="font-extrabold text-primary">${m.holdingQuantity.toLocaleString()}枚</p>
-          <p class="text-[9px] text-secondary uppercase tracking-widest">チラシ保有数</p>
-        </div>
-      `;
-      newMembersContainer.appendChild(item);
-    });
-  } else {
-    newMembersContainer.innerHTML = '<p class="text-sm text-secondary py-2">今月の新規登録はありません</p>';
-  }
-
-  // 4. Render Ranking list (Term sanitized to "ポスティング活動実績")
-  const rankingContainer = document.getElementById('ranking-list');
-  rankingContainer.innerHTML = '';
-  if (data.members && data.members.length > 0) {
-    const sortedMembers = [...data.members].sort((a,b) => b.monthlyDistributionQuantity - a.monthlyDistributionQuantity);
-    sortedMembers.forEach((m, idx) => {
-      const item = document.createElement('div');
-      item.className = 'py-4 flex justify-between items-center text-sm border-b border-default';
-      
-      let rankBadge = `${idx + 1}`;
-      if (idx === 0) rankBadge = '🥇';
-      else if (idx === 1) rankBadge = '🥈';
-      else if (idx === 2) rankBadge = '🥉';
-
-      item.innerHTML = `
-        <div class="flex items-center gap-4">
-          <span class="text-lg font-black w-8 text-center">${rankBadge}</span>
-          <div>
-            <p class="font-bold">${m.displayName}</p>
-            <div class="flex gap-3 text-[10px] text-secondary mt-0.5">
-              <span>活動日: ${m.activityDays}日</span>
-              <span class="text-primary font-bold">Index: ${m.activityIndex}</span>
-            </div>
-          </div>
-        </div>
-        <div class="text-right">
-          <p class="font-extrabold">${m.monthlyDistributionQuantity.toLocaleString()}枚</p>
-          <p class="text-[9px] text-secondary tracking-widest uppercase">今月のポスティング実績</p>
-        </div>
-      `;
-      rankingContainer.appendChild(item);
-    });
-  } else {
-    rankingContainer.innerHTML = '<p class="text-sm text-secondary py-2">活動ログがありません</p>';
-  }
-
-  // 5. Render Invitation Email Template options in the dropdown
-  const select = document.getElementById('email-template-select');
-  select.innerHTML = '';
-  if (data.emailTemplates && data.emailTemplates.length > 0) {
-    data.emailTemplates.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t.templateId;
-      opt.textContent = t.templateName;
-      opt.className = 'bg-black text-white';
-      select.appendChild(opt);
-    });
-    updateTemplatePreview();
-  } else {
-    select.innerHTML = '<option value="">テンプレートがありません</option>';
-    document.getElementById('email-template-subject').value = '';
-    document.getElementById('email-template-body-preview').textContent = '';
-  }
-
-  // 6. Settings tab values
+  // Settings tab values
   document.getElementById('settings-workspace-name').textContent = branchName;
   document.getElementById('settings-workspace-id').textContent = data.workspaceId || workspaceId;
   document.getElementById('settings-subscription-status').textContent = 'ACTIVE';
@@ -357,81 +159,240 @@ function renderDashboard(data) {
 
   // Goal configuration in settings
   const goalInput = document.getElementById('settings-goal-input');
-  const metaContainer = document.getElementById('settings-goal-meta-container');
-  const updatedAtEl = document.getElementById('settings-goal-updated-at');
-  const updatedByEl = document.getElementById('settings-goal-updated-by');
-
-  if (goalInput && metaContainer && updatedAtEl && updatedByEl) {
+  if (goalInput) {
     goalInput.value = data.distributionGoal !== undefined && data.distributionGoal !== null ? data.distributionGoal : '';
-    if (data.goalUpdatedAt) {
-      try {
-        const d = new Date(data.goalUpdatedAt);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const date = String(d.getDate()).padStart(2, '0');
-        const hh = String(d.getHours()).padStart(2, '0');
-        const mm = String(d.getMinutes()).padStart(2, '0');
-        updatedAtEl.textContent = `${y}/${m}/${date} ${hh}:${mm}`;
-      } catch (e) {
-        updatedAtEl.textContent = data.goalUpdatedAt;
-      }
-      updatedByEl.textContent = data.goalUpdatedBy || '-';
-      metaContainer.style.display = 'flex';
+  }
+}
+
+// ==========================================
+// P-05: Dashboard Editing Foundation (Facts)
+// ==========================================
+async function fetchFacts() {
+  const dateObj = document.getElementById('fact-filter-date');
+  const areaObj = document.getElementById('fact-filter-area');
+  
+  const dateVal = dateObj ? dateObj.value.replace(/-/g, '/') : '';
+  const areaVal = areaObj ? areaObj.value : '';
+
+  let url = `${API_URL}?action=dashboard/facts&page=${currentFactPage}&limit=${currentFactLimit}`;
+  if (dateVal) url += `&date=${encodeURIComponent(dateVal)}`;
+  if (areaVal) url += `&area=${encodeURIComponent(areaVal)}`;
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+    if (json.success) {
+      currentFactsData = json.data;
+      renderFactList(json.data);
     } else {
-      metaContainer.style.display = 'none';
+      console.error('Fact API Error:', json);
     }
-  }
-
-  // 7. Performance Panel (Developer Mode)
-  const isDevUrl = urlParams.get('dev') === 'true';
-  const isAdmin = googleUser && (googleUser.email.includes('iwasa') || googleUser.email.includes('manager') || googleUser.email.includes('admin') || googleUser.email.includes('system'));
-  const perfPanel = document.getElementById('performance-panel');
-  
-  if (isDevUrl && isAdmin && data.performanceMetrics && perfPanel) {
-    const pm = data.performanceMetrics;
-    perfPanel.classList.remove('hidden');
-    document.getElementById('perf-generated-at').textContent = pm.generatedAt || '-';
-    document.getElementById('perf-response-time').textContent = pm.responseTimeMs !== undefined ? `${pm.responseTimeMs}ms` : '-';
-    document.getElementById('perf-ss-read').textContent = pm.spreadsheetReadCount !== undefined ? `${pm.spreadsheetReadCount}` : '-';
-    document.getElementById('perf-repo-calls').textContent = pm.repositoryCallCount !== undefined ? `${pm.repositoryCallCount}` : '-';
-    
-    const loadedCount = (pm.activityRecordCount || 0) + (pm.holdingRecordCount || 0) + (pm.staffRecordCount || 0);
-    document.getElementById('perf-loaded-records').textContent = `${loadedCount}`;
-  } else if (perfPanel) {
-    perfPanel.classList.add('hidden');
+  } catch (e) {
+    console.error(e);
   }
 }
 
-function updateTemplatePreview() {
-  if (!dashboardData || !dashboardData.emailTemplates || dashboardData.emailTemplates.length === 0) return;
-  const select = document.getElementById('email-template-select');
-  const selectedId = select.value;
-  const template = dashboardData.emailTemplates.find(t => t.templateId === selectedId) || dashboardData.emailTemplates[0];
-
-  const branchName = dashboardData.name || workspaceId;
-  const lineAppUrl = dashboardData.lineAppUrl || 'https://liff.line.me/...';
-
-  const subject = template.subject || 'ポスティング活動に参加のお願い';
-  const bodyResolved = (template.body || '')
-    .replace(/\{\{workspaceName\}\}/g, branchName)
-    .replace(/\{\{lineAppUrl\}\}/g, lineAppUrl);
-
-  document.getElementById('email-template-subject').value = subject;
-  document.getElementById('email-template-body-preview').textContent = bodyResolved;
-}
-
-function onTemplateSelectChange() {
-  updateTemplatePreview();
-}
-
-function launchEmailClient() {
-  if (!dashboardData) return;
-  const subject = document.getElementById('email-template-subject').value;
-  const body = document.getElementById('email-template-body-preview').textContent;
+function renderFactList(data) {
+  const tbody = document.getElementById('fact-list-table-body');
+  tbody.innerHTML = '';
   
-  const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoUrl;
+  if (!data || !data.items || data.items.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="py-4 text-center text-secondary text-xs">データがありません</td></tr>';
+    document.getElementById('fact-pagination-info').textContent = '0 件表示';
+    return;
+  }
+
+  data.items.forEach(fact => {
+    const row = document.createElement('tr');
+    row.className = 'border-b border-default text-xs';
+    row.innerHTML = `
+      <td class="py-3 px-4 font-mono">${fact.date || '-'}</td>
+      <td class="py-3 px-4">${fact.district || '-'}</td>
+      <td class="py-3 px-4">${fact.area || '-'}</td>
+      <td class="py-3 px-4 text-right font-extrabold text-primary">${(fact.distributionCount || 0).toLocaleString()}枚</td>
+      <td class="py-3 px-4 text-center">
+        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${fact.syncStatus === 'SYNCED' ? 'bg-emerald-400/20 text-emerald-400' : 'bg-red-400/20 text-red-400'}">${fact.syncStatus}</span>
+      </td>
+      <td class="py-3 px-4 text-center">
+        <button onclick="showFactDetail('${fact.id}')" class="text-xs font-bold text-secondary hover:text-white border border-default rounded px-3 py-1 hover:bg-white/5 transition-all">詳細</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  const start = (currentFactPage - 1) * currentFactLimit + 1;
+  const end = start + data.items.length - 1;
+  document.getElementById('fact-pagination-info').textContent = `${start} - ${end} 件 / ${data.totalCount} 件`;
 }
+
+function changeFactPage(delta) {
+  if (!currentFactsData) return;
+  const maxPage = Math.ceil(currentFactsData.totalCount / currentFactLimit);
+  const newPage = currentFactPage + delta;
+  if (newPage < 1 || newPage > maxPage) return;
+  currentFactPage = newPage;
+  fetchFacts();
+}
+
+async function showFactDetail(id) {
+  showLoading(true);
+  try {
+    const res = await fetch(`${API_URL}?action=dashboard/facts/detail&id=${encodeURIComponent(id)}`);
+    const json = await res.json();
+    if (json.success && json.data) {
+      const fact = json.data;
+      document.getElementById('fact-detail-date').textContent = fact.date || '-';
+      document.getElementById('fact-detail-sync').textContent = fact.syncStatus || '-';
+      document.getElementById('fact-detail-district').textContent = fact.district || '-';
+      document.getElementById('fact-detail-area').textContent = fact.area || '-';
+      document.getElementById('fact-detail-count').textContent = `${(fact.distributionCount || 0).toLocaleString()}枚`;
+      document.getElementById('fact-detail-gps').textContent = fact.gpsEvidence || 'なし';
+      
+      const photoContainer = document.getElementById('fact-detail-photo-container');
+      if (fact.photoEvidence) {
+        photoContainer.innerHTML = `<img src="${fact.photoEvidence}" class="object-cover w-full h-full" />`;
+      } else {
+        photoContainer.innerHTML = 'NO PHOTO';
+      }
+
+      document.getElementById('fact-detail-modal').classList.remove('hidden');
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    showLoading(false);
+  }
+}
+
+function closeFactDetailModal() {
+  document.getElementById('fact-detail-modal').classList.add('hidden');
+}
+
+
+// ==========================================
+// P-05: Dashboard Editing Foundation (Holdings)
+// ==========================================
+async function fetchHoldings() {
+  try {
+    const res = await fetch(`${API_URL}?action=dashboard/holdings`);
+    const json = await res.json();
+    if (json.success) {
+      renderHoldingsList(json.data);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function renderHoldingsList(holdings) {
+  const tbody = document.getElementById('holding-list-table-body');
+  tbody.innerHTML = '';
+  
+  if (!holdings || holdings.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-secondary text-xs">登録されている保管場所がありません</td></tr>';
+    return;
+  }
+
+  holdings.forEach(h => {
+    const row = document.createElement('tr');
+    row.className = 'border-b border-default text-xs';
+    row.innerHTML = `
+      <td class="py-3 px-4 font-mono font-bold">${h.keeper}</td>
+      <td class="py-3 px-4 font-bold">-</td>
+      <td class="py-3 px-4 text-secondary">${h.location || '-'}</td>
+      <td class="py-3 px-4 text-right font-extrabold text-primary">${(h.currentHoldings || 0).toLocaleString()}枚</td>
+      <td class="py-3 px-4 text-center flex justify-center gap-2">
+        <button onclick="openHoldingModal('${h.keeper}', '${h.location || ''}', ${h.currentHoldings})" class="text-xs font-bold text-secondary hover:text-white border border-default rounded px-3 py-1 hover:bg-white/5 transition-all">編集</button>
+        <button onclick="deleteHolding('${h.keeper}')" class="text-xs font-bold text-red-400 hover:text-red-300 border border-red-500/30 rounded px-3 py-1 hover:bg-red-500/10 transition-all">削除</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function openHoldingModal(keeper = '', location = '', count = 0) {
+  const isEdit = !!keeper;
+  document.getElementById('holding-modal-title').textContent = isEdit ? '保管場所 編集' : '保管場所 新規追加';
+  document.getElementById('holding-mode').value = isEdit ? 'update' : 'add';
+  
+  const keeperInput = document.getElementById('holding-keeper-input');
+  keeperInput.value = keeper;
+  keeperInput.readOnly = isEdit; // Do not allow changing keeper ID during edit
+  
+  document.getElementById('holding-location-input').value = location;
+  document.getElementById('holding-count-input').value = count;
+  
+  document.getElementById('holding-edit-modal').classList.remove('hidden');
+}
+
+function closeHoldingModal() {
+  document.getElementById('holding-edit-modal').classList.add('hidden');
+}
+
+async function saveHolding(event) {
+  event.preventDefault();
+  const mode = document.getElementById('holding-mode').value;
+  const keeper = document.getElementById('holding-keeper-input').value;
+  const location = document.getElementById('holding-location-input').value;
+  const count = Number(document.getElementById('holding-count-input').value);
+  
+  const payload = {
+    action: mode === 'add' ? 'dashboard/holdings/add' : 'dashboard/holdings/update',
+    dto: {
+      holdingId: keeper,
+      workspaceId: workspaceId,
+      location: location,
+      keeper: keeper,
+      currentHoldings: count,
+      updatedAt: new Date().toISOString()
+    }
+  };
+
+  showLoading(true);
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (result.success) {
+      closeHoldingModal();
+      fetchHoldings(); // Refresh list
+    } else {
+      alert('保存に失敗しました: ' + (result.error || '不明なエラー'));
+    }
+  } catch (e) {
+    alert('通信エラー: ' + e.message);
+  } finally {
+    showLoading(false);
+  }
+}
+
+async function deleteHolding(keeper) {
+  if (!confirm(`本当に保管者 ${keeper} の記録を削除しますか？`)) return;
+  
+  showLoading(true);
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'dashboard/holdings/delete',
+        keeper: keeper
+      })
+    });
+    const result = await res.json();
+    if (result.success) {
+      fetchHoldings(); // Refresh list
+    } else {
+      alert('削除に失敗しました: ' + (result.error || '不明なエラー'));
+    }
+  } catch (e) {
+    alert('通信エラー: ' + e.message);
+  } finally {
+    showLoading(false);
+  }
+}
+
 
 function showScreen(id) {
   document.getElementById('auth-screen').classList.add('hidden');
@@ -461,56 +422,5 @@ function showError(msg) {
   alert(msg);
 }
 
-// Save goal to backend
-async function saveGoal() {
-  if (!googleUser || !dashboardData) return;
-  const goalInput = document.getElementById('settings-goal-input');
-  const goalVal = goalInput.value.trim();
-
-  if (goalVal === '') {
-    alert('目標枚数を入力してください。');
-    return;
-  }
-
-  const goalNum = Number(goalVal);
-  if (isNaN(goalNum) || goalNum < 0) {
-    alert('正しい目標枚数を入力してください。');
-    return;
-  }
-
-  showLoading(true);
-
-  const url = `${API_URL}`;
-  const bodyPayload = {
-    action: 'updateWorkspaceGoal',
-    workspaceId: dashboardData.workspaceId || workspaceId,
-    distributionGoal: goalNum,
-    updatedBy: googleUser.email
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(bodyPayload)
-    });
-    const result = await response.json();
-
-    if (result && result.success) {
-      const freshData = await fetchDashboardData(googleUser.email);
-      if (freshData) {
-        renderDashboard(freshData.data || freshData);
-      }
-      alert('目標を設定しました。');
-    } else {
-      alert('目標の保存に失敗しました。: ' + (result.message || 'エラー'));
-    }
-  } catch (e) {
-    alert('通信エラーが発生しました。: ' + e.message);
-  } finally {
-    showLoading(false);
-  }
-}
-
 // Start checks
 checkAuth();
-
