@@ -59,19 +59,7 @@ class FieldOperationsAdapter {
           const areaFieldEvents = tenantFieldEvents.filter(e => e.regionId === r.regionId && e.areaId === a.areaId);
           const areaTimelineEvents = tenantTimelineEvents.filter(e => e.regionId === r.regionId && e.areaId === a.areaId);
 
-          // 目標数を 100 とする決定論的カバー率算出
-          const targetLimit = 100;
           const eventCount = areaFieldEvents.length;
-          const completedCount = Math.min(eventCount, targetLimit);
-          const coverageRate = Math.min(Math.round((completedCount / targetLimit) * 100), 100);
-
-          // 決定論的 Status 分類ルール
-          let status = 'LOW';
-          if (coverageRate >= 80) {
-            status = 'COMPLETE';
-          } else if (coverageRate >= 50) {
-            status = 'NORMAL';
-          }
 
           let lastActivity = '-';
           if (areaFieldEvents.length > 0) {
@@ -83,14 +71,23 @@ class FieldOperationsAdapter {
             areaId: a.areaId,
             fieldEventsCount: eventCount,
             timelineEventsCount: areaTimelineEvents.length,
-            completedCount,
-            coverageRate,
-            lastActivity,
-            status
+            lastActivity
           });
         });
       }
     });
+
+    let inventories = [];
+    try {
+      const app = (window.DashboardApplication && typeof window.DashboardApplication.getInstance === 'function')
+        ? window.DashboardApplication.getInstance()
+        : null;
+      if (app && app.stateModel) {
+        inventories = app.stateModel.getInventories() || [];
+      }
+    } catch (e) {
+      console.warn('[FieldOperationsAdapter] Failed to resolve inventories from stateModel:', e);
+    }
 
     return Object.freeze({
       tenantContext: Object.freeze({
@@ -99,7 +96,8 @@ class FieldOperationsAdapter {
         totalFieldEvents: tenantFieldEvents.length
       }),
       regionSummary: Object.freeze(regionSummary.map(r => Object.freeze(r))),
-      areaOperations: Object.freeze(areaOperations.map(a => Object.freeze(a)))
+      areaOperations: Object.freeze(areaOperations.map(a => Object.freeze(a))),
+      inventories: Object.freeze(inventories.map(i => Object.freeze(i)))
     });
   }
 }

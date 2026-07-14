@@ -51,15 +51,8 @@ export class ActivityApplicationService {
 
     await this.activityRepository.save(activity);
 
-    // Coordinate with FlyerHolding inventory if repository is present
-    if (this.holdingRepository) {
-      const holding = await this.holdingRepository.findByStaffNo(command.staffNo);
-      if (holding) {
-        const holdingEvents = holding.consume(new Quantity(command.quantity));
-        await this.holdingRepository.save(holding);
-        domainEvents.push(...holdingEvents);
-      }
-    }
+    // [POSTING MAP 憲法] 自動計算・自動減算の廃止に伴い、配布実績発生時の自動在庫減算（consume）は行わない。
+    // (将来の保管・棚卸し画面等のために、引数 holdingRepository 自体は維持します)
 
     // Publish all accumulated domain events
     for (const event of domainEvents) {

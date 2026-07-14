@@ -40,6 +40,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 4. システムの起動開始
   try {
+    (window as any).DashboardApplication = DashboardApplication;
     await DashboardApplication.getInstance().start(root as HTMLElement, apiUrl, tenantId, branchId);
   } catch (err) {
     console.error('[DashboardBootstrap] Application startup failed', err);

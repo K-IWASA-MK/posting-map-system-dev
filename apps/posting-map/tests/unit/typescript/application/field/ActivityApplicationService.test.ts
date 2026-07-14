@@ -98,19 +98,19 @@ async function runTests() {
   assert(dto.latitude === 34.965, 'latitude mismatch');
   assert(dto.longitude === 136.622, 'longitude mismatch');
 
-  // Verify stock decrement
+  // Verify stock is NOT decremented (POSTING MAP 憲法: 自動減算の廃止)
   const updatedHolding = await holdingRepo.findByStaffNo('S037');
   assert(updatedHolding !== undefined, 'holding should exist');
-  assert(updatedHolding!.getQuantity().getValue() === 90, 'stock should be 90');
+  assert(updatedHolding!.getQuantity().getValue() === 150, 'stock should remain 150 (not automatically decremented)');
 
   // Verify domain events published
   // Should trigger:
   // 1. DistributionActivityCompleted (from activity complete)
-  // 2. FlyerShortageWarning (from holding consume below threshold)
-  // 3. DistributionActivityRecordedEvent (legacy event compatibility)
+  // 2. DistributionActivityRecordedEvent (legacy event compatibility)
+  // (FlyerShortageWarning is NOT triggered as inventory is not automatically decremented)
   const eventTypes = publisher.publishedEvents.map(e => e.eventType);
   assert(eventTypes.includes('DistributionActivityCompleted'), 'missing DistributionActivityCompleted event');
-  assert(eventTypes.includes('FlyerShortageWarning'), 'missing FlyerShortageWarning event');
+  assert(!eventTypes.includes('FlyerShortageWarning'), 'FlyerShortageWarning should not be raised on auto-deductions');
   assert(eventTypes.includes('DistributionActivityRecordedEvent'), 'missing legacy DistributionActivityRecordedEvent event');
 
   console.log('[Test ActivityApplicationService] All tests PASSED.');

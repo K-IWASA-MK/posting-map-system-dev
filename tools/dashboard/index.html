@@ -320,81 +320,75 @@
         <div class="grid grid-cols-12 gap-6 overflow-hidden animate-entry-card delay-300">
           <!-- Inventory (col-span-8) -->
           <section class="col-span-8 premium-glass p-5 flex flex-col gap-2 overflow-hidden">
-            <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
+            <!-- Card Header Design System Unified -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">保管状況</h3>
-                <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Inventory Stock Level</p>
+                <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">保管状況 (Flyer Holdings)</h3>
+                <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">User-Inputted Stocks</p>
               </div>
               <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
                 <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
-                <span class="text-[7px] font-bold text-blue-400 tracking-widest font-mono">SYNC</span>
+                <span class="text-[7px] font-bold text-blue-400 tracking-widest font-mono">FACT</span>
               </div>
             </div>
-            <!-- SVG Bar Chart -->
-            <div class="flex-1 w-full h-full flex items-end justify-between px-6 pb-2">
-              <div class="w-[8%] bg-brand/25 border border-brand/40 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/50 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 40%"></div>
-              <div class="w-[8%] bg-brand/40 border border-brand/50 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/60 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 65%"></div>
-              <div class="w-[8%] bg-brand/15 border border-brand/35 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/30 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 25%"></div>
-              <div class="w-[8%] bg-brand/50 border border-brand/70 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/70 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 85%"></div>
-              <div class="w-[8%] bg-brand/30 border border-brand/45 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/50 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 50%"></div>
-              <div class="w-[8%] bg-brand/20 border border-brand/40 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-brand/40 hover:shadow-[0_0_12px_rgba(217,90,16,0.3)] cursor-pointer" style="height: 35%"></div>
-              <div class="w-[8%] bg-[#22c55e]/25 border border-[#22c55e]/45 rounded-t-md transition-all duration-300 hover:scale-y-105 origin-bottom hover:bg-[#22c55e]/45 hover:shadow-[0_0_12px_rgba(34,197,94,0.3)] cursor-pointer" style="height: 70%"></div>
+            <!-- Flyer Holdings List -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 text-xs">
+              <div class="flex justify-between items-center bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl">
+                <div>
+                  <div class="font-bold text-white/80">桑名倉庫</div>
+                  <div class="text-[9px] text-white/30 mt-0.5">最終更新: 2026-07-15 18:20</div>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold font-mono text-sm text-[#D95A10]">3,500</span> <span class="text-[10px] text-white/40">枚</span>
+                </div>
+              </div>
+              <div class="flex justify-between items-center bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl">
+                <div>
+                  <div class="font-bold text-white/80">○○さん宅</div>
+                  <div class="text-[9px] text-white/30 mt-0.5">最終更新: 2026-07-15 18:20</div>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold font-mono text-sm text-[#D95A10]">800</span> <span class="text-[10px] text-white/40">枚</span>
+                </div>
+              </div>
+              <div class="flex justify-between items-center bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl">
+                <div>
+                  <div class="font-bold text-white/80">△△支部</div>
+                  <div class="text-[9px] text-white/30 mt-0.5">最終更新: 2026-07-15 18:15</div>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold font-mono text-sm text-[#D95A10]">2,000</span> <span class="text-[10px] text-white/40">枚</span>
+                </div>
+              </div>
             </div>
           </section>
 
-          <!-- Turnout Panel (col-span-4) -->
+          <!-- Distribution Status (col-span-4) -->
           <section class="col-span-4 premium-glass p-5 flex flex-col gap-2 overflow-hidden">
-            <!-- Card Header Design System Unified (Sprint 1-5.2 Typography polished) -->
+            <!-- Card Header Design System Unified -->
             <div class="flex justify-between items-center border-b border-[rgba(255,255,255,0.04)] pb-2.5 mb-3 flex-shrink-0 select-none">
               <div>
-                <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">市別投票率</h3>
-                <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Turnout Progress</p>
+                <h3 class="text-[14px] font-black text-white tracking-tight brand-title-glow">実績集計</h3>
+                <p class="text-[7.5px] font-bold text-white/20 tracking-[0.12em] uppercase mt-0.5">Factual Distribution Counts</p>
               </div>
-              <div class="flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
-                <span class="w-1 h-1 bg-blue-500 rounded-full"></span>
-                <span class="text-[7px] font-bold text-blue-400 tracking-widest font-mono">TARGET</span>
+              <div class="flex items-center gap-1.5 bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+                <span class="w-1 h-1 bg-green-500 rounded-full"></span>
+                <span class="text-[7px] font-bold text-green-400 tracking-widest font-mono">COUNT</span>
               </div>
             </div>
-            <!-- Concrete progress bars -->
+            <!-- Simple count rows -->
             <div class="flex-1 flex flex-col justify-center gap-3 overflow-y-auto custom-scrollbar pr-1">
-              <div class="space-y-1 select-none">
-                <div class="flex justify-between items-baseline text-xs">
-                  <span class="text-white/60 text-[11px]">鈴鹿市</span>
-                  <div class="flex items-center gap-2">
-                    <span class="text-white font-bold text-sm tracking-tight">67.43 %</span>
-                    <span class="text-[9px] text-green-500 font-mono font-bold">+11.17 ▲</span>
-                  </div>
-                </div>
-                <div class="w-full h-[2px] bg-brand-bg rounded-full overflow-hidden">
-                  <div class="h-full bg-brand rounded-full transition-all duration-1000" style="width: 67.43%"></div>
-                </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-white/60">鈴鹿市</span>
+                <span class="text-white font-bold font-mono">1,200 枚</span>
               </div>
-              
-              <div class="space-y-1 select-none">
-                <div class="flex justify-between items-baseline text-xs">
-                  <span class="text-white/60 text-[11px]">津市</span>
-                  <div class="flex items-center gap-2">
-                    <span class="text-white font-bold text-sm tracking-tight">52.12 %</span>
-                    <span class="text-[9px] text-green-500 font-mono font-bold">+8.45 ▲</span>
-                  </div>
-                </div>
-                <div class="w-full h-[2px] bg-brand-bg rounded-full overflow-hidden">
-                  <div class="h-full bg-brand rounded-full transition-all duration-1000" style="width: 52.12%"></div>
-                </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-white/60">津市</span>
+                <span class="text-white font-bold font-mono">800 枚</span>
               </div>
-
-              <div class="space-y-1 select-none">
-                <div class="flex justify-between items-baseline text-xs">
-                  <span class="text-white/60 text-[11px]">四日市市</span>
-                  <div class="flex items-center gap-2">
-                    <span class="text-white font-bold text-sm tracking-tight">41.80 %</span>
-                    <span class="text-[9px] text-blue-500 font-mono font-bold">+3.20 ▲</span>
-                  </div>
-                </div>
-                <div class="w-full h-[2px] bg-brand-bg rounded-full overflow-hidden">
-                  <div class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: 41.80%"></div>
-                </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-white/60">四日市市</span>
+                <span class="text-white font-bold font-mono">1,500 枚</span>
               </div>
             </div>
           </section>

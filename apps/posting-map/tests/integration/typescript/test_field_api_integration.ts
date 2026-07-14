@@ -244,7 +244,7 @@ async function runTests() {
 
     const result = response.body.data;
     assert(result.success === true, 'ReservationResult success must be true');
-    assert(result.stock.quantity === 700, 'FlyerHolding quantity must be updated to 700 (automatic subtraction)');
+    assert(result.stock.quantity === 1000, 'FlyerHolding quantity must NOT be updated upon activity recording (Constitution compliance)');
     assert(result.eventIds.length >= 1, 'Event ID must be mapped and returned');
     assert(result.eventIds[0].indexOf('EV-DAR') === 0, 'Event ID must start with EV-DAR');
 

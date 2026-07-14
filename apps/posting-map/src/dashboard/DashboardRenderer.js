@@ -277,7 +277,7 @@ class DashboardRenderer {
         }
       ];
     } else if (viewMode === 'operations') {
-      const opsData = window.FieldOperationsAdapter ? window.FieldOperationsAdapter.getFieldOperationsData() : { tenantContext: {}, regionSummary: [], areaOperations: [] };
+      const opsData = window.FieldOperationsAdapter ? window.FieldOperationsAdapter.getFieldOperationsData() : { tenantContext: {}, regionSummary: [], areaOperations: [], inventories: [] };
       components = [
         {
           key: 'FieldOperationsCard',
@@ -288,6 +288,11 @@ class DashboardRenderer {
           key: 'AreaOperationsStatusCard',
           render: () => window.AreaOperationsStatusCard.render({ areaOperations: opsData.areaOperations, delay: 200 }),
           props: opsData.areaOperations
+        },
+        {
+          key: 'FlyerHoldingsCard',
+          render: () => window.FlyerHoldingsCard.render({ inventories: opsData.inventories, delay: 250 }),
+          props: opsData.inventories
         }
       ];
     } else if (viewMode === 'analytics') {
@@ -1477,6 +1482,16 @@ class DashboardRenderer {
       if (el) {
         el.outerHTML = window.AreaOperationsStatusCard.render({ areaOperations: opsData.areaOperations, delay: 0 });
         const newEl = gridContainer.children[1];
+        if (newEl) DashboardRenderer.activateMotion(newEl);
+      }
+    }
+
+    // 2: FlyerHoldingsCard
+    if (window.FlyerHoldingsCard && window.DashboardRenderCache.hasChanged('FlyerHoldingsCard', opsData.inventories)) {
+      const el = gridContainer.children[2];
+      if (el) {
+        el.outerHTML = window.FlyerHoldingsCard.render({ inventories: opsData.inventories, delay: 0 });
+        const newEl = gridContainer.children[2];
         if (newEl) DashboardRenderer.activateMotion(newEl);
       }
     }

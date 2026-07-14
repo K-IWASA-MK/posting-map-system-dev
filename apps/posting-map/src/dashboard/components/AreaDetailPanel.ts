@@ -150,8 +150,7 @@ export class AreaDetailPanel {
       { label: '地区コード', val: area.areaId },
       { label: '所属市区町村', val: area.cityName || '未設定' },
       { label: '目標世帯数', val: `${area.totalHouseholds.toLocaleString()} 世帯` },
-      { label: '配布完了数', val: `${area.doneCount.toLocaleString()} 枚` },
-      { label: '進捗率', val: `${area.progressRate}%` }
+      { label: '配布完了数', val: `${area.doneCount.toLocaleString()} 枚` }
     ];
     specs.forEach(spec => {
       const row = document.createElement('div');
@@ -193,19 +192,6 @@ export class AreaDetailPanel {
       }
     } catch (e) {}
 
-    let inventoryText = '情報なし';
-    let isInventoryLow = false;
-    const invLog = areaLogs.find(l => l.meta && (l.meta.remainingSheets !== undefined || l.meta.remaining !== undefined));
-    if (invLog) {
-      const remaining = invLog.meta.remainingSheets !== undefined ? invLog.meta.remainingSheets : invLog.meta.remaining;
-      const threshold = invLog.meta.lowStockThreshold || 100;
-      inventoryText = `${remaining} 枚`;
-      if (remaining < threshold) {
-        inventoryText += ' (手持ち僅少)';
-        isInventoryLow = true;
-      }
-    }
-
     let gpsText = '測位なし';
     const gpsLog = areaLogs.find(l => typeof l.latitude === 'number' && typeof l.longitude === 'number' && l.latitude !== 0 && l.longitude !== 0);
     if (gpsLog) {
@@ -222,9 +208,8 @@ export class AreaDetailPanel {
 
     this.fieldContainer.innerHTML = '';
     
-    const fieldRows = [
+    const fieldRows: { label: string; val: string; isBadge?: boolean; link?: string; color?: string; }[] = [
       { label: '活動状況', val: distStatus, isBadge: true },
-      { label: '手持ちチラシ残数', val: inventoryText, color: isInventoryLow ? '#ef4444' : '#ffffff' },
       { label: '最新GPS位置取得', val: gpsText },
       { label: '最新写真証跡', val: photoText, link: photoUrl }
     ];
