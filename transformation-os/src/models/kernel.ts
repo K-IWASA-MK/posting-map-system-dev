@@ -45,7 +45,7 @@ export interface ExecutionAttempt {
  * ExecutionPhase
  * Represents the lifecycle state of a single execution attempt.
  */
-export type ExecutionPhase = "STARTED" | "COMPLETED" | "FAILED" | "TIMEOUT" | "CANCELLED";
+export type ExecutionPhase = "QUEUED" | "DISPATCHED" | "STARTED" | "COMPLETED" | "FAILED" | "TIMEOUT" | "CANCELLED";
 
 /**
  * ExecutionRecord
