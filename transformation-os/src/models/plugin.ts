@@ -32,8 +32,8 @@ export enum PluginOrigin {
 
 export type PluginState = 
   | 'DISCOVERED'
-  | 'REGISTERED'
-  | 'LOADED'
+  | 'TRUSTED'
+  | 'ACTIVATING'
   | 'ACTIVE'
   | 'SUSPENDED'
   | 'UNLOADED'

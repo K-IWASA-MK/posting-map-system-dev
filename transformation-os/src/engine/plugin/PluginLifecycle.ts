@@ -10,9 +10,9 @@ import { PluginState } from '../../models/plugin';
 export class PluginLifecyclePolicy {
   
   private static readonly VALID_TRANSITIONS: Record<PluginState, ReadonlySet<PluginState>> = {
-    'DISCOVERED': new Set(['REGISTERED', 'FAILED']),
-    'REGISTERED': new Set(['LOADED', 'UNLOADED', 'FAILED']),
-    'LOADED': new Set(['ACTIVE', 'UNLOADED', 'FAILED']),
+    'DISCOVERED': new Set(['TRUSTED', 'FAILED']),
+    'TRUSTED': new Set(['ACTIVATING', 'FAILED']),
+    'ACTIVATING': new Set(['ACTIVE', 'FAILED']),
     'ACTIVE': new Set(['SUSPENDED', 'UNLOADED', 'FAILED']),
     'SUSPENDED': new Set(['ACTIVE', 'UNLOADED', 'FAILED']),
     'UNLOADED': new Set([]), // Terminal state

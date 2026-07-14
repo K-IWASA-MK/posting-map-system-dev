@@ -18,20 +18,9 @@ export class DefaultPluginRegistry implements IPluginRegistry {
       throw new Error(`Plugin Registration Failed: Duplicate pluginId '${id}'`);
     }
 
-    // A newly loaded plugin should be in DISCOVERED state.
-    // The act of registering transitions it to REGISTERED.
-    PluginLifecyclePolicy.validateTransition(plugin.descriptor.state, 'REGISTERED');
-    
-    // We create a new descriptor with the updated state
-    const registeredPlugin: IPlugin = {
-      ...plugin,
-      descriptor: {
-        ...plugin.descriptor,
-        state: 'REGISTERED'
-      }
-    };
-
-    this.plugins.set(id, registeredPlugin);
+    // In Generation 5, PluginLoader handles the transition. 
+    // We just store the plugin assuming its state is valid (e.g. ACTIVE)
+    this.plugins.set(id, plugin);
   }
 
   unregister(id: PluginId): void {
@@ -67,7 +56,7 @@ export class DefaultPluginRegistry implements IPluginRegistry {
       descriptor: {
         ...plugin.descriptor,
         state: targetState,
-        loadedAt: targetState === 'LOADED' ? new Date().toISOString() : plugin.descriptor.loadedAt
+        loadedAt: targetState === 'ACTIVE' ? new Date().toISOString() : plugin.descriptor.loadedAt
       }
     };
 

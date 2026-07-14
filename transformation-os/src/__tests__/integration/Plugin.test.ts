@@ -39,8 +39,8 @@ describe('Layer 7: Plugin Runtime Foundation (Sprint X-23)', () => {
     expect(retrieved).toBeDefined();
     expect(retrieved?.descriptor.manifest.name).toBe('Test Worker Plugin');
     
-    // Check initial state translation
-    expect(retrieved?.descriptor.state).toBe('REGISTERED');
+    // Check initial state translation (DefaultPluginLoader loads as DISCOVERED)
+    expect(retrieved?.descriptor.state).toBe('DISCOVERED');
   });
 
   it('Plugin-003: Duplicate Registration (Throws on duplicate ID)', async () => {
@@ -54,12 +54,14 @@ describe('Layer 7: Plugin Runtime Foundation (Sprint X-23)', () => {
 
   it('Plugin-004: Lifecycle Transition (Enforces state machine)', async () => {
     const plugin = await loader.load(validManifestPayload);
-    registry.register(plugin); // Transitions to REGISTERED
+    registry.register(plugin); 
     
-    // Valid transition
-    expect(() => registry.transitionState('com.postingmap.worker.test', 'LOADED')).not.toThrow();
+    // Valid transition (DISCOVERED -> TRUSTED)
+    expect(() => registry.transitionState('com.postingmap.worker.test', 'TRUSTED')).not.toThrow();
+    // Valid transition (TRUSTED -> ACTIVATING)
+    expect(() => registry.transitionState('com.postingmap.worker.test', 'ACTIVATING')).not.toThrow();
     
-    // Invalid transition: LOADED -> DISCOVERED is forbidden
+    // Invalid transition: ACTIVATING -> DISCOVERED is forbidden
     expect(() => registry.transitionState('com.postingmap.worker.test', 'DISCOVERED'))
       .toThrow(/Invalid plugin lifecycle transition/);
   });
