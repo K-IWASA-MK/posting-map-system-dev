@@ -1,0 +1,7 @@
+export enum SchedulerHealth {
+  NORMAL = "NORMAL",
+  DEGRADED = "DEGRADED",
+  STARVED = "STARVED",
+  OVERLOADED = "OVERLOADED",
+  BLOCKED = "BLOCKED"
+}
