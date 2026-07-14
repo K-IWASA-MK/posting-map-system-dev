@@ -240,11 +240,12 @@ function renderDetailModalContent(p) {
     // GPS indicator
     let gpsStatusHtml = '';
     if (p.gps) {
+      const accText = p.gpsAccuracy ? `(誤差 約${Math.round(p.gpsAccuracy)}m)` : '';
       gpsStatusHtml = `
         <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.25);" class="w-full rounded-2xl py-3 px-4 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="text-sm">📍</span>
-            <span class="text-[10px] font-black text-[#10b981] tracking-[0.1em]">GPS測定済</span>
+            <span class="text-[10px] font-black text-[#10b981] tracking-[0.1em]">GPS測定済 ${accText}</span>
           </div>
           <span class="text-[10px] text-white/50">${p.gps}</span>
         </div>
@@ -325,7 +326,7 @@ function renderDetailModalContent(p) {
     if (s === 'SYNCING' || s === 'sending') {
       syncLabelHtml = `<span class="text-[8px] font-black text-[#2563eb] animate-pulse tracking-widest bg-[#2563eb]/10 px-2 py-0.5 rounded-full ml-auto">FIELD DATA SYNCING...</span>`;
     } else if (s === 'RETRY' || s === 'failed') {
-      syncLabelHtml = `<span class="text-[8px] font-black text-red-500 animate-pulse tracking-widest bg-red-500/10 px-2 py-0.5 rounded-full ml-auto">UPLOAD RETRYING...</span>`;
+      syncLabelHtml = `<button onclick="forceRetrySync('${areaName}', ${p.rowId})" class="text-[10px] font-black text-white tracking-widest bg-[#2563eb] px-3 py-1.5 rounded-xl ml-auto active:scale-95 transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)]">📤 今すぐ送信</button>`;
     } else {
       syncLabelHtml = `<span class="text-[8px] font-black text-white/40 animate-pulse tracking-widest bg-white/5 px-2 py-0.5 rounded-full ml-auto">READY TO SYNC (OFFLINE)</span>`;
     }
@@ -333,11 +334,12 @@ function renderDetailModalContent(p) {
 
   let gpsBadgeHtml = '';
   if (p.gps) {
+    const accText = p.gpsAccuracy ? `(誤差 約${Math.round(p.gpsAccuracy)}m)` : '';
     gpsBadgeHtml = `
       <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
         <div class="flex items-center justify-center gap-2 w-full">
           <span class="text-sm">📍</span>
-          <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em]">GPS VERIFIED</span>
+          <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em]">GPS VERIFIED ${accText}</span>
         </div>
       </div>
     `;
@@ -645,32 +647,138 @@ function toggleDone(areaName, rowId, checkbox) {
     openNumpad(areaName, rowId, p.count || 0, true, checkbox);
   } else {
     // 誤操作防止の削除確認ダイアログ
-    if (!confirm("完了実績をキャンセルしますか？\n入力された配布枚数もクリアされます。")) {
-      checkbox.checked = true; // キャンセルされたらチェック状態を元に戻す
-      return;
-    }
-    
-    // Directly clear completion and count
-    p.isDone = false;
-    p.count = 0;
-    p.completedAt = '';
-    p.staffName = '';
-    delete p.syncStatus;
-    delete p.tempPhotoUrl;
-    
-    // Update local card list
-    renderDetailList(areaName);
-    
-    // Update active modal content
-    const modalContent = $('detail-modal-content');
-    if (modalContent) {
-      modalContent.innerHTML = renderDetailModalContent(p);
-    }
-    
-    // Send update to server
-    updateRecord(areaName, rowId, false, 0);
+    checkbox.checked = true; // 一旦戻す
+    renderCancelConfirmModal(areaName, p, checkbox);
   }
 }
+
+function executeCancelDone(areaName, rowId, checkbox) {
+  const p = allPoints.find(point => point.rowId === rowId);
+  if (!p) return;
+  
+  if (checkbox) checkbox.checked = false;
+  
+  // Directly clear completion and count
+  p.isDone = false;
+  p.count = 0;
+  p.completedAt = '';
+  p.staffName = '';
+  delete p.syncStatus;
+  delete p.tempPhotoUrl;
+  
+  // Update local card list
+  renderDetailList(areaName);
+  
+  // Update active modal content
+  const modalContent = $('detail-modal-content');
+  if (modalContent) {
+    modalContent.innerHTML = renderDetailModalContent(p);
+  }
+  
+  // Send update to server
+  updateRecord(areaName, rowId, false, 0);
+  closeConfirmModal();
+}
+window.executeCancelDone = executeCancelDone;
+
+function renderCancelConfirmModal(areaName, p, checkbox) {
+  const modal = $('confirm-modal');
+  const content = $('confirm-modal-content');
+  if (!modal || !content) return;
+  
+  content.innerHTML = `
+    <h3 class="text-base font-black tracking-widest text-red-500 mb-6 uppercase">完了実績をキャンセルしますか？</h3>
+    <div class="space-y-4 text-left">
+      <p class="text-sm font-bold text-white/80">入力された配布枚数や写真、GPSの証跡もクリアされます。</p>
+    </div>
+    
+    <div class="flex gap-3 mt-8">
+      <button onclick="closeConfirmModal()" class="flex-1 py-4 rounded-xl border border-white/20 text-sm font-bold text-white active:scale-95 transition-all">戻る</button>
+      <button onclick="executeCancelDone('${areaName}', ${p.rowId})" style="background: #ef4444; box-shadow: 0 0 15px rgba(239,68,68,0.4);" class="flex-1 py-4 rounded-xl text-sm font-black text-white active:scale-95 transition-all">キャンセルする</button>
+    </div>
+  `;
+  
+  modal.classList.remove('opacity-0', 'pointer-events-none');
+  modal.children[0].classList.replace('scale-95', 'scale-100');
+}
+window.renderCancelConfirmModal = renderCancelConfirmModal;
+
+
+function closeConfirmModal() {
+  const modal = $('confirm-modal');
+  if (modal) {
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modal.children[0].classList.replace('scale-100', 'scale-95');
+  }
+}
+window.closeConfirmModal = closeConfirmModal;
+
+function renderConfirmModal(areaName, p) {
+  const modal = $('confirm-modal');
+  const content = $('confirm-modal-content');
+  if (!modal || !content) return;
+  
+  const cleanAddr = getCleanAddress(p.address || "");
+  const count = p.count || 0;
+  const hasPhoto = !!p.tempPhotoUrl || (p.photoUrl && p.photoUrl !== 'none');
+  const photoStatusText = hasPhoto ? '撮影済み' : 'なし';
+  const hasGps = !!p.gps;
+  const gpsStatusText = hasGps ? '取得済み' : '未取得';
+  const accuracy = p.gpsAccuracy || 0;
+  
+  let gpsWarningHtml = '';
+  if (hasGps && accuracy > 150) {
+    gpsWarningHtml = `
+      <div class="mt-4 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 text-left">
+        <p class="text-xs font-bold text-orange-400">⚠️ 位置情報の精度が低いです（誤差 約${Math.round(accuracy)}m）</p>
+        <p class="text-[10px] text-orange-400/80 mt-1">正確な位置で再度GPSを取得することをお勧めします。このまま提出することも可能です。</p>
+      </div>
+    `;
+  }
+  
+  content.innerHTML = `
+    <h3 class="text-base font-black tracking-widest text-white mb-6 uppercase">配布内容を確認してください</h3>
+    
+    <div class="space-y-4 text-left">
+      <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
+        <span class="text-xs font-bold text-white/50">地区・住所</span>
+        <div class="text-right">
+          <p class="text-[10px] font-bold text-[#2563eb]">${areaName}</p>
+          <p class="text-sm font-black text-white mt-1">${cleanAddr}</p>
+        </div>
+      </div>
+      
+      <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
+        <span class="text-xs font-bold text-white/50">配布枚数</span>
+        <span class="text-xl font-black text-[#2563eb]">${count} <span class="text-xs">枚</span></span>
+      </div>
+      
+      <div class="flex gap-3">
+        <div class="flex-1 p-3 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1">
+          <span class="text-[10px] font-bold text-white/50">写真</span>
+          <span class="text-xs font-black ${hasPhoto ? 'text-[#10b981]' : 'text-white/30'}">${photoStatusText}</span>
+        </div>
+        <div class="flex-1 p-3 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-1">
+          <span class="text-[10px] font-bold text-white/50">GPS</span>
+          <span class="text-xs font-black ${hasGps ? 'text-[#10b981]' : 'text-red-400'}">${gpsStatusText}</span>
+        </div>
+      </div>
+      
+      ${gpsWarningHtml}
+    </div>
+    
+    <p class="text-sm font-bold text-white mt-8 mb-4">提出しますか？</p>
+    
+    <div class="flex gap-3">
+      <button onclick="closeConfirmModal()" class="flex-1 py-4 rounded-xl border border-white/20 text-sm font-bold text-white active:scale-95 transition-all">戻る</button>
+      <button onclick="executeCommitDistribution('${areaName}', ${p.rowId})" style="background: #2563eb; box-shadow: 0 0 15px rgba(37,99,235,0.4);" class="flex-1 py-4 rounded-xl text-sm font-black text-white active:scale-95 transition-all">提出する</button>
+    </div>
+  `;
+  
+  modal.classList.remove('opacity-0', 'pointer-events-none');
+  modal.children[0].classList.replace('scale-95', 'scale-100');
+}
+window.renderConfirmModal = renderConfirmModal;
 
 function renderSettings() {
   let userInfo = JSON.parse(localStorage.getItem('user_info'));

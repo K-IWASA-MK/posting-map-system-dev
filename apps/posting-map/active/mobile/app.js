@@ -1836,9 +1836,17 @@ async function capturePhotoForDetail(areaName, rowId) {
 }
 window.capturePhotoForDetail = capturePhotoForDetail;
 
+window.isSubmitting = false;
+
 async function commitDistribution(areaName, rowId) {
+  if (window.isSubmitting) return;
+
   const p = allPoints.find(point => point.rowId === rowId);
   if (!p) return;
+  
+  if (p.status === 'READY_TO_SYNC' || p.status === 'SYNCED' || p.syncStatus === 'pending' || p.syncStatus === 'SYNCING') {
+    return;
+  }
   
   // 1. Validation Count
   const count = p.count || 0;
@@ -1855,87 +1863,108 @@ async function commitDistribution(areaName, rowId) {
   
   const gpsAge = Date.now() - (p.gpsMeasuredAt || 0);
   if (gpsAge > 300000) { // 5 minutes
-    alert("位置情報が古くなっています。位置情報を更新してください。");
+    alert("位置情報が古くなっています。位置情報を再取得してください。");
     return;
   }
   
   // 3. Validation Photo
   const isPhotoRequired = localStorage.getItem('photo_required') === 'true';
-  if (isPhotoRequired && !p.tempPhotoUrl && (!p.photoUrl || p.photoUrl === 'none')) {
+  const hasPhoto = !!p.tempPhotoUrl || (p.photoUrl && p.photoUrl !== 'none');
+  if (isPhotoRequired && !hasPhoto) {
     alert("写真を撮影してください。");
     return;
   }
   
-  // Read photo data from localDrafts
-  let photoBase64Data = '';
-  try {
-    const draft = await window.getDraft(`${areaName}_${rowId}`);
-    if (draft) {
-      photoBase64Data = draft.photoBase64 || '';
-    }
-  } catch (err) {
-    console.error("Failed to read draft photo:", err);
+  // Show Confirm Modal
+  if (typeof renderConfirmModal === 'function') {
+    renderConfirmModal(areaName, p);
   }
-  
-  // 4. Update status to READY_TO_SYNC
-  p.status = 'READY_TO_SYNC';
-  p.isDone = true;
-  p.syncStatus = 'pending';
-  
-  const now = new Date();
-  const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  p.completedAt = timeStr;
-  
-  const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-  const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
-  const staffId = userInfo.id || '';
-  p.staffName = staffName;
-  p.staffId = staffId;
-  
-  // Re-render UI
-  if (typeof mergeDraftsAndRender === 'function') {
-    await mergeDraftsAndRender(areaName);
-  } else {
-    renderDetailList(areaName);
-  }
-  closeDetailModal();
-  
-  // Clean up draft
-  try {
-    await window.deleteDraft(`${areaName}_${rowId}`);
-  } catch (err) {
-    console.warn("Failed to delete draft:", err);
-  }
-  
-  // Queue sync
-  if (typeof enqueueSync === 'function') {
-    const lat = p.gps ? p.gps.split(',')[0] : '';
-    const lon = p.gps ? p.gps.split(',')[1] : '';
-    
-    enqueueSync({
-      areaName,
-      rowId,
-      isDone: true,
-      count: p.count,
-      latitude: lat,
-      longitude: lon,
-      accuracy: p.gpsAccuracy || null,
-      branchCode: localStorage.getItem('branch_name') || '',
-      areaId: String(rowId),
-      photoBase64: photoBase64Data,
-      staffName,
-      staffId
-    }).then(() => {
-      if (navigator.onLine && typeof processQueue === 'function') {
-        processQueue();
-      }
-    });
-  }
-  
-  // Emit DistributionCompleted event
-  const event = new CustomEvent('DistributionCompleted', { detail: { areaName, rowId, point: p } });
-  window.dispatchEvent(event);
 }
 window.commitDistribution = commitDistribution;
+
+async function executeCommitDistribution(areaName, rowId) {
+  if (window.isSubmitting) return;
+  window.isSubmitting = true;
+
+  try {
+    const p = allPoints.find(point => point.rowId === rowId);
+    if (!p) return;
+
+    // Read photo data from localDrafts
+    let photoBase64Data = '';
+    try {
+      const draft = await window.getDraft(`${areaName}_${rowId}`);
+      if (draft) {
+        photoBase64Data = draft.photoBase64 || '';
+      }
+    } catch (err) {
+      console.error("Failed to read draft photo:", err);
+    }
+    
+    // 4. Update status to READY_TO_SYNC
+    p.status = 'READY_TO_SYNC';
+    p.isDone = true;
+    p.syncStatus = 'pending';
+    
+    const now = new Date();
+    const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    p.completedAt = timeStr;
+    
+    const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+    const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+    const staffId = userInfo.id || '';
+    p.staffName = staffName;
+    p.staffId = staffId;
+    
+    // Re-render UI
+    if (typeof mergeDraftsAndRender === 'function') {
+      await mergeDraftsAndRender(areaName);
+    } else {
+      renderDetailList(areaName);
+    }
+    closeDetailModal();
+    if (typeof closeConfirmModal === 'function') closeConfirmModal();
+    
+    // Clean up draft
+    try {
+      await window.deleteDraft(`${areaName}_${rowId}`);
+    } catch (err) {
+      console.warn("Failed to delete draft:", err);
+    }
+    
+    // Queue sync
+    if (typeof enqueueSync === 'function') {
+      const lat = p.gps ? p.gps.split(',')[0] : '';
+      const lon = p.gps ? p.gps.split(',')[1] : '';
+      
+      enqueueSync({
+        areaName,
+        rowId,
+        isDone: true,
+        count: p.count,
+        latitude: lat,
+        longitude: lon,
+        accuracy: p.gpsAccuracy || null,
+        branchCode: localStorage.getItem('branch_name') || '',
+        areaId: String(rowId),
+        photoBase64: photoBase64Data,
+        staffName,
+        staffId
+      }).then(() => {
+        if (navigator.onLine && typeof processQueue === 'function') {
+          processQueue();
+        }
+      });
+    }
+    
+    // Emit DistributionCompleted event
+    const event = new CustomEvent('DistributionCompleted', { detail: { areaName, rowId, point: p } });
+    window.dispatchEvent(event);
+  } finally {
+    window.isSubmitting = false;
+  }
+}
+window.executeCommitDistribution = executeCommitDistribution;
+
 
 

@@ -362,6 +362,15 @@
   </div>
 
 
+  <!-- 7. STANDARD CONFIRM MODAL -->
+  <div id="confirm-modal" class="fixed inset-0 z-[6000] bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="if(typeof closeConfirmModal === 'function') closeConfirmModal()">
+    <div style="padding-bottom: env(safe-area-inset-bottom);" class="w-[90%] max-w-sm bg-[#1C1C1E] border border-white/10 rounded-[2rem] p-6 transform scale-95 transition-transform duration-300 flex flex-col space-y-6 shadow-2xl" onclick="event.stopPropagation()">
+      <div id="confirm-modal-content" class="w-full">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </div>
+
   <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
   <script defer src="./config.js?v=20260707085331"></script>
   <script defer src="./db.js?v=20260701131527"></script>
