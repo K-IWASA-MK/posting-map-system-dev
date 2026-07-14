@@ -45,7 +45,7 @@ export function bootstrapFieldApis(): void {
 
   const staffAppService = new StaffApplicationService(staffRepo);
   const holdingAppService = new HoldingApplicationService(holdingRepo, eventPublisher);
-  const activityAppService = new ActivityApplicationService(activityRepo, eventPublisher);
+  const activityAppService = new ActivityApplicationService(activityRepo, eventPublisher, holdingRepo);
   const dashboardAppService = new DashboardApplicationService(workspaceRepo, staffRepo, holdingRepo, activityRepo);
   const subscriptionAppService = new SubscriptionApplicationService(subscriptionRepo);
   const operationsDashboardAppService = new OperationsDashboardApplicationService(workspaceRepo, subscriptionRepo);

@@ -5,7 +5,8 @@ export class RecordActivityCommand {
     public readonly photoUrl: string,
     public readonly latitude: number,
     public readonly longitude: number,
-    public readonly accuracy: number = 0
+    public readonly accuracy: number = 0,
+    public readonly areaId: string = "AREA-001"
   ) {
     if (!staffNo || staffNo.trim().length === 0) {
       throw new Error("staffNo is required");

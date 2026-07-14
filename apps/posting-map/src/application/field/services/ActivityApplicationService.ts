@@ -2,6 +2,10 @@ import { IActivityRepository } from '@domain/field/activity/repositories/IActivi
 import { DistributionActivity } from '@domain/field/activity/entities/DistributionActivity';
 import { Quantity } from '@domain/field/valueobjects/Quantity';
 import { Location } from '@domain/field/valueobjects/Location';
+import { AreaId } from '@domain/field/valueobjects/AreaId';
+import { GPSEvidence } from '@domain/field/valueobjects/GPSEvidence';
+import { PhotoEvidence } from '@domain/field/valueobjects/PhotoEvidence';
+import { IFlyerHoldingRepository } from '@domain/field/holding/repositories/IFlyerHoldingRepository';
 import { RecordActivityCommand } from '../commands/RecordActivityCommand';
 import { RecordFieldActivityCommand } from '../commands/RecordFieldActivityCommand';
 import { ActivityDto } from '../dto/ActivityDto';
@@ -16,7 +20,8 @@ declare const SpreadsheetApp: any;
 export class ActivityApplicationService {
   constructor(
     private activityRepository: IActivityRepository,
-    private eventPublisher: ApplicationEventPublisher
+    private eventPublisher: ApplicationEventPublisher,
+    private holdingRepository?: IFlyerHoldingRepository
   ) {}
 
   public async getLatestActivities(staffNo: string, limit: number = 10): Promise<ActivityDto[]> {
@@ -26,17 +31,43 @@ export class ActivityApplicationService {
 
   public async recordActivity(command: RecordActivityCommand): Promise<ActivityDto> {
     const activityId = `ACT-${command.staffNo}-${Date.now()}`;
+    const gps = new GPSEvidence(
+      new Location(command.latitude, command.longitude, command.accuracy),
+      new Date()
+    );
+    const photo = new PhotoEvidence(command.photoUrl, new Date());
+    
     const activity = new DistributionActivity({
       id: activityId,
       staffNo: command.staffNo,
       reportedQuantity: new Quantity(command.quantity),
-      photoUrl: command.photoUrl,
-      location: new Location(command.latitude, command.longitude, command.accuracy)
+      gpsEvidence: gps,
+      photoEvidence: photo,
+      areaId: new AreaId(command.areaId)
     });
+
+    // Execute complete on the domain model (raises events and validates rules)
+    const domainEvents = activity.complete({ now: new Date(), photoRequired: true });
 
     await this.activityRepository.save(activity);
 
-    const event = new DistributionActivityRecordedEvent(
+    // Coordinate with FlyerHolding inventory if repository is present
+    if (this.holdingRepository) {
+      const holding = await this.holdingRepository.findByStaffNo(command.staffNo);
+      if (holding) {
+        const holdingEvents = holding.consume(new Quantity(command.quantity));
+        await this.holdingRepository.save(holding);
+        domainEvents.push(...holdingEvents);
+      }
+    }
+
+    // Publish all accumulated domain events
+    for (const event of domainEvents) {
+      this.eventPublisher.publish(event);
+    }
+
+    // Publish the legacy recorded event to keep backward compatibility with monitors/dashboard
+    const legacyEvent = new DistributionActivityRecordedEvent(
       activityId,
       command.staffNo,
       command.quantity,
@@ -44,7 +75,7 @@ export class ActivityApplicationService {
       command.latitude,
       command.longitude
     );
-    this.eventPublisher.publish(event);
+    this.eventPublisher.publish(legacyEvent);
 
     return this.toDto(activity);
   }

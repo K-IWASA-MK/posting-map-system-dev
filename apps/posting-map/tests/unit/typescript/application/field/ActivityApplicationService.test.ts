@@ -3,6 +3,9 @@ import { IActivityRepository } from '@domain/field/activity/repositories/IActivi
 import { DistributionActivity } from '@domain/field/activity/entities/DistributionActivity';
 import { RecordActivityCommand } from '@application/field/commands/RecordActivityCommand';
 import { ApplicationEventPublisher } from '@application/events/ApplicationEventPublisher';
+import { IFlyerHoldingRepository } from '@domain/field/holding/repositories/IFlyerHoldingRepository';
+import { FlyerHolding } from '@domain/field/holding/entities/FlyerHolding';
+import { Quantity } from '@domain/field/valueobjects/Quantity';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -40,33 +43,75 @@ class MockActivityRepository implements IActivityRepository {
   }
 }
 
+class MockFlyerHoldingRepository implements IFlyerHoldingRepository {
+  public db = new Map<string, FlyerHolding>();
+
+  public async findByStaffNo(staffNo: string): Promise<FlyerHolding | undefined> {
+    return this.db.get(staffNo);
+  }
+
+  public async findAllRaw(): Promise<any[]> {
+    return [];
+  }
+
+  public async findAll(): Promise<FlyerHolding[]> {
+    return Array.from(this.db.values());
+  }
+
+  public async save(holding: FlyerHolding): Promise<void> {
+    this.db.set(holding.staffNo, holding);
+  }
+}
+
 async function runTests() {
-  console.log('[Test ActivityApplicationService] Verifying service...');
+  console.log('[Test ActivityApplicationService] Verifying service coordination...');
 
   const repo = new MockActivityRepository();
+  const holdingRepo = new MockFlyerHoldingRepository();
   const publisher = new ApplicationEventPublisher();
-  const service = new ActivityApplicationService(repo, publisher);
+  
+  // Set up initial stock (150 flyers, threshold is 100)
+  const initialHolding = new FlyerHolding({
+    staffNo: 'S037',
+    quantity: new Quantity(150),
+    cityName: 'Suzuka'
+  });
+  await holdingRepo.save(initialHolding);
 
-  // Record activity test
-  {
-    const command = new RecordActivityCommand(
-      'S037',
-      300,
-      'http://example.com/photo.jpg',
-      34.965,
-      136.622,
-      5
-    );
+  const service = new ActivityApplicationService(repo, publisher, holdingRepo);
 
-    const dto = await service.recordActivity(command);
-    assert(dto.staffNo === 'S037', 'staffNo mismatch');
-    assert(dto.reportedQuantity === 300, 'quantity mismatch');
-    assert(dto.photoUrl === 'http://example.com/photo.jpg', 'photoUrl mismatch');
-    assert(dto.latitude === 34.965, 'latitude mismatch');
-    assert(dto.longitude === 136.622, 'longitude mismatch');
-    assert(publisher.publishedEvents.length === 1, 'Event must be published');
-    assert(publisher.publishedEvents[0].eventType === 'DistributionActivityRecordedEvent', 'Event type mismatch');
-  }
+  // Record activity test: consume 60 flyers -> remaining 90 (triggers shortage warning)
+  const command = new RecordActivityCommand(
+    'S037',
+    60,
+    'http://example.com/photo.jpg',
+    34.965,
+    136.622,
+    5,
+    'AREA-001'
+  );
+
+  const dto = await service.recordActivity(command);
+  assert(dto.staffNo === 'S037', 'staffNo mismatch');
+  assert(dto.reportedQuantity === 60, 'quantity mismatch');
+  assert(dto.photoUrl === 'http://example.com/photo.jpg', 'photoUrl mismatch');
+  assert(dto.latitude === 34.965, 'latitude mismatch');
+  assert(dto.longitude === 136.622, 'longitude mismatch');
+
+  // Verify stock decrement
+  const updatedHolding = await holdingRepo.findByStaffNo('S037');
+  assert(updatedHolding !== undefined, 'holding should exist');
+  assert(updatedHolding!.getQuantity().getValue() === 90, 'stock should be 90');
+
+  // Verify domain events published
+  // Should trigger:
+  // 1. DistributionActivityCompleted (from activity complete)
+  // 2. FlyerShortageWarning (from holding consume below threshold)
+  // 3. DistributionActivityRecordedEvent (legacy event compatibility)
+  const eventTypes = publisher.publishedEvents.map(e => e.eventType);
+  assert(eventTypes.includes('DistributionActivityCompleted'), 'missing DistributionActivityCompleted event');
+  assert(eventTypes.includes('FlyerShortageWarning'), 'missing FlyerShortageWarning event');
+  assert(eventTypes.includes('DistributionActivityRecordedEvent'), 'missing legacy DistributionActivityRecordedEvent event');
 
   console.log('[Test ActivityApplicationService] All tests PASSED.');
 }
