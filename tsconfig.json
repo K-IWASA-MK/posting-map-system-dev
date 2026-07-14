@@ -11,14 +11,14 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@core/*": ["products/posting-map/src/core/*"],
-      "@foundation/*": ["products/posting-map/src/foundation/*"],
-      "@domain/*": ["products/posting-map/src/domain/*"],
-      "@infra/*": ["products/posting-map/src/infrastructure/*"],
-      "@application/*": ["products/posting-map/src/application/*"],
-      "@api/*": ["products/posting-map/src/api/*"]
+      "@core/*": ["apps/posting-map/src/core/*"],
+      "@foundation/*": ["apps/posting-map/src/foundation/*"],
+      "@domain/*": ["apps/posting-map/src/domain/*"],
+      "@infra/*": ["apps/posting-map/src/infrastructure/*"],
+      "@application/*": ["apps/posting-map/src/application/*"],
+      "@api/*": ["apps/posting-map/src/api/*"]
     }
   },
-  "include": ["products/posting-map/src/**/*", "aios/**/*", "shared/**/*"],
-  "exclude": ["**/deprecated/**/*", "node_modules", "aios/tests/**/*", "aios/adaptive", "aios/auditgate", "aios/evolution", "aios/graph", "aios/healing", "aios/kernel", "aios/metagovernance", "aios/optimization", "aios/orchestrator", "aios/planning", "aios/resume", "aios/review", "aios/safety", "aios/selfoptimization", "aios/selfregulation", "aios/simulation", "aios/stabilization", "aios/systemkernel"]
+  "include": ["apps/posting-map/src/**/*", "aios/**/*", "shared/**/*"],
+  "exclude": ["**/deprecated/**/*", "node_modules", "aios/tests/**/*", "aios/transformation/**/*", "aios/aios-core/**/*", "aios/adaptive", "aios/auditgate", "aios/evolution", "aios/graph", "aios/healing", "aios/kernel", "aios/metagovernance", "aios/optimization", "aios/orchestrator", "aios/planning", "aios/resume", "aios/review", "aios/safety", "aios/selfoptimization", "aios/selfregulation", "aios/audit", "aios/stabilization", "aios/systemkernel"]
 }

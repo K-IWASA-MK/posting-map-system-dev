@@ -8,7 +8,7 @@
  */
 
 const { SimulationTestRunner } = require('../../aios/tests/simulation/SimulationTestRunner');
-const { AuditWriter } = require('../../aios/simulation/AuditWriter');
+const { AuditWriter } = require('../../aios/audit/AuditWriter');
 
 class HookRunner {
   /**

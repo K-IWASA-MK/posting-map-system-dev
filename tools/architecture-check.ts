@@ -27,7 +27,7 @@ function getFiles(dir: string, fileList: string[] = []): string[] {
 }
 
 function checkDependencies() {
-  const srcDir = path.join(__dirname, '../src');
+  const srcDir = path.join(__dirname, '../apps/posting-map/src');
   const layers = Object.keys(allowedDependencies);
   let hasErrors = false;
 

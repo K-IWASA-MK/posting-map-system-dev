@@ -7,12 +7,12 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Sprint X-27 Execution Runtime Foundation`
-- **Milestone**: `Sprint X-27 COMPLETED`
-- **Tag**: `v5.7.0-alpha.0`
-- **Current Phase**: `Sprint X-27`
-- **Next Action**: `Generation 5 Audit Phase`
-- **Branch**: `execution-orchestration-runtime`
+- **Completed**: `Sprint X-25 Plugin Discovery Foundation`
+- **Milestone**: `Sprint X-25 COMPLETED`
+- **Tag**: `v5.5.0-alpha.0`
+- **Current Phase**: `Sprint X-25`
+- **Next Action**: `Sprint X-26 Plugin Marketplace Foundation`
+- **Branch**: `main`
 
 ---
 
@@ -769,3 +769,20 @@ Sprint 9 の全フェーズ（S9-1〜S9-8）における実装、検証、そし
 
 これをもって、不変資産としてのパターンデータ抽出からガバナンス承認、保存、そして安全なクエリ提供までを一元管理する Learning OS のすべての基盤が完成しました。次回の担当AIは、本 handover.md を読み込み、Sprint 10 (Knowledge OS) の構築を開始してください。
 
+### Sprint X-20: Execution Model Foundation
+Execution Model（実行モデル）として、`Command` の識別子（`commandId`, `type`, `version`）と `WorkerProvider` を確立しました。
+
+### Sprint X-21: Execution Kernel Foundation
+Execution Kernel（実行制御）として、`TimeoutExecutor`, `RetryExecutor`, `CancellationExecutor` を備えた不変の実行コンテキスト層を確立しました。
+
+### Sprint X-22: Execution Ledger Foundation
+Execution Ledger（実行監査）として、ペイロードを持たない純粋な状態遷移（`STARTED`, `COMPLETED`, `FAILED`, `TIMEOUT`, `CANCELLED`）を追跡する単一真実の台帳を確立しました。
+
+### Sprint X-23: Plugin Runtime Foundation
+Plugin Runtime（拡張基盤）として、`PluginManifest`, `PluginDescriptor`, `PluginLifecyclePolicy` (DISCOVERED -> REGISTERED -> LOADED -> ACTIVE -> SUSPENDED -> UNLOADED の厳密なステートマシン) を確立し、LoaderとRegistryの責務を完全分離。Workerだけでなく全てのOS拡張が同じアーキテクチャで稼働するExtensible OSへの道を開きました。次フェーズは Sprint X-24 (Worker Plugin SDK) となります。
+
+### Sprint X-24: Plugin SDK Foundation
+Plugin SDK（開発基盤）として、Capability First設計に基づくコンポジションモデルを採用し、`PluginBase` と `ExecutableCapability` を提供。OS Core の `IWorker` を安全にラップするオーバーロードブリッジを持つ `WorkerPluginBase` や、三層のバージョン互換性（Manifest, SDK, OS Core）を担保する `SdkDescriptor` を実装しました。また、将来の自動計装やAI介入に向けたライフサイクルフック（`beforeExecute`, `afterExecute`等）や、単体テスト用の `PluginTestKit`、静的検証用の `PluginValidator` を備え、Transformation OS を安全に拡張できる土台が完成しました。
+
+### Sprint X-25: Plugin Discovery Foundation
+Marketplace統合に向けた抽象探索基盤として、`PluginCandidate` および `IDiscoverySource` を実装しました。Discovery層を「純粋関数」として定義し、副作用（ロードやレジストリ登録）を完全に排除しています。ローカルファイルシステムだけでなく、複数のSourceから候補を収集し、`PluginRankingEngine` によるスコアリングと `PluginSelector` による最終選定を経て提供するコーディネーター `PluginResolver` を構築しました。これにより、以後のスプリントで OS Core に変更を加えることなく Remote や Marketplace の Source を追加できる決定論的な探索基盤が完成しました。

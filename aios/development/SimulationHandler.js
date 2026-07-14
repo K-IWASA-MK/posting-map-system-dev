@@ -5,7 +5,7 @@
  * 本番カーネル実行（Production Command）への接続経路を一切持たず、シミュレーションランタイムをトリガーする。
  */
 
-const { SimulationRuntime } = require('../simulation/SimulationRuntime');
+const { SimulationRuntime } = require('../audit/SimulationRuntime');
 
 class SimulationHandler {
   /**
