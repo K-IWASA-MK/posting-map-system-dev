@@ -1,0 +1,8 @@
+export enum AllocationStrategy {
+  BEST_FIT = "BEST_FIT",
+  FIRST_FIT = "FIRST_FIT",
+  BALANCED = "BALANCED",
+  RESERVED = "RESERVED",
+  PREEMPTIVE = "PREEMPTIVE",
+  FAIR_SHARE = "FAIR_SHARE"
+}
