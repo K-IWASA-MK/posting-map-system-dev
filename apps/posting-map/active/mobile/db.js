@@ -13,7 +13,7 @@
 
 const DB_NAME    = 'PostingMapDB';
 const STORE_NAME = 'syncQueue';
-const DB_VERSION = 2; // スキーマ拡張のためバージョンアップ
+const DB_VERSION = 3; // スキーマ拡張のためバージョンアップ
 
 // リトライ設定
 const RETRY_DELAYS  = [10000, 30000, 60000, 60000, 60000]; // ms
@@ -32,9 +32,17 @@ function getDB() {
 
     request.onupgradeneeded = (e) => {
       const db = e.target.result;
-      // v1 → v2: インデックスは不要だが syncStatus フィールドを追加
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains('localDrafts')) {
+        db.createObjectStore('localDrafts', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('settings')) {
+        db.createObjectStore('settings', { keyPath: 'key' });
+      }
+      if (!db.objectStoreNames.contains('cache')) {
+        db.createObjectStore('cache', { keyPath: 'key' });
       }
     };
 
@@ -216,6 +224,8 @@ async function processQueue() {
     console.log(`[Queue] Processing ${targets.length} item(s)...`);
     let anySuccess = false; // 全アイテム処理後に1回だけloadDataを呼ぶフラグ
 
+    window.dispatchEvent(new CustomEvent('SyncStarted', { detail: { count: targets.length } }));
+
     for (const item of targets) {
       // 送信中マーク
       await updateQueueItem(item.id, { syncStatus: 'SYNCING' });
@@ -254,6 +264,7 @@ async function processQueue() {
               if (item.latitude && item.longitude) {
                 p.gps = `${item.latitude},${item.longitude}`;
               }
+              p.status = 'SYNCED';
               p.syncStatus = undefined;
               delete p.tempPhotoUrl;
             }
@@ -261,8 +272,15 @@ async function processQueue() {
 
           // 2. 現在開いている画面(L3)のallPointsを同期
           if (typeof allPoints !== 'undefined' && allPoints && window.currentCityDetailAreaName === item.areaName) {
-            // allPointsはキャッシュ配列への参照であるため、上記1の処理で自動的に値が更新されています
-            if (typeof renderDetailList === 'function') {
+            const p = allPoints.find(pt => pt.rowId === item.rowId);
+            if (p) {
+              p.status = 'SYNCED';
+              p.syncStatus = undefined;
+              delete p.tempPhotoUrl;
+            }
+            if (typeof mergeDraftsAndRender === 'function') {
+              await mergeDraftsAndRender(item.areaName);
+            } else if (typeof renderDetailList === 'function') {
               renderDetailList(item.areaName);
             }
             if (window.currentPointDetailRowId === item.rowId) {
@@ -275,6 +293,7 @@ async function processQueue() {
           }
 
           console.log(`[Queue] Synced: id=${item.id}, rowId=${item.rowId}`);
+          window.dispatchEvent(new CustomEvent('SyncCompleted', { detail: { areaName: item.areaName, rowId: item.rowId } }));
           anySuccess = true; // 1件でも成功 → 後でまとめてUI更新
         } else {
           throw new Error(res ? (res.message || 'API failure') : 'No response');
@@ -295,10 +314,14 @@ async function processQueue() {
 
         // 2. 現在表示中の画面(L3)のステータス更新
         if (typeof allPoints !== 'undefined' && allPoints && window.currentCityDetailAreaName === item.areaName) {
-          if (typeof renderDetailList === 'function') {
+          if (typeof mergeDraftsAndRender === 'function') {
+            await mergeDraftsAndRender(item.areaName);
+          } else if (typeof renderDetailList === 'function') {
             renderDetailList(item.areaName);
           }
         }
+
+        window.dispatchEvent(new CustomEvent('SyncFailed', { detail: { areaName: item.areaName, rowId: item.rowId, error: err.message } }));
       }
     }
 
@@ -352,3 +375,120 @@ window.addEventListener('online', () => {
 setInterval(() => {
   if (navigator.onLine) processQueue();
 }, 10000);
+
+// ── Drafts CRUD helpers ───────────────────────────────────────
+async function saveDraft(draft) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('localDrafts', 'readwrite');
+    const store = tx.objectStore('localDrafts');
+    const request = store.put(draft);
+    request.onsuccess = () => resolve();
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function getDraft(id) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('localDrafts', 'readonly');
+    const store = tx.objectStore('localDrafts');
+    const request = store.get(id);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function deleteDraft(id) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('localDrafts', 'readwrite');
+    const store = tx.objectStore('localDrafts');
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function getAreaDrafts(areaName) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('localDrafts', 'readonly');
+    const store = tx.objectStore('localDrafts');
+    const request = store.getAll();
+    request.onsuccess = () => {
+      const all = request.result || [];
+      resolve(all.filter(d => d.areaName === areaName));
+    };
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+window.saveDraft = saveDraft;
+window.getDraft = getDraft;
+window.deleteDraft = deleteDraft;
+window.getAreaDrafts = getAreaDrafts;
+
+// ── Settings CRUD helpers ─────────────────────────────────────
+async function saveSetting(key, value) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('settings', 'readwrite');
+    const store = tx.objectStore('settings');
+    const request = store.put({ key, value });
+    request.onsuccess = () => resolve();
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function getSetting(key) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('settings', 'readonly');
+    const store = tx.objectStore('settings');
+    const request = store.get(key);
+    request.onsuccess = () => resolve(request.result ? request.result.value : null);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+window.saveSetting = saveSetting;
+window.getSetting = getSetting;
+
+// ── Cache CRUD helpers ────────────────────────────────────────
+async function saveCache(key, value) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('cache', 'readwrite');
+    const store = tx.objectStore('cache');
+    const request = store.put({ key, value, timestamp: Date.now() });
+    request.onsuccess = () => resolve();
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function getCache(key) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('cache', 'readonly');
+    const store = tx.objectStore('cache');
+    const request = store.get(key);
+    request.onsuccess = () => resolve(request.result ? request.result.value : null);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function clearCache(key) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('cache', 'readwrite');
+    const store = tx.objectStore('cache');
+    const request = store.delete(key);
+    request.onsuccess = () => resolve();
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+window.saveCache = saveCache;
+window.getCache = getCache;
+window.clearCache = clearCache;

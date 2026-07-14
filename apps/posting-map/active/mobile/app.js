@@ -349,6 +349,9 @@ async function syncOfflineQueue() {
 
 async function loadData(skipSync = false) {
   logDebug("[loadData] START");
+  if (typeof startGPSWatching === 'function') {
+    startGPSWatching();
+  }
 
   try {
     if (!skipSync && navigator.onLine) {
@@ -507,29 +510,119 @@ function closeNumpad() {
   numpadContext = null;
 }
 
-// GPS現在地取得ヘルパー (3秒タイムアウト)
+// GPS現在地保持用グローバル変数
+let latestLocation = { latitude: null, longitude: null, accuracy: null, timestamp: 0 };
+let gpsWatchId = null;
+
+function startGPSWatching() {
+  if (gpsWatchId) return;
+  if (!navigator.geolocation) {
+    console.warn("Geolocation not supported by browser.");
+    return;
+  }
+  gpsWatchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      latestLocation = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        accuracy: pos.coords.accuracy,
+        timestamp: pos.timestamp || Date.now()
+      };
+      console.log(`[GPS] Location updated: ${latestLocation.latitude}, ${latestLocation.longitude} (accuracy: ${latestLocation.accuracy}m)`);
+    },
+    (err) => {
+      console.warn("[GPS] Watch position error:", err);
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}
+
+// GPS現在地取得ヘルパー (最新のキャッシュを即座に返し、古い場合は再測定)
 function getGPSLocation() {
   return new Promise((resolve) => {
+    // 60秒以内の新しい位置情報があれば即座に返す
+    if (latestLocation.latitude !== null && (Date.now() - latestLocation.timestamp) < 60000) {
+      resolve({
+        latitude: latestLocation.latitude,
+        longitude: latestLocation.longitude,
+        accuracy: latestLocation.accuracy,
+        measuredAt: new Date(latestLocation.timestamp)
+      });
+      return;
+    }
+
     if (!navigator.geolocation) {
-      resolve({ latitude: '', longitude: '' });
+      resolve({ latitude: '', longitude: '', accuracy: null });
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        resolve({
-          latitude:  pos.coords.latitude,
+        latestLocation = {
+          latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
-          accuracy:  pos.coords.accuracy   // GPS精度(m) — 要件2
+          accuracy: pos.coords.accuracy,
+          timestamp: pos.timestamp || Date.now()
+        };
+        resolve({
+          latitude: latestLocation.latitude,
+          longitude: latestLocation.longitude,
+          accuracy: latestLocation.accuracy,
+          measuredAt: new Date(latestLocation.timestamp)
         });
       },
       (err) => {
-        console.warn("GPS Error:", err);
+        console.warn("GPS getCurrentPosition error:", err);
         resolve({ latitude: '', longitude: '', accuracy: null });
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 10000 }
     );
   });
 }
+
+// ── Draft Auto-Save & Debounce ────────────────────────────────
+let autoSaveTimers = {};
+
+function triggerDraftAutoSave(areaName, rowId, fields = {}) {
+  const key = `${areaName}_${rowId}`;
+  if (autoSaveTimers[key]) {
+    clearTimeout(autoSaveTimers[key]);
+  }
+  
+  autoSaveTimers[key] = setTimeout(async () => {
+    try {
+      const p = allPoints.find(point => point.rowId === rowId);
+      if (!p) return;
+      
+      const existingDraft = await window.getDraft(key);
+      const draft = {
+        id: key,
+        areaName,
+        rowId,
+        status: p.status || 'IN_PROGRESS',
+        count: p.count || 0,
+        tempPhotoUrl: p.tempPhotoUrl || '',
+        photoBase64: fields.photoBase64 || (existingDraft ? existingDraft.photoBase64 : ''),
+        latitude: fields.latitude !== undefined ? fields.latitude : (p.gps ? p.gps.split(',')[0] : (existingDraft ? existingDraft.latitude : '')),
+        longitude: fields.longitude !== undefined ? fields.longitude : (p.gps ? p.gps.split(',')[1] : (existingDraft ? existingDraft.longitude : '')),
+        accuracy: fields.accuracy !== undefined ? fields.accuracy : (existingDraft ? existingDraft.accuracy : null),
+        gpsMeasuredAt: fields.gpsMeasuredAt || (existingDraft ? existingDraft.gpsMeasuredAt : null),
+        startedAt: p.startedAt || Date.now(),
+        updatedAt: Date.now()
+      };
+      
+      await window.saveDraft(draft);
+      console.log(`[Draft] Auto-saved draft: ${key}`);
+      
+      // Emit DraftSaved event
+      const event = new CustomEvent('DraftSaved', { detail: { areaName, rowId, draft } });
+      window.dispatchEvent(event);
+      
+    } catch (err) {
+      console.error("[Draft] Auto-save error:", err);
+    }
+  }, 3000);
+}
+window.triggerDraftAutoSave = triggerDraftAutoSave;
 
 // カメラを起動して写真Blobを返す
 function capturePhoto() {
@@ -709,91 +802,30 @@ function pressNum(key) {
     const { areaName, rowId } = numpadContext;
     
     const p = allPoints.find(point => point.rowId === rowId);
-    const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-    const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
-    const staffId = userInfo.id || '';
-    const now = new Date();
-    const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    
-    // 1. UIを即座に「完了」へ更新 (待ち時間ゼロUX)
     if (p) {
-      p.isDone = true;
       p.count = valNum;
-      p.staffName = staffName;
-      p.completedAt = timeStr;
-      p.syncStatus = 'pending';
+      if (!p.status || p.status === 'NOT_STARTED') {
+        p.status = 'IN_PROGRESS';
+        p.startedAt = p.startedAt || Date.now();
+      }
       
-      // リストを再描画（裏画面用）
-      renderDetailList(areaName);
+      // Trigger draft auto save
+      triggerDraftAutoSave(areaName, rowId);
+      
+      // Update UI
+      if (typeof mergeDraftsAndRender === 'function') {
+        mergeDraftsAndRender(areaName);
+      } else {
+        renderDetailList(areaName);
+      }
+      
+      const modalContent = $('detail-modal-content');
+      if (modalContent) {
+        modalContent.innerHTML = renderDetailModalContent(p);
+      }
     }
     
-    numpadContext.isDoneToggle = false;
-
-    // GPS・カメラを先に開始（ユーザーのタップジェスチャーが生きている間に呼ぶ）
-    const gpsPromise = getGPSLocation();
-    // capturePhoto()内のinput.click()はここで同期的に実行される
-    // → テンキーを閉じる前にカメラが起動するため、裏画面が一瞬見える現象を防ぐ
-    const cameraPromise = capturePhoto();
-
-    closeNumpad(); // カメラ起動後にテンキーを閉じる
-
-    // 2. バックグラウンドで写真取得完了とGPS結果を待ちキューイングする
-    (async () => {
-      let imageBlob = null;
-      try {
-        imageBlob = await cameraPromise;
-      } catch (err) {
-        console.error("Camera activation failed:", err);
-      }
-
-      // カメラから戻った後、先行開始しておいたGPSの結果を待つ
-      let gps = await gpsPromise;
-      // GPS未取得の場合はカメラ復帰後にリトライ
-      if (!gps.latitude || !gps.longitude) {
-        console.log("GPS empty after camera, retrying...");
-        gps = await getGPSLocation();
-      }
-
-      if (p) {
-        if (gps.latitude && gps.longitude) {
-          p.gps = `${gps.latitude},${gps.longitude}`;
-        }
-        if (imageBlob) {
-          p.tempPhotoUrl = URL.createObjectURL(imageBlob);
-        }
-        renderDetailList(areaName);
-        const modalContent = $('detail-modal-content');
-        if (modalContent) {
-          modalContent.innerHTML = renderDetailModalContent(p);
-        }
-      }
-
-      // BlobはSafari/LINE WebViewのIndexedDBで失われるため送信前にbase64変換
-      let photoBase64 = '';
-      if (imageBlob && typeof window.blobToBase64 === 'function') {
-        photoBase64 = await window.blobToBase64(imageBlob);
-      }
-      
-      if (typeof enqueueSync === 'function') {
-        await enqueueSync({
-          areaName,
-          rowId,
-          isDone:     true,
-          count:      valNum,
-          latitude:   gps.latitude,
-          longitude:  gps.longitude,
-          accuracy:   gps.accuracy   || null,                    // 要件2
-          branchCode: localStorage.getItem('branch_name') || '', // 要件2
-          areaId:     String(rowId),                             // 要件2
-          photoBase64, // BlobではなくBase64文字列で保存
-          staffName,
-          staffId
-        });
-      }
-    })().catch(err => {
-      console.error("Async sync background task failed:", err);
-    });
-    
+    closeNumpad();
     return;
   } else {
     if (numpadContext.currentVal === '0') {
@@ -1714,5 +1746,196 @@ window.closeTransferRequestDialog = function() {
   const d = document.getElementById('dynamic-transfer-dialog');
   if (d) d.remove();
 };
+
+// ── Field Operations Workflow Functions (Sprint P-02) ──────────
+
+function startDistribution(areaName, rowId) {
+  const p = allPoints.find(point => point.rowId === rowId);
+  if (!p) return;
+  p.status = 'IN_PROGRESS';
+  p.startedAt = Date.now();
+  
+  // Save draft
+  triggerDraftAutoSave(areaName, rowId);
+  
+  // Re-render UI
+  if (typeof mergeDraftsAndRender === 'function') {
+    mergeDraftsAndRender(areaName);
+  } else {
+    renderDetailList(areaName);
+  }
+  
+  const modalContent = $('detail-modal-content');
+  if (modalContent) {
+    modalContent.innerHTML = renderDetailModalContent(p);
+  }
+  
+  // Emit DistributionStarted
+  const event = new CustomEvent('DistributionStarted', { detail: { areaName, rowId, startedAt: p.startedAt } });
+  window.dispatchEvent(event);
+}
+window.startDistribution = startDistribution;
+
+async function acquireGPSForDetail(areaName, rowId) {
+  const p = allPoints.find(point => point.rowId === rowId);
+  if (!p) return;
+  
+  const gps = await getGPSLocation();
+  if (gps.latitude && gps.longitude) {
+    p.gps = `${gps.latitude},${gps.longitude}`;
+    p.gpsMeasuredAt = gps.measuredAt ? gps.measuredAt.getTime() : Date.now();
+    p.gpsAccuracy = gps.accuracy;
+    
+    // Save draft
+    triggerDraftAutoSave(areaName, rowId, {
+      latitude: gps.latitude,
+      longitude: gps.longitude,
+      accuracy: gps.accuracy,
+      gpsMeasuredAt: p.gpsMeasuredAt
+    });
+    
+    // Re-render UI
+    if (typeof mergeDraftsAndRender === 'function') {
+      mergeDraftsAndRender(areaName);
+    } else {
+      renderDetailList(areaName);
+    }
+    
+    const modalContent = $('detail-modal-content');
+    if (modalContent) {
+      modalContent.innerHTML = renderDetailModalContent(p);
+    }
+  } else {
+    alert("位置情報の取得に失敗しました。GPSまたは端末の位置情報設定を確認してください。");
+  }
+}
+window.acquireGPSForDetail = acquireGPSForDetail;
+
+async function capturePhotoForDetail(areaName, rowId) {
+  const p = allPoints.find(point => point.rowId === rowId);
+  if (!p) return;
+  
+  const imageBlob = await capturePhoto();
+  if (!imageBlob) return;
+  
+  p.tempPhotoUrl = URL.createObjectURL(imageBlob);
+  
+  // Re-render modal
+  const modalContent = $('detail-modal-content');
+  if (modalContent) {
+    modalContent.innerHTML = renderDetailModalContent(p);
+  }
+  
+  let photoBase64 = '';
+  if (imageBlob && typeof window.blobToBase64 === 'function') {
+    photoBase64 = await window.blobToBase64(imageBlob);
+  }
+  
+  // Save draft
+  triggerDraftAutoSave(areaName, rowId, { photoBase64 });
+}
+window.capturePhotoForDetail = capturePhotoForDetail;
+
+async function commitDistribution(areaName, rowId) {
+  const p = allPoints.find(point => point.rowId === rowId);
+  if (!p) return;
+  
+  // 1. Validation Count
+  const count = p.count || 0;
+  if (count <= 0) {
+    alert("配布枚数を1枚以上に設定してください。");
+    return;
+  }
+  
+  // 2. Validation GPS
+  if (!p.gps) {
+    alert("位置情報を取得してください。");
+    return;
+  }
+  
+  const gpsAge = Date.now() - (p.gpsMeasuredAt || 0);
+  if (gpsAge > 300000) { // 5 minutes
+    alert("位置情報が古くなっています。位置情報を更新してください。");
+    return;
+  }
+  
+  // 3. Validation Photo
+  const isPhotoRequired = localStorage.getItem('photo_required') === 'true';
+  if (isPhotoRequired && !p.tempPhotoUrl && (!p.photoUrl || p.photoUrl === 'none')) {
+    alert("写真を撮影してください。");
+    return;
+  }
+  
+  // Read photo data from localDrafts
+  let photoBase64Data = '';
+  try {
+    const draft = await window.getDraft(`${areaName}_${rowId}`);
+    if (draft) {
+      photoBase64Data = draft.photoBase64 || '';
+    }
+  } catch (err) {
+    console.error("Failed to read draft photo:", err);
+  }
+  
+  // 4. Update status to READY_TO_SYNC
+  p.status = 'READY_TO_SYNC';
+  p.isDone = true;
+  p.syncStatus = 'pending';
+  
+  const now = new Date();
+  const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  p.completedAt = timeStr;
+  
+  const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+  const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
+  const staffId = userInfo.id || '';
+  p.staffName = staffName;
+  p.staffId = staffId;
+  
+  // Re-render UI
+  if (typeof mergeDraftsAndRender === 'function') {
+    await mergeDraftsAndRender(areaName);
+  } else {
+    renderDetailList(areaName);
+  }
+  closeDetailModal();
+  
+  // Clean up draft
+  try {
+    await window.deleteDraft(`${areaName}_${rowId}`);
+  } catch (err) {
+    console.warn("Failed to delete draft:", err);
+  }
+  
+  // Queue sync
+  if (typeof enqueueSync === 'function') {
+    const lat = p.gps ? p.gps.split(',')[0] : '';
+    const lon = p.gps ? p.gps.split(',')[1] : '';
+    
+    enqueueSync({
+      areaName,
+      rowId,
+      isDone: true,
+      count: p.count,
+      latitude: lat,
+      longitude: lon,
+      accuracy: p.gpsAccuracy || null,
+      branchCode: localStorage.getItem('branch_name') || '',
+      areaId: String(rowId),
+      photoBase64: photoBase64Data,
+      staffName,
+      staffId
+    }).then(() => {
+      if (navigator.onLine && typeof processQueue === 'function') {
+        processQueue();
+      }
+    });
+  }
+  
+  // Emit DistributionCompleted event
+  const event = new CustomEvent('DistributionCompleted', { detail: { areaName, rowId, point: p } });
+  window.dispatchEvent(event);
+}
+window.commitDistribution = commitDistribution;
 
 

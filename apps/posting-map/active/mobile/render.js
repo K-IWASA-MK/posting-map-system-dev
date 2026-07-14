@@ -193,104 +193,12 @@ function renderDetailModalContent(p) {
   const myId = userInfo.id || '';
   const myName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
   
-  // 他人の完了実績か判定
-  const isOtherStaff = p.isDone && (
-    (p.staffId && p.staffId !== myId) ||
-    (!p.staffId && p.staffName && p.staffName !== myName)
-  );
-
-  // 配布完了時は編集ロック
-  const isLocked = p.isDone;
-
-  // GPS接続バッジ
-  let gpsBadgeHtml = '';
-  if (p.isDone) {
-    if (p.gps) {
-      gpsBadgeHtml = `
-        <!-- 【GPSあり】横幅いっぱいの青色カード型 (PHOTO VERIFIED と完全同一スタイル) -->
-        <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4); box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.15), 0 0 30px rgba(37, 99, 235, 0.05);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
-          <div class="flex items-center justify-center gap-2 w-full">
-            <span class="text-sm">📍</span>
-            <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em]">GPS VERIFIED</span>
-          </div>
-        </div>
-      `;
-    } else {
-      gpsBadgeHtml = `
-        <!-- 【GPSなし】横幅いっぱいのカード型 -->
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
-          <div class="flex items-center justify-center gap-2 w-full">
-            <span class="text-sm opacity-30">📍</span>
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">NO GPS DATA</span>
-          </div>
-        </div>
-      `;
-    }
-  }
-
-  // 非同期送信ステータスバッジ (要件8: PENDING / SYNCING / COMPLETE / RETRYING...)
-  let syncLabelHtml = '';
-  if (p.isDone) {
-    const s = p.syncStatus;
-    if (s === 'SYNCING' || s === 'sending') {
-      syncLabelHtml = `<span class="text-[8px] font-black text-[#2563eb] animate-pulse tracking-widest bg-[#2563eb]/10 px-2 py-0.5 rounded-full ml-auto">FIELD DATA SYNCING...</span>`;
-    } else if (s === 'RETRY' || s === 'failed') {
-      syncLabelHtml = `<span class="text-[8px] font-black text-red-500 animate-pulse tracking-widest bg-red-500/10 px-2 py-0.5 rounded-full ml-auto">UPLOAD RETRYING...</span>`;
-    } else if (s === 'PENDING' || s === 'pending') {
-      syncLabelHtml = `<span class="text-[8px] font-black text-white/40 animate-pulse tracking-widest bg-white/5 px-2 py-0.5 rounded-full ml-auto">SYNC PENDING...</span>`;
-    }
-  }
-
-  // 🔒アイコン
-  const lockIconHtml = isLocked ? `<span class="text-xs mr-1">🔒</span>` : '';
-
-  // 写真表示・追加・変更ブロック
-  const photoId = p.photoUrl || '';
-  const tempUrl = p.tempPhotoUrl || '';
-  let photoBlockHtml = '';
-  if (p.isDone) {
-    if (tempUrl) {
-      photoBlockHtml = `
-        <div class="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
-          <img src="${tempUrl}" class="w-full h-full object-cover">
-        </div>
-      `;
-    } else if (photoId) {
-      photoBlockHtml = `
-        <!-- 【写真あり】青色（#2563eb）テーマの写真確認カード (コンパクト化・ボタン廃止・外枠青色化) -->
-        <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4); box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.15), 0 0 30px rgba(37, 99, 235, 0.05);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
-          <div class="flex items-center justify-center gap-2 w-full">
-            <span class="text-sm">📸</span>
-            <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO VERIFIED</span>
-          </div>
-        </div>
-      `;
-    } else {
-      photoBlockHtml = `
-        <!-- 【写真なし】「写真を追加」ボタンを排除し、証跡なし状態のみをシンプルに表示 -->
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
-          <div class="flex items-center justify-center gap-2 w-full">
-            <span class="text-sm opacity-30">📸</span>
-            <span class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
-          </div>
-        </div>
-      `;
-    }
-  }
-
-  // ロック状態によるスタイル分岐
-  const cardClasses = isOtherStaff
-    ? "rounded-3xl p-5 flex items-center gap-5 bg-white/[0.01] border border-white/[0.03]"
-    : "rounded-3xl p-5 flex items-center gap-5 bg-white/5 border border-white/10";
-  
-  const labelStyle = !isOtherStaff && p.isDone
-    ? 'background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2);'
-    : '';
-
+  // Status check
+  const currentStatus = p.status || (p.isDone ? 'SYNCED' : 'NOT_STARTED');
   const areaName = window.currentCityDetailAreaName || '';
-
   const cleanAddr = getCleanAddress(p.address);
-  // 住所の文字数に応じてフォントサイズを自動調整（折り返し・はみ出し防止）
+  
+  // Font size check
   let addrFontSizeClass = 'text-lg';
   if (cleanAddr.length > 16) {
     addrFontSizeClass = 'text-sm';
@@ -298,84 +206,190 @@ function renderDetailModalContent(p) {
     addrFontSizeClass = 'text-base';
   }
 
-  // 完了済み(p.isDone)の場合はGoogle Mapsボタンを非表示にする
-  const googleMapsButtonHtml = !p.isDone ? `
-    <!-- 2行目: 横幅いっぱいのGoogle Mapsボタン -->
-    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 0 6px rgba(37,99,235,0.1), 0 0 12px rgba(37,99,235,0.05); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-2xl active:scale-[0.97] transition-all">
-      📍 Googleマップで開く
-    </a>
-  ` : '';
-
-  return `
-    <!-- 1行目: 住所バッジ（中央寄せ） -->
+  // Header address display
+  const addressHeaderHtml = `
     <div class="w-full flex flex-col items-center gap-3">
       <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); height: 26px; font-size: 12px; color: rgba(255, 255, 255, 0.9);" class="inline-flex items-center px-3 font-bold rounded-full tracking-wide truncate max-w-full select-text">
         🏠 ${cleanAddr}
       </div>
       ${p.memo ? `<div class="text-xs text-white/50 bg-white/5 rounded-xl p-3 border border-white/5 select-text w-full text-center mt-1">${p.memo}</div>` : ''}
     </div>
-    
-    ${googleMapsButtonHtml}
-    
-    <div class="flex flex-col gap-4">
-      ${!p.isDone ? `
-        <!-- 【未完了】全体がタップ可能な極上シンメトリーカード -->
-        <label ontouchstart="" class="cursor-pointer rounded-3xl py-6 px-5 bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-4 w-full">
-          <input type="checkbox" class="hidden" onchange="toggleDone('${areaName}', ${p.rowId}, this)">
-          
-          <!-- 1. テキスト（中央揃え） -->
-          <div class="flex flex-col items-center select-none text-center">
-            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">READY TO DEPLOY</span>
-            <span class="text-xs font-bold text-white/40 mt-1 tracking-wider">タップで配布完了</span>
-          </div>
+  `;
 
-          <!-- 2. チェックボックス（押した瞬間だけ沈み込む） -->
-          <div ontouchstart="" style="border-color: #10b981; background-color: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.4); transition: transform 75ms ease-out, box-shadow 75ms ease-out, filter 75ms ease-out;" class="w-12 h-12 rounded-2xl border flex items-center justify-center select-none"
-            onpointerdown="this.style.transform='scale(0.82)'; this.style.boxShadow='0 0 4px rgba(16,185,129,0.2)'; this.style.filter='brightness(0.85)'"
-            onpointerup="this.style.transform=''; this.style.boxShadow='0 0 10px rgba(16,185,129,0.4)'; this.style.filter=''"
-            onpointerleave="this.style.transform=''; this.style.boxShadow='0 0 10px rgba(16,185,129,0.4)'; this.style.filter=''">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
+  // 1. NOT_STARTED state
+  if (currentStatus === 'NOT_STARTED') {
+    const googleMapsButtonHtml = `
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddr)}" target="_blank" style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.25); color: #2563eb;" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-2xl active:scale-[0.97] transition-all">
+        📍 Googleマップで開く
+      </a>
+    `;
+
+    return `
+      ${addressHeaderHtml}
+      ${googleMapsButtonHtml}
+      <div class="flex flex-col gap-4 mt-2">
+        <button ontouchstart="" onclick="startDistribution('${areaName}', ${p.rowId})" style="background: #2563eb; color: #ffffff; box-shadow: 0 0 20px rgba(37,99,235,0.3);" class="w-full h-16 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest rounded-2xl active:scale-95 transition-all">
+          🟢 配布を開始する
+        </button>
+      </div>
+    `;
+  }
+
+  // 2. IN_PROGRESS state
+  if (currentStatus === 'IN_PROGRESS') {
+    // GPS indicator
+    let gpsStatusHtml = '';
+    if (p.gps) {
+      gpsStatusHtml = `
+        <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.25);" class="w-full rounded-2xl py-3 px-4 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm">📍</span>
+            <span class="text-[10px] font-black text-[#10b981] tracking-[0.1em]">GPS測定済</span>
           </div>
-        </label>
-      ` : `
-        <!-- 【完了済み】編集ロックがかかった上品なグリーンステータス表示 -->
-        <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.1), 0 0 30px rgba(16, 185, 129, 0.05);" class="w-full rounded-3xl py-6 px-5 flex flex-col items-center justify-center gap-4">
-          
-          <!-- 1. テキスト（中央揃え） -->
-          <div class="flex flex-col items-center select-none text-center">
-            <div class="flex items-center justify-center gap-1.5">
-              <span class="text-xs">🔒</span>
-              <span class="text-[10px] font-black uppercase tracking-widest text-[#10b981]">MISSION COMPLETED</span>
-            </div>
-            <span class="text-xs font-bold text-white/80 mt-1">${p.completedAt ? `${formatCompletedAt(p.completedAt)}${p.staffName ? ` · ${p.staffName}` : ''}` : ''}</span>
-          </div>
-          
-          ${syncLabelHtml ? `<div class="w-full flex justify-center mt-1">${syncLabelHtml.replace('ml-auto', '')}</div>` : ''}
+          <span class="text-[10px] text-white/50">${p.gps}</span>
         </div>
-      `}
+      `;
+    } else {
+      gpsStatusHtml = `
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="w-full rounded-2xl py-3 px-4 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm opacity-35">📍</span>
+            <span class="text-[10px] font-black text-white/40 tracking-[0.1em]">GPS未測定</span>
+          </div>
+          <button onclick="acquireGPSForDetail('${areaName}', ${p.rowId})" class="text-[10px] font-bold text-[#2563eb] bg-[#2563eb]/10 px-3 py-1.5 rounded-xl border border-[#2563eb]/25 active:scale-95 transition-all">測定する</button>
+        </div>
+      `;
+    }
 
-      ${p.isDone ? `
-        ${gpsBadgeHtml}
-        
-        ${photoBlockHtml}
+    // Photo block
+    let photoBlockHtml = '';
+    const tempUrl = p.tempPhotoUrl || '';
+    if (tempUrl) {
+      photoBlockHtml = `
+        <div class="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+          <img src="${tempUrl}" class="w-full h-full object-cover">
+          <button onclick="capturePhotoForDetail('${areaName}', ${p.rowId})" class="absolute bottom-3 right-3 bg-black/60 hover:bg-black/80 px-3 py-2 rounded-xl text-[10px] text-white font-bold border border-white/10 active:scale-95 transition-all">
+            📸 写真を再撮影
+          </button>
+        </div>
+      `;
+    } else {
+      photoBlockHtml = `
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center gap-2">
+          <div class="flex items-center justify-center gap-2 w-full">
+            <span class="text-sm opacity-30">📸</span>
+            <span class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">NO EVIDENCE PHOTO</span>
+          </div>
+          <button onclick="capturePhotoForDetail('${areaName}', ${p.rowId})" class="text-xs font-bold text-white bg-[#2563eb] px-4 py-2.5 rounded-xl border border-white/10 active:scale-95 transition-all mt-1">写真を追加する</button>
+        </div>
+      `;
+    }
 
-        <!-- 【配布数】上2つの証拠カードと枠サイズ・デザイン・青色テーマを完全統一 -->
-        <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4); box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.15), 0 0 30px rgba(37, 99, 235, 0.05);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
+    return `
+      ${addressHeaderHtml}
+      
+      <div class="flex flex-col gap-4">
+        <!-- 枚数変更 -->
+        <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
           <div class="text-3xl font-black text-[#2563eb] text-center tracking-tight">
             配布数 ${p.count || 0}枚
           </div>
-          ${!isLocked ? `
-            <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all mt-2">枚数変更</button>
-          ` : ''}
+          <button onclick="openNumpad('${areaName}', ${p.rowId}, ${p.count || 0})" class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/80 active:scale-95 transition-all mt-2">枚数変更</button>
         </div>
 
-        <!-- 4行目: この内容で提出する（閉じる）ボタン -->
-        <button ontouchstart="" onclick="closeDetailModal()" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); color: #10b981; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 0 6px rgba(16,185,129,0.1), 0 0 12px rgba(16,185,129,0.05); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-2xl active:scale-95 active:translate-y-[2px] transition-all duration-75 mt-2">
-          ✅ この内容で提出する（閉じる）
+        <!-- GPS証跡 -->
+        ${gpsStatusHtml}
+
+        <!-- 写真証跡 -->
+        ${photoBlockHtml}
+
+        <!-- 配布完了ボタン -->
+        <button ontouchstart="" onclick="commitDistribution('${areaName}', ${p.rowId})" style="background: #10b981; color: #ffffff; box-shadow: 0 0 20px rgba(16,185,129,0.3);" class="w-full h-14 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest rounded-2xl active:scale-95 transition-all mt-2">
+          ✅ 配布を完了する
         </button>
-      ` : ''}
+
+        <!-- 一時保存メッセージ (自動保存される旨のメッセージ) -->
+        <p class="text-[10px] text-white/40 text-center select-none mt-1">※ 変更は3秒後に自動的に下書き保存されます。</p>
+      </div>
+    `;
+  }
+
+  // 3. READY_TO_SYNC or SYNCED (completed state)
+  const isSynced = (currentStatus === 'SYNCED');
+  
+  let syncLabelHtml = '';
+  if (isSynced) {
+    syncLabelHtml = `<span class="text-[8px] font-black text-[#2563eb] tracking-widest bg-[#2563eb]/10 px-2 py-0.5 rounded-full ml-auto">SYNCED COMPLETE</span>`;
+  } else {
+    const s = p.syncStatus || 'PENDING';
+    if (s === 'SYNCING' || s === 'sending') {
+      syncLabelHtml = `<span class="text-[8px] font-black text-[#2563eb] animate-pulse tracking-widest bg-[#2563eb]/10 px-2 py-0.5 rounded-full ml-auto">FIELD DATA SYNCING...</span>`;
+    } else if (s === 'RETRY' || s === 'failed') {
+      syncLabelHtml = `<span class="text-[8px] font-black text-red-500 animate-pulse tracking-widest bg-red-500/10 px-2 py-0.5 rounded-full ml-auto">UPLOAD RETRYING...</span>`;
+    } else {
+      syncLabelHtml = `<span class="text-[8px] font-black text-white/40 animate-pulse tracking-widest bg-white/5 px-2 py-0.5 rounded-full ml-auto">READY TO SYNC (OFFLINE)</span>`;
+    }
+  }
+
+  let gpsBadgeHtml = '';
+  if (p.gps) {
+    gpsBadgeHtml = `
+      <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
+        <div class="flex items-center justify-center gap-2 w-full">
+          <span class="text-sm">📍</span>
+          <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em]">GPS VERIFIED</span>
+        </div>
+      </div>
+    `;
+  }
+
+  let photoBlockHtml = '';
+  const tempUrl = p.tempPhotoUrl || '';
+  const photoId = p.photoUrl || '';
+  if (tempUrl) {
+    photoBlockHtml = `
+      <div class="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+        <img src="${tempUrl}" class="w-full h-full object-cover">
+      </div>
+    `;
+  } else if (photoId && photoId !== 'none') {
+    photoBlockHtml = `
+      <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
+        <div class="flex items-center justify-center gap-2 w-full">
+          <span class="text-sm">📸</span>
+          <span class="text-[10px] font-black text-[#2563eb] uppercase tracking-[0.2em]">PHOTO VERIFIED</span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    ${addressHeaderHtml}
+    
+    <div class="flex flex-col gap-4">
+      <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.1), 0 0 30px rgba(16, 185, 129, 0.05);" class="w-full rounded-3xl py-6 px-5 flex flex-col items-center justify-center gap-4">
+        <div class="flex flex-col items-center select-none text-center">
+          <div class="flex items-center justify-center gap-1.5">
+            <span class="text-xs">🔒</span>
+            <span class="text-[10px] font-black uppercase tracking-widest text-[#10b981]">MISSION COMPLETED</span>
+          </div>
+          <span class="text-xs font-bold text-white/80 mt-1">${p.completedAt ? `${formatCompletedAt(p.completedAt)}${p.staffName ? ` · ${p.staffName}` : ''}` : ''}</span>
+        </div>
+        ${syncLabelHtml ? `<div class="w-full flex justify-center mt-1">${syncLabelHtml.replace('ml-auto', '')}</div>` : ''}
+      </div>
+
+      ${gpsBadgeHtml}
+      ${photoBlockHtml}
+
+      <div style="background: rgba(37, 99, 235, 0.05); border: 1.5px solid rgba(37, 99, 235, 0.4);" class="w-full rounded-2xl py-4 px-5 flex flex-col items-center justify-center">
+        <div class="text-3xl font-black text-[#2563eb] text-center tracking-tight">
+          配布数 ${p.count || 0}枚
+        </div>
+      </div>
+
+      <button ontouchstart="" onclick="closeDetailModal()" class="w-full h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-2xl bg-white/5 border border-white/10 active:scale-95 transition-all mt-2">
+        閉じる
+      </button>
     </div>
   `;
 }
@@ -383,24 +397,44 @@ function renderDetailModalContent(p) {
 // Render the entire details list using global allPoints (1-line simple card)
 function renderDetailList(areaName) {
   const cardsHtml = allPoints.map((p, i) => {
-    const statusDot   = p.isDone 
-      ? 'background-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6);' 
-      : 'background-color: rgba(255, 255, 255, 0.2);';
-    const statusText  = p.isDone ? '🔒 完了' : '未完了';
-    const statusColor = p.isDone ? 'color: #2563eb;' : 'color: rgba(255, 255, 255, 0.4);';
+    // Determine the status
+    const currentStatus = p.status || (p.isDone ? 'SYNCED' : 'NOT_STARTED');
+    
+    let statusDot = 'background-color: rgba(255, 255, 255, 0.2);';
+    let statusText = '未着手';
+    let statusColor = 'color: rgba(255, 255, 255, 0.4);';
+    
+    if (currentStatus === 'IN_PROGRESS') {
+      statusDot = 'background-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);';
+      statusText = '🟡 配布中';
+      statusColor = 'color: #f59e0b;';
+    } else if (currentStatus === 'READY_TO_SYNC') {
+      statusDot = 'background-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);';
+      statusText = '🟢 配布完了';
+      statusColor = 'color: #10b981;';
+    } else if (currentStatus === 'SYNCED') {
+      statusDot = 'background-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6);';
+      statusText = '🔒 完了';
+      statusColor = 'color: #2563eb;';
+    }
 
-    // 同期バッジ (要件8: PENDING↓SYNCING↓COMPLETE / RETRYING...)
+    // 同期バッジ
     const _s = p.syncStatus;
     const syncBadge = (() => {
-      if (!_s) return '';
+      if (currentStatus === 'SYNCED') return '';
+      if (!_s) {
+        if (currentStatus === 'READY_TO_SYNC') return ` <span style="color:#10b981;font-size:7px;font-weight:900;letter-spacing:0.08em">(待機中)</span>`;
+        return '';
+      }
       if (_s === 'SYNCING'  || _s === 'sending') return ` <span style="color:#2563eb;font-size:7px;font-weight:900;letter-spacing:0.1em">●</span>`;
       if (_s === 'RETRY'    || _s === 'failed')  return ` <span style="color:#ef4444;font-size:7px;font-weight:900;letter-spacing:0.08em">RETRY</span>`;
       if (_s === 'PENDING'  || _s === 'pending') return ` <span style="color:#f59e0b;font-size:7px;font-weight:900;letter-spacing:0.08em">⋯</span>`;
       return '';
     })();
 
-    // 3行目：配布員名（グリーンのバッジ枠で囲み、自然に中央揃えに）
-    const nameLineHtml = p.isDone && p.staffName
+    // 3行目：配布員名
+    const isCompletedOrSynced = (currentStatus === 'READY_TO_SYNC' || currentStatus === 'SYNCED');
+    const nameLineHtml = isCompletedOrSynced && p.staffName
       ? `
         <div class="w-full flex justify-center mt-0.5">
           <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); height: 22px; font-size: 10px; color: #10b981;" class="inline-flex items-center justify-center h-[22px] px-2.5 text-[10px] font-bold text-[#10b981] rounded-full tracking-wider">
@@ -409,9 +443,9 @@ function renderDetailList(areaName) {
         </div>`
       : '';
 
-    // 完了済みカードはタップ無効（ロック状態）
-    const onclickAttr = p.isDone ? '' : `onclick="openPointDetailModal(${p.rowId})"`;
-    const cardClass = p.isDone
+    // 完了済み/同期済みカードはタップ無効（ロック状態）
+    const onclickAttr = isCompletedOrSynced ? '' : `onclick="openPointDetailModal(${p.rowId})"`;
+    const cardClass = isCompletedOrSynced
       ? "premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center"
       : "clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center";
 
@@ -424,7 +458,7 @@ function renderDetailList(areaName) {
         </div>
         <div style="${statusColor}" class="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 w-full">
           <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
-          <span>${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}</span>
+          <span>${statusText} ${isCompletedOrSynced && p.count ? `· ${p.count}枚` : ''}${syncBadge}</span>
         </div>
         ${nameLineHtml}
       </div>`;
@@ -465,13 +499,65 @@ function navigateToSiblingArea(direction) {
   }
 }
 
+async function mergeDraftsAndRender(areaName) {
+  if (typeof window.getAreaDrafts === 'function') {
+    try {
+      const drafts = await window.getAreaDrafts(areaName);
+      drafts.forEach(draft => {
+        const p = allPoints.find(pt => pt.rowId === draft.rowId);
+        if (p) {
+          p.status = draft.status;
+          p.count = draft.count;
+          p.tempPhotoUrl = draft.tempPhotoUrl;
+          if (draft.latitude && draft.longitude) {
+            p.gps = `${draft.latitude},${draft.longitude}`;
+            p.gpsMeasuredAt = draft.gpsMeasuredAt;
+          }
+          p.startedAt = draft.startedAt;
+          p.isDone = (draft.status === 'READY_TO_SYNC' || draft.status === 'SYNCED');
+        }
+      });
+    } catch (err) {
+      console.error("Failed to load local drafts:", err);
+    }
+  }
+
+  if (typeof window.getQueue === 'function') {
+    try {
+      const queue = await window.getQueue();
+      queue.forEach(item => {
+        if (item.areaName === areaName) {
+          const p = allPoints.find(pt => pt.rowId === item.rowId);
+          if (p) {
+            p.status = 'READY_TO_SYNC';
+            p.isDone = true;
+            p.count = item.count;
+            p.syncStatus = item.syncStatus || 'PENDING';
+            if (item.photoBase64) {
+              p.tempPhotoUrl = item.photoBase64;
+            }
+            if (item.latitude && item.longitude) {
+              p.gps = `${item.latitude},${item.longitude}`;
+            }
+          }
+        }
+      });
+    } catch (err) {
+      console.error("Failed to check sync queue:", err);
+    }
+  }
+
+  renderDetailList(areaName);
+}
+window.mergeDraftsAndRender = mergeDraftsAndRender;
+
 async function openDetail(name) {
   // 1. 同一エリアへの再タップ: メモリキャッシュを使って即時描画
   if (window.currentCityDetailAreaName === name && allPoints && allPoints.length > 0) {
     if (typeof scrollPositions !== 'undefined') scrollPositions['detail'] = 0;
     const contentEl = $('content');
     if (contentEl) contentEl.scrollTop = 0;
-    renderDetailList(name);
+    await mergeDraftsAndRender(name);
     switchPage('detail');
     return;
   }
@@ -485,7 +571,7 @@ async function openDetail(name) {
     }
     const contentEl = $('content');
     if (contentEl) contentEl.scrollTop = 0;
-    renderDetailList(name);
+    await mergeDraftsAndRender(name);
     switchPage('detail');
     return;
   }
@@ -504,7 +590,7 @@ async function openDetail(name) {
         window.cityAreaCache = data.details;
         window.currentCityDetailAreaName = name;
         allPoints = data.details[name];
-        renderDetailList(name);
+        await mergeDraftsAndRender(name);
         
         if (typeof scrollPositions !== 'undefined') scrollPositions['detail'] = 0;
         const contentEl = $('content');
@@ -526,7 +612,7 @@ async function openDetail(name) {
       if (!window.cityAreaCache) window.cityAreaCache = {};
       window.cityAreaCache[name] = data.points;
       
-      renderDetailList(name);
+      await mergeDraftsAndRender(name);
       if (typeof scrollPositions !== 'undefined') scrollPositions['detail'] = 0;
       const contentEl = $('content');
       if (contentEl) contentEl.scrollTop = 0;
