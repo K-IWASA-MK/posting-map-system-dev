@@ -135,7 +135,10 @@ function costGuard(plan, event) {
 // 2. EVENT STREAM BRIDGE LAYER (リアルタイムストリームブリッジ)
 // ==========================================
 
-function doPost(e) {
+// [DISABLED in Version 1.0] 
+// This function shadows the standard doPost in v2_api.gs/99_entry.gs.
+// Renamed to avoid intercepting and crashing H-App POST requests.
+function v2_kernel_doPost(e) {
   try {
     var postData = JSON.parse(e.postData.contents);
     var rawEvent = {
