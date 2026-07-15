@@ -34,6 +34,10 @@ class MockFlyerHoldingRepository implements IFlyerHoldingRepository {
   async save(holding: FlyerHolding): Promise<void> {
     this.db.set(holding.staffNo, holding);
   }
+
+  public async delete(staffNo: string): Promise<void> {
+    this.db.delete(staffNo);
+  }
 }
 
 async function runTests() {
