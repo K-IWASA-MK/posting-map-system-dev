@@ -1467,3 +1467,43 @@ Execution Plan
    - コミットハッシュ (Commit Hash)
    - 次フェーズまたは次のタスクへの引き継ぎ内容
 
+
+### 49. AIOS Standard Development Lifecycle (Generation 6+)
+
+本規約は、Generation 6以降のすべてのAIOSおよびプロダクト開発における**標準開発ライフサイクル定義**である。
+
+#### ■ 開発プロセスフロー (10-Step Flow)
+1. **Implementation Plan** (実装計画書の作成)
+2. **Architecture Review** (アーキテクチャ・設計のレビュー)
+3. **Proceed (Approval)** (ユーザーによる明示的な承認・Proceedの取得)
+4. **Implementation** (実装の実施)
+5. **Verification** (自動テスト・型チェック・品質検証)
+   - `npx tsc --noEmit`
+   - `npm run test`
+   - `npm run quality:check`
+   - 必要に応じてビルド (`npm run build` 等)
+6. **Walkthrough** (成果物の要約・検証結果・設計メモ等のドキュメント作成)
+   - Changes Made
+   - Verification Results
+   - Deliverables
+   - Architecture Notes
+7. **Final Review** (最終結果のチャット報告・確認)
+8. **Git Commit** (コミットの実行)
+9. **Git Push** (リモートへのプッシュ)
+10. **HANDOVER.md Update** (必要に応じた引継ぎドキュメントの更新)
+
+#### ■ プロセスの遵守メリット
+- **アーキテクチャ整合性**: 実装前の設計レビューにより、アーキテクチャの逸脱を未然に防ぐ。
+- **スコープ制御**: Proceed（承認）を品質ゲートとすることで、意図しない機能追加やスコープ肥大化を防止する。
+- **追跡可能性**: Walkthroughにより、何を変更しどう検証したかの変更履歴が詳細に記録される。
+- **クリーンなGit履歴**: レビュー後にコミットを行うため、Git履歴が設計単位・スプリント単位で整理され可視性が高まる。
+
+
+### 50. AIOS Agent Communication Rule (Generation 6+)
+
+本ルールは、AIOS開発アシスタントのチャット上での応答形式を制御する規約である。
+
+1. **完全日本語出力**: チャットにおける全回答は日本語のみで記述する。
+2. **単一コードブロック制約**: すべての回答（成果報告、RCA、仕様説明等）は、コピーボタンが機能するように「一つのマークダウンコードブロック」の中にまとめて出力し、チャット欄に2つ以上の独立したマークダウンコードブロックを配置してはならない。
+
+
