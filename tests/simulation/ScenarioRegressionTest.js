@@ -5,7 +5,7 @@
  * 各シナリオが定義通りの期待結果を返すかをアサートする。
  */
 
-const { SimulationRuntime } = require('../../audit/SimulationRuntime');
+const { SimulationRuntime } = require('./runtime/SimulationRuntime');
 
 class ScenarioRegressionTest {
   /**

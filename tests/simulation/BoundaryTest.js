@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 // 検証対象ディレクトリ
-const SIMULATION_DIR = path.join(__dirname, '../../audit');
+const SIMULATION_DIR = path.join(__dirname, './runtime');
 
 // 禁止キーワード (本番環境への干渉)
 const FORBIDDEN_KEYWORDS = [

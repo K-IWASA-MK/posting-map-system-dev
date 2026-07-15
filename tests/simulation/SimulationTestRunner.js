@@ -9,7 +9,7 @@ const { ContractRegressionTest } = require('./ContractRegressionTest');
 const { ScenarioRegressionTest } = require('./ScenarioRegressionTest');
 const { BoundaryTest } = require('./BoundaryTest');
 const { TestReporter } = require('./TestReporter');
-const { AuditWriter } = require('../../audit/AuditWriter');
+const { AuditWriter } = require('./runtime/AuditWriter');
 
 class SimulationTestRunner {
   /**

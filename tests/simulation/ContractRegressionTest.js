@@ -5,7 +5,7 @@
  * 必須キー欠落の異常データが流れた際に、決定論的に FAIL と判定されるかを検証する。
  */
 
-const { SimulationRuntime } = require('../../audit/SimulationRuntime');
+const { SimulationRuntime } = require('./runtime/SimulationRuntime');
 
 class ContractRegressionTest {
   /**

@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "projects": [
+    {
+      "id": "posting-map",
+      "name": "Posting Map",
+      "status": "production",
+      "description": "Field operations OS for posting map distribution and management."
+    },
+    {
+      "id": "hokusei-ch",
+      "name": "Hokusei Channel",
+      "status": "development",
+      "description": "Local community broadcasting and agent monitoring system."
+    },
+    {
+      "id": "mie-sanseito-kouhou",
+      "name": "Mie Sanseito Kouhou",
+      "status": "development",
+      "description": "Political PR and public relations management system for Mie prefecture."
+    },
+    {
+      "id": "80s-disco",
+      "name": "80s Disco",
+      "status": "development",
+      "description": "Music curation and 80s disco media database."
+    }
+  ]
+}

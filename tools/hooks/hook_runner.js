@@ -8,7 +8,7 @@
  */
 
 const { SimulationTestRunner } = require('../../tests/simulation/SimulationTestRunner');
-const { AuditWriter } = require('../../audit/AuditWriter');
+const { AuditWriter } = require('../../tests/simulation/runtime/AuditWriter');
 
 class HookRunner {
   /**

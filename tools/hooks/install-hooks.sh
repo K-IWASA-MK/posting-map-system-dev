@@ -34,7 +34,7 @@ echo "[Hook Installer] 正常にフックファイルが配置されました: $
 
 # 4. フック配置監査イベントの追記 (Append-Only)
 node -e "
-const { AuditWriter } = require('$REPO_ROOT/src/simulation/AuditWriter');
+const { AuditWriter } = require('$REPO_ROOT/tests/simulation/runtime/AuditWriter');
 AuditWriter.write('HOOK-INSTALL', 'HookInstalled', {
   hookType: 'git-pre-commit',
   targetPath: '$HOOK_FILE',
