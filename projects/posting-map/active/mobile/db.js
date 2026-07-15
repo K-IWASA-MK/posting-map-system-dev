@@ -183,6 +183,24 @@ async function scheduleRetry(item) {
   });
 }
 
+/**
+ * 手動で即時再送を試みる（P-06 要件）
+ */
+async function forceRetrySync(areaName, rowId) {
+  const queue = await getQueue();
+  const item = queue.find(q => q.areaName === areaName && q.rowId === rowId && (q.syncStatus === 'RETRY' || q.status === 'failed' || q.syncStatus === 'PENDING'));
+  if (item) {
+    await updateQueueItem(item.id, {
+      syncStatus: 'PENDING',
+      nextRetryAt: 0,
+      retryCount: 0 // Reset retry count on manual retry
+    });
+    console.log(`[Queue] Manual retry triggered for rowId=${rowId}`);
+    if (typeof processQueue === 'function') processQueue();
+  }
+}
+window.forceRetrySync = forceRetrySync;
+
 // ── メイン同期処理 ────────────────────────────────────────────
 
 /**

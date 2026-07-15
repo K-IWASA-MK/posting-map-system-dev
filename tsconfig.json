@@ -11,16 +11,16 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@core/*": ["apps/posting-map/src/core/*"],
-      "@foundation/*": ["apps/posting-map/src/foundation/*"],
-      "@domain/*": ["apps/posting-map/src/domain/*"],
-      "@infra/*": ["apps/posting-map/src/infrastructure/*"],
-      "@application/*": ["apps/posting-map/src/application/*"],
-      "@api/*": ["apps/posting-map/src/api/*"],
+      "@core/*": ["projects/posting-map/src/core/*"],
+      "@foundation/*": ["projects/posting-map/src/foundation/*"],
+      "@domain/*": ["projects/posting-map/src/domain/*"],
+      "@infra/*": ["projects/posting-map/src/infrastructure/*"],
+      "@application/*": ["projects/posting-map/src/application/*"],
+      "@api/*": ["projects/posting-map/src/api/*"],
       "@kernel/*": ["aios/kernel/*"],
       "@shared/*": ["shared/*"]
     }
   },
-  "include": ["apps/posting-map/src/**/*", "aios/**/*", "shared/**/*"],
+  "include": ["projects/posting-map/src/**/*", "aios/**/*", "shared/**/*"],
   "exclude": ["**/deprecated/**/*", "node_modules", "aios/tests/**/*", "aios/transformation/**/*"]
 }

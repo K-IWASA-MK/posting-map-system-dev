@@ -37,33 +37,33 @@ def build_bundle(source_dirs, output_file):
 
 os.makedirs("active/gas", exist_ok=True)
 
-build_bundle(["src/plugins/posting-map/core"], "active/gas/00_core.gs")
-build_bundle(["src/plugins/posting-map/foundation/features", "src/plugins/posting-map/foundation/licensing", "src/plugins/posting-map/foundation/validation", "src/plugins/posting-map/foundation/monitoring", "src/plugins/posting-map/foundation/bridge"], "active/gas/01_foundation.gs")
-build_bundle(["src/plugins/posting-map/foundation/authentication", "src/plugins/posting-map/foundation/authorization", "src/plugins/posting-map/foundation/hardening"], "active/gas/02_security.gs")
-build_bundle(["src/platform"], "active/gas/03_platform.gs")
-build_bundle(["src/plugins/posting-map/infrastructure/gas"], "active/gas/04_api.gs")
+build_bundle(["projects/posting-map/src/core"], "active/gas/00_core.gs")
+build_bundle(["projects/posting-map/src/foundation/features", "projects/posting-map/src/foundation/licensing", "projects/posting-map/src/foundation/validation", "projects/posting-map/src/foundation/monitoring", "projects/posting-map/src/foundation/bridge"], "active/gas/01_foundation.gs")
+build_bundle(["projects/posting-map/src/foundation/authentication", "projects/posting-map/src/foundation/authorization", "projects/posting-map/src/foundation/hardening"], "active/gas/02_security.gs")
+build_bundle(["projects/posting-map/src/platform"], "active/gas/03_platform.gs")
+build_bundle(["projects/posting-map/src/infrastructure/gas"], "active/gas/04_api.gs")
 build_bundle([
-    "src/plugins/posting-map/domain/common",
-    "src/plugins/posting-map/domain/workspace",
-    "src/plugins/posting-map/domain/field",
-    "src/plugins/posting-map/application/events",
-    "src/plugins/posting-map/application/field",
-    "src/plugins/posting-map/application/subscription",
-    "src/plugins/posting-map/application/operations",
-    "src/plugins/posting-map/application/onboarding",
-    "src/plugins/posting-map/infrastructure/spreadsheet",
-    "src/plugins/posting-map/infrastructure/repository/workspace",
-    "src/plugins/posting-map/infrastructure/repository/field",
-    "src/plugins/posting-map/api/field",
-    "src/plugins/posting-map/api/subscription",
-    "src/plugins/posting-map/api/operations",
-    "src/plugins/posting-map/api/registry",
-    "src/plugins/posting-map/infrastructure/bootstrap"
+    "projects/posting-map/src/domain/common",
+    "projects/posting-map/src/domain/workspace",
+    "projects/posting-map/src/domain/field",
+    "projects/posting-map/src/application/events",
+    "projects/posting-map/src/application/field",
+    "projects/posting-map/src/application/subscription",
+    "projects/posting-map/src/application/operations",
+    "projects/posting-map/src/application/onboarding",
+    "projects/posting-map/src/infrastructure/spreadsheet",
+    "projects/posting-map/src/infrastructure/repository/workspace",
+    "projects/posting-map/src/infrastructure/repository/field",
+    "projects/posting-map/src/api/field",
+    "projects/posting-map/src/api/subscription",
+    "projects/posting-map/src/api/operations",
+    "projects/posting-map/src/api/registry",
+    "projects/posting-map/src/infrastructure/bootstrap"
 ], "active/gas/05_field.gs")
 
 build_bundle([
-    "src/plugins/posting-map/application/dashboard",
-    "src/plugins/posting-map/api/dashboard"
+    "projects/posting-map/src/application/dashboard",
+    "projects/posting-map/src/api/dashboard"
 ], "active/gas/06_dashboard.gs")
 
 entry_content = """// =========================================

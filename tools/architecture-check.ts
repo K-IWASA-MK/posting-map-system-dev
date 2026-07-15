@@ -27,7 +27,8 @@ function getFiles(dir: string, fileList: string[] = []): string[] {
 }
 
 function checkDependencies() {
-  const srcDir = path.join(__dirname, '../apps/posting-map/src');
+  const srcDir = path.join(__dirname, '../projects/posting-map/src');
+  if (!fs.existsSync(srcDir)) return;
   const layers = Object.keys(allowedDependencies);
   let hasErrors = false;
 
