@@ -7,7 +7,7 @@ import { ProjectMetadata } from '../project-manager/ProjectMetadata';
  */
 export class LauncherPolicy {
   /**
-   * Evaluates launch safety constraints.
+   * Asserts whether a registered project is safe to boot under policy gates.
    * @param metadata Target project metadata from ProjectManager.
    * @param request Input parameters for the launch.
    */
