@@ -1,6 +1,6 @@
 import re
 
-FILE_PATH = "src/aios/DevelopmentRules.ts"
+FILE_PATH = "sdk/DevelopmentRules.ts"
 
 with open(FILE_PATH, "r") as f:
     content = f.read()

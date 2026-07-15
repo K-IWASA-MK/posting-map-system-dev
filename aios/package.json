@@ -1,9 +1,0 @@
-{
-  "name": "@kiwasa/aios-core",
-  "version": "5.0.0-alpha.0",
-  "description": "AIOS Core OS and Framework",
-  "main": "sdk/index.ts",
-  "dependencies": {
-    "@kiwasa/shared": "*"
-  }
-}

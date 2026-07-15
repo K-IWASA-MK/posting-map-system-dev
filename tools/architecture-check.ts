@@ -51,9 +51,9 @@ function checkDependencies() {
           const resolvedPath = path.resolve(path.dirname(file), importPath);
           const relativeToRoot = path.relative(path.join(__dirname, '..'), resolvedPath);
           
-          if (relativeToRoot.startsWith('aios/') && 
-              !relativeToRoot.startsWith('aios/kernel/') && 
-              !relativeToRoot.startsWith('aios/sdk/')) {
+          const platformInternalDirs = ['core/', 'runtime/', 'automation/', 'governance/', 'monitoring/', 'optimization/', 'selfregulation/', 'transformation/', 'audit/', 'learning/'];
+          
+          if (platformInternalDirs.some(dir => relativeToRoot.startsWith(dir))) {
             console.error(`❌ [Internal Platform Import Violation] ${file}`);
             console.error(`   Application is not allowed to import directly from platform internals`);
             console.error(`   Import: '${importPath}' (resolves to '${relativeToRoot}')`);
@@ -61,9 +61,9 @@ function checkDependencies() {
           }
         }
         
-        if (importPath.startsWith('aios/') && 
-            !importPath.startsWith('aios/kernel/') && 
-            !importPath.startsWith('aios/sdk/')) {
+        const platformInternalDirs = ['core/', 'runtime/', 'automation/', 'governance/', 'monitoring/', 'optimization/', 'selfregulation/', 'transformation/', 'audit/', 'learning/'];
+        
+        if (platformInternalDirs.some(dir => importPath.startsWith(dir))) {
           console.error(`❌ [Internal Platform Import Violation] ${file}`);
           console.error(`   Application is not allowed to import directly from platform internals`);
           console.error(`   Import: '${importPath}'`);

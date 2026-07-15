@@ -1,0 +1,49 @@
+import { MetricsMonitor } from '../../../../../sdk/core/monitor/MetricsMonitor';
+import { InMemoryMetricsRepository } from '../../../../../sdk/core/metrics/InMemoryMetricsRepository';
+import { MetricName } from '../../../../../sdk/core/telemetry/MetricName';
+import { MetricCategory } from '../../../../../sdk/core/telemetry/MetricCategory';
+import { MetricUnit } from '../../../../../sdk/core/telemetry/MetricUnit';
+import { MetricAggregationType } from '../../../../../sdk/core/metrics/MetricAggregationType';
+import { MetricWindow } from '../../../../../sdk/core/metrics/MetricWindow';
+
+function assert(condition: boolean, message: string) {
+  if (!condition) {
+    throw new Error(`[Assertion Failure] ${message}`);
+  }
+}
+
+async function runTests() {
+  console.log('Running MetricsMonitor tests...');
+
+  const repo = new InMemoryMetricsRepository();
+  const monitor = new MetricsMonitor(repo);
+
+  // Test empty repo
+  const res1 = await monitor.query();
+  assert(res1.averageExecutionTime === 0 && res1.executionCount === 0, 'Empty values should return 0');
+
+  // Add metrics
+  await repo.save({
+    metricId: 'M1',
+    metricName: MetricName.EXECUTION_DURATION,
+    metricCategory: MetricCategory.EXECUTION,
+    aggregationType: MetricAggregationType.AVERAGE,
+    window: MetricWindow.EXECUTION,
+    value: 45.0,
+    unit: MetricUnit.MS,
+    sampleCount: 15,
+    generatedAt: '',
+    schemaVersion: '1.0.0'
+  });
+
+  const res2 = await monitor.query();
+  assert(res2.averageExecutionTime === 45.0, 'Average time should align');
+  assert(res2.executionCount === 15, 'ExecutionCount sample size should align');
+
+  console.log('All MetricsMonitor tests passed!');
+}
+
+runTests().catch(e => {
+  console.error(e);
+  process.exit(1);
+});

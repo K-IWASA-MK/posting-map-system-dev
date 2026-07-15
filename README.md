@@ -1,31 +1,33 @@
-# POSTING MAP - Self-Correcting Strategic OS
+# AIOS - AI-Native Development Platform
 
-POSTING MAP is a full-stack, real-time autonomous operating system for election strategy and field operations.
+AIOS is an AI-Native Development Platform.
 
-## 🏗️ 3-Layer Architecture (SaaS Standard OS Structure)
+Projects are applications built on AIOS.
 
-The repository strictly follows a 3-layer architecture to ensure scalability, stability, and clarity:
+```
+Project
+    ↓
+AIOS Platform
+```
 
-### 1. `/active` (Execution OS)
-The actively running system components.
-- `/dashboard` : Command Center OS (The single source of truth for management UI)
-- `/mobile`    : Field Agent App (Mobile OS)
-- `/gas`       : AI OS Core (Backend logic, Decision Engine, Prediction Engine)
-- `/api`       : API & Communication Layer
+## Platform Architecture
 
-### 2. `/reference` (Data Dictionary / External Memory)
-Static or semi-static data files serving as the external memory for the OS.
-- `geo_map.csv`, `turnout.csv`, `district.csv`, etc.
-- **Rule:** This layer is for REFERENCE ONLY. It provides the base realities (districts, historical turnout) to the OS.
+AIOS is a standalone Platform product. It does not contain project-specific code. All projects must depend on AIOS, and AIOS must never depend on any project.
 
-### 3. `/legacy` (Frozen Archive)
-Deprecated applications, old dashboards, and experimental features.
-- **LEGACY is frozen.**
-- **No API integration allowed.**
-- **Reference only.**
-
----
-*Note: This architecture was established in Phase 17 to stabilize the development environment into a production-ready SaaS infrastructure.*
+- `kernel/` : Core Engine
+- `runtime/` : Execution Runtime
+- `sdk/` : Integration SDK
+- `plugins/` : Reusable AI Plugins
+- `skills/` : AI Skills
+- `templates/` : UI and Logic Templates
+- `workflows/` : Process Workflows
+- `knowledge/` : Elevated Knowledge Base
+- `marketplace/` : Ecosystem Assets
+- `projects/` : Hosted Applications (e.g., POSTING MAP)
 
 ---
-*Note: Version management system integrated on 2026-06-26.*
+
+## POSTING MAP Project (Hosted Application)
+
+POSTING MAP is the first project operating on the AIOS platform.
+(Legacy architecture details for POSTING MAP have been migrated to the `projects/posting-map` context).

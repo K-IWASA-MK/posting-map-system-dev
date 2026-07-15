@@ -1,0 +1,1700 @@
+/**
+ * DevelopmentRules.ts
+ * 
+ * Development OS で適用される各開発ルールの定義体。
+ * 
+ * 警告：本ファイル内への API 通信、コマンド送信、自律改善、AI予測・推論・自動配置ロジックの実装は厳禁である。
+ */
+
+import { CapabilityRegistry } from './CapabilityRegistry';
+import { SkillRegistry, Skill } from './SkillRegistry';
+import { SkillPipelineRegistry, SkillPipeline } from './SkillPipelineRegistry';
+import { ExecutionLedgerRegistry, ExecutionRecord } from './ExecutionLedgerRegistry';
+import { QualityGateRegistry, QualityGateRecord } from './QualityGateRegistry';
+import { ToolAdapterRegistry, ToolAdapter } from './ToolAdapter';
+import { AntigravityAdapterRegistry, AntigravityAdapter } from './AntigravityAdapter';
+import { ClaudeAdapterRegistry, ClaudeAdapter } from './ClaudeAdapter';
+import { ClaudeModelRegistry, ClaudeModel } from './ClaudeModelRegistry';
+import { GeminiAdapterRegistry, GeminiAdapter } from './GeminiAdapter';
+import { GeminiModelRegistry, GeminiModel } from './GeminiModelRegistry';
+import { OpenAIAdapterRegistry, OpenAIAdapter } from './OpenAIAdapter';
+import { OpenAIModelRegistry, OpenAIModel } from './OpenAIModelRegistry';
+import { AdapterResolver } from './AdapterResolver';
+import { MultiAdapterRegistry } from './MultiAdapterRegistry';
+import { AdapterType } from './AdapterResolutionRegistry';
+import { RuntimeRegistry, RuntimeRecord } from './RuntimeRegistry';
+import { RuntimeSessionRegistry, Session } from './RuntimeSessionRegistry';
+import { RuntimeContextRegistry, Context } from './RuntimeContextRegistry';
+import { RuntimeQueueRegistry, Queue } from './RuntimeQueueRegistry';
+import { RuntimeTaskRegistry, Task } from './RuntimeTaskRegistry';
+import { RuntimeExecutionPlanRegistry, ExecutionPlan } from './RuntimeExecutionPlanRegistry';
+import { RuntimeExecutionGraphRegistry, ExecutionGraph } from './RuntimeExecutionGraphRegistry';
+import { ExecutionEngine, EXECUTION_ENGINE_BLUEPRINT } from './execution/ExecutionEngine';
+import { ExecutionRegistry, EXECUTION_REGISTRY_BLUEPRINT } from './execution/ExecutionRegistry';
+import { ExecutionRequest, EXECUTION_REQUEST_BLUEPRINT } from './execution/ExecutionRequest';
+import { ExecutionResult, EXECUTION_RESULT_BLUEPRINT } from './execution/ExecutionResult';
+import { ExecutionState, EXECUTION_STATE_BLUEPRINT } from './execution/ExecutionState';
+import { ExecutionResolver, EXECUTION_RESOLVER_BLUEPRINT } from './execution/ExecutionResolver';
+import { ExecutionDispatcher, EXECUTION_DISPATCHER_BLUEPRINT } from './execution/ExecutionDispatcher';
+import { ExecutionRuntime, EXECUTION_RUNTIME_BLUEPRINT } from './execution/ExecutionRuntime';
+import { ExecutionRuntimeRegistry, EXECUTION_RUNTIME_REGISTRY_BLUEPRINT } from './execution/ExecutionRuntimeRegistry';
+import { ExecutionContextHydrator, EXECUTION_CONTEXT_HYDRATOR_BLUEPRINT } from './execution/ExecutionContextHydrator';
+import { ExecutionBlueprintValidator, EXECUTION_BLUEPRINT_VALIDATOR_BLUEPRINT } from './execution/ExecutionBlueprintValidator';
+import { ExecutionRuntimeContext, EXECUTION_RUNTIME_CONTEXT_BLUEPRINT } from './execution/ExecutionRuntimeContext';
+import { ExecutionRuntimeSession, EXECUTION_RUNTIME_SESSION_BLUEPRINT } from './execution/ExecutionRuntimeSession';
+import { ExecutionRuntimeManager, EXECUTION_RUNTIME_MANAGER_BLUEPRINT } from './execution/ExecutionRuntimeManager';
+import { RuntimeResolverResult, EXECUTION_RUNTIME_RESOLVER_LOGIC } from './execution/ExecutionRuntimeResolver';
+import { RuntimeHydrationResult, EXECUTION_RUNTIME_HYDRATION_LOGIC } from './execution/ExecutionRuntimeHydration';
+import { RuntimeValidationResult, EXECUTION_RUNTIME_VALIDATION_LOGIC } from './execution/ExecutionRuntimeValidation';
+import { RuntimeDispatchResult, EXECUTION_RUNTIME_DISPATCH_LOGIC } from './execution/ExecutionRuntimeDispatch';
+import { RuntimeQueueResult, EXECUTION_RUNTIME_QUEUE_LOGIC } from './execution/ExecutionRuntimeQueueLogic';
+import { RuntimeSchedulerResult, EXECUTION_RUNTIME_SCHEDULER_LOGIC } from './execution/ExecutionRuntimeSchedulerLogic';
+import { RuntimeExecutorResult, EXECUTION_RUNTIME_EXECUTOR_LOGIC } from './execution/ExecutionRuntimeExecutorLogic';
+import { ExecutionRuntimeEngine, EXECUTION_RUNTIME_ENGINE_BLUEPRINT } from './execution/ExecutionRuntimeEngine';
+import { ExecutionRuntimeEngineRegistry, EXECUTION_RUNTIME_ENGINE_REGISTRY_BLUEPRINT } from './execution/ExecutionRuntimeEngineRegistry';
+import { ExecutionRuntimeEngineResolver, EXECUTION_RUNTIME_ENGINE_RESOLVER_BLUEPRINT } from './execution/ExecutionRuntimeEngineResolver';
+import { ExecutionRuntimeEngineValidator, EXECUTION_RUNTIME_ENGINE_VALIDATOR_BLUEPRINT } from './execution/ExecutionRuntimeEngineValidator';
+import { ExecutionRuntimeEngineDispatcher, EXECUTION_RUNTIME_ENGINE_DISPATCHER_BLUEPRINT } from './execution/ExecutionRuntimeEngineDispatcher';
+import { ExecutionRuntimeEngineScheduler, EXECUTION_RUNTIME_ENGINE_SCHEDULER_BLUEPRINT } from './execution/ExecutionRuntimeEngineScheduler';
+import { ExecutionRuntimeEngineExecutor, EXECUTION_RUNTIME_ENGINE_EXECUTOR_BLUEPRINT } from './execution/ExecutionRuntimeEngineExecutor';
+import { ExecutionRuntimeService, EXECUTION_RUNTIME_SERVICE_BLUEPRINT } from './execution/ExecutionRuntimeService';
+import { ExecutionRuntimeServiceRegistry, EXECUTION_RUNTIME_SERVICE_REGISTRY_BLUEPRINT } from './execution/ExecutionRuntimeServiceRegistry';
+import { ExecutionRuntimeServiceResolver, EXECUTION_RUNTIME_SERVICE_RESOLVER_BLUEPRINT } from './execution/ExecutionRuntimeServiceResolver';
+import { ExecutionRuntimeServiceValidator, EXECUTION_RUNTIME_SERVICE_VALIDATOR_BLUEPRINT } from './execution/ExecutionRuntimeServiceValidator';
+import { ExecutionRuntimeServiceDispatcher, EXECUTION_RUNTIME_SERVICE_DISPATCHER_BLUEPRINT } from './execution/ExecutionRuntimeServiceDispatcher';
+import { ExecutionRuntimeServiceScheduler, EXECUTION_RUNTIME_SERVICE_SCHEDULER_BLUEPRINT } from './execution/ExecutionRuntimeServiceScheduler';
+import { ExecutionRuntimeServiceExecutor, EXECUTION_RUNTIME_SERVICE_EXECUTOR_BLUEPRINT } from './execution/ExecutionRuntimeServiceExecutor';
+import { ExecutionRuntimeComponent, EXECUTION_RUNTIME_COMPONENT_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponent';
+import { ExecutionRuntimeComponentRegistry, EXECUTION_RUNTIME_COMPONENT_REGISTRY_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentRegistry';
+import { ExecutionRuntimeComponentResolver, EXECUTION_RUNTIME_COMPONENT_RESOLVER_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentResolver';
+import { ExecutionRuntimeComponentValidator, EXECUTION_RUNTIME_COMPONENT_VALIDATOR_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentValidator';
+import { ExecutionRuntimeComponentDispatcher, EXECUTION_RUNTIME_COMPONENT_DISPATCHER_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentDispatcher';
+import { ExecutionRuntimeComponentScheduler, EXECUTION_RUNTIME_COMPONENT_SCHEDULER_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentScheduler';
+import { ExecutionRuntimeComponentExecutor, EXECUTION_RUNTIME_COMPONENT_EXECUTOR_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentExecutor';
+import { ExecutionRuntimeComponentLifecycle, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentLifecycle';
+import { ExecutionRuntimeComponentLifecycleRegistry, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_REGISTRY_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentLifecycleRegistry';
+import { ExecutionRuntimeComponentLifecycleResolver, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_RESOLVER_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentLifecycleResolver';
+import { ExecutionRuntimeComponentLifecycleValidator, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_VALIDATOR_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentLifecycleValidator';
+import { ExecutionRuntimeComponentLifecycleDispatcher, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_DISPATCHER_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentLifecycleDispatcher';
+import { ExecutionRuntimeComponentLifecycleScheduler, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_SCHEDULER_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentLifecycleScheduler';
+import { ExecutionRuntimeComponentLifecycleExecutor, EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_EXECUTOR_BLUEPRINT } from './runtime/execution/component/ExecutionRuntimeComponentLifecycleExecutor';
+import { ExecutionRuntimeBoot, EXECUTION_RUNTIME_BOOT_BLUEPRINT } from './execution/ExecutionRuntimeBoot';
+import { ExecutionRuntimeOrchestrator, EXECUTION_RUNTIME_ORCHESTRATOR_BLUEPRINT } from './execution/ExecutionRuntimeOrchestrator';
+import { ExecutionRuntimePipeline, EXECUTION_RUNTIME_PIPELINE_BLUEPRINT } from './execution/ExecutionRuntimePipeline';
+import { ExecutionRuntimeContextManager, EXECUTION_RUNTIME_CONTEXT_MANAGER_BLUEPRINT } from './execution/ExecutionRuntimeContextManager';
+import { ExecutionRuntimeStateManager, EXECUTION_RUNTIME_STATE_MANAGER_BLUEPRINT } from './execution/ExecutionRuntimeStateManager';
+import { ExecutionRuntimeSessionManager, EXECUTION_RUNTIME_SESSION_MANAGER_BLUEPRINT } from './execution/ExecutionRuntimeSessionManager';
+import { ExecutionRuntimeInstance, EXECUTION_RUNTIME_INSTANCE_BLUEPRINT } from './execution/ExecutionRuntimeInstance';
+import { ExecutionRuntimeLoader, EXECUTION_RUNTIME_LOADER_BLUEPRINT } from './execution/ExecutionRuntimeLoader';
+import { ExecutionRuntimeBuilder, EXECUTION_RUNTIME_BUILDER_BLUEPRINT } from './execution/ExecutionRuntimeBuilder';
+import { ExecutionRuntimeComposer, EXECUTION_RUNTIME_COMPOSER_BLUEPRINT } from './execution/ExecutionRuntimeComposer';
+import { ExecutionRuntimeExecutor, EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT } from './execution/ExecutionRuntimeExecutor';
+import { ExecutionRuntimeBlueprintInterpreter, EXECUTION_RUNTIME_BLUEPRINT_INTERPRETER_BLUEPRINT } from './execution/ExecutionRuntimeBlueprintInterpreter';
+import { ExecutionRuntimeKernel, EXECUTION_RUNTIME_KERNEL_BLUEPRINT } from './execution/ExecutionRuntimeKernel';
+import { ExecutionRuntimeKernelEngine, EXECUTION_RUNTIME_KERNEL_ENGINE_BLUEPRINT } from './execution/ExecutionRuntimeKernelEngine';
+import { ExecutionRuntimeThread, EXECUTION_RUNTIME_THREAD_BLUEPRINT } from './execution/ExecutionRuntimeThread';
+import { ExecutionRuntimeScheduler, EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT } from './execution/ExecutionRuntimeScheduler';
+import { ExecutionRuntimeQueue, EXECUTION_RUNTIME_QUEUE_BLUEPRINT } from './execution/ExecutionRuntimeQueue';
+import { ExecutionRuntimeTask, EXECUTION_RUNTIME_TASK_BLUEPRINT } from './execution/ExecutionRuntimeTask';
+import { ExecutionRuntimeWorker, EXECUTION_RUNTIME_WORKER_BLUEPRINT } from './execution/ExecutionRuntimeWorker';
+import { ExecutionRuntimeDispatcher, EXECUTION_RUNTIME_DISPATCHER_BLUEPRINT } from './execution/ExecutionRuntimeDispatcher';
+import { ExecutionRuntimeEvent, EXECUTION_RUNTIME_EVENT_BLUEPRINT } from './execution/ExecutionRuntimeEvent';
+import { ExecutionRuntimeEventBus, EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT } from './execution/ExecutionRuntimeEventBus';
+import { ExecutionRuntimeMessageRouter, EXECUTION_RUNTIME_MESSAGE_ROUTER_BLUEPRINT } from './execution/ExecutionRuntimeMessageRouter';
+import { ExecutionRuntimeTransport, EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT } from './execution/ExecutionRuntimeTransport';
+import { ExecutionRuntimeConnection, EXECUTION_RUNTIME_CONNECTION_BLUEPRINT } from './execution/ExecutionRuntimeConnection';
+import { ExecutionRuntimeProtocol, EXECUTION_RUNTIME_PROTOCOL_BLUEPRINT } from './execution/ExecutionRuntimeProtocol';
+import { ExecutionRuntimePacket, EXECUTION_RUNTIME_PACKET_BLUEPRINT } from './execution/ExecutionRuntimePacket';
+import { ExecutionRuntimeFrame, EXECUTION_RUNTIME_FRAME_BLUEPRINT } from './execution/ExecutionRuntimeFrame';
+import { ExecutionRuntimeMessage, EXECUTION_RUNTIME_MESSAGE_BLUEPRINT } from './execution/ExecutionRuntimeMessage';
+import { ExecutionRuntimeEnvelope, EXECUTION_RUNTIME_ENVELOPE_BLUEPRINT } from './execution/ExecutionRuntimeEnvelope';
+import { ExecutionRuntimeSecureChannel, EXECUTION_RUNTIME_SECURE_CHANNEL_BLUEPRINT } from './execution/ExecutionRuntimeSecureChannel';
+import { ExecutionRuntimeIdentity, EXECUTION_RUNTIME_IDENTITY_BLUEPRINT } from './execution/ExecutionRuntimeIdentity';
+import { ExecutionRuntimeSocket, EXECUTION_RUNTIME_SOCKET_BLUEPRINT } from './execution/ExecutionRuntimeSocket';
+import { ExecutionRuntimeStream, EXECUTION_RUNTIME_STREAM_BLUEPRINT } from './execution/ExecutionRuntimeStream';
+import { ExecutionRuntimeBuffer, EXECUTION_RUNTIME_BUFFER_BLUEPRINT } from './execution/ExecutionRuntimeBuffer';
+import { ExecutionRuntimePipe, EXECUTION_RUNTIME_PIPE_BLUEPRINT } from './execution/ExecutionRuntimePipe';
+import { ExecutionRuntimeProtocolData, EXECUTION_RUNTIME_PROTOCOL_DATA_BLUEPRINT } from './execution/ExecutionRuntimeProtocolData';
+import { ExecutionRuntimeEndpoint, EXECUTION_RUNTIME_ENDPOINT_BLUEPRINT } from './execution/ExecutionRuntimeEndpoint';
+import { ExecutionRuntimePort, EXECUTION_RUNTIME_PORT_BLUEPRINT } from './execution/ExecutionRuntimePort';
+import { ExecutionRuntimeMessageQueue, EXECUTION_RUNTIME_MESSAGE_QUEUE_BLUEPRINT } from './execution/ExecutionRuntimeMessageQueue';
+import { ExecutionRuntimeRouting, EXECUTION_RUNTIME_ROUTING_BLUEPRINT } from './execution/ExecutionRuntimeRouting';
+
+export interface DevelopmentRule {
+  readonly ruleId: string;
+  readonly ruleName: string;
+  readonly capability: string;
+  readonly priority: number;
+}
+
+export class DevelopmentRules {
+  /**
+   * 不変な開発ルールオブジェクトを生成する
+   */
+  static createRule(id: string, name: string, capability: string, priority: number): DevelopmentRule {
+    if (!id) {
+      throw new Error('[DevelopmentRules] ruleId is required');
+    }
+    if (!name) {
+      throw new Error('[DevelopmentRules] ruleName is required');
+    }
+    if (!capability) {
+      throw new Error('[DevelopmentRules] capability is required');
+    }
+
+    // Capability がレジストリに存在するか検証 (Name または ID)
+    const verified = CapabilityRegistry.get(capability) || CapabilityRegistry.getByName(capability);
+    if (!verified) {
+      throw new Error(`[DevelopmentRules] Capability is not registered: ${capability}`);
+    }
+
+    const rule: DevelopmentRule = {
+      ruleId: id,
+      ruleName: name,
+      capability: capability,
+      priority: priority
+    };
+
+    return Object.freeze(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability を満たすための全 Skill を SkillRegistry から取得する
+   */
+  static getRequiredSkills(rule: DevelopmentRule): Skill[] {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return [];
+    }
+    return SkillRegistry.getByCapability(verified.capabilityId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability を実行するための SkillPipeline を SkillPipelineRegistry から取得する
+   */
+  static getRequiredPipeline(rule: DevelopmentRule): SkillPipeline | undefined {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return undefined;
+    }
+    return SkillPipelineRegistry.getByCapability(verified.capabilityId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability に対応する ExecutionRecord 履歴を ExecutionLedgerRegistry から取得する
+   */
+  static getExecutionLedger(rule: DevelopmentRule): ExecutionRecord[] {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return [];
+    }
+    return ExecutionLedgerRegistry.getByCapability(verified.capabilityId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability の最新の QualityGateRecord を取得する
+   */
+  static getQualityGate(rule: DevelopmentRule): QualityGateRecord | undefined {
+    const ledgers = this.getExecutionLedger(rule);
+    if (ledgers.length === 0) {
+      return undefined;
+    }
+    // 最新の Ledger に対応する QualityGateRecord を取得
+    const latestLedger = ledgers[ledgers.length - 1];
+    return QualityGateRegistry.getByLedger(latestLedger.executionId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする全 ToolAdapter を取得する
+   */
+  static getToolAdapters(rule: DevelopmentRule): ToolAdapter[] {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return [];
+    }
+    return ToolAdapterRegistry.getByPipeline(pipeline.pipelineId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする AntigravityAdapter を取得する
+   */
+  static getAntigravityAdapter(rule: DevelopmentRule): AntigravityAdapter | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const list = AntigravityAdapterRegistry.getByPipeline(pipeline.pipelineId);
+    return list.length > 0 ? list[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする ClaudeAdapter を取得する
+   */
+  static getClaudeAdapter(rule: DevelopmentRule): ClaudeAdapter | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const list = ClaudeAdapterRegistry.getByPipeline(pipeline.pipelineId);
+    return list.length > 0 ? list[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする全 ClaudeModel を取得する (4層解決)
+   */
+  static getClaudeModels(rule: DevelopmentRule): ClaudeModel[] {
+    const adapter = this.getClaudeAdapter(rule);
+    if (!adapter) {
+      return [];
+    }
+    const models: ClaudeModel[] = [];
+    for (const modelId of adapter.supportedModelIds) {
+      const m = ClaudeModelRegistry.get(modelId);
+      if (m) {
+        models.push(m);
+      }
+    }
+    return models;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする GeminiAdapter を取得する
+   */
+  static getGeminiAdapter(rule: DevelopmentRule): GeminiAdapter | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const list = GeminiAdapterRegistry.getByPipeline(pipeline.pipelineId);
+    return list.length > 0 ? list[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする全 GeminiModel を取得する (4層解決)
+   */
+  static getGeminiModels(rule: DevelopmentRule): GeminiModel[] {
+    const adapter = this.getGeminiAdapter(rule);
+    if (!adapter) {
+      return [];
+    }
+    const models: GeminiModel[] = [];
+    for (const modelId of adapter.supportedModelIds) {
+      const m = GeminiModelRegistry.get(modelId);
+      if (m) {
+        models.push(m);
+      }
+    }
+    return models;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする OpenAIAdapter を取得する
+   */
+  static getOpenAIAdapter(rule: DevelopmentRule): OpenAIAdapter | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const list = OpenAIAdapterRegistry.getByPipeline(pipeline.pipelineId);
+    return list.length > 0 ? list[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability をサポートする全 OpenAIModel を取得する (4層解決)
+   */
+  static getOpenAIModels(rule: DevelopmentRule): OpenAIModel[] {
+    const adapter = this.getOpenAIAdapter(rule);
+    if (!adapter) {
+      return [];
+    }
+    const models: OpenAIModel[] = [];
+    for (const modelId of adapter.supportedModelIds) {
+      const m = OpenAIModelRegistry.get(modelId);
+      if (m) {
+        models.push(m);
+      }
+    }
+    return models;
+  }
+
+  /**
+   * ルールに関連付けられた Capability に対する最適な ToolAdapter を AdapterResolver を介して自動解決・取得する
+   */
+  static getResolvedAdapter(rule: DevelopmentRule): ToolAdapter | undefined {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return undefined;
+    }
+    return AdapterResolver.resolve(verified.capabilityId);
+  }
+
+  /**
+   * ルールに関連付けられた Capability に対するすべての利用可能アダプター一覧を取得する
+   */
+  static getAvailableAdapters(rule: DevelopmentRule): readonly ToolAdapter[] {
+    const verified = CapabilityRegistry.get(rule.capability) || CapabilityRegistry.getByName(rule.capability);
+    if (!verified) {
+      return [];
+    }
+    
+    // MultiAdapterRegistry から該当 Capability をサポートするレコードを取得
+    const records = MultiAdapterRegistry.findByCapability(verified.capabilityId);
+    const list: ToolAdapter[] = [];
+    
+    for (const rec of records) {
+      let adapter: ToolAdapter | undefined;
+      switch (rec.adapterType) {
+        case AdapterType.ANTIGRAVITY:
+          adapter = AntigravityAdapterRegistry.get(rec.adapterId);
+          break;
+        case AdapterType.CLAUDE:
+          adapter = ClaudeAdapterRegistry.get(rec.adapterId);
+          break;
+        case AdapterType.GEMINI:
+          adapter = GeminiAdapterRegistry.get(rec.adapterId);
+          break;
+        case AdapterType.OPENAI:
+          adapter = OpenAIAdapterRegistry.get(rec.adapterId);
+          break;
+      }
+      if (adapter) {
+        list.push(adapter);
+      }
+    }
+    
+    return Object.freeze(list);
+  }
+
+  /**
+   * ルールに関連付けられた Capability から Pipeline を経由して RuntimeRecord を静的に解決・取得する
+   */
+  static getRuntime(rule: DevelopmentRule): RuntimeRecord | undefined {
+    const pipeline = this.getRequiredPipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    const match = pipeline.pipelineId.match(/\d+/);
+    if (!match) {
+      return undefined;
+    }
+    return RuntimeRegistry.get(`runtime-${match[0]}`);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime から RuntimeSession を静的に解決・取得する
+   */
+  static getRuntimeSession(rule: DevelopmentRule): Session | undefined {
+    const runtime = this.getRuntime(rule);
+    if (!runtime) {
+      return undefined;
+    }
+    const sessions = RuntimeSessionRegistry.findByRuntime(runtime.runtimeId);
+    return sessions.length > 0 ? sessions[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession から RuntimeContext を静的に解決・取得する
+   */
+  static getRuntimeContext(rule: DevelopmentRule): Context | undefined {
+    const session = this.getRuntimeSession(rule);
+    if (!session) {
+      return undefined;
+    }
+    const contexts = RuntimeContextRegistry.findBySession(session.sessionId);
+    return contexts.length > 0 ? contexts[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext から RuntimeQueue を静的に解決・取得する
+   */
+  static getRuntimeQueue(rule: DevelopmentRule): Queue | undefined {
+    const context = this.getRuntimeContext(rule);
+    if (!context) {
+      return undefined;
+    }
+    const queues = RuntimeQueueRegistry.findByContext(context.contextId);
+    return queues.length > 0 ? queues[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue から RuntimeTask を静的に解決・取得する
+   */
+  static getRuntimeTask(rule: DevelopmentRule): Task | undefined {
+    const queue = this.getRuntimeQueue(rule);
+    if (!queue) {
+      return undefined;
+    }
+    const tasks = RuntimeTaskRegistry.findByQueue(queue.queueId);
+    return tasks.length > 0 ? tasks[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask から RuntimeExecutionPlan を静的に解決・取得する
+   */
+  static getRuntimeExecutionPlan(rule: DevelopmentRule): ExecutionPlan | undefined {
+    const task = this.getRuntimeTask(rule);
+    if (!task) {
+      return undefined;
+    }
+    const plans = RuntimeExecutionPlanRegistry.findByTask(task.taskId);
+    return plans.length > 0 ? plans[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan から RuntimeExecutionGraph を静的に解決・取得する
+   */
+  static getRuntimeExecutionGraph(rule: DevelopmentRule): ExecutionGraph | undefined {
+    const plan = this.getRuntimeExecutionPlan(rule);
+    if (!plan) {
+      return undefined;
+    }
+    const graphs = RuntimeExecutionGraphRegistry.findByPlan(plan.planId);
+    return graphs.length > 0 ? graphs[0] : undefined;
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph から ExecutionEngine を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionEngine(rule: DevelopmentRule): ExecutionEngine | undefined {
+    const graph = this.getRuntimeExecutionGraph(rule);
+    if (!graph) {
+      return undefined;
+    }
+    // ExecutionEngine はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_ENGINE_BLUEPRINT.getBlueprint();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine から ExecutionRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRegistry(rule: DevelopmentRule): ExecutionRegistry | undefined {
+    const engine = this.getExecutionEngine(rule);
+    if (!engine) {
+      return undefined;
+    }
+    // ExecutionRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_REGISTRY_BLUEPRINT.getRegistry();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry から ExecutionRequest を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRequest(rule: DevelopmentRule): ExecutionRequest | undefined {
+    const registry = this.getExecutionRegistry(rule);
+    if (!registry) {
+      return undefined;
+    }
+    // ExecutionRequest は静的配置された単一 of Blueprint として不変で解決される
+    return EXECUTION_REQUEST_BLUEPRINT.getRequest();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest から ExecutionResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionResult(rule: DevelopmentRule): ExecutionResult | undefined {
+    const request = this.getExecutionRequest(rule);
+    if (!request) {
+      return undefined;
+    }
+    // ExecutionResult は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RESULT_BLUEPRINT.getResult();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult から ExecutionState を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionState(rule: DevelopmentRule): ExecutionState | undefined {
+    const result = this.getExecutionResult(rule);
+    if (!result) {
+      return undefined;
+    }
+    // ExecutionState は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_STATE_BLUEPRINT.getState();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState から ExecutionResolver を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionResolver(rule: DevelopmentRule): ExecutionResolver | undefined {
+    const state = this.getExecutionState(rule);
+    if (!state) {
+      return undefined;
+    }
+    // ExecutionResolver は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RESOLVER_BLUEPRINT.getResolver();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver から ExecutionDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionDispatcher(rule: DevelopmentRule): ExecutionDispatcher | undefined {
+    const resolver = this.getExecutionResolver(rule);
+    if (!resolver) {
+      return undefined;
+    }
+    // ExecutionDispatcher は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_DISPATCHER_BLUEPRINT.getDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime から ExecutionRuntime を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntime(rule: DevelopmentRule): ExecutionRuntime | undefined {
+    const dispatcher = this.getExecutionDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntime はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_BLUEPRINT.getRuntime();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry から ExecutionRuntimeRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeRegistry(rule: DevelopmentRule): ExecutionRuntimeRegistry | undefined {
+    const runtime = this.getExecutionRuntime(rule);
+    if (!runtime) {
+      return undefined;
+    }
+    // ExecutionRuntimeRegistry はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_REGISTRY_BLUEPRINT.getRegistry();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator から ExecutionContextHydrator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionContextHydrator(rule: DevelopmentRule): ExecutionContextHydrator | undefined {
+    const registry = this.getExecutionRuntimeRegistry(rule);
+    if (!registry) {
+      return undefined;
+    }
+    // ExecutionContextHydrator はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_CONTEXT_HYDRATOR_BLUEPRINT.getHydrator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator から ExecutionBlueprintValidator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionBlueprintValidator(rule: DevelopmentRule): ExecutionBlueprintValidator | undefined {
+    const hydrator = this.getExecutionContextHydrator(rule);
+    if (!hydrator) {
+      return undefined;
+    }
+    // ExecutionBlueprintValidator はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_BLUEPRINT_VALIDATOR_BLUEPRINT.getValidator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext から ExecutionRuntimeContext を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeContext(rule: DevelopmentRule): ExecutionRuntimeContext | undefined {
+    const validator = this.getExecutionBlueprintValidator(rule);
+    if (!validator) {
+      return undefined;
+    }
+    // ExecutionRuntimeContext はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_CONTEXT_BLUEPRINT.getRuntimeContext();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession から ExecutionRuntimeSession を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeSession(rule: DevelopmentRule): ExecutionRuntimeSession | undefined {
+    // ExecutionRuntimeSession は完全静的解決 (Static Direct Resolver) として不変で解決される
+    const context = this.getExecutionRuntimeContext(rule); if (!context) return undefined; return EXECUTION_RUNTIME_SESSION_BLUEPRINT.getExecutionRuntimeSession();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager から ExecutionRuntimeManager を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeManager(rule: DevelopmentRule): ExecutionRuntimeManager | undefined {
+    const session = this.getExecutionRuntimeSession(rule);
+    if (!session) {
+      return undefined;
+    }
+    // ExecutionRuntimeManager はトポロジー層の下位に静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_MANAGER_BLUEPRINT.getRuntimeManager();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic から RuntimeResolverResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeResolverLogic(rule: DevelopmentRule): RuntimeResolverResult | undefined {
+    // ExecutionRuntimeResolverLogic シングルトン解決ロジックを使用して解決を実行する
+    return EXECUTION_RUNTIME_RESOLVER_LOGIC.resolveRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic から RuntimeHydrationResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeHydrationLogic(rule: DevelopmentRule): RuntimeHydrationResult | undefined {
+    // ExecutionRuntimeHydrationLogic シングルトン解決ロジックを使用してハイドレーション解決を実行する
+    return EXECUTION_RUNTIME_HYDRATION_LOGIC.hydrateContext(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic から RuntimeValidationResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeValidationLogic(rule: DevelopmentRule): RuntimeValidationResult | undefined {
+    // ExecutionRuntimeValidationLogic シングルトン解決ロジックを使用して整合性検証を実行する
+    return EXECUTION_RUNTIME_VALIDATION_LOGIC.validateRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic から RuntimeDispatchResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeDispatchLogic(rule: DevelopmentRule): RuntimeDispatchResult | undefined {
+    // ExecutionRuntimeDispatchLogic シングルトン解決ロジックを使用してディスパッチ解決を実行する
+    return EXECUTION_RUNTIME_DISPATCH_LOGIC.dispatchRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic から RuntimeQueueResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeQueueLogic(rule: DevelopmentRule): RuntimeQueueResult | undefined {
+    // ExecutionRuntimeQueueLogic シングルトン解決ロジックを使用してキュー解決を実行する
+    return EXECUTION_RUNTIME_QUEUE_LOGIC.queueRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic から RuntimeSchedulerResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeSchedulerLogic(rule: DevelopmentRule): RuntimeSchedulerResult | undefined {
+    // ExecutionRuntimeSchedulerLogic シングルトン解決ロジックを使用してスケジュール解決を実行する
+    return EXECUTION_RUNTIME_SCHEDULER_LOGIC.scheduleRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic から RuntimeExecutorResult を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーン of 延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeExecutorLogic(rule: DevelopmentRule): RuntimeExecutorResult | undefined {
+    // ExecutionRuntimeExecutorLogic シングルトン解決ロジックを使用して実行解決を実行する
+    return EXECUTION_RUNTIME_EXECUTOR_LOGIC.executeRuntime(rule);
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic から ExecutionRuntimeEngine を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngine(rule: DevelopmentRule): ExecutionRuntimeEngine | undefined {
+    const executorLogic = this.getExecutionRuntimeExecutorLogic(rule);
+    if (!executorLogic) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngine は静的配置された単一 of Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_BLUEPRINT.getExecutionRuntimeEngine();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine から ExecutionRuntimeEngineRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineRegistry(rule: DevelopmentRule): ExecutionRuntimeEngineRegistry | undefined {
+    const engine = this.getExecutionRuntimeEngine(rule);
+    if (!engine) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_REGISTRY_BLUEPRINT.getRegistry();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry から ExecutionRuntimeEngineResolver を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineResolver(rule: DevelopmentRule): ExecutionRuntimeEngineResolver | undefined {
+    const registry = this.getExecutionRuntimeEngineRegistry(rule);
+    if (!registry) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineResolver は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_RESOLVER_BLUEPRINT.getResolver();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver から ExecutionRuntimeEngineValidator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineValidator(rule: DevelopmentRule): ExecutionRuntimeEngineValidator | undefined {
+    const resolver = this.getExecutionRuntimeEngineResolver(rule);
+    if (!resolver) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineValidator は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_VALIDATOR_BLUEPRINT.getValidator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator から ExecutionRuntimeEngineDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineDispatcher(rule: DevelopmentRule): ExecutionRuntimeEngineDispatcher | undefined {
+    const validator = this.getExecutionRuntimeEngineValidator(rule);
+    if (!validator) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineDispatcher は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_DISPATCHER_BLUEPRINT.getDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher から ExecutionRuntimeEngineScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineScheduler(rule: DevelopmentRule): ExecutionRuntimeEngineScheduler | undefined {
+    const dispatcher = this.getExecutionRuntimeEngineDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineScheduler は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_SCHEDULER_BLUEPRINT.getScheduler();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler から ExecutionRuntimeEngineExecutor を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeEngineExecutor(rule: DevelopmentRule): ExecutionRuntimeEngineExecutor | undefined {
+    const scheduler = this.getExecutionRuntimeEngineScheduler(rule);
+    if (!scheduler) {
+      return undefined;
+    }
+    // ExecutionRuntimeEngineExecutor は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ENGINE_EXECUTOR_BLUEPRINT.getExecutor();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor から ExecutionRuntimeService を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeService(rule: DevelopmentRule): ExecutionRuntimeService | undefined {
+    const executor = this.getExecutionRuntimeEngineExecutor(rule);
+    if (!executor) {
+      return undefined;
+    }
+    // ExecutionRuntimeService は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_BLUEPRINT.getService();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService から ExecutionRuntimeServiceRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceRegistry(rule: DevelopmentRule): ExecutionRuntimeServiceRegistry | undefined {
+    const service = this.getExecutionRuntimeService(rule);
+    if (!service) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_REGISTRY_BLUEPRINT.getRegistry();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry から ExecutionRuntimeServiceResolver を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceResolver(rule: DevelopmentRule): ExecutionRuntimeServiceResolver | undefined {
+    const registry = this.getExecutionRuntimeServiceRegistry(rule);
+    if (!registry) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceResolver は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_RESOLVER_BLUEPRINT.getResolver();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry -> ExecutionRuntimeServiceResolver から ExecutionRuntimeServiceValidator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceValidator(rule: DevelopmentRule): ExecutionRuntimeServiceValidator | undefined {
+    const resolver = this.getExecutionRuntimeServiceResolver(rule);
+    if (!resolver) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceValidator は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_VALIDATOR_BLUEPRINT.getValidator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry -> ExecutionRuntimeServiceResolver -> ExecutionRuntimeServiceValidator から ExecutionRuntimeServiceDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceDispatcher(rule: DevelopmentRule): ExecutionRuntimeServiceDispatcher | undefined {
+    const validator = this.getExecutionRuntimeServiceValidator(rule);
+    if (!validator) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceDispatcher は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_DISPATCHER_BLUEPRINT.getDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry -> ExecutionRuntimeServiceResolver -> ExecutionRuntimeServiceValidator -> ExecutionRuntimeServiceDispatcher から ExecutionRuntimeServiceScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceScheduler(rule: DevelopmentRule): ExecutionRuntimeServiceScheduler | undefined {
+    const dispatcher = this.getExecutionRuntimeServiceDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceScheduler は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_SCHEDULER_BLUEPRINT.getScheduler();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> Pipeline -> Runtime -> RuntimeSession -> RuntimeContext -> RuntimeQueue -> RuntimeTask -> RuntimeExecutionPlan -> RuntimeExecutionGraph -> ExecutionEngine -> ExecutionRegistry -> ExecutionRequest -> ExecutionResult -> ExecutionState -> ExecutionResolver -> ExecutionDispatcher -> ExecutionRuntime -> ExecutionRuntimeRegistry -> ExecutionContextHydrator -> ExecutionBlueprintValidator -> ExecutionRuntimeContext -> ExecutionRuntimeSession -> ExecutionRuntimeManager -> ExecutionRuntimeResolverLogic -> ExecutionRuntimeHydrationLogic -> ExecutionRuntimeValidationLogic -> ExecutionRuntimeDispatchLogic -> ExecutionRuntimeQueueLogic -> ExecutionRuntimeSchedulerLogic -> ExecutionRuntimeExecutorLogic -> ExecutionRuntimeEngine -> ExecutionRuntimeEngineRegistry -> ExecutionRuntimeEngineResolver -> ExecutionRuntimeEngineValidator -> ExecutionRuntimeEngineDispatcher -> ExecutionRuntimeEngineScheduler -> ExecutionRuntimeEngineExecutor -> ExecutionRuntimeService -> ExecutionRuntimeServiceRegistry -> ExecutionRuntimeServiceResolver -> ExecutionRuntimeServiceValidator -> ExecutionRuntimeServiceDispatcher -> ExecutionRuntimeServiceScheduler から ExecutionRuntimeServiceExecutor を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic, Lazy Resolution, Dynamic Search 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeServiceExecutor(rule: DevelopmentRule): ExecutionRuntimeServiceExecutor | undefined {
+    const scheduler = this.getExecutionRuntimeServiceScheduler(rule);
+    if (!scheduler) {
+      return undefined;
+    }
+    // ExecutionRuntimeServiceExecutor は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SERVICE_EXECUTOR_BLUEPRINT.getExecutor();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeServiceExecutor から ExecutionRuntimeComponent を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponent(rule: DevelopmentRule): ExecutionRuntimeComponent | undefined {
+    const executor = this.getExecutionRuntimeServiceExecutor(rule);
+    if (!executor) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponent は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_BLUEPRINT.getExecutionRuntimeComponent();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponent から ExecutionRuntimeComponentRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Registry Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentRegistry(rule: DevelopmentRule): ExecutionRuntimeComponentRegistry | undefined {
+    const component = this.getExecutionRuntimeComponent(rule);
+    if (!component) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_REGISTRY_BLUEPRINT.getExecutionRuntimeComponentRegistry();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentRegistry から ExecutionRuntimeComponentResolver を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Resolver Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentResolver(rule: DevelopmentRule): ExecutionRuntimeComponentResolver | undefined {
+    const registry = this.getExecutionRuntimeComponentRegistry(rule);
+    if (!registry) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentResolver は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_RESOLVER_BLUEPRINT.getExecutionRuntimeComponentResolver();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentResolver から ExecutionRuntimeComponentValidator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Validator Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentValidator(rule: DevelopmentRule): ExecutionRuntimeComponentValidator | undefined {
+    const resolver = this.getExecutionRuntimeComponentResolver(rule);
+    if (!resolver) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentValidator は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_VALIDATOR_BLUEPRINT.getExecutionRuntimeComponentValidator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentValidator から ExecutionRuntimeComponentDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Dispatcher Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentDispatcher(rule: DevelopmentRule): ExecutionRuntimeComponentDispatcher | undefined {
+    const validator = this.getExecutionRuntimeComponentValidator(rule);
+    if (!validator) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentDispatcher は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_DISPATCHER_BLUEPRINT.getExecutionRuntimeComponentDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentDispatcher から ExecutionRuntimeComponentScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Scheduler Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentScheduler(rule: DevelopmentRule): ExecutionRuntimeComponentScheduler | undefined {
+    const dispatcher = this.getExecutionRuntimeComponentDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentScheduler は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_SCHEDULER_BLUEPRINT.getExecutionRuntimeComponentScheduler();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentScheduler から ExecutionRuntimeComponentExecutor を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Executor Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentExecutor(rule: DevelopmentRule): ExecutionRuntimeComponentExecutor | undefined {
+    const scheduler = this.getExecutionRuntimeComponentScheduler(rule);
+    if (!scheduler) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentExecutor は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_EXECUTOR_BLUEPRINT.getExecutionRuntimeComponentExecutor();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentExecutor から ExecutionRuntimeComponentLifecycle を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Lifecycle Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentLifecycle(rule: DevelopmentRule): ExecutionRuntimeComponentLifecycle | undefined {
+    const executor = this.getExecutionRuntimeComponentExecutor(rule);
+    if (!executor) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentLifecycle は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_BLUEPRINT.getExecutionRuntimeComponentLifecycle();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentLifecycle から ExecutionRuntimeComponentLifecycleRegistry を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Registry Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentLifecycleRegistry(rule: DevelopmentRule): ExecutionRuntimeComponentLifecycleRegistry | undefined {
+    const lifecycle = this.getExecutionRuntimeComponentLifecycle(rule);
+    if (!lifecycle) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentLifecycleRegistry は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_REGISTRY_BLUEPRINT.getExecutionRuntimeComponentLifecycleRegistry();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentLifecycleRegistry から ExecutionRuntimeComponentLifecycleResolver を解決する.
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Resolver Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentLifecycleResolver(rule: DevelopmentRule): ExecutionRuntimeComponentLifecycleResolver | undefined {
+    const registry = this.getExecutionRuntimeComponentLifecycleRegistry(rule);
+    if (!registry) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentLifecycleResolver は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_RESOLVER_BLUEPRINT.getExecutionRuntimeComponentLifecycleResolver();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentLifecycleResolver から ExecutionRuntimeComponentLifecycleValidator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Validator Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentLifecycleValidator(rule: DevelopmentRule): ExecutionRuntimeComponentLifecycleValidator | undefined {
+    const resolver = this.getExecutionRuntimeComponentLifecycleResolver(rule);
+    if (!resolver) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentLifecycleValidator は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_VALIDATOR_BLUEPRINT.getExecutionRuntimeComponentLifecycleValidator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentLifecycleValidator から ExecutionRuntimeComponentLifecycleDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Dispatcher Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentLifecycleDispatcher(rule: DevelopmentRule): ExecutionRuntimeComponentLifecycleDispatcher | undefined {
+    const validator = this.getExecutionRuntimeComponentLifecycleValidator(rule);
+    if (!validator) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentLifecycleDispatcher は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_DISPATCHER_BLUEPRINT.getExecutionRuntimeComponentLifecycleDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentLifecycleDispatcher から ExecutionRuntimeComponentLifecycleScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Scheduler Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentLifecycleScheduler(rule: DevelopmentRule): ExecutionRuntimeComponentLifecycleScheduler | undefined {
+    const dispatcher = this.getExecutionRuntimeComponentLifecycleDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentLifecycleScheduler は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_SCHEDULER_BLUEPRINT.getExecutionRuntimeComponentLifecycleScheduler();
+  }
+
+  /**
+   * ルールに関連付けられた Capability -> ... -> ExecutionRuntimeComponentLifecycleScheduler から ExecutionRuntimeComponentLifecycleExecutor を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Executor Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeComponentLifecycleExecutor(rule: DevelopmentRule): ExecutionRuntimeComponentLifecycleExecutor | undefined {
+    const scheduler = this.getExecutionRuntimeComponentLifecycleScheduler(rule);
+    if (!scheduler) {
+      return undefined;
+    }
+    // ExecutionRuntimeComponentLifecycleExecutor は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPONENT_LIFECYCLE_EXECUTOR_BLUEPRINT.getExecutionRuntimeComponentLifecycleExecutor();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeBoot を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Boot Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeBoot(rule: DevelopmentRule): ExecutionRuntimeBoot | undefined {
+    const executor = this.getExecutionRuntimeComponentLifecycleExecutor(rule);
+    if (!executor) {
+      return undefined;
+    }
+    // ExecutionRuntimeBoot は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_BOOT_BLUEPRINT.getExecutionRuntimeBoot();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeOrchestrator を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Orchestrator Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeOrchestrator(rule: DevelopmentRule): ExecutionRuntimeOrchestrator | undefined {
+    const boot = this.getExecutionRuntimeBoot(rule);
+    if (!boot) {
+      return undefined;
+    }
+    // ExecutionRuntimeOrchestrator は静的配置された単一 of Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_ORCHESTRATOR_BLUEPRINT.getExecutionRuntimeOrchestrator();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimePipeline を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Pipeline Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimePipeline(rule: DevelopmentRule): ExecutionRuntimePipeline | undefined {
+    const orchestrator = this.getExecutionRuntimeOrchestrator(rule);
+    if (!orchestrator) {
+      return undefined;
+    }
+    // ExecutionRuntimePipeline は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_PIPELINE_BLUEPRINT.getExecutionRuntimePipeline();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeContextManager を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Context Manager Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeContextManager(rule: DevelopmentRule): ExecutionRuntimeContextManager | undefined {
+    const pipeline = this.getExecutionRuntimePipeline(rule);
+    if (!pipeline) {
+      return undefined;
+    }
+    // ExecutionRuntimeContextManager は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_CONTEXT_MANAGER_BLUEPRINT.getExecutionRuntimeContextManager();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeStateManager を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime State Manager Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeStateManager(rule: DevelopmentRule): ExecutionRuntimeStateManager | undefined {
+    const manager = this.getExecutionRuntimeContextManager(rule);
+    if (!manager) {
+      return undefined;
+    }
+    // ExecutionRuntimeStateManager は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_STATE_MANAGER_BLUEPRINT.getExecutionRuntimeStateManager();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeSessionManager を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Session Manager Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeSessionManager(rule: DevelopmentRule): ExecutionRuntimeSessionManager | undefined {
+    const stateManager = this.getExecutionRuntimeStateManager(rule);
+    if (!stateManager) {
+      return undefined;
+    }
+    // ExecutionRuntimeSessionManager は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_SESSION_MANAGER_BLUEPRINT.getExecutionRuntimeSessionManager();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeInstance を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Instance Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeInstance(rule: DevelopmentRule): ExecutionRuntimeInstance | undefined {
+    const sessionManager = this.getExecutionRuntimeSessionManager(rule);
+    if (!sessionManager) {
+      return undefined;
+    }
+    // ExecutionRuntimeInstance は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_INSTANCE_BLUEPRINT.getExecutionRuntimeInstance();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeLoader を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Loader Logic 等は一切実装せず、静的トポロジー解決チェーンの延長線上にある不変の静的マッピングのみを返します。
+   */
+  static getExecutionRuntimeLoader(rule: DevelopmentRule): ExecutionRuntimeLoader | undefined {
+    const instanceManager = this.getExecutionRuntimeInstance(rule);
+    if (!instanceManager) {
+      return undefined;
+    }
+    // ExecutionRuntimeLoader は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_LOADER_BLUEPRINT.getExecutionRuntimeLoader();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeBuilder を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Builder Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeBuilder(rule: DevelopmentRule): ExecutionRuntimeBuilder | undefined {
+    // 依存性検証のため loader の解決可能性のみ確認
+    const loader = this.getExecutionRuntimeLoader(rule);
+    if (!loader) {
+      return undefined;
+    }
+    // ExecutionRuntimeBuilder は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_BUILDER_BLUEPRINT.getExecutionRuntimeBuilder();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeComposer を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Composer Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeComposer(rule: DevelopmentRule): ExecutionRuntimeComposer | undefined {
+    // 依存性検証のため builder の解決可能性のみ確認
+    const builder = this.getExecutionRuntimeBuilder(rule);
+    if (!builder) {
+      return undefined;
+    }
+    // ExecutionRuntimeComposer は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_COMPOSER_BLUEPRINT.getExecutionRuntimeComposer();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeExecutor を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Executor Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeExecutor(rule: DevelopmentRule): ExecutionRuntimeExecutor | undefined {
+    // 依存性検証のため composer の解決可能性のみ確認
+    const composer = this.getExecutionRuntimeComposer(rule);
+    if (!composer) {
+      return undefined;
+    }
+    // ExecutionRuntimeExecutor は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_EXECUTOR_BLUEPRINT.getExecutionRuntimeExecutor();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeBlueprintInterpreter を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Blueprint Interpreter Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeBlueprintInterpreter(rule: DevelopmentRule): ExecutionRuntimeBlueprintInterpreter | undefined {
+    // 依存性検証のため executor の解決可能性のみ確認
+    const executor = this.getExecutionRuntimeExecutor(rule);
+    if (!executor) {
+      return undefined;
+    }
+    // ExecutionRuntimeBlueprintInterpreter は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_BLUEPRINT_INTERPRETER_BLUEPRINT.getExecutionRuntimeBlueprintInterpreter();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeKernel を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Kernel Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeKernel(rule: DevelopmentRule): ExecutionRuntimeKernel | undefined {
+    // 依存性検証のため interpreter の解決可能性のみ確認
+    const interpreter = this.getExecutionRuntimeBlueprintInterpreter(rule);
+    if (!interpreter) {
+      return undefined;
+    }
+    // ExecutionRuntimeKernel は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_KERNEL_BLUEPRINT.getExecutionRuntimeKernel();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeKernelEngine を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Kernel Engine Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeKernelEngine(rule: DevelopmentRule): ExecutionRuntimeKernelEngine | undefined {
+    // 依存性検証のため kernel の解決可能性のみ確認
+    const kernel = this.getExecutionRuntimeKernel(rule);
+    if (!kernel) {
+      return undefined;
+    }
+    // ExecutionRuntimeKernelEngine は静的配置された単一の Blueprint として不変で解決される
+    return EXECUTION_RUNTIME_KERNEL_ENGINE_BLUEPRINT.getExecutionRuntimeKernelEngine();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeThread を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Thread Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeThread(rule: DevelopmentRule): ExecutionRuntimeThread | undefined {
+    // 依存性検証のため kernelEngine の解決可能性のみ確認
+    const kernelEngine = this.getExecutionRuntimeKernelEngine(rule);
+    if (!kernelEngine) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_THREAD_BLUEPRINT.getExecutionRuntimeThread();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeScheduler を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Scheduler Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeScheduler(rule: DevelopmentRule): ExecutionRuntimeScheduler | undefined {
+    // 依存性検証のため thread の解決可能性のみ確認
+    const thread = this.getExecutionRuntimeThread(rule);
+    if (!thread) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_SCHEDULER_BLUEPRINT.getExecutionRuntimeScheduler();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeQueue を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Queue Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeQueue(rule: DevelopmentRule): ExecutionRuntimeQueue | undefined {
+    // 依存性検証のため scheduler の解決可能性のみ確認
+    const scheduler = this.getExecutionRuntimeScheduler(rule);
+    if (!scheduler) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_QUEUE_BLUEPRINT.getExecutionRuntimeQueue();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeTask を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Task Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeTask(rule: DevelopmentRule): ExecutionRuntimeTask | undefined {
+    // 依存性検証のため queue の解決可能性のみ確認
+    const queue = this.getExecutionRuntimeQueue(rule);
+    if (!queue) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_TASK_BLUEPRINT.getExecutionRuntimeTask();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeWorker を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Worker Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeWorker(rule: DevelopmentRule): ExecutionRuntimeWorker | undefined {
+    // 依存性検証のため task の解決可能性のみ確認
+    const task = this.getExecutionRuntimeTask(rule);
+    if (!task) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_WORKER_BLUEPRINT.getExecutionRuntimeWorker();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeDispatcher を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Dispatcher Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeDispatcher(rule: DevelopmentRule): ExecutionRuntimeDispatcher | undefined {
+    // 依存性検証のため worker の解決可能性のみ確認
+    const worker = this.getExecutionRuntimeWorker(rule);
+    if (!worker) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_DISPATCHER_BLUEPRINT.getExecutionRuntimeDispatcher();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeEvent を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Event Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeEvent(rule: DevelopmentRule): ExecutionRuntimeEvent | undefined {
+    // 依存性検証のため dispatcher の解決可能性のみ確認
+    const dispatcher = this.getExecutionRuntimeDispatcher(rule);
+    if (!dispatcher) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_EVENT_BLUEPRINT.getExecutionRuntimeEvent();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeEventBus を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Event Bus Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeEventBus(rule: DevelopmentRule): ExecutionRuntimeEventBus | undefined {
+    // 依存性検証のため event の解決可能性のみ確認
+    const event = this.getExecutionRuntimeEvent(rule);
+    if (!event) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_EVENT_BUS_BLUEPRINT.getExecutionRuntimeEventBus();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeMessageRouter を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Message Router Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeMessageRouter(rule: DevelopmentRule): ExecutionRuntimeMessageRouter | undefined {
+    // 依存性検証のため eventBus の解決可能性のみ確認
+    const eventBus = this.getExecutionRuntimeEventBus(rule);
+    if (!eventBus) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_MESSAGE_ROUTER_BLUEPRINT.getExecutionRuntimeMessageRouter();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeTransport を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Transport Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeTransport(rule: DevelopmentRule): ExecutionRuntimeTransport | undefined {
+    // 依存性検証のため messageRouter の解決可能性のみ確認
+    const messageRouter = this.getExecutionRuntimeMessageRouter(rule);
+    if (!messageRouter) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_TRANSPORT_BLUEPRINT.getExecutionRuntimeTransport();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeConnection を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Connection Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeConnection(rule: DevelopmentRule): ExecutionRuntimeConnection | undefined {
+    // 依存性検証のため transport の解決可能性のみ確認
+    const transport = this.getExecutionRuntimeTransport(rule);
+    if (!transport) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_CONNECTION_BLUEPRINT.getExecutionRuntimeConnection();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeProtocol を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Protocol Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeProtocol(rule: DevelopmentRule): ExecutionRuntimeProtocol | undefined {
+    // 依存性検証のため connection の解決可能性のみ確認
+    const connection = this.getExecutionRuntimeConnection(rule);
+    if (!connection) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_PROTOCOL_BLUEPRINT.getExecutionRuntimeProtocol();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimePacket を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Packet Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimePacket(rule: DevelopmentRule): ExecutionRuntimePacket | undefined {
+    // 依存性検証のため protocol の解決可能性のみ確認
+    const protocol = this.getExecutionRuntimeProtocol(rule);
+    if (!protocol) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_PACKET_BLUEPRINT.getExecutionRuntimePacket();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeFrame を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Frame Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeFrame(rule: DevelopmentRule): ExecutionRuntimeFrame | undefined {
+    // 依存性検証のため packet の解決可能性のみ確認
+    const packet = this.getExecutionRuntimePacket(rule);
+    if (!packet) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_FRAME_BLUEPRINT.getExecutionRuntimeFrame();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeMessage を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Message Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeMessage(rule: DevelopmentRule): ExecutionRuntimeMessage | undefined {
+    // 依存性検証のため frame の解決可能性のみ確認
+    const frame = this.getExecutionRuntimeFrame(rule);
+    if (!frame) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_MESSAGE_BLUEPRINT.getExecutionRuntimeMessage();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeEnvelope を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Envelope Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeEnvelope(rule: DevelopmentRule): ExecutionRuntimeEnvelope | undefined {
+    // 依存性検証のため message の解決可能性のみ確認
+    const message = this.getExecutionRuntimeMessage(rule);
+    if (!message) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_ENVELOPE_BLUEPRINT.getExecutionRuntimeEnvelope();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeSecureChannel を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Secure Channel Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeSecureChannel(rule: DevelopmentRule): ExecutionRuntimeSecureChannel | undefined {
+    // 依存性検証のため envelope の解決可能性のみ確認
+    const envelope = this.getExecutionRuntimeEnvelope(rule);
+    if (!envelope) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_SECURE_CHANNEL_BLUEPRINT.getExecutionRuntimeSecureChannel();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeIdentity を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Identity Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeIdentity(rule: DevelopmentRule): ExecutionRuntimeIdentity | undefined {
+    // 依存性検証のため secureChannel の解決可能性のみ確認
+    const secureChannel = this.getExecutionRuntimeSecureChannel(rule);
+    if (!secureChannel) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_IDENTITY_BLUEPRINT.getExecutionRuntimeIdentity();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeSocket を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Socket Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeSocket(rule: DevelopmentRule): ExecutionRuntimeSocket | undefined {
+    // 依存性検証のため identity の解決可能性のみ確認
+    const identity = this.getExecutionRuntimeIdentity(rule);
+    if (!identity) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_SOCKET_BLUEPRINT.getExecutionRuntimeSocket();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeStream を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Stream Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeStream(rule: DevelopmentRule): ExecutionRuntimeStream | undefined {
+    // 依存性検証のため socket の解決可能性のみ確認
+    const socket = this.getExecutionRuntimeSocket(rule);
+    if (!socket) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_STREAM_BLUEPRINT.getExecutionRuntimeStream();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeBuffer を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Buffer Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeBuffer(rule: DevelopmentRule): ExecutionRuntimeBuffer | undefined {
+    // 依存性検証のため stream の解決可能性のみ確認
+    const stream = this.getExecutionRuntimeStream(rule);
+    if (!stream) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_BUFFER_BLUEPRINT.getExecutionRuntimeBuffer();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimePipe を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Pipe Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimePipe(rule: DevelopmentRule): ExecutionRuntimePipe | undefined {
+    // 依存性検証のため buffer の解決可能性のみ確認
+    const buffer = this.getExecutionRuntimeBuffer(rule);
+    if (!buffer) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_PIPE_BLUEPRINT.getExecutionRuntimePipe();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeProtocolData を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Protocol Data Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeProtocolData(rule: DevelopmentRule): ExecutionRuntimeProtocolData | undefined {
+    // 依存性検証のため pipe の解決可能性のみ確認
+    const pipe = this.getExecutionRuntimePipe(rule);
+    if (!pipe) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_PROTOCOL_DATA_BLUEPRINT.getExecutionRuntimeProtocolData();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeEndpoint を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Endpoint Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeEndpoint(rule: DevelopmentRule): ExecutionRuntimeEndpoint | undefined {
+    // 依存性検証のため protocolData の解決可能性のみ確認
+    const protocolData = this.getExecutionRuntimeProtocolData(rule);
+    if (!protocolData) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_ENDPOINT_BLUEPRINT.getExecutionRuntimeEndpoint();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimePort を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Port Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimePort(rule: DevelopmentRule): ExecutionRuntimePort | undefined {
+    // 依存性検証のため endpoint の解決可能性のみ確認
+    const endpoint = this.getExecutionRuntimeEndpoint(rule);
+    if (!endpoint) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_PORT_BLUEPRINT.getExecutionRuntimePort();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeMessageQueue を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Message Queue Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeMessageQueue(rule: DevelopmentRule): ExecutionRuntimeMessageQueue | undefined {
+    // 依存性検証のため port の解決可能性のみ確認
+    const port = this.getExecutionRuntimePort(rule);
+    if (!port) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_MESSAGE_QUEUE_BLUEPRINT.getExecutionRuntimeMessageQueue();
+  }
+
+  /**
+   * ルールに関連付けられた Capability から ExecutionRuntimeRouting を解決する。
+   * 
+   * 注意：このメソッドは完全静的解決（Static Mapping）のみを実行し、Runtime Routing Logic 等は一切実装せず、不変の静的マッピングを直接返却します。
+   */
+  static getExecutionRuntimeRouting(rule: DevelopmentRule): ExecutionRuntimeRouting | undefined {
+    // 依存性検証のため messageQueue の解決可能性のみ確認
+    const messageQueue = this.getExecutionRuntimeMessageQueue(rule);
+    if (!messageQueue) {
+      return undefined;
+    }
+    return EXECUTION_RUNTIME_ROUTING_BLUEPRINT.getExecutionRuntimeRouting();
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

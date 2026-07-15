@@ -17,10 +17,10 @@
       "@infra/*": ["projects/posting-map/src/infrastructure/*"],
       "@application/*": ["projects/posting-map/src/application/*"],
       "@api/*": ["projects/posting-map/src/api/*"],
-      "@kernel/*": ["aios/kernel/*"],
+      "@kernel/*": ["kernel/*"],
       "@shared/*": ["shared/*"]
     }
   },
-  "include": ["projects/posting-map/src/**/*", "aios/**/*", "shared/**/*"],
-  "exclude": ["**/deprecated/**/*", "node_modules", "aios/tests/**/*", "aios/transformation/**/*"]
+  "include": ["projects/posting-map/src/**/*",  "kernel/**/*", "runtime/**/*", "sdk/**/*", "core/**/*", "tests/**/*", "shared/**/*"],
+  "exclude": ["**/deprecated/**/*", "node_modules", "tests/**/*", "transformation/**/*"]
 }

@@ -7,8 +7,8 @@
  * 警告：本ファイル内にテスト回避（Bypass）や強制パス、自動修正ロジックを記述することは厳禁である。
  */
 
-const { SimulationTestRunner } = require('../../aios/tests/simulation/SimulationTestRunner');
-const { AuditWriter } = require('../../aios/audit/AuditWriter');
+const { SimulationTestRunner } = require('../../tests/simulation/SimulationTestRunner');
+const { AuditWriter } = require('../../audit/AuditWriter');
 
 class HookRunner {
   /**

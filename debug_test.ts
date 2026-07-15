@@ -1,5 +1,5 @@
-import { DevelopmentRules } from './src/aios/DevelopmentRules';
-import { CapabilityRegistry } from './src/aios/CapabilityRegistry';
+import { DevelopmentRules } from './src/DevelopmentRules';
+import { CapabilityRegistry } from './src/CapabilityRegistry';
 
 const rule = {
   ruleId: 'rule-1', ruleName: 'test',
