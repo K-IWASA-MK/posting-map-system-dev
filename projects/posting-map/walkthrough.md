@@ -2,7 +2,7 @@
 
 We have successfully resolved the workspace mapping under the pre-existing `FIELD_OPERATIONS_PLATFORM` workspace (ID: `1FfcVEQjod--rZSucOPFJD2DJ58hV650_`) and migrated the master address/postal CSV reference data to Google Drive, updating the AssetRegistry accordingly.
 
-Additionally, we implemented the initial intake, analysis, and structured config layers of the AIOS Order-to-Branch Automation Pipeline (**Sprint: Order-to-Research** and **Sprint: Data Builder Foundation**).
+Additionally, we implemented the entire automated intake, analysis, data compile, and district cloning phases of the AIOS Order-to-Branch Automation Pipeline (**Sprint: Order-to-Research**, **Sprint: Data Builder**, and **Sprint: Provisioning Runtime**).
 
 ---
 
@@ -98,7 +98,6 @@ The final, generated `AssetRegistry.json` implements the new multi-district stru
 ## 3. Sprint: Order-to-Research Foundation
 
 We designed and built the entry point for automated branch creation:
-
 * **OrderRequest.ts**: Standard structure for incoming district branch orders.
 * **MissionCreator.ts**: Converts valid requests into a tracking `Mission` within the runtime engine.
 * **ResearchTrigger.ts**: Boots the Research Agent scope, maps the target district name to its corresponding municipality listing (resolving "東京第18区" to `["武蔵野市", "小金井市", "西東京市"]`), and uploads the research-result data payload.
@@ -107,73 +106,93 @@ We designed and built the entry point for automated branch creation:
 
 ---
 
-## 4. Sprint: Data Builder Foundation (Phase 2 & 3)
+## 4. Sprint: Data Builder Foundation
 
-We designed and implemented the intermediate configuration compiler layer.
-
-### 4.1. Implemented Components
-* **`src/platform/data-builder-runtime/DistrictMetadata.ts`**: Handles compiling output configuration structures for `district.json`, generating stable district IDs (e.g. `TOKYO-18`) and processing object-based municipalities array mappings.
-* **`src/platform/data-builder-runtime/BranchConfig.ts`**: Compiles app/system default parameters for `config.json`, enforcing coordinate resolution separation by declaring `map.center: null`.
-* **`src/platform/data-builder-runtime/DataBuilderRuntime.ts`**: Subscribes to the `RESEARCH_COMPLETED` event, fetches the `research-result.json`, compiles configurations, uploads files, and broadcasts the completion `DATA_BUILD_COMPLETED` event.
-* **`agents/data_builder/AGENT.md`**: Specification defining boundaries (no plan/quota determination, center coords excluded).
-
-### 4.2. Output Schema Verification
-Verification guarantees that outputs match specifications:
-* **`district.json`**:
-  ```json
-  {
-    "district": {
-      "id": "TOKYO-18",
-      "name": "東京第18区",
-      "municipalities": [
-        { "name": "武蔵野市" },
-        { "name": "小金井市" },
-        { "name": "西東京市" }
-      ]
-    },
-    "createdAt": "2026-07-18T11:17:52.345Z"
-  }
-  ```
-* **`config.json`**:
-  ```json
-  {
-    "system": {
-      "syncIntervalMs": 30000,
-      "gpsTrackingIntervalMs": 10000,
-      "defaultZoom": 13,
-      "map": {
-        "center": null
-      }
-    },
-    "app": {
-      "mode": "PROD",
-      "features": {
-        "offlineMapEnabled": true,
-        "gpsPhotoVerificationEnabled": true
-      }
-    }
-  }
-  ```
+We designed and implemented the intermediate configuration compiler layer:
+* **DistrictMetadata.ts**: Compiles output configuration structures for `district.json` using object-based municipalities array mappings.
+* **BranchConfig.ts**: Compiles app system default parameters for `config.json`, enforcing coordinate resolution separation by declaring `map.center: null`.
+* **DataBuilderRuntime.ts**: Ingests `RESEARCH_COMPLETED` events, resolves local or Drive path inputs, and uploads compiled outputs.
+* **agents/data_builder/AGENT.md**: Specification defining boundaries (no plan/quota determination, center coords excluded).
 
 ---
 
-## 5. Integration Regression Test Results
+## 5. Sprint: Provisioning Runtime Foundation
 
-Running the consolidated workspace test suite (`npm test`) compiles and executes all 138 checks, demonstrating 100% success (0 failures).
+We designed and implemented the automated cloning and initialization environment layer.
 
-The Data-Builder integration flow executes correctly:
+### 5.1. Implemented Components
+* **`src/platform/provisioning-runtime/ProvisioningStage.ts`**: Enum defining the lifecycle states: `REQUESTED` ➔ `PREPARING` ➔ `CLONING_TEMPLATE` ➔ `CREATING_STORAGE` ➔ `REGISTERING_ASSETS` ➔ `VERIFYING` ➔ `READY` ➔ `FAILED`.
+* **`src/platform/provisioning-runtime/AssetCloner.ts`**: Core wrapper for Google Drive copying of Template Spreadsheet assets, creation of storage subfolders, and garbage deletion cleanups during rollback.
+* **`src/platform/provisioning-runtime/ProvisioningStateMachine.ts`**: Transition machine tracking state histories and coordinating sequential rollbacks when exceptions occur.
+* **`src/platform/provisioning-runtime/ProvisioningRuntime.ts`**: Event subscriber for `DATA_BUILD_COMPLETED` events. Orchestrates folder resolution, template copies, registry registrations (delayed until success), QA validation, and writes `deployment.json` before broadcasting `PROVISIONING_COMPLETED`.
+
+### 5.2. Verified Output Configurations
+`deployment.json` generated in `03_BRANCH/<選挙区名>/` implements the nested `gas` mapping schema for flexible execution modes:
+
+```json
+{
+  "district": {
+    "id": "TOKYO-18",
+    "name": "東京第18区"
+  },
+  "resources": {
+    "spreadsheetId": "mock-spreadsheet-1784374410915",
+    "storageFolderId": "mock-storage-1784374410918",
+    "scriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa",
+    "webAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec",
+    "gas": {
+      "mode": "REGISTER_ONLY",
+      "scriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa",
+      "webAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec"
+    }
+  },
+  "provisioning": {
+    "templateVersion": "v1",
+    "createdAt": 1784374410920,
+    "createdBy": "aios-provisioner@platform.postingmap",
+    "status": "READY",
+    "transactionId": "prov-1784374410920-TOKYO-18"
+  },
+  "certification": {
+    "phase31": "PASS"
+  }
+}
+```
+
+---
+
+## 6. Integration Regression Test Results
+
+Running the consolidated workspace test suite (`npm test`) compiles and executes all 139 checks, demonstrating 100% success (0 failures).
+
+The Provisioning flow and exception rollbacks execute correctly:
 
 ```
-🧪 Running Data-Builder Foundation Integration Test...
+🧪 Running Provisioning Runtime Foundation Integration Test...
 
-[Audit Event] DATA_BUILDER_STARTED (Mission: MIS-TEST-002, District: 東京第18区)
-[DataBuilderRuntime] Written config.json and district.json to local mock workspace.
-[Audit Event] DATA_BUILDER_COMPLETED (Mission: MIS-TEST-002)
-   ✓ Generated district.json schema (municipalities object array) validated.
-   ✓ Generated config.json schema (map.center decoupled) validated.
+[Provisioning SM] Transitioned to state: REQUESTED (Mission: MIS-TEST-003)
+[Audit Event] PROVISIONING_STARTED (Mission: MIS-TEST-003, District: 東京第18区)
+[Provisioning SM] Transitioned to state: PREPARING (Mission: MIS-TEST-003)
+[Provisioning SM] Transitioned to state: CLONING_TEMPLATE (Mission: MIS-TEST-003)
+[Provisioning SM] Transitioned to state: CREATING_STORAGE (Mission: MIS-TEST-003)
+[Provisioning SM] Transitioned to state: REGISTERING_ASSETS (Mission: MIS-TEST-003)
+[Provisioning] Updated AssetRegistry.json for district ID: TOKYO-18
+[Provisioning SM] Transitioned to state: VERIFYING (Mission: MIS-TEST-003)
+[Provisioning SM] Transitioned to state: READY (Mission: MIS-TEST-003)
+[Audit Event] PROVISIONING_COMPLETED (Mission: MIS-TEST-003)
+   ✓ State machine transitions REQUESTED -> READY successfully.
+   ✓ Cloned spreadsheet and Storage folder mappings verified.
+   ✓ deployment.json schema with nested resources.gas verified.
+   ✓ AssetRegistry.json update committing delayed till success verified.
+[Provisioning SM] Transitioned to state: REQUESTED (Mission: MIS-TEST-004)
+[Audit Event] PROVISIONING_FAILED (Mission: MIS-TEST-004, Error: Invalid or empty districtName provided.)
+[Provisioning SM] Transitioned to state: FAILED (Mission: MIS-TEST-004)
+[Provisioning SM] Provisioning failed: Invalid or empty districtName provided.. Initiating rollback...
+[Rollback] Rollback completed successfully.
+   ✓ Rollback failure paths and cleanup triggers verified.
 
 ==========================================
-🎉 DATA-BUILDER INTEGRATION TEST PASSED
+🎉 PROVISIONING RUNTIME TEST PASSED
 ==========================================
 
 ...
@@ -183,7 +202,7 @@ The Data-Builder integration flow executes correctly:
 ==================================================
 Overall Decision: PASS
 Total Suites    : 3
-Total Passed    : 138
+Total Passed    : 139
 Total Failed    : 0
 --------------------------------------------------
 [PASS] TypeScript Unit & Integration Tests

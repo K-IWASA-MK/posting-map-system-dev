@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1784371396312,
+  "updatedAt": 1784374303869,
   "schemaVersion": 1,
   "templates": {
     "spreadsheetId": "14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4",
@@ -55,6 +55,16 @@
       "MIE-03": {
         "spreadsheetId": "14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4",
         "storageFolderId": "",
+        "gasScriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa"
+      },
+      "TOKYO-18": {
+        "spreadsheetId": "mock-spreadsheet-1784374303869",
+        "storageFolderId": "mock-storage-1784374303869",
+        "gasScriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa"
+      },
+      "DST-UNK": {
+        "spreadsheetId": "mock-spreadsheet-1784374182672",
+        "storageFolderId": "mock-storage-1784374182673",
         "gasScriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa"
       }
     }
