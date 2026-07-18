@@ -265,4 +265,104 @@ LINE 側の 20 文字制限および 7 日間変更ロックを踏まえ、以�
 
 *※これにより、支部ごとの物理的な LINE チャネル複製を防ぎ、単一の共通 LINE インフラ配下で `districtId` によるコンテキスト分離を行う SaaS 基盤の設計が確立されました。*
 
+---
+
+## 8. Runtime Activation Foundation Verification Results
+
+Activation Runtime の実装および結合テストが正常に動作し、テストスイート（全140件）が 100% グリーンパスしたことを確認しました。
+
+### 8.1. テスト実行ログ (`npm test`)
+
+```
+🧪 Running Activation Runtime Foundation Integration Test...
+
+[Activation SM] Transitioned to state: ACTIVATING (Mission: MIS-TEST-ACT-001)
+[Activation SM] Transitioned to state: LINE_VERIFYING (Mission: MIS-TEST-ACT-001)
+[Activation SM] Transitioned to state: GAS_VERIFYING (Mission: MIS-TEST-ACT-001)
+[Activation SM] Transitioned to state: DASHBOARD_VERIFYING (Mission: MIS-TEST-ACT-001)
+[Activation SM] Transitioned to state: AUDIT_VERIFYING (Mission: MIS-TEST-ACT-001)
+[Activation SM] Transitioned to state: ACTIVE (Mission: MIS-TEST-ACT-001)
+[Activation] activation.json successfully generated at FIELD_OPERATIONS_PLATFORM/03_BRANCH/東京第18区/activation.json
+   ✓ State machine transitions READY -> ACTIVE successfully.
+   ✓ activation.json generated with valid runtime and check statuses.
+[Activation SM] Transitioned to state: ACTIVATING (Mission: MIS-TEST-ACT-002)
+[Activation SM] Transitioned to state: LINE_VERIFYING (Mission: MIS-TEST-ACT-002)
+[Activation SM] Transitioned to state: GAS_VERIFYING (Mission: MIS-TEST-ACT-002)
+[GasConnector] Invalid or empty GAS WebApp URL
+[Activation] Process failed at stage: GAS_VERIFYING. Error: GAS WebApp Connection check failed.
+[Activation SM] Transitioned to state: FAILED (Mission: MIS-TEST-ACT-002)
+   ✓ GAS connection failure path and FAILED state transition verified.
+[Activation SM] Transitioned to state: ACTIVATING (Mission: MIS-TEST-ACT-003)
+[Activation SM] Transitioned to state: LINE_VERIFYING (Mission: MIS-TEST-ACT-003)
+[Activation SM] Transitioned to state: GAS_VERIFYING (Mission: MIS-TEST-ACT-003)
+[Activation SM] Transitioned to state: DASHBOARD_VERIFYING (Mission: MIS-TEST-ACT-003)
+[ActivationVerifier] District TOKYO-999_NOT_EXIST not found in AssetRegistry
+[Activation] Process failed at stage: DASHBOARD_VERIFYING. Error: AssetRegistry alignment check failed.
+[Activation SM] Transitioned to state: FAILED (Mission: MIS-TEST-ACT-003)
+   ✓ Registry mapping failure path and FAILED state transition verified.
+
+==========================================
+🎉 ACTIVATION RUNTIME TEST PASSED
+==========================================
+
+...
+
+==================================================
+               TEST EXECUTION SUMMARY             
+==================================================
+Overall Decision: PASS
+Total Suites    : 3
+Total Passed    : 140
+Total Failed    : 0
+--------------------------------------------------
+[PASS] TypeScript Unit & Integration Tests
+[SKIPPED] Python Unit Tests
+[PASS] Simulation Regression Tests
+==================================================
+[Test Runner] Quality Gate Passed. Exiting successfully.
+```
+
+### 8.2. 生成された `activation.json` の実出力内容
+正常にアクティベート完了した際に `03_BRANCH/東京第18区/activation.json` に出力されるメタデータです。
+
+```json
+{
+  "district": {
+    "id": "TOKYO-18",
+    "name": "東京第18区"
+  },
+  "status": "ACTIVE",
+  "runtime": {
+    "version": "v1",
+    "activatedBy": "AIOS"
+  },
+  "checks": {
+    "line": {
+      "status": "PASS",
+      "details": {
+        "loginChannel": "POSTING MAP Login",
+        "messagingChannel": "POSTING MAP Msg API",
+        "adminChannel": "POSTING MAP Admin"
+      }
+    },
+    "gas": {
+      "status": "PASS",
+      "details": {
+        "spreadsheetId": "1_NEW_CLONED_SPREADSHEET_ID_HERE",
+        "health": "PASS"
+      }
+    },
+    "dashboard": {
+      "status": "PASS"
+    }
+  },
+  "activatedAt": 1784377986000,
+  "audit": {
+    "transactionId": "act-1784377986000-TOKYO-18",
+    "createdBy": "aios-activator@platform.postingmap"
+  }
+}
+```
+
+
 

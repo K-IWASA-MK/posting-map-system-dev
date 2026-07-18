@@ -115,7 +115,7 @@ graph TD
 
 ## 6. Workspace & AIOS Order Pipeline Migration Summaries (2026-07-18 Update)
 
-本リポジトリは、SaaS 運用の基盤整備に加え、正規の Google Drive ワークスペース構造へのバインド、および自動プロビジョニングへとつながる AIOS 注文パイプラインの結合を完了しました。
+本リポジトリは、SaaS 運用の基盤整備に加え、正規の Google Drive ワークスペース構造へのバインド、および自動プロビジョニング・アクティベーションへとつながる AIOS 注文パイプラインの結合を完了しました。
 
 ### 6.1. Google Drive Workspace & Master Reference Migration
 * **`AssetRegistry` / `AssetRegistryService` の確立**: 
@@ -126,15 +126,25 @@ graph TD
   - 郵便番号マスター (`KEN_ALL.CSV`) および全国住所マスター (`postal.csv`) をバイナリセーフでアップロード。
   - SHA-256 ハッシュ（チェックサム）、バージョン (`2026-07`)、データソース情報をメタデータとして AssetRegistry に登録し、AIOS が自動検索・参照可能に設定。
 
-### 6.2. AIOS Order-to-Branch Automation Pipeline (Sprint 1 & 2)
+### 6.2. AIOS Order-to-Branch Automation Pipeline (Sprint 1 ~ 4)
 * **Order-to-Research Foundation**:
   - 注文受付オーケストレータ `OrderRuntime.ts` と `MissionCreator.ts` を実装。
   - 注文（東京第18区等）を元に Research Agent を起動し、内包する基礎自治体リストを抽出して `research-result.json` を出力するフローを自動化。
 * **Data Builder Foundation**:
   - `RESEARCH_COMPLETED` イベント駆動によって非同期起動する `DataBuilderRuntime.ts` を実装。
-  - `district.json` （将来の拡張を見据えた市町村オブジェクト配列構造）と `config.json` （アプリ同期パラメータ）を自動生成。
-  - **責任境界の画定**: 地図の初期中心座標決定（`map.center: null`）や世帯数・配布目標の設定を Data Builder の責務から除外し、意思決定を伴わない純粋な「初期メタデータコンパイラ」として実装。
-  - 処理完了時に `DATA_BUILD_COMPLETED` イベントおよび各種 Audit ログを発行。
+  - `district.json` （市町村オブジェクト配列構造）と `config.json` を自動生成。
+  - 地図 of 初期中心座標決定（`map.center: null`）や世帯数・配布目標の設定を Data Builder の責務から除外し、意思決定を伴わない純粋な「初期メタデータコンパイラ」として実装。
+* **Provisioning Runtime Foundation**:
+  - `DATA_BUILD_COMPLETED` イベントをフックして非同期起動する `ProvisioningRuntime.ts` を実装。
+  - Google Drive 連携部 `AssetCloner.ts` を介してスプレッドシートのクローンコピー、およびブランチ専用 Storage フォルダの作成を自動実行。
+  - 異常発生時は `FAILED` に遷移し、作成中だった複製ファイルを自動検知して削除する自動ロールバック機能（`ProvisioningStateMachine`）を実装。
+  - クローン完了の READY 段階で初めて `AssetRegistry.json` への一括書き込みを行い、環境設定ファイル `deployment.json` (nested `gas` schema) をブランチフォルダへ出力。
+* **Runtime Activation Foundation**:
+  - `PROVISIONING_COMPLETED` イベントフックにより非同期起動する `ActivationRuntime.ts` を実装。
+  - `LineConnector.ts` による共通 LINE インフラ（Login / Msg / Admin）の 20 文字制限適合性および存在チェックを実行。
+  - `GasConnector.ts` による、フラット・ネスト双方に対応した GAS WebApp API の疎通ヘルスチェックを自動検証。
+  - `ActivationVerifier.ts` により、レジストリバインドと Dashboard 接続パラメータの整合性を検証。
+  - 検証フローに `AUDIT_VERIFYING` 状態を追加し、成功時に `runtime` メタデータ、各チェック PASS 状態、監査トランザクションを格納した `activation.json` を出力して `ACTIVE` 状態へ確定。
 
 ---
 
@@ -145,5 +155,7 @@ graph TD
 | `asset-registry-integrity-test.js` | Registry / Masters | ✅ 5/5 PASS |
 | `test_order_flow.ts` | Order-to-Research | ✅ 1/1 PASS |
 | `test_data_builder_flow.ts` | Data Builder | ✅ 1/1 PASS |
+| `test_provisioning_flow.ts` | Provisioning Runtime | ✅ 1/1 PASS |
+| `test_activation_flow.ts` | Activation Runtime | ✅ 1/1 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **138 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **140 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
