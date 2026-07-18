@@ -7,6 +7,15 @@
 
 import { DashboardApiClient } from './DashboardApiClient';
 import { DashboardDataMapper } from './DashboardDataMapper';
+import { PublicDashboardDataViewModel } from './PublicDashboardViewModels';
+
+export type PublicDashboardStatusType = "ONLINE" | "OFFLINE" | "WARNING";
+
+export interface PublicDashboardState {
+  readonly data: PublicDashboardDataViewModel | null;
+  readonly status: PublicDashboardStatusType;
+  readonly warning: string | null;
+}
 
 export interface AreaDetail {
   readonly areaId: string;
@@ -78,6 +87,13 @@ export class DashboardStateModel {
   private eventLogs: readonly EventLogItem[] = [];
   private inventories: readonly InventoryItem[] = [];
 
+  // Public Dashboard consumer state properties
+  private publicDashboard: PublicDashboardState = {
+    data: null,
+    status: "OFFLINE",
+    warning: null
+  };
+
   private isLoading: boolean = false;
   private error: { code: string; message: string } | null = null;
   private lastFetchedAt: number = 0;
@@ -88,6 +104,26 @@ export class DashboardStateModel {
   constructor(client: DashboardApiClient) {
     this.client = client;
   }
+
+  /**
+   * 公開ダッシュボードのリアクティブ状態を取得する
+   */
+  getPublicDashboard(): PublicDashboardState {
+    return this.publicDashboard;
+  }
+
+  /**
+   * 公開ダッシュボードのリアクティブ状態を更新して通知する
+   */
+  setPublicDashboard(state: PublicDashboardState): void {
+    this.publicDashboard = Object.freeze({
+      data: state.data ? Object.freeze(state.data) : null,
+      status: state.status,
+      warning: state.warning
+    });
+    this.notify();
+  }
+
 
   // リスナー管理
   subscribe(listener: () => void): () => void {

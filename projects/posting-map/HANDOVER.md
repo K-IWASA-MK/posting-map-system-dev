@@ -181,6 +181,17 @@ graph TD
 * **`PresentationIntegrityVerifier` (最終公開前完全性チェッカー)**:
   - ファイル存在確認、スキーマ適合性、`presentationHash` 再計算検証、および親である `outputHash` との系統チェックを一括実行。
 
+### 6.6. POSTING MAP Dashboard Consumer Foundation (Sprint: POSTING MAP Dashboard Consumer Foundation)
+* **`PublicDashboardViewModels` の策定**:
+  - UI側が安全かつ型安全にデータをバインドできるよう、公開データ契約からUI表示項目のみを抽出した専用のView Model（`PublicDistrictViewModel`, `PublicMunicipalityViewModel`, `PublicTurnoutViewModel`, `PublicBranchStatusViewModel`, `PublicAssetStatusViewModel`）群を設計・作成。
+* **`PublicDashboardDataAdapter` (消費アダプター)**:
+  - アセット `public-dashboard-data.json` の非同期フェッチ、バリデーション、および View Model への変換をカプセル化。
+  - 環境変数 `process.env.POSTING_MAP_DATA_SOURCE` および `window.POSTING_MAP_CONFIG` に基づき `'MOCK'` (開発・オフライン用フォールバックデータ `DEVELOPMENT_FALLBACK_DATA`) と `'LIVE'` (本番通信データ) を動的に切り替え可能。
+  - スキーマ適合性チェック (`validateSchema`) を含み、例外時や不整合時は安全に `'WARNING'` または `'OFFLINE'` 状態へと遷移させてモックデータで補正表示する二重の防御境界を構築。
+* **既存 `DashboardStateModel` & `DashboardDataMapper` の拡張**:
+  - `DashboardStateModel` に `publicDashboard` (状態: `ONLINE | OFFLINE | WARNING`, データ: `PublicDashboardDataViewModel | null`) リアクティブ管理プロパティを追加。
+  - `DashboardDataMapper` に純粋関数としての `mapPublicDashboardData` マッピング処理を実装。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -195,7 +206,9 @@ graph TD
 | `test_dashboard_data_flow.ts` | Dashboard Data Runtime | ✅ 6/6 PASS |
 | `test_dashboard_audit_integration.ts` | Dashboard Data Audit Connection | ✅ 4/4 PASS |
 | `test_dashboard_presentation_flow.ts` | Dashboard Presentation Runtime | ✅ 5/5 PASS |
+| `test_public_dashboard_adapter.ts` | Dashboard Consumer Adapter | ✅ 6/6 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **145 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **151 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+
 
 
