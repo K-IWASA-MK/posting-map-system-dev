@@ -153,6 +153,22 @@ graph TD
   - インプット JSON 文字列の連結から算出する決定論的な `sourceHash` によるデータ整合性監査、および `dashboard-runtime-${timestamp}-${shortHash}` 形式の `executionId` による実行インスタンス監査に対応。
   - `DashboardDataContract.ts` を用いた出力契約スキーマ（`schemaVersion: "v1"`）の独立・明確化と厳格な型検証を実現し、未知の将来拡張フィールドを許容しつつ、未来の無効なバージョンは拒否する上位互換性設計を実装。
 
+### 6.4. Dashboard Data Audit Connection (Sprint: Dashboard Data Audit Connection)
+* **`DashboardDataAuditEvent` の契約策定**:
+  - `eventType: "DASHBOARD_DATA_GENERATED"` を持つ標準イベントスキーマを定義。イベント自身のスキーマバージョン管理（`schemaVersion: "v1"`）に対応。
+* **`DashboardAuditPublisher` (隔離イベントバス)**:
+  - 監査記録の失敗がリードモデル生成処理に影響を与えないよう、リスナー実行時の例外を try-catch で安全にトラップして隔離するノンブロッキング監査方式を実装。
+* **`ExecutionLedgerAdapter` (相互変換と動的登録)**:
+  - イベントからプラットフォーム標準の `ExecutionRecord` への型安全なマッピングを実現。
+  - レジストリ未登録による例外を防止するため、Capability, Skill, Pipeline 情報を `ExecutionLedgerRegistry` 登録時にオンデマンドで動的事前登録する防衛コードを導入。
+  - `executionId` を `ledger-\d+` 正規表現に適合する形式へ決定論的にハッシュ・マッピング。
+* **`OutputHashGenerator` (決定論的出力ハッシュ算出)**:
+  - 出力 JSON から実行ごとの動的メタデータ（`generatedAt`, `executionId`）を除外した上で SHA-256 チェックサムを算出する機構を分離。同一インプットからのビルドなら同一の `outputHash` が保証される決定論的特性を維持。
+* **`DashboardDataIntegrityVerifier` (完全性チェッカー)**:
+  - 出力存在チェック、スキーマ定義の妥当性、`sourceHash` の一致、`outputHash` の再計算確認、`schemaVersion` 整合性を一括検証するセキュリティバリデータを実装。
+* **Lineage メタデータの埋め込み**:
+  - `dashboard-data.json` 内に、インプット元ファイルの系統リスト (`sources`)、`sourceHash`、および `outputHash` を格納する `lineage` オブジェクトを追加。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -165,5 +181,7 @@ graph TD
 | `test_provisioning_flow.ts` | Provisioning Runtime | ✅ 1/1 PASS |
 | `test_activation_flow.ts` | Activation Runtime | ✅ 1/1 PASS |
 | `test_dashboard_data_flow.ts` | Dashboard Data Runtime | ✅ 6/6 PASS |
+| `test_dashboard_audit_integration.ts` | Dashboard Data Audit Connection | ✅ 4/4 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **141 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。（一部プラットフォーム側の Ledger 単体テストは除く）
+※プロジェクト全体の TypeScript 統合テストを含む **143 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+

@@ -14,6 +14,8 @@ export class DashboardDataBuilder {
     sourceHash: string;
     executionId: string;
     generatedAt: string;
+    lineageSources: string[];
+    outputHash: string;
   }): DashboardDataContract {
     return {
       metadata: {
@@ -22,6 +24,11 @@ export class DashboardDataBuilder {
         sourceHash: params.sourceHash,
         executionId: params.executionId,
         schemaVersion: CURRENT_SCHEMA_VERSION
+      },
+      lineage: {
+        sources: params.lineageSources,
+        sourceHash: params.sourceHash,
+        outputHash: params.outputHash
       },
       districts: [
         {

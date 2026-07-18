@@ -3,6 +3,9 @@ import * as path from "path";
 import * as crypto from "crypto";
 import { SchemaValidator } from "./validation/SchemaValidator";
 import { SourceHashGenerator } from "./utils/SourceHashGenerator";
+import { OutputHashGenerator } from "./utils/OutputHashGenerator";
+import { DashboardAuditPublisher } from "./audit/DashboardAuditPublisher";
+import { DashboardDataAuditEvent } from "./audit/DashboardDataAuditEvent";
 import { ElectionResearchAdapter } from "./adapters/ElectionResearchAdapter";
 import { DeploymentAdapter } from "./adapters/DeploymentAdapter";
 import { ActivationAdapter } from "./adapters/ActivationAdapter";
@@ -138,7 +141,14 @@ export class DashboardDataRuntime {
       const executionId = `dashboard-runtime-${timestamp}-${shortHash}`;
       const generatedAt = new Date().toISOString();
 
-      // 6. Build unified view model representation
+      const lineageSources = [
+        "election-research-result.json",
+        "deployment.json",
+        "activation.json",
+        "AssetRegistry.json"
+      ];
+
+      // 6. Build unified view model representation with a blank outputHash first
       const dashboardData = DashboardDataBuilder.build({
         district: finalDistrict,
         municipalities: adaptedMunicipalities,
@@ -147,23 +157,56 @@ export class DashboardDataRuntime {
         assetStatus: finalAssetStatus,
         sourceHash,
         executionId,
-        generatedAt
+        generatedAt,
+        lineageSources,
+        outputHash: ""
       });
 
-      // 7. Validate output Contract schema
+      // 7. Calculate outputHash canonically using OutputHashGenerator
+      const outputHash = OutputHashGenerator.generate(dashboardData);
+      dashboardData.lineage.outputHash = outputHash;
+
+      // 8. Validate output Contract schema
       const outputVal = SchemaValidator.validateDashboardData(dashboardData);
       if (!outputVal.valid) throw new Error(`Generated dashboard-data contract validation failed: ${outputVal.errors.join(", ")}`);
 
-      // 8. Write to output file
+      // 9. Write to output file
       const outputPath = path.join(branchFolder, "dashboard-data.json");
       fs.writeFileSync(outputPath, JSON.stringify(dashboardData, null, 2), "utf-8");
       console.log(`[DashboardDataRuntime] Successfully generated dashboard-data.json at ${outputPath}`);
 
-      // Calculate result file checksum
+      // 10. Publish Audit Event (Non-blocking: protected by try-catch)
+      try {
+        const auditEvent: DashboardDataAuditEvent = {
+          eventType: "DASHBOARD_DATA_GENERATED",
+          executionId,
+          schemaVersion: "v1",
+          runtime: {
+            name: "DashboardDataRuntime",
+            version: "1.0.0"
+          },
+          sourceHash,
+          output: {
+            file: `03_BRANCH/${event.districtName}/dashboard-data.json`,
+            schemaVersion: "v1"
+          },
+          timestamp: generatedAt,
+          lineage: {
+            sources: lineageSources,
+            sourceHash,
+            outputHash
+          }
+        };
+        DashboardAuditPublisher.publish(auditEvent);
+      } catch (auditErr: any) {
+        console.warn(`[DashboardDataRuntime] Non-blocking audit publication failure: ${auditErr.message}`);
+      }
+
+      // Calculate result file checksum (SHA-256 of finalized output file)
       const outputContent = JSON.stringify(dashboardData, null, 2);
-      const outputHash = crypto.createHash("sha256");
-      outputHash.update(outputContent);
-      const checksum = outputHash.digest("hex");
+      const fileChecksumHash = crypto.createHash("sha256");
+      fileChecksumHash.update(outputContent);
+      const checksum = fileChecksumHash.digest("hex");
 
       const completedEvent: DashboardDataCompletedEvent = {
         type: "DASHBOARD_DATA_COMPLETED",

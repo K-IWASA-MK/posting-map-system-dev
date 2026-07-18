@@ -45,6 +45,11 @@ export interface DashboardDataContract {
     executionId: string;
     schemaVersion: string;
   };
+  lineage: {
+    sources: string[];
+    sourceHash: string;
+    outputHash: string;
+  };
   districts: DistrictView[];
   municipalities: MunicipalityView[];
   turnoutComparison: TurnoutView[];
