@@ -1,0 +1,63 @@
+{
+  "updatedAt": 1784352682966,
+  "schemaVersion": 1,
+  "districts": [
+    {
+      "id": "MIE-03",
+      "name": "三重県第3区",
+      "status": "READY",
+      "deployment": {
+        "version": "v1",
+        "environment": "production"
+      },
+      "runtime": {
+        "latency": 8690,
+        "lastHeartbeat": "2026-07-18T05:31:22.966Z",
+        "lastCertification": "2026-07-18T05:31:11.290Z"
+      },
+      "resources": {
+        "spreadsheetId": "14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4",
+        "webAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec",
+        "scriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa"
+      }
+    },
+    {
+      "id": "MIE-04",
+      "name": "三重県第4区",
+      "status": "READY",
+      "deployment": {
+        "version": "v1",
+        "environment": "production"
+      },
+      "runtime": {
+        "latency": 11567,
+        "lastHeartbeat": "2026-07-18T05:31:22.966Z",
+        "lastCertification": "2026-07-18T05:31:11.291Z"
+      },
+      "resources": {
+        "spreadsheetId": "1n2xYOW_rinS-mDzVSOPz9aDmT8ihPUOri59CfMLnCsg",
+        "webAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec",
+        "scriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa"
+      }
+    },
+    {
+      "id": "MIE-05",
+      "name": "MIE-05 支部",
+      "status": "READY",
+      "deployment": {
+        "version": "v1",
+        "environment": "production"
+      },
+      "runtime": {
+        "latency": 9080,
+        "lastHeartbeat": "2026-07-18T05:31:22.966Z",
+        "lastCertification": "2026-07-18T05:31:11.291Z"
+      },
+      "resources": {
+        "spreadsheetId": "1nwreNCMn2f_wcBW4658xgxLyb8udUJlYXydh0dpTpLM",
+        "webAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec",
+        "scriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa"
+      }
+    }
+  ]
+}

@@ -193,6 +193,9 @@ async function main() {
     );
     console.log(`✓ Client registry folder created: active/dashboard/clients/${districtId}/`);
 
+    // Rebuild global registry index
+    RegistryManager.rebuildRegistry();
+
     console.log(`\n🎉 PROVISIONING SUCCESSFUL: District ${districtId} is certified and active.`);
   } catch (err) {
     console.error(`\n❌ Provisioning failed: ${err.toString()}`);
