@@ -206,6 +206,22 @@ graph TD
 * **`CompletionRuntime` (コアランタイム)**:
   - リクエスト受信から、テスト品質検証、Git操作、リモート同期検証、Handover文書追記、`COMPLETION_COMPLETED` 監査イベントの発行までを一括オーケストレーション。同一リクエストでの二重コミットを完全に防ぐ `Replay Safety` 機構を実装。
 
+### 6.8. Runtime Integration Orchestration Foundation (Sprint: Runtime Integration Orchestration Foundation)
+* **`RuntimeEventContract` の策定**:
+  - 全 Runtime 共通のイベント構造 `RuntimeEvent` を定義し、`correlationId` などのコンテキスト伝達属性を追加。
+* **`RuntimeRegistry` (能力レジストリ)**:
+  - 各 Runtime 名、バージョン、能力記述（Capabilities）情報を管理し、疎結合性を維持。
+* **`RuntimeEventBus` (非同期イベントバス)**:
+  - publish / subscribe / unsubscribe のイベント配送制御を担当。例外隔離（Subscriber Exception Isolation）を実装し、一部の Runtime 障害が他へ波及しない堅牢性を確保。
+* **`RuntimeEventRouter` (ルーティング制御)**:
+  - イベントタイプ（`EXECUTION_COMPLETED` → `Validation` → `AUDIT_RECORDED` → `Completion` → `Learning`）を決定論的かつ一方向にルーティングする固定マップを定義。
+* **`IntegrationPolicy` (遷移ポリシー)**:
+  - 前段 Runtime の実行結果（`SUCCESS` / `FAILED` / `BLOCKED` / `INVALID` 等）に基づき、次段 Runtime への遷移認可を制限するポリシー。
+* **`RuntimeIntegrationTrace` (処理系統トレース)**:
+  - 各配送処理に一意の `traceId` を付与し、履歴（`DELIVERED`, `EVENT_FAILED`, `CONTRACT_INVALID`, `BLOCKED_BY_POLICY`）を一元的に記録・管理。
+* **`RuntimeOrchestrator` (オーケストレーター)**:
+  - イベント受信から、スキーマチェック、リプレイセーフティキャッシュ検証、ポリシー適用、レジストリ検証、および EventBus 経由での各 Runtime へのターゲットディスパッチを統括。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -222,8 +238,10 @@ graph TD
 | `test_dashboard_presentation_flow.ts` | Dashboard Presentation Runtime | ✅ 5/5 PASS |
 | `test_public_dashboard_adapter.ts` | Dashboard Consumer Adapter | ✅ 6/6 PASS |
 | `test_completion_runtime.ts` | Completion Runtime | ✅ 6/6 PASS |
+| `test_runtime_orchestration.ts` | Runtime Orchestration | ✅ 5/5 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **157 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **162 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+
 
 
 
