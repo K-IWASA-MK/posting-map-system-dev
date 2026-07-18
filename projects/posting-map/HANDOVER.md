@@ -169,6 +169,18 @@ graph TD
 * **Lineage メタデータの埋め込み**:
   - `dashboard-data.json` 内に、インプット元ファイルの系統リスト (`sources`)、`sourceHash`、および `outputHash` を格納する `lineage` オブジェクトを追加。
 
+### 6.5. Dashboard Presentation Runtime Foundation (Sprint: Dashboard Presentation Runtime Foundation)
+* **`PresentationContract` の策定**:
+  - フロントエンドが直接フェッチして解釈する `PublicDashboardDataContract` を策定。`schemaVersion: "v1"` を必須契約項目として定義。
+* **`PresentationBuilder` (プレゼンテーションマッパー)**:
+  - 監査済みの `DashboardDataContract` からパブリックデータへの投影変換処理を実装。
+* **`PresentationHashGenerator` (決定論的公開ハッシュ算出)**:
+  - 公開アセットから動的メタデータ（`generatedAt`, `deploymentUrl`, `executionId`）を除外した状態で SHA-256 チェックサムを算出する機構をカプセル化。入力系統から最終成果物に至る「3段階インテグリティ・チェーン（`sourceHash` -> `outputHash` -> `presentationHash`）」を担保。
+* **`DeploymentAdapter` / `LocalFileDeploymentAdapter` (配信先抽象化)**:
+  - 各種クラウドストレージ（Drive, GitHub Pages, GAS 等）への配信先差し替えを可能にする `DeploymentAdapter` 抽象化インターフェースを導入し、検証・テスト用のローカルファイル配信アダプターを実装。
+* **`PresentationIntegrityVerifier` (最終公開前完全性チェッカー)**:
+  - ファイル存在確認、スキーマ適合性、`presentationHash` 再計算検証、および親である `outputHash` との系統チェックを一括実行。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -182,6 +194,8 @@ graph TD
 | `test_activation_flow.ts` | Activation Runtime | ✅ 1/1 PASS |
 | `test_dashboard_data_flow.ts` | Dashboard Data Runtime | ✅ 6/6 PASS |
 | `test_dashboard_audit_integration.ts` | Dashboard Data Audit Connection | ✅ 4/4 PASS |
+| `test_dashboard_presentation_flow.ts` | Dashboard Presentation Runtime | ✅ 5/5 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **143 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **145 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+
 
