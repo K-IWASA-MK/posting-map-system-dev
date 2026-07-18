@@ -1,0 +1,22 @@
+{
+  "district": {
+    "id": "MIE-05",
+    "name": "MIE-05 支部"
+  },
+  "resources": {
+    "spreadsheetId": "1nwreNCMn2f_wcBW4658xgxLyb8udUJlYXydh0dpTpLM",
+    "storageFolderId": "1uoCwkEITDxoQjvVkl2G4djA34wMQS9eV",
+    "scriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa",
+    "webAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec"
+  },
+  "provisioning": {
+    "templateVersion": "v1",
+    "createdAt": 1784343114573,
+    "createdBy": "postingareamap@gmail.com",
+    "status": "READY",
+    "transactionId": "prov-1784343114573-MIE-05"
+  },
+  "certification": {
+    "phase31": "PASS"
+  }
+}

@@ -1,0 +1,18 @@
+/**
+ * Auto-generated Client Config
+ */
+window.PMS_CLIENT_CONFIG = {
+  "districtId": "MIE-05",
+  "districtName": "MIE-05 支部",
+  "environment": "production",
+  "api": {
+    "gasWebAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec"
+  },
+  "line": {
+    "liffId": "2010177345-tXZIMAJK"
+  },
+  "features": {
+    "photoUpload": true,
+    "gpsTracking": true
+  }
+};

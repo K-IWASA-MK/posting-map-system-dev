@@ -1,8 +1,8 @@
-# Handover Document: Phase 32 — District Provisioning Foundation
+# Handover Document: POSTING MAP Deployment & Partitioning Foundation
 
 ## 1. 概要
-本フェーズでは、POSTING MAP を新しい選挙区・地区へ迅速かつミスなく水平展開するための自動インフラ複製・初期化・認証検証パイプライン（District Provisioning Foundation）を構築しました。
-ローカルの資格情報（clasp）と GAS 側のネイティブ実行権限を組み合わせることで、従来の Google API スコープ問題を完全に回避しつつ、1 コマンドでの全自動立ち上げを実現しています。
+本リポジトリは、POSTING MAP を全国 289 選挙区・支部へ展開するための「SaaS型 共通コアアプリケーション構造」への移行を完了しました。
+主要ファイルや実装済みコンポーネントは、特定の地区名やIDに依存せず、設定レイヤー（Client Configurations）のみを切り離して動作する状態になっています。
 
 ---
 
@@ -10,45 +10,44 @@
 
 ```mermaid
 graph TD
-    A[provision-district.js] -->|1. clasp push & deploy| B[GAS Script v55]
-    A -->|2. OAuth Check| C[oauth-checker.js]
-    C -->|Unauthorized| D[Operator Alert & Pause]
-    C -->|Certified| E[Trigger provisionDistrict API]
-    E -->|3. Copy Template & Create Folder| F[DriveApp inside GAS]
-    F -->|4. Auto Property Setup| G[ScriptProperties inside GAS]
-    G -->|5. Return IDs| A
-    A -->|6. Save Manifest| H[deployment.json]
-    A -->|7. Run deploy-verify.js| I[Phase 31 Validation]
-    I -->|PASS| J[Final Status: READY]
-    I -->|FAIL| K[Trigger cleanup-district.js]
-    K -->|Rollback via GAS cleanupResources| L[Trash generated files]
+    A[index.html Boot] -->|1. Load loader| B[client-loader.js]
+    B -->|2. Resolve client ID| C{Search Parameter / LocalStorage / Default}
+    C -->|MIE-03| D[Load clients/MIE-03/config.js]
+    C -->|MIE-04| E[Load clients/MIE-04/config.js]
+    C -->|MIE-05| F[Load clients/MIE-05/config.js]
+    D & E & F -->|3. Initialize Global Object| G[window.PMS_CLIENT_CONFIG]
+    G -->|4. Resolve App Config| H[app.html / api calls / features]
 ```
 
 ---
 
-## 3. 主要ファイル構成
+## 3. 主要コンポーネント
 
-* **`development/provision-district.js`**:
-  主オーケストレーションプログラム。引数 `--district ID` を受けてデプロイとプロビジョニングを実行します。
-* **`development/registry-manager.js`**:
-  `deployment.json` マニフェストの入出力、および新規トランザクションの初期化処理を担当。
-* **`development/oauth-checker.js`**:
-  Web App に対するテスト疎通 POST 経由で OAuth ゲートウェイの認証状態を正確に検知。
-* **`development/cleanup-district.js`**:
-  構築失敗時に GAS 側の API を経由して、複製された Spreadsheet / Storage フォルダを安全にゴミ箱へ自動移動しロールバックします。
-* **`active/gas/v2_deployment_foundation.js`**:
-  GAS 側に実装された `provisionDistrict` および `cleanupResources` API の実体部。
+### ⚙️ プロビジョニングエンジン (development/)
+* **`provision-district.js`**:
+  新地区用の Google Drive リソースを自動複製し、GAS 側のスクリプトプロパティを設定・デプロイし、最終的に `clients/` 配下へ個別 config.js およびマニフェストを自動書き出しします。
+* **`cleanup-district.js`**:
+  構築失敗時に GAS 側の API を通じて自動複製された Spreadsheet/Folder をゴミ箱へ自動移動しロールバックします。
+* **`deploy-verify.js`**:
+  Web App URL や ID の整合性、模擬ポスティング送信を自動テストする READY ゲート検証プログラム。
 
----
-
-## 4. 稼働検証実績
-テスト地区 `MIE-04` のプロビジョニングを実行し、以下の項目が完全自動で完走し、`READY` に到達することを確認・実証しました。
-* 新スプレッドシート（`1n2xYOW...`）および STORAGE フォルダ（`18-NCH-...`）の自動複製。
-* GAS スクリプトプロパティの自動書き換えとキャッシュクリア。
-* GET/POST 診断、模擬配布送信（EventLog ID `cb177840-8525-453e-974c-a3e1c5b06f35`）の連動試験オールパス。
-* ロールバック機能による、作成途中リソースのクリーンアップ完了。
+### 📂 クライアント設定レジストリ (active/dashboard/clients/)
+各フォルダ内に、設定ファイルと検証マニフェストが独立して保存されます。
+* **`config.js`**: LIFF ID、環境変数、GAS Web App URL、Feature Flags（機能トグルのブーリアン）を保持。
+* **`deployment.json`**: プロビジョニング時刻、バージョン、検証ステータス（READY）を記録。
 
 ---
 
-## 5. 次フェーズへの引き継ぎ
-次フェーズである **Phase 33** では、将来の 289 クライアント展開（Case C 方針）に向け、フロントエンドコードを一切変更せず、クライアントごとの設定ファイル（`config.js`）のみを切り離してロード・配備する「Client Configuration Partitioning Foundation」の構築を計画します。
+## 4. 稼働実績と検証ステータス
+* **MIE-03**: 本番実運用稼働中。
+* **MIE-04**: プロビジョニングテスト成功、`READY` 獲得。
+* **MIE-05**: 新規自動プロビジョニング・マニフェスト/config の自動生成、および Phase 31 の 6 項目オール PASS テスト成功。
+* **統合テスト**: `tests/client-loader-test.js` により、URL クエリパラメータ・LocalStorage ・デフォルトフォールバック経由での 3 クライアント切り替えおよびスキーマ構造検証の完全合格を証明済み。
+
+---
+
+## 5. 将来の展望（Phase 34: Multi-District Operations Foundation）
+このクライアント切り分け（Configuration Partitioning）の完成により、次回は **Phase 34: Multi-District Operations Foundation** へと接続します。
+* 全国規模での 289 クライアントの設定状態・デプロイバージョンを一元監視する「SaaS管理ダッシュボード（Registry Dashboard）」の構築。
+* 各地区の稼働統計（アクティブユーザー数、配布率等）の横断集計（Multi-District Aggregator）。
+* クライアント一括アップデート（Bulk Clasp Deployment）の自動化。

@@ -3,6 +3,8 @@
  * Phase 32: District Provisioning CLI Tool
  */
 
+const fs = require('fs');
+const path = require('path');
 const { execSync } = require('child_process');
 const readline = require('readline');
 const RegistryManager = require('./registry-manager');
@@ -154,6 +156,42 @@ async function main() {
     manifest.provisioning.status = "READY";
     manifest.certification.phase31 = "PASS";
     RegistryManager.save(manifest);
+
+    // Generate active/dashboard/clients/DISTRICT_ID/ config & manifest files
+    console.log(`\n[5/5] Generating client configuration registry...`);
+    const clientDir = path.join(__dirname, '..', 'active', 'dashboard', 'clients', districtId);
+    if (!fs.existsSync(clientDir)) {
+      fs.mkdirSync(clientDir, { recursive: true });
+    }
+
+    const clientConfig = {
+      districtId: districtId,
+      districtName: `${districtId} 支部`,
+      environment: "production",
+      api: {
+        gasWebAppUrl: webAppUrl
+      },
+      line: {
+        liffId: "2010177345-tXZIMAJK"
+      },
+      features: {
+        photoUpload: true,
+        gpsTracking: true
+      }
+    };
+
+    fs.writeFileSync(
+      path.join(clientDir, 'config.js'),
+      `/**\n * Auto-generated Client Config\n */\nwindow.PMS_CLIENT_CONFIG = ${JSON.stringify(clientConfig, null, 2)};\n`,
+      'utf8'
+    );
+
+    fs.writeFileSync(
+      path.join(clientDir, 'deployment.json'),
+      JSON.stringify(manifest, null, 2),
+      'utf8'
+    );
+    console.log(`✓ Client registry folder created: active/dashboard/clients/${districtId}/`);
 
     console.log(`\n🎉 PROVISIONING SUCCESSFUL: District ${districtId} is certified and active.`);
   } catch (err) {

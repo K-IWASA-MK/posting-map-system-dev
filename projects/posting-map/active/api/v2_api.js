@@ -226,6 +226,7 @@ function processPostAction(action, postData, e) {
     case 'submitDistribution':
       return submitDistribution(postData);
     case 'verifyDeployment':
+      // Trigger clasp push synchronization update v2
       return verifyDistrictDeployment(postData || e.parameter);
     case 'updateRecordWithGPSPhoto':
       return updateRecordWithGPSPhoto(postData);
