@@ -17,20 +17,26 @@ export class FileLedgerStorage implements ILedgerStorage {
     this.filePath = filePath;
   }
 
+  private appendQueue: Promise<any> = Promise.resolve();
+
   public async append(entry: LedgerEntry): Promise<LedgerStorageResult> {
-    try {
-      const dir = path.dirname(this.filePath);
-      await fs.mkdir(dir, { recursive: true });
-      const serialized = this.serializer.serialize(entry) + '\n';
-      await fs.appendFile(this.filePath, serialized, 'utf8');
-      return {
-        success: true,
-        entryId: entry.entryId,
-        storageType: 'file'
-      };
-    } catch (err) {
-      throw new Error(`[LEDGER_STORAGE_WRITE_FAILED] Failed write operation: ${(err as Error).message}`);
-    }
+    return new Promise((resolve, reject) => {
+      this.appendQueue = this.appendQueue.then(async () => {
+        try {
+          const dir = path.dirname(this.filePath);
+          await fs.mkdir(dir, { recursive: true });
+          const serialized = this.serializer.serialize(entry) + '\n';
+          await fs.appendFile(this.filePath, serialized, 'utf8');
+          resolve({
+            success: true,
+            entryId: entry.entryId,
+            storageType: 'file'
+          });
+        } catch (err) {
+          reject(new Error(`[LEDGER_STORAGE_WRITE_FAILED] Failed write operation: ${(err as Error).message}`));
+        }
+      });
+    });
   }
 
   public async query(filter?: LedgerQueryFilter): Promise<LedgerEntry[]> {

@@ -222,6 +222,20 @@ graph TD
 * **`RuntimeOrchestrator` (オーケストレーター)**:
   - イベント受信から、スキーマチェック、リプレイセーフティキャッシュ検証、ポリシー適用、レジストリ検証、および EventBus 経由での各 Runtime へのターゲットディスパッチを統括。
 
+### 6.9. Runtime Observability Foundation (Sprint: Runtime Observability Foundation)
+* **`ObservabilityEventContract` & `RuntimeMetrics` の策定**:
+  - `ObservabilityEvent`（開始、成功、失敗、ブロック等のメトリクス）および `RuntimeMetric` 状態構造を定義。
+* **`RuntimeMetricsCollector` (メトリクスコレクター)**:
+  - イベントから実行回数、成功/失敗数、平均所要時間を再計算するコレクターを構築。Object.freeze による完全なイミュータブルモデル化を保証。
+* **`RuntimeHealthEvaluator` (ヘルスイバリュエーター)**:
+  - 失敗件数と失敗率に基づき、対象 Runtime の状態（`HEALTHY` / `WARNING` / `DEGRADED` / `FAILED`）を決定論的な定数閾値で判定。
+* **`TraceQueryService` (クエリサービス)**:
+  - 収集されたトレースログから `traceId` や `runtime`, `status` でフィルタリングを行う検索エンジンを構築。
+* **`RuntimeStatusProjection` (プロジェクションリードモデル)**:
+  - メトリクス、ヘルス状態、最終トレースを一括して内包する読み取り専用 Projection モデル。Object.freeze によりダッシュボード等の外部消費側からの不正変更（サイドエフェクト）を完全に防御。
+* **`ObservabilityRuntime` (観測コアランタイム)**:
+  - 観測Pipelineの統括。コントラクト検証、リプレイセーフティ（二重カウント防止）に加え、メトリクス・ヘルス集計中の例外発生時もメイン動作を停止させないノンブロッキング障害設計を適用。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -238,9 +252,12 @@ graph TD
 | `test_dashboard_presentation_flow.ts` | Dashboard Presentation Runtime | ✅ 5/5 PASS |
 | `test_public_dashboard_adapter.ts` | Dashboard Consumer Adapter | ✅ 6/6 PASS |
 | `test_completion_runtime.ts` | Completion Runtime | ✅ 6/6 PASS |
+| `test_runtime_ledger.ts` | Runtime Ledger (Race Fixed) | ✅ 3/3 PASS |
 | `test_runtime_orchestration.ts` | Runtime Orchestration | ✅ 5/5 PASS |
+| `test_runtime_observability.ts` | Runtime Observability | ✅ 7/7 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **162 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **169 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+
 
 
 
