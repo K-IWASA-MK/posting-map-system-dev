@@ -105,34 +105,37 @@ async function executeBulkDeploy() {
   const claspJsonPath = path.join(__dirname, '..', '.clasp.json');
   const originalConfig = JSON.parse(fs.readFileSync(claspJsonPath, 'utf8'));
   
-  for (let i = 0; i < queue.length; i++) {
-    const dist = queue[i];
-    const scriptId = dist.resources.scriptId;
-    if (!scriptId) {
-      console.warn(`[${i+1}/${queue.length}] ⚠️ Skipping ${dist.id}: No scriptId mapped.`);
-      continue;
-    }
-    
-    console.log(`\n[${i+1}/${queue.length}] Deploying to client ${dist.id} (Script: ${scriptId})...`);
-    
-    try {
-      // 1. Temporarily rewrite clasp mapping target scriptId
-      const tempConfig = { ...originalConfig, scriptId };
-      fs.writeFileSync(claspJsonPath, JSON.stringify(tempConfig, null, 2), 'utf8');
+  try {
+    for (let i = 0; i < queue.length; i++) {
+      const dist = queue[i];
+      const scriptId = dist.resources.scriptId;
+      if (!scriptId) {
+        console.warn(`[${i+1}/${queue.length}] ⚠️ Skipping ${dist.id}: No scriptId mapped.`);
+        continue;
+      }
       
-      // 2. Perform clasp push & clasp deploy to apply upgrades
-      execSync(`clasp push`, { stdio: 'inherit' });
-      execSync(`clasp deploy -i ${dist.resources.webAppUrl.split('/s/')[1].split('/exec')[0]}`, { stdio: 'inherit' });
+      console.log(`\n[${i+1}/${queue.length}] Deploying to client ${dist.id} (Script: ${scriptId})...`);
       
-      console.log(`✓ Successful upgrade deployment for ${dist.id}`);
-    } catch (err) {
-      console.error(`❌ Deployment failed for ${dist.id}: ${err.message}`);
+      try {
+        // 1. Temporarily rewrite clasp mapping target scriptId
+        const tempConfig = { ...originalConfig, scriptId };
+        fs.writeFileSync(claspJsonPath, JSON.stringify(tempConfig, null, 2), 'utf8');
+        
+        // 2. Perform clasp push & clasp deploy to apply upgrades
+        execSync(`clasp push`, { stdio: 'inherit' });
+        execSync(`clasp deploy -i ${dist.resources.webAppUrl.split('/s/')[1].split('/exec')[0]}`, { stdio: 'inherit' });
+        
+        console.log(`✓ Successful upgrade deployment for ${dist.id}`);
+      } catch (err) {
+        console.error(`❌ Deployment failed for ${dist.id}: ${err.message}`);
+      }
     }
+    console.log("\n✓ Bulk clasp deployments completed.");
+  } finally {
+    // CRITICAL: Always restore original .clasp.json regardless of success or failure
+    fs.writeFileSync(claspJsonPath, JSON.stringify(originalConfig, null, 2), 'utf8');
+    console.log("✓ Original .clasp.json config restored.");
   }
-  
-  // 3. Restore original config
-  fs.writeFileSync(claspJsonPath, JSON.stringify(originalConfig, null, 2), 'utf8');
-  console.log("\n✓ Bulk clasp deployments completed. Original config restored.");
 }
 
 async function main() {
