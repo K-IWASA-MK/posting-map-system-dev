@@ -1454,6 +1454,15 @@ class ApiExecutionContext {
     this.validationTime = 0;
     this.routingTime = 0;
     this.handlerTime = 0;
+
+    // Synchronize context properties with 04_api.gs (Canonical)
+    this.authContext = null;
+    this.authzContext = null;
+    this.licenseContext = null;
+    this.featureContext = null;
+    this.bridgeContext = null;
+    this.platformCtx = null;
+    this.currentStage = PlatformStage.INITIALIZING;
   }
   getRequestId() { return this.requestId; }
   getExecutionId() { return this.executionId; }
@@ -1467,7 +1476,24 @@ class ApiExecutionContext {
   getRoutingTime() { return this.routingTime; }
   setHandlerTime(ms) { this.handlerTime = ms; }
   getHandlerTime() { return this.handlerTime; }
+
+  // Synchronize context getters/setters with 04_api.gs (Canonical)
+  setAuthenticationContext(context) { this.authContext = context; }
+  getAuthenticationContext() { return this.authContext; }
+  setAuthorizationContext(context) { this.authzContext = context; }
+  getAuthorizationContext() { return this.authzContext; }
+  setLicenseContext(context) { this.licenseContext = context; }
+  getLicenseContext() { return this.licenseContext; }
+  setFeatureContext(context) { this.featureContext = context; }
+  getFeatureContext() { return this.featureContext; }
+  setBridgeContext(context) { this.bridgeContext = context; }
+  getBridgeContext() { return this.bridgeContext; }
+  setPlatformContext(context) { this.platformCtx = context; }
+  getPlatformContext() { return this.platformCtx; }
+  setCurrentStage(stage) { this.currentStage = stage; }
+  getCurrentStage() { return this.currentStage; }
 }
+
 
 class GasPerformanceMonitor {
   constructor() {
