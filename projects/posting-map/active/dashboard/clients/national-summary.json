@@ -1,0 +1,43 @@
+{
+  "updatedAt": 1784352881346,
+  "summary": {
+    "totalDistricts": 3,
+    "activeDistricts": 3,
+    "totalAreas": 0,
+    "completedAreas": 0,
+    "progress": 0
+  },
+  "regions": [
+    {
+      "code": "MIE",
+      "name": "三重県",
+      "districtsCount": 3,
+      "totalAreas": 0,
+      "completedAreas": 0,
+      "progress": 0
+    }
+  ],
+  "districts": [
+    {
+      "id": "MIE-03",
+      "name": "三重県第3区",
+      "totalAreas": 0,
+      "completedAreas": 0,
+      "progress": 0
+    },
+    {
+      "id": "MIE-04",
+      "name": "三重県第4区",
+      "totalAreas": 0,
+      "completedAreas": 0,
+      "progress": 0
+    },
+    {
+      "id": "MIE-05",
+      "name": "MIE-05 支部",
+      "totalAreas": 0,
+      "completedAreas": 0,
+      "progress": 0
+    }
+  ]
+}

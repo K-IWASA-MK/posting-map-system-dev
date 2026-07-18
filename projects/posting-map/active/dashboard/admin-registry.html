@@ -60,23 +60,36 @@
       </div>
     </header>
 
-    <!-- Overview Metrics Row -->
+    <!-- Operational Alerts Banner Panel -->
+    <div id="alert-banner-container" class="hidden">
+      <!-- Alerts injected dynamically -->
+    </div>
+
+    <!-- Overview Metrics Row (National KPI Focus) -->
     <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div class="glass-card p-6 flex flex-col justify-between min-h-[140px]">
         <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Active Districts</span>
         <span id="stat-districts" class="text-4xl font-black text-white tracking-tight mt-4">--</span>
       </div>
       <div class="glass-card p-6 flex flex-col justify-between min-h-[140px]">
-        <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">System Health</span>
-        <span id="stat-health" class="text-4xl font-black text-green-500 tracking-tight mt-4">100%</span>
+        <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">National Avg Progress</span>
+        <span id="stat-progress" class="text-4xl font-black text-green-500 tracking-tight mt-4">--</span>
       </div>
       <div class="glass-card p-6 flex flex-col justify-between min-h-[140px]">
-        <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">SaaS Version</span>
-        <span id="stat-version" class="text-4xl font-black text-blue-400 tracking-tight mt-4">v61</span>
+        <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Total Areas</span>
+        <span id="stat-areas" class="text-4xl font-black text-blue-400 tracking-tight mt-4">--</span>
       </div>
       <div class="glass-card p-6 flex flex-col justify-between min-h-[140px]">
-        <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Registry schema</span>
-        <span class="text-4xl font-black text-white/70 tracking-tight mt-4">v1.0</span>
+        <span class="text-[10px] font-black text-white/40 uppercase tracking-widest">Completed Areas</span>
+        <span id="stat-completed" class="text-4xl font-black text-white/70 tracking-tight mt-4">--</span>
+      </div>
+    </section>
+
+    <!-- Region Aggregation Panel -->
+    <section class="glass-card p-6 space-y-4">
+      <h3 class="text-xs font-black text-white/40 uppercase tracking-widest">Region Analytics Summary</h3>
+      <div id="region-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Region cards injected dynamically -->
       </div>
     </section>
 
@@ -113,19 +126,92 @@
 
     async function fetchRegistry() {
       try {
-        const res = await fetch('clients/registry.json');
-        if (!res.ok) throw new Error("Failed to load registry index.");
-        const data = await res.json();
-        registryData = data.districts || [];
+        // 1. Fetch registry.json
+        const resReg = await fetch('clients/registry.json');
+        if (!resReg.ok) throw new Error("Failed to load registry index.");
+        const dataReg = await resReg.json();
+        registryData = dataReg.districts || [];
         
-        document.getElementById('last-update').textContent = `Sync: ${new Date(data.updatedAt).toLocaleTimeString()}`;
-        document.getElementById('stat-districts').textContent = registryData.length;
+        document.getElementById('last-update').textContent = `Sync: ${new Date(dataReg.updatedAt).toLocaleTimeString()}`;
+        document.getElementById('stat-districts').textContent = `${registryData.filter(d => d.status === "READY").length} / ${registryData.length}`;
         
         renderTable(registryData);
+
+        // 2. Fetch national-summary.json
+        try {
+          const resSummary = await fetch('clients/national-summary.json');
+          if (resSummary.ok) {
+            const dataSummary = await resSummary.json();
+            document.getElementById('stat-progress').textContent = `${dataSummary.summary.progress}%`;
+            document.getElementById('stat-areas').textContent = dataSummary.summary.totalAreas;
+            document.getElementById('stat-completed').textContent = dataSummary.summary.completedAreas;
+            renderRegions(dataSummary.regions);
+          }
+        } catch (e) {
+          console.warn("national-summary.json load skipped or failed.", e);
+        }
+
+        // 3. Fetch alerts.json
+        try {
+          const resAlerts = await fetch('clients/alerts.json');
+          if (resAlerts.ok) {
+            const dataAlerts = await resAlerts.json();
+            renderAlerts(dataAlerts.alerts || []);
+          }
+        } catch (e) {
+          console.warn("alerts.json load skipped or failed.", e);
+        }
+
       } catch (err) {
         console.error(err);
         document.getElementById('last-update').textContent = "Sync: Offline";
       }
+    }
+
+    function renderRegions(regions) {
+      const container = document.getElementById('region-grid');
+      container.innerHTML = '';
+      if (!regions || regions.length === 0) {
+        container.innerHTML = `<div class="text-xs text-white/30 font-bold p-2">No regional metrics compiled.</div>`;
+        return;
+      }
+      regions.forEach(rg => {
+        const div = document.createElement('div');
+        div.className = "border border-white/5 bg-white/[0.01] p-4 rounded-2xl flex justify-between items-center";
+        div.innerHTML = `
+          <div>
+            <div class="font-bold text-sm text-white/90">${rg.name}</div>
+            <div class="text-[10px] text-white/40 font-bold uppercase tracking-wider mt-0.5">${rg.districtsCount} Districts / ${rg.totalAreas} Areas</div>
+          </div>
+          <div class="font-mono font-black text-green-500 text-lg">${rg.progress}%</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderAlerts(alerts) {
+      const container = document.getElementById('alert-banner-container');
+      container.innerHTML = '';
+      
+      if (!alerts || alerts.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+      
+      container.classList.remove('hidden');
+      const box = document.createElement('div');
+      box.className = "border border-red-500/20 bg-red-950/20 text-red-200 p-5 rounded-[28px] space-y-3 backdrop-blur-md pulse-ready";
+      box.innerHTML = `<h4 class="text-xs font-black uppercase tracking-widest text-red-500">🚨 Active Headquarters Alerts (${alerts.length})</h4>`;
+      
+      const ul = document.createElement('ul');
+      ul.className = "list-disc pl-5 text-xs font-semibold space-y-1.5";
+      alerts.forEach(a => {
+        const li = document.createElement('li');
+        li.textContent = `[${a.severity}] ${a.districtId}: ${a.message}`;
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+      container.appendChild(box);
     }
 
     function renderTable(districts) {
