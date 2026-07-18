@@ -807,3 +807,19 @@ AIOS の実行、検証、監査、スケジューリングなどのシステム
 
 本基盤の完成をもって AIOS Runtime Foundation は一度クローズ（凍結）し、次回以降は本基盤を前提とした **POSTING MAP 開発** を開始します。
 
+### Generation 5 Foundation & Autonomous Execution (Security First Edition)
+AIOS Generation 5 Foundationの全体結合と、自律開発ループを安全に制御する **Autonomous Development Execution Foundation (Security First Edition)** を完遂しました。
+
+- **Completion Runtime Foundation**: 開発完了判定、自動テスト、Gitコミット・プッシュ、HANDOVER更新の一連のクローズ動作を自動化。
+- **Runtime Integration Orchestration**: EventBus, Router, Registryに基づく疎結合・イベント駆動型オーケストレーション。
+- **Runtime Observability**: メトリクス、健康状態、トレースの収集とビュー投影（Read-Only設計）。
+- **Production Cloud Deployment & Release**: SemVer・SHA-256ハッシュ検証、配置後読み戻し検証を備えたデプロイアダプター（GitHub Pages, GAS, Google Drive対応）とNo Auto Rollbackポリシー。
+- **Autonomous Development Execution (Security First Edition)**:
+  - **Trigger Verification**: HMAC-SHA256署名検証、タイムスタンプ検証、Nonceリプレイ保護（Replay Nonce）。
+  - **Information Protection**: `PUBLIC` | `INTERNAL` | `CONFIDENTIAL` | `SECRET` の4層データ分類、および秘密情報・内部パスの流出防止データリークガード。
+  - **Secret Isolation**: `SecretProvider`によるコントローラーからの機密データの物理隔離。
+  - **Policy Firewall & Budget**: 対象ファイルスコープ・リスクのファイアウォール検証、および30分制限・1Sprint・1Commit・1Release制限およびクールダウン制限（`AutonomousExecutionBudget`）。
+  - **Loop Guard**: 同一Sprint再実行や同一エラー修正、リリース再試行ループの抑止（`AutonomousLoopGuard`, MAX_RETRY = 1, MAX_CHAIN_DEPTH = 1）。
+  - **Human Override**: docs/testは自動承認（AUTO）、srcコード変更は要承認（REQUIRE_APPROVAL）、core/security変更は即時BLOCKする `AutonomousApprovalPolicy` の実装。
+
+150件のTypeScript単体・結合テスト、シミュレーションテストを実行し、すべて100%パス（0 failures）の状態でマージ・プッシュされています。これにより、AIOSは安全制御された自律開発可能な開発/配信OSへ進化しました。
