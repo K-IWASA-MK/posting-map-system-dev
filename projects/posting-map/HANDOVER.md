@@ -146,6 +146,13 @@ graph TD
   - `ActivationVerifier.ts` により、レジストリバインドと Dashboard 接続パラメータの整合性を検証。
   - 検証フローに `AUDIT_VERIFYING` 状態を追加し、成功時に `runtime` メタデータ、各チェック PASS 状態、監査トランザクションを格納した `activation.json` を出力して `ACTIVE` 状態へ確定。
 
+### 6.3. Dashboard Data Runtime Foundation (Sprint: Dashboard Data Runtime Foundation)
+* **Dashboard Data Runtime の確立**:
+  - 4つのインプット（`election-research-result.json`, `deployment.json`, `activation.json`, `AssetRegistry.json`）を読み込んでダッシュボードリードモデル `dashboard-data.json` を生成する基盤を構築。
+  - ステートレス、かつ決定論的な変換処理を実現。
+  - インプット JSON 文字列の連結から算出する決定論的な `sourceHash` によるデータ整合性監査、および `dashboard-runtime-${timestamp}-${shortHash}` 形式の `executionId` による実行インスタンス監査に対応。
+  - `DashboardDataContract.ts` を用いた出力契約スキーマ（`schemaVersion: "v1"`）の独立・明確化と厳格な型検証を実現し、未知の将来拡張フィールドを許容しつつ、未来の無効なバージョンは拒否する上位互換性設計を実装。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -157,5 +164,6 @@ graph TD
 | `test_data_builder_flow.ts` | Data Builder | ✅ 1/1 PASS |
 | `test_provisioning_flow.ts` | Provisioning Runtime | ✅ 1/1 PASS |
 | `test_activation_flow.ts` | Activation Runtime | ✅ 1/1 PASS |
+| `test_dashboard_data_flow.ts` | Dashboard Data Runtime | ✅ 6/6 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **140 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **141 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。（一部プラットフォーム側の Ledger 単体テストは除く）
