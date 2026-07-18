@@ -1,0 +1,163 @@
+{
+  "updatedAt": 1784369985884,
+  "status": "Completed",
+  "assets": [
+    {
+      "name": "[伊賀市]_K.IWASA_1333.jpg",
+      "type": "other",
+      "id": "1q93EONIBcBEG9A9kSSltGXjRHnW_qQhq",
+      "parents": [
+        "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY"
+      ],
+      "canMove": true,
+      "action": "skip",
+      "destination": "",
+      "destinationFolderId": "",
+      "status": "Skipped"
+    },
+    {
+      "name": "[REPORT]_Reconciliation_20260624_134647.json",
+      "type": "other",
+      "id": "1jfcygKSMnkgON8vBPF22cbzWGwqSPYTf",
+      "parents": [
+        "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY"
+      ],
+      "canMove": true,
+      "action": "skip",
+      "destination": "",
+      "destinationFolderId": "",
+      "status": "Skipped"
+    },
+    {
+      "name": "[REPORT]_Reconciliation_20260624_131924.json",
+      "type": "other",
+      "id": "19ouqVa0-ZKEYKUK5SlbzqKRJFRJBdOSK",
+      "parents": [
+        "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY"
+      ],
+      "canMove": true,
+      "action": "skip",
+      "destination": "",
+      "destinationFolderId": "",
+      "status": "Skipped"
+    },
+    {
+      "name": "[REPORT]_Reconciliation_20260624_130910.json",
+      "type": "other",
+      "id": "1Gp3_zmObY15UpMf1BaoNFi5MpXbPw1gH",
+      "parents": [
+        "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY"
+      ],
+      "canMove": true,
+      "action": "skip",
+      "destination": "",
+      "destinationFolderId": "",
+      "status": "Skipped"
+    },
+    {
+      "name": "[伊賀市]_K.IWASA_1306.jpg",
+      "type": "other",
+      "id": "1z7STtblxVqr-3YfBQSJ_UHSobc5iYyIl",
+      "parents": [
+        "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY"
+      ],
+      "canMove": true,
+      "action": "skip",
+      "destination": "",
+      "destinationFolderId": "",
+      "status": "Skipped"
+    },
+    {
+      "name": "[伊賀市]_K.IWASA_1256.jpg",
+      "type": "other",
+      "id": "1qNKawTS-0M85pSyFpIdCxQ8TfdpbdgBG",
+      "parents": [
+        "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY"
+      ],
+      "canMove": true,
+      "action": "skip",
+      "destination": "",
+      "destinationFolderId": "",
+      "status": "Skipped"
+    },
+    {
+      "name": "[伊賀市]_K.IWASA_1908.jpg",
+      "type": "other",
+      "id": "1ycV-nbaPmSozrLMLZhHRsKvPNLH9tsWl",
+      "parents": [
+        "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY"
+      ],
+      "canMove": true,
+      "action": "skip",
+      "destination": "",
+      "destinationFolderId": "",
+      "status": "Skipped"
+    },
+    {
+      "name": "三重県第3区 Apps Script Project",
+      "projectName": "三重県第3区",
+      "type": "gas_project",
+      "id": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa",
+      "action": "register",
+      "destination": "02_SYSTEM/GAS/",
+      "webAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec",
+      "version": "v1",
+      "destinationFolderId": "1BcaQzhxU9-llY4edq0ivUFuDrSkb-uL4",
+      "status": "Registered"
+    },
+    {
+      "name": "三重県第3区 Spreadsheet",
+      "type": "template_spreadsheet",
+      "id": "14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4",
+      "action": "register",
+      "destination": "01_MASTER/Templates/",
+      "destinationFolderId": "1Zt-AC153J0ByAwP9TkaUjimsgGVwDImF",
+      "status": "Registered"
+    },
+    {
+      "name": "三重県第4区 Spreadsheet",
+      "type": "branch_spreadsheet",
+      "id": "1n2xYOW_rinS-mDzVSOPz9aDmT8ihPUOri59CfMLnCsg",
+      "action": "register",
+      "destination": "03_BRANCH/",
+      "destinationFolderId": "1EQQqWbtyF7iMd7Fk-WnUwWiAGB4MdIdN",
+      "status": "Registered"
+    },
+    {
+      "name": "MIE-05 支部 Spreadsheet",
+      "type": "branch_spreadsheet",
+      "id": "1nwreNCMn2f_wcBW4658xgxLyb8udUJlYXydh0dpTpLM",
+      "action": "register",
+      "destination": "03_BRANCH/",
+      "destinationFolderId": "1EQQqWbtyF7iMd7Fk-WnUwWiAGB4MdIdN",
+      "status": "Registered"
+    },
+    {
+      "name": "MIE-05 支部_STORAGE",
+      "type": "branch_storage_folder",
+      "id": "1uoCwkEITDxoQjvVkl2G4djA34wMQS9eV",
+      "action": "register",
+      "destination": "04_STORAGE/",
+      "destinationFolderId": "1FyM4wCIqWJovbcsMZ6h9JKFQxhgwciGb",
+      "status": "Registered"
+    },
+    {
+      "name": "MIE-04 支部_STORAGE",
+      "type": "branch_storage_folder",
+      "id": "1j45kdXmU9pj-tY7QQmjB3nvINz4zCesN",
+      "action": "register",
+      "destination": "04_STORAGE/",
+      "destinationFolderId": "1FyM4wCIqWJovbcsMZ6h9JKFQxhgwciGb",
+      "status": "Registered"
+    },
+    {
+      "name": "posting-map-snapshot",
+      "type": "branch_storage_folder",
+      "id": "1hjoDkBQ-q7YWuHwOZaLmqEHTlJwvcMHY",
+      "action": "register",
+      "destination": "04_STORAGE/",
+      "destinationFolderId": "1FyM4wCIqWJovbcsMZ6h9JKFQxhgwciGb",
+      "status": "Registered"
+    }
+  ]
+}

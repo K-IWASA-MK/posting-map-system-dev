@@ -113,19 +113,37 @@ graph TD
 
 ---
 
-## 6. Foundation Freeze 後の展望
+## 6. Workspace & AIOS Order Pipeline Migration Summaries (2026-07-18 Update)
 
-Foundation Phase 31–37 の完了により、以下が確立されました:
-- **認証**: 地区デプロイの品質保証ゲート
-- **生成**: 1 コマンドでの新規地区開設
-- **分離**: 共通コア + 地区別設定の SaaS 構造
-- **運用**: 全地区の一括監視・ヘルスチェック
-- **集計**: 全国 KPI のリアルタイム集約
-- **報告**: 自動レポート生成（日次 / 週次 / 月次）
-- **通知**: 運用イベントの Chatwork 自動配信
+本リポジトリは、SaaS 運用の基盤整備に加え、正規の Google Drive ワークスペース構造へのバインド、および自動プロビジョニングへとつながる AIOS 注文パイプラインの結合を完了しました。
 
-Product Evolution Phase では、以下が主要な対応項目となります:
-1. 地区ごとの独立 Script ID / Deployment ID 割当アーキテクチャ
-2. `execSync` 連鎖の非同期イベント駆動への移行
-3. 地域コードマスタの外部ファイル化
-4. GAS レート制限対応のバッチ分割制御
+### 6.1. Google Drive Workspace & Master Reference Migration
+* **`AssetRegistry` / `AssetRegistryService` の確立**: 
+  - `FIELD_OPERATIONS_PLATFORM/` (ID: `1FfcVEQjod--rZSucOPFJD2DJ58hV650_`) を本番 single source of truth とし、配下の 8大サブフォルダとアセット ID の完全な紐付けを自動化。
+  - `masters.global` および `masters.districts` の拡張階層スキーマを導入。
+* **Master Reference CSV 資産化**:
+  - `Address/` および `Postal/` サブフォルダを Drive 上に新規作成。
+  - 郵便番号マスター (`KEN_ALL.CSV`) および全国住所マスター (`postal.csv`) をバイナリセーフでアップロード。
+  - SHA-256 ハッシュ（チェックサム）、バージョン (`2026-07`)、データソース情報をメタデータとして AssetRegistry に登録し、AIOS が自動検索・参照可能に設定。
+
+### 6.2. AIOS Order-to-Branch Automation Pipeline (Sprint 1 & 2)
+* **Order-to-Research Foundation**:
+  - 注文受付オーケストレータ `OrderRuntime.ts` と `MissionCreator.ts` を実装。
+  - 注文（東京第18区等）を元に Research Agent を起動し、内包する基礎自治体リストを抽出して `research-result.json` を出力するフローを自動化。
+* **Data Builder Foundation**:
+  - `RESEARCH_COMPLETED` イベント駆動によって非同期起動する `DataBuilderRuntime.ts` を実装。
+  - `district.json` （将来の拡張を見据えた市町村オブジェクト配列構造）と `config.json` （アプリ同期パラメータ）を自動生成。
+  - **責任境界の画定**: 地図の初期中心座標決定（`map.center: null`）や世帯数・配布目標の設定を Data Builder の責務から除外し、意思決定を伴わない純粋な「初期メタデータコンパイラ」として実装。
+  - 処理完了時に `DATA_BUILD_COMPLETED` イベントおよび各種 Audit ログを発行。
+
+---
+
+## 7. 追加テスト合格実績
+
+| テスト | 対象フェーズ | 結果 |
+| :--- | :--- | :--- |
+| `asset-registry-integrity-test.js` | Registry / Masters | ✅ 5/5 PASS |
+| `test_order_flow.ts` | Order-to-Research | ✅ 1/1 PASS |
+| `test_data_builder_flow.ts` | Data Builder | ✅ 1/1 PASS |
+
+※プロジェクト全体の TypeScript 統合テストを含む **138 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
