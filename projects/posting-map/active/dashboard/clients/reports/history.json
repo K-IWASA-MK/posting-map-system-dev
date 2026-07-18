@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "history": [
+    {
+      "type": "daily",
+      "timestamp": 1784353286767,
+      "files": {
+        "markdown": "clients/reports/daily-report-1784353286767.md",
+        "csv": "clients/reports/daily-report-1784353286767.csv",
+        "html": "clients/reports/daily-report-1784353286767.html"
+      }
+    },
+    {
+      "type": "weekly",
+      "timestamp": 1784353281554,
+      "files": {
+        "markdown": "clients/reports/weekly-report-1784353281554.md",
+        "csv": "clients/reports/weekly-report-1784353281554.csv",
+        "html": "clients/reports/weekly-report-1784353281554.html"
+      }
+    }
+  ]
+}

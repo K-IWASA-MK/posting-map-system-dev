@@ -118,6 +118,15 @@ async function aggregate() {
   fs.writeFileSync(summaryPath, JSON.stringify(nationalKPI, null, 2), 'utf8');
   console.log(`✓ National summary generated successfully under active/dashboard/clients/national-summary.json`);
 
+  // Trigger report generator dynamically
+  const { execSync } = require('child_process');
+  try {
+    console.log("Triggering automated report generation...");
+    execSync('node development/report-generator.js --type daily', { stdio: 'inherit' });
+  } catch (e) {
+    console.error("⚠️ Failed to trigger report-generator.js:", e.message);
+  }
+
   // Print Markdown Console Report
   console.log("\n==================================================");
   console.log("📋 NATIONAL KPI SUMMARY REPORT");
