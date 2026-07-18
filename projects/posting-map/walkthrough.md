@@ -230,17 +230,39 @@ Total Failed    : 0
   - **変更前**: `MIE-2/K`
   - **変更後**: `MIE-02/K`（アカウント名同期）
 
-### 7.2. LINE側制約に関する重要報告
+### 7.2. 最終承認名称と AIOS 連携スキーマ
 
-> [!WARNING]
-> **1. チャネル名・公式アカウント名の「20文字」制限**
-> LINE Developers の Messaging API チャネル名（および LINE 公式アカウント名）には原則 **20文字以内** の文字数制限があります。そのため、ご指定の `POSTING MAP Messaging API` (25文字) および `POSTING MAP Admin Messaging API` (31文字) は、文字数エラーとなり入力することができません。代替名として以下のような20文字以内の名称を推奨します。
-> * Messaging API: `POSTING MAP Msg API` (20文字) または `POSTING MAP Bot` (16文字)
-> * Admin Messaging API: `POSTING MAP Admin` (17文字)
+LINE 側の 20 文字制限および 7 日間変更ロックを踏まえ、以下の最終名称を決定・固定しました。
 
-> [!IMPORTANT]
-> **2. LINE公式アカウントの「7日間名前変更禁止」ロックについて**
-> LINE公式アカウントのセキュリティ仕様により、アカウント名を一度変更すると**変更日を含めて7日間は再変更することができません。**
-> 今回、自動操作プロセスにて `MIE-02/H` / `MIE-02/K` への変更を行った結果、現在LINE側でこの7日間制限ロック状態に入っています。ロック解除後に、上記20文字以内の代替サービス名への最終リネーム（自動化操作）を再実行することを推奨いたします。
-> *※この間、Webhook URL、Channel ID / Secret、および既存のLINE Bot動作への悪影響は一切なく、通信は100%正常に稼働しています。*
+* **LINE Login Channel**:
+  - `POSTING MAP Login` (完了・固定)
+* **Messaging API Channel** (配布員用):
+  - `POSTING MAP Msg API` (7日間のロック解除後に変更)
+* **Admin Messaging API Channel** (管理者用):
+  - `POSTING MAP Admin` (7日間のロック解除後に変更)
+
+#### AIOS 側 Activation Registry 登録定義
+本設定は、今後の自動プロビジョニングおよび Activation Runtime の共通環境バインド設定として以下のスキーマで登録されます。
+
+```json
+{
+  "line": {
+    "loginChannel": {
+      "name": "POSTING MAP Login",
+      "mode": "SHARED"
+    },
+    "messaging": {
+      "name": "POSTING MAP Msg API",
+      "mode": "SHARED"
+    },
+    "admin": {
+      "name": "POSTING MAP Admin",
+      "mode": "SHARED"
+    }
+  }
+}
+```
+
+*※これにより、支部ごとの物理的な LINE チャネル複製を防ぎ、単一の共通 LINE インフラ配下で `districtId` によるコンテキスト分離を行う SaaS 基盤の設計が確立されました。*
+
 
