@@ -236,6 +236,24 @@ graph TD
 * **`ObservabilityRuntime` (観測コアランタイム)**:
   - 観測Pipelineの統括。コントラクト検証、リプレイセーフティ（二重カウント防止）に加え、メトリクス・ヘルス集計中の例外発生時もメイン動作を停止させないノンブロッキング障害設計を適用。
 
+### 6.10. Production Cloud Deployment & Release Foundation (Sprint: Production Cloud Deployment & Release Foundation)
+* **`ReleaseContract` の定義**:
+  - `ReleaseRequest`、`ReleaseResult`、および `ReleaseEvent` のスキーマ定義。
+* **`ArtifactValidator` (成果物バリデーター)**:
+  - ファイルの存在有無、サイズ非空、および指定時の SHA-256 ハッシュの完全性チェック。
+* **`ReleaseIntegrityVerifier` (整合性検証者)**:
+  - セマンティックバージョン（SemVer `major.minor.patch`）形式、および path traversal 防御チェック。
+* **`DeploymentAdapter` 共通抽象インターフェース**:
+  - 多種のアダプター（GitHub Pages, GAS, Google Drive）の共通デプロイ操作契約。
+- 各種アダプターの実装:
+  - **`GitHubPagesDeploymentAdapter`**: GitHub Pages 環境（gh-pages フォルダ構造）への配置シミュレーション。
+  - **`GASDeploymentAdapter`**: Google Apps Script (GAS) 環境へのコード・設定配置シミュレーション。
+  - **`GoogleDriveDeploymentAdapter`**: Google Drive 成果物ストレージ（`storageFolderId`）へのアップロードシミュレーション。
+* **`ProductionVerifier` (本番検証サービス)**:
+  - 各アダプターのデプロイ先からファイルを読み戻し、本来のソースデータと SHA-256 ハッシュ値が完全に一致するかを検査するデリバリ最終検証。
+* **`ReleaseRuntime` (リリースランタイムオーケストレーター)**:
+  - 各種検証、リプレイ防止（Version Lock）、複数アダプターに対する順次デプロイ処理、本番検証およびリリースイベント（Requested, Completed, Failed, Blocked）発行の全体統合ライフサイクル。障害時ロールバックを実行しない防御設計（No Auto Rollback）を適用。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -255,8 +273,9 @@ graph TD
 | `test_runtime_ledger.ts` | Runtime Ledger (Race Fixed) | ✅ 3/3 PASS |
 | `test_runtime_orchestration.ts` | Runtime Orchestration | ✅ 5/5 PASS |
 | `test_runtime_observability.ts` | Runtime Observability | ✅ 7/7 PASS |
+| `test_runtime_release.ts` | Production Cloud Release | ✅ 8/8 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **169 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **177 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
 
 
 
