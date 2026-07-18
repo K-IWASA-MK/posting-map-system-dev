@@ -192,6 +192,20 @@ graph TD
   - `DashboardStateModel` に `publicDashboard` (状態: `ONLINE | OFFLINE | WARNING`, データ: `PublicDashboardDataViewModel | null`) リアクティブ管理プロパティを追加。
   - `DashboardDataMapper` に純粋関数としての `mapPublicDashboardData` マッピング処理を実装。
 
+### 6.7. Completion Runtime Foundation (Sprint: Completion Runtime Foundation)
+* **`CompletionContract` & `CompletionResult` の策定**:
+  - スプリント完了リクエスト (`CompletionRequest`) および結果オブジェクト (`CompletionResult`) スキーマを定義。
+* **`TestValidator` (品質判定バリデータ)**:
+  - テスト失敗件数のアサーション (`failed > 0` または `passed === 0` および `qualityGate === "FAIL"` 時の `BLOCKED` 遷移) を担当。
+* **`GitCommitExecutor` & `GitPushExecutor` (Git処理抽象化)**:
+  - Gitの add/commit/push 操作を実行。セキュリティ上のガードレールとして、自動修正、強制プッシュ（Force push）、コンフリクト自動解決は明示的に禁止・ガードレール化。
+* **`RemoteVerifier` (リモート同期検証)**:
+  - `git fetch` 実行後、ローカル HEAD と `origin-dev/main` の SHA-1 ハッシュが一致しているかアサートし同期完全性を判定。
+* **`HandoverGenerator` (ドキュメント更新)**:
+  - スプリント名、コミットハッシュ、テスト結果、リモート同期状況を含む固定の構造化フォーマット (`## Sprint Completion Record`) を `HANDOVER.md` の末尾へ自動追記。
+* **`CompletionRuntime` (コアランタイム)**:
+  - リクエスト受信から、テスト品質検証、Git操作、リモート同期検証、Handover文書追記、`COMPLETION_COMPLETED` 監査イベントの発行までを一括オーケストレーション。同一リクエストでの二重コミットを完全に防ぐ `Replay Safety` 機構を実装。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -207,8 +221,10 @@ graph TD
 | `test_dashboard_audit_integration.ts` | Dashboard Data Audit Connection | ✅ 4/4 PASS |
 | `test_dashboard_presentation_flow.ts` | Dashboard Presentation Runtime | ✅ 5/5 PASS |
 | `test_public_dashboard_adapter.ts` | Dashboard Consumer Adapter | ✅ 6/6 PASS |
+| `test_completion_runtime.ts` | Completion Runtime | ✅ 6/6 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **151 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **157 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+
 
 
 
