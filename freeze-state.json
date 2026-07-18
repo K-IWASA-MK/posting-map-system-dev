@@ -1,0 +1,10 @@
+{
+  "generation": "5",
+  "status": "FROZEN",
+  "allowedChanges": [
+    "BUGFIX",
+    "SECURITY_PATCH"
+  ],
+  "createdAt": "2026-07-18T23:17:44.431Z",
+  "hash": "ed1fbf52c86b89276cc0494f9e0445ac0a0fd8b1ad1cf79d4202fb572f89afa1"
+}

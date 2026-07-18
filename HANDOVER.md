@@ -7,13 +7,13 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Generation 6 Runtime Foundation`
-- **Milestone**: `Generation 6 COMPLETED`
-- **Tag**: `v6.0.0-alpha.0`
-- **Current Commit**: `c95fbf6aca8453997ee2f2d8ff486b217f159886`
-- **Third-Party Audit**: `Approved (A+ / Approve Generation 6)`
+- **Completed**: `AIOS Generation 5 Certified Baseline`
+- **Milestone**: `Generation 5 Certified Baseline`
+- **Tag**: `v5.0.0-alpha-certified`
+- **Current Commit**: `d21228e810c95f0ac5f2a187cfc6cd8e5495bb85`
+- **Third-Party Audit**: `Approved (A+ / Approve Generation 5 Certified Baseline)`
 - **Current Phase**: `Release Ready`
-- **Next Action**: `POSTING MAP 開発 (Begin App Features)`
+- **Next Action**: `Generation 6 Planning`
 - **Branch**: `main`
 
 ---
@@ -823,3 +823,17 @@ AIOS Generation 5 Foundationの全体結合と、自律開発ループを安全�
   - **Human Override**: docs/testは自動承認（AUTO）、srcコード変更は要承認（REQUIRE_APPROVAL）、core/security変更は即時BLOCKする `AutonomousApprovalPolicy` の実装。
 
 150件のTypeScript単体・結合テスト、シミュレーションテストを実行し、すべて100%パス（0 failures）の状態でマージ・プッシュされています。これにより、AIOSは安全制御された自律開発可能な開発/配信OSへ進化しました。
+
+### Generation 5 Stabilization & Certification (Baseline Freeze Edition)
+AIOS Generation 5 の完成状態を認証し、安全な基準ベースラインとしてロックする **AIOS Generation 5 Stabilization & Certification** を完遂しました。
+
+- **Certification Runtime**: 10つのコア/配信ランタイムの責務境界、およびインポート文の静的スキャンによる直接依存違反（モジュール間の直接結合）の有無を自動で監査。
+- **Certification Self-Audit**: 認証ロジック自体の改ざんや無効化フラグ、および直接インポート違反をチェックする `CertificationSelfAuditor` の導入。
+- **Dependency Graph**: ランタイム間の静的依存グラフ `aios-dependency-graph.json` を自動生成し、DFS巡回による循環依存（Cyclic Dependency）の検知・防止を確立。
+- **Security & Safety Audit**: ハードコードキー・秘密情報の漏洩スキャン、および自律開発実行コントローラーのキルスイッチ、ループガード、バジェットポリシーの活性・適合状態を監査。
+- **Event Lineage Verification**: 自律トリガーからリリースまでの全開発イベントチェーンについて、不変の `traceId` / `correlationId` の同一性と重複のない整合性を追跡監査。
+- **Release Certification & Hash Pinning**: 監査レポート `AIOS_GENERATION_5_CERTIFICATION.md` と依存グラフファイルから SHA-256 ハッシュを計算し、メタデータにピン留めする（`certificationHash`）ことで認証結果の改ざんを防御。
+- **Baseline Freeze Persistence**: Freeze状態を `freeze-state.json` へディスク永続化し、プロセスの再起動を跨いでもコア機能の新規開発（FEATURE）をブロックし、BUGFIX / SECURITY_PATCH のみを通すポリシーゲートを構成。
+
+認証ランタイムの検証テスト、ハッシュ整合性、および Freeze 永続テストを含むすべてのテストケースを追加し、品質ゲートを 100% 通過（151 passed, 0 failures）した状態で完了しています。
+
