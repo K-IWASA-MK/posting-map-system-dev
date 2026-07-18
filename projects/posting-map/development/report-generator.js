@@ -229,6 +229,15 @@ function main() {
     html: `clients/reports/${htmlName}`
   });
 
+  // Trigger notification engine dynamically
+  const { execSync } = require('child_process');
+  try {
+    console.log("Triggering report delivery to Chatwork...");
+    execSync(`node development/notification-engine.js --type report --filePath clients/reports/${mdName}`, { stdio: 'inherit' });
+  } catch (e) {
+    console.error("⚠️ Failed to trigger notification dispatch:", e.message);
+  }
+
   console.log("\n==================================================");
   console.log(`🎉 REPORT COMPILATION SUCCEEDED`);
   console.log("==================================================");

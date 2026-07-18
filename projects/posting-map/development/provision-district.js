@@ -196,6 +196,14 @@ async function main() {
     // Rebuild global registry index
     RegistryManager.rebuildRegistry();
 
+    // Dispatch success notification to Chatwork
+    try {
+      console.log("Triggering provisioning success notification dispatch...");
+      execSync(`node development/notification-engine.js --type provision --district ${districtId}`, { stdio: 'inherit' });
+    } catch (e) {
+      console.error("⚠️ Failed to trigger provisioning notification dispatch:", e.message);
+    }
+
     console.log(`\n🎉 PROVISIONING SUCCESSFUL: District ${districtId} is certified and active.`);
   } catch (err) {
     console.error(`\n❌ Provisioning failed: ${err.toString()}`);

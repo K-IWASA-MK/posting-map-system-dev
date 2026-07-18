@@ -75,6 +75,17 @@ function monitor() {
   fs.writeFileSync(alertsPath, JSON.stringify({ updatedAt: Date.now(), alerts }, null, 2), 'utf8');
   console.log(`✓ Scanned completed. Generated ${alerts.length} operational alerts in active/dashboard/clients/alerts.json`);
 
+  // Trigger notification dispatch on active alerts
+  if (alerts.length > 0) {
+    const { execSync } = require('child_process');
+    try {
+      console.log("Triggering active alerts delivery to Chatwork...");
+      execSync('node development/notification-engine.js --type alert', { stdio: 'inherit' });
+    } catch (e) {
+      console.error("⚠️ Failed to trigger alerts dispatch:", e.message);
+    }
+  }
+
   // Print console warnings
   if (alerts.length > 0) {
     console.log("\n==================================================");

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "history": [
+    {
+      "type": "report",
+      "timestamp": 1784353475171,
+      "status": "SUCCESS",
+      "contentPreview": "[info][title]📋 POSTING MAP REPORT[/title]\n# POSTING MAP DAILY PERFORMANCE REPORT\n* **Generated At**: 2026/7/18 14:44:35\n* **Active Districts**: 3 / 3...",
+      "response": {
+        "success": true,
+        "messageId": "mock-msg-1784353475171"
+      }
+    },
+    {
+      "type": "provision",
+      "timestamp": 1784353475116,
+      "status": "SUCCESS",
+      "contentPreview": "[info][title]🎉 NEW DISTRICT READY GATE CERTIFIED[/title]District [MIE-TEST-05] has been successfully provisioned and verified.\n* Status: READY\n* Time...",
+      "response": {
+        "success": true,
+        "messageId": "mock-msg-1784353475116"
+      }
+    },
+    {
+      "type": "test",
+      "timestamp": 1784353475083,
+      "status": "SUCCESS",
+      "contentPreview": "[info][title]🔌 POSTING MAP Chatwork notification test connection[/title]HQ Notification Engine link online: 7/18/2026, 2:44:35 PM[/info]",
+      "response": {
+        "success": true,
+        "messageId": "mock-msg-1784353475083"
+      }
+    }
+  ]
+}
