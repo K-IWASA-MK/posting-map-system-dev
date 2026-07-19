@@ -12,6 +12,11 @@ Runtime Service Layer は、各 Runtime 間の直接的な結合を排除し、�
 4. **アクティベーション・非アクティベーション（Activation/Deactivation）**: 各 Runtime の必要に応じた動的なブート、終了の順序統制。
 5. **ヘルス監視（Health Monitoring）**: 登録された各 Runtime の健全性（status, reason, lastCheckedAt）の定期監査。
 
+## 標準登録ランタイム (Standard Registered Runtimes)
+本プラットフォームにおける自己規制（Self-Regulation）閉ループの運用を目的とし、以下のランタイムが Runtime Service Layer に標準登録され、ディスカバリ検索およびライフサイクル管理の統治下に置かれます。
+- **Quality Runtime (`aios.quality`)**: プラットフォーム品質スコア監査、ポリシー判定。
+- **Automation Runtime (`aios.automation`)**: 自動修復アクション承認、実行キューイング制御。
+
 ---
 
 ## 拡張設計ポイント (Future Extension points)

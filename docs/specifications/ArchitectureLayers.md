@@ -41,29 +41,35 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
 
 ### 2. Runtime (システム実行基盤層)
 - **役割**: システムの実行、メッセージング制御、および監視・検証制御を行います。
-- **プラットフォームランタイム階層 (Platform Runtime Sub-layers)**:
+-  プラットフォームランタイム階層 (Platform Runtime Sub-layers):
   プラットフォームの実行基盤は、以下の順序で多層化されたランタイムモデルを採用しています。
   ```
-  Kernel (最下位コア)
+  Kernel
       ↓
-  Capability (共通機能・サービス)
+  Capability
       ↓
-  Runtime (システム実行基盤)
+  Runtime
       ↓
-  Runtime Service (ランタイム連携・共通管理基盤)
-        ├── Runtime Registry (登録・メタデータ管理)
-        ├── Runtime Discovery (動的検出・検索)
-        ├── Runtime Lifecycle (状態・遷移制御)
-        ├── Runtime Activation (動的ブート・起動)
-        └── Runtime Health (健全性状態監視)
+  Runtime Service
       ↓
-  Validation Runtime (境界・規則自動検証)
+  Observability Runtime (観測基盤)
       ↓
-  Console Runtime (システム観測・可視化)
+  Quality Runtime (品質判定)
+      ↓
+  Automation Runtime (実行承認・安全監査)
+      ↓
+  Execution Runtime (アクション処理)
+      ↓
+  Event Ledger (不変イベント元帳)
+      ↓
+  Projection (読取専用状態射影)
+      ↓
+  Console Runtime (システム状態可視化)
       ↓
   Plugin Runtime (プラグイン実行コンテナ)
   ```
-  *注意*: 各 Runtime 間の直接的な結合・依存は完全に禁止されます。すべての Runtime は `Runtime Service` を仲介して登録、解決、およびライフサイクル管理が行われます。プラグイン自体は Runtime の一部ではなく、プラットフォームのガバナンスとセキュリティが適用された **Plugin Runtime** 上で実行されます。
+  *注意*: 各 Runtime 間の直接的な結合・依存は完全に禁止されます。すべての Runtime は `Runtime Service` を仲介して登録、解決、およびライフサイクル管理が行われます。プラグイン自身は Runtime の一部ではなく、プラットフォームのガバナンスとセキュリティが適用された **Plugin Runtime** 上で実行されます。
+  アクションの実行結果は Event Ledger に不変記録され、その結果を Projection 経由で Console Runtime が表示する流れが正式なデータ伝播アーキテクチャとなります。
 - **依存関係**: `Kernel / Core` レイヤーにのみ依存可能です。
 
 ### 3. Capabilities (機能・サービス提供層)

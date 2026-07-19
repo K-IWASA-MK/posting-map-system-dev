@@ -49,3 +49,7 @@ SDKの公開APIは、原則として後方互換性を維持します。破壊�
 
 ### 15. ランタイムサービス統制 (Runtime Service Governance)
 プラットフォーム内のすべての Runtime（実行基盤）は、互いに直接依存することを厳格に禁止され、統一された「Runtime Service」を介して登録・発見・運用管理されなければなりません。ライフサイクル、健全性監視、およびアクティベーションはすべて Runtime Service Layer の一元管理下で実行されます。
+
+### 16. 自己規制統制 (Self-Regulation Governance)
+プラットフォームは「観測（Observability）」「評価（Quality）」「実行（Automation）」「記録（Event Ledger）」の責務を厳格に分離し、実行結果を元帳経由で再観測する閉ループ自己規制（Self-Regulation Loop）の構成を備えなければなりません。
+
