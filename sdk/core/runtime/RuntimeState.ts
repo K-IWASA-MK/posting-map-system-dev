@@ -1,5 +1,6 @@
 export enum RuntimeState {
   CREATED = 'CREATED',
+  REGISTERED = 'REGISTERED',
   INITIALIZING = 'INITIALIZING',
   READY = 'READY',
   RUNNING = 'RUNNING',

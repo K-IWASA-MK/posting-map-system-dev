@@ -50,13 +50,20 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
       ↓
   Runtime (システム実行基盤)
       ↓
+  Runtime Service (ランタイム連携・共通管理基盤)
+        ├── Runtime Registry (登録・メタデータ管理)
+        ├── Runtime Discovery (動的検出・検索)
+        ├── Runtime Lifecycle (状態・遷移制御)
+        ├── Runtime Activation (動的ブート・起動)
+        └── Runtime Health (健全性状態監視)
+      ↓
   Validation Runtime (境界・規則自動検証)
       ↓
   Console Runtime (システム観測・可視化)
       ↓
   Plugin Runtime (プラグイン実行コンテナ)
   ```
-  *注意*: プラグイン（Plugin）自体は Runtime の一部ではなく、プラットフォームのガバナンスとセキュリティが適用された **Plugin Runtime** 上で実行されます。
+  *注意*: 各 Runtime 間の直接的な結合・依存は完全に禁止されます。すべての Runtime は `Runtime Service` を仲介して登録、解決、およびライフサイクル管理が行われます。プラグイン自体は Runtime の一部ではなく、プラットフォームのガバナンスとセキュリティが適用された **Plugin Runtime** 上で実行されます。
 - **依存関係**: `Kernel / Core` レイヤーにのみ依存可能です。
 
 ### 3. Capabilities (機能・サービス提供層)

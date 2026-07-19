@@ -10,7 +10,8 @@ export class RuntimeStateMachine {
     }
 
     const validTransitions: Record<RuntimeState, RuntimeState[]> = {
-      [RuntimeState.CREATED]: [RuntimeState.INITIALIZING, RuntimeState.FAILED],
+      [RuntimeState.CREATED]: [RuntimeState.REGISTERED, RuntimeState.INITIALIZING, RuntimeState.FAILED],
+      [RuntimeState.REGISTERED]: [RuntimeState.INITIALIZING, RuntimeState.FAILED],
       [RuntimeState.INITIALIZING]: [RuntimeState.READY, RuntimeState.FAILED],
       [RuntimeState.READY]: [RuntimeState.RUNNING, RuntimeState.STOPPING, RuntimeState.FAILED],
       [RuntimeState.RUNNING]: [RuntimeState.PAUSED, RuntimeState.STOPPING, RuntimeState.READY, RuntimeState.FAILED],

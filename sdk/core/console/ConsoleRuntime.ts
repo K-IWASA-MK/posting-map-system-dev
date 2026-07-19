@@ -14,19 +14,25 @@ import { ConsoleMetricsCollector } from './metrics/ConsoleMetricsCollector';
 import { DefaultConsolePolicy, ConsolePolicy } from './ConsolePolicy';
 
 export class ConsoleRuntime implements IRuntime<ConsoleManifest, void> {
-  public readonly runtimeId = 'aios.console';
+  public readonly id = 'aios.console';
+  public readonly version = '1.0.0';
+  public readonly dependsOn = ['aios.validation'];
+  public readonly runtimeId = this.id;
 
   public readonly descriptor: RuntimeDescriptor = {
-    runtimeId: this.runtimeId,
+    runtimeId: this.id,
     runtimeName: 'System Console',
-    version: '1.0.0',
+    version: this.version,
     contractVersion: '1.0',
-    capabilities: [RuntimeCapability.CAN_DISCOVER], // Console discovers & reads
-    dependencies: []
+    capabilities: [RuntimeCapability.CAN_DISCOVER, RuntimeCapability.CONSOLE], // Console discovers & reads
+    dependencies: [
+      { runtimeId: 'aios.validation', version: '1.0.0', required: true }
+    ]
   };
 
   private subscriber: EventSubscriber;
   private services: ConsoleServices;
+  public manifest?: ConsoleManifest;
 
   constructor(
     private readonly eventBus: AIOSEventBus,
@@ -40,10 +46,16 @@ export class ConsoleRuntime implements IRuntime<ConsoleManifest, void> {
   }
 
   public async getHealth(): Promise<RuntimeHealth> {
+    return this.health();
+  }
+
+  public health(): RuntimeHealth {
     return {
       status: RuntimeHealthStatus.HEALTHY,
       reason: 'Console Runtime is active and listening to events',
-      lastCheckedAt: new Date().toISOString()
+      lastCheckedAt: new Date().toISOString(),
+      lastChecked: new Date().toISOString(),
+      message: 'Console Runtime is active and listening to events'
     };
   }
 
@@ -59,10 +71,21 @@ export class ConsoleRuntime implements IRuntime<ConsoleManifest, void> {
   }
 
   public async execute(manifest: ConsoleManifest): Promise<void> {
+    this.manifest = manifest;
     await this.services.startServer(
       manifest.configuration.port,
       manifest.configuration.apiPrefix
     );
+  }
+
+  public async start(): Promise<void> {
+    if (this.manifest) {
+      await this.execute(this.manifest);
+    }
+  }
+
+  public async stop(): Promise<void> {
+    await this.shutdown();
   }
 
   public async pause(): Promise<void> {
