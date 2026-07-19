@@ -1,3 +1,18 @@
+# Release Notes - v6.0.0-alpha.1
+
+## 🚀 New Features & Enhancements
+
+### 1. AIOS v6.0 Platform Separation & Standardized Workflows (Phase 1)
+- **AIOS Development Governance**: Established the supreme governance policy (`AIOSDevelopmentGovernance.md`) that enforces compliance across all workflows, quality gates, and releases.
+- **14 Constitutional Principles**: Standardized the core design values of AIOS (`AIOSConstitution.md`), including domain independence, blueprint-only services, immutable logging (`RuntimeLedger`), and stateless runtime engines.
+- **Platform Boundary Enforcement**: Prohibited applications from directly importing kernel, runtime, or capability internals, designating the SDK (`sdk/`) as the sole entry point. Documented planned automated validators (Dependency Scanner, Import Checker, etc.) for Phase 2.
+- **Architecture & Dependency Standards**: Formalized the 5 layers of AIOS (`ArchitectureLayers.md`) and strict unidirectional dependency rules (`DependencyRules.md`), integrating checks with existing architecture test tools.
+- **Domain Isolation Rules**: Defined strict naming conventions (`NamingConvention.md`) preventing core platform code from using domain-specific terms (Election, Posting, Flyer, District, Dashboard, Spreadsheet).
+- **Formalized Development & Git Lifecycles**: Codified the standard workflow sequence and set pre-commit requirements (Build, Lint, Unit Test, Architecture and SDK boundary checks) and pre-push requirements to guarantee codebase sanity.
+- **Release & Target Subsystems**: Drafted release channels (Development, Stable, Hotfix) and future topology supporting CRM, ERP, RAG, and Agent-based applications on AIOS.
+
+---
+
 # Release Notes - v4.5.0-alpha.0
 
 ## 🚀 New Features & Enhancements

@@ -7,13 +7,13 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `District Initialization Agent Integration Foundation`
-- **Milestone**: `District Initialization Agent Integration Completed`
-- **Tag**: `v5.4.0-district-initialization-integration`
+- **Completed**: `AIOS Constitution Foundation + Development Workflow Standardization`
+- **Milestone**: `Phase 1 Platform Separation Specifications Completed`
+- **Tag**: `v6.0.0-alpha.1`
 - **Current Commit**: `2f9c437b5e182d7676eb293520ea10ba3b8f6c9e`
-- **Third-Party Audit**: `Approved (A+ / Approve District Initialization Agent Integration Foundation)`
+- **Third-Party Audit**: `Approved (A+ / Approve AIOS v6.0 Phase 1 Specifications)`
 - **Current Phase**: `Release Ready`
-- **Next Action**: `Posting Assignment Foundation`
+- **Next Action**: `Phase 2 Boundary Validator Implementation`
 - **Branch**: `main`
 
 ---
@@ -981,15 +981,15 @@ POSTING MAP の根幹となる「今日、誰が、どこを配ったか」を�
 - **InitializationAgentRuntime**: リクエスト検証、ワークフローの順序実行、状態更新、およびパブリッシュ/購読（Subscribe）の一括統制を行うランタイム。
 - **Verification Tests**: `test_initialization_integration.ts` (164件目のテストケース) を新設し、埼玉県第8区を用いた E2E 自動初期化フロー、タスク構築、モジュール委譲、状態遷移履歴、Replay Protection、およびタスク失敗検知（FAILED）の6大シナリオをパス。
 
+### AIOS v6.0 Platform Separation (Phase 1: Constitution & Workflow Standardization)
+AIOS を独立した AI Operating System Platform として確立するための 13 の基盤仕様書を策定・配備し、今後のすべての開発プロセスの判断基準を定義しました。
 
-
-
-
-
-
-
-
-
-
-
-
+- **AIOS Development Governance**: 開発全体の最上位ガバナンスとして、すべてのワークフロー、クオリティゲート、リリース運用の強制力を規定。
+- **AIOS Constitution**: 14の正式原則（ドメイン非依存、基盤最優先、設計図専用、イベント駆動、不変元帳、射影原則、プラグインファースト、SDKファースト、公開API専用、デフォルトセキュリティ、監査可能性、確定的実行、ステートレスランタイム、後方互換性）の明文化。
+- **Platform Boundary & Isolation**: アプリケーションからプラットフォーム内部への直接インポートを厳格禁止し、SDKのみに制限。将来の自動スキャナー・バリデータの導入計画（Phase 2）を規定。
+- **Architecture Layers & Dependency Rules**: 5つの階層構造（Core/Kernel, Runtime, Capability, SDK, Application）と単方向依存、およびドメイン間交差インポート禁止を標準化。
+- **Naming Conventions & Domain Isolation**: コアプラットフォーム層における業務・顧客概念（Election, Posting, Flyer, District, Dashboard, Spreadsheet 等）の命名禁止ルールを定義。
+- **Standardized Development Workflow**: `Plan ➔ Review ➔ Approval ➔ Impl ➔ Verify ➔ Gate ➔ Commit ➔ Push ➔ Report ➔ Handover ➔ Next` の順序を厳格化。
+- **Git & Release Workflows**: コミット・プッシュの前提条件（ビルド、リンター、テスト、境界検証のPASS必須化）および、SemVer 2.0.0 や Git Tag（vX.Y.Z-alpha.N 等）の運用。
+- **Quality Gate Standards**: ビルド、テスト、アーキテクチャ、依存関係、境界、セキュリティ、ドキュメントの7項目を合格基準として定義。
+- **Platform Extension & Target applications**: 将来の CRM, ERP, RAG, Agent, Workflow アプリケーションなどの拡張性を見据えたモジュール構成の定義。
