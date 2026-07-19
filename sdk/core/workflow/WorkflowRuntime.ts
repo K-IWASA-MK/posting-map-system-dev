@@ -30,7 +30,16 @@ export class WorkflowRuntime implements IRuntime<void, void> {
   private readonly executor = new WorkflowExecutor();
   private context?: RuntimeContext;
 
-  constructor(private readonly eventBus: AIOSEventBus) {}
+  constructor(private readonly eventBus: AIOSEventBus) {
+    this.eventBus.subscribe('WorkflowDispatched', async (event) => {
+      const { workflowId } = event.payload;
+      try {
+        await this.startWorkflow(workflowId);
+      } catch (e) {
+        // Log/handle error silently to maintain decoupled architecture
+      }
+    });
+  }
 
   public getHealth(): Promise<RuntimeHealth> {
     return Promise.resolve(this.health());

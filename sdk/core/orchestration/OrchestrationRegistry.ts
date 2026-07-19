@@ -1,27 +1,39 @@
-import { OrchestrationSession } from './OrchestrationSession';
-import { JobSchedule } from './models/JobSchedule';
-import { RuntimeLock } from './models/RuntimeLock';
+import { OrchestrationPlan, ExecutionQueueItem, ResourceAllocation } from './models/OrchestrationModels';
 
 export class OrchestrationRegistry {
-    private sessions: Map<string, OrchestrationSession> = new Map();
-    private schedules: Map<string, JobSchedule> = new Map();
-    private locks: Map<string, RuntimeLock> = new Map();
+  private plans = new Map<string, OrchestrationPlan>();
+  private queue = new Map<string, ExecutionQueueItem>();
+  private allocations = new Map<string, ResourceAllocation>();
 
-    public registerSession(session: OrchestrationSession) {
-        this.sessions.set(session.sessionId, session);
-    }
-    public getSession(sessionId: string) {
-        return this.sessions.get(sessionId);
-    }
+  public registerPlan(plan: OrchestrationPlan): void {
+    this.plans.set(plan.planId, plan);
+  }
 
-    public registerSchedule(schedule: JobSchedule) {
-        this.schedules.set(schedule.jobId, schedule);
-    }
+  public getPlan(planId: string): OrchestrationPlan | undefined {
+    return this.plans.get(planId);
+  }
 
-    public registerLock(lock: RuntimeLock) {
-        this.locks.set(lock.lockOwner, lock);
-    }
-    public getLock(jobId: string) {
-        return this.locks.get(jobId);
-    }
+  public getPlanByApplication(appId: string): OrchestrationPlan | undefined {
+    return Array.from(this.plans.values()).find(p => p.applicationId === appId);
+  }
+
+  public registerQueueItem(item: ExecutionQueueItem): void {
+    this.queue.set(item.queueId, item);
+  }
+
+  public getQueueItem(queueId: string): ExecutionQueueItem | undefined {
+    return this.queue.get(queueId);
+  }
+
+  public listQueue(): ExecutionQueueItem[] {
+    return Array.from(this.queue.values());
+  }
+
+  public registerAllocation(allocation: ResourceAllocation): void {
+    this.allocations.set(allocation.allocationId, allocation);
+  }
+
+  public getAllocation(allocationId: string): ResourceAllocation | undefined {
+    return this.allocations.get(allocationId);
+  }
 }

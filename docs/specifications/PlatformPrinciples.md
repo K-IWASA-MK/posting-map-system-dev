@@ -42,6 +42,10 @@
 22. **実行前契約検証 (Contract Before Execution)**: サービスの実行要求は、事前に発行された有効なライセンス（LicenseRecord）の状態（ISSUED ➔ ACTIVE ➔ EXPIRED）を Security Runtime が検証し、不当な契約状態の呼び出しを即時遮断しなければなりません。
 23. **ワークフロー主導 (Workflow First)**: 同一サービス群から複数のアプリケーションを動的構築するため、ビジネスロジックはサービス実装から分離され、有向非巡回グラフ（DAG）によって宣言的に記述されなければなりません。
 24. **グラフベース実行と活性化前プロビジョニング (Graph-Based Execution & Provision Before Activation)**: ワークフローは実行前に完全性が検証され、依存リソースと安全境界が検証済みの配備計画（ProvisioningPlan）に従って解決・確保されるまで活性化してはなりません。
+25. **実行前オーケストレーション (Orchestration Before Execution)**: すべての実行要求（アプリケーション、ワークフロー、サービス）は、事前に `OrchestrationPlan` が策定され、配置計画およびリソース割り当てが決定されてからでなければ実行されてはなりません。
+26. **弾力的資源管理 (Elastic Resource Management)**: リソースの割り当てやスケーリング（Auto-Scaling）は、CPU・メモリなどの利用状況や実行キュー（ExecutionQueue）の深さに応じて、動的かつ自動的に決定・適用されなければなりません。
+27. **高可用性設計 (High Availability by Design)**: システムは配置ポリシー（PlacementPolicy）を用いてアフィニティおよび反アフィニティ（Affinity / Anti-Affinity）制御を行い、単一障害点（SPOF）を排除して高可用性を保証しなければなりません。
+28. **自己修復優先 (Self-Healing First)**: システムの実行環境やプロセスの異常を検知した際、自動的に `RecoveryPlan` を策定し、人間の介入なしにプロセスの再起動や別ノードへの安全な移行（Migration）を試みなければなりません。
 
 
 

@@ -34,6 +34,12 @@ export class LauncherExecutionRuntime {
       );
     }
 
+    if (config?.checkQueue && !config?.queueId) {
+      throw new Error(
+        'Orchestration Violation: Execution must go through ExecutionQueue (Orchestration Before Execution)'
+      );
+    }
+
     const processId = `proc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     // Default to running a simple non-terminating node event loop if no arguments are provided

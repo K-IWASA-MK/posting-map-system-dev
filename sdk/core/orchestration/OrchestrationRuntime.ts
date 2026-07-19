@@ -1,249 +1,222 @@
 import { IRuntime } from '../runtime/IRuntime';
 import { RuntimeDescriptor } from '../runtime/RuntimeDescriptor';
+import { RuntimeCapability } from '../runtime/RuntimeCapability';
+import { RuntimeHealth, RuntimeHealthStatus } from '../runtime/RuntimeHealth';
 import { RuntimeContext } from '../runtime/RuntimeContext';
-import { RuntimeHealth } from '../runtime/RuntimeHealth';
 import { AIOSEventBus } from '../event/AIOSEventBus';
-import crypto from 'crypto';
-
-import { OrchestrationManifest } from './OrchestrationManifest';
-import { OrchestrationPolicy } from './OrchestrationPolicy';
+import { AIOSEvent } from '../event/AIOSEvent';
 import { OrchestrationRegistry } from './OrchestrationRegistry';
-import { OrchestrationState } from './OrchestrationState';
-import { OrchestrationSession } from './OrchestrationSession';
+import { OrchestrationPlanner } from './OrchestrationPlanner';
+import { PlacementResolver } from './PlacementResolver';
+import { ExecutionDispatcher } from './ExecutionDispatcher';
+import { RecoveryPlanner } from './RecoveryPlanner';
+import { OrchestrationPlan, ExecutionQueueItem, RecoveryPlan, RecoveryState } from './models/OrchestrationModels';
 
-import { ExecutionOrchestrationService } from './services/ExecutionOrchestrationService';
-import { ExecutionSchedulingService } from './services/ExecutionSchedulingService';
-import { DependencyResolutionService } from './services/DependencyResolutionService';
-import { RuntimeLockService } from './services/RuntimeLockService';
-import { ExecutionContextService } from './services/ExecutionContextService';
-import { RetryPolicyService } from './services/RetryPolicyService';
-import { TimeoutManagementService } from './services/TimeoutManagementService';
-import { CancellationService } from './services/CancellationService';
-import { PauseResumeService } from './services/PauseResumeService';
+export class OrchestrationRuntime implements IRuntime<void, void> {
+  public readonly id = 'aios.orchestration';
+  public readonly version = '1.0.0';
+  public readonly dependsOn = [];
 
-import { OrchestrationStateMachine } from './state/OrchestrationStateMachine';
-import { OrchestrationLedger } from './ledger/OrchestrationLedger';
-import { OrchestrationMetrics } from './metrics/OrchestrationMetrics';
-import { OrchestrationObservability } from './observability/OrchestrationObservability';
+  public readonly descriptor: RuntimeDescriptor = {
+    runtimeId: this.id,
+    runtimeName: 'Orchestration Runtime',
+    version: this.version,
+    contractVersion: '1.0',
+    capabilities: [
+      RuntimeCapability.ORCHESTRATION as any,
+      RuntimeCapability.RESOURCE_MANAGEMENT as any,
+      RuntimeCapability.SCHEDULING as any,
+      RuntimeCapability.RECOVERY as any
+    ],
+    dependencies: []
+  };
 
-import { ExecutionJob } from './models/ExecutionJob';
-import { RuntimeLock } from './models/RuntimeLock';
-import { RetryProfile } from './models/RetryProfile';
+  private context?: RuntimeContext;
+  private readonly registry = new OrchestrationRegistry();
+  private readonly planner = new OrchestrationPlanner();
+  private readonly placementResolver = new PlacementResolver();
+  private readonly dispatcher: ExecutionDispatcher;
+  private readonly recoveryPlanner = new RecoveryPlanner();
+  private activeRecoveryPlans = new Map<string, RecoveryPlan>();
 
-export class OrchestrationRuntime implements IRuntime<OrchestrationManifest, void> {
-    public readonly descriptor: RuntimeDescriptor = {
-        runtimeId: 'execution-orchestration-runtime',
-        runtimeName: 'Execution Orchestration Runtime',
-        version: 'v4.2.0-alpha.0',
-        contractVersion: '1.0',
-        capabilities: [
-            'CAN_ORCHESTRATE_EXECUTION' as any,
-            'CAN_SCHEDULE_JOB' as any,
-            'CAN_RESOLVE_DEPENDENCY' as any,
-            'CAN_MANAGE_LOCKS' as any,
-            'CAN_RETRY_EXECUTION' as any,
-            'CAN_PAUSE_EXECUTION' as any,
-            'CAN_RESUME_EXECUTION' as any,
-            'CAN_CANCEL_EXECUTION' as any,
-            'CAN_DISPATCH_EXECUTION' as any,
-            'CAN_VALIDATE_DEPENDENCY' as any,
-            'CAN_MANAGE_QUEUE' as any,
-            'CAN_HANDLE_TIMEOUT' as any,
-            'CAN_RESTORE_CONTEXT' as any
-        ],
-        dependencies: []
+  constructor(private readonly eventBus: AIOSEventBus) {
+    this.dispatcher = new ExecutionDispatcher(eventBus);
+  }
+
+  public getHealth(): Promise<RuntimeHealth> {
+    return Promise.resolve(this.health());
+  }
+
+  public health(): RuntimeHealth {
+    return {
+      status: RuntimeHealthStatus.HEALTHY,
+      lastCheckedAt: new Date().toISOString(),
+      reason: 'Orchestration Runtime is active',
+      lastChecked: new Date().toISOString(),
+      message: 'Orchestration Runtime is active'
+    };
+  }
+
+  public async initialize(context: RuntimeContext): Promise<void> {
+    this.context = context;
+  }
+
+  public async validate(): Promise<void> {}
+  public async execute(): Promise<void> {}
+  public async start(): Promise<void> {}
+  public async stop(): Promise<void> {}
+  public async pause(): Promise<void> {}
+  public async resume(): Promise<void> {}
+  public async shutdown(): Promise<void> {}
+
+  public getRegistry(): OrchestrationRegistry {
+    return this.registry;
+  }
+
+  public getPlanner(): OrchestrationPlanner {
+    return this.planner;
+  }
+
+  public getPlacementResolver(): PlacementResolver {
+    return this.placementResolver;
+  }
+
+  public getDispatcher(): ExecutionDispatcher {
+    return this.dispatcher;
+  }
+
+  public getRecoveryPlanner(): RecoveryPlanner {
+    return this.recoveryPlanner;
+  }
+
+  public async planOrchestration(applicationId: string, workflowId?: string): Promise<OrchestrationPlan> {
+    const plan = this.planner.createPlan(applicationId, workflowId);
+    this.registry.registerPlan(plan);
+
+    await this.publishEvent('OrchestrationPlanned', {
+      planId: plan.planId,
+      applicationId,
+      state: 'RUNNING'
+    });
+
+    const placement = this.placementResolver.resolvePlacement(plan.placementPolicy, plan.resourceAllocation);
+    const updatedPlan: OrchestrationPlan = {
+      ...plan,
+      resourceAllocation: {
+        ...plan.resourceAllocation,
+        placement
+      },
+      status: 'ACTIVE'
+    };
+    this.registry.registerPlan(updatedPlan);
+
+    await this.publishEvent('PlacementResolved', {
+      planId: plan.planId,
+      placement,
+      state: 'RUNNING'
+    });
+
+    await this.publishEvent('ResourcesAllocated', {
+      planId: plan.planId,
+      allocationId: plan.resourceAllocation.allocationId,
+      state: 'RUNNING'
+    });
+
+    return updatedPlan;
+  }
+
+  public async enqueueExecution(
+    workflowId: string,
+    applicationId: string,
+    priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  ): Promise<ExecutionQueueItem> {
+    const defaultResources = {
+      allocationId: `RES-ALL-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      cpu: 1,
+      memory: 2048,
+      gpu: 0,
+      storage: 10,
+      network: 50,
+      placement: 'node-pending'
     };
 
-    private context?: RuntimeContext;
-    private eventBus?: AIOSEventBus;
+    const item: ExecutionQueueItem = {
+      queueId: `Q-ITEM-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      priority,
+      workflowId,
+      applicationId,
+      requestedResources: defaultResources,
+      retryCount: 0,
+      status: 'PENDING',
+      createdAt: new Date().toISOString()
+    };
 
-    constructor(
-        private policy: OrchestrationPolicy,
-        private registry: OrchestrationRegistry,
-        private stateMachine: OrchestrationStateMachine,
-        private ledger: OrchestrationLedger,
-        private metrics: OrchestrationMetrics,
-        private observability: OrchestrationObservability,
-        private orchestrationService: ExecutionOrchestrationService,
-        private schedulingService: ExecutionSchedulingService,
-        private dependencyService: DependencyResolutionService,
-        private lockService: RuntimeLockService,
-        private contextService: ExecutionContextService,
-        private retryService: RetryPolicyService,
-        private timeoutService: TimeoutManagementService,
-        private cancelService: CancellationService,
-        private pauseService: PauseResumeService
-    ) {}
+    this.registry.registerQueueItem(item);
 
-    public async initialize(context: RuntimeContext): Promise<void> {
-        this.context = context;
-        this.eventBus = (context as any).eventBus;
+    await this.publishEvent('ExecutionQueued', {
+      queueId: item.queueId,
+      workflowId,
+      applicationId,
+      state: 'RUNNING'
+    });
+
+    return item;
+  }
+
+  public async dispatchExecution(queueId: string): Promise<void> {
+    const item = this.registry.getQueueItem(queueId);
+    if (!item) {
+      throw new Error(`Queue item ${queueId} not found`);
     }
 
-    public async execute(manifest: OrchestrationManifest): Promise<void> {}
+    const updatedItem: ExecutionQueueItem = {
+      ...item,
+      status: 'RUNNING'
+    };
+    this.registry.registerQueueItem(updatedItem);
 
-    public async orchestrate(job: ExecutionJob): Promise<boolean> {
-        const sessionId = crypto.randomUUID();
-        const session: OrchestrationSession = {
-            sessionId,
-            job,
-            status: OrchestrationState.CREATED,
-            startedAt: new Date().toISOString(),
-            currentRetryCount: 0
-        };
+    await this.dispatcher.dispatch(updatedItem);
+  }
 
-        this.registry.registerSession(session);
-        this.metrics.recordJob();
-        this.publishEvent('OrchestrationStarted', { sessionId, jobId: job.jobId });
-        
-        const startTime = Date.now();
-        let lock: RuntimeLock | null = null;
-        let wasCompleted = false;
+  public async triggerRecovery(targetId: string, reason: string): Promise<void> {
+    const plan = this.recoveryPlanner.createRecoveryPlan(targetId, reason);
+    this.activeRecoveryPlans.set(plan.recoveryId, plan);
 
-        try {
-            // 1. PLANNING
-            this.stateMachine.transition(session, OrchestrationState.PLANNING);
-            const t0 = Date.now();
-            const steps = await this.dependencyService.resolve(job);
-            this.metrics.recordDependencyResolution(Date.now() - t0);
-            this.publishEvent('DependenciesResolved', { sessionId, steps: steps.length });
+    await this.publishEvent('RecoveryPlanned', {
+      recoveryId: plan.recoveryId,
+      targetId,
+      reason,
+      state: 'RUNNING'
+    });
 
-            // 2. SCHEDULING
-            this.stateMachine.transition(session, OrchestrationState.SCHEDULING);
-            const schedule = await this.schedulingService.schedule(job, steps);
-            this.registry.registerSchedule(schedule);
-            
-            // Acquire Lock
-            lock = await this.lockService.lock(job.jobId, job.targetRuntime);
-            this.registry.registerLock(lock);
-            this.publishEvent('RuntimeLocked', { sessionId, lockId: lock.lockId });
+    const plannedPlan = this.recoveryPlanner.transitionState(plan, RecoveryState.PLANNED);
+    const executingPlan = this.recoveryPlanner.transitionState(plannedPlan, RecoveryState.RECOVERING);
+    const completedPlan = this.recoveryPlanner.transitionState(executingPlan, RecoveryState.COMPLETED);
+    
+    this.activeRecoveryPlans.set(plan.recoveryId, completedPlan);
 
-            this.publishEvent('JobScheduled', { sessionId, scheduleId: schedule.scheduleId });
-            this.publishEvent('SchedulingCompleted', { sessionId, scheduleId: schedule.scheduleId });
+    await this.publishEvent('RecoveryExecuted', {
+      recoveryId: plan.recoveryId,
+      targetId,
+      status: 'COMPLETED',
+      state: 'RUNNING'
+    });
+  }
 
-            // 3. READY
-            this.stateMachine.transition(session, OrchestrationState.READY);
-
-            while (session.status !== OrchestrationState.COMPLETED && session.status !== OrchestrationState.CANCELLED) {
-                // 4. DISPATCHING
-                if (session.status === OrchestrationState.READY) {
-                    this.stateMachine.transition(session, OrchestrationState.DISPATCHING);
-                    const t1 = Date.now();
-                    this.publishEvent('ExecutionDispatched', { sessionId, jobId: job.jobId });
-                    this.metrics.recordDispatchLatency(Date.now() - t1);
-                }
-
-                // 5. EXECUTING
-                if (session.status === OrchestrationState.DISPATCHING || session.status === OrchestrationState.RETRYING || session.status === OrchestrationState.RESUMED) {
-                    this.stateMachine.transition(session, OrchestrationState.EXECUTING);
-                    this.publishEvent('ExecutionStarted', { sessionId, jobId: job.jobId });
-                }
-
-                const success = await this.orchestrationService.dispatch(job, steps);
-
-                if (success) {
-                    this.stateMachine.transition(session, OrchestrationState.COMPLETED);
-                    this.publishEvent('ExecutionCompleted', { sessionId, jobId: job.jobId });
-                } else {
-                    this.stateMachine.transition(session, OrchestrationState.FAILED);
-                    this.publishEvent('ExecutionFailed', { sessionId, jobId: job.jobId });
-                    
-                    if (session.currentRetryCount < this.policy.retryPolicy.globalRetryLimit) {
-                        session.currentRetryCount++;
-                        this.stateMachine.transition(session, OrchestrationState.RETRYING);
-                        this.metrics.recordRetry();
-                        this.publishEvent('ExecutionRetrying', { sessionId, retryCount: session.currentRetryCount });
-                        
-                        const retryProfile: RetryProfile = {
-                            profileId: crypto.randomUUID(),
-                            jobId: job.jobId,
-                            retryCount: session.currentRetryCount,
-                            maxRetry: this.policy.retryPolicy.globalRetryLimit,
-                            backoffStrategy: 'LINEAR',
-                            retryDelay: 10, // fast for tests
-                            retryReason: 'Execution Failed',
-                            lastFailure: new Date().toISOString(),
-                            retryPolicyId: 'default'
-                        };
-                        await this.retryService.waitBeforeRetry(retryProfile);
-                    } else {
-                        this.stateMachine.transition(session, OrchestrationState.CANCELLED);
-                        this.metrics.recordCancel();
-                        this.publishEvent('ExecutionCancelled', { sessionId, jobId: job.jobId, reason: 'Retry limit reached' });
-                    }
-                }
-            }
-
-        } catch (error) {
-            this.stateMachine.transition(session, OrchestrationState.FAILED);
-            this.stateMachine.transition(session, OrchestrationState.CANCELLED);
-            this.metrics.recordFailure();
-            this.publishEvent('ExecutionCancelled', { sessionId, jobId: job.jobId, reason: (error as Error).message });
-        } finally {
-            if (lock) {
-                await this.lockService.unlock(lock);
-                this.publishEvent('RuntimeUnlocked', { sessionId, lockId: lock.lockId });
-            }
-            
-            wasCompleted = session.status === OrchestrationState.COMPLETED;
-            
-            this.stateMachine.transition(session, OrchestrationState.ARCHIVED);
-            
-            if (wasCompleted) {
-                this.metrics.recordCompletion(Date.now() - startTime);
-            } else {
-                this.metrics.recordFailure();
-            }
-            this.publishEvent('OrchestrationCompleted', { sessionId, status: session.status });
-        }
-
-        return wasCompleted;
-    }
-
-    private publishEvent(eventType: string, payload: any): void {
-        if (this.eventBus) {
-            this.eventBus.publish({
-                eventId: crypto.randomUUID(),
-                eventType,
-                eventVersion: '1.0',
-                occurredAt: new Date().toISOString(),
-                producerRuntimeId: this.descriptor.runtimeId,
-                correlationId: crypto.randomUUID(),
-                causationId: crypto.randomUUID(),
-                payload
-            });
-        }
-    }
-
-    public async pause(jobId?: string): Promise<void> {
-        if (!jobId) return;
-        // Find session by job id
-        const session = Array.from((this.registry as any).sessions.values()).find((s: any) => s.job.jobId === jobId) as OrchestrationSession;
-        if (session && session.status === OrchestrationState.EXECUTING) {
-            this.stateMachine.transition(session, OrchestrationState.PAUSED);
-            this.metrics.recordPause();
-            this.publishEvent('ExecutionPaused', { sessionId: session.sessionId, jobId });
-        }
-    }
-
-    public async resume(jobId?: string): Promise<void> {
-        const session = Array.from((this.registry as any).sessions.values()).find((s: any) => s.job.jobId === jobId) as OrchestrationSession;
-        if (session && session.status === OrchestrationState.PAUSED) {
-            this.stateMachine.transition(session, OrchestrationState.RESUMED);
-            this.publishEvent('ExecutionResumed', { sessionId: session.sessionId, jobId });
-            this.stateMachine.transition(session, OrchestrationState.EXECUTING);
-        }
-    }
-
-    public async getHealth(): Promise<RuntimeHealth> {
-        const isHealthy = this.observability.checkHealth();
-        return {
-            status: (isHealthy ? 'HEALTHY' : 'DEGRADED') as any,
-            lastCheckedAt: new Date().toISOString(),
-            details: this.observability.getStatusReport()
-        };
-    }
-
-    public async shutdown(): Promise<void> {}
-    public async validate(manifest: OrchestrationManifest): Promise<void> {}
+  private async publishEvent(eventType: string, payload: any): Promise<void> {
+    const event: AIOSEvent = {
+      eventId: `EVT-ORCH-${eventType.toUpperCase()}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      eventType,
+      eventVersion: '1.0',
+      occurredAt: new Date().toISOString(),
+      producerRuntimeId: this.id,
+      correlationId: `COR-ORCH-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      causationId: `CAU-ORCH-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      payload,
+      runtimeId: this.id,
+      timestamp: new Date().toISOString(),
+      state: payload.state
+    };
+    await this.eventBus.publish(event);
+  }
 }
