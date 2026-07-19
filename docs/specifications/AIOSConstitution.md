@@ -59,5 +59,9 @@ SDKの公開APIは、原則として後方互換性を維持します。破壊�
 ### 18. ゼロトラスト実行 (Zero Trust Runtime)
 すべてのプラグインおよびサードパーティコードは、Security Runtime による認証・認可を経なければリソースやシークレットへのアクセスが許可されず、常に Sandbox Manager の隔離コンテナ（Sandboxed Environment）内でのみ実行されなければなりません。
 
+### 19. 検証済アイデンティティと信頼 (Verified Identity & Trust)
+プラットフォーム内のすべてのコンポーネントおよびエージェントは、Identity Runtime によって発行された検証可能な暗号学的デジタル ID を有さなければならず、その操作信頼性は Trust Engine による署名および実績評価スコア（Trust Score）に基づいて常に監査されなければなりません。
+
+
 
 

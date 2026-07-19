@@ -26,5 +26,10 @@ export enum RuntimeCapability {
   COMPLIANCE = 'COMPLIANCE',
 
   // Phase 8 Runtime Capabilities
-  SANDBOX = 'SANDBOX'
+  SANDBOX = 'SANDBOX',
+
+  // Phase 9 Runtime Capabilities
+  IDENTITY = 'IDENTITY',
+  TRUST = 'TRUST',
+  CERTIFICATE = 'CERTIFICATE'
 }

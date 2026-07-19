@@ -30,7 +30,13 @@ export class SecurityRuntime implements IRuntime<SecurityManifest, void> {
   private context?: RuntimeContext;
   public manifest?: SecurityManifest;
 
+  private trustEngine?: any;
+
   constructor(private readonly eventBus: AIOSEventBus) {}
+
+  public setTrustEngine(trustEngine: any): void {
+    this.trustEngine = trustEngine;
+  }
 
   public getHealth(): Promise<RuntimeHealth> {
     return Promise.resolve(this.health());
@@ -95,6 +101,33 @@ export class SecurityRuntime implements IRuntime<SecurityManifest, void> {
     action: string,
     tokenId?: string
   ): Promise<AuthorizationDecision> {
+    if (this.trustEngine && securityCtx.principalId.startsWith('ID-')) {
+      try {
+        const trustRecord = await this.trustEngine.evaluateTrust(securityCtx.principalId);
+        if (trustRecord.trustScore < 70) {
+          const decision: AuthorizationDecision = {
+            decisionId: `DEC-AUTH-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+            principalId: securityCtx.principalId,
+            resource,
+            action,
+            result: 'DENY',
+            reason: `Trust score ${trustRecord.trustScore} is below minimum passing threshold 70`,
+            timestamp: new Date().toISOString()
+          };
+          await this.publishEvent('AuthorizationEvaluated', {
+            decisionId: decision.decisionId,
+            principalId: decision.principalId,
+            result: decision.result,
+            state: RuntimeState.RUNNING
+          });
+          await this.detectViolation(securityCtx, `Authorization Denied: Trust score below threshold`, 'CRITICAL');
+          return decision;
+        }
+      } catch (e) {
+        // ID not found, carry on with standard Auth
+      }
+    }
+
     const decision = this.authEngine.evaluateAuthorization(securityCtx, resource, action, tokenId);
     
     await this.publishEvent('AuthorizationEvaluated', {

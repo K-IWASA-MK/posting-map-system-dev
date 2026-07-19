@@ -34,6 +34,9 @@
 14. **適合性監査 (Compliance by Evaluation)**: プラットフォームは各 Runtime の適合性評価結果（Compliance Result）を Quality Runtime のスコア（compliance 項目）へ動的にマッピングさせ、自己規制キューの判断基準とします。
 15. **サンドボックス隔離 (Sandbox Isolation)**: 外部プラグインや非特権コードは、セキュリティプロファイル（Sandbox Profile）で定義された制限のもと、Sandbox Manager 内で隔離実行されなければならず、共有メモリやファイルシステムへの無制限なアクセスを禁止します。
 16. **最小特権原則 (Least Privilege)**: すべてのセキュリティ認可判定は、要求主体が必要最小限の権限のみを持つ Capability Token または対応するコンテキストにのみアクセスを限定する Zero Trust 方式を徹底します。
+17. **アイデンティティ主導 (Identity First)**: プラットフォームで稼働するすべての主体は名前空間付きで一意の ID が付与され、暗号学的な署名検証（Cryptographic Verification）を経てからでなければ動作を許可されません。
+18. **信頼の動的更新 (Verified Trust & Revocation Awareness)**: 主体の Trust Score は、電子署名や違反履歴などの証跡（Trust Evidence）を基に動的に更新され、証明書の失効（CRL）や時間経過（Decay）がリアルタイムに反映されなければなりません。
+
 
 
 
