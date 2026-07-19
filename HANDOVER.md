@@ -7,13 +7,13 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Posting Map Election Visualization Projection Foundation`
-- **Milestone**: `Posting Map Election Visualization Completed`
-- **Tag**: `v5.0.6-visualization-projection`
-- **Current Commit**: `b5a4e6727ad9a508b5e28a5e01614749f7b13a77`
-- **Third-Party Audit**: `Approved (A+ / Approve Posting Map Election Visualization)`
+- **Completed**: `Posting Area Management Foundation`
+- **Milestone**: `Posting Area Management Completed`
+- **Tag**: `v5.0.7-posting-area-management`
+- **Current Commit**: `f516fe3fa3433a0131498b31a31741df74c0b46e`
+- **Third-Party Audit**: `Approved (A+ / Approve Posting Area Management)`
 - **Current Phase**: `Release Ready`
-- **Next Action**: `Posting Area Data Integration Foundation`
+- **Next Action**: `Posting Assignment Foundation`
 - **Branch**: `main`
 
 ---
@@ -899,6 +899,18 @@ POSTING MAP において、`ElectionDashboardStorage` に保存された `Electi
 - **Geo Geometry Decoupling**: 自治体境界データ（GeoJSON などの巨大データ）を直接保持させず、`geometryId` 参照による Geo Boundary との結合キーのみを保持。
 - **Event-Driven Lifecyle**: 正常完了時に `POSTING_MAP_VISUALIZATION_UPDATED`、失敗時に `POSTING_MAP_VISUALIZATION_FAILED` イベントを発行し、Runtime からの直接的な外部配信を排除。
 - **Verification Tests**: `test_posting_map_visualization_projection.ts` (157件目のテストケース) を追加し、正常変換、カラー保存、市区町村紐付け、不正カラー・改ざんハッシュ・重複コードブロック、イミュータビリティ、および追加要求である Geo Binding Missing, Source Hash Mismatch の9大検証シナリオをパス。
+
+### Posting Area Management Foundation (Spreadsheet Area Master Edition)
+POSTING MAP の根幹となる「今日、誰が、どこを配ったか」を管理するため、スプレッドシートの1シート＝1エリア運用を再現・ドメインモデル化した配布エリア管理基盤（Area Master）を構築しました。
+
+- **Area Directory Separation**: すべてのエリア管理モジュールを `domains/posting-map/area/` 配下に新設し、選挙ドメインから完全に独立したエリア業務ドメイン（SSOT）を確立。
+- **Auto sorting & 10-Item Chunking**: 自治体名 ➔ 各自治体内の住所群を日本語あいうえお順にソートした上で10件ずつのチャンク（シート）に分割する自動生成ロジックを実装。
+- **Area Naming & Range Formation**: `{municipalityCode}-{sheetNumber.toString().padStart(4, "0")}` による Area ID 採番、および `[最初住所]〜[最後住所]` による `addressRange` 表現、チャンク内の実住所配列 `sourceAddresses` および実件数 `addressCount` の保持を追加。
+- **State Transition Machine**: `UNASSIGNED ➔ ASSIGNED ➔ IN_PROGRESS ➔ COMPLETED` の遷移を制御し、担当変更等の `IN_PROGRESS ➔ ASSIGNED` は許可しつつ、`COMPLETED` からのあらゆる逆戻り遷移を BLOCK。
+- **deepFreeze Immutability**: 浅い freeze ではなく、市区町村の住所配列を含むすべてのデータ階層オブジェクトを再帰的に `deepFreeze` し、メモリ上での改ざんを完全にブロック。
+- **Atomic File Storage**: `*.tmp` ➔ `fs.renameSync` を用いるアトミックなファイル永続化方式を採用。
+- **Verification Tests**: `test_posting_area_management.ts` (158件目のテストケース) を追加し、自治体ソート、住所ソート、10件分割、Area ID採番、重複ID拒否、状態遷移（正常・異常）、イミュータビリティ保護、ランタイム連携の8大シナリオを検証。
+
 
 
 
