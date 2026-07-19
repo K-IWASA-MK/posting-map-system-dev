@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Dashboard Runtime Integration Foundation`
-- **Milestone**: `Dashboard Runtime Integration Completed`
-- **Tag**: `v5.2.0-dashboard-runtime`
-- **Current Commit**: `df0b87c46132f0c72f0df7bc805a5a1fec463692`
-- **Third-Party Audit**: `Approved (A+ / Approve Dashboard Runtime Integration Foundation)`
+- **Completed**: `District Data Acquisition Foundation`
+- **Milestone**: `District Data Acquisition Completed`
+- **Tag**: `v5.3.0-district-data-acquisition`
+- **Current Commit**: `420613bf5f1184098b67606e62807bb221f2e13a`
+- **Third-Party Audit**: `Approved (A+ / Approve District Data Acquisition Foundation)`
 - **Current Phase**: `Release Ready`
 - **Next Action**: `Posting Assignment Foundation`
 - **Branch**: `main`
@@ -957,6 +957,18 @@ POSTING MAP の根幹となる「今日、誰が、どこを配ったか」を�
 - **DashboardValidator & Hash Integrity**: 投票率（0%〜100%）、エリア関係 (`completed <= total`)、およびマスタ/可視化データのハッシュ改ざん検出チェックを実装。
 - **DashboardRuntime**: 安全な `deepFreeze` により再帰的不変性を保証したビューモデルを取得・返却する統合ランタイム。
 - **Verification Tests**: `test_dashboard_runtime.ts` (162件目のテストケース) を追加し、自治体ロード、投票率表示、 preserved 色表示、エリア進捗の算出、および改ざん検出の5大シナリオをパス。
+
+### District Data Acquisition Foundation
+指定された選挙区名から所属自治体と地方公共団体コード（JIS）を解決し、ハッシュ検証可能な Raw 基礎データ（raw-district.json）を自動保存・供給する基盤を構築しました。
+
+- **Directory Creation**: `domains/posting-map/district/acquisition/` ディレクトリを新設。
+- **DistrictDataAcquisitionContract**: 基礎データリクエスト `DistrictDataAcquisitionRequest` と取得済 Raw データ `RawDistrictData` のスキーマ定義。
+- **DistrictDataSource**: 選挙区情報を引くためのデータソース定義および登録済 District Master Registry と結合して解決する `LocalDistrictDataSource` の実装。
+- **DistrictDataValidator**: 英数字表記の選挙区ID判定、5桁の市区町村JISコード形式チェック、およびマッピングの整合性（`sourceHash`）検証。
+- **DistrictDataRepository**: 原子性を保障したアトミックなファイル保存（`raw-district.json`）を実装。
+- **DistrictDataAcquisitionService & Runtime**: 取得、検証、ハッシュ割当て、ライフサイクルイベント（`DISTRICT_DATA_ACQUIRED`）通知を統制するランタイムの実装。
+- **Verification Tests**: `test_district_data_acquisition.ts` (163件目のテストケース) を新設し、埼玉県第8区解決、メタデータ検査、不正地区エラー、スキーマ逸脱検知の4大シナリオをパス。
+
 
 
 
