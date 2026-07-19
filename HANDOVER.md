@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Turnout Dashboard Projection Foundation`
-- **Milestone**: `Turnout Dashboard Projection Foundation Completed`
-- **Tag**: `v5.0.3-dashboard-projection`
-- **Current Commit**: `189c690f0559ceea2614b7e8d6411f58a7e0591e`
-- **Third-Party Audit**: `Approved (A+ / Approve Turnout Dashboard Projection)`
+- **Completed**: `Election Dashboard Consumer Adapter Foundation`
+- **Milestone**: `Election Dashboard Consumer Adapter Completed`
+- **Tag**: `v5.0.4-consumer-adapter`
+- **Current Commit**: `09d6df9487c67dfb6f5cfcc262e3d36009865103`
+- **Third-Party Audit**: `Approved (A+ / Approve Election Dashboard Consumer Adapter)`
 - **Current Phase**: `Release Ready`
 - **Next Action**: `Turnout Data Import Runtime`
 - **Branch**: `main`
@@ -865,5 +865,17 @@ Election Master (SSOT) の選挙・投票率データと分類エンジンの結
 - **Lineage Tracking Hash**: 入力された Master スキーマ情報のシリアライズ文字列より SHA-256 ハッシュを計算し、生成タイムスタンプとともに `lineage` メタデータへ記録するデータ系統追跡機構を実装。
 - **Projection Validator**: `lineage.hash` 形式検証、自治体➔選挙区の存在関連整合性、差分計算と分類 status の整合性、投票率の `[0, 100]` 境界チェックを行う validator を構築。
 - **Verification Tests**: `test_turnout_projection.ts` (154件目のテストケース) を追加し、正常なマッピング結合、選挙区集計の差分・status、不整合エラー、範囲外エラー、および lineage hash 形式エラーを検証。
+
+### Election Dashboard Consumer Adapter Foundation
+POSTING MAP Dashboard が `TurnoutDashboardProjection` (Read Model) を安全かつ型安全に消費するための Adapter/ViewModel レイヤーを構築しました。
+
+- **Consumer Directory Separation**: すべてのモジュールを `domains/election/consumer/` 配下に新設し、UI表示に特化した消費境界を画定。
+- **ElectionTurnoutViewModel**: `sourceType: "TURNOUT_DASHBOARD_PROJECTION"` を追加定義し、他の進捗・GPSデータソースと混ざらないようデータ出所を明記。
+- **No-Local-Classification Policy**: 自治体および選挙区の `status` ➔ `colorStatus` へのマッピングでは追加の分類ロジックを持たず、等値転記するルールを徹底。
+- **Lineage Retention**: 元データ投影モデルのハッシュを `lineageHash`、生成タイムスタンプを `lastUpdated` として UI 消費側まで保持・貫通。
+- **ID Preservation**: 自治体の `municipalityCode` および選挙区の `districtId` 属性を一切欠損なく正確に保持したまま引き継ぐ設計。
+- **Consumer Validator**: `lineageHash` / `lastUpdated` の必須性チェック、および `colorStatus` の適正値境界・型安全性の検証ロジックを実装。
+- **Verification Tests**: `test_election_consumer.ts` (155件目のテストケース) を追加し、ViewModel への正常系マッピング、欠損データブロック、ID保持を検証。
+
 
 
