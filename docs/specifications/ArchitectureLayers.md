@@ -56,6 +56,12 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
           ↓
   Compliance Engine (適合性評価)
       ↓
+  Federation Runtime (連邦管理)
+          ↓
+  Cross-Domain Identity Engine (外部IDマッピング)
+          ↓
+  Federation Trust Engine (外部信頼度評価)
+      ↓
   Identity Runtime (アイデンティティ管理)
           ↓
   Trust Engine (信頼性評価)
@@ -63,9 +69,9 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
   Certificate Registry (証明書ストア)
       ↓
   Security Runtime (セキュリティ判断)
-          ↓
+      ↓
   Secret Broker (機密仲介)
-          ↓
+      ↓
   Sandbox Manager (実行空間隔離)
       ↓
   Observability Runtime (観測基盤)

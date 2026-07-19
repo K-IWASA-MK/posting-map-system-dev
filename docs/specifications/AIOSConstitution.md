@@ -62,6 +62,10 @@ SDKの公開APIは、原則として後方互換性を維持します。破壊�
 ### 19. 検証済アイデンティティと信頼 (Verified Identity & Trust)
 プラットフォーム内のすべてのコンポーネントおよびエージェントは、Identity Runtime によって発行された検証可能な暗号学的デジタル ID を有さなければならず、その操作信頼性は Trust Engine による署名および実績評価スコア（Trust Score）に基づいて常に監査されなければなりません。
 
+### 20. 連邦信託とアイデンティティ (Federated Trust & Identity)
+プラットフォームは、外部ドメインや他インスタンスとのアイデンティティ連携において、検証鍵の交換（Certificate Exchange）、外部 ID 変換（Cross-Domain Mapping）、および相手ドメインの信頼度評価（Federation Trust Score）を暗号学的に維持し、境界を越えた安全な分散信託関係を確立しなければなりません。
+
+
 
 
 

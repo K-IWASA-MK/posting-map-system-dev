@@ -101,6 +101,37 @@ export class SecurityRuntime implements IRuntime<SecurityManifest, void> {
     action: string,
     tokenId?: string
   ): Promise<AuthorizationDecision> {
+    if (this.trustEngine && securityCtx.principalId.startsWith('ID-USER-') && securityCtx.principalId.includes(':')) {
+      try {
+        const parts = securityCtx.principalId.replace('ID-USER-', '').split(':');
+        const domainId = parts[0];
+        if (typeof this.trustEngine.evaluateDomainTrust === 'function') {
+          const domainScore = await this.trustEngine.evaluateDomainTrust(domainId);
+          if (domainScore < 70) {
+            const decision: AuthorizationDecision = {
+              decisionId: `DEC-AUTH-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+              principalId: securityCtx.principalId,
+              resource,
+              action,
+              result: 'DENY',
+              reason: `Remote domain trust score ${domainScore} is below minimum passing threshold 70`,
+              timestamp: new Date().toISOString()
+            };
+            await this.publishEvent('AuthorizationEvaluated', {
+              decisionId: decision.decisionId,
+              principalId: decision.principalId,
+              result: decision.result,
+              state: RuntimeState.RUNNING
+            });
+            await this.detectViolation(securityCtx, `Authorization Denied: Remote domain trust score below threshold`, 'CRITICAL');
+            return decision;
+          }
+        }
+      } catch (e) {
+        // Carry on with standard Auth
+      }
+    }
+
     if (this.trustEngine && securityCtx.principalId.startsWith('ID-')) {
       try {
         const trustRecord = await this.trustEngine.evaluateTrust(securityCtx.principalId);

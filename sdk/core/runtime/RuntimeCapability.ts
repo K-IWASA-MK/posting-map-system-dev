@@ -31,5 +31,10 @@ export enum RuntimeCapability {
   // Phase 9 Runtime Capabilities
   IDENTITY = 'IDENTITY',
   TRUST = 'TRUST',
-  CERTIFICATE = 'CERTIFICATE'
+  CERTIFICATE = 'CERTIFICATE',
+
+  // Phase 10 Runtime Capabilities
+  FEDERATION = 'FEDERATION',
+  CROSS_DOMAIN_IDENTITY = 'CROSS_DOMAIN_IDENTITY',
+  FEDERATION_TRUST = 'FEDERATION_TRUST'
 }

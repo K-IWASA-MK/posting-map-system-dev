@@ -36,6 +36,9 @@
 16. **最小特権原則 (Least Privilege)**: すべてのセキュリティ認可判定は、要求主体が必要最小限の権限のみを持つ Capability Token または対応するコンテキストにのみアクセスを限定する Zero Trust 方式を徹底します。
 17. **アイデンティティ主導 (Identity First)**: プラットフォームで稼働するすべての主体は名前空間付きで一意の ID が付与され、暗号学的な署名検証（Cryptographic Verification）を経てからでなければ動作を許可されません。
 18. **信頼の動的更新 (Verified Trust & Revocation Awareness)**: 主体の Trust Score は、電子署名や違反履歴などの証跡（Trust Evidence）を基に動的に更新され、証明書の失効（CRL）や時間経過（Decay）がリアルタイムに反映されなければなりません。
+19. **連邦アイデンティティ (Federated Identity)**: 外部インスタンスや他サービスとのID連携時は、安全なマッピングポリシー（Identity Mapping Policy）に基づいて名前空間が決定論的に変換され、かつドメイン境界が厳格に分離（Domain Isolation）されなければなりません。
+20. **ドメイン間信託 (Cross-Domain Trust)**: 他ドメインとのセッションは相互認証（Mutual Authentication）に基づいて確立され、失効時は関連するリモート信頼キャッシュ（Trust Cache）を即座に破棄するセッション主導の運用を徹底します。
+
 
 
 
