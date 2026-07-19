@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `District Master Foundation (National District Registry Edition)`
-- **Milestone**: `District Master Foundation Completed`
-- **Tag**: `v5.1.0-district-master`
-- **Current Commit**: `c75bc84fbfcf65463f847596ff58c1c4e70e94bb`
-- **Third-Party Audit**: `Approved (A+ / Approve District Master Foundation)`
+- **Completed**: `Dashboard Runtime Integration Foundation`
+- **Milestone**: `Dashboard Runtime Integration Completed`
+- **Tag**: `v5.2.0-dashboard-runtime`
+- **Current Commit**: `df0b87c46132f0c72f0df7bc805a5a1fec463692`
+- **Third-Party Audit**: `Approved (A+ / Approve Dashboard Runtime Integration Foundation)`
 - **Current Phase**: `Release Ready`
 - **Next Action**: `Posting Assignment Foundation`
 - **Branch**: `main`
@@ -947,6 +947,17 @@ POSTING MAP の根幹となる「今日、誰が、どこを配ったか」を�
 - **DistrictMasterRepository**: アトミック保存 (`.tmp` ➔ `fs.renameSync`) を実装。
 - **DistrictMasterResolver & Decoupling**: 静的な `StaticDistrictResolver` をプロダクトから廃止し、本番リゾルバーはすべて `DistrictMasterResolver` に接続するインターフェース設計へ統一。
 - **Verification Tests**: `test_district_master.ts` (161件目のテストケース) を追加し、マスタ登録、自治体解決、新規追加（埼玉県第8区等）、動的解決、存在しない選挙区のエラー、重複 ID ブロック、改ざん検出、および E2E（District Master ➔ District Initialization ➔ Sales Preview）統合の8大シナリオをパス。
+
+### Dashboard Runtime Integration Foundation
+既存のモック UI を実データソースへ安全に接続するための、Dashboard Runtime を構築しました。これにより、各ドメインの出力 Read Model を統合して画面用モデルへ合成・供給可能になりました。
+
+- **Directory Creation**: `domains/posting-map/dashboard/` ディレクトリを新設し、UI プレゼンテーション結合層を定義。
+- **DashboardViewModel & Contract**: ダッシュボード画面専用 of 統合ビューモデル `DashboardViewModel` を定義。
+- **DashboardAdapter**: No Calculation Policy に従い、投票率・色判定の再計算を行わず、既存の `dashboard.json`, `areas.json`, `visualization.json` をロードして合計/完了エリア数や進捗率を動的集計・マッピング。
+- **DashboardValidator & Hash Integrity**: 投票率（0%〜100%）、エリア関係 (`completed <= total`)、およびマスタ/可視化データのハッシュ改ざん検出チェックを実装。
+- **DashboardRuntime**: 安全な `deepFreeze` により再帰的不変性を保証したビューモデルを取得・返却する統合ランタイム。
+- **Verification Tests**: `test_dashboard_runtime.ts` (162件目のテストケース) を追加し、自治体ロード、投票率表示、 preserved 色表示、エリア進捗の算出、および改ざん検出の5大シナリオをパス。
+
 
 
 
