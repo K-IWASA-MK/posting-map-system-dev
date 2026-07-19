@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Election Dashboard Consumer Adapter Foundation`
-- **Milestone**: `Election Dashboard Consumer Adapter Completed`
-- **Tag**: `v5.0.4-consumer-adapter`
-- **Current Commit**: `09d6df9487c67dfb6f5cfcc262e3d36009865103`
-- **Third-Party Audit**: `Approved (A+ / Approve Election Dashboard Consumer Adapter)`
+- **Completed**: `Election Dashboard Storage & Delivery Foundation`
+- **Milestone**: `Election Dashboard Storage & Delivery Completed`
+- **Tag**: `v5.0.5-storage-delivery`
+- **Current Commit**: `c29001655b3be2cf04f2f45cc3984d436ec0591e`
+- **Third-Party Audit**: `Approved (A+ / Approve Election Dashboard Storage & Delivery)`
 - **Current Phase**: `Release Ready`
 - **Next Action**: `Turnout Data Import Runtime`
 - **Branch**: `main`
@@ -876,6 +876,19 @@ POSTING MAP Dashboard が `TurnoutDashboardProjection` (Read Model) を安全か
 - **ID Preservation**: 自治体の `municipalityCode` および選挙区の `districtId` 属性を一切欠損なく正確に保持したまま引き継ぐ設計。
 - **Consumer Validator**: `lineageHash` / `lastUpdated` の必須性チェック、および `colorStatus` の適正値境界・型安全性の検証ロジックを実装。
 - **Verification Tests**: `test_election_consumer.ts` (155件目のテストケース) を追加し、ViewModel への正常系マッピング、欠損データブロック、ID保持を検証。
+
+### Election Dashboard Storage & Delivery Foundation
+POSTING MAP Dashboard が `ElectionTurnoutViewModel` を安全・追跡可能・再生成可能な形式で保存・配信する基盤（Storage & Delivery Layer）を構築しました。
+
+- **Storage Directory Separation**: すべてのストレージ関連モジュールを `domains/election/storage/` 配下に新設し、UI配信用データの保存・配信境界を定義。
+- **Hash Verification Separation**: `sourceLineageHash` (元の系統ハッシュ) と `contentHash` (保存データの SHA-256) をメタデータ内に分離・明記し、データの完全性を担保。
+- **deepFreeze Immutability**: 浅い freeze ではなく、メタデータ・データ・市区町村・選挙区リストを含む全階層オブジェクトを再帰的に `deepFreeze` し、生成後のメモリ上での改ざんをブロック。
+- **Atomic File Writes**: テンポラリファイルへの書き出し ➔ `fs.renameSync` によるアトミックファイル更新方式を採用し、ダッシュボード配信データの書き込み中破損を完全に防止。
+- **Versioned Replay Safety**: メモリ上に `processedVersions` マップを保持し、同一 `storageId` の同一バージョン以下の重複処理をスキップ（SKIPPED）しつつ、バージョン更新時は上書き・再生成を許容。
+- **Event-Driven Lifecycle**: 正常完了時に `ELECTION_DASHBOARD_STORAGE_UPDATED`、失敗時に `ELECTION_DASHBOARD_STORAGE_FAILED` イベントを発行する機能を追加。
+- **Delivery Adapter Connection**: 直接的な Git や外部 API 操作を完全に排除し、`ReleaseRuntime` へリリース依頼を行う `ElectionDashboardDeliveryAdapter` 境界を構築。
+- **Verification Tests**: `test_election_dashboard_storage.ts` (156件目のテストケース) を追加し、正常系保存、ハッシュ検証、破損検知、Replay Safety、デリバリー境界、イミュータビリティ、ストレージ境界侵害防止の7大シナリオを検証。
+
 
 
 
