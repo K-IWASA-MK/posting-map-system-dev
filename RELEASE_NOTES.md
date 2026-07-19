@@ -1,3 +1,20 @@
+# Release Notes - v6.0.0-alpha.2
+
+## 🚀 New Features & Enhancements
+
+### 1. AIOS v6.0 Platform Boundary Enforcement (Phase 2)
+- **Validation Runtime & Pipeline**: Introduced the `ValidationRuntime` platform execution engine, orchestrating validation via `ValidationPipeline` over 6 custom validators with unified results and CI-friendly exit codes (success on warnings, fail on errors).
+- **6 Domain and Boundary Validators**:
+  - `DependencyScanner`: Traverses files in a DAG structure and verifies layer separation; includes warnings for localized/legacy cycles in `sdk/`.
+  - `ImportRuleChecker`: Prevents applications from directly importing kernel, runtime, and internal capabilities.
+  - `ArchitectureValidator`: Enforces layer directions and infrastructure decoupling from domain services.
+  - `SDKBoundaryValidator`: Verifies applications only import from `@aios/sdk`, and audits `sdk/index.ts` to prevent internal module leaks.
+  - `DomainIsolationValidator`: Case-insensitively blocks forbidden words (Election, Posting, Flyer, District, Spreadsheet) in platform core. Emits warnings for `Dashboard` and compiles files into a Phase 3 rename registry (`DashboardRenamePreparation.md`).
+  - `NamingValidator`: Validates PascalCase, camelCase, and UPPER_SNAKE_CASE rules across folders, files, classes, interfaces, and events.
+- **Git Commit Gate & Quality Check Integration**: Integrated validations into Git pre-commit hooks (`hook_runner.js`) and standard quality checks (`npm run quality:check`), ensuring boundary violations block developer commits.
+
+---
+
 # Release Notes - v6.0.0-alpha.1
 
 ## 🚀 New Features & Enhancements

@@ -14,7 +14,7 @@
     "build:gas": "python3 tools/build_gas.py",
     "test": "npx ts-node -r tsconfig-paths/register tools/testing/TestRunner.ts",
     "architecture:test": "npx ts-node -r tsconfig-paths/register tools/architecture-check.ts",
-    "quality:check": "npm run build && npm run architecture:test && npx ts-node -r tsconfig-paths/register tools/testing/TestRunner.ts"
+    "quality:check": "npm run build && npx ts-node -r tsconfig-paths/register tools/testing/TestRunner.ts && npx ts-node -r tsconfig-paths/register tools/runtime/ValidationRuntime.ts"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",

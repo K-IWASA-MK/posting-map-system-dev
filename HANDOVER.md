@@ -7,13 +7,13 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `AIOS Constitution Foundation + Development Workflow Standardization`
-- **Milestone**: `Phase 1 Platform Separation Specifications Completed`
-- **Tag**: `v6.0.0-alpha.1`
+- **Completed**: `AIOS Platform Separation Phase 2 (Platform Boundary Enforcement)`
+- **Milestone**: `Phase 2 Boundary Validator Implementation Completed`
+- **Tag**: `v6.0.0-alpha.2`
 - **Current Commit**: `2f9c437b5e182d7676eb293520ea10ba3b8f6c9e`
-- **Third-Party Audit**: `Approved (A+ / Approve AIOS v6.0 Phase 1 Specifications)`
+- **Third-Party Audit**: `Approved (A+ / Approve AIOS v6.0 Phase 2 Validators)`
 - **Current Phase**: `Release Ready`
-- **Next Action**: `Phase 2 Boundary Validator Implementation`
+- **Next Action**: `Phase 3 Monitor/Console Refactoring & Cleanup`
 - **Branch**: `main`
 
 ---
@@ -993,3 +993,18 @@ AIOS を独立した AI Operating System Platform として確立するための
 - **Git & Release Workflows**: コミット・プッシュの前提条件（ビルド、リンター、テスト、境界検証のPASS必須化）および、SemVer 2.0.0 や Git Tag（vX.Y.Z-alpha.N 等）の運用。
 - **Quality Gate Standards**: ビルド、テスト、アーキテクチャ、依存関係、境界、セキュリティ、ドキュメントの7項目を合格基準として定義。
 - **Platform Extension & Target applications**: 将来の CRM, ERP, RAG, Agent, Workflow アプリケーションなどの拡張性を見据えたモジュール構成の定義。
+
+### AIOS v6.0 Platform Separation (Phase 2: Platform Boundary Enforcement)
+AIOS の境界ルールおよびドメイン非依存ルールを自動で検証・強制する 6 つの Validator と Validation Runtime 実行基盤を構築しました。
+
+- **Unified Validation Runtime & Pipeline**: `ValidationRuntime` ➔ `ValidationPipeline` ➔ `Validators` の3層で構成され、全検証の合否を一括出力。警告（WARNING）と失敗（FAIL）を識別し、CIに対応した決定論的 Exit Code（PASS/WARNING: 0, FAIL: 1）を実装。
+- **6 Custom Validators**:
+  - `DependencyScanner`: ファイル依存グラフ（DAG）の構築、循環依存およびレイヤー逆流（Core ➔ App）依存の自動検証。同フォルダ内・SDK内の循環参照は許容し警告に留める緩和機構を配備。
+  - `ImportRuleChecker`: アプリケーション層からコア内部（kernel/runtime/capability等）への直接的相対パスインポートを遮断。
+  - `ArchitectureValidator`: 階層方向ルール（Applications ➔ SDK ➔ Capability ➔ Runtime ➔ Kernel）とインフラ層のドメインサービス非依存ルールを検証。
+  - `SDKBoundaryValidator`: アプリケーションが公開 SDK (`@aios/sdk`) 以外から直接インポートしていないかを検証。さらに `sdk/index.ts` のバレル/再エクスポートを検査し、内部ファイルの漏洩を防ぐ。
+  - `DomainIsolationValidator`: `kernel`, `runtime`, `core`, `sdk` 内の禁止語（Election, Posting, Flyer, District, Spreadsheet）を完全遮断。`Dashboard` は警告（WARNING）およびリネーム影響範囲登録（`DashboardRenamePreparation.md` 生成）に留める暫定緩和措置を統合。
+  - `NamingValidator`: フォルダ、ファイル、クラス、インターフェース、イベント名の命名規則（PascalCase, camelCase, UPPER_SNAKE_CASE）をコメント等を除外した上で厳格検査。
+- **Git Commit Gate Integration**: `hook_runner.js` に `ValidationPipeline` の自動実行を統合。コミット前にビルド・テスト・バリデータが全件通過することを強制し、違反時はコミットをブロック。
+- **`npm run quality:check` Integration**: テストスイートの実行後に `ValidationRuntime` を自動実行し、Build、Tests、および6つの Validator の結果を集約した表形式の品質レポートを出力。
+

@@ -43,18 +43,36 @@ class HookRunner {
       const report = await SimulationTestRunner.runAll(tempRunId);
       activeRunId = report.testRunId;
 
-      // 3. Quality Gate アサーションに基づく合否判定
-      if (report.result === 'PASS') {
+      // 3. Validation Pipeline の実行
+      console.log(`[Simulation Hook] Platform Validation Pipeline を開始します...`);
+      require('ts-node').register({
+        transpileOnly: true,
+        compilerOptions: { module: 'commonjs' }
+      });
+      const { ValidationPipeline } = require('../validators/ValidationPipeline');
+      const pipeline = new ValidationPipeline();
+      const valReport = await pipeline.run();
+
+      // 詳細表示
+      for (const res of valReport.results) {
+        console.log(`   ${res.validatorId}: ${res.status}`);
+        if (res.status === 'FAIL') {
+          res.messages.forEach(msg => console.error(`      ${msg}`));
+        }
+      }
+
+      // 4. Quality Gate アサーションに基づく合否判定
+      if (report.result === 'PASS' && valReport.overallStatus !== 'FAIL') {
         gateExitCode = 0; // Allow
         gateResult = 'Passed';
         console.log(`[Simulation Hook] QUALITY GATE: PASS. 変更操作が許可されました。`);
       } else {
         gateExitCode = 1; // Block
         gateResult = 'Blocked';
-        console.error(`[Simulation Hook] QUALITY GATE: BLOCKED. 接続契約または本番隔離違反を検知したため処理を中断します。`);
+        console.error(`[Simulation Hook] QUALITY GATE: BLOCKED. テスト失敗または境界・規則違反を検知したためコミットを中断します。`);
       }
     } catch (error) {
-      console.error(`[Simulation Hook] フック実行中に致命的なエラーが発生しました:`, error.message);
+      console.error(`[Simulation Hook] フック実行中に致命的なエラーが発生しました:`, error.stack || error.message);
       gateExitCode = 1; // Block
       gateResult = 'Blocked';
     }
