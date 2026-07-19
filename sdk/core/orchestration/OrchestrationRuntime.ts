@@ -38,9 +38,14 @@ export class OrchestrationRuntime implements IRuntime<void, void> {
   private readonly dispatcher: ExecutionDispatcher;
   private readonly recoveryPlanner = new RecoveryPlanner();
   private activeRecoveryPlans = new Map<string, RecoveryPlan>();
+  private distributedRuntime?: any;
 
   constructor(private readonly eventBus: AIOSEventBus) {
     this.dispatcher = new ExecutionDispatcher(eventBus);
+  }
+
+  public setDistributedRuntime(runtime: any): void {
+    this.distributedRuntime = runtime;
   }
 
   public getHealth(): Promise<RuntimeHealth> {
@@ -175,7 +180,27 @@ export class OrchestrationRuntime implements IRuntime<void, void> {
     };
     this.registry.registerQueueItem(updatedItem);
 
-    await this.dispatcher.dispatch(updatedItem);
+    if (item.requestedResources.placement !== 'local-node' && this.distributedRuntime) {
+      const delegator = this.distributedRuntime.getDelegator();
+      const mockAttestation = {
+        nodeId: item.requestedResources.placement,
+        trustScore: 85,
+        certificateId: 'CERT-001',
+        runtimeIntegrity: true,
+        containerIntegrity: true,
+        verifiedAt: new Date().toISOString()
+      };
+      await delegator.delegate(
+        item.queueId,
+        `SES-${Date.now()}`,
+        item.requestedResources.placement,
+        item.workflowId,
+        item.applicationId,
+        mockAttestation
+      );
+    } else {
+      await this.dispatcher.dispatch(updatedItem);
+    }
   }
 
   public async triggerRecovery(targetId: string, reason: string): Promise<void> {
