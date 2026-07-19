@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Turnout Classification Engine Foundation`
-- **Milestone**: `Turnout Classification Engine Foundation Completed`
-- **Tag**: `v5.0.2-turnout-classification`
-- **Current Commit**: `279fc5e36437d2f9543e019a27e7d9cd469f3458`
-- **Third-Party Audit**: `Approved (A+ / Approve Turnout Classification Engine)`
+- **Completed**: `Turnout Dashboard Projection Foundation`
+- **Milestone**: `Turnout Dashboard Projection Foundation Completed`
+- **Tag**: `v5.0.3-dashboard-projection`
+- **Current Commit**: `189c690f0559ceea2614b7e8d6411f58a7e0591e`
+- **Third-Party Audit**: `Approved (A+ / Approve Turnout Dashboard Projection)`
 - **Current Phase**: `Release Ready`
 - **Next Action**: `Turnout Data Import Runtime`
 - **Branch**: `main`
@@ -855,5 +855,15 @@ Election Master (SSOT) に保存された投票率データを、決定論的ル
 - **Classification Rules**: `GREEN` (差分 +3% 以上)、`RED` (差分 -3% 以下)、`YELLOW` (その他) のしきい値ルールを `TurnoutClassificationRule` にて定数管理。
 - **Presentation Projection**: フロントエンド・API用の投影モデル `TurnoutProjection` に変換出力するプロジェクションパイプラインを実装。
 - **Classification Validation**: 差分計算と分類結果ステータスのマッピング不整合や範囲外数値を検知して BLOCK する `ClassificationValidator` を構築。
-- **Verification Tests**: `test_turnout_classification.ts` (153件目のテストケース) を追加し、正常系（YELLOW/GREEN/RED）および境界値 (+3.0, +2.99, -3.0, -2.99)、異常値を検証。
+- **Verification Tests**: `test_turnout_classification.ts` (153件目のテストケース) を追加し、正常系（YELLOW/GREEN/RED）および境界値 (+3.0, +2.99, -3.0, -2.99), 異常値を検証。
+
+### Turnout Dashboard Projection Foundation
+Election Master (SSOT) の選挙・投票率データと分類エンジンの結果を統合し、POSTING MAP Dashboard が容易に消費可能な決定論的プロジェクション（投影）データ（Read Model）を生成する基盤を構築しました。
+
+- **Read Model Boundary**: `domains/election/projection/` を表示・API消費専用の完全な Read Model と定義。SSOT への書き戻しや上書きが一切不可能な片方向設計を徹底。
+- **District Projection Extension**: 自治体に加えて選挙区 (`TurnoutDistrictProjection`) にも `nationalTurnout`, `difference`, `status` を追加し、選挙区単位での色表示（GREEN / YELLOW / RED）を即利用可能な設計に拡張。
+- **Lineage Tracking Hash**: 入力された Master スキーマ情報のシリアライズ文字列より SHA-256 ハッシュを計算し、生成タイムスタンプとともに `lineage` メタデータへ記録するデータ系統追跡機構を実装。
+- **Projection Validator**: `lineage.hash` 形式検証、自治体➔選挙区の存在関連整合性、差分計算と分類 status の整合性、投票率の `[0, 100]` 境界チェックを行う validator を構築。
+- **Verification Tests**: `test_turnout_projection.ts` (154件目のテストケース) を追加し、正常なマッピング結合、選挙区集計の差分・status、不整合エラー、範囲外エラー、および lineage hash 形式エラーを検証。
+
 
