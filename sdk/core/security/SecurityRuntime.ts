@@ -33,6 +33,7 @@ export class SecurityRuntime implements IRuntime<SecurityManifest, void> {
   private trustEngine?: any;
 
   private licenseRuntime?: any;
+  private workflowRuntime?: any;
 
   constructor(private readonly eventBus: AIOSEventBus) {}
 
@@ -42,6 +43,10 @@ export class SecurityRuntime implements IRuntime<SecurityManifest, void> {
 
   public setLicenseRuntime(licenseRuntime: any): void {
     this.licenseRuntime = licenseRuntime;
+  }
+
+  public setWorkflowRuntime(workflowRuntime: any): void {
+    this.workflowRuntime = workflowRuntime;
   }
 
   public getHealth(): Promise<RuntimeHealth> {
@@ -107,6 +112,32 @@ export class SecurityRuntime implements IRuntime<SecurityManifest, void> {
     action: string,
     tokenId?: string
   ): Promise<AuthorizationDecision> {
+    if (this.workflowRuntime && resource.startsWith('workflow:')) {
+      const workflowId = resource.replace('workflow:', '');
+      const workflow = this.workflowRuntime.getRegistry().getWorkflow(workflowId);
+      if (workflow) {
+        if (workflow.approvalPolicy === 'STRICT-APPROVAL' && securityCtx.trustLevel !== 'HIGH') {
+          const decision: AuthorizationDecision = {
+            decisionId: `DEC-AUTH-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+            principalId: securityCtx.principalId,
+            resource,
+            action,
+            result: 'DENY',
+            reason: `Workflow ${workflowId} requires STRICT-APPROVAL but principal has trustLevel ${securityCtx.trustLevel}`,
+            timestamp: new Date().toISOString()
+          };
+          await this.publishEvent('AuthorizationEvaluated', {
+            decisionId: decision.decisionId,
+            principalId: decision.principalId,
+            result: decision.result,
+            state: RuntimeState.RUNNING
+          });
+          await this.detectViolation(securityCtx, `Authorization Denied: Workflow approval policy violation`, 'CRITICAL');
+          return decision;
+        }
+      }
+    }
+
     if (this.licenseRuntime && resource.startsWith('service:')) {
       const serviceId = resource.replace('service:', '');
       const licenseeId = securityCtx.principalId;

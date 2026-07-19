@@ -40,6 +40,9 @@
 20. **ドメイン間信託 (Cross-Domain Trust)**: 他ドメインとのセッションは相互認証（Mutual Authentication）に基づいて確立され、失効時は関連するリモート信頼キャッシュ（Trust Cache）を即座に破棄するセッション主導の運用を徹底します。
 21. **サービス第一 (Service First)**: 実行されるすべてのロジック、外部 API、およびプラグインは「サービス」として統一的な定義（ServiceDefinition）とアイデンティティ（ServiceIdentity）を持たなければならず、依存関係（ServiceDependency）が完全に解決されるまで起動してはなりません。
 22. **実行前契約検証 (Contract Before Execution)**: サービスの実行要求は、事前に発行された有効なライセンス（LicenseRecord）の状態（ISSUED ➔ ACTIVE ➔ EXPIRED）を Security Runtime が検証し、不当な契約状態の呼び出しを即時遮断しなければなりません。
+23. **ワークフロー主導 (Workflow First)**: 同一サービス群から複数のアプリケーションを動的構築するため、ビジネスロジックはサービス実装から分離され、有向非巡回グラフ（DAG）によって宣言的に記述されなければなりません。
+24. **グラフベース実行と活性化前プロビジョニング (Graph-Based Execution & Provision Before Activation)**: ワークフローは実行前に完全性が検証され、依存リソースと安全境界が検証済みの配備計画（ProvisioningPlan）に従って解決・確保されるまで活性化してはなりません。
+
 
 
 

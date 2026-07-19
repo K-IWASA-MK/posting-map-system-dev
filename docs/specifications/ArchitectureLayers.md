@@ -56,6 +56,10 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
           ↓
   Compliance Engine (適合性評価)
       ↓
+  Application Runtime (アプリケーション配備・管理)
+          ↓
+  Workflow Runtime (グラフワークフロー実行)
+      ↓
   Marketplace Runtime (マーケットプレイス管理)
           ↓
   Service Runtime (サービス実行管理)

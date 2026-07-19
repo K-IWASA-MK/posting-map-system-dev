@@ -1,31 +1,28 @@
-import { WorkflowManifest } from './WorkflowManifest';
-import { WorkflowJob } from './WorkflowModels';
+import { WorkflowDefinition, WorkflowVersion } from './WorkflowModels';
 
 export class WorkflowRegistry {
-  private readonly manifests: Map<string, WorkflowManifest> = new Map();
-  private readonly activeJobs: Map<string, WorkflowJob> = new Map();
+  private workflows = new Map<string, WorkflowDefinition>();
+  private versions = new Map<string, WorkflowVersion[]>();
 
-  public registerManifest(manifest: WorkflowManifest): void {
-    this.manifests.set(manifest.workflowId, manifest);
+  public registerWorkflow(workflow: WorkflowDefinition): void {
+    this.workflows.set(workflow.workflowId, workflow);
   }
 
-  public getManifest(workflowId: string): WorkflowManifest | undefined {
-    return this.manifests.get(workflowId);
+  public getWorkflow(workflowId: string): WorkflowDefinition | undefined {
+    return this.workflows.get(workflowId);
   }
 
-  public registerJob(job: WorkflowJob): void {
-    this.activeJobs.set(job.id, job);
+  public registerVersion(version: WorkflowVersion): void {
+    const list = this.versions.get(version.workflowId) || [];
+    list.push(version);
+    this.versions.set(version.workflowId, list);
   }
 
-  public getJob(jobId: string): WorkflowJob | undefined {
-    return this.activeJobs.get(jobId);
+  public getVersions(workflowId: string): WorkflowVersion[] {
+    return this.versions.get(workflowId) || [];
   }
 
-  public removeJob(jobId: string): void {
-    this.activeJobs.delete(jobId);
-  }
-
-  public getAllManifests(): WorkflowManifest[] {
-    return Array.from(this.manifests.values());
+  public removeWorkflow(workflowId: string): void {
+    this.workflows.delete(workflowId);
   }
 }
