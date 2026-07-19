@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Election Master Storage Contract Foundation`
-- **Milestone**: `Election Master Storage Foundation Completed`
-- **Tag**: `v5.0.1-election-master`
-- **Current Commit**: `f2b059436e2f1cf5b098319a27e7d9cd469f3458`
-- **Third-Party Audit**: `Approved (A+ / Approve Election Master Foundation)`
+- **Completed**: `Turnout Classification Engine Foundation`
+- **Milestone**: `Turnout Classification Engine Foundation Completed`
+- **Tag**: `v5.0.2-turnout-classification`
+- **Current Commit**: `279fc5e36437d2f9543e019a27e7d9cd469f3458`
+- **Third-Party Audit**: `Approved (A+ / Approve Turnout Classification Engine)`
 - **Current Phase**: `Release Ready`
 - **Next Action**: `Turnout Data Import Runtime`
 - **Branch**: `main`
@@ -846,3 +846,14 @@ POSTING MAP の投票率データ基盤となる Election Master のデータ契
 - **turnout Range Checks**: 全投票率値に対して決定論的に `0 <= turnout <= 100` の範囲制限をチェック。
 - **SSOT Integrity**: 投票率データの唯一の正規データ源（SSOT）として `ElectionMasterSchema` を定義し、同一 `electionId` の重複登録の防止、および投票率欠損を検証。
 - **Validation Unit Tests**: 152件目のテストケースを追加し、正常系（登録成功）と各種異常系（値範囲外、重複ID、リレーションエラー）が正確に BLOCK されることを検証。
+
+### Turnout Classification Engine Foundation
+Election Master (SSOT) に保存された投票率データを、決定論的ルールに基づいて GREEN / YELLOW / RED 状態に分類する分類エンジンを構築しました。
+
+- **Read-Only SSOT**: `domains/election/master/` のデータ契約・スキーマを読み取り専用とし、書き換えや上書きを一切行わないクリーンな実装。
+- **Deterministic Engine**: AI推論による不確実性を排除し、全国平均投票率を基準とした決定論的な差分計算（`difference = municipality - national`）に基づく分類。
+- **Classification Rules**: `GREEN` (差分 +3% 以上)、`RED` (差分 -3% 以下)、`YELLOW` (その他) のしきい値ルールを `TurnoutClassificationRule` にて定数管理。
+- **Presentation Projection**: フロントエンド・API用の投影モデル `TurnoutProjection` に変換出力するプロジェクションパイプラインを実装。
+- **Classification Validation**: 差分計算と分類結果ステータスのマッピング不整合や範囲外数値を検知して BLOCK する `ClassificationValidator` を構築。
+- **Verification Tests**: `test_turnout_classification.ts` (153件目のテストケース) を追加し、正常系（YELLOW/GREEN/RED）および境界値 (+3.0, +2.99, -3.0, -2.99)、異常値を検証。
+
