@@ -53,3 +53,7 @@ SDKの公開APIは、原則として後方互換性を維持します。破壊�
 ### 16. 自己規制統制 (Self-Regulation Governance)
 プラットフォームは「観測（Observability）」「評価（Quality）」「実行（Automation）」「記録（Event Ledger）」の責務を厳格に分離し、実行結果を元帳経由で再観測する閉ループ自己規制（Self-Regulation Loop）の構成を備えなければなりません。
 
+### 17. ガバナンス主導 (Governance First)
+プラットフォームのすべての動作環境およびプラグインは、Governance Runtime が定義・配信する統一ポリシーバンドルに従わなければならず、Compliance Engine による適合評価に服さなければなりません。
+
+

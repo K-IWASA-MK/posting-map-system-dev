@@ -57,6 +57,12 @@ export class QualityRuntime implements IRuntime<QualityManifest, void> {
     this.eventBus.subscribe('TelemetryCollected', async (event) => {
       await this.evaluateQuality(event);
     });
+    this.eventBus.subscribe('ComplianceEvaluated', async (event) => {
+      const payload = event.payload as any;
+      if (payload && typeof payload.overallScore === 'number') {
+        this.lastComplianceScore = payload.overallScore;
+      }
+    });
   }
 
   public async validate(manifest: QualityManifest): Promise<void> {
@@ -75,6 +81,7 @@ export class QualityRuntime implements IRuntime<QualityManifest, void> {
   public async resume(): Promise<void> {}
   public async shutdown(): Promise<void> {}
 
+  private lastComplianceScore = 100;
   private lastEvaluation?: QualityEvaluation;
 
   public getLastEvaluation(): QualityEvaluation | undefined {
@@ -91,7 +98,7 @@ export class QualityRuntime implements IRuntime<QualityManifest, void> {
       minPassingStabilityScore: 90
     };
 
-    const evaluation = this.policyEngine.evaluate(projection, config);
+    const evaluation = this.policyEngine.evaluate(projection, config, this.lastComplianceScore);
     this.lastEvaluation = evaluation;
 
     // 1. Publish QualityEvaluated

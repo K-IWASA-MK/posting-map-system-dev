@@ -19,5 +19,9 @@ export enum RuntimeCapability {
   SECURITY = 'SECURITY',
 
   // Phase 5 Runtime Capabilities
-  OBSERVABILITY = 'OBSERVABILITY'
+  OBSERVABILITY = 'OBSERVABILITY',
+
+  // Phase 7 Runtime Capabilities
+  GOVERNANCE = 'GOVERNANCE',
+  COMPLIANCE = 'COMPLIANCE'
 }

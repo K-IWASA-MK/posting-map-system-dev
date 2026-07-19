@@ -1,31 +1,50 @@
-import { GovernanceSession } from './GovernanceSession';
-import { GovernanceDecision } from './models/GovernanceDecision';
-import { ImpactAnalysis } from './models/ImpactAnalysis';
-import { ComplianceReport } from './models/ComplianceReport';
+import { PolicyBundle, PolicyDefinition } from './GovernanceModels';
 
 export class GovernanceRegistry {
-    private sessions: Map<string, GovernanceSession> = new Map();
-    private decisions: Map<string, GovernanceDecision> = new Map();
-    private impacts: Map<string, ImpactAnalysis> = new Map();
-    private compliance: Map<string, ComplianceReport> = new Map();
+  private activeBundle?: PolicyBundle;
+  private bundleHistory = new Map<string, PolicyBundle>();
 
-    public registerSession(session: GovernanceSession): void {
-        this.sessions.set(session.sessionId, session);
+  public registerBundle(bundle: PolicyBundle): void {
+    const computedChecksum = this.calculateChecksum(bundle.policies);
+    if (bundle.checksum !== computedChecksum) {
+      throw new Error(`GovernanceRegistry Checksum mismatch: Expected ${bundle.checksum}, computed ${computedChecksum}`);
     }
+    this.bundleHistory.set(bundle.version, bundle);
+  }
 
-    public getSession(sessionId: string): GovernanceSession | undefined {
-        return this.sessions.get(sessionId);
+  public activateBundle(version: string): void {
+    const bundle = this.bundleHistory.get(version);
+    if (!bundle) {
+      throw new Error(`GovernanceRegistry: Policy bundle version ${version} not registered`);
     }
+    this.activeBundle = bundle;
+  }
 
-    public registerDecision(decision: GovernanceDecision): void {
-        this.decisions.set(decision.requestId, decision);
-    }
+  public getActiveBundle(): PolicyBundle | undefined {
+    return this.activeBundle;
+  }
 
-    public registerImpact(impact: ImpactAnalysis): void {
-        this.impacts.set(impact.requestId, impact);
-    }
+  public getHistory(): PolicyBundle[] {
+    return Array.from(this.bundleHistory.values());
+  }
 
-    public registerCompliance(report: ComplianceReport): void {
-        this.compliance.set(report.requestId, report);
+  public rollbackTo(version: string): void {
+    this.activateBundle(version);
+  }
+
+  public calculateChecksum(policies: PolicyDefinition[]): string {
+    let data = '';
+    // Sort policies by priority and ID to ensure deterministic checksum
+    const sorted = [...policies].sort((a, b) => a.priority - b.priority || a.policyId.localeCompare(b.policyId));
+    sorted.forEach(p => {
+      data += `${p.policyId}:${p.version}:${p.state}`;
+    });
+    
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      hash = (hash << 5) - hash + data.charCodeAt(i);
+      hash |= 0;
     }
+    return `CS-${Math.abs(hash)}`;
+  }
 }

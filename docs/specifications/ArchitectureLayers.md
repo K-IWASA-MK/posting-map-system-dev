@@ -52,6 +52,10 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
       ↓
   Runtime Service
       ↓
+  Governance Runtime (ポリシー管理)
+          ↓
+  Compliance Engine (適合性評価)
+      ↓
   Observability Runtime (観測基盤)
       ↓
   Quality Runtime (品質判定)

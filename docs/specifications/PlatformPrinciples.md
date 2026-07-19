@@ -30,4 +30,7 @@
 10. **持続可能な拡張性**: 将来の機能拡張を見越し、結合箇所は必ずインターフェース契約（Interface Contract）を介して行います。
 11. **ランタイム間結合の排除 (Runtime Decoupling)**: 各実行環境（Runtime）同士の直接依存は禁止されます。実行環境の登録、解決、および連携は必ず Runtime Service を仲介し、イベント駆動（Event Driven）の非同期通信によって行わなければなりません。
 12. **自己規制閉ループ (Self-Regulation Loop)**: 観測されたテレメトリを Quality ➔ Automation ➔ Execution ➔ Event Ledger の順に巡回させ、再度 Observability に戻す自己規制閉ループを一方向データフローとして構築し、自律修復・自律運用の安全な基盤とします。
+13. **ポリシー駆動設計 (Policy Driven)**: 各種実行環境や境界検証のルールはハードコードせず、不変のポリシーバンドル（Versioned Policy）として定義・管理し、ガバナンス主導で評価されなければなりません。
+14. **適合性監査 (Compliance by Evaluation)**: プラットフォームは各 Runtime の適合性評価結果（Compliance Result）を Quality Runtime のスコア（compliance 項目）へ動的にマッピングさせ、自己規制キューの判断基準とします。
+
 

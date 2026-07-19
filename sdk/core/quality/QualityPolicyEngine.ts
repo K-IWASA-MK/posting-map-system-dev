@@ -3,13 +3,14 @@ import { QualityEvaluation, QualityScore, Recommendation } from './QualityEvalua
 export class QualityPolicyEngine {
   public evaluate(
     projection: any,
-    config: { minPassingOverallScore: number; minPassingHealthScore: number; minPassingStabilityScore: number }
+    config: { minPassingOverallScore: number; minPassingHealthScore: number; minPassingStabilityScore: number },
+    complianceScore = 100
   ): QualityEvaluation {
     const evalId = `EVAL-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     const timestamp = new Date().toISOString();
 
     // 1. Calculate Scores based on projection
-    const scores = this.calculateScores(projection);
+    const scores = this.calculateScores(projection, complianceScore);
 
     // 2. Policy Evaluation
     const policyPassed = 
@@ -29,9 +30,9 @@ export class QualityPolicyEngine {
     };
   }
 
-  private calculateScores(projection: any): QualityScore {
+  private calculateScores(projection: any, complianceScore = 100): QualityScore {
     if (!projection || !projection.platformHealth) {
-      return { overall: 50, health: 50, stability: 50, performance: 100, security: 100, compliance: 100 };
+      return { overall: Math.round((50 + 50 + 50 + complianceScore) / 4), health: 50, stability: 50, performance: 100, security: 100, compliance: complianceScore };
     }
 
     // Health Score calculation
@@ -59,7 +60,7 @@ export class QualityPolicyEngine {
     performance = Math.max(0, Math.min(100, performance));
 
     // Mapped Overall score
-    const overall = Math.round((health + stability + performance) / 3);
+    const overall = Math.round((health + stability + performance + complianceScore) / 4);
 
     return {
       overall,
@@ -67,7 +68,7 @@ export class QualityPolicyEngine {
       stability,
       performance,
       security: 100, // Placeholder for Phase 7
-      compliance: 100 // Placeholder for Phase 7
+      compliance: complianceScore // Placeholder for Phase 7
     };
   }
 
