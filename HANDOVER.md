@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Posting Map Sales Preview Application Foundation`
-- **Milestone**: `Posting Map Sales Preview Application Completed`
-- **Tag**: `v5.0.9-sales-preview-app`
-- **Current Commit**: `8526f52cc7087612f0df7bc805a5a1fec463692c`
-- **Third-Party Audit**: `Approved (A+ / Approve Posting Map Sales Preview Application)`
+- **Completed**: `District Master Foundation (National District Registry Edition)`
+- **Milestone**: `District Master Foundation Completed`
+- **Tag**: `v5.1.0-district-master`
+- **Current Commit**: `c75bc84fbfcf65463f847596ff58c1c4e70e94bb`
+- **Third-Party Audit**: `Approved (A+ / Approve District Master Foundation)`
 - **Current Phase**: `Release Ready`
 - **Next Action**: `Posting Assignment Foundation`
 - **Branch**: `main`
@@ -937,6 +937,17 @@ POSTING MAP の根幹となる「今日、誰が、どこを配ったか」を�
 - **SalesPreviewValidator**: 営業画面からのデータ書込み行為を完全ブロックするための Read-Only スキーマ検証、および `dashboard.json` データの改ざん検出 (ContentHash Integrity) を実装。
 - **SalesPreviewRuntime**: 初期化ワークフロー完了後、データをアダプター/バリデータに通し、`deepFreeze` により再帰的完全不変性（Immutability）を適用したプレビューモデルを返却。
 - **Verification Tests**: `test_sales_preview.ts` (160件目のテストケース) を追加し、READY遷移、自治体表示、投票率表示、カラー preservation 結合、可視化 feature マップ、deepFreeze 変更ブロック、ファイル改ざん検知、Runtime 書込み API 非公開化の8大シナリオをパス。
+
+### District Master Foundation (National District Registry Edition)
+全国の選挙区・自治体構造データを一元管理する SSOT として、District Master（地区マスタ）基盤を構築しました。これにより、全国の各地区データから動的な地区解決ができる環境へ移行しました。
+
+- **Directory Creation**: `domains/posting-map/district/` ディレクトリを新設し、地区管理層を定義。
+- **DistrictMasterContract & Versioning**: `DistrictMasterSchema` および操作イベントを新設。地区データに時間依存する有効期間 `effectiveFrom`, `effectiveTo` および `masterVersion` を定義。
+- **Source & Content Hash separation**: 元データの自治体構成整合性を検証する `sourceHash` と、シリアライズされたファイル全体の書き込み完全性を保障する `contentHash` を完全分離。
+- **DistrictMasterRepository**: アトミック保存 (`.tmp` ➔ `fs.renameSync`) を実装。
+- **DistrictMasterResolver & Decoupling**: 静的な `StaticDistrictResolver` をプロダクトから廃止し、本番リゾルバーはすべて `DistrictMasterResolver` に接続するインターフェース設計へ統一。
+- **Verification Tests**: `test_district_master.ts` (161件目のテストケース) を追加し、マスタ登録、自治体解決、新規追加（埼玉県第8区等）、動的解決、存在しない選挙区のエラー、重複 ID ブロック、改ざん検出、および E2E（District Master ➔ District Initialization ➔ Sales Preview）統合の8大シナリオをパス。
+
 
 
 

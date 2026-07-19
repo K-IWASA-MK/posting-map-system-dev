@@ -2,7 +2,32 @@ import * as fs from "fs";
 import * as path from "path";
 import { DistrictInitializationRuntime } from "../../../domains/posting-map/initialization/runtime/DistrictInitializationRuntime";
 import { DistrictInitializationWorkflow } from "../../../domains/posting-map/initialization/models/DistrictInitializationWorkflow";
-import { StaticDistrictResolver } from "../../../domains/posting-map/initialization/contracts/DistrictResolver";
+import { DistrictResolver, DistrictInfo } from "../../../domains/posting-map/initialization/contracts/DistrictResolver";
+
+class StaticDistrictResolver implements DistrictResolver {
+  private static readonly DISTRICTS: Record<string, Omit<DistrictInfo, "districtName">> = {
+    "三重県第3区": {
+      districtId: "mie-03",
+      municipalities: [
+        { code: "24205", name: "桑名市" },
+        { code: "24214", name: "いなべ市" },
+        { code: "24202", name: "四日市市" }
+      ]
+    }
+  };
+
+  public resolve(districtName: string): DistrictInfo {
+    const info = StaticDistrictResolver.DISTRICTS[districtName];
+    if (!info) {
+      throw new Error(`Unknown or unsupported district: ${districtName}`);
+    }
+    return {
+      districtId: info.districtId,
+      districtName,
+      municipalities: info.municipalities
+    };
+  }
+}
 import { PostingAreaRuntime } from "../../../domains/posting-map/area/runtime/PostingAreaRuntime";
 import { ElectionDashboardStorageRuntime } from "../../../domains/election/storage/runtime/ElectionDashboardStorageRuntime";
 import { PostingMapVisualizationRuntime } from "../../../domains/posting-map/visualization/runtime/PostingMapVisualizationRuntime";
