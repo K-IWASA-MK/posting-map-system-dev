@@ -7,13 +7,13 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `Election Dashboard Storage & Delivery Foundation`
-- **Milestone**: `Election Dashboard Storage & Delivery Completed`
-- **Tag**: `v5.0.5-storage-delivery`
-- **Current Commit**: `c29001655b3be2cf04f2f45cc3984d436ec0591e`
-- **Third-Party Audit**: `Approved (A+ / Approve Election Dashboard Storage & Delivery)`
+- **Completed**: `Posting Map Election Visualization Projection Foundation`
+- **Milestone**: `Posting Map Election Visualization Completed`
+- **Tag**: `v5.0.6-visualization-projection`
+- **Current Commit**: `b5a4e6727ad9a508b5e28a5e01614749f7b13a77`
+- **Third-Party Audit**: `Approved (A+ / Approve Posting Map Election Visualization)`
 - **Current Phase**: `Release Ready`
-- **Next Action**: `Turnout Data Import Runtime`
+- **Next Action**: `Posting Area Data Integration Foundation`
 - **Branch**: `main`
 
 ---
@@ -888,6 +888,18 @@ POSTING MAP Dashboard が `ElectionTurnoutViewModel` を安全・追跡可能・
 - **Event-Driven Lifecycle**: 正常完了時に `ELECTION_DASHBOARD_STORAGE_UPDATED`、失敗時に `ELECTION_DASHBOARD_STORAGE_FAILED` イベントを発行する機能を追加。
 - **Delivery Adapter Connection**: 直接的な Git や外部 API 操作を完全に排除し、`ReleaseRuntime` へリリース依頼を行う `ElectionDashboardDeliveryAdapter` 境界を構築。
 - **Verification Tests**: `test_election_dashboard_storage.ts` (156件目のテストケース) を追加し、正常系保存、ハッシュ検証、破損検知、Replay Safety、デリバリー境界、イミュータビリティ、ストレージ境界侵害防止の7大シナリオを検証。
+
+### Posting Map Election Visualization Projection Foundation
+POSTING MAP において、`ElectionDashboardStorage` に保存された `ElectionTurnoutViewModel` を地図表示用の境界データへ結合・変換し、自治体単位で投票率カラー（GREEN / YELLOW / RED）を安全かつ決定論的に管理するための可視化プロジェクションレイヤーを構築しました。
+
+- **Visualization Directory Separation**: すべての可視化関連モジュールを `domains/posting-map/visualization/` 配下に新設し、UI表示形式変換境界を定義。
+- **Hash Lineage Clarification**: メタデータ名を `sourceContentHash` (ストレージ由来の contentHash) と `visualizationHash` (可視化データの SHA-256) に明確化し、系統追跡性を向上。
+- **deepFreeze Immutability**: 浅い freeze ではなく、メタデータ・市区町村リストを含む全階層オブジェクトを再帰的に `deepFreeze` し、生成後のメモリ上での改ざんを完全にブロック。
+- **Color Preservation**: 可視化レイヤーで投票率判定を再計算せず、入力された `colorStatus` から `fillColor` への単純マッピング（コピー転記）とする決定論的ロジックを採用。
+- **Geo Geometry Decoupling**: 自治体境界データ（GeoJSON などの巨大データ）を直接保持させず、`geometryId` 参照による Geo Boundary との結合キーのみを保持。
+- **Event-Driven Lifecyle**: 正常完了時に `POSTING_MAP_VISUALIZATION_UPDATED`、失敗時に `POSTING_MAP_VISUALIZATION_FAILED` イベントを発行し、Runtime からの直接的な外部配信を排除。
+- **Verification Tests**: `test_posting_map_visualization_projection.ts` (157件目のテストケース) を追加し、正常変換、カラー保存、市区町村紐付け、不正カラー・改ざんハッシュ・重複コードブロック、イミュータビリティ、および追加要求である Geo Binding Missing, Source Hash Mismatch の9大検証シナリオをパス。
+
 
 
 
