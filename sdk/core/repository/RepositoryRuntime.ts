@@ -38,7 +38,7 @@ export class RepositoryRuntime implements IRuntime<RepositoryManifest, Repositor
     private lifecycle: RepositoryLifecycleService,
     private provisioning: RepositoryProvisioningService,
     private sync: RepositorySynchronizationService,
-    private health: RepositoryHealthMonitor,
+    private healthMonitor: RepositoryHealthMonitor,
     private metrics: RepositoryMetricsService,
     private bootstrapOrchestrator: ProjectBootstrapOrchestrator,
     private eventBus?: IAIOSEventBus // Optional for backward compatibility in tests
@@ -145,7 +145,7 @@ export class RepositoryRuntime implements IRuntime<RepositoryManifest, Repositor
   public async checkHealth(id: string): Promise<void> {
     const record = this.registry.getById(id);
     if (record) {
-      record.health = await this.health.checkHealth(record);
+      record.health = await this.healthMonitor.checkHealth(record);
     }
   }
 

@@ -45,6 +45,10 @@ export class ConsoleRuntime implements IRuntime<ConsoleManifest, void> {
     this.services = new ConsoleServices(this.registry, metrics, ledger);
   }
 
+  public setObservabilityRuntime(obs: any): void {
+    this.registry.setObservabilityRuntime(obs);
+  }
+
   public async getHealth(): Promise<RuntimeHealth> {
     return this.health();
   }

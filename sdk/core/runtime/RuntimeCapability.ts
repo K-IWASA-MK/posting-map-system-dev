@@ -16,5 +16,8 @@ export enum RuntimeCapability {
   QUALITY = 'QUALITY',
   LEARNING = 'LEARNING',
   AUTOMATION = 'AUTOMATION',
-  SECURITY = 'SECURITY'
+  SECURITY = 'SECURITY',
+
+  // Phase 5 Runtime Capabilities
+  OBSERVABILITY = 'OBSERVABILITY'
 }

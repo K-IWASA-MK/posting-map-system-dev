@@ -4,6 +4,7 @@ import { AIOSEvent } from '../event/AIOSEvent';
 
 export class ConsoleRegistry {
   private readonly state: ConsoleState;
+  private observabilityRuntime?: any;
 
   constructor(private readonly policy: ConsolePolicy) {
     this.state = {
@@ -19,6 +20,10 @@ export class ConsoleRegistry {
       ledger: [],
       dependencyGraph: { nodes: [], edges: [] }
     };
+  }
+
+  public setObservabilityRuntime(obs: any): void {
+    this.observabilityRuntime = obs;
   }
 
   // Projections
@@ -73,6 +78,20 @@ export class ConsoleRegistry {
 
   // Getters for HTTP API
   public getRuntimes(): RuntimeStateProjection[] {
+    if (this.observabilityRuntime) {
+      const proj = this.observabilityRuntime.getProjection();
+      if (proj && proj.metrics) {
+        return Object.keys(proj.metrics.runtimeStates).map(runtimeId => ({
+          runtimeId,
+          runtimeName: runtimeId.split('.').pop() || 'Unknown',
+          version: '1.0.0',
+          status: proj.metrics.runtimeStates[runtimeId],
+          health: proj.metrics.runtimeHealths[runtimeId] || 'UNKNOWN',
+          uptimeMs: 0,
+          lastUpdatedAt: new Date().toISOString()
+        }));
+      }
+    }
     return Array.from(this.state.runtimes.values()).map(r => Object.freeze({ ...r }));
   }
 
@@ -81,6 +100,24 @@ export class ConsoleRegistry {
   }
 
   public getEvents(): AIOSEvent[] {
+    if (this.observabilityRuntime) {
+      const proj = this.observabilityRuntime.getProjection();
+      if (proj && proj.activeAlerts) {
+        return proj.activeAlerts.map((a: any) => ({
+          eventId: a.alertId,
+          eventType: 'ConsoleAlertTriggered',
+          eventVersion: '1.0',
+          occurredAt: a.timestamp,
+          producerRuntimeId: a.runtimeId,
+          correlationId: a.sessionId || 'N/A',
+          causationId: 'N/A',
+          payload: { message: a.message },
+          runtimeId: a.runtimeId,
+          timestamp: a.timestamp,
+          state: a.severity
+        }));
+      }
+    }
     return this.state.events.map(e => Object.freeze({ ...e }));
   }
 
@@ -89,6 +126,23 @@ export class ConsoleRegistry {
   }
 
   public getMetrics(): any {
+    if (this.observabilityRuntime) {
+      const proj = this.observabilityRuntime.getProjection();
+      if (proj && proj.metrics) {
+        return Object.freeze({
+          runtimeMetrics: {
+            runtimeCount: proj.metrics.runtimeCount,
+            validationCount: proj.metrics.validationCount,
+            pluginCount: proj.metrics.pluginCount,
+            errorCount: proj.metrics.errorCount,
+            warningCount: proj.metrics.warningCount
+          },
+          workflowMetrics: {},
+          doraMetrics: {},
+          queueMetrics: {}
+        });
+      }
+    }
     return Object.freeze({ ...this.state.metrics });
   }
 

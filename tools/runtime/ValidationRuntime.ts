@@ -7,6 +7,7 @@ import { RuntimeDescriptor } from '../../sdk/core/runtime/RuntimeDescriptor';
 import { RuntimeCapability } from '../../sdk/core/runtime/RuntimeCapability';
 import { RuntimeHealth, RuntimeHealthStatus } from '../../sdk/core/runtime/RuntimeHealth';
 import { RuntimeContext } from '../../sdk/core/runtime/RuntimeContext';
+import { RuntimeState } from '../../sdk/core/runtime/RuntimeState';
 
 export class ValidationRuntime implements IRuntime<void, ValidationReport> {
   public readonly id = 'aios.validation';
