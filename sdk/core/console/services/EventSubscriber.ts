@@ -1,15 +1,15 @@
 import { AIOSEventBus, EventHandler } from '../../event/AIOSEventBus';
 import { AIOSEvent } from '../../event/AIOSEvent';
-import { DashboardRegistry } from '../DashboardRegistry';
-import { DashboardMetricsCollector } from '../metrics/DashboardMetricsCollector';
+import { ConsoleRegistry } from '../ConsoleRegistry';
+import { ConsoleMetricsCollector } from '../metrics/ConsoleMetricsCollector';
 
 export class EventSubscriber {
   private handler: EventHandler;
 
   constructor(
     private readonly eventBus: AIOSEventBus,
-    private readonly registry: DashboardRegistry,
-    private readonly metrics: DashboardMetricsCollector
+    private readonly registry: ConsoleRegistry,
+    private readonly metrics: ConsoleMetricsCollector
   ) {
     this.handler = async (event: AIOSEvent<any>) => {
       const startTime = Date.now();

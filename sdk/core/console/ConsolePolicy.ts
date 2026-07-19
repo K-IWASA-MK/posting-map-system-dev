@@ -1,21 +1,21 @@
-export enum DashboardFailurePolicy {
+export enum ConsoleFailurePolicy {
   FAIL_FAST = 'FAIL_FAST',
   RETRY = 'RETRY',
   IGNORE = 'IGNORE'
 }
 
-export interface DashboardPolicy {
+export interface ConsolePolicy {
   maxRetries: number;
   backoffMs: number;
-  failurePolicy: DashboardFailurePolicy;
+  failurePolicy: ConsoleFailurePolicy;
   eventRetentionCount: number;
   projectionUpdateIntervalMs: number;
 }
 
-export const DefaultDashboardPolicy: DashboardPolicy = {
+export const DefaultConsolePolicy: ConsolePolicy = {
   maxRetries: 3,
   backoffMs: 1000,
-  failurePolicy: DashboardFailurePolicy.RETRY,
+  failurePolicy: ConsoleFailurePolicy.RETRY,
   eventRetentionCount: 1000, // keep last 1000 events
   projectionUpdateIntervalMs: 100 // debounce updates
 };

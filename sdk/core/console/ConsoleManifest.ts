@@ -2,7 +2,7 @@ import { RuntimeManifest } from '../runtime/RuntimeManifest';
 import { RuntimeConfiguration } from '../runtime/RuntimeConfiguration';
 import { RuntimePolicy } from '../runtime/RuntimePolicy';
 
-export interface DashboardConfiguration extends RuntimeConfiguration {
+export interface ConsoleConfiguration extends RuntimeConfiguration {
   port: number;
   apiPrefix: string;
   enableCors: boolean;
@@ -10,8 +10,8 @@ export interface DashboardConfiguration extends RuntimeConfiguration {
   maxEventsRetention: number;
 }
 
-export interface DashboardManifest extends RuntimeManifest {
-  dashboardId: string;
-  configuration: DashboardConfiguration;
+export interface ConsoleManifest extends RuntimeManifest {
+  consoleId: string;
+  configuration: ConsoleConfiguration;
   lifecyclePolicy: RuntimePolicy;
 }

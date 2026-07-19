@@ -1,11 +1,11 @@
-import { DashboardState, RuntimeStateProjection, WorkflowStateProjection } from './DashboardState';
-import { DashboardPolicy } from './DashboardPolicy';
+import { ConsoleState, RuntimeStateProjection, WorkflowStateProjection } from './ConsoleState';
+import { ConsolePolicy } from './ConsolePolicy';
 import { AIOSEvent } from '../event/AIOSEvent';
 
-export class DashboardRegistry {
-  private readonly state: DashboardState;
+export class ConsoleRegistry {
+  private readonly state: ConsoleState;
 
-  constructor(private readonly policy: DashboardPolicy) {
+  constructor(private readonly policy: ConsolePolicy) {
     this.state = {
       runtimes: new Map(),
       workflows: new Map(),
@@ -73,26 +73,26 @@ export class DashboardRegistry {
 
   // Getters for HTTP API
   public getRuntimes(): RuntimeStateProjection[] {
-    return Array.from(this.state.runtimes.values());
+    return Array.from(this.state.runtimes.values()).map(r => Object.freeze({ ...r }));
   }
 
   public getWorkflows(): WorkflowStateProjection[] {
-    return Array.from(this.state.workflows.values());
+    return Array.from(this.state.workflows.values()).map(w => Object.freeze({ ...w }));
   }
 
   public getEvents(): AIOSEvent[] {
-    return this.state.events;
+    return this.state.events.map(e => Object.freeze({ ...e }));
   }
 
   public getLedger(): any[] {
-    return this.state.ledger;
+    return this.state.ledger.map(l => Object.freeze({ ...l }));
   }
 
   public getMetrics(): any {
-    return this.state.metrics;
+    return Object.freeze({ ...this.state.metrics });
   }
 
   public getDependencyGraph(): any {
-    return this.state.dependencyGraph;
+    return Object.freeze({ ...this.state.dependencyGraph });
   }
 }

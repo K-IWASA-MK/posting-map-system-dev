@@ -7,13 +7,13 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `AIOS Platform Separation Phase 2 (Platform Boundary Enforcement)`
-- **Milestone**: `Phase 2 Boundary Validator Implementation Completed`
-- **Tag**: `v6.0.0-alpha.2`
-- **Current Commit**: `2f9c437b5e182d7676eb293520ea10ba3b8f6c9e`
-- **Third-Party Audit**: `Approved (A+ / Approve AIOS v6.0 Phase 2 Validators)`
+- **Completed**: `AIOS Platform Separation Phase 3 (Console Runtime Foundation)`
+- **Milestone**: `Phase 3 Console Runtime Foundation Completed`
+- **Tag**: `v6.0.0-alpha.3`
+- **Current Commit**: `217f2aa0724835824c30c3332ebbcfa6b4458ef8`
+- **Third-Party Audit**: `Approved (A+ / Approve AIOS v6.0 Phase 3 Console Runtime)`
 - **Current Phase**: `Release Ready`
-- **Next Action**: `Phase 3 Monitor/Console Refactoring & Cleanup`
+- **Next Action**: `Phase 4 Observability/Monitoring Runtime Integration & Automation`
 - **Branch**: `main`
 
 ---
@@ -1007,4 +1007,24 @@ AIOS の境界ルールおよびドメイン非依存ルールを自動で検証
   - `NamingValidator`: フォルダ、ファイル、クラス、インターフェース、イベント名の命名規則（PascalCase, camelCase, UPPER_SNAKE_CASE）をコメント等を除外した上で厳格検査。
 - **Git Commit Gate Integration**: `hook_runner.js` に `ValidationPipeline` の自動実行を統合。コミット前にビルド・テスト・バリデータが全件通過することを強制し、違反時はコミットをブロック。
 - **`npm run quality:check` Integration**: テストスイートの実行後に `ValidationRuntime` を自動実行し、Build、Tests、および6つの Validator の結果を集約した表形式の品質レポートを出力。
+
+### AIOS v6.0 Platform Separation (Phase 3: Console Runtime Foundation)
+AIOS Core からアプリケーション寄りの「Dashboard」概念を完全に排除し、プラットフォーム監視・可視化を担う「Console Runtime」として昇格・再設計しました。
+
+- **Complete Elimination of Dashboard in Core**:
+  - `sdk/core/dashboard` ディレクトリを削除し、`sdk/core/console` ディレクトリへ移行。すべての関連クラス・ファイルを `Console*` へ置換・リネーム。
+  - `LearningSource` enum 内の `DASHBOARD_RUNTIME` を `CONSOLE_RUNTIME` に変更。
+  - `DomainIsolationValidator` において `Dashboard` を FAIL 対象の `forbiddenWords` へ移行し、コアコード内の Dashboard 出現件数を **0件** に抑え、ドメイン隔離を完全達成。
+- **Console Architecture & Read-Only Specification**:
+  - Console の責務を「システム状態・メトリクス・イベント・プロジェクション・ヘルス・監査情報」の可視化および監視に限定し、状態変更（State Mutation）やビジネスロジック、制御APIを完全に排除（Read-Only Model）。
+  - `Execution Ledger ➔ Projection ➔ Console` のみの参照フロー（Projection Principle）を仕様化。
+- **Comprehensive Console Specifications**:
+  - `ConsoleRuntime.md`, `ConsoleArchitecture.md`, `ConsoleEventModel.md`, `ConsoleAPI.md` を作成し、Console の公開 API コントラクトおよび内部ライフサイクルイベントモデルを策定。
+- **Event-Driven Integration**:
+  - `ValidationRuntime` 完了時に `ConsoleValidationCompleted` イベントを発行するように統合し、将来の Monitoring/Quality Runtime による自動監視統合用の拡張パスを配備。
+- **Verification Report Row Integration**:
+  - Git フック (`hook_runner.js`) および `ValidationRuntime` のレポートレイアウトを更新し、`Validation` と `Console Runtime` (PASS) を個別のチェック項目として表示するように統合。
+- **Architecture Sub-layers definition**:
+  - `ArchitectureLayers.md` にて `Platform Runtime` の実行レイヤー構造を `Kernel ➔ Capability ➔ Runtime ➔ Validation Runtime ➔ Console Runtime ➔ Plugin Runtime` と再定義し、プラグインは `Plugin Runtime` 上で動作することを明確化。
+
 

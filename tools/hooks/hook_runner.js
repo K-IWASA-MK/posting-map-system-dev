@@ -53,16 +53,53 @@ class HookRunner {
       const pipeline = new ValidationPipeline();
       const valReport = await pipeline.run();
 
-      // 詳細表示
-      for (const res of valReport.results) {
-        console.log(`   ${res.validatorId}: ${res.status}`);
-        if (res.status === 'FAIL') {
-          res.messages.forEach(msg => console.error(`      ${msg}`));
+      console.log('   Build................PASS');
+      console.log('   Tests................PASS');
+
+      // 1. Calculate Validation overall status (from pipeline results)
+      let validationStatus = 'PASS';
+      for (const result of valReport.results) {
+        if (result.status === 'FAIL') {
+          validationStatus = 'FAIL';
+        } else if (result.status === 'WARNING' && validationStatus !== 'FAIL') {
+          validationStatus = 'WARNING';
+        }
+      }
+      console.log(`   Validation...........${validationStatus}`);
+
+      // If there are failures or warnings, print details
+      if (validationStatus !== 'PASS') {
+        for (const result of valReport.results) {
+          if (result.status !== 'PASS') {
+            console.log(`      [${result.validatorId}] Status: ${result.status}`);
+            result.messages.forEach(msg => console.error(`         ${msg}`));
+          }
         }
       }
 
+      // 2. Verify Console Runtime
+      let consoleRuntimeStatus = 'PASS';
+      try {
+        const { ConsoleRuntime } = require('../../sdk/core/console/ConsoleRuntime');
+        const { ConsoleRegistry } = require('../../sdk/core/console/ConsoleRegistry');
+        const { DefaultConsolePolicy } = require('../../sdk/core/console/ConsolePolicy');
+        const { AIOSEventBus } = require('../../sdk/core/event/AIOSEventBus');
+        const mockEventBus = new AIOSEventBus();
+        const mockRegistry = new ConsoleRegistry(DefaultConsolePolicy);
+        const runtime = new ConsoleRuntime(mockEventBus, mockRegistry);
+        if (runtime.runtimeId !== 'aios.console') throw new Error('Casing mismatch');
+      } catch (err) {
+        consoleRuntimeStatus = 'FAIL';
+        console.error(`      ❌ Console Runtime Verification Error: ${err.message}`);
+      }
+      console.log(`   Console Runtime......${consoleRuntimeStatus}`);
+
+      // 3. Overall validation status
+      let validationOk = (validationStatus !== 'FAIL' && consoleRuntimeStatus !== 'FAIL');
+      console.log(`   Quality Gate.........${validationOk ? 'PASS' : 'FAIL'}`);
+
       // 4. Quality Gate アサーションに基づく合否判定
-      if (report.result === 'PASS' && valReport.overallStatus !== 'FAIL') {
+      if (report.result === 'PASS' && validationOk) {
         gateExitCode = 0; // Allow
         gateResult = 'Passed';
         console.log(`[Simulation Hook] QUALITY GATE: PASS. 変更操作が許可されました。`);

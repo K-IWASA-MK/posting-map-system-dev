@@ -1,3 +1,17 @@
+# Release Notes - v6.0.0-alpha.3
+
+## 🚀 New Features & Enhancements
+
+### 1. AIOS v6.0 Console Runtime Foundation (Phase 3)
+- **Purged Dashboard in Core**: Completely renamed all files and internal classes from `Dashboard` to `Console` in `sdk/core/console/` (moved from `sdk/core/dashboard/`). Promoted `Dashboard` to forbidden word (`FAIL` status) under `DomainIsolationValidator.ts`, maintaining strict domain-isolation for core modules.
+- **Console Runtime Specification**: Documented Console architecture and lifecycle requirements via `ConsoleRuntime.md`, `ConsoleArchitecture.md`, `ConsoleEventModel.md`, and `ConsoleAPI.md`. Established that Console is a read-only (Read Model) system observation layer that adheres to the Projection Principle.
+- **Architecture Layers Updated**: Redefined the Platform Runtime execution stack to: `Kernel ➔ Capability ➔ Runtime ➔ Validation Runtime ➔ Console Runtime ➔ Plugin Runtime`.
+- **Event-Driven and Hook Integrations**:
+  - Automatically publishes a `ConsoleValidationCompleted` event upon Validation completion.
+  - Formatted the pre-commit report rows to verify `Validation` and `Console Runtime` (PASS) separately inside `hook_runner.js` and `ValidationRuntime.ts`.
+
+---
+
 # Release Notes - v6.0.0-alpha.2
 
 ## 🚀 New Features & Enhancements

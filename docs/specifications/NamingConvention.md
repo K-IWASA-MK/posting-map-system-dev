@@ -29,14 +29,14 @@ AIOS Core（`core/`, `runtime/`, `kernel/`, `sdk/` などのプラットフォ�
 2. **Posting** (ポスティング・配布)
 3. **Flyer** (チラシ)
 4. **District** (地区・選挙区)
-5. **Dashboard** (管理画面・ダッシュボード)
+5. **AppPortal** (アプリケーション管理画面)
 6. **Spreadsheet** (スプレッドシート - アプリケーションデータとしての操作名)
 7. **顧客固有の名称**
 
-### 代替推奨ワード (汎用表現)
+###  代替推奨ワード (汎用表現)
 ドメイン固有の概念をプラットフォーム側で表現する必要がある場合は、以下のようなドメイン非依存の抽象的表現に置き換えて設計します。
 - `Election` / `Posting` -> `Task`, `Job`, `Operation`, `Execution`
 - `District` -> `Area`, `Scope`, `Boundary`, `Workspace`
 - `Flyer` -> `Asset`, `Payload`, `Content`
 - `Spreadsheet` -> `DataStore`, `Storage`, `Ledger`, `Repository`
-- `Dashboard` -> `Console`, `Portal`, `Monitor`
+- アプリケーション管理画面 -> `Portal`, `Monitor`

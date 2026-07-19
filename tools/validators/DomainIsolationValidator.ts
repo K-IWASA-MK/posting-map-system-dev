@@ -12,8 +12,8 @@ export class DomainIsolationValidator implements IValidator {
   private readonly scanDirs = ['kernel', 'runtime', 'core', 'sdk'];
 
   // Prohibited words in AIOS Core
-  private readonly forbiddenWords = ['election', 'posting', 'flyer', 'district', 'spreadsheet'];
-  private readonly warningWords = ['dashboard'];
+  private readonly forbiddenWords = ['election', 'posting', 'flyer', 'district', 'spreadsheet', 'dashboard'];
+  private readonly warningWords: string[] = [];
 
   public async validate(): Promise<ValidationResult> {
     const startTime = Date.now();

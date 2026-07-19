@@ -1,15 +1,15 @@
 import * as http from 'http';
-import { DashboardRegistry } from '../DashboardRegistry';
-import { DashboardMetricsCollector } from '../metrics/DashboardMetricsCollector';
-import { DashboardLedger } from '../ledger/DashboardLedger';
+import { ConsoleRegistry } from '../ConsoleRegistry';
+import { ConsoleMetricsCollector } from '../metrics/ConsoleMetricsCollector';
+import { ConsoleLedger } from '../ledger/ConsoleLedger';
 
-export class DashboardServices {
+export class ConsoleServices {
   private server?: http.Server;
 
   constructor(
-    private readonly registry: DashboardRegistry,
-    private readonly metrics: DashboardMetricsCollector,
-    private readonly ledger: DashboardLedger
+    private readonly registry: ConsoleRegistry,
+    private readonly metrics: ConsoleMetricsCollector,
+    private readonly ledger: ConsoleLedger
   ) {}
 
   public async startServer(port: number, apiPrefix: string = '/api'): Promise<void> {
@@ -51,8 +51,8 @@ export class DashboardServices {
             case `${apiPrefix}/metrics`:
               res.writeHead(200);
               const sysMetrics = this.registry.getMetrics();
-              const dashMetrics = this.metrics.getMetrics();
-              res.end(JSON.stringify({ ...sysMetrics, dashboardMetrics: dashMetrics }));
+              const consoleMetrics = this.metrics.getMetrics();
+              res.end(JSON.stringify({ ...sysMetrics, consoleMetrics: consoleMetrics }));
               break;
             case `${apiPrefix}/ledger`:
               res.writeHead(200);
@@ -78,7 +78,7 @@ export class DashboardServices {
 
     return new Promise((resolve) => {
       this.server!.listen(port, () => {
-        console.log(`[Dashboard] HTTP API Server listening on port ${port}`);
+        console.log(`[Console] HTTP API Server listening on port ${port}`);
         resolve();
       });
     });

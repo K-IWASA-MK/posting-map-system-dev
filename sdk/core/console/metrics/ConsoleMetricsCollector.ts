@@ -1,4 +1,4 @@
-export class DashboardMetricsCollector {
+export class ConsoleMetricsCollector {
   private apiRequests: number = 0;
   private eventProcessTime: number[] = [];
 

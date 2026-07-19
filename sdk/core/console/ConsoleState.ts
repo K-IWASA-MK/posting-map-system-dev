@@ -27,7 +27,7 @@ export interface MetricsProjection {
   queueMetrics: Record<string, any>;
 }
 
-export interface DashboardState {
+export interface ConsoleState {
   runtimes: Map<string, RuntimeStateProjection>;
   workflows: Map<string, WorkflowStateProjection>;
   events: any[]; // Stream of AIOSEvents

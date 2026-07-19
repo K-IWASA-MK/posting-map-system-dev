@@ -5,60 +5,60 @@ import { RuntimeHealth, RuntimeHealthStatus } from '../runtime/RuntimeHealth';
 import { RuntimeContext } from '../runtime/RuntimeContext';
 import { AIOSEventBus } from '../event/AIOSEventBus';
 
-import { DashboardManifest } from './DashboardManifest';
-import { DashboardRegistry } from './DashboardRegistry';
-import { DashboardServices } from './services/DashboardServices';
+import { ConsoleManifest } from './ConsoleManifest';
+import { ConsoleRegistry } from './ConsoleRegistry';
+import { ConsoleServices } from './services/ConsoleServices';
 import { EventSubscriber } from './services/EventSubscriber';
-import { DashboardLedger } from './ledger/DashboardLedger';
-import { DashboardMetricsCollector } from './metrics/DashboardMetricsCollector';
-import { DefaultDashboardPolicy, DashboardPolicy } from './DashboardPolicy';
+import { ConsoleLedger } from './ledger/ConsoleLedger';
+import { ConsoleMetricsCollector } from './metrics/ConsoleMetricsCollector';
+import { DefaultConsolePolicy, ConsolePolicy } from './ConsolePolicy';
 
-export class DashboardRuntime implements IRuntime<DashboardManifest, void> {
-  public readonly runtimeId = 'aios.dashboard';
+export class ConsoleRuntime implements IRuntime<ConsoleManifest, void> {
+  public readonly runtimeId = 'aios.console';
 
   public readonly descriptor: RuntimeDescriptor = {
     runtimeId: this.runtimeId,
     runtimeName: 'System Console',
     version: '1.0.0',
     contractVersion: '1.0',
-    capabilities: [RuntimeCapability.CAN_DISCOVER], // Dashboard discovers & reads
+    capabilities: [RuntimeCapability.CAN_DISCOVER], // Console discovers & reads
     dependencies: []
   };
 
   private subscriber: EventSubscriber;
-  private services: DashboardServices;
+  private services: ConsoleServices;
 
   constructor(
     private readonly eventBus: AIOSEventBus,
-    private readonly registry: DashboardRegistry,
-    private readonly policy: DashboardPolicy = DefaultDashboardPolicy,
-    ledger: DashboardLedger = new DashboardLedger(),
-    metrics: DashboardMetricsCollector = new DashboardMetricsCollector()
+    private readonly registry: ConsoleRegistry,
+    private readonly policy: ConsolePolicy = DefaultConsolePolicy,
+    ledger: ConsoleLedger = new ConsoleLedger(),
+    metrics: ConsoleMetricsCollector = new ConsoleMetricsCollector()
   ) {
     this.subscriber = new EventSubscriber(this.eventBus, this.registry, metrics);
-    this.services = new DashboardServices(this.registry, metrics, ledger);
+    this.services = new ConsoleServices(this.registry, metrics, ledger);
   }
 
   public async getHealth(): Promise<RuntimeHealth> {
     return {
       status: RuntimeHealthStatus.HEALTHY,
-      reason: 'Dashboard Runtime is active and listening to events',
+      reason: 'Console Runtime is active and listening to events',
       lastCheckedAt: new Date().toISOString()
     };
   }
 
   public async initialize(context: RuntimeContext): Promise<void> {
-    console.log(`Dashboard Runtime initializing...`);
+    console.log(`Console Runtime initializing...`);
     this.subscriber.subscribe();
   }
 
-  public async validate(manifest: DashboardManifest): Promise<void> {
-    if (!manifest.dashboardId || !manifest.configuration.port) {
-      throw new Error('Invalid DashboardManifest: Missing configuration');
+  public async validate(manifest: ConsoleManifest): Promise<void> {
+    if (!manifest.consoleId || !manifest.configuration.port) {
+      throw new Error('Invalid ConsoleManifest: Missing configuration');
     }
   }
 
-  public async execute(manifest: DashboardManifest): Promise<void> {
+  public async execute(manifest: ConsoleManifest): Promise<void> {
     await this.services.startServer(
       manifest.configuration.port,
       manifest.configuration.apiPrefix
