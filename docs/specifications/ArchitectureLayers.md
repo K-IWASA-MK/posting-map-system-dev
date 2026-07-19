@@ -56,6 +56,12 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
           ↓
   Compliance Engine (適合性評価)
       ↓
+  Security Runtime (セキュリティ判断)
+          ↓
+  Secret Broker (機密仲介)
+          ↓
+  Sandbox Manager (実行空間隔離)
+      ↓
   Observability Runtime (観測基盤)
       ↓
   Quality Runtime (品質判定)
@@ -70,7 +76,7 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
       ↓
   Console Runtime (システム状態可視化)
       ↓
-  Plugin Runtime (プラグイン実行コンテナ)
+  Plugin Runtime (Sandboxed)
   ```
   *注意*: 各 Runtime 間の直接的な結合・依存は完全に禁止されます。すべての Runtime は `Runtime Service` を仲介して登録、解決、およびライフサイクル管理が行われます。プラグイン自身は Runtime の一部ではなく、プラットフォームのガバナンスとセキュリティが適用された **Plugin Runtime** 上で実行されます。
   アクションの実行結果は Event Ledger に不変記録され、その結果を Projection 経由で Console Runtime が表示する流れが正式なデータ伝播アーキテクチャとなります。

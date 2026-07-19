@@ -56,4 +56,8 @@ SDKの公開APIは、原則として後方互換性を維持します。破壊�
 ### 17. ガバナンス主導 (Governance First)
 プラットフォームのすべての動作環境およびプラグインは、Governance Runtime が定義・配信する統一ポリシーバンドルに従わなければならず、Compliance Engine による適合評価に服さなければなりません。
 
+### 18. ゼロトラスト実行 (Zero Trust Runtime)
+すべてのプラグインおよびサードパーティコードは、Security Runtime による認証・認可を経なければリソースやシークレットへのアクセスが許可されず、常に Sandbox Manager の隔離コンテナ（Sandboxed Environment）内でのみ実行されなければなりません。
+
+
 

@@ -32,5 +32,8 @@
 12. **自己規制閉ループ (Self-Regulation Loop)**: 観測されたテレメトリを Quality ➔ Automation ➔ Execution ➔ Event Ledger の順に巡回させ、再度 Observability に戻す自己規制閉ループを一方向データフローとして構築し、自律修復・自律運用の安全な基盤とします。
 13. **ポリシー駆動設計 (Policy Driven)**: 各種実行環境や境界検証のルールはハードコードせず、不変のポリシーバンドル（Versioned Policy）として定義・管理し、ガバナンス主導で評価されなければなりません。
 14. **適合性監査 (Compliance by Evaluation)**: プラットフォームは各 Runtime の適合性評価結果（Compliance Result）を Quality Runtime のスコア（compliance 項目）へ動的にマッピングさせ、自己規制キューの判断基準とします。
+15. **サンドボックス隔離 (Sandbox Isolation)**: 外部プラグインや非特権コードは、セキュリティプロファイル（Sandbox Profile）で定義された制限のもと、Sandbox Manager 内で隔離実行されなければならず、共有メモリやファイルシステムへの無制限なアクセスを禁止します。
+16. **最小特権原則 (Least Privilege)**: すべてのセキュリティ認可判定は、要求主体が必要最小限の権限のみを持つ Capability Token または対応するコンテキストにのみアクセスを限定する Zero Trust 方式を徹底します。
+
 
 
