@@ -7,11 +7,11 @@
 ## 📍 1. Current Location (現在地)
 
 - **Platform**: `POSTING MAP System`
-- **Completed**: `District Initialization Foundation`
-- **Milestone**: `District Initialization Completed`
-- **Tag**: `v5.0.8-district-initialization`
-- **Current Commit**: `f444a3f5a5e396825c04b86e088a803923ccbaae`
-- **Third-Party Audit**: `Approved (A+ / Approve District Initialization Foundation)`
+- **Completed**: `Posting Map Sales Preview Application Foundation`
+- **Milestone**: `Posting Map Sales Preview Application Completed`
+- **Tag**: `v5.0.9-sales-preview-app`
+- **Current Commit**: `8526f52cc7087612f0df7bc805a5a1fec463692c`
+- **Third-Party Audit**: `Approved (A+ / Approve Posting Map Sales Preview Application)`
 - **Current Phase**: `Release Ready`
 - **Next Action**: `Posting Assignment Foundation`
 - **Branch**: `main`
@@ -927,6 +927,17 @@ POSTING MAP の根幹となる「今日、誰が、どこを配ったか」を�
 - **Event-Driven Progress Lifecycle**: 段階的進捗に連動して `STARTED` ➔ `RESOLVED` ➔ `AREA_READY` ➔ `DASHBOARD_READY` ➔ `VISUALIZATION_READY` ➔ `COMPLETED/FAILED` の細粒度イベントを RuntimeEventBus へ通知。
 - **Replay Protection**: 重複する初期化IDからの実行要求を遮断する `processedIds` メモリレジストリ（将来永続化可能）を実装。
 - **Verification Tests**: `test_district_initialization.ts` (159件目のテストケース) を追加し、正常系READY遷移、あいうえお順自治体解決、エリア・ダッシュボード・可視化連携、デモ用プレビューAPI、Replayブロック、存在しない選挙区エラーハンドリングの7大検証シナリオをパス。
+
+### Posting Map Sales Preview Application Foundation
+営業担当がデモ環境を即座に立ち上げ、購入検討者へ Read-Only で安全に確認・提案できる、本番アプリから分離された営業デモ用Previewアプリケーション基盤を構築しました。
+
+- **Directory Creation**: `apps/posting-map-sales-preview/` ディレクトリを新設し、プロダクト・アプリケーション層を定義。
+- **SalesPreviewModel & Context**: 営業追跡ID `previewId`, 系統 `traceId`, `generatedAt` を含めた営業用統合プレビューデータ構造を新設。
+- **SalesPreviewAdapter**: No Calculation Policy（投票率や色の再計算を禁止し、元の colorStatus から fillColor を直接 Preservation マッピング）に則り、インポート結果とドメイン Read Model を合成。
+- **SalesPreviewValidator**: 営業画面からのデータ書込み行為を完全ブロックするための Read-Only スキーマ検証、および `dashboard.json` データの改ざん検出 (ContentHash Integrity) を実装。
+- **SalesPreviewRuntime**: 初期化ワークフロー完了後、データをアダプター/バリデータに通し、`deepFreeze` により再帰的完全不変性（Immutability）を適用したプレビューモデルを返却。
+- **Verification Tests**: `test_sales_preview.ts` (160件目のテストケース) を追加し、READY遷移、自治体表示、投票率表示、カラー preservation 結合、可視化 feature マップ、deepFreeze 変更ブロック、ファイル改ざん検知、Runtime 書込み API 非公開化の8大シナリオをパス。
+
 
 
 
