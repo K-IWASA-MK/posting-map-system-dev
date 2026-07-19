@@ -46,6 +46,10 @@
 26. **弾力的資源管理 (Elastic Resource Management)**: リソースの割り当てやスケーリング（Auto-Scaling）は、CPU・メモリなどの利用状況や実行キュー（ExecutionQueue）の深さに応じて、動的かつ自動的に決定・適用されなければなりません。
 27. **高可用性設計 (High Availability by Design)**: システムは配置ポリシー（PlacementPolicy）を用いてアフィニティおよび反アフィニティ（Affinity / Anti-Affinity）制御を行い、単一障害点（SPOF）を排除して高可用性を保証しなければなりません。
 28. **自己修復優先 (Self-Healing First)**: システムの実行環境やプロセスの異常を検知した際、自動的に `RecoveryPlan` を策定し、人間の介入なしにプロセスの再起動や別ノードへの安全な移行（Migration）を試みなければなりません。
+29. **実行前隔離 (Isolation Before Execution)**: プロセスが起動される前に、すべてのファイルシステム、ネットワーク、特権能力に対するセキュリティ隔離プロファイル（IsolationProfile）が定義・バインドされていなければなりません。
+30. **最小権限原則 (Least Privilege)**: コンテナプロセスには、動作に必要な最小限の実行特権（CapabilityFilter）およびリソース枠（ResourceQuota）のみを割り当てなければなりません。
+31. **不変実行環境 (Immutable Runtime Environment)**: 稼働中のコンテナおよび隔離サンドボックスは、外部や他のプロセスからの動的変更を許容せず、不変（Immutable）の状態で実行されなければなりません。
+32. **デフォルト安全 (Secure by Default)**: すべてのプロセス実行は、追加の構成や指示がない場合でも、デフォルトで最も厳格なサンドボックスポリシーおよび隔離プロファイル下で実行されなければなりません。
 
 
 

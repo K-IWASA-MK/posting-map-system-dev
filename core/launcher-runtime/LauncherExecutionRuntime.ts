@@ -3,6 +3,10 @@ import { IExecutionProcess } from './IExecutionProcess';
 import { NodeExecutionProcess } from './NodeExecutionProcess';
 import { ExecutionConfig } from './ExecutionConfig';
 import { spawn } from 'child_process';
+import { ContainerLauncher } from '../../sdk/core/container/ContainerLauncher';
+import { SandboxEngine } from '../../sdk/core/sandbox/SandboxEngine';
+import { AIOSEventBus } from '../../sdk/core/event/AIOSEventBus';
+import { ContainerDefinition, RuntimeClass } from '../../sdk/core/container/ContainerDefinition';
 
 /**
  * InvalidLauncherDecisionError is thrown when execution is requested on a denied result.
@@ -38,6 +42,34 @@ export class LauncherExecutionRuntime {
       throw new Error(
         'Orchestration Violation: Execution must go through ExecutionQueue (Orchestration Before Execution)'
       );
+    }
+
+    if (config?.useContainer) {
+      const eventBus = new AIOSEventBus();
+      const sandboxEngine = new SandboxEngine(eventBus);
+      const launcher = new ContainerLauncher(eventBus, sandboxEngine);
+
+      const quota = config.resourceQuota || {
+        quotaId: 'Q-MOCK',
+        cpuLimit: 80,
+        memoryLimit: 1024,
+        gpuLimit: 0,
+        storageLimit: 10,
+        networkLimit: 100
+      };
+
+      const containerDef: ContainerDefinition = {
+        containerId: config.containerId || `container-${Date.now()}`,
+        image: config.image || 'node:18-alpine',
+        entrypoint: config.args || [],
+        environment: config.env || {},
+        volumes: [],
+        network: 'bridge',
+        resourceQuota: quota,
+        sandboxProfile: config.sandboxProfile || 'LIMITED_NETWORK'
+      };
+
+      await launcher.launch(containerDef);
     }
 
     const processId = `proc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;

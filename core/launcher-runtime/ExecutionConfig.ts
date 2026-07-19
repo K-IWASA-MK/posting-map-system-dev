@@ -7,4 +7,9 @@ export interface ExecutionConfig {
   cwd?: string;
   queueId?: string;
   checkQueue?: boolean;
+  useContainer?: boolean;
+  containerId?: string;
+  image?: string;
+  sandboxProfile?: string;
+  resourceQuota?: any;
 }
