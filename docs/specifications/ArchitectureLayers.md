@@ -56,6 +56,14 @@ AIOS は以下の5つの主要レイヤーで構成され、上位レイヤー�
           ↓
   Compliance Engine (適合性評価)
       ↓
+  Marketplace Runtime (マーケットプレイス管理)
+          ↓
+  Service Runtime (サービス実行管理)
+          ↓
+  License Runtime (ライセンス契約判定)
+          ↓
+  Billing Runtime (抽象決済・請求管理)
+      ↓
   Federation Runtime (連邦管理)
           ↓
   Cross-Domain Identity Engine (外部IDマッピング)

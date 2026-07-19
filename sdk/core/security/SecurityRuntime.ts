@@ -32,10 +32,16 @@ export class SecurityRuntime implements IRuntime<SecurityManifest, void> {
 
   private trustEngine?: any;
 
+  private licenseRuntime?: any;
+
   constructor(private readonly eventBus: AIOSEventBus) {}
 
   public setTrustEngine(trustEngine: any): void {
     this.trustEngine = trustEngine;
+  }
+
+  public setLicenseRuntime(licenseRuntime: any): void {
+    this.licenseRuntime = licenseRuntime;
   }
 
   public getHealth(): Promise<RuntimeHealth> {
@@ -101,6 +107,52 @@ export class SecurityRuntime implements IRuntime<SecurityManifest, void> {
     action: string,
     tokenId?: string
   ): Promise<AuthorizationDecision> {
+    if (this.licenseRuntime && resource.startsWith('service:')) {
+      const serviceId = resource.replace('service:', '');
+      const licenseeId = securityCtx.principalId;
+      const license = this.licenseRuntime.getManager().getLicenseForLicensee(serviceId, licenseeId);
+      if (!license) {
+        const decision: AuthorizationDecision = {
+          decisionId: `DEC-AUTH-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          principalId: securityCtx.principalId,
+          resource,
+          action,
+          result: 'DENY',
+          reason: `No active license found for service ${serviceId} and licensee ${licenseeId}`,
+          timestamp: new Date().toISOString()
+        };
+        await this.publishEvent('AuthorizationEvaluated', {
+          decisionId: decision.decisionId,
+          principalId: decision.principalId,
+          result: decision.result,
+          state: RuntimeState.RUNNING
+        });
+        await this.detectViolation(securityCtx, `Authorization Denied: Missing active license`, 'CRITICAL');
+        return decision;
+      }
+
+      const valid = this.licenseRuntime.getVerifier().verify(license);
+      if (!valid) {
+        const decision: AuthorizationDecision = {
+          decisionId: `DEC-AUTH-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          principalId: securityCtx.principalId,
+          resource,
+          action,
+          result: 'DENY',
+          reason: `License status ${license.status} is invalid or expired for service ${serviceId}`,
+          timestamp: new Date().toISOString()
+        };
+        await this.publishEvent('AuthorizationEvaluated', {
+          decisionId: decision.decisionId,
+          principalId: decision.principalId,
+          result: decision.result,
+          state: RuntimeState.RUNNING
+        });
+        await this.detectViolation(securityCtx, `Authorization Denied: Invalid/Expired license`, 'CRITICAL');
+        return decision;
+      }
+    }
+
     if (this.trustEngine && securityCtx.principalId.startsWith('ID-USER-') && securityCtx.principalId.includes(':')) {
       try {
         const parts = securityCtx.principalId.replace('ID-USER-', '').split(':');

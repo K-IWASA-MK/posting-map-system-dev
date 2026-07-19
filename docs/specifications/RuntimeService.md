@@ -17,6 +17,10 @@ Runtime Service Layer は、各 Runtime 間の直接的な結合を排除し、�
 - **Governance Runtime (`aios.governance`)**: プラットフォーム全体のポリシーバンドルの配布・バージョン管理。
 - **Identity Runtime (`aios.identity`)**: プラットフォーム内の各主体のデジタルID発行、および名前空間・証明書チェーンの不変管理。
 - **Federation Runtime (`aios.federation`)**: 外部インスタンスや他クラウドサービスとの接続、フェデレーションセッション、および相互信頼評価の管理。
+- **Marketplace Runtime (`aios.marketplace`)**: プラットフォーム対応サービスの公開審査、カタログ掲載、品質レビュー集計。
+- **Service Runtime (`aios.service`)**: プラットフォーム内サービスのインストール登録、依存解決、および起動停止の統制。
+- **License Runtime (`aios.license`)**: サービスの契約ライセンス発行、有効期限・状態遷移の判定管理。
+- **Billing Runtime (`aios.billing`)**: 抽象決済プロバイダーを通じた料金請求トランザクションの監査。
 - **Security Runtime (`aios.security`)**: プラットフォーム全体の認証、認可、シークレット仲介およびサンドボックス管理。
 - **Quality Runtime (`aios.quality`)**: プラットフォーム品質スコア監査、ポリシー判定。
 - **Automation Runtime (`aios.automation`)**: 自動修復アクション承認、実行キューイング制御。
