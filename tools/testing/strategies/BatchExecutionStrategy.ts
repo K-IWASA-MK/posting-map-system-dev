@@ -2,6 +2,7 @@ import { ITestExecutionStrategy, StrategyCapabilities } from '../ITestExecutionS
 import { StrategyExecutionResult } from '../StrategyExecutionResult';
 import { TestIsolationManager } from '../TestIsolationManager';
 import { SequentialExecutionStrategy } from './SequentialExecutionStrategy';
+import { ExecutionPlan, ExecutionPlanEntry } from '../ExecutionPlan';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -45,34 +46,32 @@ export class BatchExecutionStrategy implements ITestExecutionStrategy {
     }
   }
 
-  public async execute(testFiles: string[]): Promise<StrategyExecutionResult> {
+  public async execute(plan: ExecutionPlan): Promise<StrategyExecutionResult> {
     const startTime = Date.now();
     let passedCount = 0;
     let failedCount = 0;
     const errors: string[] = [];
     let totalCleanupTime = 0;
 
-    // 1. Partition files by capability requirements and execution model
-    const sequentialFiles: string[] = [];
-    const batchFiles: string[] = [];
+    // 1. Partition entries by strategy
+    const sequentialEntries: ExecutionPlanEntry[] = [];
+    const batchEntries: ExecutionPlanEntry[] = [];
 
-    for (const file of testFiles) {
-      const caps = TestIsolationManager.resolveCapabilities(file);
-      const isStandard = this.checkIsStandardTest(file);
-
-      if (caps.includes('requiresFreshProcess') || !isStandard) {
-        sequentialFiles.push(file);
+    for (const entry of plan.entries) {
+      if (entry.strategyName === 'Sequential') {
+        sequentialEntries.push(entry);
       } else {
-        batchFiles.push(file);
+        batchEntries.push(entry);
       }
     }
 
-    // 2. Execute files that require a fresh process or are legacy using SequentialExecutionStrategy
+    // 2. Execute sequential entries using SequentialExecutionStrategy
     let sequentialTime = 0;
-    if (sequentialFiles.length > 0) {
-      console.log(`[Batch Strategy] Routing ${sequentialFiles.length} file(s) to Sequential execution...`);
+    if (sequentialEntries.length > 0) {
+      console.log(`[Batch Strategy] Routing ${sequentialEntries.length} file(s) to Sequential execution...`);
       const seqStrategy = new SequentialExecutionStrategy();
-      const seqResult = await seqStrategy.execute(sequentialFiles);
+      const seqPlan: ExecutionPlan = { entries: sequentialEntries };
+      const seqResult = await seqStrategy.execute(seqPlan);
       
       passedCount += seqResult.passedCount;
       failedCount += seqResult.failedCount;
@@ -80,7 +79,7 @@ export class BatchExecutionStrategy implements ITestExecutionStrategy {
       sequentialTime = seqResult.metrics.totalTime;
     }
 
-    if (batchFiles.length === 0) {
+    if (batchEntries.length === 0) {
       const totalTime = Date.now() - startTime;
       return {
         success: failedCount === 0,
@@ -116,14 +115,19 @@ export class BatchExecutionStrategy implements ITestExecutionStrategy {
 
     const compilationStart = Date.now();
     // Pre-resolve all files to ensure they can be imported
-    const absoluteFiles = batchFiles.map(file => path.resolve(file));
+    const absoluteEntries = batchEntries.map(entry => ({
+      entry,
+      resolvedPath: path.resolve(entry.asset.module)
+    }));
     const compileTime = Date.now() - compilationStart;
 
     const executionStart = Date.now();
     const isolationManager = new TestIsolationManager();
 
-    for (const file of absoluteFiles) {
+    for (const item of absoluteEntries) {
       exitInterceptedError = null;
+      const file = item.resolvedPath;
+      const entry = item.entry;
       
       // Prepare isolation context
       const context = await isolationManager.prepare(file, this.name, 'Strict');
@@ -147,7 +151,7 @@ export class BatchExecutionStrategy implements ITestExecutionStrategy {
         }
 
         const metadata = testInstance.metadata || testInstance.constructor?.metadata || {};
-        const timeout = metadata.timeout || 30000; // Default 30s timeout
+        const timeout = entry.timeout || metadata.timeout || 30000;
 
         // Construct context wrappers
         const testCtx = {
