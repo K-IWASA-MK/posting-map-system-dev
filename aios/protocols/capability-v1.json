@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "protocolId": { "type": "string", "const": "aios-capability-v1" },
+    "protocolVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "compatibleVersions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "identity": { "type": "string" },
+    "allowedPaths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "timestamp": { "type": "string" }
+  },
+  "required": [
+    "protocolId",
+    "protocolVersion",
+    "compatibleVersions",
+    "identity",
+    "allowedPaths",
+    "capabilities",
+    "timestamp"
+  ]
+}
