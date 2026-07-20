@@ -45,10 +45,11 @@ export class RulePromotionEngine {
   ): boolean {
     console.log(`[RulePromotionEngine] Evaluating promotion criteria for rule candidate: "${candidate.id}"`);
 
-    // 1. Constitution Check
-    const constitutionResult = RuleEvolutionEngine.checkConstitution(candidate);
-    if (!constitutionResult.pass) {
-      console.error(`[RulePromotionEngine] Promotion REJECTED: ${constitutionResult.reason}`);
+    // 1. Constitution Compliance Check
+    const { ConstitutionComplianceEngine } = require('./ConstitutionComplianceEngine');
+    const compliance = ConstitutionComplianceEngine.validate('RULE', candidate);
+    if (!compliance.pass) {
+      console.error(`[RulePromotionEngine] Promotion REJECTED: Candidate failed Constitution Compliance checks.`);
       this.updateCandidateStatus(candidate.id, 'REJECTED');
       return false;
     }

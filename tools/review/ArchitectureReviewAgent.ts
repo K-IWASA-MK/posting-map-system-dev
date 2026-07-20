@@ -54,20 +54,70 @@ export class ArchitectureReviewAgent {
     const engine = new ConsensusEngine();
     const { result, trace, agentResults } = await engine.run(context);
 
+    // 5. Run Constitution Compliance Engine over the Plan and Consensus
+    const { ConstitutionComplianceEngine } = require('./ConstitutionComplianceEngine');
+    const compliance = ConstitutionComplianceEngine.validate('PLAN', context);
+    
+    // Also validate consensus decisions to verify C-008 Explainable Decision
+    const consensusCompliance = ConstitutionComplianceEngine.validate('CONSENSUS', {
+      consensusTrace: trace
+    });
+
+    // Merge violations and veto checks
+    const finalViolations = [...result.violations];
+    
+    for (const cv of compliance.violations) {
+      finalViolations.push({
+        ruleId: `CONSTITUTION-${cv.articleId}`,
+        severity: cv.severity === 'VETO' ? 'ERROR' : (cv.severity === 'ERROR' ? 'ERROR' : 'WARNING'),
+        message: cv.message,
+        remediation: `Constitution Requirement for article ${cv.articleId}`
+      });
+    }
+
+    for (const cv of consensusCompliance.violations) {
+      finalViolations.push({
+        ruleId: `CONSTITUTION-${cv.articleId}`,
+        severity: cv.severity === 'VETO' ? 'ERROR' : (cv.severity === 'ERROR' ? 'ERROR' : 'WARNING'),
+        message: cv.message,
+        remediation: `Constitution Requirement for article ${cv.articleId}`
+      });
+    }
+
+    const hasConstitutionBlocker = !compliance.pass || !consensusCompliance.pass;
+    const finalDecision: 'PROCEED' | 'REJECT' = (result.decision === 'REJECT' || hasConstitutionBlocker) ? 'REJECT' : 'PROCEED';
+    const finalStatus: 'PASS' | 'FAILED' = finalDecision === 'PROCEED' ? 'PASS' : 'FAILED';
+    const finalScore = Math.min(result.score, compliance.score, consensusCompliance.score);
+
+    // Write the constitution report to ConstitutionReport.md
+    const combinedCompliance = {
+      pass: !hasConstitutionBlocker,
+      decision: finalDecision,
+      score: finalScore,
+      violations: [...compliance.violations, ...consensusCompliance.violations],
+      trace: [...compliance.trace, ...consensusCompliance.trace]
+    };
+    ConstitutionComplianceEngine.writeReport(combinedCompliance, 'PLAN', context.taskTitle);
+
     // Attach trace and agent reviews to serialized JSON
     const finalResult = {
-      ...result,
+      status: finalStatus,
+      decision: finalDecision,
+      score: finalScore,
+      violations: finalViolations,
+      timestamp: new Date().toISOString(),
       consensusTrace: trace,
-      agentReviews: agentResults
+      agentReviews: agentResults,
+      constitutionTrace: combinedCompliance.trace
     };
 
-    // 5. Write AUDIT_REVIEW_RESULT.json (root of project)
+    // 6. Write AUDIT_REVIEW_RESULT.json (root of project)
     const workspaceRoot = path.resolve(__dirname, '../..');
     const jsonPath = path.join(workspaceRoot, 'AUDIT_REVIEW_RESULT.json');
     fs.writeFileSync(jsonPath, JSON.stringify(finalResult, null, 2), 'utf-8');
     console.log(`[Architecture Review Agent] Written JSON result to: ${jsonPath}`);
 
-    // 6. Generate Human-Readable Markdown Report
+    // 7. Generate Human-Readable Markdown Report
     const reportPath = path.join(workspaceRoot, 'ArchitectureReviewReport.md');
     const reportMd = this.generateReportMarkdown(finalResult, context);
     fs.writeFileSync(reportPath, reportMd, 'utf-8');
