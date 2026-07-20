@@ -2,6 +2,8 @@ import { OrderRuntime } from '../../src/platform/order-runtime/OrderRuntime';
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { RootResolver } from '../../../../tools/review/RootResolver';
+
 function assert(condition: boolean, message: string) {
   if (!condition) {
     throw new Error(`[Assertion Failure] ${message}`);
@@ -29,8 +31,7 @@ async function runTest() {
     assert(result.missionId!.startsWith("MIS-ORD-TEST-001-"), "Mission ID pattern mismatch.");
 
     // Check if research-result.json was generated locally in the mock directory
-    const workspaceRoot = path.resolve(__dirname, '../../../..');
-    const resultPath = path.join(workspaceRoot, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', '東京第18区', 'research-result.json');
+    const resultPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', '東京第18区', 'research-result.json');
     
     assert(fs.existsSync(resultPath), "research-result.json must be written to the branch directory.");
     

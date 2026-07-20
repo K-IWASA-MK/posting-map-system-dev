@@ -2,6 +2,8 @@ import { DataBuilderRuntime } from '../../src/platform/data-builder-runtime/Data
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { RootResolver } from '../../../../tools/review/RootResolver';
+
 function assert(condition: boolean, message: string) {
   if (!condition) {
     throw new Error(`[Assertion Failure] ${message}`);
@@ -30,9 +32,8 @@ async function runTest() {
     assert(result.outputEvent.missionId === "MIS-TEST-002", "Mission ID mismatch.");
 
     // Retrieve generated outputs
-    const workspaceRoot = path.resolve(__dirname, '../../../..');
-    const districtPath = path.join(workspaceRoot, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', '東京第18区', 'district.json');
-    const configPath = path.join(workspaceRoot, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', '東京第18区', 'config.json');
+    const districtPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', '東京第18区', 'district.json');
+    const configPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', '東京第18区', 'config.json');
 
     assert(fs.existsSync(districtPath), "district.json must be generated.");
     assert(fs.existsSync(configPath), "config.json must be generated.");
