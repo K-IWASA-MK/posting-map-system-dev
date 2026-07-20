@@ -44,19 +44,23 @@ function validateProtocolSchema(fileName: string, expectedProtocolId: string) {
   assert(schema.$schema === "http://json-schema.org/draft-07/schema#", `${fileName} must define standard draft-07 schema`);
   assert(schema.type === "object", `${fileName} root type must be object`);
   assert(schema.properties !== undefined, `${fileName} must define properties`);
+  const props = schema.properties;
+  assert(props !== undefined, `${fileName} properties must be defined`);
+  if (!props) {
+    throw new Error("properties is undefined");
+  }
 
   // 4. Validate metadata parameters
-  const props = schema.properties;
   assert(props.protocolId !== undefined, `${fileName} must define protocolId`);
-  assert(props.protocolId.type === "string", `${fileName} protocolId must be string`);
-  assert(props.protocolId.const === expectedProtocolId, `${fileName} protocolId.const must match '${expectedProtocolId}'`);
+  assert(props.protocolId!.type === "string", `${fileName} protocolId must be string`);
+  assert(props.protocolId!.const === expectedProtocolId, `${fileName} protocolId.const must match '${expectedProtocolId}'`);
 
   assert(props.protocolVersion !== undefined, `${fileName} must define protocolVersion`);
-  assert(props.protocolVersion.type === "string", `${fileName} protocolVersion must be string`);
-  assert(props.protocolVersion.pattern === "^[0-9]+\\.[0-9]+\\.[0-9]+$", `${fileName} protocolVersion pattern must be semantic version regex`);
+  assert(props.protocolVersion!.type === "string", `${fileName} protocolVersion must be string`);
+  assert(props.protocolVersion!.pattern === "^[0-9]+\\.[0-9]+\\.[0-9]+$", `${fileName} protocolVersion pattern must be semantic version regex`);
 
   assert(props.compatibleVersions !== undefined, `${fileName} must define compatibleVersions`);
-  assert(props.compatibleVersions.type === "array", `${fileName} compatibleVersions must be array`);
+  assert(props.compatibleVersions!.type === "array", `${fileName} compatibleVersions must be array`);
 
   // 5. Check standard required fields
   const required = schema.required || [];
