@@ -8,6 +8,8 @@ import { AIOSEventBus } from '../../../sdk/core/event/AIOSEventBus';
 import { RuntimeCapability } from '../../../sdk/core/runtime/RuntimeCapability';
 import { ServiceDefinition, ServiceIdentity, ServiceDependency, MarketplaceEntry, MarketplaceReview, LicenseRecord } from '../../../sdk/core/service/ServiceModels';
 import { IBillingProvider } from '../../../sdk/core/billing/BillingProvider';
+import { ITestModule } from '../../../tools/testing/ITestModule';
+import { TestExecutionContext } from '../../../tools/testing/TestContext';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -275,18 +277,21 @@ async function testDiscoveryCapabilities() {
   console.log('[Test 6] Marketplace Capabilities: PASSED');
 }
 
-async function runAll() {
-  console.log('--- Starting Service & Marketplace Runtime Tests ---');
-  await testServiceRegistryAndLifecycle();
-  await testDependencyResolution();
-  await testMarketplaceCatalogAndReviews();
-  await testLicensingAndBilling();
-  await testSecurityAuthorizationHook();
-  await testDiscoveryCapabilities();
-  console.log('--- All Service & Marketplace Runtime Tests PASSED ---');
-}
+export default class ServiceRuntimeTest implements ITestModule {
+  public static readonly metadata = {
+    name: 'Service & Marketplace Runtime Tests',
+    timeout: 30000,
+    capabilities: []
+  };
 
-runAll().catch(err => {
-  console.error('[Test Suite Error]', err);
-  process.exit(1);
-});
+  public async execute(context: TestExecutionContext): Promise<void> {
+    console.log('--- Starting Service & Marketplace Runtime Tests ---');
+    await testServiceRegistryAndLifecycle();
+    await testDependencyResolution();
+    await testMarketplaceCatalogAndReviews();
+    await testLicensingAndBilling();
+    await testSecurityAuthorizationHook();
+    await testDiscoveryCapabilities();
+    console.log('--- All Service & Marketplace Runtime Tests PASSED ---');
+  }
+}
