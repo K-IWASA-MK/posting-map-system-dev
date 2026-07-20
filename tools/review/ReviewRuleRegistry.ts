@@ -31,11 +31,13 @@ export class ReviewRuleRegistry {
     const { OwnershipRule } = require('./rules/OwnershipRule');
     const { ArchitecturePolicyRule } = require('./rules/ArchitecturePolicyRule');
     const { ArchitectureKnowledgeRule } = require('./rules/ArchitectureKnowledgeRule');
+    const { ArchitecturePatternRule } = require('./rules/ArchitecturePatternRule');
 
     this.register(new ProjectBoundaryRule());
     this.register(new DirectoryResponsibilityRule());
     this.register(new OwnershipRule());
     this.register(new ArchitecturePolicyRule());
     this.register(new ArchitectureKnowledgeRule());
+    this.register(new ArchitecturePatternRule());
   }
 }
