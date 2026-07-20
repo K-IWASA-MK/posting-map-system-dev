@@ -3,6 +3,8 @@ import { StrategyExecutionResult } from '../StrategyExecutionResult';
 import { TestIsolationManager } from '../TestIsolationManager';
 import { SequentialExecutionStrategy } from './SequentialExecutionStrategy';
 import { ExecutionPlan, ExecutionPlanEntry } from '../ExecutionPlan';
+import { ExecutionDependencyGraph } from '../ExecutionDependencyGraph';
+import { spawnSync } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -53,6 +55,10 @@ export class BatchExecutionStrategy implements ITestExecutionStrategy {
     const errors: string[] = [];
     let totalCleanupTime = 0;
 
+    // Build the dependency graph of all planned assets to resolve transitive dependencies
+    const graph = new ExecutionDependencyGraph(plan.entries.map(e => e.asset));
+    const failedAssets = new Set<string>();
+
     // 1. Partition entries by strategy
     const sequentialEntries: ExecutionPlanEntry[] = [];
     const batchEntries: ExecutionPlanEntry[] = [];
@@ -65,18 +71,37 @@ export class BatchExecutionStrategy implements ITestExecutionStrategy {
       }
     }
 
-    // 2. Execute sequential entries using SequentialExecutionStrategy
+    // 2. Execute sequential entries using child process spawning
     let sequentialTime = 0;
-    if (sequentialEntries.length > 0) {
-      console.log(`[Batch Strategy] Routing ${sequentialEntries.length} file(s) to Sequential execution...`);
-      const seqStrategy = new SequentialExecutionStrategy();
-      const seqPlan: ExecutionPlan = { entries: sequentialEntries };
-      const seqResult = await seqStrategy.execute(seqPlan);
-      
-      passedCount += seqResult.passedCount;
-      failedCount += seqResult.failedCount;
-      errors.push(...seqResult.errors);
-      sequentialTime = seqResult.metrics.totalTime;
+    for (const entry of sequentialEntries) {
+      const file = entry.asset.module;
+
+      // Check failure propagation
+      const transitiveDeps = graph.getTransitiveDependencies(entry.asset.id);
+      const failedDep = transitiveDeps.find(depId => failedAssets.has(depId));
+      if (failedDep) {
+        failedCount++;
+        errors.push(`Test file skipped: ${file} (Reason: Transitive dependency '${failedDep}' failed)`);
+        failedAssets.add(entry.asset.id);
+        continue;
+      }
+
+      const spawnStart = Date.now();
+      console.log(`[Batch Strategy] Spawning sequential process for ${file}...`);
+      const result = spawnSync('npx', ['ts-node', '-r', 'tsconfig-paths/register', file], {
+        encoding: 'utf-8',
+        stdio: 'inherit'
+      });
+      const duration = Date.now() - spawnStart;
+      sequentialTime += duration;
+
+      if (result.status === 0) {
+        passedCount++;
+      } else {
+        failedCount++;
+        errors.push(`TypeScript test file failed: ${file} (Exit code: ${result.status})`);
+        failedAssets.add(entry.asset.id);
+      }
     }
 
     if (batchEntries.length === 0) {
@@ -128,6 +153,16 @@ export class BatchExecutionStrategy implements ITestExecutionStrategy {
       exitInterceptedError = null;
       const file = item.resolvedPath;
       const entry = item.entry;
+
+      // Check failure propagation
+      const transitiveDeps = graph.getTransitiveDependencies(entry.asset.id);
+      const failedDep = transitiveDeps.find(depId => failedAssets.has(depId));
+      if (failedDep) {
+        failedCount++;
+        errors.push(`Test file skipped in batch: ${path.basename(file)} (Reason: Transitive dependency '${failedDep}' failed)`);
+        failedAssets.add(entry.asset.id);
+        continue;
+      }
       
       // Prepare isolation context
       const context = await isolationManager.prepare(file, this.name, 'Strict');
@@ -179,6 +214,7 @@ export class BatchExecutionStrategy implements ITestExecutionStrategy {
         passedCount++;
       } catch (err: any) {
         failedCount++;
+        failedAssets.add(entry.asset.id); // Mark as failed
         const displayError = exitInterceptedError || err.message || 'Unknown error';
         errors.push(`Test file failed in batch: ${path.basename(file)}\nError: ${displayError}\nStack: ${err.stack || ''}`);
       } finally {

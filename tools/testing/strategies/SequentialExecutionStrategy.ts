@@ -1,6 +1,7 @@
 import { ITestExecutionStrategy, StrategyCapabilities } from '../ITestExecutionStrategy';
 import { StrategyExecutionResult } from '../StrategyExecutionResult';
 import { ExecutionPlan } from '../ExecutionPlan';
+import { ExecutionDependencyGraph } from '../ExecutionDependencyGraph';
 import { spawnSync } from 'child_process';
 
 /**
@@ -21,10 +22,24 @@ export class SequentialExecutionStrategy implements ITestExecutionStrategy {
     let failedCount = 0;
     const errors: string[] = [];
 
+    const graph = new ExecutionDependencyGraph(plan.entries.map(e => e.asset));
+    const failedAssets = new Set<string>();
+
     let totalSpawnTime = 0;
 
     for (const entry of plan.entries) {
       const file = entry.asset.module;
+
+      // Check failure propagation
+      const transitiveDeps = graph.getTransitiveDependencies(entry.asset.id);
+      const failedDep = transitiveDeps.find(depId => failedAssets.has(depId));
+      if (failedDep) {
+        failedCount++;
+        errors.push(`TypeScript test file skipped: ${file} (Reason: Transitive dependency '${failedDep}' failed)`);
+        failedAssets.add(entry.asset.id);
+        continue;
+      }
+
       const spawnStart = Date.now();
       const result = spawnSync('npx', ['ts-node', '-r', 'tsconfig-paths/register', file], {
         encoding: 'utf-8',
@@ -37,6 +52,7 @@ export class SequentialExecutionStrategy implements ITestExecutionStrategy {
       } else {
         failedCount++;
         errors.push(`TypeScript test file failed: ${file} (Exit code: ${result.status})`);
+        failedAssets.add(entry.asset.id);
       }
     }
 

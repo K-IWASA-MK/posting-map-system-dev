@@ -1,5 +1,7 @@
 import { TestAsset } from './TestAsset';
 import { ExecutionPlan, ExecutionPlanEntry } from './ExecutionPlan';
+import { ExecutionDependencyGraph } from './ExecutionDependencyGraph';
+import { GraphScheduler } from './GraphScheduler';
 
 export interface PlanOptions {
   tags?: string[];
@@ -10,24 +12,29 @@ export interface PlanOptions {
 
 export class ExecutionPlanner {
   /**
-   * Generates a filtered, prioritized, and strategy-resolved ExecutionPlan from a list of test assets.
+   * Generates a filtered, topologically scheduled, and strategy-resolved ExecutionPlan.
    */
   public static plan(assets: TestAsset[], options: PlanOptions = {}): ExecutionPlan {
     const enabledOnly = options.enabledOnly !== false;
+
+    // 1. Build the complete dependency graph and topologically sort it
+    const graph = new ExecutionDependencyGraph(assets);
+    const sortedAssets = GraphScheduler.schedule(graph);
+
     const entries: ExecutionPlanEntry[] = [];
 
-    for (const asset of assets) {
-      // 1. Filter: Enabled check
+    for (const asset of sortedAssets) {
+      // 2. Filter: Enabled check
       if (enabledOnly && !asset.enabled) {
         continue;
       }
 
-      // 2. Filter: Category check (case-insensitive)
+      // 3. Filter: Category check (case-insensitive)
       if (options.category && asset.category.toLowerCase() !== options.category.toLowerCase()) {
         continue;
       }
 
-      // 3. Filter: Tags check (case-insensitive, match any)
+      // 4. Filter: Tags check (case-insensitive, match any)
       if (options.tags && options.tags.length > 0) {
         const assetTagsLower = asset.tags.map(t => t.toLowerCase());
         const filterTagsLower = options.tags.map(t => t.toLowerCase());
@@ -37,7 +44,7 @@ export class ExecutionPlanner {
         }
       }
 
-      // 4. Filter: Capabilities check (case-insensitive, match any)
+      // 5. Filter: Capabilities check (case-insensitive, match any)
       if (options.capabilities && options.capabilities.length > 0) {
         const assetCapsLower = asset.capabilities.map(c => c.toLowerCase());
         const filterCapsLower = options.capabilities.map(c => c.toLowerCase());
@@ -47,14 +54,12 @@ export class ExecutionPlanner {
         }
       }
 
-      // 5. Strategy Resolution
-      // If requiresFreshProcess is requested or if it is a Legacy test, force Sequential strategy.
+      // 6. Strategy Resolution
       const requiresFresh = asset.capabilities.some(c => c.toLowerCase() === 'requiresfreshprocess');
       const strategyName = (requiresFresh || asset.isLegacy) ? 'Sequential' : 'Batch';
 
-      // 6. Priority Resolution
-      // Standard (batch) tests execute first (priority 50), Legacy (sequential) execute later (priority 100)
-      const priority = asset.isLegacy ? 100 : 50;
+      // 7. Priority Resolution
+      const priority = asset.priority ?? (asset.isLegacy ? 100 : 50);
 
       entries.push({
         asset,
@@ -63,14 +68,6 @@ export class ExecutionPlanner {
         priority
       });
     }
-
-    // 7. Sort by Priority (ascending) and ID (alphabetical, for determinism)
-    entries.sort((a, b) => {
-      if (a.priority !== b.priority) {
-        return a.priority - b.priority;
-      }
-      return a.asset.id.localeCompare(b.asset.id);
-    });
 
     return { entries };
   }

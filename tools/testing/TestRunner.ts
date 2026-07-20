@@ -9,6 +9,8 @@ import { TestDiscoveryService } from './TestDiscoveryService';
 import { RegistryValidator } from './RegistryValidator';
 import { ExecutionPlanner, PlanOptions } from './ExecutionPlanner';
 import { ExecutionPlan } from './ExecutionPlan';
+import { ExecutionDependencyGraph } from './ExecutionDependencyGraph';
+import { DependencyValidator } from './DependencyValidator';
 import * as path from 'path';
 
 /**
@@ -29,7 +31,13 @@ export class TestRunner {
     const assets = await discoveryService.discover(workspaceRoot);
 
     // 2. Validate Discovery Integrity
-    const validationReport = RegistryValidator.validate(assets, workspaceRoot);
+    const registryValidationReport = RegistryValidator.validate(assets, workspaceRoot);
+
+    // Build Dependency Graph and Validate
+    const graph = new ExecutionDependencyGraph(assets);
+    const depValidationReport = DependencyValidator.validate(graph);
+
+    const isValid = registryValidationReport.isValid && depValidationReport.isValid;
 
     // Print Discovery Report
     const registeredCount = assets.filter(a => !a.isLegacy).length;
@@ -43,24 +51,27 @@ export class TestRunner {
     console.log(`  - Registered Standard : ${registeredCount}`);
     console.log(`  - Virtual Legacy      : ${legacyCount}`);
     console.log(`Disabled Assets          : ${disabledCount}`);
-    console.log(`Validation Status       : ${validationReport.isValid ? '✅ PASS' : '❌ FAIL'}`);
+    console.log(`Validation Status       : ${isValid ? '✅ PASS' : '❌ FAIL'}`);
     console.log('--------------------------------------------------');
 
-    if (validationReport.warnings.length > 0) {
+    if (registryValidationReport.warnings.length > 0) {
       console.log('Warnings:');
-      for (const warn of validationReport.warnings) {
+      for (const warn of registryValidationReport.warnings) {
         console.log(`  ⚠️  ${warn}`);
       }
       console.log('--------------------------------------------------');
     }
 
-    if (!validationReport.isValid) {
+    if (!isValid) {
       console.error('Validation Errors:');
-      for (const err of validationReport.errors) {
-        console.error(`  ❌ ${err}`);
+      for (const err of registryValidationReport.errors) {
+        console.error(`  ❌ Registry: ${err}`);
+      }
+      for (const err of depValidationReport.errors) {
+        console.error(`  ❌ Dependency: ${err}`);
       }
       console.error('==================================================');
-      console.error('[Test Runner] Registry Validation Failed. Exiting.');
+      console.error('[Test Runner] Validation Failed. Exiting.');
       process.exit(1);
     }
 
