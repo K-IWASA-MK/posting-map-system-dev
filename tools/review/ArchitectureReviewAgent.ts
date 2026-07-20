@@ -49,60 +49,37 @@ export class ArchitectureReviewAgent {
     console.log(`[Architecture Review Agent] Discovered ${uniqueFiles.length} files to inspect.`);
     console.log(`[Architecture Review Agent] Task Owner Context: ${isPlatformTask ? 'AIOS Core Platform' : 'Application'}`);
 
-    // 4. Discover and evaluate rules
-    ReviewRuleRegistry.discover();
-    const rules = ReviewRuleRegistry.getRules();
-    const violations: ReviewViolation[] = [];
+    // 4. Run Consensus Engine across AI review panel
+    const { ConsensusEngine } = require('./ConsensusEngine');
+    const engine = new ConsensusEngine();
+    const { result, trace, agentResults } = await engine.run(context);
 
-    for (const rule of rules) {
-      const ruleViolations = await rule.evaluate(context);
-      violations.push(...ruleViolations);
-    }
-
-    // 5. Calculate score (base 100, -20 per error, -5 per warning)
-    let score = 100;
-    for (const v of violations) {
-      if (v.severity === 'ERROR') {
-        score -= 20;
-      } else {
-        score -= 5;
-      }
-    }
-    score = Math.max(0, score);
-
-    // 6. Determine Decision
-    const hasErrors = violations.some(v => v.severity === 'ERROR');
-    const decision = (hasErrors || score < 80) ? 'REJECT' : 'PROCEED';
-    const status = decision === 'PROCEED' ? 'PASS' : 'FAILED';
-    const timestamp = new Date().toISOString();
-
-    const result: ReviewResult = {
-      status,
-      decision,
-      score,
-      violations,
-      timestamp
+    // Attach trace and agent reviews to serialized JSON
+    const finalResult = {
+      ...result,
+      consensusTrace: trace,
+      agentReviews: agentResults
     };
 
-    // 7. Write AUDIT_REVIEW_RESULT.json (root of project)
+    // 5. Write AUDIT_REVIEW_RESULT.json (root of project)
     const workspaceRoot = path.resolve(__dirname, '../..');
     const jsonPath = path.join(workspaceRoot, 'AUDIT_REVIEW_RESULT.json');
-    fs.writeFileSync(jsonPath, JSON.stringify(result, null, 2), 'utf-8');
+    fs.writeFileSync(jsonPath, JSON.stringify(finalResult, null, 2), 'utf-8');
     console.log(`[Architecture Review Agent] Written JSON result to: ${jsonPath}`);
 
-    // 8. Generate Human-Readable Markdown Report
+    // 6. Generate Human-Readable Markdown Report
     const reportPath = path.join(workspaceRoot, 'ArchitectureReviewReport.md');
-    const reportMd = this.generateReportMarkdown(result, context);
+    const reportMd = this.generateReportMarkdown(finalResult, context);
     fs.writeFileSync(reportPath, reportMd, 'utf-8');
     console.log(`[Architecture Review Agent] Written human-readable report to: ${reportPath}`);
 
-    return result;
+    return finalResult;
   }
 
-  private static generateReportMarkdown(result: ReviewResult, context: ReviewContext): string {
+  private static generateReportMarkdown(result: any, context: ReviewContext): string {
     const statusEmoji = result.decision === 'PROCEED' ? '✅ PASS' : '❌ REJECT';
     
-    let md = `# Architecture Review Report
+    let md = `# Architecture Review Report (Consensus Board)
 
 ## Summary
 * **Status**: ${result.status}
@@ -114,6 +91,34 @@ export class ArchitectureReviewAgent {
 * **Task Title**: ${context.taskTitle}
 * **Is Platform Task**: ${context.isPlatformTask ? 'Yes' : 'No'}
 * **Files Inspected**: ${context.proposedFiles.length}
+
+## AI Consensus Board
+| AI Agent | Role | Score | Decision | Capabilities |
+| :--- | :--- | :--- | :--- | :--- |
+`;
+
+    if (result.agentReviews) {
+      for (const ar of result.agentReviews) {
+        const caps = ar.agentId === 'agent-architecture' ? 'Boundary, Ownership, Pattern, Knowledge' :
+                     ar.agentId === 'agent-governance' ? 'Responsibility, Policy' :
+                     ar.agentId === 'agent-security' ? 'Secret, Sandbox, Trust' :
+                     ar.agentId === 'agent-performance' ? 'Runtime, Complexity, Cost' :
+                     'Score, Maintainability, Readability';
+        md += `| \`${ar.agentId}\` | **${ar.role}** | ${ar.score} | ${ar.decision} | ${caps} |\n`;
+      }
+    }
+
+    md += `\n## Consensus Trace
+\`\`\`text
+`;
+
+    if (result.consensusTrace) {
+      for (const t of result.consensusTrace) {
+        md += `${t}\n`;
+      }
+    }
+
+    md += `\`\`\`
 
 ## Violations (${result.violations.length})
 `;
@@ -135,9 +140,9 @@ export class ArchitectureReviewAgent {
 
     md += `\n## Recommendations\n`;
     if (result.decision === 'PROCEED') {
-      md += `* Architecture is compliant. You are authorized to proceed to implementation.\n`;
+      md += `* Consensus board is compliant. You are authorized to proceed to implementation.\n`;
     } else {
-      md += `* Please resolve all **ERROR** violations listed above. Check target path directories and file ownership boundaries before re-running the review agent.\n`;
+      md += `* Please resolve all **ERROR** violations and security vetoes listed above before re-running the review agent.\n`;
     }
 
     return md;

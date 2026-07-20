@@ -1,0 +1,1 @@
+export type ReviewRole = 'ARCHITECTURE' | 'GOVERNANCE' | 'SECURITY' | 'PERFORMANCE' | 'QUALITY';

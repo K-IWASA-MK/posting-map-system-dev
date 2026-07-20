@@ -12,4 +12,6 @@ export interface ReviewResult {
   readonly score: number; // Evaluated score between 0 and 100
   readonly violations: ReviewViolation[];
   readonly timestamp: string;
+  readonly consensusTrace?: string[];
+  readonly agentReviews?: any[];
 }
