@@ -1,10 +1,10 @@
 import { ConstitutionArticle } from './ConstitutionArticle';
 
 export class ConstitutionRegistry {
-  public static readonly version = '1.0.0';
+  public static readonly version = '1.1.0';
   public static readonly effectiveDate = '2026-07-21';
   public static readonly minimumCompatibleVersion = '1.0.0';
-  public static readonly supersedes = 'None';
+  public static readonly supersedes = '1.0.0';
 
   private static readonly articles: ConstitutionArticle[] = [
     {
@@ -95,6 +95,24 @@ export class ConstitutionRegistry {
       description: 'All system upgrades and newly evolved rules must preserve compatibility with active version schemas and core configuration JSON files.',
       severity: 'ERROR',
       version: '1.0.0',
+      enabled: true
+    },
+    {
+      id: 'C-011',
+      title: 'Centralized Root Resolution',
+      category: 'ARCHITECTURE',
+      description: 'Project root and platform directories must be resolved exclusively via ProjectRegistry and RootResolver API. Self-discovery is forbidden.',
+      severity: 'ERROR',
+      version: '1.1.0',
+      enabled: true
+    },
+    {
+      id: 'C-012',
+      title: 'No Relative Root Discovery',
+      category: 'ARCHITECTURE',
+      description: 'Directory path traversal jumps or dynamic parent directory calculations in source files or plans are strictly prohibited.',
+      severity: 'ERROR',
+      version: '1.1.0',
       enabled: true
     }
   ];

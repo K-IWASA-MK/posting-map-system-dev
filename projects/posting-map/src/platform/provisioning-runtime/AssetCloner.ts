@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const LOCAL_WORKSPACE_ROOT = path.join(__dirname, '..', '..', '..', '..', '..');
+import { RootResolver } from '../../../../../tools/review/RootResolver';
 
 async function driveFetch(endpoint: string, token: string, options: any = {}) {
   const url = `https://www.googleapis.com/drive/v3/${endpoint}`;
@@ -29,7 +29,7 @@ export class AssetCloner {
     if (isMock) {
       // Mock spreadsheet cloning by generating dummy file path ID
       const mockId = `mock-spreadsheet-${Date.now()}`;
-      const mockPath = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', name, 'spreadsheet.json');
+      const mockPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', name, 'spreadsheet.json');
       fs.writeFileSync(mockPath, JSON.stringify({ spreadsheetId: mockId, name }, null, 2), 'utf8');
       return mockId;
     }
@@ -56,7 +56,7 @@ export class AssetCloner {
   ): Promise<string> {
     if (isMock) {
       const mockId = `mock-storage-${Date.now()}`;
-      const mockPath = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', name, 'storage');
+      const mockPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', name, 'storage');
       if (!fs.existsSync(mockPath)) {
         fs.mkdirSync(mockPath, { recursive: true });
       }

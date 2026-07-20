@@ -32,6 +32,7 @@ export class ReviewRuleRegistry {
     const { ArchitecturePolicyRule } = require('./rules/ArchitecturePolicyRule');
     const { ArchitectureKnowledgeRule } = require('./rules/ArchitectureKnowledgeRule');
     const { ArchitecturePatternRule } = require('./rules/ArchitecturePatternRule');
+    const { ProjectRootResolutionRule } = require('./rules/ProjectRootResolutionRule');
 
     this.register(new ProjectBoundaryRule());
     this.register(new DirectoryResponsibilityRule());
@@ -39,6 +40,7 @@ export class ReviewRuleRegistry {
     this.register(new ArchitecturePolicyRule());
     this.register(new ArchitectureKnowledgeRule());
     this.register(new ArchitecturePatternRule());
+    this.register(new ProjectRootResolutionRule());
 
     // 2. Load dynamic promoted rules
     const fs = require('fs');

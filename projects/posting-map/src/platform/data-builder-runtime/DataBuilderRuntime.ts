@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as os from 'os';
 import { DistrictMetadataHelper } from './DistrictMetadata';
 import { BranchConfigHelper } from './BranchConfig';
+import { RootResolver } from '../../../../../tools/review/RootResolver';
 
 const BRANCH_ROOT_FOLDER_ID = "1EQQqWbtyF7iMd7Fk-WnUwWiAGB4MdIdN"; // FIELD_OPERATIONS_PLATFORM/03_BRANCH
-const LOCAL_WORKSPACE_ROOT = path.join(__dirname, '..', '..', '..', '..', '..');
 
 interface AIOSEvent {
   type: string;
@@ -131,7 +131,7 @@ export class DataBuilderRuntime {
       let inputData: any;
       
       if (process.env.NODE_ENV === 'test' || process.env.AIOS_MOCK === 'true') {
-        const localResultPath = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', event.districtName, 'research-result.json');
+        const localResultPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName, 'research-result.json');
         if (!fs.existsSync(localResultPath)) {
           throw new Error(`Local research-result.json not found for ${event.districtName} at: ${localResultPath}`);
         }
@@ -163,7 +163,7 @@ export class DataBuilderRuntime {
 
       // 3. Save artifacts (Drive vs Local Mock)
       if (process.env.NODE_ENV === 'test' || process.env.AIOS_MOCK === 'true') {
-        const localBranchDir = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', event.districtName);
+        const localBranchDir = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName);
         
         fs.writeFileSync(path.join(localBranchDir, 'district.json'), JSON.stringify(districtMetadata, null, 2), 'utf8');
         fs.writeFileSync(path.join(localBranchDir, 'config.json'), JSON.stringify(branchConfig, null, 2), 'utf8');

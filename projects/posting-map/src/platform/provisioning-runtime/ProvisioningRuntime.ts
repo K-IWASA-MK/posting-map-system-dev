@@ -4,9 +4,9 @@ import * as os from 'os';
 import { ProvisioningStage } from './ProvisioningStage';
 import { ProvisioningStateMachine, ProvisioningContext } from './ProvisioningStateMachine';
 import { AssetCloner } from './AssetCloner';
+import { RootResolver } from '../../../../../tools/review/RootResolver';
 
 const BRANCH_ROOT_FOLDER_ID = "1EQQqWbtyF7iMd7Fk-WnUwWiAGB4MdIdN"; // FIELD_OPERATIONS_PLATFORM/03_BRANCH
-const LOCAL_WORKSPACE_ROOT = path.join(__dirname, '..', '..', '..', '..', '..');
 
 interface AIOSEvent {
   type: string;
@@ -160,7 +160,7 @@ export class ProvisioningRuntime {
       let districtFolderId = '';
       
       if (isMock) {
-        const localBranchDir = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', event.districtName);
+        const localBranchDir = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName);
         if (!fs.existsSync(localBranchDir)) {
           fs.mkdirSync(localBranchDir, { recursive: true });
         }
@@ -178,7 +178,7 @@ export class ProvisioningRuntime {
       }
 
       // 3. Resolve template ID from AssetRegistry
-      const registryPath = path.join(LOCAL_WORKSPACE_ROOT, 'projects', 'posting-map', 'active', 'dashboard', 'clients', 'AssetRegistry.json');
+      const registryPath = path.join(RootResolver.resolveProject('posting-map'), 'active', 'dashboard', 'clients', 'AssetRegistry.json');
       if (!fs.existsSync(registryPath)) {
         throw new Error(`AssetRegistry.json not found at: ${registryPath}`);
       }
@@ -244,8 +244,8 @@ export class ProvisioningRuntime {
       
       // Check file existences
       if (isMock) {
-        const mockSpreadsheetPath = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', event.districtName, 'spreadsheet.json');
-        const mockStoragePath = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', event.districtName, 'storage');
+        const mockSpreadsheetPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName, 'spreadsheet.json');
+        const mockStoragePath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName, 'storage');
         if (!fs.existsSync(mockSpreadsheetPath) || !fs.existsSync(mockStoragePath)) {
           throw new Error("Cloned mock assets missing during verification.");
         }
@@ -290,7 +290,7 @@ export class ProvisioningRuntime {
       };
 
       if (isMock) {
-        const localDeploymentPath = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', event.districtName, 'deployment.json');
+        const localDeploymentPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName, 'deployment.json');
         fs.writeFileSync(localDeploymentPath, JSON.stringify(deploymentData, null, 2), 'utf8');
       } else {
         await uploadJsonFile("deployment.json", deploymentData, districtFolderId, token);

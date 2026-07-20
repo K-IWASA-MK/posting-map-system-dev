@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { Mission } from './MissionCreator';
+import { RootResolver } from '../../../../../tools/review/RootResolver';
 
 const BRANCH_ROOT_FOLDER_ID = "1EQQqWbtyF7iMd7Fk-WnUwWiAGB4MdIdN"; // FIELD_OPERATIONS_PLATFORM/03_BRANCH
-const LOCAL_WORKSPACE_ROOT = path.join(__dirname, '..', '..', '..', '..', '..');
 
 async function getClaspToken() {
   const claspRcPath = path.join(os.homedir(), '.clasprc.json');
@@ -142,7 +142,7 @@ export class ResearchTrigger {
 
     // If running in local unit test or simulation fallback, write locally
     if (process.env.NODE_ENV === 'test' || process.env.AIOS_MOCK === 'true') {
-      const localBranchDir = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', mission.districtName);
+      const localBranchDir = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', mission.districtName);
       if (!fs.existsSync(localBranchDir)) {
         fs.mkdirSync(localBranchDir, { recursive: true });
       }
@@ -168,7 +168,7 @@ export class ResearchTrigger {
     } catch (err: any) {
       console.error(`[ResearchTrigger] Upload failed: ${err.message}. Saving to local fallback.`);
       // Fallback local write
-      const localBranchDir = path.join(LOCAL_WORKSPACE_ROOT, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', mission.districtName);
+      const localBranchDir = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', mission.districtName);
       if (!fs.existsSync(localBranchDir)) {
         fs.mkdirSync(localBranchDir, { recursive: true });
       }

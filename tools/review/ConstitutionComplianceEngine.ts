@@ -62,6 +62,45 @@ export class ConstitutionComplianceEngine {
           }
         }
       }
+
+      // C-011 & C-012: Centralized path resolution checks
+      const fs = require('fs');
+      const { RootResolutionPolicy } = require('./RootResolutionPolicy');
+      
+      const planViolation = RootResolutionPolicy.isPolicyViolated(targetData.planContent || '');
+      if (planViolation.violated) {
+        const art12 = articles.find(a => a.id === 'C-012')!;
+        violations.push({
+          articleId: art12.id,
+          message: `Constitution Violation C-012: Plan content uses parent traversal path patterns.`,
+          severity: art12.severity
+        });
+      }
+
+      for (const file of proposedFiles) {
+        if (fs.existsSync(file)) {
+          try {
+            const content = fs.readFileSync(file, 'utf-8');
+            const fileViolation = RootResolutionPolicy.isPolicyViolated(content);
+            if (fileViolation.violated) {
+              const art11 = articles.find(a => a.id === 'C-011')!;
+              const art12 = articles.find(a => a.id === 'C-012')!;
+              violations.push({
+                articleId: art11.id,
+                message: `Constitution Violation C-011: File "${file}" performs self-discovery of project roots instead of using RootResolver.`,
+                severity: art11.severity
+              });
+              violations.push({
+                articleId: art12.id,
+                message: `Constitution Violation C-012: File "${file}" uses forbidden relative directory traversal methods: ${fileViolation.reason}`,
+                severity: art12.severity
+              });
+            }
+          } catch (e) {
+            // Ignore un-readable files
+          }
+        }
+      }
     }
 
     if (targetType === 'RULE') {
