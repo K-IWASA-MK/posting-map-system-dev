@@ -10,6 +10,6 @@ export interface ReviewContext {
 export interface ReviewRule {
   readonly id: string;
   readonly name: string;
-  readonly category: 'Boundary' | 'Responsibility' | 'Ownership' | 'Policy';
+  readonly category: 'Boundary' | 'Responsibility' | 'Ownership' | 'Policy' | 'Security' | 'Dependency';
   evaluate(context: ReviewContext): Promise<ReviewViolation[]>;
 }

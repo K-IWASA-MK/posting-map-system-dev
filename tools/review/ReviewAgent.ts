@@ -41,18 +41,16 @@ export class ArchitectureAgent extends ReviewAgent {
   public async review(context: ReviewContext): Promise<AgentReviewResult> {
     const violations: ReviewViolation[] = [];
     
-    // Dynamically load only rules that match capabilities/category
-    const { ProjectBoundaryRule } = require('./rules/ProjectBoundaryRule');
-    const { OwnershipRule } = require('./rules/OwnershipRule');
-    const { ArchitectureKnowledgeRule } = require('./rules/ArchitectureKnowledgeRule');
-    const { ArchitecturePatternRule } = require('./rules/ArchitecturePatternRule');
+    const { ReviewRuleRegistry } = require('./ReviewRuleRegistry');
+    ReviewRuleRegistry.discover();
+    const allRules = ReviewRuleRegistry.getRules();
 
-    const rules: ReviewRule[] = [
-      new ProjectBoundaryRule(),
-      new OwnershipRule(),
-      new ArchitectureKnowledgeRule(),
-      new ArchitecturePatternRule()
-    ];
+    const rules = allRules.filter((r: ReviewRule) => 
+      r.category === 'Boundary' || 
+      r.category === 'Ownership' || 
+      r.id.startsWith('RULE-G6-02-KNOWLEDGE-MATCH') ||
+      r.id.startsWith('EVOL-RULE')
+    );
 
     for (const r of rules) {
       const v = await r.evaluate(context);
@@ -80,13 +78,14 @@ export class GovernanceAgent extends ReviewAgent {
   public async review(context: ReviewContext): Promise<AgentReviewResult> {
     const violations: ReviewViolation[] = [];
 
-    const { DirectoryResponsibilityRule } = require('./rules/DirectoryResponsibilityRule');
-    const { ArchitecturePolicyRule } = require('./rules/ArchitecturePolicyRule');
+    const { ReviewRuleRegistry } = require('./ReviewRuleRegistry');
+    ReviewRuleRegistry.discover();
+    const allRules = ReviewRuleRegistry.getRules();
 
-    const rules: ReviewRule[] = [
-      new DirectoryResponsibilityRule(),
-      new ArchitecturePolicyRule()
-    ];
+    const rules = allRules.filter((r: ReviewRule) => 
+      (r.category === 'Responsibility' || r.category === 'Policy') && 
+      !r.id.startsWith('RULE-G6-02-KNOWLEDGE-MATCH')
+    );
 
     for (const r of rules) {
       const v = await r.evaluate(context);
