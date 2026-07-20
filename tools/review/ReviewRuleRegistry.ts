@@ -30,10 +30,12 @@ export class ReviewRuleRegistry {
     const { DirectoryResponsibilityRule } = require('./rules/DirectoryResponsibilityRule');
     const { OwnershipRule } = require('./rules/OwnershipRule');
     const { ArchitecturePolicyRule } = require('./rules/ArchitecturePolicyRule');
+    const { ArchitectureKnowledgeRule } = require('./rules/ArchitectureKnowledgeRule');
 
     this.register(new ProjectBoundaryRule());
     this.register(new DirectoryResponsibilityRule());
     this.register(new OwnershipRule());
     this.register(new ArchitecturePolicyRule());
+    this.register(new ArchitectureKnowledgeRule());
   }
 }
