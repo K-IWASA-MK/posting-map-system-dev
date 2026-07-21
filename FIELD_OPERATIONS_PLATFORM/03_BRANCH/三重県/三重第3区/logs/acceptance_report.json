@@ -1,5 +1,5 @@
 {
-  "agent": "District Initialization AI",
+  "agent": "Address Extraction AI",
   "agentType": "Production",
   "validator": "Acceptance Validator AI",
   "validatorId": "VAL-ACCEPTANCE-001",
@@ -35,15 +35,15 @@
   ],
   "failures": [],
   "execution": {
-    "startedAt": "2026-07-21T15:26:00+09:00",
-    "finishedAt": "2026-07-21T15:26:30+09:00",
-    "durationMs": 30000
+    "startedAt": "2026-07-21T07:20:38.109Z",
+    "finishedAt": "2026-07-21T07:20:38.110Z",
+    "durationMs": 1500
   },
   "artifacts": [
     {
-      "file": "source/district_municipalities.csv",
-      "size": 230,
-      "sha256": "7b670557ff0bce35e7d4773bac37911ac64a770bd20272ee912bd91fae542265"
+      "file": "master/address_database.json",
+      "size": 2430,
+      "sha256": "8c0b9b834812c08372f37a9c7c6e410a0b0994dee73d0ab2705b6a1ff9ed3b45"
     }
   ]
 }

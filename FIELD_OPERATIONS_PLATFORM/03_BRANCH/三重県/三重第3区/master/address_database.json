@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0.0",
+  "districtId": "MIE-03",
+  "districtName": "三重第3区",
+  "prefecture": "三重県",
+  "totalMunicipalities": 5,
+  "totalTowns": 17,
+  "owner": "Address Extraction AI",
+  "municipalities": [
+    {
+      "name": "四日市市（一部）",
+      "towns": [
+        {
+          "name": "富田",
+          "chome": [
+            "1丁目",
+            "2丁目",
+            "3丁目"
+          ]
+        },
+        {
+          "name": "富州原町",
+          "chome": []
+        },
+        {
+          "name": "羽津",
+          "chome": [
+            "1丁目",
+            "2丁目"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "桑名市",
+      "towns": [
+        {
+          "name": "江場",
+          "chome": [
+            "1丁目",
+            "2丁目",
+            "3丁目"
+          ]
+        },
+        {
+          "name": "吉之丸",
+          "chome": []
+        },
+        {
+          "name": "大山田",
+          "chome": [
+            "1丁目",
+            "2丁目",
+            "3丁目",
+            "4丁目",
+            "5丁目",
+            "6丁目",
+            "7丁目",
+            "8丁目"
+          ]
+        },
+        {
+          "name": "播磨",
+          "chome": []
+        },
+        {
+          "name": "多度町香取",
+          "chome": []
+        },
+        {
+          "name": "長島町駒江",
+          "chome": []
+        }
+      ]
+    },
+    {
+      "name": "いなべ市",
+      "towns": [
+        {
+          "name": "員弁町大泉",
+          "chome": []
+        },
+        {
+          "name": "北勢町阿下喜",
+          "chome": []
+        },
+        {
+          "name": "大安町丹生川",
+          "chome": []
+        },
+        {
+          "name": "藤原町市場",
+          "chome": []
+        }
+      ]
+    },
+    {
+      "name": "桑名郡",
+      "towns": [
+        {
+          "name": "木曽岬町加畑",
+          "chome": []
+        },
+        {
+          "name": "木曽岬町源緑輪中",
+          "chome": []
+        }
+      ]
+    },
+    {
+      "name": "員弁郡",
+      "towns": [
+        {
+          "name": "東員町穴太",
+          "chome": []
+        },
+        {
+          "name": "東員町笹尾東",
+          "chome": [
+            "1丁目",
+            "2丁目",
+            "3丁目"
+          ]
+        }
+      ]
+    }
+  ],
+  "lastUpdated": "2026-07-21T07:20:32.675Z"
+}
