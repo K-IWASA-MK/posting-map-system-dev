@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "districtId": "MIE-03",
   "districtName": "三重第3区",
   "prefecture": "三重県",
@@ -12,6 +12,8 @@
       "towns": [
         {
           "name": "富田",
+          "hasChome": true,
+          "chomeStatus": "VERIFIED",
           "chome": [
             "1丁目",
             "2丁目",
@@ -20,10 +22,14 @@
         },
         {
           "name": "富州原町",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "羽津",
+          "hasChome": true,
+          "chomeStatus": "VERIFIED",
           "chome": [
             "1丁目",
             "2丁目"
@@ -36,6 +42,8 @@
       "towns": [
         {
           "name": "江場",
+          "hasChome": true,
+          "chomeStatus": "VERIFIED",
           "chome": [
             "1丁目",
             "2丁目",
@@ -44,10 +52,14 @@
         },
         {
           "name": "吉之丸",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "大山田",
+          "hasChome": true,
+          "chomeStatus": "VERIFIED",
           "chome": [
             "1丁目",
             "2丁目",
@@ -61,14 +73,20 @@
         },
         {
           "name": "播磨",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "多度町香取",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "長島町駒江",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         }
       ]
@@ -78,18 +96,26 @@
       "towns": [
         {
           "name": "員弁町大泉",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "北勢町阿下喜",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "大安町丹生川",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "藤原町市場",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         }
       ]
@@ -99,10 +125,14 @@
       "towns": [
         {
           "name": "木曽岬町加畑",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "木曽岬町源緑輪中",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         }
       ]
@@ -112,10 +142,14 @@
       "towns": [
         {
           "name": "東員町穴太",
+          "hasChome": false,
+          "chomeStatus": "NONE",
           "chome": []
         },
         {
           "name": "東員町笹尾東",
+          "hasChome": true,
+          "chomeStatus": "VERIFIED",
           "chome": [
             "1丁目",
             "2丁目",
@@ -125,5 +159,5 @@
       ]
     }
   ],
-  "lastUpdated": "2026-07-21T07:20:32.675Z"
+  "lastUpdated": "2026-07-21T07:31:51.428Z"
 }

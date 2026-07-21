@@ -35,15 +35,15 @@
   ],
   "failures": [],
   "execution": {
-    "startedAt": "2026-07-21T07:20:38.109Z",
-    "finishedAt": "2026-07-21T07:20:38.110Z",
+    "startedAt": "2026-07-21T07:31:53.440Z",
+    "finishedAt": "2026-07-21T07:31:53.441Z",
     "durationMs": 1500
   },
   "artifacts": [
     {
       "file": "master/address_database.json",
-      "size": 2430,
-      "sha256": "8c0b9b834812c08372f37a9c7c6e410a0b0994dee73d0ab2705b6a1ff9ed3b45"
+      "size": 3499,
+      "sha256": "95bd38c664901073ae76f632e4a6ef8d003872142ddbcca9745f7226413c30c0"
     }
   ]
 }
