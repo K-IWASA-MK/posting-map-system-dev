@@ -1,6 +1,6 @@
 # Address Extraction AI - INPUT / OUTPUT Specification
 
-Version: 1.1.0
+Version: 2.0.0 (Single Status SSOT)
 
 ---
 
@@ -12,10 +12,12 @@ Version: 1.1.0
 
 ## ■ Output (出力)
 
-### 1. `master/address_database.json` (新スキーマ v1.1.0)
+### 1. `master/address_database.json` (スキーマ v2.0.0)
+`hasChome` を完全廃止し、`chomeStatus` を唯一の真実 (Single Source of Truth) とした決定論的データ構造。
+
 ```json
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "2.0.0",
   "districtId": "MIE-03",
   "districtName": "三重第3区",
   "totalMunicipalities": 5,
@@ -27,36 +29,34 @@ Version: 1.1.0
       "towns": [
         {
           "name": "大山田",
-          "hasChome": true,
           "chomeStatus": "VERIFIED",
           "chome": ["1丁目", "2丁目", "3丁目"]
         },
         {
           "name": "吉之丸",
-          "hasChome": false,
           "chomeStatus": "NONE",
           "chome": []
         }
       ]
     }
   ],
-  "lastUpdated": "2026-07-21T16:32:00+09:00"
+  "lastUpdated": "2026-07-21T16:34:00+09:00"
 }
 ```
 
-#### 丁目ステータス (`chomeStatus`) 定義
-- `VERIFIED`: 丁目が存在し、一覧が検証済み (`hasChome: true`)
-- `NONE`: 丁目が存在しない町名であることが確定検証済み (`hasChome: false`, `chome: []`)
-- `PENDING`: 未調査
-- `FAILED`: 取得失敗
+#### 丁目ステータス (`chomeStatus`) 整合性マトリクス
+- `VERIFIED`: 丁目が存在し一覧が検証済み (`chome`: 1件以上必須)
+- `NONE`: 丁目が存在しない町名であることが確定検証済み (`chome`: 空配列 `[]` 必須)
+- `PENDING`: 未調査 (`chome`: 空配列 `[]` 必須)
+- `FAILED`: 取得失敗 (`chome`: 空配列 `[]` 必須)
 
 ---
 
-### 2. `logs/verification.json` (監査ログ)
+### 2. `logs/verification.json`
 ```json
 {
   "agent": "Address Extraction AI",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "result": "SUCCESS",
   "input": {
     "districtProfile": "master/district_profile.json"
@@ -68,7 +68,7 @@ Version: 1.1.0
   "artifacts": [
     {
       "file": "master/address_database.json",
-      "size": 1850,
+      "size": 1720,
       "sha256": "..."
     }
   ]

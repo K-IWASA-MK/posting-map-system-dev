@@ -2,10 +2,10 @@ Agent Name:
 Address Extraction AI
 
 Version:
-1.1.0
+2.0.0
 
 Status:
-Production Blueprint (Explicit Chome Schema v1.1.0)
+Production Blueprint (Single Status SSOT v2.0.0)
 
 Target:
 POSTING MAP / FIELD OPERATIONS OS
