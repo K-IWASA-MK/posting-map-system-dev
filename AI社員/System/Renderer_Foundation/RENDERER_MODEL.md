@@ -1,3 +1,9 @@
+# IRenderer Interface & Complete Rendering Contract Specification v1.0
+
+---
+
+## ■ Extended RENDERING_CONTRACT.json Specification
+```json
 {
   "contractId": "RC-MIE03-SPREADSHEET-001",
   "targetRenderer": "GoogleSheetsRenderer",
@@ -19,13 +25,6 @@
       "source": "master/district_profile.json",
       "field": "districtName",
       "label": "選挙区名"
-    },
-    {
-      "sheet": "Summary",
-      "cell": "B3",
-      "source": "master/district_profile.json",
-      "field": "prefecture",
-      "label": "都道府県"
     },
     {
       "sheet": "Summary",
@@ -55,3 +54,13 @@
     }
   ]
 }
+```
+
+---
+
+## ■ IRenderer Interface Methods
+- `open(destination)`
+- `renderCell(sheetName, cellAddress, value, styleConfig)`
+- `renderTable(sheetName, startCell, tableData, headerStyleConfig, dataStyleConfig)`
+- `applyLayout(sheetName, layoutConfig)`
+- `flush()`
