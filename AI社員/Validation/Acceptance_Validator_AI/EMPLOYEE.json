@@ -1,0 +1,41 @@
+{
+  "employeeId": "AI-VAL-0001",
+  "employeeName": "Acceptance Validator AI",
+  "employeeType": "VALIDATION",
+  "version": "1.0.0",
+  "status": "ACTIVE",
+
+  "responsibility": [
+    "Inspect Workspace and Artifacts",
+    "Evaluate 5-Gate Acceptance Standard",
+    "Generate Immutable Acceptance Report"
+  ],
+
+  "capabilities": [
+    "NON_INVASIVE_INSPECTION",
+    "DETERMINISTIC_HASH_VERIFICATION",
+    "ACCEPTANCE_REPORT_GENERATION"
+  ],
+
+  "acceptedInputs": [
+    "03_BRANCH Workspace",
+    "master/*.json",
+    "logs/verification.json"
+  ],
+
+  "ownedArtifacts": [
+    "logs/acceptance_report.json"
+  ],
+
+  "producedArtifacts": [
+    "logs/acceptance_report.json"
+  ],
+
+  "validator": "SELF",
+
+  "dependencies": [],
+
+  "downstreamEmployees": [
+    "GOVERNANCE_AI"
+  ]
+}

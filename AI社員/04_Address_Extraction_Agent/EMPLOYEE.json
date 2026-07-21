@@ -1,0 +1,42 @@
+{
+  "employeeId": "AI-0002",
+  "employeeName": "Address Extraction AI",
+  "employeeType": "PRODUCTION",
+  "version": "2.3.0",
+  "status": "ACTIVE",
+
+  "responsibility": [
+    "Extract Address",
+    "Normalize Address",
+    "Generate Master Artifact"
+  ],
+
+  "capabilities": [
+    "ADDRESS_EXTRACTION",
+    "ADDRESS_NORMALIZATION",
+    "MASTER_ARTIFACT_GENERATION"
+  ],
+
+  "acceptedInputs": [
+    "master/district_profile.json",
+    "NATIONAL_ADDRESS_MASTER"
+  ],
+
+  "ownedArtifacts": [
+    "master/address_database.json"
+  ],
+
+  "producedArtifacts": [
+    "master/address_database.json"
+  ],
+
+  "validator": "Acceptance Validator AI",
+
+  "dependencies": [
+    "AI-0001"
+  ],
+
+  "downstreamEmployees": [
+    "AI-0003"
+  ]
+}

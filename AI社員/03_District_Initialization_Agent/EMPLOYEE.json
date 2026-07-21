@@ -1,0 +1,45 @@
+{
+  "employeeId": "AI-0001",
+  "employeeName": "District Initialization AI",
+  "employeeType": "PRODUCTION",
+  "version": "1.1.0",
+  "status": "ACTIVE",
+
+  "responsibility": [
+    "Verify Municipalities with Public Sources",
+    "Generate District Master Profile",
+    "Maintain Election Turnout History"
+  ],
+
+  "capabilities": [
+    "DISTRICT_INITIALIZATION",
+    "PUBLIC_DATA_VERIFICATION",
+    "MASTER_PROFILE_GENERATION",
+    "TURNOUT_HISTORY_ROTATION"
+  ],
+
+  "acceptedInputs": [
+    "MIC_PUBLIC_DATA",
+    "ELECTION_COMMISSION_DATA"
+  ],
+
+  "ownedArtifacts": [
+    "master/district_profile.json",
+    "master/election_history.json"
+  ],
+
+  "producedArtifacts": [
+    "source/district_municipalities.csv",
+    "master/district_profile.json",
+    "master/election_history.json"
+  ],
+
+  "validator": "Acceptance Validator AI",
+
+  "dependencies": [],
+
+  "downstreamEmployees": [
+    "AI-0002",
+    "AI-0003"
+  ]
+}
