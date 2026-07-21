@@ -5,6 +5,7 @@ import { ElectionMasterResolver } from "./ElectionMasterResolver";
 import { TurnoutDataResolver } from "./TurnoutDataResolver";
 import { ElectionResearchCompiler } from "./ElectionResearchCompiler";
 import { ResearchValidator } from "./ResearchValidator";
+import { PostingMapPathResolver } from "../../shared/PostingMapPathResolver";
 
 export interface ResearchRequestedEvent {
   type: string;
@@ -69,12 +70,8 @@ export class ElectionResearchRuntime {
       }
 
       // 出力先パスの特定
-      const branchFolder = path.join(
-        this.localWorkspaceRoot,
-        "FIELD_OPERATIONS_PLATFORM",
-        "03_BRANCH",
-        event.districtName
-      );
+      const pathResolver = new PostingMapPathResolver(this.localWorkspaceRoot);
+      const branchFolder = pathResolver.getBranchDirectory(event.districtName);
       const outputJsonPath = path.join(branchFolder, "election-research-result.json");
 
       // フォルダが存在しない場合は作成

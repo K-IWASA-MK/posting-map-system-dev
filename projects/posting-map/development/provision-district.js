@@ -81,8 +81,12 @@ async function main() {
   try {
     const token = await getClaspToken();
     
-    // Step 1: Initialize Manifest
+    // Step 1: Initialize Manifest (Rule-004: Sheet Name Format: {branchId} v{masterVersionMajor})
+    const masterVersionMajor = "1";
+    const sheetName = `${districtId} v${masterVersionMajor}`;
     const manifest = RegistryManager.initialize(districtId, `${districtId} 支部`, "postingareamap@gmail.com");
+    manifest.district.sheetName = sheetName;
+    manifest.district.displayName = `${districtId} 支部`;
     const scriptId = manifest.resources.scriptId || "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa";
     manifest.resources.scriptId = scriptId;
 

@@ -6,6 +6,7 @@ import { PresentationIntegrityVerifier } from "../../src/platform/dashboard-pres
 import { DeploymentAdapter } from "../../src/platform/dashboard-presentation-runtime/adapters/DeploymentAdapter";
 import { DeploymentResult } from "../../src/platform/dashboard-presentation-runtime/adapters/DeploymentResult";
 import { PublicDashboardDataContract } from "../../src/platform/dashboard-presentation-runtime/contract/PresentationContract";
+import { PostingMapPathResolver } from "../../src/shared/PostingMapPathResolver";
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -30,15 +31,11 @@ async function runTest() {
   console.log("🧪 Running Dashboard Presentation Runtime Foundation Test...\n");
 
   const localWorkspaceRoot = path.join(__dirname, "..", "..", "..", "..");
+  const pathResolver = new PostingMapPathResolver(localWorkspaceRoot);
   const districtName = "TEST-DISTRICT-PRESENTATION";
   const districtId = "TEST-DST-PRES";
 
-  const branchDir = path.join(
-    localWorkspaceRoot,
-    "FIELD_OPERATIONS_PLATFORM",
-    "03_BRANCH",
-    districtName
-  );
+  const branchDir = pathResolver.getBranchDirectory(districtName);
 
   const researchPath = path.join(branchDir, "election-research-result.json");
   const deploymentPath = path.join(branchDir, "deployment.json");
@@ -46,15 +43,7 @@ async function runTest() {
   const dashboardDataPath = path.join(branchDir, "dashboard-data.json");
   const publicDataPath = path.join(branchDir, "public-dashboard-data.json");
 
-  const registryPath = path.join(
-    localWorkspaceRoot,
-    "projects",
-    "posting-map",
-    "active",
-    "dashboard",
-    "clients",
-    "AssetRegistry.json"
-  );
+  const registryPath = pathResolver.getAssetRegistryPath();
 
   let originalRegistryContent: string = "";
 

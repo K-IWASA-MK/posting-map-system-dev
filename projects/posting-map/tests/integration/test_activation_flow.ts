@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { ActivationRuntime, ActivationEvent } from "../../src/platform/activation-runtime/ActivationRuntime";
 import { ActivationStage } from "../../src/platform/activation-runtime/ActivationStage";
+import { PostingMapPathResolver } from "../../src/shared/PostingMapPathResolver";
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -13,24 +14,13 @@ async function runTest() {
   console.log("🧪 Running Activation Runtime Foundation Integration Test...\n");
 
   const localWorkspaceRoot = path.join(__dirname, "..", "..", "..", "..");
-  const branchDir = path.join(
-    localWorkspaceRoot,
-    "FIELD_OPERATIONS_PLATFORM",
-    "03_BRANCH",
-    "東京第18区"
-  );
+  const pathResolver = new PostingMapPathResolver(localWorkspaceRoot);
+
+  const branchDir = pathResolver.getBranchDirectory("東京第18区");
   const deploymentJsonPath = path.join(branchDir, "deployment.json");
   const activationJsonPath = path.join(branchDir, "activation.json");
   
-  const registryPath = path.join(
-    localWorkspaceRoot,
-    "projects",
-    "posting-map",
-    "active",
-    "dashboard",
-    "clients",
-    "AssetRegistry.json"
-  );
+  const registryPath = pathResolver.getAssetRegistryPath();
 
   let originalRegistryContent: string = "";
 

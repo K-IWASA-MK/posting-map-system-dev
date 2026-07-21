@@ -3,6 +3,7 @@ import * as path from "path";
 import { DeploymentAdapter } from "./DeploymentAdapter";
 import { PublicDashboardDataContract } from "../contract/PresentationContract";
 import { DeploymentResult } from "./DeploymentResult";
+import { PostingMapPathResolver } from "../../../shared/PostingMapPathResolver";
 
 export class LocalFileDeploymentAdapter implements DeploymentAdapter {
   private readonly workspaceRoot: string;
@@ -16,12 +17,8 @@ export class LocalFileDeploymentAdapter implements DeploymentAdapter {
    */
   public async deploy(artifact: PublicDashboardDataContract, districtName: string): Promise<DeploymentResult> {
     try {
-      const branchFolder = path.join(
-        this.workspaceRoot,
-        "FIELD_OPERATIONS_PLATFORM",
-        "03_BRANCH",
-        districtName
-      );
+      const pathResolver = new PostingMapPathResolver(this.workspaceRoot);
+      const branchFolder = pathResolver.getBranchDirectory(districtName);
 
       if (!fs.existsSync(branchFolder)) {
         fs.mkdirSync(branchFolder, { recursive: true });

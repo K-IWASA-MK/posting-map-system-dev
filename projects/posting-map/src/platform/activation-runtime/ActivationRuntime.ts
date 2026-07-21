@@ -5,6 +5,7 @@ import { ActivationStateMachine } from "./ActivationStateMachine";
 import { LineConnector } from "./LineConnector";
 import { GasConnector } from "./GasConnector";
 import { ActivationVerifier } from "./ActivationVerifier";
+import { PostingMapPathResolver } from "../../shared/PostingMapPathResolver";
 
 export interface ActivationEvent {
   type: string;
@@ -47,12 +48,8 @@ export class ActivationRuntime {
     const sm = new ActivationStateMachine(event.missionId);
     
     // 出力先フォルダの特定
-    const branchFolder = path.join(
-      this.localWorkspaceRoot,
-      "FIELD_OPERATIONS_PLATFORM",
-      "03_BRANCH",
-      event.districtName
-    );
+    const pathResolver = new PostingMapPathResolver(this.localWorkspaceRoot);
+    const branchFolder = pathResolver.getBranchDirectory(event.districtName);
     const deploymentJsonPath = path.join(branchFolder, "deployment.json");
     const activationJsonPath = path.join(branchFolder, "activation.json");
 

@@ -5,6 +5,7 @@ import { ProvisioningStage } from './ProvisioningStage';
 import { ProvisioningStateMachine, ProvisioningContext } from './ProvisioningStateMachine';
 import { AssetCloner } from './AssetCloner';
 import { RootResolver } from '../../../../../tools/review/RootResolver';
+import { PostingMapPathResolver } from '../../shared/PostingMapPathResolver';
 
 const BRANCH_ROOT_FOLDER_ID = "1EQQqWbtyF7iMd7Fk-WnUwWiAGB4MdIdN"; // FIELD_OPERATIONS_PLATFORM/03_BRANCH
 
@@ -159,8 +160,9 @@ export class ProvisioningRuntime {
       sm.transitionTo(ProvisioningStage.PREPARING);
       let districtFolderId = '';
       
+      const pathResolver = new PostingMapPathResolver();
       if (isMock) {
-        const localBranchDir = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName);
+        const localBranchDir = pathResolver.getBranchDirectory(event.districtName);
         if (!fs.existsSync(localBranchDir)) {
           fs.mkdirSync(localBranchDir, { recursive: true });
         }
@@ -178,7 +180,7 @@ export class ProvisioningRuntime {
       }
 
       // 3. Resolve template ID from AssetRegistry
-      const registryPath = path.join(RootResolver.resolveProject('posting-map'), 'active', 'dashboard', 'clients', 'AssetRegistry.json');
+      const registryPath = pathResolver.getAssetRegistryPath();
       if (!fs.existsSync(registryPath)) {
         throw new Error(`AssetRegistry.json not found at: ${registryPath}`);
       }
@@ -244,8 +246,8 @@ export class ProvisioningRuntime {
       
       // Check file existences
       if (isMock) {
-        const mockSpreadsheetPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName, 'spreadsheet.json');
-        const mockStoragePath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName, 'storage');
+        const mockSpreadsheetPath = path.join(pathResolver.getBranchDirectory(event.districtName), 'spreadsheet.json');
+        const mockStoragePath = path.join(pathResolver.getBranchDirectory(event.districtName), 'storage');
         if (!fs.existsSync(mockSpreadsheetPath) || !fs.existsSync(mockStoragePath)) {
           throw new Error("Cloned mock assets missing during verification.");
         }
@@ -290,7 +292,7 @@ export class ProvisioningRuntime {
       };
 
       if (isMock) {
-        const localDeploymentPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', event.districtName, 'deployment.json');
+        const localDeploymentPath = path.join(pathResolver.getBranchDirectory(event.districtName), 'deployment.json');
         fs.writeFileSync(localDeploymentPath, JSON.stringify(deploymentData, null, 2), 'utf8');
       } else {
         await uploadJsonFile("deployment.json", deploymentData, districtFolderId, token);

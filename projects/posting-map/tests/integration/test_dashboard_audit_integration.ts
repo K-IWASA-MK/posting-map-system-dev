@@ -5,6 +5,7 @@ import { DashboardAuditPublisher } from "../../src/platform/dashboard-data-runti
 import { ExecutionLedgerAdapter } from "../../src/platform/dashboard-data-runtime/audit/ExecutionLedgerAdapter";
 import { DashboardDataIntegrityVerifier } from "../../src/platform/dashboard-data-runtime/audit/DashboardDataIntegrityVerifier";
 import { ExecutionLedgerRegistry } from "../../../../sdk/ExecutionLedgerRegistry";
+import { PostingMapPathResolver } from "../../src/shared/PostingMapPathResolver";
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -16,30 +17,18 @@ async function runTest() {
   console.log("🧪 Running Dashboard Data Audit Integration Integration Test...\n");
 
   const localWorkspaceRoot = path.join(__dirname, "..", "..", "..", "..");
+  const pathResolver = new PostingMapPathResolver(localWorkspaceRoot);
   const districtName = "TEST-DISTRICT-AUDIT";
   const districtId = "TEST-DST-AUDIT";
 
-  const branchDir = path.join(
-    localWorkspaceRoot,
-    "FIELD_OPERATIONS_PLATFORM",
-    "03_BRANCH",
-    districtName
-  );
+  const branchDir = pathResolver.getBranchDirectory(districtName);
 
   const researchPath = path.join(branchDir, "election-research-result.json");
   const deploymentPath = path.join(branchDir, "deployment.json");
   const activationPath = path.join(branchDir, "activation.json");
   const dashboardDataPath = path.join(branchDir, "dashboard-data.json");
 
-  const registryPath = path.join(
-    localWorkspaceRoot,
-    "projects",
-    "posting-map",
-    "active",
-    "dashboard",
-    "clients",
-    "AssetRegistry.json"
-  );
+  const registryPath = pathResolver.getAssetRegistryPath();
 
   let originalRegistryContent: string = "";
 

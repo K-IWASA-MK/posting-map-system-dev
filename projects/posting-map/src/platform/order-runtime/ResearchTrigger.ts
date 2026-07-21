@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { Mission } from './MissionCreator';
 import { RootResolver } from '../../../../../tools/review/RootResolver';
+import { PostingMapPathResolver } from '../../shared/PostingMapPathResolver';
 
 const BRANCH_ROOT_FOLDER_ID = "1EQQqWbtyF7iMd7Fk-WnUwWiAGB4MdIdN"; // FIELD_OPERATIONS_PLATFORM/03_BRANCH
 
@@ -141,8 +142,9 @@ export class ResearchTrigger {
     };
 
     // If running in local unit test or simulation fallback, write locally
+    const pathResolver = new PostingMapPathResolver();
     if (process.env.NODE_ENV === 'test' || process.env.AIOS_MOCK === 'true') {
-      const localBranchDir = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', mission.districtName);
+      const localBranchDir = pathResolver.getBranchDirectory(mission.districtName);
       if (!fs.existsSync(localBranchDir)) {
         fs.mkdirSync(localBranchDir, { recursive: true });
       }
@@ -168,7 +170,7 @@ export class ResearchTrigger {
     } catch (err: any) {
       console.error(`[ResearchTrigger] Upload failed: ${err.message}. Saving to local fallback.`);
       // Fallback local write
-      const localBranchDir = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', mission.districtName);
+      const localBranchDir = pathResolver.getBranchDirectory(mission.districtName);
       if (!fs.existsSync(localBranchDir)) {
         fs.mkdirSync(localBranchDir, { recursive: true });
       }

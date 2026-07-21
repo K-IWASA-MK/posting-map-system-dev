@@ -12,7 +12,7 @@ function appendEventLog(event) {
   }
 
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const ss = getSS();
     let sheet = ss.getSheetByName(CONFIG.get("SHEETS.EVENTLOG"));
     
     // シートが存在しない場合は自動生成

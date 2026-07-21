@@ -12,6 +12,7 @@ import { ActivationAdapter } from "./adapters/ActivationAdapter";
 import { AssetRegistryAdapter } from "./adapters/AssetRegistryAdapter";
 import { DashboardDataBuilder } from "./builder/DashboardDataBuilder";
 import { DashboardDataCompletedEvent, DashboardDataEvent } from "./contract/DashboardDataContract";
+import { PostingMapPathResolver } from "../../shared/PostingMapPathResolver";
 
 export class DashboardDataRuntime {
   private localWorkspaceRoot: string;
@@ -36,25 +37,13 @@ export class DashboardDataRuntime {
     console.log(`[DashboardDataRuntime] Processing dashboard read model generation for: ${event.districtName} (Mission: ${event.missionId})`);
 
     try {
-      const branchFolder = path.join(
-        this.localWorkspaceRoot,
-        "FIELD_OPERATIONS_PLATFORM",
-        "03_BRANCH",
-        event.districtName
-      );
+      const pathResolver = new PostingMapPathResolver(this.localWorkspaceRoot);
+      const branchFolder = pathResolver.getBranchDirectory(event.districtName);
 
       const researchPath = path.join(branchFolder, "election-research-result.json");
       const deploymentPath = path.join(branchFolder, "deployment.json");
       const activationPath = path.join(branchFolder, "activation.json");
-      const assetRegistryPath = path.join(
-        this.localWorkspaceRoot,
-        "projects",
-        "posting-map",
-        "active",
-        "dashboard",
-        "clients",
-        "AssetRegistry.json"
-      );
+      const assetRegistryPath = pathResolver.getAssetRegistryPath();
 
       // 1. Existence Checks
       if (!fs.existsSync(researchPath)) throw new Error(`Missing required input: ${researchPath}`);

@@ -1,4 +1,5 @@
 import { ProvisioningRuntime } from '../../src/platform/provisioning-runtime/ProvisioningRuntime';
+import { PostingMapPathResolver } from '../../src/shared/PostingMapPathResolver';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -21,7 +22,8 @@ async function runTest() {
   };
 
   const workspaceRoot = path.resolve(__dirname, '../..');
-  const registryPath = path.join(workspaceRoot, 'active', 'dashboard', 'clients', 'AssetRegistry.json');
+  const pathResolver = new PostingMapPathResolver(workspaceRoot);
+  const registryPath = pathResolver.getAssetRegistryPath();
   
   // Backup registry to restore after test
   const originalRegistryContent = fs.readFileSync(registryPath, 'utf8');
@@ -35,7 +37,7 @@ async function runTest() {
     assert(result.outputEvent.type === "PROVISIONING_COMPLETED", "Output event type must be PROVISIONING_COMPLETED.");
     assert(result.outputEvent.districtId === "TOKYO-18", "Expected district ID TOKYO-18.");
 
-    const branchDir = path.join(workspaceRoot, 'FIELD_OPERATIONS_PLATFORM', '03_BRANCH', '東京第18区');
+    const branchDir = pathResolver.getBranchDirectory('東京第18区');
     const deploymentPath = path.join(branchDir, 'deployment.json');
 
     assert(fs.existsSync(deploymentPath), "deployment.json must be generated in branch folder.");

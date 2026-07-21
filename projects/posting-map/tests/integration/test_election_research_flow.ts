@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { ElectionResearchRuntime, ResearchRequestedEvent } from "../../src/platform/election-research-runtime/ElectionResearchRuntime";
 import { ResearchValidator } from "../../src/platform/election-research-runtime/ResearchValidator";
+import { PostingMapPathResolver } from "../../src/shared/PostingMapPathResolver";
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -13,6 +14,7 @@ async function runTest() {
   console.log("🧪 Running Election Research Foundation Integration Test...\n");
 
   const localWorkspaceRoot = path.join(__dirname, "..", "..", "..", "..");
+  const pathResolver = new PostingMapPathResolver(localWorkspaceRoot);
   
   // Test Case 1: Tokyo 18th normal resolution and event compilation
   {
@@ -33,8 +35,7 @@ async function runTest() {
     assert(outputEvent.result.path === "03_BRANCH/東京第18区/election-research-result.json", "Output json file path must match target");
     assert(typeof outputEvent.result.checksum === "string" && outputEvent.result.checksum.length === 64, "SHA-256 checksum must be a 64-char hex string");
 
-    // output jsonの内容検証
-    const outputJsonPath = path.join(localWorkspaceRoot, "FIELD_OPERATIONS_PLATFORM", "03_BRANCH", "東京第18区", "election-research-result.json");
+    const outputJsonPath = path.join(pathResolver.getBranchDirectory("東京第18区"), "election-research-result.json");
     assert(fs.existsSync(outputJsonPath) === true, "Compiled JSON file must be generated.");
     
     const resultObj = JSON.parse(fs.readFileSync(outputJsonPath, "utf-8"));
@@ -63,7 +64,7 @@ async function runTest() {
     const outputEvent = res.event!;
     assert(outputEvent.districtId === "OSAKA-06", "District ID must be OSAKA-06");
 
-    const outputJsonPath = path.join(localWorkspaceRoot, "FIELD_OPERATIONS_PLATFORM", "03_BRANCH", "大阪第6区", "election-research-result.json");
+    const outputJsonPath = path.join(pathResolver.getBranchDirectory("大阪第6区"), "election-research-result.json");
     assert(fs.existsSync(outputJsonPath) === true, "Compiled JSON file must be generated.");
     const resultObj = JSON.parse(fs.readFileSync(outputJsonPath, "utf-8"));
     assert(resultObj.municipalities.length === 4, "Osaka 6th has 4 municipalities.");
@@ -106,8 +107,8 @@ async function runTest() {
 
   // クリーンアップ
   const cleanupPaths = [
-    path.join(localWorkspaceRoot, "FIELD_OPERATIONS_PLATFORM", "03_BRANCH", "東京第18区", "election-research-result.json"),
-    path.join(localWorkspaceRoot, "FIELD_OPERATIONS_PLATFORM", "03_BRANCH", "大阪第6区", "election-research-result.json")
+    path.join(pathResolver.getBranchDirectory("東京第18区"), "election-research-result.json"),
+    path.join(pathResolver.getBranchDirectory("大阪第6区"), "election-research-result.json")
   ];
   for (const p of cleanupPaths) {
     if (fs.existsSync(p)) {

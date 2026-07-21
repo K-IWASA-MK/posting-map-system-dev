@@ -7,6 +7,7 @@ import { PresentationHashGenerator } from "./utils/PresentationHashGenerator";
 import { DeploymentAdapter } from "./adapters/DeploymentAdapter";
 import { LocalFileDeploymentAdapter } from "./adapters/LocalFileDeploymentAdapter";
 import { PresentationIntegrityVerifier } from "./validation/PresentationIntegrityVerifier";
+import { PostingMapPathResolver } from "../../shared/PostingMapPathResolver";
 
 export interface PresentationEvent {
   readonly type: "DASHBOARD_PRESENTATION_REQUESTED";
@@ -41,12 +42,8 @@ export class DashboardPresentationRuntime {
         return { success: false, error: `Unsupported event type: ${event.type}` };
       }
 
-      const branchFolder = path.join(
-        this.workspaceRoot,
-        "FIELD_OPERATIONS_PLATFORM",
-        "03_BRANCH",
-        event.districtName
-      );
+      const pathResolver = new PostingMapPathResolver(this.workspaceRoot);
+      const branchFolder = pathResolver.getBranchDirectory(event.districtName);
 
       const inputPath = path.join(branchFolder, "dashboard-data.json");
 

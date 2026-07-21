@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { RootResolver } from '../../../../../tools/review/RootResolver';
+import { PostingMapPathResolver } from '../../shared/PostingMapPathResolver';
 
 async function driveFetch(endpoint: string, token: string, options: any = {}) {
   const url = `https://www.googleapis.com/drive/v3/${endpoint}`;
@@ -11,11 +12,10 @@ async function driveFetch(endpoint: string, token: string, options: any = {}) {
   };
   const res = await fetch(url, { ...options, headers });
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Drive API Error [${res.status}]: ${text}`);
+    const errText = await res.text();
+    throw new Error(`Google Drive API error (${res.status}): ${errText}`);
   }
-  if (res.status === 204) return null;
-  return await res.json();
+  return res.json();
 }
 
 export class AssetCloner {
@@ -28,8 +28,9 @@ export class AssetCloner {
   ): Promise<string> {
     if (isMock) {
       // Mock spreadsheet cloning by generating dummy file path ID
+      const pathResolver = new PostingMapPathResolver();
       const mockId = `mock-spreadsheet-${Date.now()}`;
-      const mockPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', name, 'spreadsheet.json');
+      const mockPath = path.join(pathResolver.getBranchDirectory(name), 'spreadsheet.json');
       fs.writeFileSync(mockPath, JSON.stringify({ spreadsheetId: mockId, name }, null, 2), 'utf8');
       return mockId;
     }
@@ -55,8 +56,9 @@ export class AssetCloner {
     isMock: boolean = false
   ): Promise<string> {
     if (isMock) {
+      const pathResolver = new PostingMapPathResolver();
       const mockId = `mock-storage-${Date.now()}`;
-      const mockPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', name, 'storage');
+      const mockPath = path.join(pathResolver.getBranchDirectory(name), 'storage');
       if (!fs.existsSync(mockPath)) {
         fs.mkdirSync(mockPath, { recursive: true });
       }

@@ -1,8 +1,8 @@
 import { OrderRuntime } from '../../src/platform/order-runtime/OrderRuntime';
+import { RootResolver } from '../../../../tools/review/RootResolver';
+import { PostingMapPathResolver } from '../../src/shared/PostingMapPathResolver';
 import * as fs from 'fs';
 import * as path from 'path';
-
-import { RootResolver } from '../../../../tools/review/RootResolver';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -11,10 +11,11 @@ function assert(condition: boolean, message: string) {
 }
 
 async function runTest() {
-  console.log("🧪 Running Order-to-Research Foundation Integration Test...\n");
+  console.log("🧪 Running Order Runtime Integration Test...\n");
 
-  process.env.NODE_ENV = 'test'; // Enable local mock writing for testing
+  process.env.NODE_ENV = 'test';
   process.env.AIOS_MOCK = 'true';
+  const pathResolver = new PostingMapPathResolver();
 
   const order = {
     orderId: "ORD-TEST-001",
@@ -31,7 +32,7 @@ async function runTest() {
     assert(result.missionId!.startsWith("MIS-ORD-TEST-001-"), "Mission ID pattern mismatch.");
 
     // Check if research-result.json was generated locally in the mock directory
-    const resultPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', '東京第18区', 'research-result.json');
+    const resultPath = path.join(pathResolver.getBranchDirectory('東京第18区'), 'research-result.json');
     
     assert(fs.existsSync(resultPath), "research-result.json must be written to the branch directory.");
     

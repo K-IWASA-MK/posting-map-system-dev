@@ -1,8 +1,8 @@
 import { DataBuilderRuntime } from '../../src/platform/data-builder-runtime/DataBuilderRuntime';
+import { RootResolver } from '../../../../tools/review/RootResolver';
+import { PostingMapPathResolver } from '../../src/shared/PostingMapPathResolver';
 import * as fs from 'fs';
 import * as path from 'path';
-
-import { RootResolver } from '../../../../tools/review/RootResolver';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -11,10 +11,11 @@ function assert(condition: boolean, message: string) {
 }
 
 async function runTest() {
-  console.log("🧪 Running Data-Builder Foundation Integration Test...\n");
+  console.log("🧪 Running Data Builder Runtime Foundation Integration Test...\n");
 
   process.env.NODE_ENV = 'test';
   process.env.AIOS_MOCK = 'true';
+  const pathResolver = new PostingMapPathResolver();
 
   const mockEvent = {
     type: "RESEARCH_COMPLETED",
@@ -32,8 +33,9 @@ async function runTest() {
     assert(result.outputEvent.missionId === "MIS-TEST-002", "Mission ID mismatch.");
 
     // Retrieve generated outputs
-    const districtPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', '東京第18区', 'district.json');
-    const configPath = path.join(RootResolver.resolvePlatform('posting-map'), '03_BRANCH', '東京第18区', 'config.json');
+    const branchDir = pathResolver.getBranchDirectory('東京第18区');
+    const districtPath = path.join(branchDir, 'district.json');
+    const configPath = path.join(branchDir, 'config.json');
 
     assert(fs.existsSync(districtPath), "district.json must be generated.");
     assert(fs.existsSync(configPath), "config.json must be generated.");
