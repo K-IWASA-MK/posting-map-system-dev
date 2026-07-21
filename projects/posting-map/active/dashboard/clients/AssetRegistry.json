@@ -1,5 +1,5 @@
 {
-  "updatedAt": 1784374303869,
+  "updatedAt": 1784605064205,
   "schemaVersion": 1,
   "templates": {
     "spreadsheetId": "14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4",
@@ -58,8 +58,8 @@
         "gasScriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa"
       },
       "TOKYO-18": {
-        "spreadsheetId": "mock-spreadsheet-1784374303869",
-        "storageFolderId": "mock-storage-1784374303869",
+        "spreadsheetId": "mock-spreadsheet-1784605064205",
+        "storageFolderId": "mock-storage-1784605064205",
         "gasScriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa"
       },
       "DST-UNK": {

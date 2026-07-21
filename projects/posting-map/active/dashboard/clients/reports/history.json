@@ -3,6 +3,15 @@
   "history": [
     {
       "type": "daily",
+      "timestamp": 1784353475139,
+      "files": {
+        "markdown": "clients/reports/daily-report-1784353475139.md",
+        "csv": "clients/reports/daily-report-1784353475139.csv",
+        "html": "clients/reports/daily-report-1784353475139.html"
+      }
+    },
+    {
+      "type": "daily",
       "timestamp": 1784353286767,
       "files": {
         "markdown": "clients/reports/daily-report-1784353286767.md",
