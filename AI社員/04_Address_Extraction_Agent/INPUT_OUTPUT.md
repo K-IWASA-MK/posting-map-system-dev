@@ -1,6 +1,6 @@
 # Address Extraction AI - INPUT / OUTPUT Specification
 
-Version: 2.2.0 (Data Lineage Standard Compliant)
+Version: 2.3.0 (Artifact Standard v1.0 & Lineage v1.1 Compliant)
 
 ---
 
@@ -12,12 +12,13 @@ Version: 2.2.0 (Data Lineage Standard Compliant)
 
 ## ■ Output (出力)
 
-### 1. `master/address_database.json` (スキーマ v2.2.0)
-Data Lineage Standard v1.0 準拠の共通血統追跡オブジェクト `lineage` を内包。
+### 1. `master/address_database.json` (スキーマ v2.3.0)
+`Artifact Standard v1.0` 共通ヘッダーおよび `Data Lineage Standard v1.1` (`inputs` 配列) に完全適合。
 
 ```json
 {
-  "schemaVersion": "2.2.0",
+  "schemaVersion": "2.3.0",
+  "artifactId": "MIE-03-ADDRESS-DATABASE",
   "districtId": "MIE-03",
   "districtName": "三重第3区",
   "prefecture": "三重県",
@@ -26,11 +27,22 @@ Data Lineage Standard v1.0 準拠の共通血統追跡オブジェクト `lineag
   "owner": "Address Extraction AI",
   "lineage": {
     "producer": "Address Extraction AI",
-    "sourceArtifact": "master/district_profile.json",
-    "sourceVersion": "1.0.0",
-    "masterSource": "NATIONAL_ADDRESS_MASTER_v2026.07",
-    "generatedAt": "2026-07-21T16:37:00+09:00",
-    "schemaVersion": "2.2.0"
+    "generatedAt": "2026-07-21T16:40:00+09:00",
+    "schemaVersion": "2.3.0",
+    "inputs": [
+      {
+        "artifactId": "MIE-03-DISTRICT-PROFILE",
+        "artifact": "master/district_profile.json",
+        "version": "1.0.0",
+        "checksum": "sha256:4f3a..."
+      },
+      {
+        "artifactId": "NATIONAL-ADDRESS-MASTER",
+        "artifact": "NATIONAL_ADDRESS_MASTER",
+        "version": "2026.07",
+        "checksum": "sha256:9b1c..."
+      }
+    ]
   },
   "municipalities": [
     {
@@ -51,7 +63,7 @@ Data Lineage Standard v1.0 準拠の共通血統追跡オブジェクト `lineag
       ]
     }
   ],
-  "lastUpdated": "2026-07-21T16:37:00+09:00"
+  "lastUpdated": "2026-07-21T16:40:00+09:00"
 }
 ```
 
@@ -61,7 +73,7 @@ Data Lineage Standard v1.0 準拠の共通血統追跡オブジェクト `lineag
 ```json
 {
   "agent": "Address Extraction AI",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "result": "SUCCESS",
   "input": {
     "districtProfile": "master/district_profile.json"
@@ -73,7 +85,7 @@ Data Lineage Standard v1.0 準拠の共通血統追跡オブジェクト `lineag
   "artifacts": [
     {
       "file": "master/address_database.json",
-      "size": 1980,
+      "size": 2150,
       "sha256": "..."
     }
   ]

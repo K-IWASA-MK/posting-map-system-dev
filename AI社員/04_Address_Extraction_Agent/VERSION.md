@@ -2,10 +2,10 @@ Agent Name:
 Address Extraction AI
 
 Version:
-2.2.0
+2.3.0
 
 Status:
-Production Blueprint (Data Lineage Standard v2.2.0)
+Production Blueprint (Artifact Standard v1.0 & Lineage v1.1)
 
 Target:
 POSTING MAP / FIELD OPERATIONS OS

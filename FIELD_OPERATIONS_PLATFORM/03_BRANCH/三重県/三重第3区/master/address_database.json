@@ -1,5 +1,6 @@
 {
-  "schemaVersion": "2.2.0",
+  "schemaVersion": "2.3.0",
+  "artifactId": "MIE-03-ADDRESS-DATABASE",
   "districtId": "MIE-03",
   "districtName": "三重第3区",
   "prefecture": "三重県",
@@ -8,11 +9,22 @@
   "owner": "Address Extraction AI",
   "lineage": {
     "producer": "Address Extraction AI",
-    "sourceArtifact": "master/district_profile.json",
-    "sourceVersion": "1.0.0",
-    "masterSource": "NATIONAL_ADDRESS_MASTER_v2026.07",
-    "generatedAt": "2026-07-21T07:37:40.567Z",
-    "schemaVersion": "2.2.0"
+    "generatedAt": "2026-07-21T07:40:22.168Z",
+    "schemaVersion": "2.3.0",
+    "inputs": [
+      {
+        "artifactId": "MIE-03-DISTRICT-PROFILE",
+        "artifact": "master/district_profile.json",
+        "version": "1.0.0",
+        "checksum": "sha256:ef9195b1c05542b21ec84a39c76fb1d11ffef7570a2822df7550c30d8328e5ac"
+      },
+      {
+        "artifactId": "NATIONAL-ADDRESS-MASTER",
+        "artifact": "NATIONAL_ADDRESS_MASTER",
+        "version": "2026.07",
+        "checksum": "sha256:4a0ca966ea4b69f23e9fdb8ef84a6da870c88e0e97b99f26ff218eb648574ea4"
+      }
+    ]
   },
   "municipalities": [
     {
@@ -167,5 +179,5 @@
       ]
     }
   ],
-  "lastUpdated": "2026-07-21T07:37:40.567Z"
+  "lastUpdated": "2026-07-21T07:40:22.168Z"
 }
