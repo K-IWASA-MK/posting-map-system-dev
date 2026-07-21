@@ -1,0 +1,48 @@
+{
+  "agent": "District Initialization AI",
+  "version": "1.1.0",
+  "result": "SUCCESS",
+  "verified": true,
+  "verifiedAt": "2026-07-21T15:15:00+09:00",
+  "schemaVersion": "1.0.0",
+  "sourceRevision": "2022-12-28 (公職選挙法改正等告示)",
+  "input": {
+    "district": "三重第3区"
+  },
+  "workspace": {
+    "root": "FIELD_OPERATIONS_PLATFORM",
+    "branch": "03_BRANCH",
+    "prefecture": "三重県",
+    "district": "三重第3区"
+  },
+  "execution": {
+    "startedAt": "2026-07-21T15:14:40+09:00",
+    "finishedAt": "2026-07-21T15:15:00+09:00",
+    "durationMs": 20000
+  },
+  "sources": [
+    {
+      "name": "総務省 衆議院小選挙区区割り情報",
+      "url": "https://www.soumu.go.jp/senkyo/senkyo_s/news/senkyo/shuugiin_kuwari/",
+      "retrievedAt": "2026-07-21T15:14:45+09:00",
+      "status": "matched"
+    },
+    {
+      "name": "三重県選挙管理委員会 衆議院小選挙区の区域",
+      "url": "https://www.pref.mie.lg.jp/SENKAN/HP/kuwari.htm",
+      "retrievedAt": "2026-07-21T15:14:50+09:00",
+      "status": "matched"
+    }
+  ],
+  "outputs": [
+    "source/district_municipalities.csv",
+    "logs/verification.json"
+  ],
+  "artifacts": [
+    {
+      "file": "source/district_municipalities.csv",
+      "size": 230,
+      "sha256": "7b670557ff0bce35e7d4773bac37911ac64a770bd20272ee912bd91fae542265"
+    }
+  ]
+}

@@ -1,61 +1,33 @@
-# Security Policy
+# Security & Governance Policy: District Initialization AI
 
+## 1. 情報源アクセス制御 (Source Authorization)
 
-## 禁止事項
+本AI社員は、データ収集において厳格なホワイトリスト（許可リスト）制御を適用する。
 
-Direct Access禁止
+### 許可ドメイン・機関 (Allowlist)
+- **総務省 (soumu.go.jp)**: 衆議院小選挙区区割り告示・法改正データ
+- **対象都道府県選管 (pref.*.lg.jp)**: 各都道府県選挙管理委員会の公式発表資料
 
+### 禁止ドメイン・情報源 (Blocklist - 絶対アクセス・参照禁止)
+- **Wikipedia / ウィキペディア**
+- **個人ウェブサイト・ブログ・SNS**
+- **LLM / AIによる推測補完・生成情報**
+- **出典元が証明できない匿名メディア**
 
-禁止:
+---
 
-Agent
- ↓
-Database
+## 2. ファクトチェック規律 (Fact-Check Protocol)
 
+1. **二重照合の義務化**:
+   必ず「総務省」と「都道府県選管」の2つ以上の公的情報源から同一自治体リストが得られた場合のみ、検証成功（`matched`）とする。
+2. **AI推測・自動補完の絶対禁止**:
+   情報が曖昧な場合や不一致が検出された場合、AIが勝手に推測補完してデータを穴埋めすることを厳禁とする。直ちに `FAILED` として停止すること。
 
-Agent
- ↓
-Spreadsheet
+---
 
+## 3. ガバナンス・アクセス標準 (Workspace Governance)
 
-Agent
- ↓
-File Modify
-
-
-## 正式経路
-
-
-Agent
-
-↓
-
-Runtime
-
-↓
-
-EventBus
-
-↓
-
-Domain
-
-
-## Secret
-
-禁止:
-
-- API Key保持
-- Token保持
-- Credential保存
-
-
-## Audit
-
-全処理:
-
-- traceId
-- correlationId
-- initializationId
-
-を保持する。
+1. **文字列ハードコードの禁止**:
+   フォルダパスの取得は必ず `WORKSPACE.FOLDERS.BRANCH` 等のシステム定数を参照すること。直接 `"03_BRANCH"` 等の文字列をハードコードしてはならない。
+2. **監査証跡の保存**:
+   処理結果は必ず `logs/verification.json` に照合URL・日時とともに保存し、第三者監査が常時可能な状態を維持すること。
