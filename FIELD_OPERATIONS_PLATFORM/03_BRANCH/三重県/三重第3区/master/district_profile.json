@@ -1,0 +1,13 @@
+{
+  "districtId": "MIE-03",
+  "districtName": "三重第3区",
+  "prefecture": "三重県",
+  "municipalities": [
+    "四日市市（一部）",
+    "桑名市",
+    "いなべ市",
+    "桑名郡",
+    "員弁郡"
+  ],
+  "lastUpdated": "2026-07-21T15:55:00+09:00"
+}
