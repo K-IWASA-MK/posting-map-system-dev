@@ -1,0 +1,47 @@
+{
+  "contractId": "RC-MIE03-SPREADSHEET-001",
+  "targetRenderer": "Spreadsheet AI",
+  "version": "1.0.0",
+  "mappings": [
+    {
+      "sheet": "Summary",
+      "cell": "B2",
+      "source": "master/district_profile.json",
+      "field": "districtName",
+      "label": "選挙区名"
+    },
+    {
+      "sheet": "Summary",
+      "cell": "B3",
+      "source": "master/district_profile.json",
+      "field": "prefecture",
+      "label": "都道府県"
+    },
+    {
+      "sheet": "Summary",
+      "cell": "B4",
+      "source": "master/address_database.json",
+      "field": "totalMunicipalities",
+      "label": "構成自治体数"
+    },
+    {
+      "sheet": "Summary",
+      "cell": "B5",
+      "source": "master/address_database.json",
+      "field": "totalTowns",
+      "label": "総町名数"
+    },
+    {
+      "sheet": "Addresses",
+      "table": "towns",
+      "source": "master/address_database.json",
+      "field": "municipalities",
+      "columns": [
+        { "header": "自治体名", "key": "municipalityName" },
+        { "header": "町名", "key": "townName" },
+        { "header": "丁目状態", "key": "chomeStatus" },
+        { "header": "検証ソース", "key": "verificationSource" }
+      ]
+    }
+  ]
+}
