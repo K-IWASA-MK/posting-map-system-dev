@@ -1,0 +1,44 @@
+{
+  "employeeId": "AI-0003",
+  "employeeName": "Spreadsheet AI",
+  "employeeType": "PRODUCTION",
+  "version": "1.0.0",
+  "status": "ACTIVE",
+
+  "responsibility": [
+    "Read Master Artifacts",
+    "Render Formatted Spreadsheets and CSVs",
+    "Output Human Terminal Artifacts"
+  ],
+
+  "capabilities": [
+    "SPREADSHEET_GENERATION",
+    "CSV_RENDERING",
+    "OUTPUT_ARTIFACT_GENERATION"
+  ],
+
+  "acceptedInputs": [
+    "master/district_profile.json",
+    "master/address_database.json",
+    "master/election_history.json"
+  ],
+
+  "ownedArtifacts": [
+    "output/district_summary.csv"
+  ],
+
+  "producedArtifacts": [
+    "output/district_summary.csv"
+  ],
+
+  "validator": "Acceptance Validator AI",
+
+  "dependencies": [
+    "AI-0001",
+    "AI-0002"
+  ],
+
+  "downstreamEmployees": [
+    "AI-VAL-0001"
+  ]
+}
