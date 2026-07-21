@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "totalRecords": 2,
+  "lastUpdated": "2026-07-21T07:49:30.069Z",
+  "records": [
+    {
+      "ledgerId": "LDG-1784620170068",
+      "executionId": "EXEC-1784620170068",
+      "taskId": "TSK-20260721-0001",
+      "employeeId": "AI-0002",
+      "executionStatus": "COMPLETED",
+      "timestamps": {
+        "startedAt": "2026-07-21T07:49:30.068Z",
+        "completedAt": "2026-07-21T07:49:30.068Z"
+      },
+      "artifactIds": [
+        "master/address_database.json"
+      ],
+      "durationMs": 0,
+      "checksum": "sha256:54d309f1943e520305b0bfe843fa9bbc863ae30745a7d5da89cde0b7469f242b"
+    },
+    {
+      "ledgerId": "LDG-1784620170069",
+      "executionId": "EXEC-1784620170069",
+      "taskId": "TSK-20260721-0002",
+      "employeeId": "AI-0002",
+      "executionStatus": "ABORTED",
+      "timestamps": {
+        "startedAt": "2026-07-21T07:49:30.069Z",
+        "completedAt": "2026-07-21T07:49:30.069Z"
+      },
+      "artifactIds": [],
+      "durationMs": 0,
+      "checksum": "sha256:71c14af2722ae307faaf57eb52fe95c4bc5f2fa53a13d0f1d1f6561cf2913b11"
+    }
+  ]
+}
