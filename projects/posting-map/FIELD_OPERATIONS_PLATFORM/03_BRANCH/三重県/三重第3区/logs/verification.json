@@ -1,9 +1,9 @@
 {
   "agent": "Address Extraction AI",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "result": "SUCCESS",
   "verified": true,
-  "verifiedAt": "2026-07-21T07:35:16.282Z",
+  "verifiedAt": "2026-07-21T07:37:40.567Z",
   "input": {
     "districtProfile": "master/district_profile.json"
   },
@@ -20,8 +20,8 @@
   "artifacts": [
     {
       "file": "master/address_database.json",
-      "size": 4014,
-      "sha256": "cd8d1f367842184754a08151746aa3e43c4e96412974c70f9b6f7e4d7f1ebdf0"
+      "size": 4291,
+      "sha256": "faa0ad91c44ac65a69ac215aef4bc4e6dea748100e77f148aa674146af8f8052"
     }
   ]
 }

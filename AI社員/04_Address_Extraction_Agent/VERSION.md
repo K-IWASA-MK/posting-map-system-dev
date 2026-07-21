@@ -2,10 +2,10 @@ Agent Name:
 Address Extraction AI
 
 Version:
-2.1.0
+2.2.0
 
 Status:
-Production Blueprint (Evidence Lineage & Enum Lock v2.1.0)
+Production Blueprint (Data Lineage Standard v2.2.0)
 
 Target:
 POSTING MAP / FIELD OPERATIONS OS

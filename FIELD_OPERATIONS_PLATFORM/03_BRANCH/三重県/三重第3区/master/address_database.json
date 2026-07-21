@@ -1,11 +1,19 @@
 {
-  "schemaVersion": "2.1.0",
+  "schemaVersion": "2.2.0",
   "districtId": "MIE-03",
   "districtName": "三重第3区",
   "prefecture": "三重県",
   "totalMunicipalities": 5,
   "totalTowns": 17,
   "owner": "Address Extraction AI",
+  "lineage": {
+    "producer": "Address Extraction AI",
+    "sourceArtifact": "master/district_profile.json",
+    "sourceVersion": "1.0.0",
+    "masterSource": "NATIONAL_ADDRESS_MASTER_v2026.07",
+    "generatedAt": "2026-07-21T07:37:40.567Z",
+    "schemaVersion": "2.2.0"
+  },
   "municipalities": [
     {
       "name": "四日市市（一部）",
@@ -159,5 +167,5 @@
       ]
     }
   ],
-  "lastUpdated": "2026-07-21T07:35:16.281Z"
+  "lastUpdated": "2026-07-21T07:37:40.567Z"
 }

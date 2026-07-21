@@ -1,28 +1,37 @@
 # Address Extraction AI - INPUT / OUTPUT Specification
 
-Version: 2.1.0 (Evidence Lineage & Enum Lock)
+Version: 2.2.0 (Data Lineage Standard Compliant)
 
 ---
 
 ## ■ Input (入力)
 - **正本ファイル**: `FIELD_OPERATIONS_PLATFORM/03_BRANCH/【都道府県】/【選挙区】/master/district_profile.json`
-- **全国住所マスター**: プロジェクト内既存住所マスターデータベース
+- **全国住所マスター**: プロジェクト内既存住所マスターデータベース (`NATIONAL_ADDRESS_MASTER_v2026.07`)
 
 ---
 
 ## ■ Output (出力)
 
-### 1. `master/address_database.json` (スキーマ v2.1.0)
-`verificationSource`（根拠エビデンス）および `chomeStatus` の厳格 Enum 固定。
+### 1. `master/address_database.json` (スキーマ v2.2.0)
+Data Lineage Standard v1.0 準拠の共通血統追跡オブジェクト `lineage` を内包。
 
 ```json
 {
-  "schemaVersion": "2.1.0",
+  "schemaVersion": "2.2.0",
   "districtId": "MIE-03",
   "districtName": "三重第3区",
+  "prefecture": "三重県",
   "totalMunicipalities": 5,
   "totalTowns": 17,
   "owner": "Address Extraction AI",
+  "lineage": {
+    "producer": "Address Extraction AI",
+    "sourceArtifact": "master/district_profile.json",
+    "sourceVersion": "1.0.0",
+    "masterSource": "NATIONAL_ADDRESS_MASTER_v2026.07",
+    "generatedAt": "2026-07-21T16:37:00+09:00",
+    "schemaVersion": "2.2.0"
+  },
   "municipalities": [
     {
       "name": "桑名市",
@@ -42,16 +51,9 @@ Version: 2.1.0 (Evidence Lineage & Enum Lock)
       ]
     }
   ],
-  "lastUpdated": "2026-07-21T16:35:00+09:00"
+  "lastUpdated": "2026-07-21T16:37:00+09:00"
 }
 ```
-
-#### 丁目ステータス Enum (`chomeStatus`) 定義
-許容される値は以下の4種類の厳格 Enum のみ。他の文字列（`verified`, `NO_CHOME` 等）は不可。
-- `VERIFIED`: 丁目が存在し一覧が検証済み (`chome`: 1件以上必須)
-- `NONE`: 丁目が存在しない町名であることが確定検証済み (`chome`: 空配列 `[]` 必須)
-- `PENDING`: 未調査 (`chome`: 空配列 `[]` 必須)
-- `FAILED`: 取得失敗 (`chome`: 空配列 `[]` 必須)
 
 ---
 
@@ -59,7 +61,7 @@ Version: 2.1.0 (Evidence Lineage & Enum Lock)
 ```json
 {
   "agent": "Address Extraction AI",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "result": "SUCCESS",
   "input": {
     "districtProfile": "master/district_profile.json"
@@ -71,7 +73,7 @@ Version: 2.1.0 (Evidence Lineage & Enum Lock)
   "artifacts": [
     {
       "file": "master/address_database.json",
-      "size": 1890,
+      "size": 1980,
       "sha256": "..."
     }
   ]
