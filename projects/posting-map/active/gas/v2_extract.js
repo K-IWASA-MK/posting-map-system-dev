@@ -36,19 +36,55 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
   let finalDistrictName = targetDistrictName || CONFIG.get("DEFAULT_DISTRICT") || "三重第3区";
   let finalPrefecture = targetPrefecture || CONFIG.get("DEFAULT_PREFECTURE") || "三重県";
 
+  // 選挙区CSVの列定義Enum（マジックナンバー排除）
+  const DISTRICT_COLUMN = {
+    DISTRICT: 0,   // 選挙区名（例: "第3区", "三重第3区"）
+    PREFECTURE: 1, // 都道府県名（例: "三重県"）
+    CITY: 2,       // 自治体名（例: "桑名市", "三重郡"）
+    TARGET_AREA: 3 // 対象地域
+  };
+
+  /**
+   * 選挙区名および都道府県の厳密完全一致判定
+   * 全国・複数県・第1区〜第4区等の展開においてコード変更なしで動作
+   */
+  function isDistrictMatch(targetDist, csvDist, targetPref, csvPref) {
+    if (!csvDist) return false;
+    const tDist = targetDist.toString().trim();
+    const cDist = csvDist.toString().trim();
+    const tPref = (targetPref || "").toString().trim();
+    const cPref = (csvPref || "").toString().trim();
+
+    // 都道府県が指定されており、CSVにも記載がある場合は都道府県の一致を検証
+    if (tPref && cPref && tPref !== cPref) return false;
+
+    // 1. 完全一致 ("三重第3区" === "三重第3区", "第3区" === "第3区")
+    if (tDist === cDist) return true;
+
+    // 2. 都道府県プレフィックス結合の完全一致 ("三重第3区" === "三重" + "第3区")
+    if (cPref && `${cPref}${cDist}` === tDist) return true;
+    if (tPref && `${tPref}${tDist}` === cDist) return true;
+
+    return false;
+  }
+
   const targetRules = [];
   for (let i = 1; i < districtData.length; i++) {
     const row = districtData[i];
-    if (!row || row.length < 2) continue;
-    const rowText = row.join(" ");
-    if (rowText.includes("3区") || rowText.includes("三重")) {
-      const rawCityStr = row[2] ? row[2].toString().trim() : "";
+    if (!row || row.length <= DISTRICT_COLUMN.CITY) continue;
+
+    const csvDistrict = row[DISTRICT_COLUMN.DISTRICT] ? row[DISTRICT_COLUMN.DISTRICT].toString().trim() : "";
+    const csvPrefecture = row[DISTRICT_COLUMN.PREFECTURE] ? row[DISTRICT_COLUMN.PREFECTURE].toString().trim() : "";
+
+    // 曖昧判定 (includes) を完全に排除し、厳密一致のみを対象とする
+    if (isDistrictMatch(finalDistrictName, csvDistrict, finalPrefecture, csvPrefecture)) {
+      const rawCityStr = row[DISTRICT_COLUMN.CITY] ? row[DISTRICT_COLUMN.CITY].toString().trim() : "";
       const cityStr = rawCityStr.replace(/（.*?）/g, "").replace(/\(.*?\)/g, "").trim();
       if (cityStr) {
         const isGun = cityStr.endsWith("郡") || cityStr.includes("郡");
         targetRules.push({
           city: cityStr,
-          townArea: row[3] || "",
+          townArea: row[DISTRICT_COLUMN.TARGET_AREA] || "",
           type: isGun ? "GUN" : "CITY"
         });
       }
