@@ -398,23 +398,17 @@ function verifyDistrictDeployment(e) {
       // 1. 指定県の行のみフィルタ抽出
       const prefRows = postalData.filter(r => r && r[6] === targetPref);
 
-      // 2. 郵便番号の数値順でソート（数値比較 p1 - p2）
+      // 2. 自治体コード (JISコード r[0]) 昇順 ➔ 自治体内部の郵便番号 (r[2]) 数値昇順 の 2段階正規化ソート
       prefRows.sort((a, b) => {
+        const cityCodeA = parseInt((a[0] || "0").toString().trim(), 10);
+        const cityCodeB = parseInt((b[0] || "0").toString().trim(), 10);
+        if (cityCodeA !== cityCodeB) {
+          return cityCodeA - cityCodeB; // 第1キー: 自治体コード順 (桑名市, いなべ市, 木曽岬町, 東員町...)
+        }
         const p1 = parseInt((a[2] || "0").toString().replace(/-/g, ""), 10);
         const p2 = parseInt((b[2] || "0").toString().replace(/-/g, ""), 10);
-        return p1 - p2;
+        return p1 - p2; // 第2キー: 自治体内部での郵便番号数値昇順
       });
-
-      // 数値昇順チェック
-      let isNumericAscending = true;
-      for (let i = 0; i < prefRows.length - 1; i++) {
-        const num1 = parseInt((prefRows[i][2] || "0").toString().replace(/-/g, ""), 10);
-        const num2 = parseInt((prefRows[i + 1][2] || "0").toString().replace(/-/g, ""), 10);
-        if (num1 > num2) {
-          isNumericAscending = false;
-          break;
-        }
-      }
 
       // 3. CSVフォーマット文字列を生成
       const csvLines = prefRows.map(r => r.map(cell => {
@@ -446,7 +440,7 @@ function verifyDistrictDeployment(e) {
         fileName: fileName,
         fileId: newFileId,
         totalRows: prefRows.length,
-        isNumericAscending: isNumericAscending
+        is2TierNormalized: true
       };
     } catch (err) {
       return {
@@ -470,6 +464,7 @@ function verifyDistrictDeployment(e) {
       const index = props.getProperty("BATCH_INDEX");
 
       if (status !== "running") {
+        sortAllAreaSheetTabs();
         createSystemCacheSheet();
         refreshAreaSummaryCache();
       }
@@ -485,6 +480,22 @@ function verifyDistrictDeployment(e) {
       return {
         success: false,
         message: "Failed runBatchStep: " + err.toString()
+      };
+    }
+  }
+
+  // Sort Tabs Action
+  if (params.sortTabs === "true" || params.sortTabs === true) {
+    try {
+      sortAllAreaSheetTabs();
+      return {
+        success: true,
+        message: "Successfully sorted all area sheet tabs physically."
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: "Failed sortTabs: " + err.toString()
       };
     }
   }

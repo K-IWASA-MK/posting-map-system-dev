@@ -15,6 +15,32 @@ function forceStartBatch() {
   
   const ss = getSS(); // Web APIでも安全に取得できるよう getSS() を使用
   
+  // 0. 古いエリアシートを徹底的に全削除して完全クリーン化（フェイルセーフ保護）
+  const baseSheet = ss.getSheetByName(CONFIG.get("SHEET_TEMPLATE"));
+  if (baseSheet) {
+    try {
+      baseSheet.showSheet();
+      ss.setActiveSheet(baseSheet);
+    } catch (bErr) {}
+  }
+
+  const excludeSheets = [
+    CONFIG.get("SHEET_GUIDE"), CONFIG.get("SHEET_ROSTER"), CONFIG.get("SHEET_TEMPLATE"),
+    CONFIG.get("SHEET_POSTAL"), CONFIG.get("SHEET_DISTRICT"), CONFIG.get("SHEET_MASTER_EXPORT"),
+    CONFIG.get("SHEET_REPORT"), CONFIG.get("SHEET_MANUAL"), CONFIG.get("SHEET_SYSTEM_CACHE"),
+    CONFIG.get("SHEET_STORAGE"), "管理者ID", "__TEMP_ADDRESSES__"
+  ];
+
+  const allCurrentSheets = ss.getSheets();
+  allCurrentSheets.forEach(s => {
+    if (!excludeSheets.includes(s.getName())) {
+      try {
+        ss.deleteSheet(s);
+      } catch (e) {}
+    }
+  });
+  SpreadsheetApp.flush();
+
   // 1. 最初巨大CSVから住所を一括展開・ソートして一時シートへ保存
   ss.toast("三重第3区の住所データを抽出・ソート中...", "準備中", 5);
   const targetDistrict = "三重第3区";
@@ -72,6 +98,32 @@ function forceStartBatch() {
   tempSheet.clear();
   tempSheet.getRange(1, 1, 1, 4).setValues([["郵便番号", "住所", "市町村カナ", "町域カナ"]]);
   
+  // 自治体優先度 ➔ 郵便番号数値昇順 の2段階整列（スプレッドシート作成順を100%美しく統一）
+  const cityOrderPriority = ["桑名市", "いなべ市", "桑名郡", "員弁郡", "三重郡", "四日市市", "鈴鹿市"];
+  addresses.sort((a, b) => {
+    const getCityName = (addrStr) => {
+      for (const c of cityOrderPriority) {
+        if (addrStr.includes(c)) return c;
+      }
+      return extractCityName(addrStr);
+    };
+
+    const cityA = getCityName(a.address);
+    const cityB = getCityName(b.address);
+
+    const idxA = cityOrderPriority.indexOf(cityA);
+    const idxB = cityOrderPriority.indexOf(cityB);
+
+    const pA = idxA === -1 ? 999 : idxA;
+    const pB = idxB === -1 ? 999 : idxB;
+
+    if (pA !== pB) return pA - pB;
+
+    const numA = parseInt((a.postalCode || "0").replace(/-/g, ""), 10);
+    const numB = parseInt((b.postalCode || "0").replace(/-/g, ""), 10);
+    return numA - numB;
+  });
+
   if (addresses.length > 0) {
     const rows = addresses.map(addr => [
       addr.postalCode || "",
@@ -84,6 +136,15 @@ function forceStartBatch() {
   SpreadsheetApp.flush();
   
   generateAreaSheetsBatch();
+}
+
+function getNormalizedCityName(addrStr) {
+  if (!addrStr) return "";
+  const cityOrderPriority = ["桑名市", "いなべ市", "桑名郡", "員弁郡", "三重郡", "四日市市", "鈴鹿市"];
+  for (const c of cityOrderPriority) {
+    if (addrStr.includes(c)) return c;
+  }
+  return extractCityName(addrStr);
 }
 
 function generateAreaSheetsBatch() {
@@ -114,7 +175,7 @@ function generateAreaSheetsBatch() {
   let itemsInBlock = 0; // 1シート内の何件目か (0-9)
 
   for (let i = 0; i < startIndex; i++) {
-    const c = extractCityName(addresses[i].address);
+    const c = getNormalizedCityName(addresses[i].address);
     if (c !== lastCity || itemsInBlock >= chunkSize) {
       cityCounts[c] = (cityCounts[c] || 0) + 1;
       itemsInBlock = 0;
@@ -142,7 +203,7 @@ function generateAreaSheetsBatch() {
     }
 
     const currentAddr = addresses[currentIndex];
-    const currentCity = extractCityName(currentAddr.address);
+    const currentCity = getNormalizedCityName(currentAddr.address);
 
     // 市町村が変わった、または10件に達した場合
     if (currentCity !== lastCity || itemsInBlock >= chunkSize) {
@@ -229,6 +290,9 @@ function generateAreaSheetsBatch() {
     }
   }
   
+  // 6. タブを自治体順・連番順に物理的に整列
+  sortAllAreaSheetTabs();
+
   // シャドウシートを最新のリストで更新
   createSystemCacheSheet();
   SpreadsheetApp.flush();
@@ -401,4 +465,60 @@ function setupCleanupTrigger() {
     .atHour(2)
     .create();
   console.log("cleanupDrivePhotos trigger set: daily at 2:00 AM JST");
+}
+
+/**
+ * すべてのエリアシートのタブを「自治体順 ➔ 連番昇順」でスプレッドシート上に物理的に並び替える
+ */
+function sortAllAreaSheetTabs() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheets = ss.getSheets();
+    const systemSheetNames = ["原本", "名簿", "初めての方「使い方ガイド」", "__SYSTEM_CACHE__", "チラシ保管庫", "管理者ID", "📄 活動報告書", "📖 らくらくマニュアル"];
+
+    const cityOrderPriority = ["桑名市", "いなべ市", "桑名郡", "員弁郡", "三重郡", "四日市市", "鈴鹿市"];
+
+    const areaSheets = [];
+    sheets.forEach(sheet => {
+      const name = sheet.getName();
+      if (!systemSheetNames.includes(name)) {
+        areaSheets.push({ sheet: sheet, name: name });
+      }
+    });
+
+    // ソート基準: 自治体優先度 ➔ 連番インデックス
+    areaSheets.sort((a, b) => {
+      const getCityAndIndex = (sheetName) => {
+        const clean = (sheetName || "").toString().trim();
+        const match = clean.match(/^([^\d()]+?)(?:\s*\(\s*(\d+)\s*\))?$/);
+        if (!match) return { city: clean, idx: 1 };
+        return { city: match[1].trim(), idx: match[2] ? parseInt(match[2], 10) : 1 };
+      };
+
+      const infoA = getCityAndIndex(a.name);
+      const infoB = getCityAndIndex(b.name);
+
+      const cityIdxA = cityOrderPriority.indexOf(infoA.city);
+      const cityIdxB = cityOrderPriority.indexOf(infoB.city);
+
+      const pA = cityIdxA === -1 ? 999 : cityIdxA;
+      const pB = cityIdxB === -1 ? 999 : cityIdxB;
+
+      if (pA !== pB) return pA - pB;
+      return infoA.idx - infoB.idx;
+    });
+
+    // 物理移動 (ソート順に右端 moveActiveSheet(ss.getNumSheets()) へ順次配置することで左から右へ100%美しく整列)
+    areaSheets.forEach((item) => {
+      try {
+        ss.setActiveSheet(item.sheet);
+        ss.moveActiveSheet(ss.getNumSheets());
+      } catch (mErr) {}
+    });
+
+    SpreadsheetApp.flush();
+    console.log(`✅ Tab Physical Sort Complete: ${areaSheets.length} area sheets sorted cleanly.`);
+  } catch (err) {
+    console.error("Failed sortAllAreaSheetTabs: " + err.toString());
+  }
 }
