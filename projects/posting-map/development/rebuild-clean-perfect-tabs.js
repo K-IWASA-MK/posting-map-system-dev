@@ -2,7 +2,7 @@
  * POSTING MAP - Clean Rebuild & Perfect Physical Tab Sequence
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwy8RZPeQKfwmM_zObRDFpjL-SKWyN_3tAWjK29oWQ6l_QB2rO7_9vqZBM4MBfHcyoa/exec";
 
 async function main() {
   console.log(`🧹 [Step 1] Triggering Force Start Batch (Clean Delete All Stale Area Sheets)...`);
@@ -12,13 +12,13 @@ async function main() {
   console.log(`  - forceStartBatch:`, rawStart.success ? '✅ SUCCESS' : '❌ FAILED');
 
   console.log(`\n🔄 [Step 2] Executing Batch Steps to Rebuild All Area Sheets from scratch...`);
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 30; i++) {
     const stepUrl = `${WEB_APP_URL}?action=verifyDeployment&apiKey=valid-api-key&runBatchStep=true`;
     const resStep = await fetch(stepUrl, { method: 'GET', redirect: 'follow' });
     const rawStep = await resStep.json();
     const data = rawStep.data || rawStep;
     console.log(`  [Batch Loop #${i}] ${data.message || JSON.stringify(data)}`);
-    if (data.isCompleted || data.status === 'completed') break;
+    if (data.isCompleted || data.status === 'completed' || data.status === null) break;
   }
 
   console.log(`\n✨ [Step 3] Triggering Physical Tab Sort on Spreadsheet...`);

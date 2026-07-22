@@ -2,7 +2,7 @@
  * POSTING MAP - Tab Sequence Fact Check
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwy8RZPeQKfwmM_zObRDFpjL-SKWyN_3tAWjK29oWQ6l_QB2rO7_9vqZBM4MBfHcyoa/exec";
 
 async function main() {
   console.log(`📡 Fetching actual Spreadsheet Tab Names & Sequence...`);

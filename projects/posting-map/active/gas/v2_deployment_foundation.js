@@ -387,6 +387,76 @@ function verifyDistrictDeployment(e) {
     }
   }
 
+  // 調査専用: inspectDriveCsv
+  if (params.inspectDriveCsv === "true" || params.inspectDriveCsv === true) {
+    try {
+      const fileId = CONFIG.get("POSTAL_CSV_FILE_ID");
+      let fileFound = false;
+      let fileName = "";
+      let fileSize = 0;
+      let mimeType = "";
+      let canAccess = false;
+      let rawContentSnippet = "";
+      let rowCount = 0;
+      let sampleRows = [];
+      let errMessage = null;
+
+      try {
+        const file = DriveApp.getFileById(fileId);
+        fileFound = true;
+        canAccess = true;
+        fileName = file.getName();
+        fileSize = file.getSize();
+        mimeType = file.getMimeType();
+
+        const blob = file.getBlob();
+        const text = blob.getDataAsString();
+        rawContentSnippet = text.slice(0, 300);
+
+        const data = getCsvOrSheetDataFromFile(file);
+        rowCount = data ? data.length : 0;
+        sampleRows = data ? data.slice(0, 5) : [];
+      } catch (e) {
+        errMessage = e.toString();
+      }
+
+      return {
+        success: true,
+        postalCsvFileId: fileId,
+        fileFound: fileFound,
+        canAccess: canAccess,
+        fileName: fileName,
+        fileSize: fileSize,
+        mimeType: mimeType,
+        rowCount: rowCount,
+        errMessage: errMessage,
+        rawContentSnippet: rawContentSnippet,
+        sampleRows: sampleRows
+      };
+    } catch (err) {
+      return { success: false, message: err.toString() };
+    }
+  }
+
+  // 調査専用: inspectSheetNames
+  if (params.inspectSheetNames === "true" || params.inspectSheetNames === true) {
+    try {
+      const ss = getSS();
+      const sheets = ss.getSheets();
+      const sheetNames = sheets.map(s => s.getName());
+      return {
+        success: true,
+        data: {
+          spreadsheetId: ss.getId(),
+          templateConfigName: CONFIG.get("SHEET_TEMPLATE"),
+          sheetNames: sheetNames
+        }
+      };
+    } catch (err) {
+      return { success: false, error: err.toString() };
+    }
+  }
+
   // AI社員①: Postal CSV Builder Action
   if (params.buildPrefPostalCsv === "true" || params.buildPrefPostalCsv === true) {
     try {
@@ -446,6 +516,28 @@ function verifyDistrictDeployment(e) {
       return {
         success: false,
         message: "Failed buildPrefPostalCsv: " + err.toString()
+      };
+    }
+  }
+
+  // Force Start Batch Action
+  if (params.forceStartBatch === "true" || params.forceStartBatch === true) {
+    try {
+      forceStartBatch();
+      const ss = getSS();
+      const tempSheet = ss.getSheetByName("__TEMP_ADDRESSES__");
+      const tempRows = tempSheet ? tempSheet.getLastRow() : 0;
+      const props = PropertiesService.getScriptProperties();
+      return {
+        success: true,
+        batchStatus: props.getProperty("BATCH_STATUS"),
+        tempRowsCount: tempRows,
+        message: `Batch force started cleanly. Temp rows: ${tempRows}`
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: "Failed forceStartBatch: " + err.toString()
       };
     }
   }

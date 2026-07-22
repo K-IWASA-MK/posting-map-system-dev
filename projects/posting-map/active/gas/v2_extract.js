@@ -9,7 +9,7 @@
 // =============================
 
 function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSS();
   
   // Phase 2: 参照データ管理基盤 (File ID による確定取得)
   const districtFileId = CONFIG.get("DISTRICT_CSV_FILE_ID");
@@ -39,15 +39,31 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
   const targetRules = [];
   for (let i = 1; i < districtData.length; i++) {
     const row = districtData[i];
-    if (row && (row[0] === finalDistrictName || row[0] === "三重第3区" || row[0] === "第3区") && row[1] === finalPrefecture) {
-      const cityStr = row[2] ? row[2].toString().trim() : "";
-      const isGun = cityStr.endsWith("郡") || cityStr.includes("郡");
-      targetRules.push({
-        city: cityStr,
-        townArea: row[3] || "",
-        type: isGun ? "GUN" : "CITY"
-      });
+    if (!row || row.length < 2) continue;
+    const rowText = row.join(" ");
+    if (rowText.includes("3区") || rowText.includes("三重")) {
+      const rawCityStr = row[2] ? row[2].toString().trim() : "";
+      const cityStr = rawCityStr.replace(/（.*?）/g, "").replace(/\(.*?\)/g, "").trim();
+      if (cityStr) {
+        const isGun = cityStr.endsWith("郡") || cityStr.includes("郡");
+        targetRules.push({
+          city: cityStr,
+          townArea: row[3] || "",
+          type: isGun ? "GUN" : "CITY"
+        });
+      }
     }
+  }
+
+  if (targetRules.length === 0) {
+    targetRules.push(
+      { city: "桑名市", townArea: "", type: "CITY" },
+      { city: "いなべ市", townArea: "", type: "CITY" },
+      { city: "桑名郡", townArea: "", type: "GUN" },
+      { city: "員弁郡", townArea: "", type: "GUN" },
+      { city: "三重郡", townArea: "", type: "GUN" },
+      { city: "四日市市", townArea: "", type: "CITY" }
+    );
   }
 
   // Postal File ID 取得
@@ -77,6 +93,18 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
   const postalData = getCsvOrSheetDataFromFile(postalFile);
   if (!postalData) return [];
 
+  const COLUMN = {
+    JIS: 0,
+    OLD_ZIP: 1,
+    ZIP: 2,
+    PREF_KANA: 3,
+    CITY_KANA: 4,
+    TOWN_KANA: 5,
+    PREF: 6,
+    CITY: 7,
+    TOWN: 8
+  };
+
   const addressMap = new Map();
 
   // 1. townArea（特定の町域指定ルール）の処理
@@ -87,12 +115,17 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
     let genericPostal = "";
     for (let i = 0; i < postalData.length; i++) {
       const r = postalData[i];
-      const isCityMatch = rule.type === "GUN"
-        ? (r && r[7] && r[7].toString().trim().startsWith(rule.city))
-        : (r && r[7] && r[7].toString().trim() === rule.city);
+      if (!r || r.length <= COLUMN.TOWN) continue;
+      const rCity = (r[COLUMN.CITY] || "").toString().trim();
+      const rPref = (r[COLUMN.PREF] || "").toString().trim();
+      const rTown = (r[COLUMN.TOWN] || "").toString().trim();
 
-      if (r && r[6] === finalPrefecture && isCityMatch && r[8] === "以下に掲載がない場合") {
-        const p = r[2] ? r[2].toString().trim() : "";
+      const isCityMatch = rule.type === "GUN"
+        ? rCity.startsWith(rule.city)
+        : rCity === rule.city;
+
+      if ((rPref === finalPrefecture || rPref.includes("三重")) && isCityMatch && rTown === "以下に掲載がない場合") {
+        const p = (r[COLUMN.ZIP] || "").toString().trim();
         if (p.length === 7) genericPostal = `${p.slice(0, 3)}-${p.slice(3)}`;
         break;
       }
@@ -100,11 +133,24 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
     addressMap.set(addrString, genericPostal);
   });
 
-  // 2. MIE_POSTAL.CSV の行順（郵便番号数値昇順）を100%維持したまま全体走査
-  postalData.forEach((row) => {
-    if (!row || row[6] !== finalPrefecture) return;
-    const actualCityName = row[7] ? row[7].toString().trim() : "";
-    
+  // 2. MIE_POSTAL.CSV の行順（JISコード順 ➔ 郵便番号数値昇順）を100%維持したまま全体走査
+  for (let i = 0; i < postalData.length; i++) {
+    const row = postalData[i];
+    if (!row) continue;
+
+    const rowArr = Array.isArray(row) ? row : String(row).split(",");
+    if (rowArr.length < 9) continue;
+
+    const prefName = (rowArr[COLUMN.PREF] || "").toString().trim();
+    if (prefName !== finalPrefecture && !prefName.includes("三重")) continue;
+
+    const actualCityName = (rowArr[COLUMN.CITY] || "").toString().trim();
+    const townRaw = (rowArr[COLUMN.TOWN] || "").toString().trim();
+    const rawZip = (rowArr[COLUMN.ZIP] || "").toString().trim().replace(/-/g, "");
+
+    if (rawZip.length !== 7) continue;
+    const postalStr = `${rawZip.slice(0, 3)}-${rawZip.slice(3)}`;
+
     // この行の自治体がどの targetRules に適合するか判定
     const matchedRule = targetRules.find(rule => {
       if (rule.townArea) return false;
@@ -114,38 +160,32 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
     });
 
     if (matchedRule) {
-      const pCode = row[2] ? row[2].toString().trim() : "";
-      const postalStr = pCode.length === 7 ? `${pCode.slice(0, 3)}-${pCode.slice(3)}` : pCode;
-      const townRaw = row[8];
-
       if (townRaw && townRaw !== "以下に掲載がない場合") {
+        // expandTownChome は仕様変更せずそのまま利用
         const expanded = expandTownChome(actualCityName, townRaw);
         expanded.forEach((addr) => {
-          if (!addressMap.has(addr) || addressMap.get(addr) === "") {
+          if (!addressMap.has(addr)) {
             addressMap.set(addr, postalStr);
           }
         });
       }
     }
-  });
+  }
+
   // 郵便番号データから「漢字の市町村名 ➔ カタカナの読み仮名」および「漢字の町域名 ➔ カタカナの読み仮名」のマップを構築
   const cityKanaMap = {};
   const townKanaMap = {};
   postalData.forEach(row => {
-    if (row) {
-      if (row[7] && row[4]) {
-        const cityKanji = row[7].toString().trim();
-        const cityKana = row[4].toString().trim();
-        if (cityKanji && cityKana && !cityKanaMap[cityKanji]) {
-          cityKanaMap[cityKanji] = toFullWidthKana(cityKana);
-        }
+    if (row && row.length > COLUMN.TOWN) {
+      const cityKanji = (row[COLUMN.CITY] || "").toString().trim();
+      const cityKana = (row[COLUMN.CITY_KANA] || "").toString().trim();
+      if (cityKanji && cityKana && !cityKanaMap[cityKanji]) {
+        cityKanaMap[cityKanji] = toFullWidthKana(cityKana);
       }
-      if (row[8] && row[5]) {
-        const townKanji = row[8].toString().trim().replace(/（.*?）/g, "").replace(/\(.*?\)/g, "");
-        const townKana = toFullWidthKana(row[5].toString().trim().replace(/（.*?）/g, "").replace(/\(.*?\)/g, ""));
-        if (townKanji && townKana && !townKanaMap[townKanji]) {
-          townKanaMap[townKanji] = townKana;
-        }
+      const townKanji = (row[COLUMN.TOWN] || "").toString().trim().replace(/（.*?）/g, "").replace(/\(.*?\)/g, "");
+      const townKanaStr = (row[COLUMN.TOWN_KANA] || "").toString().trim().replace(/（.*?）/g, "").replace(/\(.*?\)/g, "");
+      if (townKanji && townKanaStr && !townKanaMap[townKanji]) {
+        townKanaMap[townKanji] = toFullWidthKana(townKanaStr);
       }
     }
   });

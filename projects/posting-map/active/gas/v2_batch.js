@@ -134,8 +134,96 @@ function forceStartBatch() {
     tempSheet.getRange(2, 1, rows.length, 4).setValues(rows);
   }
   SpreadsheetApp.flush();
-  
-  generateAreaSheetsBatch();
+}
+
+function generateAreaSheetsBatch() {
+  const props = PropertiesService.getScriptProperties();
+  if (props.getProperty("BATCH_STATUS") !== "running") return;
+
+  const ss = getSS();
+  const tempSheet = ss.getSheetByName("__TEMP_ADDRESSES__");
+  if (!tempSheet) return;
+
+  const allValues = tempSheet.getDataRange().getValues();
+  if (!allValues || allValues.length < 2) return;
+
+  const tempValues = allValues.slice(1);
+  const addresses = tempValues.map(r => ({ postalCode: r[0], address: r[1] }));
+  const total = addresses.length;
+
+  const startIndex = parseInt(props.getProperty("BATCH_INDEX")) || 0;
+  const chunkSize = CONFIG.get("CHUNK_SIZE") || 10;
+  const baseSheet = ss.getSheetByName(CONFIG.get("SHEET_TEMPLATE"));
+
+  let cityCounts = {};
+  let lastCity = "";
+  let itemsInBlock = 0;
+
+  for (let i = 0; i < startIndex; i++) {
+    const c = getNormalizedCityName(addresses[i].address);
+    if (c !== lastCity || itemsInBlock >= chunkSize) {
+      cityCounts[c] = (cityCounts[c] || 0) + 1;
+      itemsInBlock = 0;
+      lastCity = c;
+    }
+    itemsInBlock++;
+  }
+
+  // 1回のリクエストで 30件 (3シート分) のみ生成し、Web APIタイムアウトを確実に回避
+  const limit = Math.min(startIndex + 30, total);
+  for (let i = startIndex; i < limit; i++) {
+    const currentAddr = addresses[i];
+    const currentCity = getNormalizedCityName(currentAddr.address);
+
+    if (currentCity !== lastCity || itemsInBlock >= chunkSize) {
+      cityCounts[currentCity] = (cityCounts[currentCity] || 0) + 1;
+      itemsInBlock = 0;
+      lastCity = currentCity;
+    }
+
+    let sheetName = cityCounts[currentCity] === 1
+      ? currentCity
+      : `${currentCity}(${cityCounts[currentCity]})`;
+
+    let sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      try {
+        sheet = ss.insertSheet(sheetName);
+      } catch (e) {
+        SpreadsheetApp.flush();
+        sheet = ss.getSheetByName(sheetName);
+      }
+    }
+    sheet.showSheet();
+
+    if (itemsInBlock === 0) {
+      sheet.getRange("A2:L11").clearContent();
+      applyProDesign(sheet);
+    }
+
+    const targetRow = itemsInBlock + 2;
+    const displayAddress = currentAddr.postalCode
+      ? `〒${currentAddr.postalCode}\n${currentAddr.address}`
+      : currentAddr.address;
+
+    sheet.getRange(targetRow, 1).setValue(displayAddress);
+    const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(currentAddr.address);
+    sheet.getRange(targetRow, 2).setFormula(`=HYPERLINK("${mapsUrl}","📍")`);
+    sheet.getRange(targetRow, 12).setValue(i + 2);
+
+    itemsInBlock++;
+  }
+
+  SpreadsheetApp.flush();
+
+  if (limit >= total) {
+    props.deleteProperty("BATCH_STATUS");
+    props.deleteProperty("BATCH_INDEX");
+    createSystemCacheSheet();
+    refreshAreaSummaryCache();
+  } else {
+    props.setProperty("BATCH_INDEX", limit.toString());
+  }
 }
 
 function getNormalizedCityName(addrStr) {
@@ -160,10 +248,11 @@ function generateAreaSheetsBatch() {
     ss.toast("一時データが見つかりません。一括作成を最初からやり直してください。", "エラー", 5);
     return;
   }
-  const lastRow = tempSheet.getLastRow();
-  if (lastRow < 2) return;
   
-  const tempValues = tempSheet.getRange(2, 1, lastRow - 1, 2).getValues();
+  const allValues = tempSheet.getDataRange().getValues();
+  if (!allValues || allValues.length < 2) return;
+
+  const tempValues = allValues.slice(1);
   const addresses = tempValues.map(r => ({ postalCode: r[0], address: r[1] }));
   
   const startIndex = parseInt(props.getProperty("BATCH_INDEX")) || 0;
@@ -191,14 +280,8 @@ function generateAreaSheetsBatch() {
     currentIndex++
   ) {
     const now = new Date().getTime();
-    if (now - startTime > 260 * 1000) { // 安全のため4.3分で中断
-      // 5分制限
+    if (now - startTime > 15 * 1000) { // Web APIタイムアウト(30s)を回避するため15秒で中断
       props.setProperty("BATCH_INDEX", currentIndex.toString());
-      ScriptApp.newTrigger("generateAreaSheetsBatch")
-        .timeBased()
-        .after(1000 * 60)
-        .create();
-      ss.toast(`${currentIndex}件で中断。1分後に自動再開します。`, "中断", 5);
       return;
     }
 
@@ -220,17 +303,14 @@ function generateAreaSheetsBatch() {
     // シートの取得/作成ロジックを堅牢化
     let sheet = ss.getSheetByName(sheetName);
     if (!sheet) {
-      try {
-        sheet = baseSheet.copyTo(ss).setName(sheetName);
-        SpreadsheetApp.flush(); // コピーと名前設定を強制同期
-      } catch (e) {
-        // 重複エラーが発生した場合のリカバリ
-        sheet = ss.getSheetByName(sheetName);
-        if (!sheet) {
-          // それでも取得できない場合は名前を少し変えて作成
-          sheet = baseSheet.copyTo(ss).setName(sheetName + " ");
-          SpreadsheetApp.flush();
+      if (baseSheet) {
+        try {
+          sheet = baseSheet.copyTo(ss).setName(sheetName);
+        } catch (e) {
+          sheet = ss.insertSheet(sheetName);
         }
+      } else {
+        sheet = ss.insertSheet(sheetName);
       }
     }
     sheet.showSheet();

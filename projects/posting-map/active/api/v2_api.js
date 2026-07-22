@@ -84,6 +84,10 @@ function doGet(e) {
       updatedAt: data.updatedAt
     })).setMimeType(ContentService.MimeType.JSON);
   }
+  if (action === "verifyDeployment") {
+    const res = verifyDistrictDeployment(e);
+    return ContentService.createTextOutput(JSON.stringify(res)).setMimeType(ContentService.MimeType.JSON);
+  }
   return PlatformIntegrationPipeline.execute(e);
 }
 
