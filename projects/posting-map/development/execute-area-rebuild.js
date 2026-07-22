@@ -2,7 +2,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwy8RZPeQKfwmM_zObRDFpjL-SKWyN_3tAWjK29oWQ6l_QB2rO7_9vqZBM4MBfHcyoa/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec";
 const VERIFICATION_REPORT_PATH = "/Users/katsujiiwasa/.gemini/antigravity-ide/brain/ca5a9d14-de78-4c24-800b-3e9be8ecfcec/district_verification_report.md";
 
 function fetchJson(url) {
@@ -56,7 +56,7 @@ async function main() {
 
   // ガードレール 4: 古い中途エリアシートの全クリーン削除 (削除ガバナンス実行)
   console.log("🧹 [PM-002 既存シート削除] 中途作成エリアシート (32シート) のクリーン削除を実行中...");
-  const cleanRes = await fetchJson(`${API_URL}?action=verifyDeployment&districtId=MIE-03&executeFullBatch=true`);
+  const cleanRes = await fetchJson(`${API_URL}?action=verifyDeployment&districtId=MIE-03&forceStartBatch=true`);
   if (!cleanRes || !cleanRes.success) {
     console.error("❌ シートの初期化・クリーン削除に失敗しました:", cleanRes);
     process.exit(1);

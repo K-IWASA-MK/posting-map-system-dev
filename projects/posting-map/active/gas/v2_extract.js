@@ -11,26 +11,18 @@
 function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
   const ss = getSS();
   
-  // Phase 2: 参照データ管理基盤 (File ID による確定取得)
+  // Phase 2: 参照データ管理基盤 (File ID による確定取得 - ドライブ瞬断/権限エラー対策のフォールバック付)
   const districtFileId = CONFIG.get("DISTRICT_CSV_FILE_ID");
   let districtFile = null;
+  let districtData = null;
   if (districtFileId) {
     try {
       districtFile = DriveApp.getFileById(districtFileId);
+      districtData = getCsvOrSheetDataFromFile(districtFile);
     } catch (e) {
-      const errMsg = `❌ DISTRICT_CSV_FILE_ID が無効です (ID: ${districtFileId})`;
-      if (ss) ss.toast(errMsg, "設定エラー", 10);
-      throw new Error(errMsg);
+      Logger.log("⚠️ DISTRICT_CSV_FILE_ID のロードで例外が発生しました。フォールバック適用します: " + e.toString());
     }
   }
-  if (!districtFile) {
-    const errMsg = `❌ DISTRICT_CSV_FILE_ID が設定されていません。`;
-    if (ss) ss.toast(errMsg, "設定エラー", 10);
-    throw new Error(errMsg);
-  }
-
-  const districtData = getCsvOrSheetDataFromFile(districtFile);
-  if (!districtData || districtData.length < 2) return [];
 
   // 引数が未指定の場合のフォールバック
   let finalDistrictName = targetDistrictName || CONFIG.get("DEFAULT_DISTRICT") || "三重第3区";
@@ -71,15 +63,16 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
   }
 
   const targetRules = [];
-  for (let i = 1; i < districtData.length; i++) {
-    const row = districtData[i];
-    if (!row || row.length <= DISTRICT_COLUMN.CITY) continue;
+  if (districtData && districtData.length >= 2) {
+    for (let i = 1; i < districtData.length; i++) {
+      const row = districtData[i];
+      if (!row || row.length <= DISTRICT_COLUMN.CITY) continue;
 
-    const csvDistrict = row[DISTRICT_COLUMN.DISTRICT] ? row[DISTRICT_COLUMN.DISTRICT].toString().trim() : "";
-    const csvPrefecture = row[DISTRICT_COLUMN.PREFECTURE] ? row[DISTRICT_COLUMN.PREFECTURE].toString().trim() : "";
+      const csvDistrict = row[DISTRICT_COLUMN.DISTRICT] ? row[DISTRICT_COLUMN.DISTRICT].toString().trim() : "";
+      const csvPrefecture = row[DISTRICT_COLUMN.PREFECTURE] ? row[DISTRICT_COLUMN.PREFECTURE].toString().trim() : "";
 
-    // 曖昧判定 (includes) を完全に排除し、厳密一致のみを対象とする
-    if (isDistrictMatch(finalDistrictName, csvDistrict, finalPrefecture, csvPrefecture)) {
+      // 曖昧判定 (includes) を完全に排除し、厳密一致のみを対象とする
+      if (isDistrictMatch(finalDistrictName, csvDistrict, finalPrefecture, csvPrefecture)) {
       const rawCityStr = row[DISTRICT_COLUMN.CITY] ? row[DISTRICT_COLUMN.CITY].toString().trim() : "";
       const cityStr = rawCityStr.replace(/（.*?）/g, "").replace(/\(.*?\)/g, "").trim();
       if (cityStr) {
@@ -92,6 +85,7 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
       }
     }
   }
+}
 
   if (targetRules.length === 0) {
     targetRules.push(
@@ -100,35 +94,36 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
       { city: "桑名郡", townArea: "", type: "GUN" },
       { city: "員弁郡", townArea: "", type: "GUN" },
       { city: "三重郡", townArea: "", type: "GUN" },
-      { city: "四日市市", townArea: "", type: "CITY" }
+      { city: "四日市市", townArea: "第2区に属しない区域", type: "CITY" }
     );
   }
 
-  // Postal File ID 取得
+  // Postal File ID 取得 (ドライブ瞬断/権限エラー対策の二重フォールバック付)
   const postalFileId = CONFIG.get("POSTAL_CSV_FILE_ID");
-  let postalFile = null;
+  let postalData = null;
   if (postalFileId) {
     try {
-      postalFile = DriveApp.getFileById(postalFileId);
+      const postalFile = DriveApp.getFileById(postalFileId);
+      postalData = getCsvOrSheetDataFromFile(postalFile);
     } catch (e) {
-      // ALT ID Fallback
-      const altId = CONFIG.get("POSTAL_ALT_FILE_ID") || "1jr272nvp4bUWh7maGfEnTKDa9qEqSbgP";
-      try {
-        postalFile = DriveApp.getFileById(altId);
-      } catch (errAlt) {
-        const errMsg = `❌ POSTAL_CSV_FILE_ID が無効です (ID: ${postalFileId})`;
-        if (ss) ss.toast(errMsg, "設定エラー", 10);
-        throw new Error(errMsg);
-      }
+      Logger.log("⚠️ Driveからの郵便データロードに失敗しました。スプレッドシート内のシートからロードを試みます: " + e.toString());
     }
   }
-  if (!postalFile) {
-    const errMsg = `❌ POSTAL_CSV_FILE_ID が設定されていません。`;
+  
+  if (!postalData) {
+    const postalSheetName = CONFIG.get("SHEET_POSTAL") || "郵便番号";
+    const postalSheet = ss.getSheetByName(postalSheetName);
+    if (postalSheet) {
+      postalData = postalSheet.getDataRange().getValues();
+      Logger.log("✅ スプレッドシートの「" + postalSheetName + "」シートから郵便マスタをロードしました。件数: " + postalData.length);
+    }
+  }
+
+  if (!postalData || postalData.length < 2) {
+    const errMsg = `❌ 郵便番号データ（MIE_POSTAL）のロードに失敗しました。`;
     if (ss) ss.toast(errMsg, "設定エラー", 10);
     throw new Error(errMsg);
   }
-
-  const postalData = getCsvOrSheetDataFromFile(postalFile);
   if (!postalData) return [];
 
   const COLUMN = {
@@ -470,6 +465,11 @@ function matchDistrict(address, city) {
 }
 
 // === [Yokkaichi District Master Area SSOT: START] ===
+// AUTO GENERATED
+// Source: data/districts/mie/yokkaichi_district_master.csv
+// Records: 89
+// Generated: 2026-07-22T07:57:14.136Z
+// DO NOT EDIT
 const YOKKAICHI_DISTRICT_MASTER = [
   {
     "city": "四日市市",

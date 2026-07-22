@@ -272,45 +272,45 @@ function generateAreaSheetsBatch() {
 
   // 3. 再開時の状態シミュレーション
   let cityCounts = {};
+  let cityNameCounts = {}; // 市町村名ごとのシート枚数カウント (シート名(2)(3)付与用)
   let lastCity = "";
   let itemsInBlock = 0; // 1シート内の何件目か (0-9)
 
   for (let i = 0; i < startIndex; i++) {
     const key = addresses[i].areaKey;
+    const cityName = extractCityName(addresses[i].address);
     if (key !== lastCity || itemsInBlock >= chunkSize) {
       cityCounts[key] = (cityCounts[key] || 0) + 1;
+      cityNameCounts[cityName] = (cityNameCounts[cityName] || 0) + 1;
       itemsInBlock = 0;
       lastCity = key;
     }
     itemsInBlock++;
   }
 
-  // 4. メインループ
+  // 4. メインループ (1回で最大30件処理してタイムアウト回避)
+  const limit = Math.min(startIndex + 30, addresses.length);
   for (
     let currentIndex = startIndex;
-    currentIndex < addresses.length;
+    currentIndex < limit;
     currentIndex++
   ) {
-    const now = new Date().getTime();
-    if (now - startTime > 15 * 1000) { // Web APIタイムアウト(30s)を回避するため15秒で中断
-      props.setProperty("BATCH_INDEX", currentIndex.toString());
-      return;
-    }
-
     const currentAddr = addresses[currentIndex];
     const currentKey = currentAddr.areaKey;
+    const cityName = extractCityName(currentAddr.address);
 
     // 地区が切り替わった、または10件に達した場合
     if (currentKey !== lastCity || itemsInBlock >= chunkSize) {
       cityCounts[currentKey] = (cityCounts[currentKey] || 0) + 1;
+      cityNameCounts[cityName] = (cityNameCounts[cityName] || 0) + 1;
       itemsInBlock = 0;
       lastCity = currentKey;
     }
 
     let sheetName =
-      cityCounts[currentKey] === 1
-        ? currentKey
-        : `${currentKey}(${cityCounts[currentKey]})`;
+      cityNameCounts[cityName] === 1
+        ? cityName
+        : `${cityName}(${cityNameCounts[cityName]})`;
     
     // シートの取得/作成ロジックを堅牢化
     let sheet = ss.getSheetByName(sheetName);
@@ -350,51 +350,58 @@ function generateAreaSheetsBatch() {
     itemsInBlock++;
   }
 
-  // 完了処理
-  props.deleteProperty("BATCH_STATUS");
-  props.deleteProperty("BATCH_INDEX");
-  
-  // 一時シートの削除
-  const tempSheetToDelete = ss.getSheetByName("__TEMP_ADDRESSES__");
-  
-  // BATCH 完了監査 (一時シートの削除前にマスタの整合性チェック)
-  if (tempSheetToDelete) {
-    const tempLastRow = tempSheetToDelete.getLastRow();
-    if (tempLastRow >= 2) {
-      const batchData = tempSheetToDelete.getRange(2, 1, tempLastRow - 1, 4).getValues().map(r => ({
-        postalCode: r[0],
-        address: r[1],
-        cityKana: r[2],
-        townKana: r[3]
-      }));
-      if (typeof auditDataIntegrity === 'function') {
-        auditDataIntegrity("BATCH", batchData);
+  SpreadsheetApp.flush();
+
+  // BATCHの進行状況を更新または完了処理を実行
+  if (limit >= addresses.length) {
+    // 完了処理
+    props.deleteProperty("BATCH_STATUS");
+    props.deleteProperty("BATCH_INDEX");
+    
+    // 一時シートの削除
+    const tempSheetToDelete = ss.getSheetByName("__TEMP_ADDRESSES__");
+    
+    // BATCH 完了監査 (一時シートの削除前にマスタの整合性チェック)
+    if (tempSheetToDelete) {
+      const tempLastRow = tempSheetToDelete.getLastRow();
+      if (tempLastRow >= 2) {
+        const batchData = tempSheetToDelete.getRange(2, 1, tempLastRow - 1, 4).getValues().map(r => ({
+          postalCode: r[0],
+          address: r[1],
+          cityKana: r[2],
+          townKana: r[3]
+        }));
+        if (typeof auditDataIntegrity === 'function') {
+          auditDataIntegrity("BATCH", batchData);
+        }
       }
     }
-  }
-  
-  if (tempSheetToDelete) {
-    try {
-      ss.deleteSheet(tempSheetToDelete);
-      SpreadsheetApp.flush();
-    } catch (e) {
-      // 削除エラーは無視
+    
+    if (tempSheetToDelete) {
+      try {
+        ss.deleteSheet(tempSheetToDelete);
+        SpreadsheetApp.flush();
+      } catch (e) {
+        // 削除エラーは無視
+      }
     }
-  }
-  
-  // 6. タブを自治体順・連番順に物理的に整列
-  sortAllAreaSheetTabs();
+    
+    // 6. タブを自治体順・連番順に物理的に整列
+    sortAllAreaSheetTabs();
 
-  // シャドウシートを最新のリストで更新
-  createSystemCacheSheet();
-  SpreadsheetApp.flush();
-  
-  ss.toast(
-    "すべてのエリアシートの展開（市町村境界考慮・10件分割版）が完了しました！",
-    "完了",
-    10,
-  );
-  refreshAreaSummaryCache();
+    // シャドウシートを最新のリストで更新
+    createSystemCacheSheet();
+    SpreadsheetApp.flush();
+    
+    ss.toast(
+      "すべてのエリアシートの展開（市町村境界考慮・10件分割版）が完了しました！",
+      "完了",
+      10,
+    );
+    refreshAreaSummaryCache();
+  } else {
+    props.setProperty("BATCH_INDEX", limit.toString());
+  }
 }
 
 function createAddressLinks(targetSheet) {
