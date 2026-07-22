@@ -210,6 +210,35 @@ function verifyDistrictDeployment(e) {
     }
   }
   
+  // Create Backup Snapshot Action (PM-002 Rollback support)
+  if (params.backupSpreadsheet === "true" || params.backupSpreadsheet === true) {
+    try {
+      const targetSs = getSS();
+      const file = DriveApp.getFileById(targetSs.getId());
+      const backupFolderId = "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY"; // 05_BACKUP
+      let backupFolder;
+      try {
+        backupFolder = DriveApp.getFolderById(backupFolderId);
+      } catch (fErr) {
+        backupFolder = DriveApp.getRootFolder();
+      }
+      const timestamp = Utilities.formatDate(new Date(), "JST", "yyyyMMdd_HHmmss");
+      const backupName = `BACKUP_${targetSs.getName()}_${timestamp}`;
+      const copyFile = file.makeCopy(backupName, backupFolder);
+      return {
+        success: true,
+        backupName: backupName,
+        backupFileId: copyFile.getId(),
+        message: `Successfully created spreadsheet backup copy: ${backupName}`
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: "Failed backupSpreadsheet: " + err.toString()
+      };
+    }
+  }
+
   // Provisioning Action (creates spreadsheet and storage folder under user credentials)
   if (params.provisionDistrict === "true" || params.provisionDistrict === true) {
     try {

@@ -191,7 +191,21 @@ function generateAreaSheetsBatch() {
         sheet = ss.insertSheet(sheetName);
       } catch (e) {
         SpreadsheetApp.flush();
-        sheet = ss.getSheetByName(sheetName);
+        // キャッシュ同期ズレを回避するため、全シート物理走査による完全一致検索
+        const allSheets = ss.getSheets();
+        for (let sIdx = 0; sIdx < allSheets.length; sIdx++) {
+          if (allSheets[sIdx].getName() === sheetName) {
+            sheet = allSheets[sIdx];
+            break;
+          }
+        }
+        if (!sheet) {
+          try {
+            sheet = ss.insertSheet(sheetName + "_fallback_" + new Date().getTime());
+          } catch (e2) {
+            sheet = ss.insertSheet();
+          }
+        }
       }
     }
     sheet.showSheet();
