@@ -112,12 +112,6 @@ function forceStartBatch() {
 
     if (pA !== pB) return pA - pB;
 
-    // 同一自治体内での地区名ソート
-    const distA = a.district || "";
-    const distB = b.district || "";
-    const distComp = distA.localeCompare(distB, 'ja');
-    if (distComp !== 0) return distComp;
-
     // 同一地区内での郵便番号昇順
     const numA = parseInt((a.postalCode || "0").replace(/-/g, ""), 10);
     const numB = parseInt((b.postalCode || "0").replace(/-/g, ""), 10);
@@ -131,7 +125,7 @@ function forceStartBatch() {
       addr.cityKana || "",
       addr.townKana || "",
       addr.district || "",
-      addr.city + (addr.district || "")
+      addr.city
     ]);
     tempSheet.getRange(2, 1, rows.length, 6).setValues(rows);
   }
