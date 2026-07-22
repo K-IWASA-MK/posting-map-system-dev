@@ -61,9 +61,11 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
     // 1. 完全一致 ("三重第3区" === "三重第3区", "第3区" === "第3区")
     if (tDist === cDist) return true;
 
-    // 2. 都道府県プレフィックス結合の完全一致 ("三重第3区" === "三重" + "第3区")
-    if (cPref && `${cPref}${cDist}` === tDist) return true;
-    if (tPref && `${tPref}${tDist}` === cDist) return true;
+    // 2. 都道府県プレフィックス結合の完全一致 ("三重第3区" === "三重" + "第3区" 対応のため、「県」を除去して結合判定)
+    const cPrefShort = cPref.replace(/県$/, "");
+    const tPrefShort = tPref.replace(/県$/, "");
+    if (cPrefShort && `${cPrefShort}${cDist}` === tDist) return true;
+    if (tPrefShort && `${tPrefShort}${tDist}` === cDist) return true;
 
     return false;
   }
@@ -145,6 +147,8 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
 
   // 1. townArea（特定の町域指定ルール）の処理
   targetRules.filter(r => r.townArea).forEach(rule => {
+    // "第2区に属しない区域" 等の全体指示値は townArea マッチとしては除外する
+    if (rule.townArea === "第2区に属しない区域") return;
     const addrString = rule.townArea.startsWith(rule.city)
       ? rule.townArea
       : rule.city + rule.townArea;
@@ -189,7 +193,7 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
 
     // この行の自治体がどの targetRules に適合するか判定
     const matchedRule = targetRules.find(rule => {
-      if (rule.townArea) return false;
+      if (rule.townArea && rule.townArea !== "第2区に属しない区域") return false;
       return rule.type === "GUN"
         ? actualCityName.startsWith(rule.city)
         : actualCityName === rule.city;
@@ -197,7 +201,6 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
 
     if (matchedRule) {
       if (townRaw && townRaw !== "以下に掲載がない場合") {
-        // expandTownChome は仕様変更せずそのまま利用
         const expanded = expandTownChome(actualCityName, townRaw);
         expanded.forEach((addr) => {
           if (!addressMap.has(addr)) {
@@ -249,13 +252,17 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
     };
   });
 
-  return items.map(item => ({
-    postalCode: item.postalCode,
-    address: item.address,
-    city: item.city,
-    cityKana: item.cityKana,
-    townKana: item.townKana
-  }));
+  return items.map(item => {
+    const matchedDist = matchDistrict(item.address, item.city);
+    return {
+      postalCode: item.postalCode,
+      address: item.address,
+      city: item.city,
+      cityKana: item.cityKana,
+      townKana: item.townKana,
+      district: matchedDist
+    };
+  });
 }
 
 function expandTownChome(baseCity, townRaw) {
@@ -409,3 +416,488 @@ function detectRegionFromSpreadsheetName() {
   
   return { prefecture, district };
 }
+
+function matchDistrict(address, city) {
+  if (!address) return "Unknown";
+  
+  // 四日市市の場合は詳細マスタ (District SSOT) からの完全一致で確定取得
+  if (city === "四日市市") {
+    // 住所から市名を除去した部分で判定
+    let subAddr = address;
+    if (address.indexOf(city) === 0) {
+      subAddr = address.slice(city.length);
+    }
+    
+    // YOKKAICHI_DISTRICT_MASTER から前方一致または完全一致する町名を走査
+    for (let i = 0; i < YOKKAICHI_DISTRICT_MASTER.length; i++) {
+      const rule = YOKKAICHI_DISTRICT_MASTER[i];
+      if (subAddr.indexOf(rule.town) === 0) {
+        return rule.district;
+      }
+    }
+    
+    // 四日市市の「日永地区」等、一部の境界表記例外へのフォールバック
+    if (subAddr.includes("日永")) return "日永地区";
+    if (subAddr.includes("塩浜")) return "塩浜地区";
+    if (subAddr.includes("四郷")) return "四郷地区";
+    if (subAddr.includes("内部")) return "内部地区";
+    if (subAddr.includes("河原田")) return "河原田地区";
+    if (subAddr.includes("水沢")) return "水沢地区";
+    if (subAddr.includes("楠")) return "楠地区";
+    if (subAddr.includes("小山田")) return "小山田地区";
+    if (subAddr.includes("富田")) return "富田地区";
+    if (subAddr.includes("羽津")) return "羽津地区";
+    if (subAddr.includes("常磐")) return "常磐地区";
+    if (subAddr.includes("富洲原")) return "富洲原地区";
+    
+    return "Unknown";
+  }
+  
+  // 桑名市 (多度地区・長島地区・桑名地区) の判定
+  if (city === "桑名市") {
+    if (address.includes("多度町")) return "多度地区";
+    if (address.includes("長島町")) return "長島地区";
+    return "桑名地区";
+  }
+  
+  // それ以外の市町村はデフォルトで「市区町村名 + 地区」とする (例: 朝日町 ➔ 朝日町地区)
+  let cleanCity = city;
+  if (city.includes("郡")) {
+    // 郡名を取り除く (例: 三重郡菰野町 ➔ 菰野町)
+    cleanCity = city.replace(/^.+?郡/, "");
+  }
+  return cleanCity + "地区";
+}
+
+const YOKKAICHI_DISTRICT_MASTER = [
+  {
+    "city": "四日市市",
+    "town": "天カ須賀",
+    "district": "富洲原地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "天カ須賀新田",
+    "district": "富洲原地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "住吉町",
+    "district": "富洲原地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "羽津",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "羽津町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "羽津山町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大宮町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "霞",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "金場町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "城北町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "垂坂町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "別名",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "別名町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "別名１丁目",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "別名２丁目",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "別名３丁目",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "別名４丁目",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "別名５丁目",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "別名６丁目",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "富士町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "緑丘町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "山手町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "八幡町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字羽津",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "東茂福町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "茂福",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "茂福町",
+    "district": "羽津地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "常磐",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "常磐町",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "ときわ",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "ときわ１丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "ときわ２丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "ときわ３丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "ときわ４丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "ときわ５丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "赤堀",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "赤堀町",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "赤堀南町",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "赤堀１丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "赤堀２丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "赤堀３丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "城東町",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "伊倉",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "伊倉１丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "伊倉２丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "伊倉３丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "久保田",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "久保田１丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "久保田２丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "芝田",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "芝田１丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "芝田２丁目",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字赤堀",
+    "district": "常磐地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字日永",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "日永",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "日永１丁目",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "日永２丁目",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "日永３丁目",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "日永４丁目",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "日永５丁目",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "日永東",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "日永西",
+    "district": "日永地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字塩浜",
+    "district": "塩浜地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "塩浜",
+    "district": "塩浜地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "塩浜本町",
+    "district": "塩浜地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字四郷",
+    "district": "四郷地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字内部",
+    "district": "内部地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字河原田",
+    "district": "河原田地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字水沢",
+    "district": "水沢地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字楠",
+    "district": "楠地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大字小山田",
+    "district": "小山田地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "山田町",
+    "district": "小山田地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "富田",
+    "district": "富田地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "富田一色町",
+    "district": "富田地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "川島町",
+    "district": "川島地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "神前町",
+    "district": "神前地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "桜町",
+    "district": "桜地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "生桑町",
+    "district": "三重地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "県町",
+    "district": "県地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "平尾町",
+    "district": "八郷地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "朝明町",
+    "district": "下野地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "大矢知町",
+    "district": "大矢知地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "小牧町",
+    "district": "保々地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "阿倉川町",
+    "district": "海蔵地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "東新町",
+    "district": "橋北地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "安島",
+    "district": "中部地区"
+  }
+];

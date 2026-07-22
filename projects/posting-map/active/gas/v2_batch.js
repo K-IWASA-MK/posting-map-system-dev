@@ -96,20 +96,13 @@ function forceStartBatch() {
     tempSheet.hideSheet();
   }
   tempSheet.clear();
-  tempSheet.getRange(1, 1, 1, 4).setValues([["郵便番号", "住所", "市町村カナ", "町域カナ"]]);
+  tempSheet.getRange(1, 1, 1, 6).setValues([["郵便番号", "住所", "市町村カナ", "町域カナ", "地区名", "エリアシートキー"]]);
   
-  // 自治体優先度 ➔ 郵便番号数値昇順 の2段階整列（スプレッドシート作成順を100%美しく統一）
+  // 自治体優先度 ➔ 地区名 ➔ 郵便番号数値昇順 の3段階整列（スプレッドシート作成順を100%美しく統一）
   const cityOrderPriority = ["桑名市", "いなべ市", "桑名郡", "員弁郡", "三重郡", "四日市市", "鈴鹿市"];
   addresses.sort((a, b) => {
-    const getCityName = (addrStr) => {
-      for (const c of cityOrderPriority) {
-        if (addrStr.includes(c)) return c;
-      }
-      return extractCityName(addrStr);
-    };
-
-    const cityA = getCityName(a.address);
-    const cityB = getCityName(b.address);
+    const cityA = a.city;
+    const cityB = b.city;
 
     const idxA = cityOrderPriority.indexOf(cityA);
     const idxB = cityOrderPriority.indexOf(cityB);
@@ -119,6 +112,13 @@ function forceStartBatch() {
 
     if (pA !== pB) return pA - pB;
 
+    // 同一自治体内での地区名ソート
+    const distA = a.district || "";
+    const distB = b.district || "";
+    const distComp = distA.localeCompare(distB, 'ja');
+    if (distComp !== 0) return distComp;
+
+    // 同一地区内での郵便番号昇順
     const numA = parseInt((a.postalCode || "0").replace(/-/g, ""), 10);
     const numB = parseInt((b.postalCode || "0").replace(/-/g, ""), 10);
     return numA - numB;
@@ -129,9 +129,11 @@ function forceStartBatch() {
       addr.postalCode || "",
       addr.address,
       addr.cityKana || "",
-      addr.townKana || ""
+      addr.townKana || "",
+      addr.district || "",
+      addr.city + (addr.district || "")
     ]);
-    tempSheet.getRange(2, 1, rows.length, 4).setValues(rows);
+    tempSheet.getRange(2, 1, rows.length, 6).setValues(rows);
   }
   SpreadsheetApp.flush();
 }
@@ -240,14 +242,6 @@ function generateAreaSheetsBatch() {
   }
 }
 
-function getNormalizedCityName(addrStr) {
-  if (!addrStr) return "";
-  const cityOrderPriority = ["桑名市", "いなべ市", "桑名郡", "員弁郡", "三重郡", "四日市市", "鈴鹿市"];
-  for (const c of cityOrderPriority) {
-    if (addrStr.includes(c)) return c;
-  }
-  return extractCityName(addrStr);
-}
 
 function generateAreaSheetsBatch() {
   const props = PropertiesService.getScriptProperties();
@@ -267,10 +261,14 @@ function generateAreaSheetsBatch() {
   if (!allValues || allValues.length < 2) return;
 
   const tempValues = allValues.slice(1);
-  const addresses = tempValues.map(r => ({ postalCode: r[0], address: r[1] }));
+  const addresses = tempValues.map(r => ({
+    postalCode: r[0],
+    address: r[1],
+    areaKey: r[5] || "Unknown"
+  }));
   
   const startIndex = parseInt(props.getProperty("BATCH_INDEX")) || 0;
-  const chunkSize = CONFIG.get("CHUNK_SIZE");
+  const chunkSize = CONFIG.get("CHUNK_SIZE") || 10;
 
   // 3. 再開時の状態シミュレーション
   let cityCounts = {};
@@ -278,11 +276,11 @@ function generateAreaSheetsBatch() {
   let itemsInBlock = 0; // 1シート内の何件目か (0-9)
 
   for (let i = 0; i < startIndex; i++) {
-    const c = getNormalizedCityName(addresses[i].address);
-    if (c !== lastCity || itemsInBlock >= chunkSize) {
-      cityCounts[c] = (cityCounts[c] || 0) + 1;
+    const key = addresses[i].areaKey;
+    if (key !== lastCity || itemsInBlock >= chunkSize) {
+      cityCounts[key] = (cityCounts[key] || 0) + 1;
       itemsInBlock = 0;
-      lastCity = c;
+      lastCity = key;
     }
     itemsInBlock++;
   }
@@ -300,19 +298,19 @@ function generateAreaSheetsBatch() {
     }
 
     const currentAddr = addresses[currentIndex];
-    const currentCity = getNormalizedCityName(currentAddr.address);
+    const currentKey = currentAddr.areaKey;
 
-    // 市町村が変わった、または10件に達した場合
-    if (currentCity !== lastCity || itemsInBlock >= chunkSize) {
-      cityCounts[currentCity] = (cityCounts[currentCity] || 0) + 1;
+    // 地区が切り替わった、または10件に達した場合
+    if (currentKey !== lastCity || itemsInBlock >= chunkSize) {
+      cityCounts[currentKey] = (cityCounts[currentKey] || 0) + 1;
       itemsInBlock = 0;
-      lastCity = currentCity;
+      lastCity = currentKey;
     }
 
     let sheetName =
-      cityCounts[currentCity] === 1
-        ? currentCity
-        : `${currentCity}(${cityCounts[currentCity]})`;
+      cityCounts[currentKey] === 1
+        ? currentKey
+        : `${currentKey}(${cityCounts[currentKey]})`;
     
     // シートの取得/作成ロジックを堅牢化
     let sheet = ss.getSheetByName(sheetName);

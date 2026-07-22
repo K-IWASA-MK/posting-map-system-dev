@@ -239,6 +239,34 @@ function verifyDistrictDeployment(e) {
     }
   }
 
+  // Upload Yokkaichi District Master Action (Sprint B-4/B-5)
+  if (params.uploadYokkaichiMaster === "true" || params.uploadYokkaichiMaster === true) {
+    try {
+      const parentFolder = DriveApp.getRootFolder();
+      
+      const existing = parentFolder.getFilesByName("yokkaichi_district_master.csv");
+      while (existing.hasNext()) {
+        existing.next().setTrashed(true);
+      }
+      
+      const csvContent = params.csvContent;
+      if (!csvContent) {
+        return { success: false, message: "Missing csvContent parameter" };
+      }
+      const file = parentFolder.createFile("yokkaichi_district_master.csv", csvContent, MimeType.CSV);
+      return {
+        success: true,
+        fileId: file.getId(),
+        message: "Successfully uploaded Yokkaichi Master CSV to Root Drive"
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: "Failed uploadYokkaichiMaster: " + err.toString()
+      };
+    }
+  }
+
   // Provisioning Action (creates spreadsheet and storage folder under user credentials)
   if (params.provisionDistrict === "true" || params.provisionDistrict === true) {
     try {
