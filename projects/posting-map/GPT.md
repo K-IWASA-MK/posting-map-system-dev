@@ -146,3 +146,13 @@ POSTING MAPと北勢CHは目的が異なるが、共通して「地域を良く�
 北勢CHは、この地域メディア運営の実証モデルである。
 
 将来的には、この運営ノウハウとAIOSの共通プラットフォームを活用し、他の地域でもそれぞれの地域メディアを立ち上げ、地域に貢献する活動を支援できることを目指す。
+
+---
+
+## 郵便番号データ基盤仕様 (POSTAL CSV Generation Specification)
+
+将来の Generation 2 および全AI社員は、[POSTAL_CSV_GENERATION_SPECIFICATION.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/projects/posting-map/docs/POSTAL_CSV_GENERATION_SPECIFICATION.md) の規定に従わなければならない。
+
+- **第1キー**: 自治体コード（JISコード）昇順 (タブ並びの分断防止)
+- **第2キー**: 郵便番号数値昇順 (配布現場の移動効率最大化)
+- **後続維持**: `extractDistrictAddresses()` および `generateAreaSheetsBatch()` において、前処理の抽出・ソート順を100%維持し、エリアシート内での再並び替えを行わない。
