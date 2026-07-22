@@ -411,6 +411,36 @@ function deleteAllAreaSheets() {
 }
 
 /**
+ * 原本シートが存在しない場合、空シートを作成してデザイン・ヘッダー・チェックボックスを完全復元する
+ */
+function createTemplateSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const templateName = CONFIG.get("SHEET_TEMPLATE") || "原本";
+  let template = ss.getSheetByName(templateName);
+
+  // YES: 既に「原本」が存在する場合は何もしない
+  if (template) {
+    return template;
+  }
+
+  // NO: 存在しない場合、空シートを作成して完璧に復元構築
+  template = ss.insertSheet(templateName);
+
+  // 1. ヘッダーテキストの設定 (1行目: A1~G1)
+  const headers = [["住所", "地図", "メモ", "完了", "日付", "枚数", "担当"]];
+  template.getRange(1, 1, 1, 7).setValues(headers);
+
+  // 2. D列 (完了) にチェックボックスを標準設置 (D2:D11)
+  template.getRange("D2:D11").insertCheckboxes();
+
+  // 3. Proデザイン・色・列幅・行高・フォント・非表示制御の全適用
+  applyProDesign(template);
+
+  SpreadsheetApp.flush();
+  return template;
+}
+
+/**
  * 原本および全エリアシートのデザインを「究極の視認性（シニア対応）」に一斉整形する
  */
 function formatAllSheets() {

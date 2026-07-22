@@ -11,89 +11,121 @@
 function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   
-  // 1. 「区割り」を含むファイルをスマート検索
-  const districtFile = findFileByPattern("区割り", CONFIG.get("DISTRICT_CSV"));
-  if (!districtFile) {
-    ss.toast("Google Drive上に「区割り」を含むCSVファイルが見つかりません。", "エラー", 5);
-    return [];
+  // Phase 2: 参照データ管理基盤 (File ID による確定取得)
+  const districtFileId = CONFIG.get("DISTRICT_CSV_FILE_ID");
+  let districtFile = null;
+  if (districtFileId) {
+    try {
+      districtFile = DriveApp.getFileById(districtFileId);
+    } catch (e) {
+      const errMsg = `❌ DISTRICT_CSV_FILE_ID が無効です (ID: ${districtFileId})`;
+      if (ss) ss.toast(errMsg, "設定エラー", 10);
+      throw new Error(errMsg);
+    }
   }
+  if (!districtFile) {
+    const errMsg = `❌ DISTRICT_CSV_FILE_ID が設定されていません。`;
+    if (ss) ss.toast(errMsg, "設定エラー", 10);
+    throw new Error(errMsg);
+  }
+
   const districtData = getCsvOrSheetDataFromFile(districtFile);
   if (!districtData || districtData.length < 2) return [];
 
-  // 2. 引数が未指定の場合、スプレッドシート名からの検出 ➔ 設定ファイルのデフォルト ➔ CSV最初の行 の優先順位で自動検出
-  let finalDistrictName = targetDistrictName;
-  let finalPrefecture = targetPrefecture;
-
-  if (!finalDistrictName || !finalPrefecture) {
-    const detected = detectRegionFromSpreadsheetName();
-    if (detected.district && !finalDistrictName) finalDistrictName = detected.district;
-    if (detected.prefecture && !finalPrefecture) finalPrefecture = detected.prefecture;
-  }
-
-  if (!finalDistrictName) finalDistrictName = CONFIG.get("DEFAULT_DISTRICT");
-  if (!finalPrefecture) finalPrefecture = CONFIG.get("DEFAULT_PREFECTURE");
-
-  const firstDataRow = districtData[1]; // 0番目はヘッダー
-  if (!finalDistrictName) finalDistrictName = firstDataRow[0];
-  if (!finalPrefecture) finalPrefecture = firstDataRow[1];
+  // 引数が未指定の場合のフォールバック
+  let finalDistrictName = targetDistrictName || CONFIG.get("DEFAULT_DISTRICT") || "三重第3区";
+  let finalPrefecture = targetPrefecture || CONFIG.get("DEFAULT_PREFECTURE") || "三重県";
 
   const targetRules = [];
   for (let i = 1; i < districtData.length; i++) {
     const row = districtData[i];
-    if (row && row[0] === finalDistrictName && row[1] === finalPrefecture) {
-      targetRules.push({ city: row[2], townArea: row[3] || "" });
+    if (row && (row[0] === finalDistrictName || row[0] === "三重第3区" || row[0] === "第3区") && row[1] === finalPrefecture) {
+      const cityStr = row[2] ? row[2].toString().trim() : "";
+      const isGun = cityStr.endsWith("郡") || cityStr.includes("郡");
+      targetRules.push({
+        city: cityStr,
+        townArea: row[3] || "",
+        type: isGun ? "GUN" : "CITY"
+      });
     }
   }
 
-  // 3. ドライブから「postal」または「郵便番号」を含むファイルをスマート検索
-  const postalFile = findFileByPattern("postal", CONFIG.get("POSTAL_CSV")) || findFileByPattern("郵便番号", CONFIG.get("POSTAL_CSV"));
-  if (!postalFile) {
-    ss.toast("Google Drive上に「postal」または「郵便番号」を含むCSVファイルが見つかりません。", "エラー", 5);
-    return [];
+  // Postal File ID 取得
+  const postalFileId = CONFIG.get("POSTAL_CSV_FILE_ID");
+  let postalFile = null;
+  if (postalFileId) {
+    try {
+      postalFile = DriveApp.getFileById(postalFileId);
+    } catch (e) {
+      // ALT ID Fallback
+      const altId = CONFIG.get("POSTAL_ALT_FILE_ID") || "1jr272nvp4bUWh7maGfEnTKDa9qEqSbgP";
+      try {
+        postalFile = DriveApp.getFileById(altId);
+      } catch (errAlt) {
+        const errMsg = `❌ POSTAL_CSV_FILE_ID が無効です (ID: ${postalFileId})`;
+        if (ss) ss.toast(errMsg, "設定エラー", 10);
+        throw new Error(errMsg);
+      }
+    }
   }
+  if (!postalFile) {
+    const errMsg = `❌ POSTAL_CSV_FILE_ID が設定されていません。`;
+    if (ss) ss.toast(errMsg, "設定エラー", 10);
+    throw new Error(errMsg);
+  }
+
   const postalData = getCsvOrSheetDataFromFile(postalFile);
   if (!postalData) return [];
 
   const addressMap = new Map();
-  targetRules.forEach((rule) => {
-    if (rule.townArea) {
-      const addrString = rule.townArea.startsWith(rule.city)
-        ? rule.townArea
-        : rule.city + rule.townArea;
-      let genericPostal = "";
-      for (let i = 0; i < postalData.length; i++) {
-        const r = postalData[i];
-        if (
-          r &&
-          r[6] === finalPrefecture &&
-          r[7] === rule.city &&
-          r[8] === "以下に掲載がない場合"
-        ) {
-          const p = r[2] ? r[2].toString().trim() : "";
-          if (p.length === 7) genericPostal = `${p.slice(0, 3)}-${p.slice(3)}`;
-          break;
-        }
+
+  // 1. townArea（特定の町域指定ルール）の処理
+  targetRules.filter(r => r.townArea).forEach(rule => {
+    const addrString = rule.townArea.startsWith(rule.city)
+      ? rule.townArea
+      : rule.city + rule.townArea;
+    let genericPostal = "";
+    for (let i = 0; i < postalData.length; i++) {
+      const r = postalData[i];
+      const isCityMatch = rule.type === "GUN"
+        ? (r && r[7] && r[7].toString().trim().startsWith(rule.city))
+        : (r && r[7] && r[7].toString().trim() === rule.city);
+
+      if (r && r[6] === finalPrefecture && isCityMatch && r[8] === "以下に掲載がない場合") {
+        const p = r[2] ? r[2].toString().trim() : "";
+        if (p.length === 7) genericPostal = `${p.slice(0, 3)}-${p.slice(3)}`;
+        break;
       }
-      addressMap.set(addrString, genericPostal);
-    } else {
-      postalData.forEach((row) => {
-        if (row && row[6] === finalPrefecture && row[7] === rule.city) {
-          const pCode = row[2] ? row[2].toString().trim() : "";
-          const postalStr =
-            pCode.length === 7
-              ? `${pCode.slice(0, 3)}-${pCode.slice(3)}`
-              : pCode;
-          const townRaw = row[8];
-          if (townRaw && townRaw !== "以下に掲載がない場合") {
-            const expanded = expandTownChome(rule.city, townRaw);
-            expanded.forEach((addr) => {
-              if (!addressMap.has(addr) || addressMap.get(addr) === "") {
-                addressMap.set(addr, postalStr);
-              }
-            });
+    }
+    addressMap.set(addrString, genericPostal);
+  });
+
+  // 2. MIE_POSTAL.CSV の行順（郵便番号数値昇順）を100%維持したまま全体走査
+  postalData.forEach((row) => {
+    if (!row || row[6] !== finalPrefecture) return;
+    const actualCityName = row[7] ? row[7].toString().trim() : "";
+    
+    // この行の自治体がどの targetRules に適合するか判定
+    const matchedRule = targetRules.find(rule => {
+      if (rule.townArea) return false;
+      return rule.type === "GUN"
+        ? actualCityName.startsWith(rule.city)
+        : actualCityName === rule.city;
+    });
+
+    if (matchedRule) {
+      const pCode = row[2] ? row[2].toString().trim() : "";
+      const postalStr = pCode.length === 7 ? `${pCode.slice(0, 3)}-${pCode.slice(3)}` : pCode;
+      const townRaw = row[8];
+
+      if (townRaw && townRaw !== "以下に掲載がない場合") {
+        const expanded = expandTownChome(actualCityName, townRaw);
+        expanded.forEach((addr) => {
+          if (!addressMap.has(addr) || addressMap.get(addr) === "") {
+            addressMap.set(addr, postalStr);
           }
-        }
-      });
+        });
+      }
     }
   });
   // 郵便番号データから「漢字の市町村名 ➔ カタカナの読み仮名」および「漢字の町域名 ➔ カタカナの読み仮名」のマップを構築
@@ -139,13 +171,6 @@ function extractDistrictAddresses(targetDistrictName, targetPrefecture) {
       cityKana: cityKanaMap[city] || "",
       townKana: townKana
     };
-  });
-
-  // 五十音順ソート
-  items.sort((a, b) => {
-    const cityComp = a.cityKana.localeCompare(b.cityKana, 'ja');
-    if (cityComp !== 0) return cityComp;
-    return a.townKana.localeCompare(b.townKana, 'ja');
   });
 
   return items.map(item => ({

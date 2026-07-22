@@ -15,9 +15,33 @@ function forceStartBatch() {
   
   const ss = getSS(); // Web APIでも安全に取得できるよう getSS() を使用
   
-  // 1. 最初に巨大CSVから住所を一括展開・ソートして一時シートへ保存
-  ss.toast("住所データを抽出・ソート中...", "準備中", 5);
-  const addresses = extractDistrictAddresses();
+  // 1. 最初巨大CSVから住所を一括展開・ソートして一時シートへ保存
+  ss.toast("三重第3区の住所データを抽出・ソート中...", "準備中", 5);
+  const targetDistrict = "三重第3区";
+  const targetPrefecture = "三重県";
+  const addresses = extractDistrictAddresses(targetDistrict, targetPrefecture);
+
+  // 【Step 1 強化版 監査ログ】
+  Logger.log("=== 【Step 1 抽出監査ログ】 ===");
+  Logger.log("対象地区: " + targetDistrict + " (" + targetPrefecture + ")");
+  Logger.log("総抽出件数: " + (addresses ? addresses.length : 0) + "件");
+
+  if (addresses && addresses.length > 0) {
+    Logger.log("--- [先頭5件] ---");
+    const top5 = addresses.slice(0, 5);
+    top5.forEach((item, idx) => {
+      Logger.log(`[${idx + 1}] 〒${item.postalCode || ''} | ${item.city || ''} | ${item.address || ''} | ${item.townKana || ''}`);
+    });
+
+    Logger.log("--- [末尾5件] ---");
+    const last5 = addresses.slice(-5);
+    last5.forEach((item, idx) => {
+      const realIndex = addresses.length - 5 + idx + 1;
+      Logger.log(`[${realIndex}] 〒${item.postalCode || ''} | ${item.city || ''} | ${item.address || ''} | ${item.townKana || ''}`);
+    });
+  } else {
+    Logger.log("⚠️ 抽出件数が0件です！");
+  }
   
   // EXTRACT 完了監査
   if (typeof auditDataIntegrity === 'function') {
@@ -66,7 +90,7 @@ function generateAreaSheetsBatch() {
   const props = PropertiesService.getScriptProperties();
   if (props.getProperty("BATCH_STATUS") !== "running") return;
   const startTime = new Date().getTime();
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSS();
   const baseSheet = ss.getSheetByName(CONFIG.get("SHEET_TEMPLATE"));
 
   // 2. CSV読み込みの代わりに一時シートから高速ロード

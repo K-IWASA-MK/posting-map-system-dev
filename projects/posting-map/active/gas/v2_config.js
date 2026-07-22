@@ -44,8 +44,21 @@ const DEFAULT_STORE = {
     CHUNK_SIZE: 10,
     ROW_HEIGHT_STAFF: 60,
     DENOMINATOR_UNITS: 651,
-    DEFAULT_DISTRICT: "第3区",
-    DEFAULT_PREFECTURE: "三重県",
+    DEFAULTS: {
+      DEFAULT_PREFECTURE: "三重県",
+      DEFAULT_DISTRICT: "三重第3区"
+    },
+
+    // 参照データソース基盤 (REFERENCE_FILES)
+    REFERENCE_FILES: {
+      POSTAL_CSV_FILE_ID: "1VTjL5GQw2USmyccusr1TAJ1yw4gwNvhr",   // MIE_POSTAL.CSV (数値昇順保証)
+      POSTAL_ALT_FILE_ID: "1m6e6tH8vwBKs1HJuXAeEFCAU8wlKpSHl",     // KEN_ALL.CSV
+      DISTRICT_CSV_FILE_ID: "1LGeZIaxidgKihq5iirYp-KXygJlBQ5Wm", // 三重県選挙区区割り.csv
+      MUNICIPALITY_CSV_FILE_ID: ""
+    },
+
+    POSTAL_CSV_FILE_ID: "1VTjL5GQw2USmyccusr1TAJ1yw4gwNvhr",
+    DISTRICT_CSV_FILE_ID: "1LGeZIaxidgKihq5iirYp-KXygJlBQ5Wm",
     DEFAULT_TENANT_ID: "MIE-03",
     DEFAULT_BRANCH_ID: "MIE-03",
     DEFAULT_BRANCH_NAME: "三重第3支部",

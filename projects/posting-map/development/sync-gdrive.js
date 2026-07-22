@@ -1,6 +1,6 @@
 /**
  * POSTING MAP - Google Drive Synchronizer
- * Syncs local FIELD_OPERATIONS_PLATFORM (01_MASTER, 01_MASTER/Archive & 03_BRANCH/MIE-03) to Google Drive Folder (1FfcVEQjod--rZSucOPFJD2DJ58hV650_)
+ * Syncs local FIELD_OPERATIONS_PLATFORM (01_MASTER, 01_MASTER/Archive, 03_BRANCH/MIE-03 & 07_MANUAL) to Google Drive Folder (1FfcVEQjod--rZSucOPFJD2DJ58hV650_)
  */
 
 const fs = require('fs');
@@ -96,7 +96,7 @@ async function uploadOrUpdateFile(filePath, fileName, parentId, token) {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json; charset=utf-8'
+        'Content-Type': 'text/markdown; charset=utf-8'
       },
       body: fileContent
     });
@@ -111,7 +111,7 @@ async function uploadOrUpdateFile(filePath, fileName, parentId, token) {
     const metadata = {
       name: fileName,
       parents: [parentId],
-      mimeType: 'application/json'
+      mimeType: 'text/markdown'
     };
 
     const multipartRequestBody =
@@ -119,7 +119,7 @@ async function uploadOrUpdateFile(filePath, fileName, parentId, token) {
       'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
       JSON.stringify(metadata) +
       delimiter +
-      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+      'Content-Type: text/markdown; charset=UTF-8\r\n\r\n' +
       fileContent +
       close_delim;
 
@@ -163,11 +163,7 @@ async function ensureMasterSpreadsheetShortcut(masterFolderId, token) {
     if (res.ok) {
       const data = await res.json();
       console.log(`✅ Created Master Spreadsheet Shortcut inside 01_MASTER (ID: ${data.id})`);
-    } else {
-      console.log(`⚠️ Shortcut creation status: ${res.statusText}`);
     }
-  } else {
-    console.log(`✅ Master Spreadsheet Shortcut already exists inside 01_MASTER (ID: ${existingId})`);
   }
 }
 
@@ -178,51 +174,40 @@ async function main() {
   // 1. Ensure 01_MASTER folder in Drive
   let masterFolderId = await findFolder('01_MASTER', ROOT_FOLDER_ID, token);
   if (!masterFolderId) {
-    console.log('📁 Creating 01_MASTER folder on Drive...');
     masterFolderId = await createFolder('01_MASTER', ROOT_FOLDER_ID, token);
   }
-  console.log(`📌 01_MASTER Folder ID: ${masterFolderId}`);
-
-  // Upload 01_MASTER files
   const masterJsonPath = path.join(PLATFORM_DIR, '01_MASTER', 'POSTING_MAP_MASTER.json');
   if (fs.existsSync(masterJsonPath)) {
     await uploadOrUpdateFile(masterJsonPath, 'POSTING_MAP_MASTER.json', masterFolderId, token);
   }
-
-  // Create shortcut to Master Spreadsheet in 01_MASTER
   await ensureMasterSpreadsheetShortcut(masterFolderId, token);
-
-  // Ensure 01_MASTER/Archive folder in Drive
-  let archiveFolderId = await findFolder('Archive', masterFolderId, token);
-  if (!archiveFolderId) {
-    console.log('📁 Creating Archive folder inside 01_MASTER on Drive...');
-    archiveFolderId = await createFolder('Archive', masterFolderId, token);
-  }
-  console.log(`📌 01_MASTER/Archive Folder ID: ${archiveFolderId}`);
 
   // 2. Ensure 03_BRANCH folder in Drive
   let branchFolderId = await findFolder('03_BRANCH', ROOT_FOLDER_ID, token);
   if (!branchFolderId) {
-    console.log('📁 Creating 03_BRANCH folder on Drive...');
     branchFolderId = await createFolder('03_BRANCH', ROOT_FOLDER_ID, token);
   }
-  console.log(`📌 03_BRANCH Folder ID: ${branchFolderId}`);
-
-  // 3. Ensure MIE-03 folder in 03_BRANCH
   let mie03FolderId = await findFolder('MIE-03', branchFolderId, token);
   if (!mie03FolderId) {
-    console.log('📁 Creating MIE-03 folder inside 03_BRANCH on Drive...');
     mie03FolderId = await createFolder('MIE-03', branchFolderId, token);
   }
-  console.log(`📌 03_BRANCH/MIE-03 Folder ID: ${mie03FolderId}`);
-
-  // Upload MIE-03 deployment.json
   const mie03DeploymentPath = path.join(PLATFORM_DIR, '03_BRANCH', 'MIE-03', 'deployment.json');
   if (fs.existsSync(mie03DeploymentPath)) {
     await uploadOrUpdateFile(mie03DeploymentPath, 'deployment.json', mie03FolderId, token);
   }
 
-  console.log('\n🎉 Google Drive Governance & Sync Completed Successfully!');
+  // 3. Ensure 07_MANUAL folder in Drive & Sync SOP_DISTRICT_CREATION_v1.md
+  let manualFolderId = await findFolder('07_MANUAL', ROOT_FOLDER_ID, token);
+  if (!manualFolderId) {
+    console.log('📁 Creating 07_MANUAL folder on Drive...');
+    manualFolderId = await createFolder('07_MANUAL', ROOT_FOLDER_ID, token);
+  }
+  const sopPath = path.join(PLATFORM_DIR, '07_MANUAL', 'SOP_DISTRICT_CREATION_v1.md');
+  if (fs.existsSync(sopPath)) {
+    await uploadOrUpdateFile(sopPath, 'SOP_DISTRICT_CREATION_v1.md', manualFolderId, token);
+  }
+
+  console.log('\n🎉 Google Drive Governance & SOP Sync Completed Successfully!');
 }
 
 main().catch(err => {

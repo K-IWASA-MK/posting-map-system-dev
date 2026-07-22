@@ -74,6 +74,16 @@ var globalCacheHit = false;
  * GETリクエスト：JSONデータの取得
  */
 function doGet(e) {
+  const action = e && e.parameter ? e.parameter.action : "";
+  if (action === "getDashboardData" || action === "getSummary") {
+    const data = getDashboardData();
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      summary: data.summary,
+      stats: data.stats,
+      updatedAt: data.updatedAt
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
   return PlatformIntegrationPipeline.execute(e);
 }
 
@@ -103,6 +113,10 @@ function processGetActionLegacy(action, e) {
     }
   } else {
     switch (action) {
+      case 'getDashboardData':
+      case 'getSummary':
+        response = { success: true, ...getDashboardData() };
+        break;
       case 'getRanking':
         response = { success: true, ranking: getRankingData() };
         break;

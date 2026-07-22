@@ -61,42 +61,22 @@ MASTERへ昇格できるのは、以下3点を満たしたスプレッドシー�
 
 全国展開時の各支部の一貫した品質管理と監査のため、原本および全支部に作成元の「世代（バージョン）情報」を不可逆記録する。
 
-#### 原本 (POSTING_MAP_MASTER.json) 記録規定
-```json
-{
-  "masterVersion": "2.0.0",
-  "status": "LATEST",
-  "approvedAt": "2026-07-22",
-  "approvedBy": "CEO/AI Governance",
-  "previousVersion": "1.0.0"
-}
-```
-
-#### 支部 (deployment.json) 記録規定
-```json
-{
-  "branchId": "MIE-03",
-  "masterVersion": "1.0.0",
-  "createdFrom": "POSTING MAP MASTER"
-}
-```
-
 ---
 
-### Rule-004: Version Immutability Rule & Sheet Naming Rule
+### Rule-004: Version Immutability Rule & Spreadsheet Title Rule
 
 #### 原則 (Version Immutability)
 1. 支部は作成時に使用した MASTER の世代を永久に保持するものとする。
 2. 既存支部は、MASTER が新しいバージョンへ昇格してもアップグレードしてはならない。
 3. これにより、データ整合性・帳票整合性・AI分析結果・監査・リネージを完全に保証する。
 
-#### Sheet Naming Rule (シート命名規則)
-支部作成時のシート名は、**`[支部コード] v[MASTERMajor世代]`** とする。
+#### Spreadsheet Title Rule (スプレッドシートファイル名規則)
+支部作成時のスプレッドシートファイル名（画面左上タイトル）は、**`[支部コード] v[MASTERMajor世代]`** とする。
+内部のシートタブ名は原本のまま一切変更してはならない（原本構造を100%保持）。
 
 例：
-- `MIE-03 v1`
-- `NARA-07 v2`
-- `OSAKA-10 v3`
+- スプレッドシート名（ファイル名・画面左上）: `MIE-03 v1`
+- 内部シート（タブ）名: 変えてはならない（原本のシート名を完全保持）
 
 ---
 
@@ -106,21 +86,6 @@ MASTERへ昇格できるのは、以下3点を満たしたスプレッドシー�
 1. **支部ファイル・スプレッドシート自体は不変（Immutable）** とする。
 2. 運用開始後の実績・配布ログ・地域データは `MIE-03 v1` のように作成時の環境に蓄積・固定され、過去の事実として永久保存される。
 3. 新しい MASTER（例: `MASTER v2`）の新機能を採用する場合は、既存ファイルを上書き・改変するのではなく、**新しい支部環境（例: `MIE-03 v2`）として別体生成**する。
-
-#### 世代移行モデル (Upgrade Migration)
-```
-MIE-03 v1   <-- 過去の運用実績・配布ログを不可逆保持 (監査・参照用)
-    │
-    └─ (有償移行サービス / Upgrade Migration)
-          ↓
-MIE-03 v2   <-- MASTER v2 から生成された新運用環境
-```
-
-#### ビジネスモデルとプラットフォーム価値
-- **導入時**: 最新 MASTER から支部環境を生成
-- **運用中**: 作成時の世代・ファイル構造を維持
-- **新機能が必要**: 有償の移行サービス（Upgrade Migration）を提供
-- **旧データ**: アーカイブとして保持し、監査・照合・過去データ分析が可能
 
 ---
 
@@ -133,8 +98,6 @@ MIE-03 v2   <-- MASTER v2 から生成された新運用環境
 新しい支部を追加する場合は、必ず以下の手順のみで作成する。
 
 1. `01_MASTER` 内の**最新の MASTER スプレッドシート**から複製作成
-2. Google Drive（`1FfcVEQjod--rZSucOPFJD2DJ58hV650_`）配下の `03_BRANCH` およびローカル `03_BRANCH/[支部ID]/` を作成・同期
-3. スプレッドシートの最初のシート名・表示名を指定設定
-   - **シート名（システム用）**: `{branchId} v{masterVersionMajor}` (例: `MIE-03 v1`)
-   - **表示名（画面・PDF・LINE・AI社員用）**: `[支部名]` (例: `三重第3支部`)
+2. コピーしたスプレッドシートのファイル名（画面左上）を `{branchId} v{masterVersionMajor}` （例: `MIE-03 v1`）に設定
+3. 内部のシート（タブ）名は変更せず、原本のまま100%保持
 4. 支部の `deployment.json` に `masterVersion` および `createdFrom` を記録
