@@ -469,7 +469,23 @@ function matchDistrict(address, city) {
   return cleanCity + "地区";
 }
 
+// === [Yokkaichi District Master Area SSOT: START] ===
 const YOKKAICHI_DISTRICT_MASTER = [
+  {
+    "city": "四日市市",
+    "town": "富州原町",
+    "district": "富洲原地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "富洲原町",
+    "district": "富洲原地区"
+  },
+  {
+    "city": "四日市市",
+    "town": "平町",
+    "district": "富洲原地区"
+  },
   {
     "city": "四日市市",
     "town": "天カ須賀",
@@ -901,3 +917,4 @@ const YOKKAICHI_DISTRICT_MASTER = [
     "district": "中部地区"
   }
 ];
+// === [Yokkaichi District Master Area SSOT: END] ===
