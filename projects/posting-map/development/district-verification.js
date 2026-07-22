@@ -79,19 +79,60 @@ function loadAndAuditDistrictRules(pref = 'mie') {
   return rules;
 }
 
+// 自治体別地区マスタの動的ロード (Sprint B-3 仕様)
+function loadCityDistrictMaster(city, pref = 'mie') {
+  const mapping = {
+    "四日市市": "yokkaichi"
+    // 将来的に "桑名市": "kuwana" など追加可能
+  };
+  const masterKey = mapping[city];
+  if (!masterKey) return null; // 詳細マスタが定義されていない場合
+
+  const masterPath = path.join(__dirname, '..', 'data', 'districts', pref, `${masterKey}_district_master.csv`);
+  if (!fs.existsSync(masterPath)) {
+    return null;
+  }
+
+  const content = fs.readFileSync(masterPath, 'utf8');
+  const lines = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const master = {};
+
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i].split(',');
+    if (cells.length < 3) continue;
+    const town = cells[1].trim();
+    const district = cells[2].trim();
+    master[town] = district; // TOWN ➔ DISTRICT
+  }
+  return master;
+}
+
 // 2. 地区マッピングアルゴリズム
 function matchDistrict(address, city, rules) {
-  const cityRules = rules.filter(r => r.city === city);
-  if (cityRules.length === 0) return null; // ルールが一切ない場合
+  // A. 詳細自治体マスターが存在する場合は優先的に完全一致判定
+  const cityMaster = loadCityDistrictMaster(city, 'mie');
+  if (cityMaster) {
+    // 住所文字列から正式町域名を完全一致照合するため、マスタの全TOWNキーと突合
+    for (const town of Object.keys(cityMaster)) {
+      // 住所の中に正式町域名が完全独立して存在しているか (前方一致/曖昧の排除のため完全マッチ)
+      // 例: "三重県四日市市富洲原町" ➔ 住所が「富洲原町」を含む、且つマスタに完全一致するキーが存在
+      if (address.includes(town)) {
+        return cityMaster[town];
+      }
+    }
+    return null; // マスターがある自治体で、マスターにマッチしない場合は Unknown
+  }
 
-  // キーワード一致のルールを優先チェック
+  // B. 詳細マスターがない場合は従来の一般ルールフォールバック
+  const cityRules = rules.filter(r => r.city === city);
+  if (cityRules.length === 0) return null;
+
   for (const rule of cityRules) {
     if (rule.keyword !== '*' && address.includes(rule.keyword)) {
       return rule.district;
     }
   }
 
-  // 一致しなければワイルドカードルールを適用
   const fallbackRule = cityRules.find(r => r.keyword === '*');
   if (fallbackRule) {
     return fallbackRule.district;
@@ -308,8 +349,15 @@ async function verifyDistrict() {
 
   for (const [key, cnt] of Object.entries(districtCounts)) {
     const [city, dist] = key.split('::');
-    const rule = rules.find(r => r.city === city && r.district === dist);
-    const keywordInfo = rule ? `キーワード: 「${rule.keyword}」` : 'ワイルドカードフォールバック';
+    let keywordInfo = 'ワイルドカードフォールバック';
+    if (city === "四日市市") {
+      keywordInfo = '四日市市地区管内マスター (完全一致)';
+    } else {
+      const rule = rules.find(r => r.city === city && r.district === dist);
+      if (rule) {
+        keywordInfo = `キーワード: 「${rule.keyword}」`;
+      }
+    }
     reportMd += `| ${city} | ${dist} | ${cnt} 件 | ${keywordInfo} |\n`;
   }
 
