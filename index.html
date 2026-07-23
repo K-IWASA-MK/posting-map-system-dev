@@ -179,9 +179,7 @@
       try {
         const options = { method: method, redirect: 'follow' };
         if (method === 'POST') {
-          const formData = new FormData();
-          formData.append('json', JSON.stringify({ action, ...params }));
-          options.body = formData;
+          options.body = JSON.stringify({ action, ...params });
         } else {
           Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
         }
