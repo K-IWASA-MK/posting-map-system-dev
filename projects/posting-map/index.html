@@ -205,11 +205,17 @@
         return true;
       } catch (err) {
         console.error('[LIFF] Init/Login Error:', err);
-        setHud('profile', 'Error', false, err.message || err.toString());
+        const errMsg = err.message || err.toString();
+        setHud('profile', 'Error', false, errMsg);
         if (typeof liff !== 'undefined') {
           console.log("isLoggedIn =", liff.isLoggedIn());
           console.log("AccessToken =", liff.getAccessToken());
           console.log("IDToken =", liff.getIDToken());
+          if (errMsg.includes('revoked') || errMsg.includes('invalid') || errMsg.includes('token') || errMsg.includes('400')) {
+            console.warn('[LIFF Auto-Recovery] Stale token detected. Purging session & triggering login()...');
+            try { if (liff.isLoggedIn()) liff.logout(); } catch(e) {}
+            setTimeout(() => { liff.login(); }, 800);
+          }
         }
       }
       return false;
