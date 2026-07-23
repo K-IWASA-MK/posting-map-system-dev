@@ -267,7 +267,12 @@
       document.getElementById('screen-gateway').classList.add('hidden');
       document.getElementById('app-shell').classList.remove('hidden');
       showLoading('LINE認証確認中...');
-      await initLiff();
+      const ok = await initLiff();
+      if (!ok) {
+        hideLoading();
+        showToast("LINE認証に失敗しました", true);
+        return;
+      }
       if (currentUser) {
         api('registerStaff', {
           lastName: currentUser.displayName || currentUser.name,
@@ -381,7 +386,7 @@
     }
 
     function renderAreaList(main) {
-      if (!appData) {
+      if (!appData || !Array.isArray(appData.areas)) {
         main.innerHTML = `<div class="bg-white rounded-[2rem] p-12 text-center shadow-sm"><p class="text-gray-400 font-bold mb-6">データを同期しています...</p><button onclick="startApp()" class="text-navy font-black border-b-2 border-navy/20">再試行する</button></div>`;
         return;
       }
