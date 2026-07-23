@@ -10,7 +10,7 @@ window.PMS_CLIENT_CONFIG = {
     gasWebAppUrl: "https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec"
   },
   line: {
-    liffId: "2010177345-tXZIMAJK"
+    liffId: "2010374196-bHBYo37e"
   },
   features: {
     photoUpload: true,
