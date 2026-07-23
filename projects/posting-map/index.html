@@ -138,12 +138,10 @@
               pictureUrl: liffProfile.pictureUrl || '',
               name: liffProfile.displayName
             };
-            // SSOT Principle: Save UI display name to localStorage only; userId is transmitted to GAS for Column D persistence
             localStorage.setItem('posting_display_name', liffProfile.displayName);
-            localStorage.removeItem('liff_profile'); // Ensure no stale userId in localStorage
+            localStorage.removeItem('liff_profile'); 
             localStorage.removeItem('posting_user');
             
-            // Transmit LINE user ID & display name to GAS (SSOT: Column D of Roster Sheet)
             api('registerStaff', { 
               lastName: liffProfile.displayName, 
               firstName: 'LINE', 
@@ -151,6 +149,11 @@
             }, 'POST').catch(err => console.error('[GAS Sync Error]', err));
           }
           return true;
+        } else {
+          if (liff.isInClient()) {
+            console.log('[LIFF] In LINE client. Automatic login...');
+            liff.login();
+          }
         }
       } catch (err) {
         console.error('[LIFF] Init/Login Error:', err);
@@ -188,11 +191,13 @@
     }
 
     function init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isOAuthCallback = urlParams.has('code') || urlParams.has('liff.state');
       const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      if (!isStandalone) {
-        document.getElementById('screen-gateway').classList.remove('hidden');
-      } else {
+      if (isOAuthCallback || isStandalone) {
         startApp();
+      } else {
+        document.getElementById('screen-gateway').classList.remove('hidden');
       }
     }
 

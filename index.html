@@ -149,6 +149,11 @@
             }, 'POST').catch(err => console.error('[GAS Sync Error]', err));
           }
           return true;
+        } else {
+          if (liff.isInClient()) {
+            console.log('[LIFF] In LINE client. Automatic login...');
+            liff.login();
+          }
         }
       } catch (err) {
         console.error('[LIFF] Init/Login Error:', err);
@@ -186,11 +191,13 @@
     }
 
     function init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isOAuthCallback = urlParams.has('code') || urlParams.has('liff.state');
       const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      if (!isStandalone) {
-        document.getElementById('screen-gateway').classList.remove('hidden');
-      } else {
+      if (isOAuthCallback || isStandalone) {
         startApp();
+      } else {
+        document.getElementById('screen-gateway').classList.remove('hidden');
       }
     }
 
