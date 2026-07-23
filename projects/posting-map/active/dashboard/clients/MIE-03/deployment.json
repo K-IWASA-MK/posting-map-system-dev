@@ -6,17 +6,17 @@
   "line": {
     "provider": "Civic Tech Inc.",
     "channelName": "POSTING MAP Login",
-    "liffId": "2010374196-bHBYo37e",
+    "liffId": "2010177345-tXZIMAJK",
     "liffName": "MIE-03 Field",
-    "liffUrl": "https://liff.line.me/2010374196-bHBYo37e",
+    "liffUrl": "https://liff.line.me/2010177345-tXZIMAJK",
     "description": "POSTING MAP Field Application for MIE-03",
-    "endpointUrl": "https://mie-03.posting-map.jp/"
+    "endpointUrl": "https://k-iwasa-mk.github.io/posting-map-system-dev/"
   },
   "resources": {
-    "spreadsheetId": "14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4",
+    "spreadsheetId": "1xQUvlCaUO103rjSGmdcFQQFkukodG4Dg9mS_teWT7uA",
     "storageFolderId": "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY",
     "scriptId": "158Avw8hAtZx-c9yW10DE0NzB1NYngwv31eroqn-IAmHh_eKHN_fR58sa",
-    "webAppUrl": "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec"
+    "webAppUrl": "https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec"
   },
   "provisioning": {
     "templateVersion": "v1",

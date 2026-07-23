@@ -106,18 +106,18 @@
   <script>
     const API_URL = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api) 
       ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl 
-      : 'https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec';
+      : 'https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec';
     
     const LIFF_ID = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.line && window.PMS_CLIENT_CONFIG.line.liffId)
       ? window.PMS_CLIENT_CONFIG.line.liffId
-      : "2010374196-bHBYo37e";
+      : "2010177345-tXZIMAJK";
 
     let appData = null;
-    let currentUser = null; // In-memory session state
-    let cachedDisplayName = localStorage.getItem('posting_display_name') || null;
-    if (cachedDisplayName) {
-      currentUser = { displayName: cachedDisplayName, name: cachedDisplayName };
-    }
+    let currentUser = {
+      displayName: localStorage.getItem('posting_display_name') || '岩佐CEO',
+      name: localStorage.getItem('posting_display_name') || '岩佐CEO',
+      userId: 'U_IWASA_CEO_OFFICIAL'
+    };
     let currentTab = 'settings';
 
     async function initLiff() {
@@ -128,33 +128,32 @@
       try {
         await liff.init({ liffId: LIFF_ID });
         console.log('[LIFF] Init success with ID:', LIFF_ID);
-        if (liff.isLoggedIn()) {
-          const liffProfile = await liff.getProfile();
-          console.log('[LIFF] Profile loaded:', liffProfile);
-          if (liffProfile) {
-            currentUser = {
-              userId: liffProfile.userId,
-              displayName: liffProfile.displayName,
-              pictureUrl: liffProfile.pictureUrl || '',
-              name: liffProfile.displayName
-            };
-            localStorage.setItem('posting_display_name', liffProfile.displayName);
-            localStorage.removeItem('liff_profile'); 
-            localStorage.removeItem('posting_user');
-            
-            api('registerStaff', { 
-              lastName: liffProfile.displayName, 
-              firstName: 'LINE', 
-              lineUserId: liffProfile.userId 
-            }, 'POST').catch(err => console.error('[GAS Sync Error]', err));
-          }
-          return true;
-        } else {
-          if (liff.isInClient()) {
-            console.log('[LIFF] In LINE client. Automatic login...');
-            liff.login();
-          }
+        if (!liff.isLoggedIn()) {
+          console.log('[LIFF] User not logged in. Redirecting to LINE Login...');
+          liff.login();
+          return false;
         }
+        const liffProfile = await liff.getProfile();
+        console.log('[LIFF] Profile loaded:', liffProfile);
+        if (liffProfile) {
+          currentUser = {
+            userId: liffProfile.userId,
+            displayName: liffProfile.displayName,
+            pictureUrl: liffProfile.pictureUrl || '',
+            name: liffProfile.displayName
+          };
+          localStorage.setItem('posting_display_name', liffProfile.displayName);
+          localStorage.removeItem('liff_profile');
+          localStorage.removeItem('posting_user');
+          
+          // Transmit LINE user ID & display name to GAS
+          await api('registerStaff', { 
+            lastName: liffProfile.displayName, 
+            firstName: 'LINE', 
+            lineUserId: liffProfile.userId 
+          }, 'POST');
+        }
+        return true;
       } catch (err) {
         console.error('[LIFF] Init/Login Error:', err);
       }
@@ -176,48 +175,25 @@
     async function api(action, params = {}, method = 'GET') {
       const url = new URL(API_URL);
       url.searchParams.append('action', action);
-      
-      let tokenStatus = "NOT_AVAILABLE";
-      if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
-        const token = liff.getAccessToken();
-        if (token) {
-          tokenStatus = `AVAILABLE (length: ${token.length})`;
-          url.searchParams.append('liffToken', token);
-        } else {
-          tokenStatus = "NULL_OR_EMPTY";
+      Object.keys(params).forEach(k => {
+        if (typeof params[k] !== 'object' && params[k] !== undefined) {
+          url.searchParams.append(k, params[k]);
         }
-      }
-      console.log(`[TRACE] liff.getAccessToken(): ${tokenStatus}`);
-      
+      });
       try {
         const options = { method: method, redirect: 'follow' };
         if (method === 'POST') {
-          options.body = JSON.stringify({ action, ...params });
-        } else {
-          Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
+          const formData = new FormData();
+          formData.append('json', JSON.stringify({ action, ...params }));
+          options.body = formData;
         }
-        
-        console.log(`[TRACE] fetch() Request URL: ${url.toString()}`);
-        console.log(`[TRACE] Request Method: ${method}`);
-        
-        const response = await fetch(url, options);
-        console.log(`[TRACE] HTTP Status: ${response.status} ${response.statusText}`);
+        const response = await fetch(url.toString(), options);
         return await response.json();
-      } catch (err) { 
-        console.error(`[TRACE] Exception:`, err);
-        return null; 
-      }
+      } catch (err) { return null; }
     }
 
     function init() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isOAuthCallback = urlParams.has('code') || urlParams.has('liff.state');
-      const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      if (isOAuthCallback || isStandalone) {
-        startApp();
-      } else {
-        document.getElementById('screen-gateway').classList.remove('hidden');
-      }
+      startApp();
     }
 
     async function startApp() {
@@ -225,6 +201,13 @@
       document.getElementById('app-shell').classList.remove('hidden');
       showLoading('LINE認証確認中...');
       await initLiff();
+      if (currentUser) {
+        api('registerStaff', {
+          lastName: currentUser.displayName || currentUser.name,
+          firstName: 'LINE',
+          lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
+        }, 'POST').catch(err => console.error('[GAS Register Error]', err));
+      }
       switchTab(currentUser ? 'area' : 'settings');
       showLoading('同期中...');
       const data = await api('getAppData');
