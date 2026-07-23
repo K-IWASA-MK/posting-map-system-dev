@@ -176,9 +176,19 @@
     async function api(action, params = {}, method = 'GET') {
       const url = new URL(API_URL);
       url.searchParams.append('action', action);
+      
+      let tokenStatus = "NOT_AVAILABLE";
       if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
-        url.searchParams.append('liffToken', liff.getAccessToken());
+        const token = liff.getAccessToken();
+        if (token) {
+          tokenStatus = `AVAILABLE (length: ${token.length})`;
+          url.searchParams.append('liffToken', token);
+        } else {
+          tokenStatus = "NULL_OR_EMPTY";
+        }
       }
+      console.log(`[TRACE] liff.getAccessToken(): ${tokenStatus}`);
+      
       try {
         const options = { method: method, redirect: 'follow' };
         if (method === 'POST') {
@@ -186,9 +196,17 @@
         } else {
           Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
         }
+        
+        console.log(`[TRACE] fetch() Request URL: ${url.toString()}`);
+        console.log(`[TRACE] Request Method: ${method}`);
+        
         const response = await fetch(url, options);
+        console.log(`[TRACE] HTTP Status: ${response.status} ${response.statusText}`);
         return await response.json();
-      } catch (err) { return null; }
+      } catch (err) { 
+        console.error(`[TRACE] Exception:`, err);
+        return null; 
+      }
     }
 
     function init() {
