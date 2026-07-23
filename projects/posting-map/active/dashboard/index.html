@@ -156,6 +156,11 @@
         return true;
       } catch (err) {
         console.error('[LIFF] Init/Login Error:', err);
+        if (typeof liff !== 'undefined') {
+          console.log("isLoggedIn =", liff.isLoggedIn());
+          console.log("AccessToken =", liff.getAccessToken());
+          console.log("IDToken =", liff.getIDToken());
+        }
       }
       return false;
     }
