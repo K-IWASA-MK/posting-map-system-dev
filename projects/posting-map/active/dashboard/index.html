@@ -191,12 +191,7 @@
     }
 
     function init() {
-      const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      if (!isStandalone) {
-        document.getElementById('screen-gateway').classList.remove('hidden');
-      } else {
-        startApp();
-      }
+      startApp();
     }
 
     async function startApp() {
