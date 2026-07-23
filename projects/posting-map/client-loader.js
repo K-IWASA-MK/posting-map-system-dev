@@ -1,8 +1,13 @@
 /**
  * POSTING MAP
- * Client Configuration dynamic loader
+ * Client Configuration dynamic loader (Root Level)
  */
 (function() {
+  // GAS Server-side Environment Safety Guard
+  if (typeof window === 'undefined' || typeof document === 'undefined' || typeof URLSearchParams === 'undefined') {
+    return;
+  }
+
   // 1. Resolve client from Query Parameter
   const urlParams = new URLSearchParams(window.location.search);
   let client = urlParams.get('client');
