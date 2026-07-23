@@ -173,16 +173,19 @@
     async function api(action, params = {}, method = 'GET') {
       const url = new URL(API_URL);
       url.searchParams.append('action', action);
+      Object.keys(params).forEach(k => {
+        if (typeof params[k] !== 'object' && params[k] !== undefined) {
+          url.searchParams.append(k, params[k]);
+        }
+      });
       try {
         const options = { method: method, redirect: 'follow' };
         if (method === 'POST') {
           const formData = new FormData();
           formData.append('json', JSON.stringify({ action, ...params }));
           options.body = formData;
-        } else {
-          Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
         }
-        const response = await fetch(url, options);
+        const response = await fetch(url.toString(), options);
         return await response.json();
       } catch (err) { return null; }
     }

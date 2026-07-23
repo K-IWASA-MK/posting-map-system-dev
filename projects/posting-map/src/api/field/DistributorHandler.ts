@@ -16,7 +16,7 @@ export class DistributorHandler implements EndpointHandler {
         const body = request.body || {};
         const displayName = body.lastName || body.displayName || '';
         const lineUserId = body.lineUserId || '';
-        const workspaceId = body.workspaceId || '';
+        const workspaceId = body.workspaceId || body.branchId || 'MIE-03';
         const staffNo = body.staffNo;
 
         const command = new RegisterStaffCommand(staffNo, displayName, lineUserId, workspaceId);

@@ -67,6 +67,12 @@ export class PlatformIntegrationPipeline {
       let postData: any = null;
       if (method === 'POST') {
         try {
+          if (typeof Logger !== 'undefined') {
+            Logger.log("[DIAG doPost] e.parameter: " + JSON.stringify(e ? e.parameter : {}));
+            Logger.log("[DIAG doPost] e.postData.contents: " + (e && e.postData ? e.postData.contents : "none"));
+          }
+        } catch (lErr) {}
+        try {
           if (e.postData && e.postData.contents) {
             postData = JSON.parse(e.postData.contents);
           } else {
@@ -77,8 +83,16 @@ export class PlatformIntegrationPipeline {
         }
       }
 
-      const action = (method === 'POST' ? (postData?.action || e.parameter.action) : e.parameter.action) || 'health';
-      let path = (method === 'POST' ? (postData?.path || e.parameter.path) : e.parameter.path) || '';
+      // 対応案B: FormData経由で e.parameter.json にJSON文字列が渡された場合、POST/GET問わず自動パースして復元する
+      if (e && e.parameter && e.parameter.json) {
+        try {
+          const parsedJson = typeof e.parameter.json === 'string' ? JSON.parse(e.parameter.json) : e.parameter.json;
+          postData = { ...(postData || {}), ...e.parameter, ...parsedJson };
+        } catch (eJson) {}
+      }
+
+      const action = postData?.action || e?.parameter?.action || 'health';
+      let path = postData?.path || e?.parameter?.path || '';
       if (!path) {
         path = '/' + action;
         if (action === 'getAppData') {

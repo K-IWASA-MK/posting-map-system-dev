@@ -8,7 +8,13 @@ import { RepositoryPerformanceProfiler } from '../profiler/RepositoryPerformance
 export class SpreadsheetStaffRepository implements IStaffRepository {
   private reader: SpreadsheetReader;
   private writer: SpreadsheetWriter;
-  private sheetName = 'Staff';
+  private getSheetName(): string {
+    if (typeof CONFIG !== 'undefined' && CONFIG.get) {
+      const configured = CONFIG.get('SHEET_ROSTER');
+      if (configured) return configured;
+    }
+    return '名簿';
+  }
 
   constructor() {
     this.reader = new SpreadsheetReader();
@@ -21,13 +27,13 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     const startTime = Date.now();
 
     try {
-    const rows = this.reader.readAll(this.sheetName);
+    const rows = this.reader.readAll(this.getSheetName());
     if (rows.length <= 1) return undefined;
 
     const headers = rows[0];
-    const staffIdIdx = headers.indexOf('スタッフID');
-    const nameIdx = headers.indexOf('スタッフ名');
-    const lineIdx = headers.indexOf('LINEユーザーID');
+    const staffIdIdx = headers.findIndex(h => String(h) === 'ID' || String(h) === 'スタッフID');
+    const nameIdx = headers.findIndex(h => String(h) === '名前' || String(h) === 'スタッフ名');
+    const lineIdx = headers.findIndex(h => String(h) === 'LINE_USER_ID' || String(h) === 'LINEユーザーID');
     const wsIdx = headers.indexOf('ワークスペースID');
     const dateIdx = headers.indexOf('登録日時');
 
@@ -57,13 +63,13 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     const startTime = Date.now();
 
     try {
-    const rows = this.reader.readAll(this.sheetName);
+    const rows = this.reader.readAll(this.getSheetName());
     if (rows.length <= 1) return undefined;
 
     const headers = rows[0];
-    const staffIdIdx = headers.indexOf('スタッフID');
-    const nameIdx = headers.indexOf('スタッフ名');
-    const lineIdx = headers.indexOf('LINEユーザーID');
+    const staffIdIdx = headers.findIndex(h => String(h) === 'ID' || String(h) === 'スタッフID');
+    const nameIdx = headers.findIndex(h => String(h) === '名前' || String(h) === 'スタッフ名');
+    const lineIdx = headers.findIndex(h => String(h) === 'LINE_USER_ID' || String(h) === 'LINEユーザーID');
     const wsIdx = headers.indexOf('ワークスペースID');
     const dateIdx = headers.indexOf('登録日時');
 
@@ -93,7 +99,7 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     const startTime = Date.now();
 
     try {
-    const rows = this.reader.readAll(this.sheetName);
+    const rows = this.reader.readAll(this.getSheetName());
     if (rows.length <= 1) return [];
 
     const headers = rows[0];
@@ -148,7 +154,7 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     const startTime = Date.now();
 
     try {
-    const rows = this.reader.readAll(this.sheetName);
+    const rows = this.reader.readAll(this.getSheetName());
     if (rows.length <= 1) return [];
 
     const headers = rows[0];
@@ -185,7 +191,7 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     const startTime = Date.now();
 
     try {
-    const rows = this.reader.readAll(this.sheetName);
+    const rows = this.reader.readAll(this.getSheetName());
     if (rows.length <= 1) {
       return 'S001';
     }
@@ -226,10 +232,10 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     const startTime = Date.now();
 
     try {
-    const rows = this.reader.readAll(this.sheetName);
-    const headers = rows.length > 0 ? rows[0] : ['スタッフID', 'スタッフ名', 'LINEユーザーID', 'ワークスペースID', '登録日時'];
+    const rows = this.reader.readAll(this.getSheetName());
+    const headers = rows.length > 0 ? rows[0] : ['ID', '名前', 'アプリ名', 'LINE_USER_ID'];
 
-    const staffIdIdx = headers.indexOf('スタッフID');
+    const staffIdIdx = headers.findIndex(h => String(h) === 'ID' || String(h) === 'スタッフID');
 
     let rowIndex = -1;
     if (staffIdIdx !== -1) {
@@ -242,21 +248,23 @@ export class SpreadsheetStaffRepository implements IStaffRepository {
     }
 
     const rowValues = headers.map(h => {
-      if (h === 'スタッフID') return staff.staffNo;
-      if (h === 'スタッフ名') return staff.displayName;
-      if (h === 'LINEユーザーID') return staff.lineUserId;
-      if (h === 'ワークスペースID') return staff.workspaceId;
-      if (h === '登録日時') return staff.createdAt.getTime();
+      const strH = String(h);
+      if (strH === 'ID' || strH === 'スタッフID') return staff.staffNo;
+      if (strH === '名前' || strH === 'スタッフ名') return staff.displayName;
+      if (strH === 'アプリ名') return 'LINE';
+      if (strH === 'LINE_USER_ID' || strH === 'LINEユーザーID') return staff.lineUserId;
+      if (strH === 'ワークスペースID') return staff.workspaceId;
+      if (strH === '登録日時') return staff.createdAt.getTime();
       return '';
     });
 
     if (rowIndex !== -1) {
-      this.writer.updateRange(this.sheetName, rowIndex, 1, [rowValues]);
+      this.writer.updateRange(this.getSheetName(), rowIndex, 1, [rowValues]);
     } else {
       if (rows.length === 0) {
-        this.writer.appendRows(this.sheetName, [headers, rowValues]);
+        this.writer.appendRows(this.getSheetName(), [headers, rowValues]);
       } else {
-        this.writer.appendRows(this.sheetName, [rowValues]);
+        this.writer.appendRows(this.getSheetName(), [rowValues]);
       }
     }
     } finally {

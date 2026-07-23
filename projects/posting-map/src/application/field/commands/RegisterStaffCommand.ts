@@ -14,8 +14,7 @@ export class RegisterStaffCommand {
     if (!lineUserId || lineUserId.trim().length === 0) {
       throw new Error("lineUserId is required");
     }
-    if (!workspaceId || workspaceId.trim().length === 0) {
-      throw new Error("workspaceId is required");
-    }
+    const effectiveWorkspaceId = workspaceId && workspaceId.trim().length > 0 ? workspaceId : "MIE-03";
+    this.workspaceId = effectiveWorkspaceId;
   }
 }
