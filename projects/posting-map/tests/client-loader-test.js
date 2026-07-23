@@ -64,7 +64,7 @@ function runTest() {
   
   assert.ok(global.window.PMS_CLIENT_CONFIG, "PMS_CLIENT_CONFIG should be loaded");
   assert.equal(global.window.PMS_CLIENT_CONFIG.districtId, "MIE-03");
-  assert.equal(global.window.PMS_CLIENT_CONFIG.api.gasWebAppUrl, "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec");
+  assert.equal(global.window.PMS_CLIENT_CONFIG.api.gasWebAppUrl, "https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec");
   assert.equal(global.localStorage.getItem('PMS_ACTIVE_CLIENT'), "MIE-03", "Active client must be saved to LocalStorage");
   console.log("✓ Test Case 1 PASS\n");
 

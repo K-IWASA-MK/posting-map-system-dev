@@ -3,6 +3,15 @@
     "id": "MIE-03",
     "name": "三重県第3区"
   },
+  "line": {
+    "provider": "Civic Tech Inc.",
+    "channelName": "POSTING MAP Login",
+    "liffId": "2010374196-bHBYo37e",
+    "liffName": "MIE-03 Field",
+    "liffUrl": "https://liff.line.me/2010374196-bHBYo37e",
+    "description": "POSTING MAP Field Application for MIE-03",
+    "endpointUrl": "https://mie-03.posting-map.jp/"
+  },
   "resources": {
     "spreadsheetId": "14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4",
     "storageFolderId": "18SZgoZBw-lWMMvuWwlnah5tFM2RYgsnY",
