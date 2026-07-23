@@ -11,7 +11,7 @@ if (typeof window !== 'undefined') {
       gasWebAppUrl: "https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec"
     },
     line: {
-      liffId: "2010374196-bHBYo37e"
+      liffId: "2010177345-tXZIMAJK"
     },
     features: {
       photoUpload: true,

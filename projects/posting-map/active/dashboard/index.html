@@ -106,11 +106,11 @@
   <script>
     const API_URL = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api) 
       ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl 
-      : 'https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec';
+      : 'https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec';
     
     const LIFF_ID = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.line && window.PMS_CLIENT_CONFIG.line.liffId)
       ? window.PMS_CLIENT_CONFIG.line.liffId
-      : "2010374196-bHBYo37e";
+      : "2010177345-tXZIMAJK";
 
     let appData = null;
     let currentUser = {
@@ -128,30 +128,32 @@
       try {
         await liff.init({ liffId: LIFF_ID });
         console.log('[LIFF] Init success with ID:', LIFF_ID);
-        if (liff.isLoggedIn()) {
-          const liffProfile = await liff.getProfile();
-          console.log('[LIFF] Profile loaded:', liffProfile);
-          if (liffProfile) {
-            currentUser = {
-              userId: liffProfile.userId,
-              displayName: liffProfile.displayName,
-              pictureUrl: liffProfile.pictureUrl || '',
-              name: liffProfile.displayName
-            };
-            // SSOT Principle: Save UI display name to localStorage only; userId is transmitted to GAS for Column D persistence
-            localStorage.setItem('posting_display_name', liffProfile.displayName);
-            localStorage.removeItem('liff_profile'); // Ensure no stale userId in localStorage
-            localStorage.removeItem('posting_user');
-            
-            // Transmit LINE user ID & display name to GAS (SSOT: Column D of Roster Sheet)
-            api('registerStaff', { 
-              lastName: liffProfile.displayName, 
-              firstName: 'LINE', 
-              lineUserId: liffProfile.userId 
-            }, 'POST').catch(err => console.error('[GAS Sync Error]', err));
-          }
-          return true;
+        if (!liff.isLoggedIn()) {
+          console.log('[LIFF] User not logged in. Redirecting to LINE Login...');
+          liff.login();
+          return false;
         }
+        const liffProfile = await liff.getProfile();
+        console.log('[LIFF] Profile loaded:', liffProfile);
+        if (liffProfile) {
+          currentUser = {
+            userId: liffProfile.userId,
+            displayName: liffProfile.displayName,
+            pictureUrl: liffProfile.pictureUrl || '',
+            name: liffProfile.displayName
+          };
+          localStorage.setItem('posting_display_name', liffProfile.displayName);
+          localStorage.removeItem('liff_profile');
+          localStorage.removeItem('posting_user');
+          
+          // Transmit LINE user ID & display name to GAS
+          await api('registerStaff', { 
+            lastName: liffProfile.displayName, 
+            firstName: 'LINE', 
+            lineUserId: liffProfile.userId 
+          }, 'POST');
+        }
+        return true;
       } catch (err) {
         console.error('[LIFF] Init/Login Error:', err);
       }
