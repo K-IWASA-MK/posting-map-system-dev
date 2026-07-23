@@ -95,6 +95,19 @@
     </nav>
   </div>
 
+  <!-- Diagnostic HUD Overlay -->
+  <div id="liff-hud" class="fixed top-4 left-4 right-4 bg-black/90 backdrop-blur-md text-white rounded-2xl p-4 text-xs font-mono z-[100000] border border-white/20 shadow-2xl space-y-1">
+    <div class="font-bold text-blue-400 text-xs border-b border-white/20 pb-1 mb-2 flex justify-between">
+      <span>📱 REAL-TIME DIAGNOSTIC HUD</span>
+      <span id="hud-os" class="text-gray-400">OS: -</span>
+    </div>
+    <div>1. LIFF Init: <span id="hud-init" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>2. LoggedIn: <span id="hud-login" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>3. Profile: <span id="hud-profile" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>4. Register Staff: <span id="hud-register" class="font-bold text-yellow-400">WAITING</span></div>
+    <div class="text-[9px] text-gray-400 pt-1 border-t border-white/10 mt-1 break-all" id="hud-url"></div>
+  </div>
+
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[10000] hidden flex flex-col items-center justify-center">
     <div class="w-12 h-12 border-4 border-gray-100 border-t-navy rounded-full animate-spin-custom"></div>
@@ -124,25 +137,46 @@
     };
     let currentTab = 'settings';
 
+    function setHud(step, text, isOk, extra = '') {
+      const el = document.getElementById('hud-' + step);
+      if (!el) return;
+      el.textContent = (isOk === true ? 'OK ' : isOk === false ? 'NG ' : '') + text + (extra ? ` (${extra})` : '');
+      el.className = 'font-bold ' + (isOk === true ? 'text-green-400' : isOk === false ? 'text-red-400' : 'text-yellow-400');
+    }
+
     async function initLiff() {
+      const hudUrl = document.getElementById('hud-url');
+      if (hudUrl) hudUrl.textContent = 'URL: ' + window.location.href;
+
       if (typeof liff === 'undefined') {
         console.warn('[LIFF] SDK not loaded.');
+        setHud('init', 'SDK NOT LOADED', false);
         return false;
       }
       try {
         await liff.init({ liffId: LIFF_ID });
         console.log('[LIFF] Init success with ID:', LIFF_ID);
-        console.log("LIFF OS =", liff.getOS());
-        console.log("LIFF Language =", liff.getLanguage());
-        console.log("LIFF LoggedIn =", liff.isLoggedIn());
-        if (!liff.isLoggedIn()) {
+        setHud('init', 'Init Success', true);
+
+        const os = liff.getOS();
+        const hudOs = document.getElementById('hud-os');
+        if (hudOs) hudOs.textContent = 'OS: ' + os;
+
+        const loggedIn = liff.isLoggedIn();
+        console.log("LIFF LoggedIn =", loggedIn);
+        setHud('login', loggedIn ? 'LoggedIn' : 'Not LoggedIn (login())', loggedIn);
+
+        if (!loggedIn) {
           console.log('[LIFF] User not logged in. Redirecting to LINE Login...');
           liff.login();
           return false;
         }
+
         console.log("Before getProfile");
         const liffProfile = await liff.getProfile();
         console.log("After getProfile", liffProfile);
+        setHud('profile', 'Profile Loaded', true, liffProfile ? liffProfile.displayName : '');
+
         if (liffProfile) {
           currentUser = {
             userId: liffProfile.userId,
@@ -154,16 +188,23 @@
           localStorage.removeItem('liff_profile');
           localStorage.removeItem('posting_user');
           
-          // Transmit LINE user ID & display name to GAS
-          await api('registerStaff', { 
+          setHud('register', 'Sending...', null);
+          const regRes = await api('registerStaff', { 
             lastName: liffProfile.displayName, 
             firstName: 'LINE', 
             lineUserId: liffProfile.userId 
           }, 'POST');
+
+          if (regRes && regRes.success) {
+            setHud('register', 'Saved to GAS', true);
+          } else {
+            setHud('register', 'GAS Fail', false);
+          }
         }
         return true;
       } catch (err) {
         console.error('[LIFF] Init/Login Error:', err);
+        setHud('profile', 'Error', false, err.message || err.toString());
         if (typeof liff !== 'undefined') {
           console.log("isLoggedIn =", liff.isLoggedIn());
           console.log("AccessToken =", liff.getAccessToken());
