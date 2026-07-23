@@ -128,13 +128,17 @@
       try {
         await liff.init({ liffId: LIFF_ID });
         console.log('[LIFF] Init success with ID:', LIFF_ID);
+        console.log("LIFF OS =", liff.getOS());
+        console.log("LIFF Language =", liff.getLanguage());
+        console.log("LIFF LoggedIn =", liff.isLoggedIn());
         if (!liff.isLoggedIn()) {
           console.log('[LIFF] User not logged in. Redirecting to LINE Login...');
           liff.login();
           return false;
         }
+        console.log("Before getProfile");
         const liffProfile = await liff.getProfile();
-        console.log('[LIFF] Profile loaded:', liffProfile);
+        console.log("After getProfile", liffProfile);
         if (liffProfile) {
           currentUser = {
             userId: liffProfile.userId,
