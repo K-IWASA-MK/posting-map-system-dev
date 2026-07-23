@@ -168,6 +168,18 @@
         setHud('login', loggedIn ? 'LoggedIn' : 'Not LoggedIn (login())', loggedIn);
 
         if (!loggedIn) {
+          if (os === 'web') {
+            console.log('[LIFF] Web environment detected. Allowing PC browser preview...');
+            setHud('login', 'Web PC Mode', true);
+            setHud('profile', 'PC Demo User', true, '岩佐CEO');
+            currentUser = {
+              userId: 'U_IWASA_CEO_OFFICIAL',
+              displayName: '岩佐CEO',
+              pictureUrl: '',
+              name: '岩佐CEO'
+            };
+            return true;
+          }
           console.log('[LIFF] User not logged in. Redirecting to LINE Login...');
           liff.login();
           return false;
