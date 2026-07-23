@@ -105,6 +105,7 @@
     <div>2. LoggedIn: <span id="hud-login" class="font-bold text-yellow-400">WAITING</span></div>
     <div>3. Profile: <span id="hud-profile" class="font-bold text-yellow-400">WAITING</span></div>
     <div>4. Register Staff: <span id="hud-register" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>5. getAppData: <span id="hud-appdata" class="font-bold text-yellow-400">WAITING</span></div>
     <div class="text-[9px] text-gray-400 pt-1 border-t border-white/10 mt-1 break-all" id="hud-url"></div>
   </div>
 
@@ -267,6 +268,19 @@
       showLoading('同期中...');
       const data = await api('getAppData');
       hideLoading();
+      const hudData = document.getElementById('hud-appdata');
+      if (hudData) {
+        if (!data) {
+          hudData.className = 'font-bold text-red-400';
+          hudData.textContent = 'NG (null)';
+        } else if (!data.areas) {
+          hudData.className = 'font-bold text-orange-400';
+          hudData.textContent = 'NG (areas: ' + (typeof data === 'object' ? JSON.stringify(data) : typeof data) + ')';
+        } else {
+          hudData.className = 'font-bold text-green-400';
+          hudData.textContent = 'OK (areas: ' + data.areas.length + ')';
+        }
+      }
       if (data) {
         appData = data;
         document.getElementById('sync-pct').textContent = currentUser ? '100%' : '0%';
