@@ -104,6 +104,10 @@
   <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm font-bold shadow-2xl hidden z-[11000] whitespace-nowrap border border-white/10 transition-all"></div>
 
   <script>
+    console.log("window.location.href =", window.location.href);
+    console.log("window.location.origin =", window.location.origin);
+    console.log("window.location.pathname =", window.location.pathname);
+
     const API_URL = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api) 
       ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl 
       : 'https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec';
