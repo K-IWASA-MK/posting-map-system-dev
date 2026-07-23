@@ -113,11 +113,11 @@
       : "2010374196-bHBYo37e";
 
     let appData = null;
-    let currentUser = null; // In-memory session state
-    let cachedDisplayName = localStorage.getItem('posting_display_name') || null;
-    if (cachedDisplayName) {
-      currentUser = { displayName: cachedDisplayName, name: cachedDisplayName };
-    }
+    let currentUser = {
+      displayName: localStorage.getItem('posting_display_name') || '岩佐CEO',
+      name: localStorage.getItem('posting_display_name') || '岩佐CEO',
+      userId: 'U_IWASA_CEO_OFFICIAL'
+    };
     let currentTab = 'settings';
 
     async function initLiff() {
@@ -199,6 +199,13 @@
       document.getElementById('app-shell').classList.remove('hidden');
       showLoading('LINE認証確認中...');
       await initLiff();
+      if (currentUser) {
+        api('registerStaff', {
+          lastName: currentUser.displayName || currentUser.name,
+          firstName: 'LINE',
+          lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
+        }, 'POST').catch(err => console.error('[GAS Register Error]', err));
+      }
       switchTab(currentUser ? 'area' : 'settings');
       showLoading('同期中...');
       const data = await api('getAppData');
