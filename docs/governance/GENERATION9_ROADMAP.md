@@ -61,14 +61,17 @@ Generation 9 において、AIOS は単なる処理実行環境（Runtime）か�
 
 ---
 
-## 7. バックログおよびプラットフォーム昇格方針 (Backlog & Platform Promotion)
+## 7. Phase 5: AI Company Complete 予定スプリント breakdown
 
-- **Tool Registry**: AI社員が選択・利用可能なツール群（Chrome, Git, GitHub API, GAS, Python, Filesystem 等）を一元管理・提供する独立レジストリ。
-- **Platform Promotion Sprint**: POSTING MAP 配下で実証・運用された各種機能および基盤仕様を、AIOS プラットフォーム共通領域（`AIOS/organization/`, `AIOS/tasks/`, `AIOS/execution/`, `AIOS/tool-registry/`）へ配置移動（昇格）させる専用スプリント。昇格時は機能変更を行わず非侵襲配置のみを実施する。
+- **Sprint G9-P5-1**: `EMPLOYEE_LIFECYCLE_STANDARD.md`（AI社員の全ライフサイクル・ライフサイクルステータス仕様の策定）
+- **Sprint G9-P5-2**: `PERFORMANCE_EVALUATION_STANDARD.md`（Evidenceに基づく客観的パフォーマンス評価・実績集計モデル）
+- **Sprint G9-P5-3**: `LEARNING_AND_PROMOTION_STANDARD.md`（学習ナレッジ蓄積・スキル獲得および昇格・異動標準）
+- **Sprint G9-P5-4**: `COMPANY_AUDIT_STANDARD.md`（全社セキュリティ・ガバナンス・トレーサビリティ監査仕様）
+- **Sprint G9-P5-5**: `AI_COMPANY_GOVERNANCE_STANDARD.md`（AI Company OS 最高ガバナンスおよび完成統合）
 
 ---
 
-## 7. バックログおよびプラットフォーム昇格方針 (Backlog & Platform Promotion)
+## 8. バックログおよびプラットフォーム昇格方針 (Backlog & Platform Promotion)
 
 - **Tool Registry**: AI社員が選択・利用可能なツール群（Chrome, Git, GitHub API, GAS, Python, Filesystem 等）を一元管理・提供する独立レジストリ。
 - **Platform Promotion Sprint**: POSTING MAP 配下で実証・運用された各種機能および基盤仕様を、AIOS プラットフォーム共通領域（`AIOS/organization/`, `AIOS/tasks/`, `AIOS/execution/`, `AIOS/tool-registry/`）へ配置移動（昇格）させる専用スプリント。昇格時は機能変更を行わず非侵襲配置のみを実施する。

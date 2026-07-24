@@ -1529,7 +1529,7 @@ Execution Plan
 AI社員は自律的に考え、調査し、検証し、学習し、提案してよい。
 しかし、システム状態を変更する操作（コミット、プッシュ、デプロイ、設定変更等）は、人間（CEO）による明示的な承認（Proceed）を受けた後にのみ実行できる。
 
-## ■ 12大基本原則 (12 Fundamental Principles)
+## ■ 13大基本原則 (13 Fundamental Principles)
 
 1. **Identity First Principle**
    - 処理の主語は常に AI社員 (Employee) である。Runtime や Logic は社員の筋肉（Skills）であり、ブラウザやツールは社員が仕事で選ぶ道具（Tools）である。
@@ -1566,6 +1566,9 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 
 12. **Governance Resolves Collaboration Conflicts Principle**
     - 部署間で契約・ハンドオフ・レビューに関する競合や対立が発生した場合は、Department Governance のみが最終的な調停・裁定を行う。各部署は独自判断で競合状態を解消してはならない。
+
+13. **Organizational Evolution Through Evidence Principle**
+    - 組織の評価・昇格・異動・教育・監査に関する意思決定は、蓄積された Evidence に基づいて行われる。会社全体の進化は、推測や一時的な印象ではなく、検証可能な事実を根拠とする。
 
 ## ■ 標準開発ライフサイクル (12-Step SDL SOP)
 すべての開発・変更タスクは、[AI Development Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_DEVELOPMENT_GOVERNANCE_STANDARD.md) に定義された 12-Step SDL（Ideation → Planning → Architecture Review → **Proceed** → Implementation → Walkthrough → Verification → **Evidence Collection** → Git Commit → Git Push → Completion Report → Handover）に従わなければならない。
