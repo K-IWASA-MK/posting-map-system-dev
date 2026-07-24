@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta name="build-id" content="20260724-1534-ab300e1">
+  <meta name="git-commit" content="ab300e1">
+  <meta name="build-source" content="main">
+  <meta name="publish-target" content="GitHub Pages">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP</title>
@@ -95,6 +99,20 @@
     </nav>
   </div>
 
+  <!-- Diagnostic HUD Overlay -->
+  <div id="liff-hud" class="fixed top-4 left-4 right-4 bg-black/90 backdrop-blur-md text-white rounded-2xl p-4 text-xs font-mono z-[100000] border border-white/20 shadow-2xl space-y-1">
+    <div class="font-bold text-blue-400 text-xs border-b border-white/20 pb-1 mb-2 flex justify-between">
+      <span>📱 REAL-TIME DIAGNOSTIC HUD</span>
+      <span id="hud-os" class="text-gray-400">OS: -</span>
+    </div>
+    <div>1. LIFF Init: <span id="hud-init" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>2. LoggedIn: <span id="hud-login" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>3. Profile: <span id="hud-profile" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>4. Register Staff: <span id="hud-register" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>5. getAppData: <span id="hud-appdata" class="font-bold text-yellow-400">WAITING</span></div>
+    <div class="text-[9px] text-gray-400 pt-1 border-t border-white/10 mt-1 break-all" id="hud-url"></div>
+  </div>
+
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[10000] hidden flex flex-col items-center justify-center">
     <div class="w-12 h-12 border-4 border-gray-100 border-t-navy rounded-full animate-spin-custom"></div>
@@ -104,59 +122,117 @@
   <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm font-bold shadow-2xl hidden z-[11000] whitespace-nowrap border border-white/10 transition-all"></div>
 
   <script>
+    console.log("window.location.href =", window.location.href);
+    console.log("window.location.origin =", window.location.origin);
+    console.log("window.location.pathname =", window.location.pathname);
+
     const API_URL = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api) 
       ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl 
-      : 'https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec';
+      : 'https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec';
     
     const LIFF_ID = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.line && window.PMS_CLIENT_CONFIG.line.liffId)
       ? window.PMS_CLIENT_CONFIG.line.liffId
       : "2010374196-bHBYo37e";
 
     let appData = null;
-    let currentUser = null; // In-memory session state
-    let cachedDisplayName = localStorage.getItem('posting_display_name') || null;
-    if (cachedDisplayName) {
-      currentUser = { displayName: cachedDisplayName, name: cachedDisplayName };
-    }
+    let currentUser = {
+      displayName: localStorage.getItem('posting_display_name') || '岩佐CEO',
+      name: localStorage.getItem('posting_display_name') || '岩佐CEO',
+      userId: 'U_IWASA_CEO_OFFICIAL'
+    };
     let currentTab = 'settings';
 
+    function setHud(step, text, isOk, extra = '') {
+      const el = document.getElementById('hud-' + step);
+      if (!el) return;
+      el.textContent = (isOk === true ? 'OK ' : isOk === false ? 'NG ' : '') + text + (extra ? ` (${extra})` : '');
+      el.className = 'font-bold ' + (isOk === true ? 'text-green-400' : isOk === false ? 'text-red-400' : 'text-yellow-400');
+    }
+
     async function initLiff() {
+      const hudUrl = document.getElementById('hud-url');
+      if (hudUrl) hudUrl.textContent = 'URL: ' + window.location.href;
+
       if (typeof liff === 'undefined') {
         console.warn('[LIFF] SDK not loaded.');
+        setHud('init', 'SDK NOT LOADED', false);
         return false;
       }
       try {
         await liff.init({ liffId: LIFF_ID });
         console.log('[LIFF] Init success with ID:', LIFF_ID);
-        if (liff.isLoggedIn()) {
-          const liffProfile = await liff.getProfile();
-          console.log('[LIFF] Profile loaded:', liffProfile);
-          if (liffProfile) {
+        setHud('init', 'Init Success', true);
+
+        const os = liff.getOS();
+        const hudOs = document.getElementById('hud-os');
+        if (hudOs) hudOs.textContent = 'OS: ' + os;
+
+        const loggedIn = liff.isLoggedIn();
+        console.log("LIFF LoggedIn =", loggedIn);
+        setHud('login', loggedIn ? 'LoggedIn' : 'Not LoggedIn (login())', loggedIn);
+
+        if (!loggedIn) {
+          if (os === 'web') {
+            console.log('[LIFF] Web environment detected. Allowing PC browser preview...');
+            setHud('login', 'Web PC Mode', true);
+            setHud('profile', 'PC Demo User', true, '岩佐CEO');
             currentUser = {
-              userId: liffProfile.userId,
-              displayName: liffProfile.displayName,
-              pictureUrl: liffProfile.pictureUrl || '',
-              name: liffProfile.displayName
+              userId: 'U_IWASA_CEO_OFFICIAL',
+              displayName: '岩佐CEO',
+              pictureUrl: '',
+              name: '岩佐CEO'
             };
-            localStorage.setItem('posting_display_name', liffProfile.displayName);
-            localStorage.removeItem('liff_profile');
-            localStorage.removeItem('posting_user');
-            
-            api('registerStaff', { 
-              lastName: liffProfile.displayName, 
-              firstName: 'LINE', 
-              lineUserId: liffProfile.userId 
-            }, 'POST').catch(err => console.error('[GAS Sync Error]', err));
+            return true;
           }
-          return true;
-        } else {
-          if (liff.isInClient()) {
-            console.log('[LIFF] In LINE client. Automatic login...');
-            liff.login();
+          console.log('[LIFF] User not logged in. Redirecting to LINE Login...');
+          liff.login();
+          return false;
+        }
+
+        console.log("Before getProfile");
+        const liffProfile = await liff.getProfile();
+        console.log("After getProfile", liffProfile);
+        setHud('profile', 'Profile Loaded', true, liffProfile ? liffProfile.displayName : '');
+
+        if (liffProfile) {
+          currentUser = {
+            userId: liffProfile.userId,
+            displayName: liffProfile.displayName,
+            pictureUrl: liffProfile.pictureUrl || '',
+            name: liffProfile.displayName
+          };
+          localStorage.setItem('posting_display_name', liffProfile.displayName);
+          localStorage.removeItem('liff_profile');
+          localStorage.removeItem('posting_user');
+          
+          setHud('register', 'Sending...', null);
+          const regRes = await api('registerStaff', { 
+            lastName: liffProfile.displayName, 
+            firstName: 'LINE', 
+            lineUserId: liffProfile.userId 
+          }, 'POST');
+
+          if (regRes && regRes.success) {
+            setHud('register', 'Saved to GAS', true);
+          } else {
+            setHud('register', 'GAS Fail', false);
           }
         }
+        return true;
       } catch (err) {
         console.error('[LIFF] Init/Login Error:', err);
+        const errMsg = err.message || err.toString();
+        setHud('profile', 'Error', false, errMsg);
+        if (typeof liff !== 'undefined') {
+          console.log("isLoggedIn =", liff.isLoggedIn());
+          console.log("AccessToken =", liff.getAccessToken());
+          console.log("IDToken =", liff.getIDToken());
+          if (errMsg.includes('revoked') || errMsg.includes('invalid') || errMsg.includes('token') || errMsg.includes('400')) {
+            console.warn('[LIFF Auto-Recovery] Stale token detected. Purging session & triggering login()...');
+            try { if (liff.isLoggedIn()) liff.logout(); } catch(e) {}
+            setTimeout(() => { liff.login(); }, 800);
+          }
+        }
       }
       return false;
     }
@@ -176,38 +252,73 @@
     async function api(action, params = {}, method = 'GET') {
       const url = new URL(API_URL);
       url.searchParams.append('action', action);
+      Object.keys(params).forEach(k => {
+        if (typeof params[k] !== 'object' && params[k] !== undefined) {
+          url.searchParams.append(k, params[k]);
+        }
+      });
       try {
         const options = { method: method, redirect: 'follow' };
         if (method === 'POST') {
-          options.body = JSON.stringify({ action, ...params });
-        } else {
-          Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
+          const formData = new FormData();
+          formData.append('json', JSON.stringify({ action, ...params }));
+          options.body = formData;
         }
-        const response = await fetch(url, options);
-        return await response.json();
-      } catch (err) { return null; }
-    }
-
-    function init() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isOAuthCallback = urlParams.has('code') || urlParams.has('liff.state');
-      const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      if (isOAuthCallback || isStandalone) {
-        startApp();
-      } else {
-        document.getElementById('screen-gateway').classList.remove('hidden');
+        const response = await fetch(url.toString(), options);
+        console.log(`[API ${action}] HTTP Status:`, response.status);
+        const text = await response.text();
+        console.log(`[API ${action}] Raw Response:`, text);
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          console.error(`[API ${action}] JSON parse failed. Raw response was:`, text);
+          return null;
+        }
+      } catch (err) { 
+        console.error(`[API ${action}] Fetch error:`, err);
+        return null; 
       }
     }
 
+    function init() {
+      startApp();
+    }
+
     async function startApp() {
+      console.log("startApp() called");
       document.getElementById('screen-gateway').classList.add('hidden');
       document.getElementById('app-shell').classList.remove('hidden');
       showLoading('LINE認証確認中...');
-      await initLiff();
+      const ok = await initLiff();
+      if (!ok) {
+        hideLoading();
+        showToast("LINE認証に失敗しました", true);
+        return;
+      }
+      if (currentUser) {
+        api('registerStaff', {
+          lastName: currentUser.displayName || currentUser.name,
+          firstName: 'LINE',
+          lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
+        }, 'POST').catch(err => console.error('[GAS Register Error]', err));
+      }
       switchTab(currentUser ? 'area' : 'settings');
       showLoading('同期中...');
       const data = await api('getAppData');
       hideLoading();
+      const hudData = document.getElementById('hud-appdata');
+      if (hudData) {
+        if (!data) {
+          hudData.className = 'font-bold text-red-400';
+          hudData.textContent = 'NG (null)';
+        } else if (!data.areas) {
+          hudData.className = 'font-bold text-orange-400';
+          hudData.textContent = 'NG (areas: ' + (typeof data === 'object' ? JSON.stringify(data) : typeof data) + ')';
+        } else {
+          hudData.className = 'font-bold text-green-400';
+          hudData.textContent = 'OK (areas: ' + data.areas.length + ')';
+        }
+      }
       if (data) {
         appData = data;
         document.getElementById('sync-pct').textContent = currentUser ? '100%' : '0%';
@@ -297,7 +408,7 @@
     }
 
     function renderAreaList(main) {
-      if (!appData) {
+      if (!appData || !Array.isArray(appData.areas)) {
         main.innerHTML = `<div class="bg-white rounded-[2rem] p-12 text-center shadow-sm"><p class="text-gray-400 font-bold mb-6">データを同期しています...</p><button onclick="startApp()" class="text-navy font-black border-b-2 border-navy/20">再試行する</button></div>`;
         return;
       }

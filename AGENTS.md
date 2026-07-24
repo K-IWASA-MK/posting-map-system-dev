@@ -1507,3 +1507,16 @@ Execution Plan
 2. **単一コードブロック制約**: すべての回答（成果報告、RCA、仕様説明等）は、コピーボタンが機能するように「一つのマークダウンコードブロック」の中にまとめて出力し、チャット欄に2つ以上の独立したマークダウンコードブロックを配置してはならない。
 
 
+
+# AIOS Release & Build Governance
+
+すべてのAI社員は、本番環境へのデプロイ（GitHub Pages公開等）や成果物の生成において、以下の2つのAIOSプラットフォーム標準仕様に厳格に準拠しなければならない。
+
+1. **[AIOS Build Provenance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_BUILD_PROVENANCE_SPECIFICATION.md)**
+   - 生成物（HTML、APIレスポンス等）に対するメタデータの埋め込みと、リポジトリルートの `build-manifest.json` の出力を義務付ける。
+   - 「誰が、いつ、どのソースから生成したか」の追跡可能性を保証すること。
+
+2. **[AIOS Release Governance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_RELEASE_GOVERNANCE_SPECIFICATION.md)**
+   - デプロイ前に必ず「Publish Consistency Gate」を自動検証すること。
+   - 条件に1つでも違反した場合、AI社員は直ちにプロセスを中断し `❌ Deploy BLOCK` としてユーザーに警告すること。ユーザーの明示的承認（Proceed）なくデプロイを強行してはならない。
+
