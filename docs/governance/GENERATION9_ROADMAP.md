@@ -51,7 +51,17 @@ Generation 9 において、AIOS は単なる処理実行環境（Runtime）か�
 
 ---
 
-## 6. バックログおよびプラットフォーム昇格方針 (Backlog & Platform Promotion)
+## 6. Phase 4: Department Collaboration 予定スプリント breakdown
+
+- **Sprint G9-P4-1**: `DEPARTMENT_COLLABORATION_STANDARD.md`（部門間協調の概念・相互契約モデルの標準仕様策定）
+- **Sprint G9-P4-2**: `TASK_HANDOFF_STANDARD.md`（部門間でのタスク・成果物バトンリレー・ハンドオフ仕様）
+- **Sprint G9-P4-3**: `INTER_DEPARTMENT_REVIEW_STANDARD.md`（開発部 → QA部 → セキュリティ部等の部門間レビュー仕様）
+- **Sprint G9-P4-4**: `COLLABORATION_EVIDENCE_STANDARD.md`（部門間ハンドオフおよびレビュー検証証跡モデル）
+- **Sprint G9-P4-5**: `DEPARTMENT_GOVERNANCE_STANDARD.md`（部門間ガバナンス・競合解消および全体統合規律）
+
+---
+
+## 7. バックログおよびプラットフォーム昇格方針 (Backlog & Platform Promotion)
 
 - **Tool Registry**: AI社員が選択・利用可能なツール群（Chrome, Git, GitHub API, GAS, Python, Filesystem 等）を一元管理・提供する独立レジストリ。
 - **Platform Promotion Sprint**: POSTING MAP 配下で実証・運用された各種機能および基盤仕様を、AIOS プラットフォーム共通領域（`AIOS/organization/`, `AIOS/tasks/`, `AIOS/execution/`, `AIOS/tool-registry/`）へ配置移動（昇格）させる専用スプリント。昇格時は機能変更を行わず非侵襲配置のみを実施する。
