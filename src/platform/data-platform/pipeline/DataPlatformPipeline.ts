@@ -7,6 +7,7 @@ import { DistrictExtractor } from '../extractor/DistrictExtractor';
 import { DataValidator, ValidationReport } from '../validator/DataValidator';
 import { DistrictBoundaryResolver } from '../resolver/DistrictBoundaryResolver';
 import { AddressHierarchyExtractor } from '../extractor/AddressHierarchyExtractor';
+import { BoundaryConfirmationGate } from '../gate/BoundaryConfirmationGate';
 
 export interface PipelineOptions {
   profile?: DistrictValidationProfile;
@@ -39,7 +40,19 @@ export class DataPlatformPipeline {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
-    // STEP 1 & STEP 2: District Boundary Resolution & Target Area Determination (MUST BE FIRST)
+    // STEP 0: Municipality Split Risk Analysis & Boundary Confirmation Gate (CRITICAL GATE)
+    console.log('📌 [STEP 0] Running Municipality Split Risk Analysis & Boundary Confirmation Gate...');
+    const rawMunicipalities = ['四日市市（一部）', '桑名市', 'いなべ市', '木曽岬町', '東員町', '菰野町', '朝日町', '川越町'];
+    const boundaryManifest = BoundaryConfirmationGate.analyzeAndValidate(profile.districtId, rawMunicipalities);
+
+    if (boundaryManifest.gateStatus !== 'PASS') {
+      throw new Error(`[BoundaryConfirmationGate] GATE REJECTED. Municipality split analysis failed for ${profile.districtId}`);
+    }
+
+    fs.writeFileSync(path.join(logsDir, 'boundary_confirmation_manifest.json'), JSON.stringify(boundaryManifest, null, 2), 'utf8');
+    console.log(`✅ [BoundaryConfirmationGate] PASS! Pattern A Whole: ${boundaryManifest.wholeMunicipalities.length}, Pattern B Split: ${boundaryManifest.splitMunicipalities.length}`);
+
+    // STEP 1 & STEP 2: District Boundary Resolution & Target Area Determination
     console.log('📌 [STEP 1 & STEP 2] Running District Boundary Resolver...');
     const boundaryEvidence = this.boundaryResolver.resolveDistrictBoundary(profile.districtId, referenceDir);
     fs.writeFileSync(path.join(logsDir, 'boundary_evidence.json'), JSON.stringify(boundaryEvidence, null, 2), 'utf8');
