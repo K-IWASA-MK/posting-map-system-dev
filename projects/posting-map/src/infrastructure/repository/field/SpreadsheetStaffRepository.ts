@@ -5,6 +5,8 @@ import { SpreadsheetReader } from '../../spreadsheet/SpreadsheetReader';
 import { SpreadsheetWriter } from '../../spreadsheet/SpreadsheetWriter';
 import { RepositoryPerformanceProfiler } from '../profiler/RepositoryPerformanceProfiler';
 
+declare const CONFIG: any;
+
 export class SpreadsheetStaffRepository implements IStaffRepository {
   private reader: SpreadsheetReader;
   private writer: SpreadsheetWriter;
