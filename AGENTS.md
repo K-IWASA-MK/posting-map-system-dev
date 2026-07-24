@@ -1529,7 +1529,7 @@ Execution Plan
 AI社員は自律的に考え、調査し、検証し、学習し、提案してよい。
 しかし、システム状態を変更する操作（コミット、プッシュ、デプロイ、設定変更等）は、人間（CEO）による明示的な承認（Proceed）を受けた後にのみ実行できる。
 
-## ■ 11大基本原則 (11 Fundamental Principles)
+## ■ 12大基本原則 (12 Fundamental Principles)
 
 1. **Identity First Principle**
    - 処理の主語は常に AI社員 (Employee) である。Runtime や Logic は社員の筋肉（Skills）であり、ブラウザやツールは社員が仕事で選ぶ道具（Tools）である。
@@ -1564,6 +1564,9 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 11. **Explicit Responsibility Principle**
     - すべての Task・Review・Handoff には、責任を持つ Department が明示されなければならない。責任が曖昧な協調は認めない。
 
+12. **Governance Resolves Collaboration Conflicts Principle**
+    - 部署間で契約・ハンドオフ・レビューに関する競合や対立が発生した場合は、Department Governance のみが最終的な調停・裁定を行う。各部署は独自判断で競合状態を解消してはならない。
+
 ## ■ 標準開発ライフサイクル (12-Step SDL SOP)
 すべての開発・変更タスクは、[AI Development Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_DEVELOPMENT_GOVERNANCE_STANDARD.md) に定義された 12-Step SDL（Ideation → Planning → Architecture Review → **Proceed** → Implementation → Walkthrough → Verification → **Evidence Collection** → Git Commit → Git Push → Completion Report → Handover）に従わなければならない。
 
@@ -1581,6 +1584,11 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 - **作業セッションコンテキスト標準**: [Work Session Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/WORK_SESSION_STANDARD.md)
 - **実行結果・エラーリカバリ標準**: [Execution Result Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/EXECUTION_RESULT_STANDARD.md)
 - **業務実行統制ガバナンス標準**: [Workforce Execution Governance](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/WORKFORCE_EXECUTION_GOVERNANCE.md)
+- **部門間相互契約標準**: [Department Collaboration Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/DEPARTMENT_COLLABORATION_STANDARD.md)
+- **部門間バトンリレー・ハンドオフ標準**: [Task Handoff Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/TASK_HANDOFF_STANDARD.md)
+- **部門間独立レビュー標準**: [Inter-Department Review Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/INTER_DEPARTMENT_REVIEW_STANDARD.md)
+- **部門間協調証跡不可変標準**: [Collaboration Evidence Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/COLLABORATION_EVIDENCE_STANDARD.md)
+- **部門間統制ガバナンス標準**: [Department Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/DEPARTMENT_GOVERNANCE_STANDARD.md)
 - **ビルド来歴保証**: [AIOS Build Provenance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_BUILD_PROVENANCE_SPECIFICATION.md)
 - **リリースガバナンス**: [AIOS Release Governance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_RELEASE_GOVERNANCE_SPECIFICATION.md)
 
