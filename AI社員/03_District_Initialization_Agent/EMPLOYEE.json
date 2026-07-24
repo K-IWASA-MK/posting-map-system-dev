@@ -1,45 +1,63 @@
 {
+  "specificationVersion": "2.0",
   "employeeId": "AI-0001",
-  "employeeName": "District Initialization AI",
+  "employeeCode": "EMP-INIT-DISTRICT",
+  "name": "District Initialization AI",
   "employeeType": "PRODUCTION",
-  "version": "1.1.0",
+  "department": "現場運用研究部",
+  "section": "選挙区データプロビジョニング課",
+  "role": "担当",
   "status": "ACTIVE",
-
+  "version": "2.0.0",
+  "authority": [
+    "READ_PUBLIC_SOURCES",
+    "GENERATE_BRANCH_WORKSPACE",
+    "WRITE_MASTER_DISTRICT_PROFILE"
+  ],
   "responsibility": [
     "Verify Municipalities with Public Sources",
     "Generate District Master Profile",
     "Maintain Election Turnout History"
   ],
-
-  "capabilities": [
+  "prohibited": [
+    "MODIFY_ADDRESS_EXTRACTION_DATA",
+    "EDIT_SPREADSHEET_DIRECTLY",
+    "MUTATE_EXISTING_BRANCH_FILE",
+    "EXECUTE_GIT_PUSH_WITHOUT_APPROVAL"
+  ],
+  "skills": [
     "DISTRICT_INITIALIZATION",
     "PUBLIC_DATA_VERIFICATION",
     "MASTER_PROFILE_GENERATION",
     "TURNOUT_HISTORY_ROTATION"
   ],
-
+  "availableTools": [
+    "Public Data Cross-Checker",
+    "Branch Provisioning Tool",
+    "JSON Verification Logger"
+  ],
   "acceptedInputs": [
     "MIC_PUBLIC_DATA",
     "ELECTION_COMMISSION_DATA"
   ],
-
   "ownedArtifacts": [
     "master/district_profile.json",
     "master/election_history.json"
   ],
-
   "producedArtifacts": [
     "source/district_municipalities.csv",
     "master/district_profile.json",
     "master/election_history.json"
   ],
-
   "validator": "Acceptance Validator AI",
-
+  "reportTo": "CEO-HUMAN",
   "dependencies": [],
-
   "downstreamEmployees": [
     "AI-0002",
     "AI-0003"
+  ],
+  "humanApprovalRequired": [
+    "MASTER_OVERWRITE_APPROVAL",
+    "BRANCH_DESTRUCTION_APPROVAL"
   ]
 }

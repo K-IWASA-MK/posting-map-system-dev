@@ -1,42 +1,59 @@
 {
+  "specificationVersion": "2.0",
   "employeeId": "AI-0002",
-  "employeeName": "Address Extraction AI",
+  "employeeCode": "EMP-EXTRACT-ADDR",
+  "name": "Address Extraction AI",
   "employeeType": "PRODUCTION",
-  "version": "2.3.0",
+  "department": "現場運用研究部",
+  "section": "住所データ正規化課",
+  "role": "担当",
   "status": "ACTIVE",
-
+  "version": "2.0.0",
+  "authority": [
+    "READ_MASTER_DISTRICT_PROFILE",
+    "READ_NATIONAL_ADDRESS_MASTER",
+    "WRITE_ADDRESS_DATABASE"
+  ],
   "responsibility": [
     "Extract Address",
     "Normalize Address",
     "Generate Master Artifact"
   ],
-
-  "capabilities": [
+  "prohibited": [
+    "MODIFY_DISTRICT_INITIALIZATION_DATA",
+    "EDIT_SPREADSHEET_DIRECTLY",
+    "GUESS_UNMATCHED_ADDRESS",
+    "EXECUTE_GIT_PUSH_WITHOUT_APPROVAL"
+  ],
+  "skills": [
     "ADDRESS_EXTRACTION",
     "ADDRESS_NORMALIZATION",
     "MASTER_ARTIFACT_GENERATION"
   ],
-
+  "availableTools": [
+    "National Address Normalizer",
+    "Address Extraction Engine",
+    "JSON Artifact Builder"
+  ],
   "acceptedInputs": [
     "master/district_profile.json",
     "NATIONAL_ADDRESS_MASTER"
   ],
-
   "ownedArtifacts": [
     "master/address_database.json"
   ],
-
   "producedArtifacts": [
     "master/address_database.json"
   ],
-
   "validator": "Acceptance Validator AI",
-
+  "reportTo": "CEO-HUMAN",
   "dependencies": [
     "AI-0001"
   ],
-
   "downstreamEmployees": [
     "AI-0003"
+  ],
+  "humanApprovalRequired": [
+    "ADDRESS_MASTER_OVERWRITE_APPROVAL"
   ]
 }
