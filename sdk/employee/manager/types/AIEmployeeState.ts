@@ -1,0 +1,9 @@
+export enum AIEmployeeState {
+  OFFLINE = 'OFFLINE',
+  PROVISIONED = 'PROVISIONED',
+  IDLE = 'IDLE',
+  WORKING = 'WORKING',
+  PAUSED = 'PAUSED',
+  DEGRADED = 'DEGRADED',
+  RETIRED = 'RETIRED'
+}
