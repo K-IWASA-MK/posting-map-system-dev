@@ -13,8 +13,8 @@ Generation 9 において、AIOS は単なる処理実行環境（Runtime）か�
 | フェーズ | フェーズ名 | 状態 | 目的と概要 |
 |---|---|---|---|
 | **Phase 1** | **Employee Foundation** | ✅ **100% COMPLETED** | 社員証標準 (Identity v2.0)、組織図 (departments.json)、12ステップSDL SOP、憲法統合の完了。 |
-| **Phase 2** | **Task Foundation** | 🟦 **NEXT** | 社員が受領・実行・評価される Task 構造（Task, Assignment, Evidence, Report）の定義。 |
-| **Phase 3** | **Workforce Execution** | ⚪ Planned | AI社員が自らツール（Chrome, GitHub, GAS, Spreadsheet）を選択・活用して自律業務を遂行。 |
+| **Phase 2** | **Task Foundation** | ✅ **100% COMPLETED** | Task 概念、TASK.json マニフェスト、Assignment 参照構造、Evidence 不可変モデル、Report 参照モデルの完結。 |
+| **Phase 3** | **Workforce Execution** | 🟦 **NEXT** | AI社員が自らツール（Chrome, GitHub, GAS, Spreadsheet）を選択・活用して自律業務を遂行。 |
 | **Phase 4** | **Department Collaboration** | ⚪ Planned | 部署間（開発部 → QA部 → セキュリティ部 → CEO）のレビュー・バトンリレー文化の自動化。 |
 | **Phase 5** | **AI Company Complete** | ⚪ Planned | 評価・昇格・異動・教育・監査を含めた AI Company OS 全体エコシステムの完成。 |
 | **Backlog** | **Platform Promotion** | ⚪ Backlog | POSTING MAP 配下で実証された成果物・機能を AIOS 共通基盤へ昇格させる専用スプリント。 |
@@ -31,10 +31,10 @@ Generation 9 において、AIOS は単なる処理実行環境（Runtime）か�
 
 ---
 
-## 4. Phase 2: Task Foundation 予定スプリント breakdown
+## 4. Phase 2 実績アーカイブ (Phase 2 Delivered Artifacts)
 
-- **Sprint G9-P2-1**: `TASK_STANDARD.md`（Task 概念およびライフサイクルの基本仕様書策定）
-- **Sprint G9-P2-2**: `TASK.json`（Task マニフェストおよびスキーマの策定）
-- **Sprint G9-P2-3**: `Assignment Model`（タスク割り当て・優先度・期限モデル）
-- **Sprint G9-P2-4**: `Evidence Model`（検証証跡構造および非改ざん保存モデル）
-- **Sprint G9-P2-5**: `Report Model`（完了報告・評価モデル）
+- **G9-P2-1 (Task Concept & Lifecycle)**: [TASK_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/TASK_STANDARD.md)
+- **G9-P2-2 (Task Manifest Schema)**: [AI_TASK_MANIFEST_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_MANIFEST_STANDARD.md)
+- **G9-P2-3 (Task Assignment Layer)**: [AI_TASK_ASSIGNMENT_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_ASSIGNMENT_STANDARD.md)
+- **G9-P2-4 (Task Evidence Layer)**: [AI_TASK_EVIDENCE_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_EVIDENCE_STANDARD.md)
+- **G9-P2-5 (Task Report Layer)**: [AI_TASK_REPORT_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_REPORT_STANDARD.md)
