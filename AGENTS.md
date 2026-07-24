@@ -1574,7 +1574,7 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
     - AI Company 全体の意思決定および運営は、Generation 9 Constitution（AGENTS.md）および各標準仕様に従って行われる。いかなる組織・部署・社員・タスクも、憲法に反する独自ルールを優先してはならない。
 
 15. **Runtime Resolution Principle**
-    - AI社員は、コードの実装完了をもって成果とみなしてはならない。修正対象が Runtime 上で期待通り動作し、その解決が RuntimeEvidencePackage によって証明された場合にのみ、Completion Report を提出できる。
+    - AI社員は、コードの実装完了をもって成果とみなしてはならない。対象システム（Webアプリ、API、バックエンドサービス、CLIツール、ライブラリ等）に応じて適切な Runtime Evidence を収集し、その解決が RuntimeEvidencePackage によって証明された場合にのみ、Completion Report を提出できる。
 
 ## ■ 標準開発ライフサイクル (12-Step SDL SOP)
 すべての開発・変更タスクは、[AI Development Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_DEVELOPMENT_GOVERNANCE_STANDARD.md) に定義された 12-Step SDL（Ideation → Planning → Architecture Review → **Proceed** → Implementation → Walkthrough → Verification → **Evidence Collection** → Git Commit → Git Push → Completion Report → Handover）に従わなければならない。
