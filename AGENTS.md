@@ -1529,7 +1529,7 @@ Execution Plan
 AI社員は自律的に考え、調査し、検証し、学習し、提案してよい。
 しかし、システム状態を変更する操作（コミット、プッシュ、デプロイ、設定変更等）は、人間（CEO）による明示的な承認（Proceed）を受けた後にのみ実行できる。
 
-## ■ 5大基本原則 (5 Fundamental Principles)
+## ■ 6大基本原則 (6 Fundamental Principles)
 
 1. **Identity First Principle**
    - 処理の主語は常に AI社員 (Employee) である。Runtime や Logic は社員の筋肉（Skills）であり、ブラウザやツールは社員が仕事で選ぶ道具（Tools）である。
@@ -1545,6 +1545,9 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 
 5. **One Sprint = One Deliverable = One Responsibility Principle**
    - 各スプリントは「単一の成果物」と「単一の責任」のみに集中し、スコープ肥大化や異種業務の混同を厳禁とする。
+
+6. **Separation of Foundation Principle**
+   - Foundation (Identity, Organization, Governance) は Task から独立して設計しなければならない。Task は Foundation へ依存できるが、Foundation は Task へ依存してはならない。
 
 ## ■ 標準開発ライフサイクル (12-Step SDL SOP)
 すべての開発・変更タスクは、[AI Development Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_DEVELOPMENT_GOVERNANCE_STANDARD.md) に定義された 12-Step SDL（Ideation → Planning → Architecture Review → **Proceed** → Implementation → Walkthrough → Verification → **Evidence Collection** → Git Commit → Git Push → Completion Report → Handover）に従わなければならない。
