@@ -38,3 +38,20 @@ Generation 9 において、AIOS は単なる処理実行環境（Runtime）か�
 - **G9-P2-3 (Task Assignment Layer)**: [AI_TASK_ASSIGNMENT_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_ASSIGNMENT_STANDARD.md)
 - **G9-P2-4 (Task Evidence Layer)**: [AI_TASK_EVIDENCE_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_EVIDENCE_STANDARD.md)
 - **G9-P2-5 (Task Report Layer)**: [AI_TASK_REPORT_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_REPORT_STANDARD.md)
+
+---
+
+## 5. Phase 3: Workforce Execution 予定スプリント breakdown
+
+- **Sprint G9-P3-1**: `WORKFORCE_EXECUTION_STANDARD.md`（タスク自律実行モデル・全体標準仕様の策定）
+- **Sprint G9-P3-2**: `TOOL_SELECTION_STANDARD.md`（Tool Is Capability 原則に基づくツール選択・能力マッチング仕様）
+- **Sprint G9-P3-3**: `WORK_SESSION_STANDARD.md`（AI社員の作業セッション・コンテキスト管理モデル）
+- **Sprint G9-P3-4**: `EXECUTION_RESULT_STANDARD.md`（実行結果およびエラーリカバリモデル）
+- **Sprint G9-P3-5**: `WORKFORCE_EXECUTION_GOVERNANCE.md`（実行ガバナンスおよび人間割込みルール統合）
+
+---
+
+## 6. バックログおよびプラットフォーム昇格方針 (Backlog & Platform Promotion)
+
+- **Tool Registry**: AI社員が選択・利用可能なツール群（Chrome, Git, GitHub API, GAS, Python, Filesystem 等）を一元管理・提供する独立レジストリ。
+- **Platform Promotion Sprint**: POSTING MAP 配下で実証・運用された各種機能および基盤仕様を、AIOS プラットフォーム共通領域（`AIOS/organization/`, `AIOS/tasks/`, `AIOS/execution/`, `AIOS/tool-registry/`）へ配置移動（昇格）させる専用スプリント。昇格時は機能変更を行わず非侵襲配置のみを実施する。

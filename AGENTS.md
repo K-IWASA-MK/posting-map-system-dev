@@ -1529,7 +1529,7 @@ Execution Plan
 AI社員は自律的に考え、調査し、検証し、学習し、提案してよい。
 しかし、システム状態を変更する操作（コミット、プッシュ、デプロイ、設定変更等）は、人間（CEO）による明示的な承認（Proceed）を受けた後にのみ実行できる。
 
-## ■ 6大基本原則 (6 Fundamental Principles)
+## ■ 7大基本原則 (7 Fundamental Principles)
 
 1. **Identity First Principle**
    - 処理の主語は常に AI社員 (Employee) である。Runtime や Logic は社員の筋肉（Skills）であり、ブラウザやツールは社員が仕事で選ぶ道具（Tools）である。
@@ -1549,6 +1549,9 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 6. **Separation of Foundation Principle**
    - Foundation (Identity, Organization, Governance) は Task から独立して設計しなければならない。Task は Foundation へ依存できるが、Foundation は Task へ依存してはならない。
 
+7. **Tool Is Capability Principle**
+   - Tool は仕事そのものではなく、AI社員が Task を遂行するために利用する Capability（能力）である。Task は Tool に依存してはならず、Employee が Task に応じて適切な Tool を選択・利用する。
+
 ## ■ 標準開発ライフサイクル (12-Step SDL SOP)
 すべての開発・変更タスクは、[AI Development Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_DEVELOPMENT_GOVERNANCE_STANDARD.md) に定義された 12-Step SDL（Ideation → Planning → Architecture Review → **Proceed** → Implementation → Walkthrough → Verification → **Evidence Collection** → Git Commit → Git Push → Completion Report → Handover）に従わなければならない。
 
@@ -1556,6 +1559,11 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 - **AI社員 Identity 標準**: [AI Employee Identity Standard v2.0](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_EMPLOYEE_IDENTITY_STANDARD.md)
 - **全社組織図 SSOT**: [Organization SSOT (departments.json)](file:///Volumes/SSD_DATA/AI%20Development%20OS/AI%E7%A4%BE%E5%93%A1/departments.json)
 - **標準開発SOP**: [AI Development Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_DEVELOPMENT_GOVERNANCE_STANDARD.md)
+- **Task 概念・ライフサイクル標準**: [Task Standard Foundation](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/TASK_STANDARD.md)
+- **Task マニフェスト標準**: [AI Task Manifest Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_MANIFEST_STANDARD.md)
+- **Task 割り当て参照標準**: [AI Task Assignment Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_ASSIGNMENT_STANDARD.md)
+- **Task 証跡不可変標準**: [AI Task Evidence Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_EVIDENCE_STANDARD.md)
+- **Task 報告要約標準**: [AI Task Report Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_REPORT_STANDARD.md)
 - **ビルド来歴保証**: [AIOS Build Provenance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_BUILD_PROVENANCE_SPECIFICATION.md)
 - **リリースガバナンス**: [AIOS Release Governance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_RELEASE_GOVERNANCE_SPECIFICATION.md)
 
