@@ -248,13 +248,28 @@
     async function api(action, params = {}, method = 'GET') {
       const url = new URL(API_URL);
       url.searchParams.append('action', action);
+
+      let token = null;
+      if (typeof liff !== 'undefined' && liff.isLoggedIn && liff.isLoggedIn()) {
+        token = liff.getAccessToken();
+        if (token) {
+          url.searchParams.append('liffToken', token);
+        }
+      }
+
       Object.keys(params).forEach(k => {
         if (typeof params[k] !== 'object' && params[k] !== undefined) {
           url.searchParams.append(k, params[k]);
         }
       });
+
       try {
-        const options = { method: method, redirect: 'follow' };
+        const headers = {};
+        if (token) {
+          headers['Authorization'] = 'Bearer ' + token;
+          console.log(`[API ${action}] Auth Token Injected (Primary: Authorization Header, Fallback: Query liffToken)`);
+        }
+        const options = { method: method, headers: headers, redirect: 'follow' };
         if (method === 'POST') {
           const formData = new FormData();
           formData.append('json', JSON.stringify({ action, ...params }));
@@ -292,11 +307,22 @@
         return;
       }
       if (currentUser) {
-        api('registerStaff', {
-          lastName: currentUser.displayName || currentUser.name,
-          firstName: 'LINE',
-          lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
-        }, 'POST').catch(err => console.error('[GAS Register Error]', err));
+        setHud('register', 'Sending...', null);
+        try {
+          const regRes = await api('registerStaff', {
+            lastName: currentUser.displayName || currentUser.name,
+            firstName: 'LINE',
+            lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
+          }, 'POST');
+          if (regRes && regRes.success) {
+            setHud('register', 'Saved to GAS', true);
+          } else {
+            setHud('register', 'GAS Fail', false);
+          }
+        } catch (err) {
+          console.error('[GAS Register Error]', err);
+          setHud('register', 'Error', false);
+        }
       }
       switchTab(currentUser ? 'area' : 'settings');
       showLoading('同期中...');

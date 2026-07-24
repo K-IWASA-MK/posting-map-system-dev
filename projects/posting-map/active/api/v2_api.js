@@ -2870,7 +2870,11 @@ class ApiKeyIdentityProvider {
 
 class LIFFIdentityProvider {
   authenticate(request) {
-    const token = (request.query && request.query.liffToken) || (request.headers && request.headers['authorization']);
+    const headerToken = request.headers && request.headers['authorization'];
+    const queryToken = request.query && request.query.liffToken;
+    const token = headerToken || queryToken;
+    const authSource = headerToken ? 'Authorization Header' : (queryToken ? 'Query liffToken' : 'Unknown');
+
     if (!token) {
       return AuthenticationResult.failureResult('LIFF token or authorization header missing');
     }
@@ -2886,7 +2890,7 @@ class LIFFIdentityProvider {
             authenticationMethod: 'LIFF',
             authenticated: true,
             issuedAt: Date.now(),
-            metadata: { provider: 'LIFFIdentityProvider', clientId: data.client_id, expiresIn: data.expires_in }
+            metadata: { provider: 'LIFFIdentityProvider', authSource: authSource, clientId: data.client_id, expiresIn: data.expires_in }
           });
           return AuthenticationResult.successResult(context);
         }
