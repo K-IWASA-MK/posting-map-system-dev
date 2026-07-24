@@ -1529,7 +1529,7 @@ Execution Plan
 AI社員は自律的に考え、調査し、検証し、学習し、提案してよい。
 しかし、システム状態を変更する操作（コミット、プッシュ、デプロイ、設定変更等）は、人間（CEO）による明示的な承認（Proceed）を受けた後にのみ実行できる。
 
-## ■ 14大基本原則 (14 Fundamental Principles)
+## ■ 15大基本原則 (15 Fundamental Principles)
 
 1. **Identity First Principle**
    - 処理の主語は常に AI社員 (Employee) である。Runtime や Logic は社員の筋肉（Skills）であり、ブラウザやツールは社員が仕事で選ぶ道具（Tools）である。
@@ -1573,6 +1573,9 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 14. **Constitutional Governance Principle**
     - AI Company 全体の意思決定および運営は、Generation 9 Constitution（AGENTS.md）および各標準仕様に従って行われる。いかなる組織・部署・社員・タスクも、憲法に反する独自ルールを優先してはならない。
 
+15. **Runtime Resolution Principle**
+    - AI社員は、コードの実装完了をもって成果とみなしてはならない。修正対象が Runtime 上で期待通り動作し、その解決が RuntimeEvidencePackage によって証明された場合にのみ、Completion Report を提出できる。
+
 ## ■ 標準開発ライフサイクル (12-Step SDL SOP)
 すべての開発・変更タスクは、[AI Development Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_DEVELOPMENT_GOVERNANCE_STANDARD.md) に定義された 12-Step SDL（Ideation → Planning → Architecture Review → **Proceed** → Implementation → Walkthrough → Verification → **Evidence Collection** → Git Commit → Git Push → Completion Report → Handover）に従わなければならない。
 
@@ -1598,6 +1601,14 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 - **AI社員ライフサイクル標準**: [Employee Lifecycle Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/EMPLOYEE_LIFECYCLE_STANDARD.md)
 - **証跡起点パフォーマンス評価標準**: [Performance Evaluation Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/PERFORMANCE_EVALUATION_STANDARD.md)
 - **実績起点学習・昇格標準**: [Learning & Promotion Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/LEARNING_AND_PROMOTION_STANDARD.md)
+- **全社組織健全性監査標準**: [Company Audit Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/COMPANY_AUDIT_STANDARD.md)
+- **最高統裁ガバナンス標準**: [AI Company Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_COMPANY_GOVERNANCE_STANDARD.md)
+- **ブラウザ動的証跡標準**: [Browser Verification Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/BROWSER_VERIFICATION_STANDARD.md)
+- **開発者ツール内部状態証跡標準**: [Developer Tools Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/DEVELOPER_TOOLS_STANDARD.md)
+- **HTTP通信暗号証跡標準**: [HTTP Verification Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/HTTP_VERIFICATION_STANDARD.md)
+- **構造化UI状態証跡標準**: [UI Verification Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/UI_VERIFICATION_STANDARD.md)
+- **統合Runtime証跡パッケージ標準**: [Runtime Evidence Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/RUNTIME_EVIDENCE_STANDARD.md)
+- **最高障害解決完了統裁ゲート標準**: [Runtime Resolution Gate Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/RUNTIME_RESOLUTION_GATE.md)
 - **全社組織健全性監査標準**: [Company Audit Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/COMPANY_AUDIT_STANDARD.md)
 - **AI Company OS 最高ガバナンス標準**: [AI Company Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_COMPANY_GOVERNANCE_STANDARD.md)
 - **ビルド来歴保証**: [AIOS Build Provenance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_BUILD_PROVENANCE_SPECIFICATION.md)
