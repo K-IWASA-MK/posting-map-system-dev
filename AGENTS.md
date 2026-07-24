@@ -1622,6 +1622,7 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 - **AI社員登録・管理基盤標準**: [AI Employee Manager Foundation Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_EMPLOYEE_MANAGER_FOUNDATION.md)
 - **AI社員タスク配分・引き継ぎ統制基盤標準**: [AI Employee Assignment Foundation Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_EMPLOYEE_ASSIGNMENT_FOUNDATION.md)
 - **AI社員間多重通信・協調基盤標準**: [AI Employee Communication Foundation Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_EMPLOYEE_COMMUNICATION_FOUNDATION.md)
+- **全社AI組織階層・権限統制基盤標準**: [AI Organization Foundation Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_ORGANIZATION_FOUNDATION.md)
 - **全社組織健全性監査標準**: [Company Audit Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/COMPANY_AUDIT_STANDARD.md)
 - **AI Company OS 最高ガバナンス標準**: [AI Company Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_COMPANY_GOVERNANCE_STANDARD.md)
 - **ビルド来歴保証**: [AIOS Build Provenance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_BUILD_PROVENANCE_SPECIFICATION.md)

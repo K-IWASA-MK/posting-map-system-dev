@@ -1,0 +1,7 @@
+export enum OrgRole {
+  SUPERVISOR = 'SUPERVISOR',
+  LEADER = 'LEADER',
+  WORKER = 'WORKER',
+  OBSERVER = 'OBSERVER',
+  SYSTEM = 'SYSTEM'
+}
