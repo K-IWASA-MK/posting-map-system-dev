@@ -4,12 +4,12 @@
   "districtId": "MIE-03",
   "districtName": "三重第3区",
   "prefecture": "三重県",
-  "totalMunicipalities": 5,
-  "totalTowns": 17,
+  "totalMunicipalities": 6,
+  "totalTowns": 20,
   "owner": "Address Extraction AI",
   "lineage": {
     "producer": "Address Extraction AI",
-    "generatedAt": "2026-07-21T08:07:08.302Z",
+    "generatedAt": "2026-07-25T08:25:00.000Z",
     "schemaVersion": "2.3.0",
     "inputs": [
       {
@@ -177,7 +177,30 @@
           ]
         }
       ]
+    },
+    {
+      "name": "三重郡",
+      "towns": [
+        {
+          "name": "菰野町大字菰野",
+          "chomeStatus": "NONE",
+          "verificationSource": "NATIONAL_ADDRESS_MASTER",
+          "chome": []
+        },
+        {
+          "name": "朝日町大字柿",
+          "chomeStatus": "NONE",
+          "verificationSource": "NATIONAL_ADDRESS_MASTER",
+          "chome": []
+        },
+        {
+          "name": "川越町大字豊田",
+          "chomeStatus": "NONE",
+          "verificationSource": "NATIONAL_ADDRESS_MASTER",
+          "chome": []
+        }
+      ]
     }
   ],
-  "lastUpdated": "2026-07-21T08:07:08.302Z"
+  "lastUpdated": "2026-07-25T08:25:00.000Z"
 }

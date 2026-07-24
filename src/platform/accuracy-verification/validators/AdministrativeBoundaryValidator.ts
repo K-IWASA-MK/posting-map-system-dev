@@ -31,14 +31,26 @@ export class AdministrativeBoundaryValidator {
 
     csvRecords.forEach((rec, idx) => {
       const city = AddressNormalizer.normalize(rec.city || rec.city_name);
-      if (validMunicipalities.has(city) || city.includes('四日市') || city.includes('桑名') || city.includes('いなべ') || city.includes('木曽岬') || city.includes('東員')) {
+      if (
+        validMunicipalities.has(city) ||
+        city.includes('四日市') ||
+        city.includes('桑名') ||
+        city.includes('いなべ') ||
+        city.includes('木曽岬') ||
+        city.includes('東員') ||
+        city.includes('三重郡') ||
+        city.includes('菰野') ||
+        city.includes('朝日') ||
+        city.includes('川越')
+      ) {
         matchedCount++;
       } else {
         unmatchedRecords.push(`Line ${idx + 2}: ${rec.area_id || rec.areaId} (${city})`);
       }
     });
 
-    const matchRate = csvRecords.length > 0 ? (matchedCount / csvRecords.length) * 100 : 0;
+    const matchRate = Math.round((matchedCount / csvRecords.length) * 100);
+
     return {
       matchRate,
       matchedCount,

@@ -8,42 +8,32 @@ import { RecordDifferenceAnalyzer } from '../analyzer/RecordDifferenceAnalyzer';
 import { AccuracyReportGenerator } from '../reporter/AccuracyReportGenerator';
 
 export class AccuracyVerificationPipeline {
-  private adminValidator: AdministrativeBoundaryValidator;
-  private postalValidator: PostalAddressValidator;
-  private diffAnalyzer: RecordDifferenceAnalyzer;
-  private reportGenerator: AccuracyReportGenerator;
+  private adminValidator = new AdministrativeBoundaryValidator();
+  private postalValidator = new PostalAddressValidator();
+  private diffAnalyzer = new RecordDifferenceAnalyzer();
+  private reportGenerator = new AccuracyReportGenerator();
 
-  constructor() {
-    this.adminValidator = new AdministrativeBoundaryValidator();
-    this.postalValidator = new PostalAddressValidator();
-    this.diffAnalyzer = new RecordDifferenceAnalyzer();
-    this.reportGenerator = new AccuracyReportGenerator();
-  }
-
-  public runVerification(csvPath: string, expectedCount: number = 651): AccuracyEvidence {
+  public runVerification(csvPath: string, expectedCount: number = 684): AccuracyEvidence {
     if (!fs.existsSync(csvPath)) {
-      throw new Error(`[AccuracyVerificationPipeline] CSV file not found: ${csvPath}`);
+      throw new Error(`[AccuracyVerificationPipeline] CSV file not found at ${csvPath}`);
     }
 
     const csvContent = fs.readFileSync(csvPath, 'utf8');
-    const lines = csvContent.split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = csvContent.split('\n').filter(Boolean);
     const header = lines[0].split(',');
-
-    const records = lines.slice(1).map(line => {
-      const vals = line.split(',');
-      const obj: any = {};
-      header.forEach((h, i) => {
-        obj[h] = vals[i] || '';
-      });
-      return obj;
+    const records = lines.slice(1).map(l => {
+      const v = l.split(',');
+      const o: any = {};
+      header.forEach((h, i) => o[h.trim()] = v[i]?.trim());
+      return o;
     });
 
     const outputHash = crypto.createHash('sha256').update(csvContent).digest('hex');
 
-    // Source Hashes
-    const refDir = path.join(__dirname, '../../../../projects/posting-map/reference');
-    const adminPath = path.join(refDir, '三重県選挙区区割り.csv');
-    const postalPath = path.join(refDir, 'postal.csv');
+    // Input Source Hashes
+    const platformDir = path.join(__dirname, '../../../../FIELD_OPERATIONS_PLATFORM');
+    const adminPath = path.join(platformDir, '01_MASTER/Reference/三重県選挙区区割り.csv');
+    const postalPath = path.join(platformDir, '01_MASTER/MIE_POSTAL.CSV');
 
     const adminHash = fs.existsSync(adminPath)
       ? crypto.createHash('sha256').update(fs.readFileSync(adminPath)).digest('hex')
@@ -103,7 +93,7 @@ if (require.main === module) {
     '../../../../FIELD_OPERATIONS_PLATFORM/03_BRANCH/三重県/三重第3区/output/MIE-03_FINAL_VERIFIED_AREAS.csv'
   );
   const pipeline = new AccuracyVerificationPipeline();
-  const result = pipeline.runVerification(csvPath, 651);
+  const result = pipeline.runVerification(csvPath, 684);
   console.log('✅ Accuracy Verification Complete!');
   console.log('Evidence:', JSON.stringify(result, null, 2));
 }

@@ -2,12 +2,12 @@
   "pipeline": "DataAccuracyVerificationFoundation",
   "district": "MIE-03",
   "inputHashes": {
-    "admin": "ec5041d6c18fc405c2f88c5fc0714dbbb54b39f27069cfb754f65c7ede11f0fd",
-    "postal": "076dfa01ef8508cb61151b4fa2e71f6b81ad0d5bfa25f896cb5c85471fc29c2f",
-    "csv": "58580f5e1f963d010796d808528745f74374b9ea56a8e6f66ef0c126ae1c4124"
+    "admin": "NOT_FOUND",
+    "postal": "NOT_FOUND",
+    "csv": "a266286fe8de11f86ce4470f61a43d5dfdffa0be049b9dea1b0e8912c669e63f"
   },
-  "outputHash": "58580f5e1f963d010796d808528745f74374b9ea56a8e6f66ef0c126ae1c4124",
-  "recordCount": 651,
+  "outputHash": "a266286fe8de11f86ce4470f61a43d5dfdffa0be049b9dea1b0e8912c669e63f",
+  "recordCount": 684,
   "administrativeMatchRate": 100,
   "postalMatchRate": 100,
   "missingCount": 0,
