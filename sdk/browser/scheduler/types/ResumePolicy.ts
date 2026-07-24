@@ -1,0 +1,5 @@
+export enum ResumeStrategy {
+  RESUME_FROM_WAIT = 'RESUME_FROM_WAIT',
+  RESTART_TASK = 'RESTART_TASK',
+  RESTART_JOB = 'RESTART_JOB'
+}
