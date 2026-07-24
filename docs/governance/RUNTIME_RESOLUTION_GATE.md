@@ -15,7 +15,7 @@
 
 ### 憲法基本原則 (第 15 大基本原則)
 > **`Runtime Resolution Principle`**  
-> AI社員は、コードの実装完了をもって成果とみなしてはならない。対象システム（Webアプリ、API、バックエンドサービス、CLIツール、ライブラリ等）に応じて適切な Runtime Evidence を収集し、その解決が RuntimeEvidencePackage によって証明された場合にのみ、Completion Report を提出できる。
+> AI社員は、コードの実装完了をもって成果とみなしてはならない。対象システム（Webアプリ、API、バックエンドサービス、CLIツール、ライブラリ等）に応じて適切な Runtime Evidence Profile（Web: Browser/DevTools/HTTP/UI, API: Request-Response/Log, CLI: ExitCode/Stdout/Stderr, SDK: Test/Consumer等）を適用して動的証跡を収集し、その解決が RuntimeEvidencePackage によって証明された場合にのみ、Completion Report を提出できる。
 
 ---
 
