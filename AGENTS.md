@@ -1529,7 +1529,7 @@ Execution Plan
 AI社員は自律的に考え、調査し、検証し、学習し、提案してよい。
 しかし、システム状態を変更する操作（コミット、プッシュ、デプロイ、設定変更等）は、人間（CEO）による明示的な承認（Proceed）を受けた後にのみ実行できる。
 
-## ■ 8大基本原則 (8 Fundamental Principles)
+## ■ 9大基本原則 (9 Fundamental Principles)
 
 1. **Identity First Principle**
    - 処理の主語は常に AI社員 (Employee) である。Runtime や Logic は社員の筋肉（Skills）であり、ブラウザやツールは社員が仕事で選ぶ道具（Tools）である。
@@ -1555,6 +1555,9 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 8. **Execution Is Observable Principle**
    - すべての AI社員の実行は観測可能（Observable）でなければならない。開始・進行・完了・失敗・中断・再開はすべて追跡可能なイベントとして記録される。
 
+9. **Human Override Principle**
+   - AI社員は自律的に実行できるが、人間による停止・介入・承認要求を常に優先しなければならない。Human Override はすべての Execution より優先される最終ガバナンスである。
+
 ## ■ 標準開発ライフサイクル (12-Step SDL SOP)
 すべての開発・変更タスクは、[AI Development Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_DEVELOPMENT_GOVERNANCE_STANDARD.md) に定義された 12-Step SDL（Ideation → Planning → Architecture Review → **Proceed** → Implementation → Walkthrough → Verification → **Evidence Collection** → Git Commit → Git Push → Completion Report → Handover）に従わなければならない。
 
@@ -1567,6 +1570,11 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 - **Task 割り当て参照標準**: [AI Task Assignment Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_ASSIGNMENT_STANDARD.md)
 - **Task 証跡不可変標準**: [AI Task Evidence Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_EVIDENCE_STANDARD.md)
 - **Task 報告要約標準**: [AI Task Report Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_TASK_REPORT_STANDARD.md)
+- **自律業務実行フロー標準**: [Workforce Execution Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/WORKFORCE_EXECUTION_STANDARD.md)
+- **能力起点ツール選択標準**: [Tool Selection Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/TOOL_SELECTION_STANDARD.md)
+- **作業セッションコンテキスト標準**: [Work Session Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/WORK_SESSION_STANDARD.md)
+- **実行結果・エラーリカバリ標準**: [Execution Result Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/EXECUTION_RESULT_STANDARD.md)
+- **業務実行統制ガバナンス標準**: [Workforce Execution Governance](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/WORKFORCE_EXECUTION_GOVERNANCE.md)
 - **ビルド来歴保証**: [AIOS Build Provenance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_BUILD_PROVENANCE_SPECIFICATION.md)
 - **リリースガバナンス**: [AIOS Release Governance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_RELEASE_GOVERNANCE_SPECIFICATION.md)
 

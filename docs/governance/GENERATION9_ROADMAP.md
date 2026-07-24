@@ -14,8 +14,8 @@ Generation 9 において、AIOS は単なる処理実行環境（Runtime）か�
 |---|---|---|---|
 | **Phase 1** | **Employee Foundation** | ✅ **100% COMPLETED** | 社員証標準 (Identity v2.0)、組織図 (departments.json)、12ステップSDL SOP、憲法統合の完了。 |
 | **Phase 2** | **Task Foundation** | ✅ **100% COMPLETED** | Task 概念、TASK.json マニフェスト、Assignment 参照構造、Evidence 不可変モデル、Report 参照モデルの完結。 |
-| **Phase 3** | **Workforce Execution** | 🟦 **NEXT** | AI社員が自らツール（Chrome, GitHub, GAS, Spreadsheet）を選択・活用して自律業務を遂行。 |
-| **Phase 4** | **Department Collaboration** | ⚪ Planned | 部署間（開発部 → QA部 → セキュリティ部 → CEO）のレビュー・バトンリレー文化の自動化。 |
+| **Phase 3** | **Workforce Execution** | ✅ **100% COMPLETED** | 自律実行フロー、能力起点ツール選択、作業セッション、実行結果、人間介入ガバナンスの完結。 |
+| **Phase 4** | **Department Collaboration** | 🟦 **NEXT** | 部署間（開発部 → QA部 → セキュリティ部 → CEO）のレビュー・バトンリレー文化の自動化。 |
 | **Phase 5** | **AI Company Complete** | ⚪ Planned | 評価・昇格・異動・教育・監査を含めた AI Company OS 全体エコシステムの完成。 |
 | **Backlog** | **Platform Promotion** | ⚪ Backlog | POSTING MAP 配下で実証された成果物・機能を AIOS 共通基盤へ昇格させる専用スプリント。 |
 
@@ -41,13 +41,13 @@ Generation 9 において、AIOS は単なる処理実行環境（Runtime）か�
 
 ---
 
-## 5. Phase 3: Workforce Execution 予定スプリント breakdown
+## 5. Phase 3 実績アーカイブ (Phase 3 Delivered Artifacts)
 
-- **Sprint G9-P3-1**: `WORKFORCE_EXECUTION_STANDARD.md`（タスク自律実行モデル・全体標準仕様の策定）
-- **Sprint G9-P3-2**: `TOOL_SELECTION_STANDARD.md`（Tool Is Capability 原則に基づくツール選択・能力マッチング仕様）
-- **Sprint G9-P3-3**: `WORK_SESSION_STANDARD.md`（AI社員の作業セッション・コンテキスト管理モデル）
-- **Sprint G9-P3-4**: `EXECUTION_RESULT_STANDARD.md`（実行結果およびエラーリカバリモデル）
-- **Sprint G9-P3-5**: `WORKFORCE_EXECUTION_GOVERNANCE.md`（実行ガバナンスおよび人間割込みルール統合）
+- **G9-P3-1 (Execution Flow Standard)**: [WORKFORCE_EXECUTION_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/WORKFORCE_EXECUTION_STANDARD.md)
+- **G9-P3-2 (Capability-based Tool Selection)**: [TOOL_SELECTION_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/TOOL_SELECTION_STANDARD.md)
+- **G9-P3-3 (Work Session & Checkpoint)**: [WORK_SESSION_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/WORK_SESSION_STANDARD.md)
+- **G9-P3-4 (Execution Result & Recovery)**: [EXECUTION_RESULT_STANDARD.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/EXECUTION_RESULT_STANDARD.md)
+- **G9-P3-5 (Workforce Execution Governance)**: [WORKFORCE_EXECUTION_GOVERNANCE.md](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/WORKFORCE_EXECUTION_GOVERNANCE.md)
 
 ---
 
