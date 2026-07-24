@@ -22,6 +22,7 @@ import { bootstrapFieldApis } from '../infrastructure/bootstrap/FieldApiBootstra
 import { WorkspaceSubscriptionGate } from '../application/subscription/WorkspaceSubscriptionGate';
 
 declare function createJsonResponseFromApiResponse(apiResponse: any): any;
+declare const Logger: any;
 
 export class PlatformIntegrationPipeline {
   public static lastContext: ApiExecutionContext | null = null;
