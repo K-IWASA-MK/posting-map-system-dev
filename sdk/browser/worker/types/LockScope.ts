@@ -1,0 +1,7 @@
+export enum LockScope {
+  GLOBAL_BROWSER = 'GLOBAL_BROWSER',
+  BROWSER_CONTEXT = 'BROWSER_CONTEXT',
+  PROFILE = 'PROFILE',
+  PAGE = 'PAGE',
+  TAB = 'TAB'
+}

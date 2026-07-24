@@ -1617,6 +1617,7 @@ AI社員は自律的に考え、調査し、検証し、学習し、提案して
 - **最高障害解決完了統裁ゲート標準**: [Runtime Resolution Gate Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/RUNTIME_RESOLUTION_GATE.md)
 - **CEO実機完成受入ゲート標準**: [CEO Runtime Acceptance Gate Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/CEO_RUNTIME_ACCEPTANCE_GATE.md)
 - **統一ブラウザ実行基盤標準**: [Browser Runtime Foundation Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/BROWSER_RUNTIME_FOUNDATION.md)
+- **ブラウザワーカー多重調停基盤標準**: [Browser Worker Foundation Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/BROWSER_WORKER_FOUNDATION.md)
 - **全社組織健全性監査標準**: [Company Audit Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/COMPANY_AUDIT_STANDARD.md)
 - **AI Company OS 最高ガバナンス標準**: [AI Company Governance Standard](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AI_COMPANY_GOVERNANCE_STANDARD.md)
 - **ビルド来歴保証**: [AIOS Build Provenance Specification](file:///Volumes/SSD_DATA/AI%20Development%20OS/docs/governance/AIOS_BUILD_PROVENANCE_SPECIFICATION.md)
