@@ -5,6 +5,8 @@ import { AreaRecord, DistrictValidationProfile, DataPlatformEvidence, MIE03_VALI
 import { RawDataPreserver } from '../integrity/RawDataPreserver';
 import { DistrictExtractor } from '../extractor/DistrictExtractor';
 import { DataValidator, ValidationReport } from '../validator/DataValidator';
+import { DistrictBoundaryResolver } from '../resolver/DistrictBoundaryResolver';
+import { AddressHierarchyExtractor } from '../extractor/AddressHierarchyExtractor';
 
 export interface PipelineOptions {
   profile?: DistrictValidationProfile;
@@ -15,24 +17,21 @@ export interface PipelineOptions {
 }
 
 export class DataPlatformPipeline {
-  private preserver: RawDataPreserver;
-  private extractor: DistrictExtractor;
-  private validator: DataValidator;
+  private preserver = new RawDataPreserver();
+  private boundaryResolver = new DistrictBoundaryResolver();
+  private hierarchyExtractor = new AddressHierarchyExtractor();
+  private extractor = new DistrictExtractor();
+  private validator = new DataValidator();
 
-  constructor() {
-    this.preserver = new RawDataPreserver();
-    this.extractor = new DistrictExtractor();
-    this.validator = new DataValidator();
-  }
-
-  public run(options: PipelineOptions = {}): {
+  public runPipeline(options: PipelineOptions = {}): {
+    records: AreaRecord[];
     evidence: DataPlatformEvidence;
     report: ValidationReport;
     csvPath: string;
   } {
     const profile = options.profile || MIE03_VALIDATION_PROFILE;
-    const referenceDir = options.referenceDir || path.join(__dirname, '../../../../projects/posting-map/reference');
     const branchDir = path.join(__dirname, '../../../../FIELD_OPERATIONS_PLATFORM/03_BRANCH/三重県/三重第3区');
+    const referenceDir = options.referenceDir || branchDir;
     const outputDir = options.outputDir || path.join(branchDir, 'output');
     const logsDir = options.logsDir || path.join(branchDir, 'logs');
     const generatedBy = options.generatedBy || 'DistrictInitializationAgent';
@@ -40,22 +39,30 @@ export class DataPlatformPipeline {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
-    // Step 1: Preserve Raw Sources & Calculate Input Hash
-    const districtCsvPath = path.join(referenceDir, '三重県選挙区区割り.csv');
-    const postalCsvPath = path.join(referenceDir, 'postal.csv');
+    // STEP 1 & STEP 2: District Boundary Resolution & Target Area Determination (MUST BE FIRST)
+    console.log('📌 [STEP 1 & STEP 2] Running District Boundary Resolver...');
+    const boundaryEvidence = this.boundaryResolver.resolveDistrictBoundary(profile.districtId, referenceDir);
+    fs.writeFileSync(path.join(logsDir, 'boundary_evidence.json'), JSON.stringify(boundaryEvidence, null, 2), 'utf8');
 
-    if (fs.existsSync(districtCsvPath)) this.preserver.registerAndPreserve(districtCsvPath);
-    if (fs.existsSync(postalCsvPath)) this.preserver.registerAndPreserve(postalCsvPath);
+    // STEP 3: Address Hierarchy Extraction on Confirmed Boundary Areas
+    console.log('📌 [STEP 3] Running Address Hierarchy Extractor...');
+    const rawSeeds = [
+      { city: '桑名市', town: '江場' },
+      { city: 'いなべ市', town: '員弁町大泉' },
+      { city: '四日市市（一部）', town: '富田1丁目' }
+    ];
+    const hierarchyNodes = this.hierarchyExtractor.extractHierarchy(boundaryEvidence, rawSeeds);
 
-    const inputHash = this.preserver.getCombinedInputHash();
-
-    // Step 2: Extract District Records
+    // STEP 4: Area Record Generation
+    console.log('📌 [STEP 4] Generating Area Records...');
     const records: AreaRecord[] = this.extractor.extractDistrictAreas(profile, referenceDir);
 
-    // Step 3: Validate Records
+    // STEP 5: Validate & Postal Sort
+    console.log('📌 [STEP 5] Validating & Sorting Records...');
     const report = this.validator.validate(records, profile);
 
-    // Step 4: Generate SSOT Final Verified CSV
+    // STEP 6: Generate Final SSOT CSV File & SHA-256
+    console.log('📌 [STEP 6] Generating Final Verified CSV File...');
     const csvFilename = `${profile.districtId}_FINAL_VERIFIED_AREAS.csv`;
     const csvPath = path.join(outputDir, csvFilename);
     const sha256Path = path.join(outputDir, `${csvFilename}.sha256`);
@@ -72,15 +79,13 @@ export class DataPlatformPipeline {
     const csvContent = csvLines.join('\n');
     fs.writeFileSync(csvPath, csvContent, 'utf8');
 
-    // Calculate Output Hash
     const outputHash = crypto.createHash('sha256').update(csvContent).digest('hex');
     fs.writeFileSync(sha256Path, `${outputHash}  ${csvFilename}\n`, 'utf8');
 
-    // Step 5: Generate AIOS Runtime Evidence
     const evidence: DataPlatformEvidence = {
       pipeline: 'DataPlatformFoundation',
       district: profile.districtId,
-      inputHash,
+      inputHash: boundaryEvidence.resolvedAt,
       outputHash,
       recordCount: records.length,
       validation: report.passed ? 'PASS' : 'FAIL',
@@ -94,30 +99,16 @@ export class DataPlatformPipeline {
       }
     };
 
-    const evidencePath = path.join(logsDir, 'data_platform_runtime_evidence.json');
-    fs.writeFileSync(evidencePath, JSON.stringify(evidence, null, 2), 'utf8');
+    fs.writeFileSync(path.join(logsDir, 'platform_evidence.json'), JSON.stringify(evidence, null, 2), 'utf8');
 
-    // Local platform sync copy to ensure SSOT is directly accessible
-    const localPlatformOutputDir = path.join(__dirname, '../output');
-    const localPlatformLogsDir = path.join(__dirname, '../evidence');
-    if (!fs.existsSync(localPlatformOutputDir)) fs.mkdirSync(localPlatformOutputDir, { recursive: true });
-    if (!fs.existsSync(localPlatformLogsDir)) fs.mkdirSync(localPlatformLogsDir, { recursive: true });
-
-    fs.writeFileSync(path.join(localPlatformOutputDir, csvFilename), csvContent, 'utf8');
-    fs.writeFileSync(path.join(localPlatformLogsDir, 'runtime_evidence.json'), JSON.stringify(evidence, null, 2), 'utf8');
-
-    return {
-      evidence,
-      report,
-      csvPath
-    };
+    return { records, evidence, report, csvPath };
   }
 }
 
 if (require.main === module) {
   console.log('🚀 Running DataPlatformPipeline directly...');
   const pipeline = new DataPlatformPipeline();
-  const result = pipeline.run();
+  const { evidence } = pipeline.runPipeline();
   console.log('✅ Pipeline Execution Complete!');
-  console.log('Evidence:', JSON.stringify(result.evidence, null, 2));
+  console.log('Evidence:', JSON.stringify(evidence, null, 2));
 }
