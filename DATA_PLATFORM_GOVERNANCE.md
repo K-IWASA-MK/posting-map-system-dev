@@ -1,66 +1,59 @@
 # POSTING MAP Data Platform 基本原則 & ガバナンス規範書 (DATA_PLATFORM_GOVERNANCE.md)
 
-Version: 4.0 (全国289選挙区展開用・究極アーキテクチャ)  
+Version: 5.0 (全国289選挙区展開用・全国住所データ基盤原則)  
 Author: 岩佐CEO  
-System: POSTING MAP / FIELD OPERATIONS OS / 289 DISTRICT EXPANSION ENGINE  
+System: POSTING MAP / FIELD OPERATIONS OS / NATIONAL ADDRESS PLATFORM ENGINE  
 
 ---
 
-## ■ 最重要原則: 全国住所データ基盤 第一原則 (National Address Platform Prerequisite)
+## ■ 最重要原則: 全国住所データ基盤構築 第一原則 (National Address Foundation Prerequisite)
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ いきなり特定選挙区 (例: MIE-03) の抽出に入ってはならない。      │
-│ まず【全国住所データ基盤 (STEP 0)】を完全構築し、             │
-│ 全国住所マスター (NATIONAL_ADDRESS_MASTER.csv) を完成させてから │
-│ 初めて選挙区境界データを重ね合わせる。                        │
+│ ❌ 先に MIE-03 や特定選挙区を作る                            │
+│ ❌ 既存 CSV を正解扱いする                                   │
+│ ❌ 郵便 CSV から直接エリア化する                              │
+│                                                             │
+│ ✅ 最新全国 Raw 取得 (日本郵便 KEN_ALL.CSV ＋ 行政マスター)    │
+│ ✅ Raw Data Audit 実施 (raw_audit_manifest.json)            │
+│ ✅ 全国住所階層 MASTER (ADDRESS_MASTER.csv) の作成            │
+│ ✅ 全国 ADDRESS_MASTER 完成後に初めて選挙区境界を重ねる        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ■ 全国 289 選挙区展開用・9 段階不可逆データ生成フロー
+## ■ 正式な 4 段階 全国住所データ基盤フロー
 
 ```
-[STEP 0]   全国住所データ基盤構築 (National Address Platform) ★最初
-           ├─ ① 日本郵便 全国郵便データ取り込み (utf_ken_all.csv)
-           ├─ ② SHA-256 ガバナンス管理 (data/raw/postal/raw_hash.json)
-           ├─ ③ Rule v3 全国住所階層解析 (都道府県/自治体/第1階層/第2階層)
-           └─ ④ 全国住所マスター完成 (data/master/NATIONAL_ADDRESS_MASTER.csv)
-              │
-              ▼
-[STEP 0.5] 自治体分割リスク判定 (Municipality Split Risk Analysis)
-              │
-              ▼
-[Gate 0]   Boundary Confirmation Gate (リスク検知通過)
-              │
-              ▼
-[STEP 1]   選挙区境界判定 (Boundary Resolution)
-              │
-              ▼
-[STEP 1.5] 境界証明ゲート (Boundary Evidence Gate: 包含/除外地域証明)
-              │
-              ▼
-[STEP 2]   対象地域確定 (Target Area Determination)
-              │
-              ▼
-[STEP 3]   FINAL CSV Generator (SSOT確定CSV生成・郵便番号昇順)
-              │
-              ▼
-[STEP 4]   CSV Accuracy Verification (精度検証)
-              │
-              ▼
-[STEP 5]   CEO Data Acceptance Gate (データ承認ゲート)
-              │
-              ▼
-[STEP 6]   Google Spreadsheet Generator (表示専用レイヤー)
+[STEP 1] 全国最新 Raw データ取得
+         ├─ ① 日本郵便 全国郵便番号データ (最新 KEN_ALL.CSV / UTF-8版)
+         └─ ② 行政住所マスターデータ (全国市区町村コード, 自治体名, 町名, 大字, 字, 丁目)
+            (※ 日本郵便データ単体の不完全さを行政マスターで補強・完備)
+            │
+            ▼
+[STEP 2] Raw Data Audit (raw/ 保持 & 証跡管理)
+         ├─ raw/postal/KEN_ALL.CSV
+         ├─ raw/administrative/national_address_master.csv
+         └─ raw/raw_audit_manifest.json
+            {"source": "...", "updatedAt": "...", "recordCount": "...", "sha256": "..."}
+            │
+            ▼
+[STEP 3] 全国住所階層解析 (Rule v3 エンジン)
+         ├─ 自治体名は階層に含めない (東員町1丁目 ➔ 自治体: 東員町, level1: 1丁目, level2: NULL)
+         ├─ 成果物: data/master/ADDRESS_MASTER.csv
+         └─ スキーマ: prefecture, municipality, address_level_1, address_level_2, postal_code, source, hash
+            │
+            ▼
+[STEP 4] 全国 ADDRESS_MASTER 完成後
+         └─ 全国 ADDRESS_MASTER ➔ 選挙区境界データ ➔ 対象自治体・地域抽出 ➔ POSTING MAP 確定 CSV
 ```
 
 ---
 
-## ■ 新規モジュール群 (`src/platform/address-data-platform/`)
+## ■ 新規構築モジュール群 (`src/platform/address-data-platform/`)
 
-1. **`PostalCsvIngestor.ts`**: 日本郵便全データ取り込み & `raw_hash.json` 保持
-2. **`AddressHierarchyParser.ts`**: Rule v3 全国住所階層分解器
-3. **`AddressMasterGenerator.ts`**: `NATIONAL_ADDRESS_MASTER.csv` 出力
-4. **`NationalAddressPipeline.ts`**: 全国パイプライン統制器
-5. **`test_national_address_pipeline.ts`**: 単体テストスイート (100% PASS)
+1. **`raw/RawDataIngestor.ts`**: KEN_ALL.CSV & 行政マスター取得・`raw_audit_manifest.json` (SHA-256) 監査
+2. **`parser/NationalAddressHierarchyParser.ts`**: 自治体を階層から除外した Rule v3 解析器
+3. **`generator/AddressMasterGenerator.ts`**: `ADDRESS_MASTER.csv` & `address_master_evidence.json` 出力
+4. **`pipeline/NationalAddressDataPipeline.ts`**: 全国パイプライン統制器 (STEP 1 〜 STEP 4)
+5. **`test_national_address_master_v4.ts`**: 単体テストスイート (**100% PASS**)
