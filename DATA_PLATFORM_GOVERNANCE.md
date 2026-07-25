@@ -1,26 +1,34 @@
 # POSTING MAP Data Platform 基本原則 & ガバナンス規範書 (DATA_PLATFORM_GOVERNANCE.md)
 
-Version: 3.0  
+Version: 4.0 (全国289選挙区展開用・究極アーキテクチャ)  
 Author: 岩佐CEO  
 System: POSTING MAP / FIELD OPERATIONS OS / 289 DISTRICT EXPANSION ENGINE  
 
 ---
 
-## ■ 最重要原則: STEP 0 (危険検知) ➔ STEP 1 (境界確定) ➔ STEP 1.5 (境界証明)
+## ■ 最重要原則: 全国住所データ基盤 第一原則 (National Address Platform Prerequisite)
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 今後289選挙区へ展開する上で、境界事故率をゼロ化するために     │
-│ 【STEP 0: 危険検知】 ➔ 【STEP 1: 境界確定】 ➔ 【STEP 1.5: 境界証明】│
-│ の3段階品質チェックを必須条件とする。                          │
+│ いきなり特定選挙区 (例: MIE-03) の抽出に入ってはならない。      │
+│ まず【全国住所データ基盤 (STEP 0)】を完全構築し、             │
+│ 全国住所マスター (NATIONAL_ADDRESS_MASTER.csv) を完成させてから │
+│ 初めて選挙区境界データを重ね合わせる。                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ■ 8 段階不可逆データ生成フロー (Complete Execution Pipeline)
+## ■ 全国 289 選挙区展開用・9 段階不可逆データ生成フロー
 
 ```
-[STEP 0]   自治体分割リスク判定 (Municipality Split Risk Analysis)
+[STEP 0]   全国住所データ基盤構築 (National Address Platform) ★最初
+           ├─ ① 日本郵便 全国郵便データ取り込み (utf_ken_all.csv)
+           ├─ ② SHA-256 ガバナンス管理 (data/raw/postal/raw_hash.json)
+           ├─ ③ Rule v3 全国住所階層解析 (都道府県/自治体/第1階層/第2階層)
+           └─ ④ 全国住所マスター完成 (data/master/NATIONAL_ADDRESS_MASTER.csv)
+              │
+              ▼
+[STEP 0.5] 自治体分割リスク判定 (Municipality Split Risk Analysis)
               │
               ▼
 [Gate 0]   Boundary Confirmation Gate (リスク検知通過)
@@ -29,55 +37,30 @@ System: POSTING MAP / FIELD OPERATIONS OS / 289 DISTRICT EXPANSION ENGINE
 [STEP 1]   選挙区境界判定 (Boundary Resolution)
               │
               ▼
-[STEP 1.5] 境界証明ゲート (Boundary Evidence Gate) ★新設
-           (各分割自治体の包含/除外地域プロパティ検証)
+[STEP 1.5] 境界証明ゲート (Boundary Evidence Gate: 包含/除外地域証明)
               │
               ▼
-[STEP 2]   対象地域確定 (Target Area Determination & Evidence)
+[STEP 2]   対象地域確定 (Target Area Determination)
               │
               ▼
-[STEP 3]   Address Extraction Rule v2 (住所階層抽出)
+[STEP 3]   FINAL CSV Generator (SSOT確定CSV生成・郵便番号昇順)
               │
               ▼
-[STEP 4]   POSTING MAP エリア生成 (Area Record Generation)
+[STEP 4]   CSV Accuracy Verification (精度検証)
               │
               ▼
-[STEP 5]   郵便番号昇順ソート (Postal Code Ascending Sort)
+[STEP 5]   CEO Data Acceptance Gate (データ承認ゲート)
               │
               ▼
-[STEP 6]   自治体別 10件単位シート生成 (10-Record Sheet Partitioning)
+[STEP 6]   Google Spreadsheet Generator (表示専用レイヤー)
 ```
 
 ---
 
-## ■ STEP 1.5: Boundary Evidence Gate 構造証明
+## ■ 新規モジュール群 (`src/platform/address-data-platform/`)
 
-分割自治体（例: 四日市市）について、以下の証明 JSON (`boundary_evidence_gate.json`) が生成され、`boundaryVerified: true` が検証された場合のみ次工程へ進行する：
-
-```json
-{
-  "district": "MIE-03",
-  "municipality": "四日市市",
-  "source": "行政区割りデータ (総務省・三重県選挙管理委員会基準)",
-  "excludedAreas": [
-    "日永", "笹川", "楠町", "内部", "塩浜", "海蔵", "三重", "桜"
-  ],
-  "includedAreas": [
-    "富田", "富州原町", "羽津"
-  ],
-  "boundaryVerified": true
-}
-```
-
----
-
-## ■ 三重第3区 (MIE-03) 最終確定分類結果
-
-- **桑名市**: Pattern A (自治体全域 1選挙区 ✅)
-- **いなべ市**: Pattern A (自治体全域 1選挙区 ✅)
-- **木曽岬町**: Pattern A (自治体全域 1選挙区 ✅)
-- **東員町**: Pattern A (自治体全域 1選挙区 ✅)
-- **菰野町**: Pattern A (自治体全域 1選挙区 ✅)
-- **朝日町**: Pattern A (自治体全域 1選挙区 ✅)
-- **川越町**: Pattern A (自治体全域 1選挙区 ✅)
-- **四日市市**: Pattern B (分割確認必須: 第2区除外・第3区確定 ✅)
+1. **`PostalCsvIngestor.ts`**: 日本郵便全データ取り込み & `raw_hash.json` 保持
+2. **`AddressHierarchyParser.ts`**: Rule v3 全国住所階層分解器
+3. **`AddressMasterGenerator.ts`**: `NATIONAL_ADDRESS_MASTER.csv` 出力
+4. **`NationalAddressPipeline.ts`**: 全国パイプライン統制器
+5. **`test_national_address_pipeline.ts`**: 単体テストスイート (100% PASS)
