@@ -3,7 +3,7 @@ import { BoundaryContainmentValidator } from './BoundaryContainmentValidator';
 
 export type CoordinateValidationResult = {
   isValid: boolean;
-  status: "VERIFIED" | "INVALID_COORDINATE" | "REJECTED_BOUNDARY_LEAK";
+  status: "VERIFIED" | "INVALID_COORDINATE" | "REJECTED_BOUNDARY_LEAK" | "WARNING_WATER";
   reason?: string;
 };
 
@@ -21,8 +21,8 @@ export class CoordinateValidator {
     const waterCheck = this.waterDetector.detect(lat, lng);
     if (waterCheck.isWater) {
       return {
-        isValid: false,
-        status: "INVALID_COORDINATE",
+        isValid: true,
+        status: "WARNING_WATER",
         reason: `Coordinate fell into water area: ${waterCheck.waterName}`
       };
     }

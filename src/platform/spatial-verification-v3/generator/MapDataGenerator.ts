@@ -62,18 +62,24 @@ export class MapDataGenerator {
 
       let spatialStatus = validation.isValid ? "VERIFIED" : "FAIL_CEO_REVIEW_REQUIRED";
       
-      if (validation.isValid && resolution.source === "POSTAL_APPROXIMATE") {
-        spatialStatus = "WARNING";
-        warningCount++;
-        approximateCount++;
-      } else if (!validation.isValid) {
+      if (validation.isValid) {
+        if (validation.status === "WARNING_WATER") {
+          spatialStatus = "WARNING";
+          warningCount++;
+          console.warn(`[WARNING] Water Area detected for ${record.area_id} (${record.town}): ${validation.reason}`);
+        } else if (resolution.source === "POSTAL_APPROXIMATE") {
+          spatialStatus = "WARNING";
+          warningCount++;
+          approximateCount++;
+        } else {
+          successCount++;
+          if (resolution.source.includes("APPROXIMATE")) {
+            approximateCount++;
+          }
+        }
+      } else {
         console.error(`[ERROR] Strict failure for ${record.area_id} (${record.town}): ${validation.reason}.`);
         failCount++;
-      } else {
-        successCount++;
-        if (resolution.source.includes("APPROXIMATE")) {
-          approximateCount++;
-        }
       }
 
       augmentedLines.push([...v, resolution.latitude, resolution.longitude, resolution.source, resolution.accuracy, spatialStatus].join(','));

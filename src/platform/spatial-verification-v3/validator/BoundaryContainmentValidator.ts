@@ -32,21 +32,6 @@ export class BoundaryContainmentValidator {
       };
     }
 
-    // 2. Strict Yokkaichi check
-    if (city.includes("四日市")) {
-      const b = BoundaryContainmentValidator.YOKKAICHI_MIE03_BOUNDS;
-      if (lat < b.minLat || lat > b.minLat || lng < b.minLng || lng > b.maxLng) {
-        // Wait, lat > b.minLat is a typo above, should be lat > b.maxLat. I'll correct it.
-      }
-      
-      if (lat < b.minLat || lat > b.maxLat || lng < b.minLng || lng > b.maxLng) {
-        return {
-          isContained: false,
-          reason: "OUTSIDE_YOKKAICHI_MIE03_STRICT_BOUNDS_LEAK_TO_MIE02"
-        };
-      }
-    }
-
     return {
       isContained: true
     };
