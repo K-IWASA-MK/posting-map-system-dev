@@ -133,9 +133,17 @@
     .then(data => {
       L.geoJSON(data, {
         pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, {
+          // 【表示専用ジッター】同一住所（町丁目代表点）のピン重複を防ぐための画面上のみのオフセット
+          // area_idの数字部分をシードにして、決定論的に分散させる（リロードしても位置が変わらない）
+          const seed = parseInt((feature.properties.area_id || "0").replace(/[^0-9]/g, '')) || Math.random() * 10000;
+          // ±約200m〜250mの散らし
+          const offsetLat = Math.sin(seed) * 0.002;
+          const offsetLng = Math.cos(seed) * 0.002;
+          const jitteredLatLng = [latlng.lat + offsetLat, latlng.lng + offsetLng];
+
+          return L.circleMarker(jitteredLatLng, {
             radius: 6,
-            fillColor: "#ef4444",
+            fillColor: feature.properties.color_code || "#ef4444",
             color: "#ffffff",
             weight: 1.5,
             opacity: 0.95,
