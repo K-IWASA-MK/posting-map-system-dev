@@ -13,7 +13,7 @@ export class MapDataGenerator {
     this.validator = new CoordinateValidator();
   }
 
-  public generateAndVerify(csvPath: string, outputDir: string, rootDir: string): void {
+  public async generateAndVerify(csvPath: string, outputDir: string, rootDir: string): Promise<void> {
     console.log("==================================================");
     console.log("🌐 MIE-03 SPATIAL VERIFICATION V3.1 PRO ENGINE");
     console.log("==================================================\n");
@@ -25,49 +25,58 @@ export class MapDataGenerator {
     const geoFeatures: any[] = [];
     const augmentedLines: string[] = [];
     
-    // Augment header
+    // Augment header (Removed 'coordinate_accuracy' and 'coordinate_source' if they are the same as old, keeping same structure)
+    // The user requested CoordinateResult fields: latitude, longitude, source, accuracy, confidence, rawQuery
     const newHeader = [...header, "latitude", "longitude", "coordinate_source", "coordinate_accuracy", "spatial_status"];
     augmentedLines.push(newHeader.join(','));
 
     let failCount = 0;
     let successCount = 0;
+    let warningCount = 0;
+    let approximateCount = 0;
 
     for (let i = 1; i < lines.length; i++) {
       const v = lines[i].split(',');
       const record: any = {};
       header.forEach((h, idx) => record[h] = v[idx]);
 
-      let resolution = this.resolver.resolve(record.area_id, record.city, record.town, i);
-      let validation = this.validator.validate(resolution.lat, resolution.lng, record.city);
+      let resolution = await this.resolver.resolve(record.city, record.town);
+      let validation = this.validator.validate(resolution.latitude, resolution.longitude, record.city);
 
-      // Retry logic if invalid (e.g. water area)
-      let attempt = 1;
-      while (!validation.isValid && attempt < 3) {
-        console.warn(`[WARNING] Resolution failed for ${record.area_id} (${record.town}): ${validation.reason}. Retrying (Attempt ${attempt})...`);
-        const retryRes = this.resolver.retryResolve(record.area_id, record.city, record.town, attempt);
+      // Fallback to postal code if strict check failed
+      if (!validation.isValid) {
+        console.warn(`[WARNING] Resolution failed for ${record.area_id} (${record.town}): ${validation.reason}. Falling back to postal code...`);
+        const retryRes = await this.resolver.retryResolve(record.postal_code);
         if (retryRes) {
           resolution = retryRes;
-          validation = this.validator.validate(resolution.lat, resolution.lng, record.city);
+          validation = this.validator.validate(resolution.latitude, resolution.longitude, record.city);
         }
-        attempt++;
       }
 
-      const spatialStatus = validation.isValid ? "VERIFIED" : "FAIL_CEO_REVIEW_REQUIRED";
-      if (!validation.isValid) {
+      let spatialStatus = validation.isValid ? "VERIFIED" : "FAIL_CEO_REVIEW_REQUIRED";
+      
+      if (validation.isValid && resolution.source === "POSTAL_APPROXIMATE") {
+        spatialStatus = "WARNING";
+        warningCount++;
+        approximateCount++;
+      } else if (!validation.isValid) {
         console.error(`[ERROR] Strict failure for ${record.area_id} (${record.town}): ${validation.reason}.`);
         failCount++;
       } else {
         successCount++;
+        if (resolution.source.includes("APPROXIMATE")) {
+          approximateCount++;
+        }
       }
 
-      augmentedLines.push([...v, resolution.lat, resolution.lng, resolution.source, resolution.accuracy, spatialStatus].join(','));
+      augmentedLines.push([...v, resolution.latitude, resolution.longitude, resolution.source, resolution.accuracy, spatialStatus].join(','));
 
       if (validation.isValid) {
         geoFeatures.push({
           type: "Feature",
           geometry: {
             type: "Point",
-            coordinates: [resolution.lng, resolution.lat]
+            coordinates: [resolution.longitude, resolution.latitude]
           },
           properties: {
             area_id: record.area_id,
@@ -77,7 +86,7 @@ export class MapDataGenerator {
             town: record.town,
             postal_code: record.postal_code,
             pattern_rule: record.city.includes('四日市') ? 'PATTERN_B_SPLIT_INCLUDED' : 'PATTERN_A_WHOLE',
-            color_code: "#ef4444",
+            color_code: spatialStatus === "WARNING" ? "#f59e0b" : "#ef4444", // Yellow for warning, Red for verified
             spatial_status: spatialStatus
           }
         });
@@ -91,6 +100,9 @@ export class MapDataGenerator {
         sourceCSV: path.basename(csvPath),
         pointCount: geoFeatures.length,
         failCount,
+        warningCount,
+        approximateCount,
+        approximateRate: ((approximateCount / (lines.length - 1)) * 100).toFixed(2) + "%",
         engine: "v3.1 Pro Spatial Verification",
         generatedAt: new Date().toISOString()
       },
@@ -101,33 +113,37 @@ export class MapDataGenerator {
     const augmentedCsvContent = augmentedLines.join('\n');
     const csvHash = crypto.createHash('sha256').update(augmentedCsvContent).digest('hex');
 
-    // 1. Write augmented CSV back (overwrite the final verified areas with coordinate data)
     fs.writeFileSync(csvPath, augmentedCsvContent, 'utf8');
 
-    // 2. Write GeoJSON to output dir and root
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     fs.writeFileSync(path.join(outputDir, 'MIE-03_AREA_MAP.geojson'), geoContent, 'utf8');
     fs.writeFileSync(path.join(rootDir, 'MIE-03_AREA_MAP.geojson'), geoContent, 'utf8');
 
-    // 3. Write evidence.json
     const visualizationUrl = 'https://k-iwasa-mk.github.io/posting-map-system-dev/MIE-03_SPATIAL_VERIFICATION/';
+    
+    // Spatial Accuracy Gate
+    const gatePassed = failCount === 0;
+
     const evidenceData = {
       district: "MIE-03",
       csvHash,
       geoHash,
-      engine: "v3.1 Pro Spatial Verification",
+      engine: "v3.1 Pro Spatial Verification (Google Maps API)",
       totalProcessed: lines.length - 1,
       verifiedSuccess: successCount,
+      warningCount,
       failedReviewRequired: failCount,
-      spatialAccuracyGate: failCount === 0 ? "SPATIAL_VERIFIED" : "COORDINATE_CHECKED",
+      approximateRate: ((approximateCount / (lines.length - 1)) * 100).toFixed(2) + "%",
+      spatialAccuracyGate: gatePassed ? "SPATIAL_VERIFIED" : "COORDINATE_CHECKED",
       visualizationUrl,
       verifiedBy: "CEO",
-      status: "PENDING_APPROVAL",
+      status: "PENDING_APPROVAL", // CEO Data Acceptance Gate remains PENDING_APPROVAL
       generatedAt: new Date().toISOString()
     };
     fs.writeFileSync(path.join(outputDir, 'evidence.json'), JSON.stringify(evidenceData, null, 2), 'utf8');
 
-    console.log(`✅ Spatial Verification Complete: ${successCount} verified, ${failCount} failed.`);
+    console.log(`✅ Spatial Verification Complete: ${successCount} verified, ${warningCount} warnings, ${failCount} failed.`);
+    console.log(`📊 Approximate Rate: ${evidenceData.approximateRate}`);
     console.log(`🗺️ Updated CSV, GeoJSON & evidence.json in ${outputDir}`);
   }
 }

@@ -1,10 +1,46 @@
 import { AddressCoordinateResolver } from '../../../src/platform/spatial-verification-v3/resolver/AddressCoordinateResolver';
 import { CoordinateValidator } from '../../../src/platform/spatial-verification-v3/validator/CoordinateValidator';
 import { WaterAreaDetector } from '../../../src/platform/spatial-verification-v3/validator/WaterAreaDetector';
+import { SecretProvider } from '../../../src/platform/spatial-verification-v3/resolver/SecretProvider';
 
-function runTests() {
+// Mock fetch globally
+(global as any).fetch = async (url: string) => {
+  const decodedUrl = decodeURIComponent(url);
+  // Simple mock to return controlled responses for tests
+  return {
+    json: async () => {
+      if (decodedUrl.includes('〒999-9999')) {
+        return {
+          status: "OK",
+          results: [{
+            geometry: {
+              location: { lat: 35.0350, lng: 136.7020 }, // Some land coord
+              location_type: "APPROXIMATE"
+            }
+          }]
+        };
+      } else if (decodedUrl.includes('桑名市江場')) {
+        return {
+          status: "OK",
+          results: [{
+            geometry: {
+              location: { lat: 35.0500, lng: 136.6500 }, // Safe kuwana coord
+              location_type: "ROOFTOP"
+            }
+          }]
+        };
+      }
+      return { status: "ZERO_RESULTS", results: [] };
+    }
+  };
+};
+
+// Mock SecretProvider to prevent error
+SecretProvider.getGoogleMapsApiKey = () => "mock-api-key";
+
+async function runTests() {
   console.log("==================================================");
-  console.log("🧪 RUNNING MIE-03 SPATIAL VERIFICATION V3.1 PRO TESTS");
+  console.log("🧪 RUNNING MIE-03 SPATIAL VERIFICATION V3.1 PRO TESTS (Google API Mock)");
   console.log("==================================================\n");
 
   const resolver = new AddressCoordinateResolver();
@@ -32,12 +68,12 @@ function runTests() {
   }
 
   // ---------------------------------------------------------
-  // Case 2: 補正後ではなく再取得 (Retry Resolution)
+  // Case 2: 郵便番号フォールバック (Retry Resolution)
   // ---------------------------------------------------------
-  console.log("\n[CASE 2] Resolver Retry Logic");
-  const retryResult = resolver.retryResolve("MIE03-999999", "桑名市", "長島町○○", 1);
-  if (retryResult && retryResult.source === "OAZA_CENTROID" && retryResult.accuracy === "C") {
-    console.log("✅ PASS: Resolver correctly fell back to OAZA_CENTROID with C accuracy on retry.");
+  console.log("\n[CASE 2] Resolver Postal Code Fallback Logic");
+  const retryResult = await resolver.retryResolve("999-9999");
+  if (retryResult && retryResult.source === "POSTAL_APPROXIMATE" && retryResult.accuracy === "C") {
+    console.log("✅ PASS: Resolver correctly fell back to POSTAL_APPROXIMATE with C accuracy.");
   } else {
     console.error("❌ FAIL: Resolver retry logic failed.");
     process.exit(1);
@@ -47,7 +83,6 @@ function runTests() {
   // Case 3: 四日市市 MIE-02地域座標 -> REJECT
   // ---------------------------------------------------------
   console.log("\n[CASE 3] Yokkaichi MIE-02 Coordinate -> REJECT");
-  // MIE-02 Yokkaichi (South Yokkaichi e.g. Hinaga 34.9500, 136.6000)
   const validateResult3 = validator.validate(34.9500, 136.6000, "四日市市");
   if (!validateResult3.isValid && validateResult3.status === "REJECTED_BOUNDARY_LEAK") {
     console.log("✅ PASS: Correctly rejected Yokkaichi coordinate outside MIE-03 inclusion zone.");
@@ -60,16 +95,19 @@ function runTests() {
   // Case 4: 正常住所 (桑名市江場) -> PASS
   // ---------------------------------------------------------
   console.log("\n[CASE 4] Normal Address (Kuwana Eba) -> PASS");
-  const resolveResult4 = resolver.resolve("MIE03-000150", "桑名市", "江場", 100);
-  const validateResult4 = validator.validate(resolveResult4.lat, resolveResult4.lng, "桑名市");
+  const resolveResult4 = await resolver.resolve("桑名市", "江場");
+  const validateResult4 = validator.validate(resolveResult4.latitude, resolveResult4.longitude, "桑名市");
   if (validateResult4.isValid && validateResult4.status === "VERIFIED") {
-    console.log(`✅ PASS: Kuwana Eba resolved and verified successfully (Lat: ${resolveResult4.lat}, Lng: ${resolveResult4.lng}).`);
+    console.log(`✅ PASS: Kuwana Eba resolved and verified successfully (Lat: ${resolveResult4.latitude}, Lng: ${resolveResult4.longitude}).`);
   } else {
     console.error(`❌ FAIL: Normal address was rejected. Reason: ${validateResult4.reason}`);
     process.exit(1);
   }
 
-  console.log("\n✅ ALL TESTS PASSED: Spatial Verification Engine v3.1 Pro is strictly enforcing data accuracy.");
+  console.log("\n✅ ALL TESTS PASSED: Spatial Verification Engine v3.1 Pro API Mock.");
 }
 
-runTests();
+runTests().catch(err => {
+  console.error("Test execution failed:", err);
+  process.exit(1);
+});
