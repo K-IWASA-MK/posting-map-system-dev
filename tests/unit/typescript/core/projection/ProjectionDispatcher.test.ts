@@ -1,7 +1,4 @@
-import { EventBus } from '../../../../../sdk/core/eventbus/EventBus';
-import { EventChannel } from '../../../../../sdk/core/eventbus/EventChannel';
-import { EventType } from '../../../../../sdk/core/eventbus/EventType';
-import { EventSource } from '../../../../../sdk/core/eventbus/EventSource';
+import { AIOSEventBus } from '../../../../../sdk/core/event/AIOSEventBus';
 import { ProjectionFactory } from '../../../../../sdk/core/projection/ProjectionFactory';
 import { ProjectionState } from '../../../../../sdk/core/projection/ProjectionState';
 
@@ -14,13 +11,11 @@ function assert(condition: boolean, message: string) {
 async function runTests() {
   console.log('Running ProjectionDispatcher tests...');
 
-  const bus = new EventBus();
+  const bus = new AIOSEventBus();
   const { repository, dispatcher } = ProjectionFactory.createInMemory();
 
-  bus.subscribe({
-    subscriptionId: 'SUB-PROJECTION',
-    subscriberName: 'ProjectionSub',
-    subscriber: dispatcher
+  bus.subscribe('*', async (event) => {
+    await dispatcher.onEvent(event);
   });
 
   const execId = 'EXEC-DISP-1';
@@ -28,15 +23,15 @@ async function runTests() {
   // 1. Publish ExecutionStarted
   await bus.publish({
     eventId: 'EVT-1',
-    eventType: EventType.ExecutionStarted,
-    channel: EventChannel.EXECUTION,
-    source: EventSource.DevelopmentOS,
-    executionId: execId,
+    eventType: 'ExecutionStarted',
+    eventVersion: '1.0.0',
+    occurredAt: new Date().toISOString(),
+    producerRuntimeId: 'aios.test',
     correlationId: 'CORR-1',
-    timestamp: new Date().toISOString(),
-    payloadType: 'ExecutionStartedPayload',
-    payload: {},
-    schemaVersion: '1.0.0'
+    causationId: 'CAUS-1',
+    payload: {
+      executionId: execId
+    }
   });
 
   const snap1 = await repository.findById(execId);
@@ -47,15 +42,15 @@ async function runTests() {
   // 2. Unknown Event Test
   await bus.publish({
     eventId: 'EVT-UNKNOWN',
-    eventType: 'UnknownAction' as any,
-    channel: EventChannel.EXECUTION,
-    source: EventSource.DevelopmentOS,
-    executionId: execId,
+    eventType: 'UnknownAction',
+    eventVersion: '1.0.0',
+    occurredAt: new Date().toISOString(),
+    producerRuntimeId: 'aios.test',
     correlationId: 'CORR-1',
-    timestamp: new Date().toISOString(),
-    payloadType: 'UnknownPayload',
-    payload: {},
-    schemaVersion: '1.0.0'
+    causationId: 'CAUS-1',
+    payload: {
+      executionId: execId
+    }
   });
 
   const snap2 = await repository.findById(execId);
@@ -78,3 +73,4 @@ runTests().catch(e => {
   console.error(e);
   process.exit(1);
 });
+

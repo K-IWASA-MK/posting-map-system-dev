@@ -1,4 +1,4 @@
-import { EventBus } from '../../eventbus/EventBus';
+import { AIOSEventBus } from '../../event/AIOSEventBus';
 import { InMemoryTelemetryRepository } from '../../telemetry/InMemoryTelemetryRepository';
 import { InMemoryProjectionRepository } from '../../projection/InMemoryProjectionRepository';
 import { InMemoryMetricsRepository } from '../../metrics/InMemoryMetricsRepository';
@@ -24,7 +24,8 @@ export class ObservabilityFactory {
 
     // 1. Initialize EventBus
     initLog.push('EventBus');
-    const eventBus = new EventBus();
+    const eventBus = new AIOSEventBus();
+
 
     // 2. Initialize Telemetry
     initLog.push('Telemetry');

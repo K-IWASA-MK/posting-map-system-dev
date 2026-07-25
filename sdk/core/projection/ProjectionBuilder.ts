@@ -1,7 +1,6 @@
 import { IProjectionBuilder } from './IProjectionBuilder';
 import { IProjectionRepository } from './IProjectionRepository';
-import { EventEnvelope } from '../eventbus/EventEnvelope';
-import { EventType } from '../eventbus/EventType';
+import { AIOSEvent } from '../event/AIOSEvent';
 import { ProjectionState } from './ProjectionState';
 import { ProjectionStage } from './ProjectionStage';
 import { ProjectionModel } from './ProjectionModel';
@@ -15,8 +14,8 @@ export class ProjectionBuilder implements IProjectionBuilder {
     this.repository = repository;
   }
 
-  public async build(envelope: EventEnvelope): Promise<void> {
-    const executionId = envelope.executionId;
+  public async build(event: AIOSEvent): Promise<void> {
+    const executionId = (event.payload as any)?.executionId || event.correlationId;
     
     // Get existing snapshot or build initial one
     const existing = await this.repository.findById(executionId);
@@ -27,37 +26,37 @@ export class ProjectionBuilder implements IProjectionBuilder {
     let targetStatus = currentStatus;
     let targetStage = existing ? existing.projection.currentStage : ProjectionStage.NONE;
 
-    switch (envelope.eventType) {
-      case EventType.SystemBoot:
+    switch (event.eventType) {
+      case 'SystemBoot':
         targetStatus = ProjectionState.BOOTING;
         targetStage = ProjectionStage.NONE;
         break;
-      case EventType.SystemReady:
+      case 'SystemReady':
         targetStatus = ProjectionState.READY;
         targetStage = ProjectionStage.NONE;
         break;
-      case EventType.ExecutionStarted:
+      case 'ExecutionStarted':
         targetStatus = ProjectionState.RUNNING;
         targetStage = ProjectionStage.CONTEXT;
         break;
-      case EventType.PluginStarted:
+      case 'PluginStarted':
         targetStatus = ProjectionState.RUNNING;
         targetStage = ProjectionStage.PLUGIN;
         break;
-      case EventType.ValidationStarted:
+      case 'ValidationStarted':
         targetStatus = ProjectionState.RUNNING;
         targetStage = ProjectionStage.VALIDATION;
         break;
-      case EventType.ReviewStarted:
+      case 'ReviewStarted':
         targetStatus = ProjectionState.RUNNING;
         targetStage = ProjectionStage.REVIEW;
         break;
-      case EventType.ExecutionCompleted:
+      case 'ExecutionCompleted':
         targetStatus = ProjectionState.COMPLETED;
         targetStage = ProjectionStage.COMPLETED;
         break;
-      case EventType.ExecutionFailed:
-      case EventType.SystemError:
+      case 'ExecutionFailed':
+      case 'SystemError':
         targetStatus = ProjectionState.ERROR;
         targetStage = ProjectionStage.NONE;
         break;
@@ -75,10 +74,10 @@ export class ProjectionBuilder implements IProjectionBuilder {
     const updatedModel: ProjectionModel = Object.freeze({
       projectionId: `PRJ-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
       executionId,
-      correlationId: envelope.correlationId,
+      correlationId: event.correlationId,
       currentStage: targetStage,
       status: targetStatus,
-      source: envelope.source,
+      source: event.producerRuntimeId,
       updatedAt: new Date().toISOString(),
       schemaVersion: '1.0.0'
     });
@@ -92,3 +91,4 @@ export class ProjectionBuilder implements IProjectionBuilder {
     await this.repository.save(snapshot);
   }
 }
+

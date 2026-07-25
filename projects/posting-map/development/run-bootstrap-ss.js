@@ -2,7 +2,7 @@
  * POSTING MAP - Bootstrap Script Properties with target Spreadsheet ID (MIE-03 v1)
  */
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec";
 
 async function main() {
   console.log(`📡 Bootstrapping SPREADSHEET_ID to "1xQUvlCaUO103rjSGmdcFQQFkukodG4Dg9mS_teWT7uA"...`);

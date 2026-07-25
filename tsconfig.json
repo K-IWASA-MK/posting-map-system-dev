@@ -21,6 +21,6 @@
       "@shared/*": ["shared/*"]
     }
   },
-  "include": ["projects/posting-map/src/**/*",  "kernel/**/*", "runtime/**/*", "sdk/**/*", "core/**/*", "tests/**/*", "shared/**/*", "aios/**/*", "domains/**/*", "apps/**/*"],
+  "include": ["projects/posting-map/src/**/*", "projects/posting-map/apps/**/*", "kernel/**/*", "runtime/**/*", "sdk/**/*", "core/**/*", "tests/**/*", "shared/**/*", "aios/**/*", "domains/**/*", "apps/**/*"],
   "exclude": ["**/deprecated/**/*", "node_modules", "tests/**/*", "transformation/**/*"]
 }

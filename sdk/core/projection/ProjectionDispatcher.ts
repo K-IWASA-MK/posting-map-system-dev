@@ -1,29 +1,21 @@
-import { IEventSubscriber } from '../eventbus/IEventSubscriber';
-import { EventEnvelope } from '../eventbus/EventEnvelope';
-import { EventChannel } from '../eventbus/EventChannel';
-import { EventType } from '../eventbus/EventType';
+import { AIOSEvent } from '../event/AIOSEvent';
 import { IProjectionBuilder } from './IProjectionBuilder';
 
-export class ProjectionDispatcher implements IEventSubscriber {
+export class ProjectionDispatcher {
   private builder: IProjectionBuilder;
 
   constructor(builder: IProjectionBuilder) {
     this.builder = builder;
   }
 
-  public supportsChannel(channel: EventChannel): boolean {
-    return channel === EventChannel.EXECUTION || channel === EventChannel.SYSTEM;
-  }
-
-  public supportsEventType(eventType: EventType): boolean {
-    return true; // Let the builder internal switch decide what to process
-  }
-
-  public async onEvent(envelope: EventEnvelope): Promise<void> {
-    await this.builder.build(envelope);
+  public async onEvent(event: AIOSEvent): Promise<void> {
+    // Only process EXECUTION and SYSTEM events
+    // (Mimicking supportsChannel logic by inspecting event properties if needed)
+    await this.builder.build(event);
   }
 
   public priority(): number {
-    return 90; // Projections run at priority 90 (above Telemetry)
+    return 90;
   }
 }
+

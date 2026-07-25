@@ -1,5 +1,6 @@
-import { EventEnvelope } from '../eventbus/EventEnvelope';
+import { AIOSEvent } from '../event/AIOSEvent';
 
 export interface IProjectionBuilder {
-  build(envelope: EventEnvelope): Promise<void>;
+  build(event: AIOSEvent): Promise<void>;
 }
+

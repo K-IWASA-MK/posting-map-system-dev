@@ -1,7 +1,4 @@
-import { EventBus } from '../../../../../sdk/core/eventbus/EventBus';
-import { EventChannel } from '../../../../../sdk/core/eventbus/EventChannel';
-import { EventType } from '../../../../../sdk/core/eventbus/EventType';
-import { EventSource } from '../../../../../sdk/core/eventbus/EventSource';
+import { AIOSEventBus } from '../../../../../sdk/core/event/AIOSEventBus';
 import { TelemetryFactory } from '../../../../../sdk/core/telemetry/TelemetryFactory';
 import { MetricName } from '../../../../../sdk/core/telemetry/MetricName';
 
@@ -15,34 +12,30 @@ async function runTests() {
   console.log('Running TelemetryDispatcher tests...');
 
   // Setup EventBus and Telemetry components
-  const bus = new EventBus();
+  const bus = new AIOSEventBus();
   const { repository, dispatcher } = TelemetryFactory.createInMemory();
 
-  bus.subscribe({
-    subscriptionId: 'SUB-TELEMETRY',
-    subscriberName: 'TelemetrySub',
-    subscriber: dispatcher
+  bus.subscribe('*', async (event) => {
+    await dispatcher.onEvent(event);
   });
 
   // Test 1: Multiple Metrics Generation (1 Event -> 2 TelemetryRecords)
-  const completedEnvelope = {
+  const completedEvent = {
     eventId: 'EVT-COMPLETED',
-    eventType: EventType.ExecutionCompleted,
-    channel: EventChannel.EXECUTION,
-    source: EventSource.DevelopmentOS,
-    executionId: 'EXEC-INT-A',
+    eventType: 'ExecutionCompleted',
+    eventVersion: '1.0.0',
+    occurredAt: new Date().toISOString(),
+    producerRuntimeId: 'aios.test',
     correlationId: 'CORR-INT-A',
-    timestamp: new Date().toISOString(),
-    payloadType: 'ExecutionCompletedPayload',
+    causationId: 'CAUS-INT-A',
     payload: {
       executionId: 'EXEC-INT-A',
       durationMs: 820,
       status: 'PASS'
-    },
-    schemaVersion: '1.0.0'
+    }
   };
 
-  await bus.publish(completedEnvelope);
+  await bus.publish(completedEvent);
 
   const execRecords = await repository.findByExecutionId('EXEC-INT-A');
   assert(execRecords.length === 2, 'ExecutionCompleted should yield exactly 2 TelemetryRecords (Duration and simulated Cost)');
@@ -54,22 +47,20 @@ async function runTests() {
   assert(costRecord !== undefined && costRecord.value === 0.05, 'Simulated Cost should match mapped value');
 
   // Test 2: Unknown Event Test (Should skip, not crash)
-  const unknownEnvelope = {
+  const unknownEvent = {
     eventId: 'EVT-UNKNOWN',
-    eventType: 'UnknownAction' as any, // Unregistered / unknown event type
-    channel: EventChannel.EXECUTION,
-    source: EventSource.DevelopmentOS,
-    executionId: 'EXEC-INT-B',
+    eventType: 'UnknownAction',
+    eventVersion: '1.0.0',
+    occurredAt: new Date().toISOString(),
+    producerRuntimeId: 'aios.test',
     correlationId: 'CORR-INT-B',
-    timestamp: new Date().toISOString(),
-    payloadType: 'UnknownPayload',
-    payload: {},
-    schemaVersion: '1.0.0'
+    causationId: 'CAUS-INT-B',
+    payload: {}
   };
 
   let threwError = false;
   try {
-    await bus.publish(unknownEnvelope);
+    await bus.publish(unknownEvent);
   } catch (e) {
     threwError = true;
   }
@@ -85,3 +76,4 @@ runTests().catch(e => {
   console.error(e);
   process.exit(1);
 });
+

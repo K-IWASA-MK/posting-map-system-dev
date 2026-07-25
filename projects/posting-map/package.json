@@ -4,6 +4,19 @@
   "description": "POSTING MAP Product",
   "dependencies": {
     "@kiwasa/aios-core": "*",
-    "@kiwasa/shared": "*"
-  }
+    "@kiwasa/shared": "*",
+    "puppeteer": "^25.3.0"
+  },
+  "main": "client-loader.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
 }

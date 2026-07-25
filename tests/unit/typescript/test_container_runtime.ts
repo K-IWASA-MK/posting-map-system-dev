@@ -215,14 +215,21 @@ async function runTests() {
   };
 
   // Test executing via LauncherExecutionRuntime using container
-  const proc = await launcherRuntime.execute(mockResult, {
-    useContainer: true,
-    containerId: 'C-MOCK',
-    sandboxProfile: 'LIMITED_NETWORK',
-    checkQueue: true,
-    queueId: 'Q-ITEM-001'
-  });
-  assert(proc !== undefined, 'Process execution utilizing container launch succeeded');
+  let proc: any;
+  try {
+    proc = await launcherRuntime.execute(mockResult, {
+      useContainer: true,
+      containerId: 'C-MOCK',
+      sandboxProfile: 'LIMITED_NETWORK',
+      checkQueue: true,
+      queueId: 'Q-ITEM-001'
+    });
+    assert(proc !== undefined, 'Process execution utilizing container launch succeeded');
+  } finally {
+    if (proc) {
+      await proc.kill();
+    }
+  }
 
   console.log('   ✓ Launcher Integration PASSED');
 
