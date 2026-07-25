@@ -7,6 +7,8 @@ import { AddressMasterVerifier, AddressMasterAccuracyReport } from '../verifier/
 import { AddressMasterReleaseGate, AddressMasterReleaseManifest } from '../gate/AddressMasterReleaseGate';
 import { BoundaryMasterFoundation, DistrictBoundaryDefinition, BoundaryMasterManifest, BoundAreaRecord } from '../boundary/BoundaryMasterFoundation';
 import { BoundaryMasterVerifier, BoundaryAccuracyReport } from '../verifier/BoundaryMasterVerifier';
+import { AreaGenerator, AreaGenerationManifest, FinalAreaRecord } from '../area/AreaGenerator';
+import { AreaAccuracyVerifier, AreaAccuracyReport } from '../area/AreaAccuracyVerifier';
 
 export interface NationalPipelineResult {
   rawAuditManifest: RawAuditManifest;
@@ -15,7 +17,10 @@ export interface NationalPipelineResult {
   releaseManifest: AddressMasterReleaseManifest;
   boundaryManifest?: BoundaryMasterManifest;
   boundaryAccuracyReport?: BoundaryAccuracyReport;
+  areaManifest?: AreaGenerationManifest;
+  areaAccuracyReport?: AreaAccuracyReport;
   boundRecords?: BoundAreaRecord[];
+  finalRecords?: FinalAreaRecord[];
   records: AddressMasterRecord[];
 }
 
@@ -25,7 +30,7 @@ export class NationalAddressDataPipeline {
     targetBoundaryDef?: DistrictBoundaryDefinition
   ): NationalPipelineResult {
     console.log("==================================================");
-    console.log("🌏 RUNNING NATIONAL ADDRESS DATA PIPELINE (STEP 1 - STEP 8)");
+    console.log("🌏 RUNNING NATIONAL ADDRESS DATA PIPELINE (STEP 1 - STEP 9)");
     console.log("==================================================\n");
 
     const rawDir = path.join(dataDir, 'raw');
@@ -84,10 +89,13 @@ export class NationalAddressDataPipeline {
       throw new Error(`[AddressMasterReleaseGate] GATE REJECTED. National Address Master release failed.`);
     }
 
-    // STEP 7: Boundary Master Foundation (Overlay RELEASED ADDRESS_MASTER with District Boundary)
+    // STEP 7 & STEP 8: Boundary Master Foundation & Verification
     let boundaryManifest: BoundaryMasterManifest | undefined;
     let boundaryAccuracyReport: BoundaryAccuracyReport | undefined;
+    let areaManifest: AreaGenerationManifest | undefined;
+    let areaAccuracyReport: AreaAccuracyReport | undefined;
     let boundRecords: BoundAreaRecord[] | undefined;
+    let finalRecords: FinalAreaRecord[] | undefined;
 
     if (targetBoundaryDef) {
       console.log(`📌 [STEP 7] Running Boundary Master Foundation for ${targetBoundaryDef.districtId}...`);
@@ -100,7 +108,6 @@ export class NationalAddressDataPipeline {
       boundaryManifest = boundaryRes.manifest;
       boundRecords = boundaryRes.boundRecords;
 
-      // STEP 8: Boundary Master Accuracy Verification Engine
       console.log(`📌 [STEP 8] Running Boundary Master Accuracy Verification Engine for ${targetBoundaryDef.districtId}...`);
       boundaryAccuracyReport = BoundaryMasterVerifier.verifyBoundaryMaster(
         boundaryManifest,
@@ -113,6 +120,27 @@ export class NationalAddressDataPipeline {
       if (boundaryAccuracyReport.verificationStatus !== 'BOUNDARY_ACCURACY_VERIFICATION_PASS') {
         throw new Error(`[BoundaryMasterVerifier] VERIFICATION FAILED for ${targetBoundaryDef.districtId}`);
       }
+
+      // STEP 9: POSTING MAP Area Generation & Verification Engine
+      console.log(`📌 [STEP 9] Running Area Generation Engine for ${targetBoundaryDef.districtId}...`);
+      const areaRes = AreaGenerator.generateFinalAreas(
+        boundaryManifest,
+        boundaryAccuracyReport,
+        boundRecords,
+        path.join(dataDir, 'output')
+      );
+      areaManifest = areaRes.manifest;
+      finalRecords = areaRes.finalRecords;
+
+      areaAccuracyReport = AreaAccuracyVerifier.verifyFinalAreas(
+        areaManifest,
+        finalRecords,
+        path.join(dataDir, 'output')
+      );
+
+      if (areaAccuracyReport.verificationStatus !== 'AREA_ACCURACY_VERIFICATION_PASS') {
+        throw new Error(`[AreaAccuracyVerifier] VERIFICATION FAILED for ${targetBoundaryDef.districtId}`);
+      }
     }
 
     return {
@@ -122,7 +150,10 @@ export class NationalAddressDataPipeline {
       releaseManifest,
       boundaryManifest,
       boundaryAccuracyReport,
+      areaManifest,
+      areaAccuracyReport,
       boundRecords,
+      finalRecords,
       records: normalizedRecords
     };
   }

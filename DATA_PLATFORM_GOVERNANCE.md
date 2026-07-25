@@ -1,60 +1,60 @@
 # POSTING MAP Data Platform 基本原則 & ガバナンス規範書 (DATA_PLATFORM_GOVERNANCE.md)
 
-Version: 9.0 (全国289選挙区展開用・Boundary Master Accuracy Verification Foundation 完全統合版)  
+Version: 10.0 (全国289選挙区展開用・Area Generation Foundation 完全決定論的統合版)  
 Author: 岩佐CEO  
-System: POSTING MAP / FIELD OPERATIONS OS / BOUNDARY MASTER VERIFICATION ENGINE  
+System: POSTING MAP / FIELD OPERATIONS OS / AREA GENERATION ENGINE  
 
 ---
 
-## ■ 最重要原則: 選挙区境界精度検証層 第一原則 (Boundary Verification Prerequisite)
+## ■ 最重要原則: エリア生成 & エリア精度検証 第一原則 (Area Generation Prerequisite)
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 住所基盤 (ADDRESS_MASTER) と 選挙区境界を統合した後、          │
-│ 直ちに FINAL CSV 生成へ進んではならない。                    │
-│ 【STEP 8: Boundary Master Accuracy Verification Foundation】│
-│ を挟み、① 自治体包含、② 分割自治体差分 (四日市市第2区除外)、│
-│ ③ 未所属住所 0 件証明、④ 二重所属 0 件証明 の 4 大検証を      │
-│ 100% クリアしてから初めて POSTING MAP AREA CSV を生成する。 │
+│ ❌ 郵便 CSV から直接エリア化する                              │
+│ ❌ 旧 CSV や過去の件数 (651件等) から逆算する                  │
+│                                                             │
+│ ✅ RELEASED ADDRESS_MASTER (STEP 6 承認) ＋                  │
+│ ✅ VERIFIED Boundary Master (STEP 8 境界精度検証 PASS)       │
+│ ➔ 【STEP 9: Area Generation Engine】で FINAL_AREA.csv を生成   │
+│ ➔ 【STEP 9-2: Area Accuracy Verifier】で郵便番号昇順・一意性を検証│
+│ ➔ 検証 PASS 後に初めてスプレッドシート表示レイヤーへ転送する  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ■ 正式な 8 段階 不可逆プラットフォーム フロー
+## ■ 正式な 9 段階 不可逆プラットフォーム フロー
 
 ```
-[STEP 1] 全国最新 Raw データ取得 (日本郵便 KEN_ALL.CSV ＋ 行政住所マスター)
-            │
-            ▼
-[STEP 2] Raw Data Audit (raw/ 保持 & SHA-256 証跡管理 `raw_audit_manifest.json`)
-            │
-            ▼
-[STEP 3] 全国住所階層解析 (Rule v3 エンジン / 自治体名は階層に含まない)
-            │
-            ▼
+[STEP 1] 全国最新 Raw データ取得 (KEN_ALL.CSV ＋ 行政マスター)
+   │
+[STEP 2] Raw Data Audit (raw_audit_manifest.json SHA-256)
+   │
+[STEP 3] 全国住所階層解析 (Rule v3 Engine / 自治体を階層から除外)
+   │
 [STEP 4] ADDRESS_MASTER.csv & SHA-256 マニフェスト生成
-            │
-            ▼
+   │
 [STEP 5] 全国 ADDRESS_MASTER 品質検証層 (欠損0件証明・安全表記揺れ統一)
-            │
-            ▼
-[STEP 6] Address Master Release Gate (状態遷移: GENERATED ➔ RELEASED)
-            │
-            ▼ (ステータスが RELEASED の場合のみ次段階を許可)
+   │
+[STEP 6] Address Master Release Gate ➔ 【RELEASED】承認
+   │
 [STEP 7] Boundary Master Foundation (RELEASED ADDRESS_MASTER ＋ 行政区割り)
-         ├─ Pattern A: 全域包含 (7 自治体)
-         └─ Pattern B: 分割自治体 (四日市市) 包含/除外キーワード照合
-            │
-            ▼
-[STEP 8] Boundary Master Accuracy Verification Foundation ★新規構築
-         ├─ ① 自治体包含検証 (`ALL_MUNICIPALITIES_INCLUDED_PASS`)
-         ├─ ② 分割自治体差分検証 (四日市市第2区 0% 混入遮断 `SPLIT_DIFFERENCE_EXACT_PASS`)
-         ├─ ③ 未所属住所 0 件検証 (`unassignedAddressCount === 0`)
-         └─ ④ 二重所属 0 件検証 (`dualAssignedCount === 0`)
-            (boundary/boundary_accuracy_{districtId}_report.json 出力)
-            │
-            ▼ (境界検証 100% PASS のみ最終生成を解禁)
-[POSTING MAP AREA CSV] 確定 SSOT CSV ➔ スプレッドシート表示レイヤー化
+   │
+[STEP 8] Boundary Master Accuracy Verification Foundation (4大境界検証 PASS)
+   │
+   ▼ (RELEASED 住所 ＋ 検証済み境界 のみエリア化を解禁)
+[STEP 9-1] Area Generation Engine ★新規実装
+         ├─ 決定論的 area_id 発番 (`MIE03-000001` ~ `MIE03-000684`)
+         ├─ 郵便番号昇順ソート
+         └─ 成果物: output/{districtId}_FINAL_VERIFIED_AREAS.csv & area_generation_{districtId}_manifest.json
+   │
+[STEP 9-2] Area Accuracy Verification Engine ★新規実装
+         ├─ ① area_id 重複 0 件検証 (`duplicateAreaIdCount === 0`)
+         ├─ ② 郵便番号昇順ソート検証 (`postalCodeAscendingPass === true`)
+         └─ ③ SHA-256 ファイル整合性検証
+            (output/area_accuracy_{districtId}_report.json 出力)
+   │
+   ▼ (エリア精度検証 PASS 後に初めてスプレッドシート化)
+[SPREADSHEET] Google Spreadsheet 表示レイヤー化 (`MIE-03_DATA_ACCEPTANCE_REVIEW`)
 ```
 
 ---
@@ -68,5 +68,7 @@ System: POSTING MAP / FIELD OPERATIONS OS / BOUNDARY MASTER VERIFICATION ENGINE
 5. **`gate/AddressMasterReleaseGate.ts`**: STEP 6 リリースゲート (`RELEASED` 承認)
 6. **`boundary/BoundaryMasterFoundation.ts`**: STEP 7 選挙区境界統合エンジン
 7. **`verifier/BoundaryMasterVerifier.ts`**: STEP 8 選挙区境界精度検証エンジン
-8. **`pipeline/NationalAddressDataPipeline.ts`**: 8 段階統制パイプライン
-9. **`test_boundary_master_accuracy_verifier.ts`**: STEP 8 テストスイート (**100% PASS**)
+8. **`area/AreaGenerator.ts`**: STEP 9-1 確定 SSOT CSV エリア生成エンジン
+9. **`area/AreaAccuracyVerifier.ts`**: STEP 9-2 エリア精度検証エンジン
+10. **`pipeline/NationalAddressDataPipeline.ts`**: 9 段階統制パイプライン
+11. **`test_area_generation_foundation.ts`**: STEP 9 テストスイート (**100% PASS**)
