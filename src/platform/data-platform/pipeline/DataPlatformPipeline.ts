@@ -9,6 +9,7 @@ import { DistrictBoundaryResolver } from '../resolver/DistrictBoundaryResolver';
 import { AddressHierarchyExtractor } from '../extractor/AddressHierarchyExtractor';
 import { BoundaryConfirmationGate } from '../gate/BoundaryConfirmationGate';
 import { BoundaryEvidenceGate } from '../gate/BoundaryEvidenceGate';
+import { FinalCsvGenerator } from '../final-csv/FinalCsvGenerator';
 
 export interface PipelineOptions {
   profile?: DistrictValidationProfile;
@@ -58,7 +59,7 @@ export class DataPlatformPipeline {
     const boundaryEvidence = this.boundaryResolver.resolveDistrictBoundary(profile.districtId, referenceDir);
     fs.writeFileSync(path.join(logsDir, 'boundary_evidence.json'), JSON.stringify(boundaryEvidence, null, 2), 'utf8');
 
-    // STEP 1.5: Boundary Evidence Gate (PROOF OF BOUNDARY DETERMINATION)
+    // STEP 1.5: Boundary Evidence Gate
     console.log('📌 [STEP 1.5] Running Boundary Evidence Gate...');
     const boundaryGateResult = BoundaryEvidenceGate.verifyAndGenerateProof(boundaryEvidence);
     fs.writeFileSync(path.join(logsDir, 'boundary_evidence_gate.json'), JSON.stringify(boundaryGateResult, null, 2), 'utf8');
@@ -68,8 +69,8 @@ export class DataPlatformPipeline {
     }
     console.log('✅ [BoundaryEvidenceGate] PASS! Yokkaichi boundary proof verified (included vs excluded subdistricts certified)');
 
-    // STEP 3: Address Hierarchy Extraction on Confirmed Boundary Areas
-    console.log('📌 [STEP 3] Running Address Hierarchy Extractor...');
+    // STEP 2: Address Extraction Rule v2 (Address Hierarchy Extraction on Confirmed Boundary Areas)
+    console.log('📌 [STEP 2] Running Address Hierarchy Extractor (Rule v2)...');
     const rawSeeds = [
       { city: '桑名市', town: '江場' },
       { city: 'いなべ市', town: '員弁町大泉' },
@@ -77,47 +78,25 @@ export class DataPlatformPipeline {
     ];
     const hierarchyNodes = this.hierarchyExtractor.extractHierarchy(boundaryEvidence, rawSeeds);
 
-    // STEP 4: Area Record Generation
-    console.log('📌 [STEP 4] Generating Area Records...');
-    const records: AreaRecord[] = this.extractor.extractDistrictAreas(profile, referenceDir);
+    // STEP 3: FINAL CSV Generator (SSOT Creation & Postal Ascending Sort)
+    console.log('📌 [STEP 3] Running FINAL CSV Generator (SSOT Output & Postal Code Ascending Sort)...');
+    const rawRecords: AreaRecord[] = this.extractor.extractDistrictAreas(profile, referenceDir);
+    const report = this.validator.validate(rawRecords, profile);
 
-    // STEP 5: Validate & Postal Sort
-    console.log('📌 [STEP 5] Validating & Sorting Records...');
-    const report = this.validator.validate(records, profile);
-
-    // STEP 6: Generate Final SSOT CSV File & SHA-256
-    console.log('📌 [STEP 6] Generating Final Verified CSV File...');
-    const csvFilename = `${profile.districtId}_FINAL_VERIFIED_AREAS.csv`;
-    const csvPath = path.join(outputDir, csvFilename);
-    const sha256Path = path.join(outputDir, `${csvFilename}.sha256`);
-
-    const csvHeader = 'area_id,district_id,prefecture,city,town,postal_code,municipality_code,source,generated_at,version,status,hash';
-    const csvLines = [csvHeader];
-
-    records.forEach(r => {
-      csvLines.push(
-        `${r.areaId},${r.districtId},${r.prefecture},${r.city},${r.town},${r.postalCode},${r.municipalityCode},${r.source},${r.generatedAt},${r.version},${r.status},${r.hash}`
-      );
-    });
-
-    const csvContent = csvLines.join('\n');
-    fs.writeFileSync(csvPath, csvContent, 'utf8');
-
-    const outputHash = crypto.createHash('sha256').update(csvContent).digest('hex');
-    fs.writeFileSync(sha256Path, `${outputHash}  ${csvFilename}\n`, 'utf8');
+    const finalCsvRes = FinalCsvGenerator.generateFinalCsv(profile.districtId, rawRecords, outputDir, logsDir);
 
     const evidence: DataPlatformEvidence = {
       pipeline: 'DataPlatformFoundation',
       district: profile.districtId,
       inputHash: boundaryEvidence.resolvedAt,
-      outputHash,
-      recordCount: records.length,
+      outputHash: finalCsvRes.outputHash,
+      recordCount: finalCsvRes.recordCount,
       validation: report.passed ? 'PASS' : 'FAIL',
       generatedBy,
       timestamp: new Date().toISOString(),
       details: {
         expectedCount: profile.expectedCount,
-        matchedCount: records.length,
+        matchedCount: finalCsvRes.recordCount,
         duplicatedCount: report.duplicateCount,
         profileVersion: profile.version
       }
@@ -125,7 +104,7 @@ export class DataPlatformPipeline {
 
     fs.writeFileSync(path.join(logsDir, 'platform_evidence.json'), JSON.stringify(evidence, null, 2), 'utf8');
 
-    return { records, evidence, report, csvPath };
+    return { records: rawRecords, evidence, report, csvPath: finalCsvRes.csvPath };
   }
 }
 
