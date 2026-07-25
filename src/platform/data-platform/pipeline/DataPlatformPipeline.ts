@@ -8,6 +8,7 @@ import { DataValidator, ValidationReport } from '../validator/DataValidator';
 import { DistrictBoundaryResolver } from '../resolver/DistrictBoundaryResolver';
 import { AddressHierarchyExtractor } from '../extractor/AddressHierarchyExtractor';
 import { BoundaryConfirmationGate } from '../gate/BoundaryConfirmationGate';
+import { BoundaryEvidenceGate } from '../gate/BoundaryEvidenceGate';
 
 export interface PipelineOptions {
   profile?: DistrictValidationProfile;
@@ -40,7 +41,7 @@ export class DataPlatformPipeline {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
-    // STEP 0: Municipality Split Risk Analysis & Boundary Confirmation Gate (CRITICAL GATE)
+    // STEP 0: Municipality Split Risk Analysis & Boundary Confirmation Gate (GATE 0)
     console.log('📌 [STEP 0] Running Municipality Split Risk Analysis & Boundary Confirmation Gate...');
     const rawMunicipalities = ['四日市市（一部）', '桑名市', 'いなべ市', '木曽岬町', '東員町', '菰野町', '朝日町', '川越町'];
     const boundaryManifest = BoundaryConfirmationGate.analyzeAndValidate(profile.districtId, rawMunicipalities);
@@ -52,10 +53,20 @@ export class DataPlatformPipeline {
     fs.writeFileSync(path.join(logsDir, 'boundary_confirmation_manifest.json'), JSON.stringify(boundaryManifest, null, 2), 'utf8');
     console.log(`✅ [BoundaryConfirmationGate] PASS! Pattern A Whole: ${boundaryManifest.wholeMunicipalities.length}, Pattern B Split: ${boundaryManifest.splitMunicipalities.length}`);
 
-    // STEP 1 & STEP 2: District Boundary Resolution & Target Area Determination
-    console.log('📌 [STEP 1 & STEP 2] Running District Boundary Resolver...');
+    // STEP 1: District Boundary Resolution
+    console.log('📌 [STEP 1] Running District Boundary Resolver...');
     const boundaryEvidence = this.boundaryResolver.resolveDistrictBoundary(profile.districtId, referenceDir);
     fs.writeFileSync(path.join(logsDir, 'boundary_evidence.json'), JSON.stringify(boundaryEvidence, null, 2), 'utf8');
+
+    // STEP 1.5: Boundary Evidence Gate (PROOF OF BOUNDARY DETERMINATION)
+    console.log('📌 [STEP 1.5] Running Boundary Evidence Gate...');
+    const boundaryGateResult = BoundaryEvidenceGate.verifyAndGenerateProof(boundaryEvidence);
+    fs.writeFileSync(path.join(logsDir, 'boundary_evidence_gate.json'), JSON.stringify(boundaryGateResult, null, 2), 'utf8');
+
+    if (boundaryGateResult.gateStatus !== 'PASS') {
+      throw new Error(`[BoundaryEvidenceGate] GATE REJECTED. Boundary proof verification failed for ${profile.districtId}`);
+    }
+    console.log('✅ [BoundaryEvidenceGate] PASS! Yokkaichi boundary proof verified (included vs excluded subdistricts certified)');
 
     // STEP 3: Address Hierarchy Extraction on Confirmed Boundary Areas
     console.log('📌 [STEP 3] Running Address Hierarchy Extractor...');

@@ -1,107 +1,83 @@
 # POSTING MAP Data Platform 基本原則 & ガバナンス規範書 (DATA_PLATFORM_GOVERNANCE.md)
 
-Version: 2.0  
+Version: 3.0  
 Author: 岩佐CEO  
 System: POSTING MAP / FIELD OPERATIONS OS / 289 DISTRICT EXPANSION ENGINE  
 
 ---
 
-## ■ 最重要原則: STEP 0 自治体分割リスク判定 & Boundary Confirmation Gate
+## ■ 最重要原則: STEP 0 (危険検知) ➔ STEP 1 (境界確定) ➔ STEP 1.5 (境界証明)
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 今後289選挙区へ展開する上で、最初に見るべきは「件数」ではなく  │
-│ 「この自治体は丸ごと使えるのか？それとも分割されているのか？」│
-│ 住所階層抽出の前に【STEP 0: 自治体分割リスク判定】を絶対強制する。 │
+│ 今後289選挙区へ展開する上で、境界事故率をゼロ化するために     │
+│ 【STEP 0: 危険検知】 ➔ 【STEP 1: 境界確定】 ➔ 【STEP 1.5: 境界証明】│
+│ の3段階品質チェックを必須条件とする。                          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-本プラットフォームにおけるデータ抽出の根本原因は、「件数合わせ」や「抽出精度」ではなく、**「抽出する前の地域認識工程 (STEP 0)」の欠如**にありました。
-
-全289選挙区展開に対応するため、データ生成前に必ず **`Boundary Confirmation Gate`** を通過しなければデータ生成（CSV出力）を実行してはなりません。
-
 ---
 
-## ■ 改訂版: 7 段階不可逆データ生成フロー
+## ■ 8 段階不可逆データ生成フロー (Complete Execution Pipeline)
 
 ```
-[STEP 0] 自治体分割リスク判定 (Municipality Split Risk Analysis)
-            │
-            ▼
-[Gate]   Boundary Confirmation Gate (品質ゲート通過必須)
-            │
-            ▼
-[STEP 1] 選挙区境界判定 (Boundary Resolution)
-            │
-            ▼
-[STEP 2] 対象地域確定 (Target Area Determination & Evidence)
-            │
-            ▼
-[STEP 3] 住所階層抽出 (Address Hierarchy Extraction)
-            │
-            ▼
-[STEP 4] POSTING MAP エリア生成 (Area Record Generation)
-            │
-            ▼
-[STEP 5] 郵便番号昇順ソート (Postal Code Ascending Sort)
-            │
-            ▼
-[STEP 6] 10件単位シート生成 (Final Verified CSV & SHA-256)
-```
-
----
-
-## ■ STEP 0: 分割パターン別分類ルール
-
-### パターン A：自治体全域が 1 選挙区 (完全包含)
-- **対象自治体例**: 桑名市, いなべ市, 木曽岬町, 東員町, 菰野町, 朝日町, 川越町 ➔ `MIE-03`
-- **処理フロー**: 自治体全域データ取得 ➔ 住所階層抽出 ➔ エリア生成
-
-### パターン B：自治体が複数選挙区に分割 (一部包含・境界複雑)
-- **対象自治体例**: 四日市市 ➔ `三重第2区` / `三重第3区`
-- **処理フロー**: 四日市市全域データ取得 ➔ 選挙区境界照合 ➔ `MIE-03`所属地域だけ抽出 ➔ 住所階層抽出 ➔ エリア生成
-
----
-
-## ■ 分割自治体チェック 4 大項目 (Municipality Boundary Check)
-
-AI社員（District Initialization Agent）は、データ生成前に必ず以下の 4 項目を判定する：
-
-1. **複数選挙区またぎの有無**: 自治体が複数小選挙区に跨っていないか？
-2. **一部地域フラグ**: 一部地域だけが対象選挙区になっていないか？
-3. **平成大合併の旧町村混在**: 旧市町村単位（例: 旧富田町、旧楠町）で区割りが分かれていないか？
-4. **郡・町名の類似混乱**: 桑名市と桑名郡（木曽岬町）、員弁郡と東員町、三重郡等の類似名称が混ざっていないか？
-
----
-
-## ■ MIE-03 分割リスク判定判定結果
-
-```
-MIE-03 構成自治体
- ├─ 桑名市    [パターン A: 全域確認 ✅]
- ├─ いなべ市  [パターン A: 全域確認 ✅]
- ├─ 木曽岬町  [パターン A: 全域確認 ✅]
- ├─ 東員町    [パターン A: 全域確認 ✅]
- ├─ 菰野町    [パターン A: 全域確認 ✅]
- ├─ 朝日町    [パターン A: 全域確認 ✅]
- ├─ 川越町    [パターン A: 全域確認 ✅]
- └─ 四日市市  [パターン B: ★分割確認必須 (第2区所属地域を除外) ✅]
+[STEP 0]   自治体分割リスク判定 (Municipality Split Risk Analysis)
+              │
+              ▼
+[Gate 0]   Boundary Confirmation Gate (リスク検知通過)
+              │
+              ▼
+[STEP 1]   選挙区境界判定 (Boundary Resolution)
+              │
+              ▼
+[STEP 1.5] 境界証明ゲート (Boundary Evidence Gate) ★新設
+           (各分割自治体の包含/除外地域プロパティ検証)
+              │
+              ▼
+[STEP 2]   対象地域確定 (Target Area Determination & Evidence)
+              │
+              ▼
+[STEP 3]   Address Extraction Rule v2 (住所階層抽出)
+              │
+              ▼
+[STEP 4]   POSTING MAP エリア生成 (Area Record Generation)
+              │
+              ▼
+[STEP 5]   郵便番号昇順ソート (Postal Code Ascending Sort)
+              │
+              ▼
+[STEP 6]   自治体別 10件単位シート生成 (10-Record Sheet Partitioning)
 ```
 
 ---
 
-## ■ Boundary Confirmation Gate 合格条件
+## ■ STEP 1.5: Boundary Evidence Gate 構造証明
 
-以下の 4 項目がすべて揃い、検証が完了した場合にのみ Gate を「PASS」とし、CSV 確定出力を許可する：
+分割自治体（例: 四日市市）について、以下の証明 JSON (`boundary_evidence_gate.json`) が生成され、`boundaryVerified: true` が検証された場合のみ次工程へ進行する：
 
-1. **対象自治体一覧の確定**
-2. **分割自治体（パターンB）一覧の確定**
-3. **各自治体の所属小選挙区の確認完了**
-4. **除外地域リスト（例: 四日市市第2区リスト）の生成完了**
+```json
+{
+  "district": "MIE-03",
+  "municipality": "四日市市",
+  "source": "行政区割りデータ (総務省・三重県選挙管理委員会基準)",
+  "excludedAreas": [
+    "日永", "笹川", "楠町", "内部", "塩浜", "海蔵", "三重", "桜"
+  ],
+  "includedAreas": [
+    "富田", "富州原町", "羽津"
+  ],
+  "boundaryVerified": true
+}
+```
 
 ---
 
-## ■ 3 大絶対禁止事項 (Strict Prohibitions)
+## ■ 三重第3区 (MIE-03) 最終確定分類結果
 
-1. ❌ **自治体名だけでの全件一括判定** (`四日市市 ➔ 全部 MIE-03`)
-2. ❌ **住所階層抽出後の後付け選挙区判定** (`住所取得 ➔ 後からフィルター`)
-3. ❌ **件数合わせによる辻褄補正** (`651件になるようデータ調整`)
+- **桑名市**: Pattern A (自治体全域 1選挙区 ✅)
+- **いなべ市**: Pattern A (自治体全域 1選挙区 ✅)
+- **木曽岬町**: Pattern A (自治体全域 1選挙区 ✅)
+- **東員町**: Pattern A (自治体全域 1選挙区 ✅)
+- **菰野町**: Pattern A (自治体全域 1選挙区 ✅)
+- **朝日町**: Pattern A (自治体全域 1選挙区 ✅)
+- **川越町**: Pattern A (自治体全域 1選挙区 ✅)
+- **四日市市**: Pattern B (分割確認必須: 第2区除外・第3区確定 ✅)
