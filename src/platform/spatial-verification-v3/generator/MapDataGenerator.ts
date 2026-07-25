@@ -34,14 +34,21 @@ export class MapDataGenerator {
     let successCount = 0;
     let warningCount = 0;
     let approximateCount = 0;
+    let normalizationCount = 0;
+    const allRemovedTokens = new Set<string>();
 
     for (let i = 1; i < lines.length; i++) {
       const v = lines[i].split(',');
       const record: any = {};
       header.forEach((h, idx) => record[h] = v[idx]);
 
-      let resolution = await this.resolver.resolve(record.city, record.town);
+      let resolution = await this.resolver.resolve(record.prefecture, record.city, record.town);
       let validation = this.validator.validate(resolution.latitude, resolution.longitude, record.city);
+
+      if (resolution.normalization && resolution.normalization.removedTokens.length > 0) {
+        normalizationCount++;
+        resolution.normalization.removedTokens.forEach(t => allRemovedTokens.add(t));
+      }
 
       // Fallback to postal code if strict check failed
       if (!validation.isValid) {
@@ -103,6 +110,8 @@ export class MapDataGenerator {
         warningCount,
         approximateCount,
         approximateRate: ((approximateCount / (lines.length - 1)) * 100).toFixed(2) + "%",
+        queryNormalizationCount: normalizationCount,
+        removedInternalTokens: Array.from(allRemovedTokens),
         engine: "v3.1 Pro Spatial Verification",
         generatedAt: new Date().toISOString()
       },
@@ -134,6 +143,8 @@ export class MapDataGenerator {
       warningCount,
       failedReviewRequired: failCount,
       approximateRate: ((approximateCount / (lines.length - 1)) * 100).toFixed(2) + "%",
+      queryNormalizationCount: normalizationCount,
+      removedInternalTokens: Array.from(allRemovedTokens),
       spatialAccuracyGate: gatePassed ? "SPATIAL_VERIFIED" : "COORDINATE_CHECKED",
       visualizationUrl,
       verifiedBy: "CEO",
@@ -144,6 +155,7 @@ export class MapDataGenerator {
 
     console.log(`✅ Spatial Verification Complete: ${successCount} verified, ${warningCount} warnings, ${failCount} failed.`);
     console.log(`📊 Approximate Rate: ${evidenceData.approximateRate}`);
+    console.log(`🧹 Normalizations applied: ${normalizationCount} queries cleaned.`);
     console.log(`🗺️ Updated CSV, GeoJSON & evidence.json in ${outputDir}`);
   }
 }

@@ -95,12 +95,33 @@ async function runTests() {
   // Case 4: 正常住所 (桑名市江場) -> PASS
   // ---------------------------------------------------------
   console.log("\n[CASE 4] Normal Address (Kuwana Eba) -> PASS");
-  const resolveResult4 = await resolver.resolve("桑名市", "江場");
+  const resolveResult4 = await resolver.resolve("三重県", "桑名市", "江場");
   const validateResult4 = validator.validate(resolveResult4.latitude, resolveResult4.longitude, "桑名市");
   if (validateResult4.isValid && validateResult4.status === "VERIFIED") {
     console.log(`✅ PASS: Kuwana Eba resolved and verified successfully (Lat: ${resolveResult4.latitude}, Lng: ${resolveResult4.longitude}).`);
   } else {
     console.error(`❌ FAIL: Normal address was rejected. Reason: ${validateResult4.reason}`);
+    process.exit(1);
+  }
+
+  // ---------------------------------------------------------
+  // Case 5: Normalizer logic (（一部） and 第X区画)
+  // ---------------------------------------------------------
+  console.log("\n[CASE 5] Address Normalization");
+  const normalizerResult = resolver['normalizer'].normalizeAddressQuery({
+    prefecture: "三重県",
+    city: "四日市市（一部）",
+    town: "羽津1丁目 第2区画"
+  });
+  
+  if (
+    normalizerResult.query === "三重県四日市市羽津1丁目" &&
+    normalizerResult.removedTokens.includes("（一部）") &&
+    normalizerResult.removedTokens.includes("第2区画")
+  ) {
+    console.log(`✅ PASS: Address Normalization stripped internal tokens successfully. Query: ${normalizerResult.query}`);
+  } else {
+    console.error(`❌ FAIL: Normalizer logic failed. Query: ${normalizerResult.query}, Tokens: ${normalizerResult.removedTokens.join(', ')}`);
     process.exit(1);
   }
 

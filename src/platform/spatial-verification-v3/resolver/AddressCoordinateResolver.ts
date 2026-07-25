@@ -1,5 +1,6 @@
 import { SecretProvider } from './SecretProvider';
 import { CoordinateCache } from './CoordinateCache';
+import { AddressQueryNormalizer, NormalizationResult } from './AddressQueryNormalizer';
 
 export interface CoordinateResult {
   latitude: number;
@@ -8,21 +9,27 @@ export interface CoordinateResult {
   accuracy: "A" | "B" | "C";
   confidence: number;
   rawQuery: string;
+  normalization?: NormalizationResult;
 }
 
 export class AddressCoordinateResolver {
   private cache: CoordinateCache;
+  private normalizer: AddressQueryNormalizer;
 
   constructor() {
     this.cache = new CoordinateCache();
+    this.normalizer = new AddressQueryNormalizer();
   }
 
   /**
    * Resolves coordinates by querying the Google Maps Geocoding API.
    * Uses hierarchical resolution: Exact -> Town -> Oaza.
    */
-  public async resolve(city: string, town: string): Promise<CoordinateResult> {
-    const addressQuery = `${city}${town}`;
+  public async resolve(prefecture: string, city: string, town: string): Promise<CoordinateResult> {
+    const normalization = this.normalizer.normalizeAddressQuery({ prefecture, city, town });
+    const addressQuery = normalization.query;
+    
+    // Use the normalized query as the cache key
     const cached = this.cache.get(addressQuery);
     
     if (cached) {
@@ -32,11 +39,14 @@ export class AddressCoordinateResolver {
         source: cached.source as any,
         accuracy: this.mapSourceToAccuracy(cached.source),
         confidence: 1.0,
-        rawQuery: addressQuery
+        rawQuery: addressQuery,
+        normalization
       };
     }
 
-    return this.fetchFromGoogle(addressQuery, addressQuery);
+    const result = await this.fetchFromGoogle(addressQuery, addressQuery);
+    result.normalization = normalization;
+    return result;
   }
 
   /**
