@@ -1,9 +1,14 @@
 {
   "district": "MIE-03",
-  "csvHash": "3dd16e256f5207421f7a6e02483d09d077a4c29ce11f0bcb1bcc3a341285e8bb",
-  "geoHash": "c4366dfef534497a96b3101e7615471096279568a8b8363d1a3c12947788eb90",
+  "csvHash": "147751ba11836bd412477c976c46158d03be2eec450e0a698438c4f1dc116de1",
+  "geoHash": "9d71691dcf9626cdc4ea9033193007756eb3d8035c69f5f74f6855de9b18f282",
+  "engine": "v3.1 Pro Spatial Verification",
+  "totalProcessed": 684,
+  "verifiedSuccess": 681,
+  "failedReviewRequired": 3,
+  "spatialAccuracyGate": "COORDINATE_CHECKED",
   "visualizationUrl": "https://k-iwasa-mk.github.io/posting-map-system-dev/MIE-03_SPATIAL_VERIFICATION/",
   "verifiedBy": "CEO",
   "status": "PENDING_APPROVAL",
-  "generatedAt": "2026-07-25T01:48:03.476Z"
+  "generatedAt": "2026-07-25T02:03:15.738Z"
 }
