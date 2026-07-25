@@ -5,19 +5,25 @@ import { NationalAddressHierarchyParser, AddressMasterRecord } from '../parser/N
 import { AddressMasterGenerator, AddressMasterEvidence } from '../generator/AddressMasterGenerator';
 import { AddressMasterVerifier, AddressMasterAccuracyReport } from '../verifier/AddressMasterVerifier';
 import { AddressMasterReleaseGate, AddressMasterReleaseManifest } from '../gate/AddressMasterReleaseGate';
+import { BoundaryMasterFoundation, DistrictBoundaryDefinition, BoundaryMasterManifest, BoundAreaRecord } from '../boundary/BoundaryMasterFoundation';
 
 export interface NationalPipelineResult {
   rawAuditManifest: RawAuditManifest;
   masterEvidence: AddressMasterEvidence;
   verificationReport: AddressMasterAccuracyReport;
   releaseManifest: AddressMasterReleaseManifest;
+  boundaryManifest?: BoundaryMasterManifest;
+  boundRecords?: BoundAreaRecord[];
   records: AddressMasterRecord[];
 }
 
 export class NationalAddressDataPipeline {
-  public runPipeline(dataDir: string = path.join(__dirname, '../../../../data')): NationalPipelineResult {
+  public runPipeline(
+    dataDir: string = path.join(__dirname, '../../../../data'),
+    targetBoundaryDef?: DistrictBoundaryDefinition
+  ): NationalPipelineResult {
     console.log("==================================================");
-    console.log("🌏 RUNNING NATIONAL ADDRESS DATA PIPELINE (STEP 1 - STEP 6)");
+    console.log("🌏 RUNNING NATIONAL ADDRESS DATA PIPELINE (STEP 1 - STEP 7)");
     console.log("==================================================\n");
 
     const rawDir = path.join(dataDir, 'raw');
@@ -76,11 +82,29 @@ export class NationalAddressDataPipeline {
       throw new Error(`[AddressMasterReleaseGate] GATE REJECTED. National Address Master release failed.`);
     }
 
+    // STEP 7: Boundary Master Foundation (Overlay RELEASED ADDRESS_MASTER with District Boundary)
+    let boundaryManifest: BoundaryMasterManifest | undefined;
+    let boundRecords: BoundAreaRecord[] | undefined;
+
+    if (targetBoundaryDef) {
+      console.log(`📌 [STEP 7] Running Boundary Master Foundation for ${targetBoundaryDef.districtId}...`);
+      const boundaryRes = BoundaryMasterFoundation.overlayBoundaryMaster(
+        releaseManifest,
+        normalizedRecords,
+        targetBoundaryDef,
+        path.join(dataDir, 'boundary')
+      );
+      boundaryManifest = boundaryRes.manifest;
+      boundRecords = boundaryRes.boundRecords;
+    }
+
     return {
       rawAuditManifest,
       masterEvidence,
       verificationReport,
       releaseManifest,
+      boundaryManifest,
+      boundRecords,
       records: normalizedRecords
     };
   }
