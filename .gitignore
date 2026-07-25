@@ -47,3 +47,12 @@ tools/.kernel_secret
 
 # Dependencies
 node_modules/
+
+# AIOS generated artifacts & temporary files
+*.log
+coordinate_cache.json
+scratch/
+test_out/
+run_poc-output/
+*_runtime.json
+review_history_db.json
