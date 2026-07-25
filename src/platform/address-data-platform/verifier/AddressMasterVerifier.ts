@@ -9,6 +9,7 @@ export interface AddressMasterAccuracyReport {
   totalRecords: number;
   missingLevel1Count: number;
   duplicateCount: number;
+  multiPostalSameAddressNotes: number;
   normalizedFormattingCount: number;
   lineageProof: {
     postalRawSha256: string;
@@ -22,7 +23,9 @@ export interface AddressMasterAccuracyReport {
 
 export class AddressMasterVerifier {
   /**
-   * Normalize Address Formatting (e.g. １丁目 -> 1丁目, 一丁目 -> 1丁目)
+   * Safe Address Formatting Normalization (e.g. 江場 １丁目 -> 江場 1丁目, 一丁目 -> 1丁目)
+   * CRITICAL SAFETY: Only replaces Kanji numbers when followed immediately by "丁目" (e.g. 一丁目 -> 1丁目).
+   * Preserves town names like "一番町" without corrupting them.
    */
   public static normalizeRecordFormatting(r: AddressMasterRecord): AddressMasterRecord {
     let lvl1 = r.addressLevel1 || '';
@@ -34,15 +37,17 @@ export class AddressMasterVerifier {
       lvl2 = lvl2.replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xfee0));
     }
 
-    // Normalize Japanese Kanji numbers in 丁目 to Arabic numerals (e.g. 一丁目 -> 1丁目, 二丁目 -> 2丁目)
-    const kanjiMap: Record<string, string> = {
+    // Safe Kanji number replacement ONLY when ending with "丁目"
+    const kanjiChomeMap: Record<string, string> = {
       '一丁目': '1丁目', '二丁目': '2丁目', '三丁目': '3丁目', '四丁目': '4丁目',
       '五丁目': '5丁目', '六丁目': '6丁目', '七丁目': '7丁目', '八丁目': '8丁目', '九丁目': '9丁目'
     };
 
-    Object.entries(kanjiMap).forEach(([k, v]) => {
-      lvl1 = lvl1.replace(k, v);
-      if (lvl2 !== 'NULL') lvl2 = lvl2.replace(k, v);
+    Object.entries(kanjiChomeMap).forEach(([k, v]) => {
+      // Use exact word end anchor to avoid touching town names like 一番町
+      const regex = new RegExp(k, 'g');
+      lvl1 = lvl1.replace(regex, v);
+      if (lvl2 !== 'NULL') lvl2 = lvl2.replace(regex, v);
     });
 
     const payload = `${r.prefecture}|${r.municipality}|${lvl1}|${lvl2}|${r.postalCode}|${r.source}`;
@@ -71,6 +76,7 @@ export class AddressMasterVerifier {
     let normalizedFormattingCount = 0;
     const normalizedRecords: AddressMasterRecord[] = [];
     const uniqueKeys = new Set<string>();
+    const addressToPostalsMap = new Map<string, Set<string>>();
     let duplicateCount = 0;
 
     records.forEach(r => {
@@ -93,9 +99,21 @@ export class AddressMasterVerifier {
       } else {
         uniqueKeys.add(uniqueKey);
       }
+
+      // 4. Same address multi-postal code detection (Postal Data Specific Note)
+      const addrKey = `${normalized.prefecture}|${normalized.municipality}|${normalized.addressLevel1}|${normalized.addressLevel2}`;
+      if (!addressToPostalsMap.has(addrKey)) {
+        addressToPostalsMap.set(addrKey, new Set<string>());
+      }
+      addressToPostalsMap.get(addrKey)!.add(normalized.postalCode);
     });
 
-    // 4. Lineage Proof (Raw SHA-256 -> Address Master SHA-256)
+    let multiPostalSameAddressNotes = 0;
+    addressToPostalsMap.forEach(postals => {
+      if (postals.size > 1) multiPostalSameAddressNotes++;
+    });
+
+    // 5. Lineage Proof (Raw SHA-256 -> Address Master SHA-256)
     const postalRawSha256 = rawManifest.postal.sha256;
     const adminRawSha256 = rawManifest.administrative.sha256;
     const addressMasterSha256 = masterEvidence.sha256;
@@ -108,6 +126,7 @@ export class AddressMasterVerifier {
       totalRecords: records.length,
       missingLevel1Count,
       duplicateCount,
+      multiPostalSameAddressNotes,
       normalizedFormattingCount,
       lineageProof: {
         postalRawSha256,
@@ -122,7 +141,7 @@ export class AddressMasterVerifier {
     if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
     fs.writeFileSync(path.join(outputDir, 'address_master_accuracy_verification.json'), JSON.stringify(report, null, 2), 'utf8');
 
-    console.log(`✅ [STEP 5 Verification Result] Total: ${records.length}, Missing: ${missingLevel1Count}, Duplicates: ${duplicateCount}, Format Normalized: ${normalizedFormattingCount}, Status: ${status}`);
+    console.log(`✅ [STEP 5 Verification Result] Total: ${records.length}, Missing: ${missingLevel1Count}, Duplicates: ${duplicateCount}, MultiPostal Notes: ${multiPostalSameAddressNotes}, Status: ${status}`);
 
     return { normalizedRecords, report };
   }

@@ -4,18 +4,20 @@ import { RawDataIngestor, RawAuditManifest } from '../raw/RawDataIngestor';
 import { NationalAddressHierarchyParser, AddressMasterRecord } from '../parser/NationalAddressHierarchyParser';
 import { AddressMasterGenerator, AddressMasterEvidence } from '../generator/AddressMasterGenerator';
 import { AddressMasterVerifier, AddressMasterAccuracyReport } from '../verifier/AddressMasterVerifier';
+import { AddressMasterReleaseGate, AddressMasterReleaseManifest } from '../gate/AddressMasterReleaseGate';
 
 export interface NationalPipelineResult {
   rawAuditManifest: RawAuditManifest;
   masterEvidence: AddressMasterEvidence;
   verificationReport: AddressMasterAccuracyReport;
+  releaseManifest: AddressMasterReleaseManifest;
   records: AddressMasterRecord[];
 }
 
 export class NationalAddressDataPipeline {
   public runPipeline(dataDir: string = path.join(__dirname, '../../../../data')): NationalPipelineResult {
     console.log("==================================================");
-    console.log("🌏 RUNNING NATIONAL ADDRESS DATA PIPELINE (STEP 1 - STEP 5)");
+    console.log("🌏 RUNNING NATIONAL ADDRESS DATA PIPELINE (STEP 1 - STEP 6)");
     console.log("==================================================\n");
 
     const rawDir = path.join(dataDir, 'raw');
@@ -62,10 +64,23 @@ export class NationalAddressDataPipeline {
       throw new Error(`[AddressMasterVerifier] VERIFICATION FAILED! Missing level 1 count: ${verificationReport.missingLevel1Count}`);
     }
 
+    // STEP 6: Address Master Release Gate (GENERATED -> VALIDATED -> ACCURACY_CHECKED -> AUDITED -> RELEASED)
+    console.log("📌 [STEP 6] Executing Address Master Release Gate...");
+    const releaseManifest = AddressMasterReleaseGate.evaluateAndRelease(
+      verificationReport,
+      masterEvidence.outputCsvPath,
+      masterDir
+    );
+
+    if (releaseManifest.gateStatus !== 'ADDRESS_MASTER_RELEASE_PASS') {
+      throw new Error(`[AddressMasterReleaseGate] GATE REJECTED. National Address Master release failed.`);
+    }
+
     return {
       rawAuditManifest,
       masterEvidence,
       verificationReport,
+      releaseManifest,
       records: normalizedRecords
     };
   }
