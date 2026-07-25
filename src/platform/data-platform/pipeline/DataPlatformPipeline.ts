@@ -6,7 +6,7 @@ import { RawDataPreserver } from '../integrity/RawDataPreserver';
 import { DistrictExtractor } from '../extractor/DistrictExtractor';
 import { DataValidator, ValidationReport } from '../validator/DataValidator';
 import { DistrictBoundaryResolver } from '../resolver/DistrictBoundaryResolver';
-import { AddressHierarchyExtractor } from '../extractor/AddressHierarchyExtractor';
+import { AddressHierarchyExtractor, AddressSeedNode } from '../extractor/AddressHierarchyExtractor';
 import { BoundaryConfirmationGate } from '../gate/BoundaryConfirmationGate';
 import { BoundaryEvidenceGate } from '../gate/BoundaryEvidenceGate';
 import { FinalCsvGenerator } from '../final-csv/FinalCsvGenerator';
@@ -69,12 +69,12 @@ export class DataPlatformPipeline {
     }
     console.log('✅ [BoundaryEvidenceGate] PASS! Yokkaichi boundary proof verified (included vs excluded subdistricts certified)');
 
-    // STEP 2: Address Extraction Rule v2 (Address Hierarchy Extraction on Confirmed Boundary Areas)
-    console.log('📌 [STEP 2] Running Address Hierarchy Extractor (Rule v2)...');
-    const rawSeeds = [
-      { city: '桑名市', town: '江場' },
-      { city: 'いなべ市', town: '員弁町大泉' },
-      { city: '四日市市（一部）', town: '富田1丁目' }
+    // STEP 2: Address Extraction Rule v3 (Dynamic Completeness Decision Engine)
+    console.log('📌 [STEP 2] Running Address Hierarchy Extractor (Address Extraction Rule v3)...');
+    const rawSeeds: AddressSeedNode[] = [
+      { city: '桑名市', level1: '江場', level2: '1丁目' },
+      { city: '東員町', level1: '1丁目' },
+      { city: '四日市市（一部）', level1: '富田1丁目' }
     ];
     const hierarchyNodes = this.hierarchyExtractor.extractHierarchy(boundaryEvidence, rawSeeds);
 
