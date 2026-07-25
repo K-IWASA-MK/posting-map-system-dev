@@ -6,6 +6,7 @@ import { AddressMasterGenerator, AddressMasterEvidence } from '../generator/Addr
 import { AddressMasterVerifier, AddressMasterAccuracyReport } from '../verifier/AddressMasterVerifier';
 import { AddressMasterReleaseGate, AddressMasterReleaseManifest } from '../gate/AddressMasterReleaseGate';
 import { BoundaryMasterFoundation, DistrictBoundaryDefinition, BoundaryMasterManifest, BoundAreaRecord } from '../boundary/BoundaryMasterFoundation';
+import { BoundaryMasterVerifier, BoundaryAccuracyReport } from '../verifier/BoundaryMasterVerifier';
 
 export interface NationalPipelineResult {
   rawAuditManifest: RawAuditManifest;
@@ -13,6 +14,7 @@ export interface NationalPipelineResult {
   verificationReport: AddressMasterAccuracyReport;
   releaseManifest: AddressMasterReleaseManifest;
   boundaryManifest?: BoundaryMasterManifest;
+  boundaryAccuracyReport?: BoundaryAccuracyReport;
   boundRecords?: BoundAreaRecord[];
   records: AddressMasterRecord[];
 }
@@ -23,7 +25,7 @@ export class NationalAddressDataPipeline {
     targetBoundaryDef?: DistrictBoundaryDefinition
   ): NationalPipelineResult {
     console.log("==================================================");
-    console.log("🌏 RUNNING NATIONAL ADDRESS DATA PIPELINE (STEP 1 - STEP 7)");
+    console.log("🌏 RUNNING NATIONAL ADDRESS DATA PIPELINE (STEP 1 - STEP 8)");
     console.log("==================================================\n");
 
     const rawDir = path.join(dataDir, 'raw');
@@ -84,6 +86,7 @@ export class NationalAddressDataPipeline {
 
     // STEP 7: Boundary Master Foundation (Overlay RELEASED ADDRESS_MASTER with District Boundary)
     let boundaryManifest: BoundaryMasterManifest | undefined;
+    let boundaryAccuracyReport: BoundaryAccuracyReport | undefined;
     let boundRecords: BoundAreaRecord[] | undefined;
 
     if (targetBoundaryDef) {
@@ -96,6 +99,20 @@ export class NationalAddressDataPipeline {
       );
       boundaryManifest = boundaryRes.manifest;
       boundRecords = boundaryRes.boundRecords;
+
+      // STEP 8: Boundary Master Accuracy Verification Engine
+      console.log(`📌 [STEP 8] Running Boundary Master Accuracy Verification Engine for ${targetBoundaryDef.districtId}...`);
+      boundaryAccuracyReport = BoundaryMasterVerifier.verifyBoundaryMaster(
+        boundaryManifest,
+        boundRecords,
+        normalizedRecords,
+        targetBoundaryDef,
+        path.join(dataDir, 'boundary')
+      );
+
+      if (boundaryAccuracyReport.verificationStatus !== 'BOUNDARY_ACCURACY_VERIFICATION_PASS') {
+        throw new Error(`[BoundaryMasterVerifier] VERIFICATION FAILED for ${targetBoundaryDef.districtId}`);
+      }
     }
 
     return {
@@ -104,6 +121,7 @@ export class NationalAddressDataPipeline {
       verificationReport,
       releaseManifest,
       boundaryManifest,
+      boundaryAccuracyReport,
       boundRecords,
       records: normalizedRecords
     };
