@@ -8,6 +8,18 @@ export class GasWebAppClient {
   ): Promise<PostingMapToolResult> {
     // Determine if we need to mock (e.g. no api key in test environment)
     const effectiveApiKey = apiKey || process.env.PMS_API_KEY;
+    const enforceReal = process.env.ENFORCE_REAL_CONNECTION === 'true';
+
+    if (enforceReal && (!effectiveApiKey || gasWebAppUrl.includes('mock'))) {
+      return {
+        success: false,
+        error: {
+          code: 'GAS_AUTH_REQUIRED',
+          message: '[GAS Security Block] Real connection is enforced but no PMS_API_KEY was provided or URL is mock.'
+        }
+      };
+    }
+
     const isMock = gasWebAppUrl.includes('mock') || !effectiveApiKey;
 
     if (isMock) {
