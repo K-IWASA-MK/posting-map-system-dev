@@ -30,7 +30,7 @@ export class NationalAddressHierarchyParser {
 
     // Case 1: Check if raw address has 丁目
     if (cleanAddr.includes('丁目') || cleanAddr.includes('番地')) {
-      const parts = cleanAddr.split(/(\d+丁目)/);
+      const parts = cleanAddr.split(/([0-9０-９一二三四五六七八九]+丁目)/);
       const prefix = (parts[0] || '').trim();
       const chomePart = (parts[1] || '').trim();
 
