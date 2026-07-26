@@ -28,7 +28,7 @@ function forceStartBatch() {
     CONFIG.get("SHEET_GUIDE"), CONFIG.get("SHEET_ROSTER"), CONFIG.get("SHEET_TEMPLATE"),
     CONFIG.get("SHEET_POSTAL"), CONFIG.get("SHEET_DISTRICT"), CONFIG.get("SHEET_MASTER_EXPORT"),
     CONFIG.get("SHEET_REPORT"), CONFIG.get("SHEET_MANUAL"), CONFIG.get("SHEET_SYSTEM_CACHE"),
-    CONFIG.get("SHEET_STORAGE"), "管理者ID", "__TEMP_ADDRESSES__"
+    CONFIG.get("SHEET_STORAGE"), "管理者ID", "__TEMP_ADDRESSES__", "MIE03_ADDRESS_MASTER"
   ];
 
   const allCurrentSheets = ss.getSheets();
@@ -41,11 +41,78 @@ function forceStartBatch() {
   });
   SpreadsheetApp.flush();
 
-  // 1. 最初巨大CSVから住所を一括展開・ソートして一時シートへ保存
-  ss.toast("三重第3区の住所データを抽出・ソート中...", "準備中", 5);
+  // 1. MIE03_ADDRESS_MASTER シートから住所を一括読み込み
+  ss.toast("MIE03_ADDRESS_MASTERから住所データを抽出中...", "準備中", 5);
+  const masterSheet = ss.getSheetByName("MIE03_ADDRESS_MASTER");
+  if (!masterSheet) {
+    throw new Error("❌ 'MIE03_ADDRESS_MASTER' シートが見つかりません。");
+  }
+  
+  const masterValues = masterSheet.getDataRange().getValues();
+  if (masterValues.length < 2) {
+    throw new Error("❌ 'MIE03_ADDRESS_MASTER' シートにデータが存在しません。");
+  }
+  
+  // 郵便番号マスタ（カナ辞書）のロード
+  const postalSheet = ss.getSheetByName("郵便番号");
+  const cityKanaMap = {};
+  const townKanaMap = {};
+  if (postalSheet) {
+    const postalData = postalSheet.getDataRange().getValues();
+    postalData.forEach(row => {
+      if (row && row.length > 8) {
+        const cityKanji = (row[7] || "").toString().trim();
+        const cityKana = (row[4] || "").toString().trim();
+        if (cityKanji && cityKana && !cityKanaMap[cityKanji]) {
+          cityKanaMap[cityKanji] = toFullWidthKana(cityKana);
+        }
+        const townKanji = (row[8] || "").toString().trim().replace(/（.*?）/g, "").replace(/\(.*?\)/g, "");
+        const townKanaStr = (row[5] || "").toString().trim().replace(/（.*?）/g, "").replace(/\(.*?\)/g, "");
+        if (townKanji && townKanaStr && !townKanaMap[townKanji]) {
+          townKanaMap[townKanji] = toFullWidthKana(townKanaStr);
+        }
+      }
+    });
+  }
+
+  const getBaseCityName = (city) => {
+    if (!city) return "";
+    if (city.indexOf("四日市市") === 0) return "四日市市";
+    const match = city.match(/^(.+?[市郡])/);
+    return match ? match[1] : city;
+  };
+
+  const addresses = [];
   const targetDistrict = "三重第3区";
   const targetPrefecture = "三重県";
-  const addresses = extractDistrictAddresses(targetDistrict, targetPrefecture);
+
+  for (let i = 1; i < masterValues.length; i++) {
+    const row = masterValues[i];
+    if (!row || row.length < 5) continue;
+    
+    const cityName = (row[1] || "").toString().trim();
+    const townName = (row[2] || "").toString().trim();
+    const fullAddr = (row[3] || "").toString().trim();
+    const postalVal = (row[4] || "").toString().trim();
+    
+    if (!fullAddr) continue;
+    
+    // 郵便番号フォーマット統一 (000-0000)
+    let postalStr = postalVal.replace(/-/g, "");
+    if (postalStr.length === 7) {
+      postalStr = `${postalStr.slice(0, 3)}-${postalStr.slice(3)}`;
+    }
+    
+    addresses.push({
+      postalCode: postalStr,
+      address: fullAddr,
+      city: getBaseCityName(cityName), // groupKey
+      originalCity: cityName, // displayName for reference
+      cityKana: cityKanaMap[cityName] || "",
+      townKana: townKanaMap[townName] || "",
+      district: targetDistrict
+    });
+  }
 
   // 【Step 1 強化版 監査ログ】
   Logger.log("=== 【Step 1 抽出監査ログ】 ===");

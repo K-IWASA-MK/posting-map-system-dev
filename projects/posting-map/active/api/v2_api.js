@@ -128,6 +128,78 @@ function doGet(e) {
     const res = verifyDistrictDeployment(e);
     return ContentService.createTextOutput(JSON.stringify(res)).setMimeType(ContentService.MimeType.JSON);
   }
+  if (action === "uploadMaster") {
+    try {
+      let postData = null;
+      if (e.postData && e.postData.contents) {
+        postData = JSON.parse(e.postData.contents);
+      }
+      const csvData = (postData && postData.csvData) || params.csvData || "";
+      if (!csvData) {
+        throw new Error("No CSV data provided.");
+      }
+      const parsedRows = Utilities.parseCsv(csvData);
+      
+      let masterSheet = ss.getSheetByName("MIE03_ADDRESS_MASTER");
+      if (!masterSheet) {
+        masterSheet = ss.insertSheet("MIE03_ADDRESS_MASTER");
+      }
+      masterSheet.clear();
+      masterSheet.getRange(1, 1, parsedRows.length, parsedRows[0].length).setValues(parsedRows);
+      SpreadsheetApp.flush();
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        message: "MIE03_ADDRESS_MASTER sheet uploaded and populated successfully!"
+      })).setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({
+        success: false,
+        message: "Failed to upload master sheet: " + err.toString()
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  if (action === "triggerBatch") {
+    try {
+      const startTime = Date.now();
+      const props = PropertiesService.getScriptProperties();
+      
+      // If triggerBatch=true is passed, force restart the batch from index 0
+      const isStart = params.triggerBatch === "true";
+      if (isStart) {
+        props.deleteProperty("BATCH_STATUS");
+        props.deleteProperty("BATCH_INDEX");
+      }
+      
+      // If batch is not already running, start it
+      if (props.getProperty("BATCH_STATUS") !== "running") {
+        forceStartBatch();
+      }
+      
+      // Keep running generateAreaSheetsBatch until finished or 22 seconds pass
+      while (props.getProperty("BATCH_STATUS") === "running") {
+        generateAreaSheetsBatch();
+        if (Date.now() - startTime > 22000) {
+          break;
+        }
+      }
+      
+      const status = props.getProperty("BATCH_STATUS") || "completed";
+      const index = props.getProperty("BATCH_INDEX") || "0";
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        status: status,
+        index: index,
+        message: status === "running" ? "Batch is running (chunk processed)" : "Batch completed successfully!"
+      })).setMimeType(ContentService.MimeType.JSON);
+    } catch (err) {
+      return ContentService.createTextOutput(JSON.stringify({
+        success: false,
+        message: "Failed to run batch step: " + err.toString()
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
   return PlatformIntegrationPipeline.execute(e);
 }
 
@@ -266,6 +338,41 @@ function processGetActionLegacy(action, e) {
  * POSTリクエスト：データの登録・更新
  */
 function doPost(e) {
+  try {
+    let params = (e && e.parameter) ? Object.assign({}, e.parameter) : {};
+    let postData = null;
+    if (e && e.postData && e.postData.contents) {
+      postData = JSON.parse(e.postData.contents);
+    }
+    const action = params.action || (postData && postData.action) || "";
+    if (action === "uploadMaster") {
+      const csvData = (postData && postData.csvData) || params.csvData || "";
+      if (!csvData) {
+        throw new Error("No CSV data provided.");
+      }
+      const parsedRows = Utilities.parseCsv(csvData);
+      
+      const ss = getSS();
+      let masterSheet = ss.getSheetByName("MIE03_ADDRESS_MASTER");
+      if (!masterSheet) {
+        masterSheet = ss.insertSheet("MIE03_ADDRESS_MASTER");
+      }
+      masterSheet.clear();
+      masterSheet.getRange(1, 1, parsedRows.length, parsedRows[0].length).setValues(parsedRows);
+      SpreadsheetApp.flush();
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        message: "MIE03_ADDRESS_MASTER sheet uploaded and populated successfully!"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      message: "Failed to upload master sheet in doPost: " + err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
   try {
     Logger.log("[DIAG doPost] e.parameter: " + JSON.stringify(e ? e.parameter : {}));
     Logger.log("[DIAG doPost] e.postData.contents: " + (e && e.postData ? e.postData.contents : "none"));
