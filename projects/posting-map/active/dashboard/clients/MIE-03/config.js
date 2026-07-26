@@ -8,7 +8,7 @@ if (typeof window !== 'undefined') {
     districtName: "三重県第3区",
     environment: "production",
     api: {
-      gasWebAppUrl: "https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec"
+      gasWebAppUrl: "https://script.google.com/macros/s/AKfycbxy1fuWL89swFVzCZW3cuPf73s7q1IrEP3aoqT2y2aQjvfcm3g0HHJ5705K9lYMYITU/exec"
     },
     line: {
       liffId: "2010374196-bHBYo37e"
