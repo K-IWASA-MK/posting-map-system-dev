@@ -1966,15 +1966,18 @@ class WriteSpreadsheetHandler {
         return ApiResponse.errorResponse('BAD_REQUEST', 'Empty csvData', 400, metadata);
       }
 
-      const ssId = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+      let ssId = postData.spreadsheetId;
       if (!ssId) {
-        return ApiResponse.errorResponse('INTERNAL_ERROR', 'SPREADSHEET_ID is not configured in Script Properties', 500, metadata);
+        ssId = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+      }
+      if (!ssId) {
+        return ApiResponse.errorResponse('INTERNAL_ERROR', 'SPREADSHEET_ID is not configured', 500, metadata);
       }
 
       const ss = SpreadsheetApp.openById(ssId);
-      let sheet = ss.getSheetByName(sheetName);
+      const sheet = ss.getSheetByName(sheetName);
       if (!sheet) {
-        sheet = ss.insertSheet(sheetName);
+        return ApiResponse.errorResponse('SHEET_NOT_FOUND', 'Target sheet not found in spreadsheet. Automatic creation is disabled for safety.', 404, metadata);
       }
 
       // Strictly execute clear and setValues on "区割り" sheet only
@@ -2013,9 +2016,12 @@ class GetAreasHandler {
         return ApiResponse.errorResponse('BAD_REQUEST', 'Spreadsheet protection error: target sheet must be "区割り". Operation rejected.', 400, metadata);
       }
 
-      const ssId = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+      let ssId = request.query ? request.query.spreadsheetId : null;
       if (!ssId) {
-        return ApiResponse.errorResponse('INTERNAL_ERROR', 'SPREADSHEET_ID is not configured in Script Properties', 500, metadata);
+        ssId = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+      }
+      if (!ssId) {
+        return ApiResponse.errorResponse('INTERNAL_ERROR', 'SPREADSHEET_ID is not configured', 500, metadata);
       }
 
       const ss = SpreadsheetApp.openById(ssId);
@@ -2031,6 +2037,114 @@ class GetAreasHandler {
       }
 
       return ApiResponse.successResponse(data, 200, metadata);
+    } catch (err) {
+      return ApiResponse.errorResponse('HANDLER_ERROR', err.toString(), 500, metadata);
+    }
+  }
+}
+class DuplicateSheetHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+
+    try {
+      const postData = request.body || {};
+      const ssId = postData.spreadsheetId;
+      const sourceSheet = postData.sourceSheet;
+      const targetSheet = postData.targetSheet;
+
+      if (!ssId || !sourceSheet || !targetSheet) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Missing required parameters: spreadsheetId, sourceSheet, targetSheet', 400, metadata);
+      }
+
+      // STRICT PROTECTION RULE: duplicateSheet API accepts only fixed names
+      if (sourceSheet !== "原本" || targetSheet !== "区割り") {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Invalid sheet duplication parameters. Only "原本" to "区割り" duplication is allowed.', 400, metadata);
+      }
+
+      const ss = SpreadsheetApp.openById(ssId);
+      const source = ss.getSheetByName(sourceSheet);
+      if (!source) {
+        return ApiResponse.errorResponse('NOT_FOUND', 'Source template sheet "原本" not found in spreadsheet', 404, metadata);
+      }
+
+      let target = ss.getSheetByName(targetSheet);
+      if (target) {
+        // If target already exists, delete it first to ensure clean duplication
+        ss.deleteSheet(target);
+      }
+
+      target = source.copyTo(ss).setName(targetSheet);
+      
+      // Ensure D2:D100 has checkboxes (completed col)
+      target.getRange("D2:D100").insertCheckboxes();
+
+      return ApiResponse.successResponse({
+        success: true,
+        spreadsheetId: ssId,
+        sourceSheet: sourceSheet,
+        targetSheet: targetSheet
+      }, 200, metadata);
+    } catch (err) {
+      return ApiResponse.errorResponse('HANDLER_ERROR', err.toString(), 500, metadata);
+    }
+  }
+}
+class CreateTestSpreadsheetHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+
+    try {
+      const TEMPLATE_SS_ID = "14rblnvJH5hkXHU9-9lhZlDaUi-FenuQQ5DWnTP7TbW4";
+      const templateFile = DriveApp.getFileById(TEMPLATE_SS_ID);
+      const newSsFile = templateFile.makeCopy(`P-03 Validation Spreadsheet`);
+      const newSsId = newSsFile.getId();
+
+      return ApiResponse.successResponse({
+        success: true,
+        spreadsheetId: newSsId
+      }, 200, metadata);
+    } catch (err) {
+      return ApiResponse.errorResponse('HANDLER_ERROR', err.toString(), 500, metadata);
+    }
+  }
+}
+
+class CleanupTestSpreadsheetHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+
+    try {
+      const postData = request.body || {};
+      const ssId = postData.spreadsheetId;
+      if (!ssId) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Missing spreadsheetId', 400, metadata);
+      }
+      
+      const file = DriveApp.getFileById(ssId);
+      if (file.getName().startsWith("P-03 Validation Spreadsheet")) {
+        file.setTrashed(true);
+        return ApiResponse.successResponse({
+          success: true,
+          message: "Successfully trashed validation spreadsheet: " + ssId
+        }, 200, metadata);
+      } else {
+        return ApiResponse.errorResponse('DENIED', 'Cannot delete non-validation spreadsheet', 403, metadata);
+      }
     } catch (err) {
       return ApiResponse.errorResponse('HANDLER_ERROR', err.toString(), 500, metadata);
     }
@@ -2058,6 +2172,9 @@ class EndpointRegistry {
     const version = new VersionHandler();
     const writeSpreadsheetHandler = new WriteSpreadsheetHandler();
     const getAreasHandler = new GetAreasHandler();
+    const duplicateSheetHandler = new DuplicateSheetHandler();
+    const createTestSpreadsheetHandler = new CreateTestSpreadsheetHandler();
+    const cleanupTestSpreadsheetHandler = new CleanupTestSpreadsheetHandler();
 
     this.register('GET', 'v2', '/dashboard', dashboard);
     this.register('POST', 'v2', '/dashboard', dashboard);
@@ -2069,6 +2186,12 @@ class EndpointRegistry {
     this.register('POST', 'v2', '/writeSpreadsheet', writeSpreadsheetHandler);
     this.register('GET', 'v1', '/getAreas', getAreasHandler);
     this.register('GET', 'v2', '/getAreas', getAreasHandler);
+    this.register('POST', 'v1', '/duplicateSheet', duplicateSheetHandler);
+    this.register('POST', 'v2', '/duplicateSheet', duplicateSheetHandler);
+    this.register('POST', 'v1', '/createTestSpreadsheet', createTestSpreadsheetHandler);
+    this.register('POST', 'v2', '/createTestSpreadsheet', createTestSpreadsheetHandler);
+    this.register('POST', 'v1', '/cleanupTestSpreadsheet', cleanupTestSpreadsheetHandler);
+    this.register('POST', 'v2', '/cleanupTestSpreadsheet', cleanupTestSpreadsheetHandler);
   }
   register(method, version, path, handler) {
     const key = RouteResolver.resolveKey(method, version, path);
