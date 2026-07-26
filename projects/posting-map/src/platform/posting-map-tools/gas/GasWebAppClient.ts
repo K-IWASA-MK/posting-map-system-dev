@@ -32,11 +32,16 @@ export class GasWebAppClient {
     }
 
     try {
-      const response = await fetch(gasWebAppUrl, {
+      const url = new URL(gasWebAppUrl);
+      if (effectiveApiKey) {
+        url.searchParams.set('apiKey', effectiveApiKey);
+      }
+
+      const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${effectiveApiKey}`
+          'x-api-key': effectiveApiKey || ''
         },
         body: JSON.stringify({
           action: 'writeSpreadsheet',

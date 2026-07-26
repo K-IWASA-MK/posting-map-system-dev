@@ -1929,6 +1929,114 @@ class LegacyApiFallbackHandler {
   }
 }
 
+class WriteSpreadsheetHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+
+    try {
+      const postData = request.body;
+      const csvData = postData.csvData;
+      if (!csvData) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Missing csvData in request body', 400, metadata);
+      }
+
+      // STRICT PROTECTION RULE: Only allow target sheet name "区割り"
+      const sheetName = CONFIG.get("SHEET_DISTRICT") || "区割り";
+      if (sheetName !== "区割り") {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Spreadsheet protection error: target sheet must be "区割り". Operation rejected.', 400, metadata);
+      }
+
+      // Parse CSV Data into rows
+      let rows;
+      try {
+        rows = Utilities.parseCsv(csvData);
+      } catch (csvErr) {
+        // Fallback simple csv parse
+        rows = csvData.split('\n').map(line => {
+          return line.split(',').map(cell => cell.replace(/^["']|["']$/g, '').trim());
+        });
+      }
+
+      if (rows.length === 0) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Empty csvData', 400, metadata);
+      }
+
+      const ssId = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+      if (!ssId) {
+        return ApiResponse.errorResponse('INTERNAL_ERROR', 'SPREADSHEET_ID is not configured in Script Properties', 500, metadata);
+      }
+
+      const ss = SpreadsheetApp.openById(ssId);
+      let sheet = ss.getSheetByName(sheetName);
+      if (!sheet) {
+        sheet = ss.insertSheet(sheetName);
+      }
+
+      // Strictly execute clear and setValues on "区割り" sheet only
+      sheet.clear();
+      sheet.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+
+      // Apply Posting Map UI Design Standards (pure black header background, white bold text)
+      sheet.getRange(1, 1, 1, rows[0].length)
+        .setBackground('#000000')
+        .setFontColor('#ffffff')
+        .setFontWeight('bold');
+
+      return ApiResponse.successResponse({
+        success: true,
+        spreadsheetId: ssId,
+        sheetCount: ss.getSheets().length
+      }, 200, metadata);
+    } catch (err) {
+      return ApiResponse.errorResponse('HANDLER_ERROR', err.toString(), 500, metadata);
+    }
+  }
+}
+
+class GetAreasHandler {
+  execute(request, context) {
+    const metadata = {
+      requestId: request.requestId,
+      serverTimestamp: context.getStartTimestamp(),
+      processingTime: context.getElapsedTime(),
+      version: request.version
+    };
+
+    try {
+      const sheetName = CONFIG.get("SHEET_DISTRICT") || "区割り";
+      if (sheetName !== "区割り") {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Spreadsheet protection error: target sheet must be "区割り". Operation rejected.', 400, metadata);
+      }
+
+      const ssId = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+      if (!ssId) {
+        return ApiResponse.errorResponse('INTERNAL_ERROR', 'SPREADSHEET_ID is not configured in Script Properties', 500, metadata);
+      }
+
+      const ss = SpreadsheetApp.openById(ssId);
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) {
+        return ApiResponse.errorResponse('NOT_FOUND', 'Sheet "' + sheetName + '" not found in spreadsheet', 404, metadata);
+      }
+
+      const lastRow = sheet.getLastRow();
+      let data = [];
+      if (lastRow > 1) {
+        data = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
+      }
+
+      return ApiResponse.successResponse(data, 200, metadata);
+    } catch (err) {
+      return ApiResponse.errorResponse('HANDLER_ERROR', err.toString(), 500, metadata);
+    }
+  }
+}
+
 class EndpointRegistry {
   constructor() {
     this.routes = {};
@@ -1948,6 +2056,8 @@ class EndpointRegistry {
     const holding = flags.mapbox ? new HoldingHandler() : new LegacyHoldingHandler();
     const health = new HealthHandler();
     const version = new VersionHandler();
+    const writeSpreadsheetHandler = new WriteSpreadsheetHandler();
+    const getAreasHandler = new GetAreasHandler();
 
     this.register('GET', 'v2', '/dashboard', dashboard);
     this.register('POST', 'v2', '/dashboard', dashboard);
@@ -1955,6 +2065,10 @@ class EndpointRegistry {
     this.register('POST', 'v2', '/holding', holding);
     this.register('GET', 'v2', '/health', health);
     this.register('GET', 'v2', '/version', version);
+    this.register('POST', 'v1', '/writeSpreadsheet', writeSpreadsheetHandler);
+    this.register('POST', 'v2', '/writeSpreadsheet', writeSpreadsheetHandler);
+    this.register('GET', 'v1', '/getAreas', getAreasHandler);
+    this.register('GET', 'v2', '/getAreas', getAreasHandler);
   }
   register(method, version, path, handler) {
     const key = RouteResolver.resolveKey(method, version, path);

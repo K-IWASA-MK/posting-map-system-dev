@@ -134,10 +134,9 @@ describe('Sprint T-02: Real Google Spreadsheet Execution Validation', () => {
       expect(evidence.spreadsheetId).toBe(spreadsheetId);
 
       // Fetch from GAS Response (Get target spreadsheet rows)
-      const response = await fetch(`${gasWebAppUrl}?action=getAreas`, {
-        headers: { 'Authorization': `Bearer ${apiKey}` }
-      });
+      const response = await fetch(`${gasWebAppUrl}?action=getAreas&apiKey=${apiKey}`);
       const result = await response.json();
+      console.log('DEBUG GET AREAS RESULT:', JSON.stringify(result));
       expect(result.success).toBe(true);
 
       // Verify counts
@@ -183,5 +182,5 @@ describe('Sprint T-02: Real Google Spreadsheet Execution Validation', () => {
       const mockHash = crypto.createHash('sha256').update(validCsv.trim()).digest('hex');
       expect(mockHash).toBeDefined();
     }
-  });
+  }, 30000);
 });
