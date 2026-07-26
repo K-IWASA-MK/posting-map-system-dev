@@ -3,12 +3,22 @@ import { TaskRecord } from '../../employee-runtime/task-assignment/models/TaskAs
 import { SpreadsheetEvidence } from '../models/PostingMapToolModels';
 
 export interface ISpreadsheetWriterTool {
-  writeSpreadsheet(
+  duplicateTemplateSheet(
+    spreadsheetId: string,
+    sourceSheet: string,
+    targetSheet: string,
+    gasWebAppUrl: string,
+    apiKey?: string
+  ): Promise<boolean>;
+
+  writeBatchSpreadsheet(
     employee: EmployeeRecord,
     task: TaskRecord,
+    sheetName: string,
     csvData: string,
     expectedRowCount: number,
     gasWebAppUrl: string,
-    apiKey?: string
+    apiKey?: string,
+    spreadsheetId?: string
   ): Promise<SpreadsheetEvidence>;
 }

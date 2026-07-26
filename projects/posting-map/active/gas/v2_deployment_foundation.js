@@ -176,6 +176,51 @@ class DistrictDeploymentFoundation {
  */
 function verifyDistrictDeployment(e) {
   const params = e && e.parameter ? e.parameter : (e || {});
+
+  // Structure Guard Validation (Required + Forbidden sheets checks)
+  if (params.structureGuard === "true" || params.structureGuard === true) {
+    try {
+      const ssId = params.spreadsheetId;
+      const ss = ssId ? SpreadsheetApp.openById(ssId) : getSS();
+      const sheetNames = ss.getSheets().map(s => s.getName());
+      
+      const REQUIRED_SHEETS = ["名簿", "チラシ保管庫", "原本"];
+      const FORBIDDEN_SHEETS = ["temp", "test", "debug", "unknown_generated"];
+      
+      const missing = REQUIRED_SHEETS.filter(name => !sheetNames.includes(name));
+      const violated = FORBIDDEN_SHEETS.filter(name => sheetNames.includes(name));
+      
+      if (missing.length > 0) {
+        return {
+          success: false,
+          error: "STRUCTURE_MISMATCH",
+          message: "Required sheets missing from spreadsheet: " + missing.join(", "),
+          status: "DENIED"
+        };
+      }
+      
+      if (violated.length > 0) {
+        return {
+          success: false,
+          error: "STRUCTURE_MISMATCH",
+          message: "Forbidden sheets found in spreadsheet: " + violated.join(", "),
+          status: "DENIED"
+        };
+      }
+      
+      return {
+        success: true,
+        message: "Spreadsheet structure guard validation passed."
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: "STRUCTURE_GUARD_ERROR",
+        message: err.toString(),
+        status: "DENIED"
+      };
+    }
+  }
   
   // Cleanup/Rollback Action (deletes spreadsheet and folder under native user credentials)
   if (params.cleanupResources === "true" || params.cleanupResources === true) {

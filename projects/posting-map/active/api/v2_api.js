@@ -1929,7 +1929,7 @@ class LegacyApiFallbackHandler {
   }
 }
 
-class WriteSpreadsheetHandler {
+class WriteBatchSpreadsheetHandler {
   execute(request, context) {
     const metadata = {
       requestId: request.requestId,
@@ -1939,31 +1939,19 @@ class WriteSpreadsheetHandler {
     };
 
     try {
-      const postData = request.body;
+      const postData = request.body || {};
       const csvData = postData.csvData;
-      if (!csvData) {
-        return ApiResponse.errorResponse('BAD_REQUEST', 'Missing csvData in request body', 400, metadata);
+      const sheetName = postData.sheetName;
+      const expectedRowCount = postData.expectedRowCount !== undefined ? parseInt(postData.expectedRowCount, 10) : null;
+
+      if (!csvData || !sheetName) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Missing required parameters: csvData, sheetName', 400, metadata);
       }
 
-      // STRICT PROTECTION RULE: Only allow target sheet name "区割り"
-      const sheetName = CONFIG.get("SHEET_DISTRICT") || "区割り";
-      if (sheetName !== "区割り") {
-        return ApiResponse.errorResponse('BAD_REQUEST', 'Spreadsheet protection error: target sheet must be "区割り". Operation rejected.', 400, metadata);
-      }
-
-      // Parse CSV Data into rows
-      let rows;
-      try {
-        rows = Utilities.parseCsv(csvData);
-      } catch (csvErr) {
-        // Fallback simple csv parse
-        rows = csvData.split('\n').map(line => {
-          return line.split(',').map(cell => cell.replace(/^["']|["']$/g, '').trim());
-        });
-      }
-
-      if (rows.length === 0) {
-        return ApiResponse.errorResponse('BAD_REQUEST', 'Empty csvData', 400, metadata);
+      // Naming validation (Must match municipality batch sheet naming convention)
+      const namePattern = /^[^（\(\)]+(?:（\d+）)?$/;
+      if (sheetName !== "区割り" && !namePattern.test(sheetName)) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Invalid target sheet name format: ' + sheetName, 400, metadata);
       }
 
       let ssId = postData.spreadsheetId;
@@ -1977,10 +1965,46 @@ class WriteSpreadsheetHandler {
       const ss = SpreadsheetApp.openById(ssId);
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) {
-        return ApiResponse.errorResponse('SHEET_NOT_FOUND', 'Target sheet not found in spreadsheet. Automatic creation is disabled for safety.', 404, metadata);
+        return ApiResponse.errorResponse('SHEET_NOT_FOUND', 'Target sheet "' + sheetName + '" not found in spreadsheet.', 404, metadata);
       }
 
-      // Strictly execute clear and setValues on "区割り" sheet only
+      // Parse CSV Data into rows
+      let rows;
+      try {
+        rows = Utilities.parseCsv(csvData);
+      } catch (csvErr) {
+        rows = csvData.split('\n').map(line => {
+          return line.split(',').map(cell => cell.replace(/^["']|["']$/g, '').trim());
+        });
+      }
+
+      if (rows.length === 0) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Empty csvData', 400, metadata);
+      }
+
+      // 1. Columns check (Verify column count and header strings matching "原本" layout)
+      const expectedHeaders = ["住所", "地図", "メモ", "完了", "日付", "枚数", "担当"];
+      if (rows[0].length !== expectedHeaders.length) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Column count mismatch. Expected ' + expectedHeaders.length + ' columns.', 400, metadata);
+      }
+      for (let c = 0; c < expectedHeaders.length; c++) {
+        if (rows[0][c] !== expectedHeaders[c]) {
+          return ApiResponse.errorResponse('BAD_REQUEST', 'Header mismatch at column ' + (c + 1) + '. Expected "' + expectedHeaders[c] + '", got "' + rows[0][c] + '".', 400, metadata);
+        }
+      }
+
+      // 2. Data row count validation (excluding header, must be <= 10)
+      const dataRowCount = rows.length - 1;
+      if (dataRowCount > 10) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Batch size limit exceeded. Maximum 10 rows allowed, got ' + dataRowCount, 400, metadata);
+      }
+
+      // 3. Expected row count validation (must match batch_plan count)
+      if (expectedRowCount !== null && dataRowCount !== expectedRowCount) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Row count mismatch. Expected ' + expectedRowCount + ' rows, got ' + dataRowCount, 400, metadata);
+      }
+
+      // Strictly execute clear and setValues on the validated target sheet
       sheet.clear();
       sheet.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
 
@@ -1993,7 +2017,8 @@ class WriteSpreadsheetHandler {
       return ApiResponse.successResponse({
         success: true,
         spreadsheetId: ssId,
-        sheetCount: ss.getSheets().length
+        sheetName: sheetName,
+        writtenRows: dataRowCount
       }, 200, metadata);
     } catch (err) {
       return ApiResponse.errorResponse('HANDLER_ERROR', err.toString(), 500, metadata);
@@ -2011,9 +2036,15 @@ class GetAreasHandler {
     };
 
     try {
-      const sheetName = CONFIG.get("SHEET_DISTRICT") || "区割り";
-      if (sheetName !== "区割り") {
-        return ApiResponse.errorResponse('BAD_REQUEST', 'Spreadsheet protection error: target sheet must be "区割り". Operation rejected.', 400, metadata);
+      let sheetName = request.query ? request.query.sheetName : null;
+      if (!sheetName) {
+        sheetName = "区割り";
+      }
+
+      // Validate sheet name format
+      const namePattern = /^[^（\(\)]+(?:（\d+）)?$/;
+      if (sheetName !== "区割り" && !namePattern.test(sheetName)) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Invalid sheet name format: ' + sheetName, 400, metadata);
       }
 
       let ssId = request.query ? request.query.spreadsheetId : null;
@@ -2042,7 +2073,8 @@ class GetAreasHandler {
     }
   }
 }
-class DuplicateSheetHandler {
+
+class DuplicateTemplateSheetHandler {
   execute(request, context) {
     const metadata = {
       requestId: request.requestId,
@@ -2061,9 +2093,14 @@ class DuplicateSheetHandler {
         return ApiResponse.errorResponse('BAD_REQUEST', 'Missing required parameters: spreadsheetId, sourceSheet, targetSheet', 400, metadata);
       }
 
-      // STRICT PROTECTION RULE: duplicateSheet API accepts only fixed names
-      if (sourceSheet !== "原本" || targetSheet !== "区割り") {
-        return ApiResponse.errorResponse('BAD_REQUEST', 'Invalid sheet duplication parameters. Only "原本" to "区割り" duplication is allowed.', 400, metadata);
+      // STRICT PROTECTION RULE: Only allow "原本" duplication to valid municipality batch names
+      if (sourceSheet !== "原本") {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Invalid source sheet duplication parameter. Only "原本" can be duplicated.', 400, metadata);
+      }
+
+      const namePattern = /^[^（\(\)]+(?:（\d+）)?$/;
+      if (targetSheet !== "区割り" && !namePattern.test(targetSheet)) {
+        return ApiResponse.errorResponse('BAD_REQUEST', 'Invalid target sheet name format: ' + targetSheet, 400, metadata);
       }
 
       const ss = SpreadsheetApp.openById(ssId);
@@ -2074,7 +2111,6 @@ class DuplicateSheetHandler {
 
       let target = ss.getSheetByName(targetSheet);
       if (target) {
-        // If target already exists, delete it first to ensure clean duplication
         ss.deleteSheet(target);
       }
 
@@ -2170,9 +2206,9 @@ class EndpointRegistry {
     const holding = flags.mapbox ? new HoldingHandler() : new LegacyHoldingHandler();
     const health = new HealthHandler();
     const version = new VersionHandler();
-    const writeSpreadsheetHandler = new WriteSpreadsheetHandler();
+    const writeBatchSpreadsheetHandler = new WriteBatchSpreadsheetHandler();
     const getAreasHandler = new GetAreasHandler();
-    const duplicateSheetHandler = new DuplicateSheetHandler();
+    const duplicateTemplateSheetHandler = new DuplicateTemplateSheetHandler();
     const createTestSpreadsheetHandler = new CreateTestSpreadsheetHandler();
     const cleanupTestSpreadsheetHandler = new CleanupTestSpreadsheetHandler();
 
@@ -2182,12 +2218,12 @@ class EndpointRegistry {
     this.register('POST', 'v2', '/holding', holding);
     this.register('GET', 'v2', '/health', health);
     this.register('GET', 'v2', '/version', version);
-    this.register('POST', 'v1', '/writeSpreadsheet', writeSpreadsheetHandler);
-    this.register('POST', 'v2', '/writeSpreadsheet', writeSpreadsheetHandler);
+    this.register('POST', 'v1', '/writeBatchSpreadsheet', writeBatchSpreadsheetHandler);
+    this.register('POST', 'v2', '/writeBatchSpreadsheet', writeBatchSpreadsheetHandler);
     this.register('GET', 'v1', '/getAreas', getAreasHandler);
     this.register('GET', 'v2', '/getAreas', getAreasHandler);
-    this.register('POST', 'v1', '/duplicateSheet', duplicateSheetHandler);
-    this.register('POST', 'v2', '/duplicateSheet', duplicateSheetHandler);
+    this.register('POST', 'v1', '/duplicateTemplateSheet', duplicateTemplateSheetHandler);
+    this.register('POST', 'v2', '/duplicateTemplateSheet', duplicateTemplateSheetHandler);
     this.register('POST', 'v1', '/createTestSpreadsheet', createTestSpreadsheetHandler);
     this.register('POST', 'v2', '/createTestSpreadsheet', createTestSpreadsheetHandler);
     this.register('POST', 'v1', '/cleanupTestSpreadsheet', cleanupTestSpreadsheetHandler);

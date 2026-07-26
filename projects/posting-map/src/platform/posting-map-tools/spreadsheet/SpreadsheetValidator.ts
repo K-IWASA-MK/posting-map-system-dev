@@ -15,14 +15,22 @@ export class SpreadsheetValidator {
 
     // 1. Header Validation
     const headerLine = lines[0];
-    const expectedHeaders = ['自治体名', '町名/大字', '丁目/詳細', 'ステータス', '検証ソース', '選挙区コード'];
-    
-    // Clean quotes from header cells
     const actualHeaders = this.parseCsvRow(headerLine);
-    
-    for (const expected of expectedHeaders) {
-      if (!actualHeaders.includes(expected)) {
-        throw new Error(`[Validation Block] Missing required column header: '${expected}'. Got headers: [${actualHeaders.join(', ')}]`);
+
+    const hasMasterFormat = actualHeaders.includes('full_address');
+    if (hasMasterFormat) {
+      const required = ['city_name', 'full_address', 'postal_code'];
+      for (const req of required) {
+        if (!actualHeaders.includes(req)) {
+          throw new Error(`[Validation Block] Master CSV format is missing required header: '${req}'. Got: [${actualHeaders.join(', ')}]`);
+        }
+      }
+    } else {
+      const required = ['自治体名', '町名/大字', '丁目/詳細'];
+      for (const req of required) {
+        if (!actualHeaders.includes(req)) {
+          throw new Error(`[Validation Block] Legacy CSV format is missing required header: '${req}'. Got: [${actualHeaders.join(', ')}]`);
+        }
       }
     }
 
