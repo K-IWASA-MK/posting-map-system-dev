@@ -374,9 +374,9 @@
           return false;
         }
 
-        // TASK-010 高速化 ①: liff.isLoggedIn() 確認後、getAppData通信を即時並列開始 (並列プリフェッチ)
+        // TASK-010-B: liff.isLoggedIn() 確認後、getAppData を即時バックグラウンド並列発火
         if (!_appDataPromise) {
-          console.log('[TASK-010 PERF] Parallel prefetching getAppData...');
+          console.log('[TASK-010-B] Background prefetching getAppData from GAS...');
           _appDataPromise = api('getAppData');
         }
 
@@ -397,7 +397,7 @@
           localStorage.setItem('user_info', JSON.stringify(currentUser));
           
           setHud('register', 'Sending (Background)', true);
-          // TASK-010 高速化 ②: registerStaff処理を非ブロッキング化 (awaitなし、バックグラウンド処理)
+          // TASK-010-B: registerStaff 処理を完全非ブロッキング化 (待機 0ms)
           api('registerStaff', { 
             lastName: liffProfile.displayName, 
             firstName: 'LINE', 
@@ -409,7 +409,6 @@
               setHud('register', 'GAS Fail (Background)', false);
             }
           }).catch(err => {
-            console.warn('[TASK-010 PERF] Background registerStaff exception:', err);
             setHud('register', 'GAS Fail (Background)', false);
           });
         }
@@ -459,43 +458,75 @@
       } catch (err) { return null; }
     }
 
+    function updateHeaderProgress(data) {
+      if (!data || !data.areas) return;
+      const totalDone = data.areas.reduce((sum, a) => sum + (a.count || 0), 0);
+      const totalTarget = data.areas.reduce((sum, a) => sum + (a.total || 500), 0);
+      const pct = totalTarget > 0 ? Math.round((totalDone / totalTarget) * 100) : 0;
+      
+      const countEl = document.getElementById('header-count');
+      if (countEl) countEl.textContent = `(${String(totalDone).padStart(3, ' ')}/${totalTarget})`;
+      const pctEl = document.getElementById('header-pct');
+      if (pctEl) pctEl.textContent = `${pct}%`;
+    }
+
     async function startApp() {
       const gateway = document.getElementById('screen-gateway');
       if (gateway) gateway.classList.add('hidden');
 
-      let ok = await initLiff();
-      if (!ok) {
-        currentUser = {
-          userId: 'U_IWASA_CEO_OFFICIAL',
-          displayName: '岩佐CEO',
-          name: '岩佐CEO',
-          id: 'U_IWASA_CEO_OFFICIAL',
-          last: '岩佐',
-          first: 'CEO'
-        };
+      // TASK-010-B 1 & 3: キャッシュファースト (localStorage から 0.1秒で即時即効描画)
+      let renderedFromCache = false;
+      const cachedRaw = localStorage.getItem('cached_app_data');
+      if (cachedRaw) {
+        try {
+          const cached = JSON.parse(cachedRaw);
+          if (cached && Array.isArray(cached.areas) && cached.areas.length > 0) {
+            appData = cached;
+            updateHeaderProgress(appData);
+            switchPage('areas'); // 通信完了を一切待たずに即時HOME画面表示！
+            renderedFromCache = true;
+            console.log('[TASK-010-B] ⚡ INSTANT LAUNCH: Rendered HOME from localStorage Cache!');
+          }
+        } catch(e) {}
       }
-      
-      // TASK-010 高速化 ③: loadDataで既存Promise (_appDataPromise) を再利用 (getAppData二重取得禁止)
-      if (!_appDataPromise) {
-        _appDataPromise = api('getAppData');
-      }
-      const rawRes = await _appDataPromise;
-      const data = (rawRes && rawRes.data) ? rawRes.data : rawRes;
-      if (data && data.areas) {
-        appData = data;
-        const totalDone = appData.areas.reduce((sum, a) => sum + (a.count || 0), 0);
-        const totalTarget = appData.areas.reduce((sum, a) => sum + (a.total || 500), 0);
-        const pct = totalTarget > 0 ? Math.round((totalDone / totalTarget) * 100) : 0;
-        
-        const countEl = document.getElementById('header-count');
-        if (countEl) countEl.textContent = `(${String(totalDone).padStart(3, ' ')}/${totalTarget})`;
-        const pctEl = document.getElementById('header-pct');
-        if (pctEl) pctEl.textContent = `${pct}%`;
-      }
-      
-      switchPage('areas');
-      const elapsed = (performance.now() - window.launchStartTime).toFixed(1);
-      console.log(`[TASK-010 PERF] 🚀 App Fully Started in ${elapsed} ms! Target < 3000 ms.`);
+
+      // TASK-010-B 4 & 5: バックグラウンド並列同期と差分レンダリング
+      const syncTask = async () => {
+        let ok = await initLiff();
+        if (!ok) {
+          currentUser = {
+            userId: 'U_IWASA_CEO_OFFICIAL',
+            displayName: '岩佐CEO',
+            name: '岩佐CEO',
+            id: 'U_IWASA_CEO_OFFICIAL',
+            last: '岩佐',
+            first: 'CEO'
+          };
+        }
+
+        if (!_appDataPromise) {
+          _appDataPromise = api('getAppData');
+        }
+        const rawRes = await _appDataPromise;
+        const data = (rawRes && rawRes.data) ? rawRes.data : rawRes;
+        if (data && data.areas) {
+          appData = data;
+          localStorage.setItem('cached_app_data', JSON.stringify(appData));
+          updateHeaderProgress(appData);
+          if (window.HAppRender && window.HAppRender.renderAreas) {
+            window.HAppRender.renderAreas(); // 受信後、画面を静かに差分更新
+          }
+          if (!renderedFromCache) {
+            switchPage('areas');
+          }
+          console.log('[TASK-010-B] 🔄 SILENT SYNC: Updated appData live from GAS.');
+        } else if (!renderedFromCache) {
+          switchPage('areas');
+        }
+      };
+
+      // バックグラウンド同期を発火
+      syncTask();
     }
 
     function forceStart() { startApp(); }
