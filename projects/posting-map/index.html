@@ -1,15 +1,589 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta name="build-id" content="20260728-task009-restored">
+  <meta name="git-commit" content="ab300e1">
+  <meta name="build-source" content="main">
+  <meta name="publish-target" content="GitHub Pages">
   <meta charset="UTF-8">
-  <title>POSTING MAP - H-app Entry</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>POSTING MAP - FIELD OPERATIONS OS</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./app/style.css?v=20260728">
+  
   <script>
-    // Redirect root access to app/index.html preserving query parameters
-    const search = window.location.search;
-    window.location.replace('./app/index.html' + search);
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              DEFAULT: '#2563eb',
+              light: '#3b82f6',
+              dark: '#1d4ed8'
+            }
+          },
+          fontFamily: {
+            sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+          }
+        }
+      }
+    }
   </script>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="./app/client-loader.js"></script>
+  <script src="./app/db.js"></script>
+  <script src="./app/render.js"></script>
+  <script src="./app/h-app-gps.js"></script>
+  <script src="./app/h-app-camera.js"></script>
+  <script src="./app/h-app-sync.js"></script>
+  <script src="./app/h-app-workflow.js"></script>
+  <script src="./app/h-app-core.js"></script>
 </head>
-<body>
-  <p>Redirecting to POSTING MAP H-app...</p>
+<body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
+
+  <!-- LEVEL 0: 1. GATEWAY / SPLASH (LINE LOGIN SYSTEM) -->
+  <div id="screen-gateway" class="fixed top-0 left-0 w-full h-[100dvh] z-[1000] bg-[#000000] flex flex-col items-center justify-center p-6 pb-6 text-center hidden">
+    <div class="gateway-header-wrap flex flex-col items-center justify-center mb-4 mt-0">
+      <div class="gateway-icon-container w-32 h-32 bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-4 p-1 relative shadow-2xl">
+        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=73" class="w-full h-full object-cover rounded-[2.2rem] z-10">
+      </div>
+      <div class="text-center">
+        <h2 id="gateway-title" style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">POSTING MAP</h2>
+        <p id="gateway-subtitle" style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2">FIELD OPERATIONS OS</p>
+      </div>
+    </div>
+    <div class="gateway-content-wrap w-full max-w-sm space-y-4">
+      <div class="gateway-btn-card bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl">
+        <button id="btn-login-manual" onclick="forceStart()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-5 text-lg font-black shadow-xl uppercase tracking-tighter">アプリを起動する</button>
+      </div>
+      <div class="gateway-footer space-y-1">
+        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Operational</p>
+        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Environment</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEVEL 0: 2. LOADING OVERLAY -->
+  <div id="loading" class="fixed top-0 left-0 w-full h-[100dvh] z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
+    <div class="w-16 h-16 bg-white/5 backdrop-blur-2xl rounded-[1.5rem] border border-white/10 flex items-center justify-center overflow-hidden mb-8 shadow-xl">
+      <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=73" class="w-full h-full object-cover rounded-[1.3rem]">
+    </div>
+    <p id="loading-status" class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">CONNECTING...</p>
+    <div class="mt-5 w-48 h-[2px] bg-white/5 rounded-full overflow-hidden">
+      <div id="loading-bar" style="width: 8%; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 8px rgba(37,99,235,0.6); background: #2563eb;" class="h-full rounded-full"></div>
+    </div>
+  </div>
+
+  <!-- MAIN APP SHELL -->
+  <div id="app" class="fixed top-0 left-0 w-full h-[100dvh] z-[2000] flex flex-col bg-[#000000]">
+    <div id="app-shell" class="flex flex-col h-full w-full">
+      <!-- HEADER HUD -->
+      <header class="safe-top px-6 pt-8 pb-4 flex items-center shrink-0">
+        <div style="background: #1C1C1E; border: 1px solid rgba(255,255,255,0.1);" class="px-6 py-3 rounded-full flex items-center justify-between text-xs font-black tracking-tight w-full shadow-2xl">
+          <div class="flex items-center gap-3">
+            <span class="text-white/40">全体進捗</span>
+            <span id="header-count" class="text-white/70 font-mono whitespace-pre">(  0/0)</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5">
+              <span id="sync-text" class="text-[8px] font-black uppercase tracking-[0.2em] text-[#22c55e] transition-all duration-300">ONLINE</span>
+              <div id="sync-status" class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e] animate-soft-pulse transition-all duration-300"></div>
+            </div>
+            <span id="header-pct" class="text-[#2563eb] font-mono">0%</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT VIEW -->
+      <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-6 overscroll-y-contain">
+        <div id="view-container" class="relative w-full h-full">
+          <div id="new-ui-container" class="w-full h-full">
+            
+            <!-- LEVEL 1: HOME DASHBOARD (AREAS PAGE) -->
+            <section id="page-areas" class="page space-y-8">
+              <div id="area-list" class="space-y-6"></div>
+              <div id="new-area-list" class="space-y-6"></div>
+            </section>
+
+            <!-- LEVEL 2: AREA DETAIL PAGE -->
+            <section id="page-detail" class="page hidden space-y-8">
+              <div class="flex items-center gap-4 mb-4">
+                <button onclick="switchPage('areas')" class="w-12 h-12 premium-glass-btn flex items-center justify-center text-xl font-bold">‹</button>
+                <span id="detail-area-title" class="text-lg font-black text-white tracking-tight"></span>
+              </div>
+              <div id="detail-list" class="space-y-8" style="padding-bottom: 160px;"></div>
+            </section>
+
+            <!-- LEVEL 1: ID / PROFILE / SETTINGS PAGE -->
+            <section id="page-settings" class="page hidden space-y-8">
+              <div id="settings-content" class="space-y-8"></div>
+            </section>
+
+            <!-- LEVEL 1: RANKING PAGE -->
+            <section id="new-page-ranking" class="page hidden space-y-8">
+              <div id="ranking-list" class="space-y-6" style="padding-bottom: 160px;"></div>
+            </section>
+
+            <!-- LEVEL 1 (Tier 2): STORAGE REGISTER PAGE -->
+            <section id="new-page-storage-register" class="page hidden space-y-8" style="padding-bottom: 160px;">
+              <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+                  <span class="text-sm">📦</span>
+                </div>
+                <div>
+                  <h3 class="text-sm font-black tracking-wider text-white">チラシ保管庫</h3>
+                  <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">STOCK REGISTRATION</p>
+                </div>
+              </div>
+
+              <!-- ID Card Status -->
+              <div class="premium-glass py-3 px-6 space-y-1">
+                <span class="text-[10px] font-black uppercase tracking-widest text-[#22c55e] font-mono block text-center">公式配布員情報</span>
+                <div class="flex items-center justify-between">
+                  <span id="storage-register-staff-id" class="text-base font-black text-white/80 font-mono">ID: ---</span>
+                  <span id="storage-register-staff-name" class="text-base font-black text-white/80">---</span>
+                </div>
+              </div>
+
+              <!-- Form Card -->
+              <div class="premium-glass p-6 space-y-6">
+                <span class="text-[10px] font-black uppercase tracking-widest text-[#22c55e] font-mono block text-center">保管情報の登録</span>
+                <div class="space-y-2">
+                  <label class="text-[10px] font-bold text-white/40 tracking-wider">保管場所（市名）</label>
+                  <select id="storage-register-location" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-4 text-sm font-bold text-white focus:outline-none focus:border-[#2563eb] transition-colors">
+                    <option value="津市">津市</option>
+                    <option value="四日市市">四日市市</option>
+                    <option value="鈴鹿市">鈴鹿市</option>
+                    <option value="松阪市">松阪市</option>
+                    <option value="伊勢市">伊勢市</option>
+                  </select>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-[10px] font-bold text-white/40 tracking-wider">保管枚数 (枚)</label>
+                  <input id="storage-register-count" type="number" pattern="[0-9]*" inputmode="numeric" placeholder="例: 1000" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-4 text-lg font-black text-white focus:outline-none focus:border-[#2563eb] transition-colors text-center font-mono">
+                </div>
+                <button id="btn-storage-register-submit" onclick="window.HAppWorkflow.submitFlyerStock()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-4 text-base font-black shadow-xl uppercase tracking-wider">在庫を登録する</button>
+                <div id="storage-register-message" class="hidden text-center text-xs font-bold text-[#22c55e]"></div>
+              </div>
+            </section>
+
+            <!-- LEVEL 1 (Tier 2): STORAGE LIST PAGE -->
+            <section id="new-page-storage-list" class="page hidden space-y-8" style="padding-bottom: 160px;">
+              <div style="border: 1px solid rgba(37, 99, 235, 0.35); box-shadow: inset 0 0 15px rgba(37,99,235,0.08), 0 0 25px rgba(37,99,235,0.12);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
+                  <span class="text-sm">📊</span>
+                </div>
+                <div>
+                  <h3 class="text-sm font-black tracking-wider text-white">保管状況一覧</h3>
+                  <p class="text-[10px] font-bold text-[#2563eb] mt-0.5 uppercase tracking-widest font-mono">FLYER STOCK INVENTORY</p>
+                </div>
+              </div>
+              <div id="new-storage-list-container" class="space-y-6"></div>
+              <div id="storage-list-container" class="space-y-6"></div>
+            </section>
+
+          </div>
+        </div>
+      </main>
+
+      <!-- NAVIGATION: 2-TIER FLOATING GLASS NAV -->
+      <nav id="bottom-nav" style="bottom: calc(env(safe-area-inset-bottom) + 1rem);" class="fixed left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
+        <!-- Tier 1 Container -->
+        <div id="nav-tier-1" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl">
+          <button data-page="areas" onclick="window.HAppWorkflow.navigateToAreaTab()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all"><div class="text-xl">🗺️</div><span class="text-[10px] font-black uppercase tracking-widest text-white">エリア</span></button>
+          <button data-page="ranking" onclick="switchPage('ranking')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">🏆</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ランキング</span></button>
+          <button data-page="settings" onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">👤</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">ID</span></button>
+          <button data-page="next" onclick="toggleNavTier(2)" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">⚙️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">次へ</span></button>
+        </div>
+        <!-- Tier 2 Container -->
+        <div id="nav-tier-2" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);" class="rounded-[2.5rem] p-2 flex justify-around items-center h-[90px] relative shadow-2xl hidden">
+          <button data-page="storage-register" onclick="switchPage('storage-register')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">📦</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">在庫登録</span></button>
+          <button data-page="storage-list" onclick="switchPage('storage-list')" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">📊</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">在庫一覧</span></button>
+          <button data-page="back" onclick="backToTier1()" class="nav-btn flex flex-col items-center gap-1 flex-1 transition-all opacity-40"><div class="text-xl">↩️</div><span class="text-[10px] font-black uppercase tracking-widest text-white/40">戻る</span></button>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <!-- LEVEL 4: CUSTOM NUMPAD MODAL -->
+  <div id="numpad-modal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 space-y-6">
+      <div class="flex justify-between items-center border-b border-white/10 pb-4">
+        <div>
+          <h3 class="text-lg font-black text-white tracking-tight">配布枚数入力</h3>
+          <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-0.5">Enter Distributed Count</p>
+        </div>
+        <button id="numpad-close" onclick="window.HAppWorkflow.closeNumpad()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold">✕</button>
+      </div>
+
+      <div class="bg-black/40 rounded-2xl p-6 text-right border border-white/5">
+        <div id="numpad-display" class="text-5xl font-black text-white tracking-tight font-mono">0</div>
+        <span class="text-xs font-bold text-white/40 uppercase tracking-widest">flyers</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <button onclick="window.HAppWorkflow.pressNum(1)" class="numpad-key">1</button>
+        <button onclick="window.HAppWorkflow.pressNum(2)" class="numpad-key">2</button>
+        <button onclick="window.HAppWorkflow.pressNum(3)" class="numpad-key">3</button>
+        <button onclick="window.HAppWorkflow.pressNum(4)" class="numpad-key">4</button>
+        <button onclick="window.HAppWorkflow.pressNum(5)" class="numpad-key">5</button>
+        <button onclick="window.HAppWorkflow.pressNum(6)" class="numpad-key">6</button>
+        <button onclick="window.HAppWorkflow.pressNum(7)" class="numpad-key">7</button>
+        <button onclick="window.HAppWorkflow.pressNum(8)" class="numpad-key">8</button>
+        <button onclick="window.HAppWorkflow.pressNum(9)" class="numpad-key">9</button>
+        <button onclick="window.HAppWorkflow.pressNum('C')" class="numpad-key text-red-500 font-bold">C</button>
+        <button onclick="window.HAppWorkflow.pressNum(0)" class="numpad-key">0</button>
+        <button onclick="window.HAppWorkflow.pressNum('OK')" class="numpad-key bg-[#2563eb] text-white font-black shadow-[0_0_15px_rgba(37,99,235,0.4)]">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEVEL 1: ID TERMS/PRIVACY INFO MODAL -->
+  <div id="id-info-modal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="openIdInfoModal()">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);" class="w-full max-w-md bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 p-8 transform translate-y-full transition-transform duration-300 flex flex-col items-center text-center space-y-4 max-h-[50dvh]" onclick="event.stopPropagation()">
+      <div onclick="openIdInfoModal(); event.stopPropagation();" class="py-3 px-6 cursor-pointer shrink-0 -mt-3 flex items-center justify-center">
+        <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+      </div>
+      <h4 id="id-info-title" class="font-black text-white text-[12px] uppercase tracking-wider shrink-0 w-full text-left"></h4>
+      <div id="id-info-body-container" class="w-full text-left overflow-y-auto hide-scrollbar flex-1 pr-1 overscroll-y-contain">
+        <p id="id-info-body" class="leading-relaxed text-xs text-white/40"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEVEL 3: POINT DETAIL ACTION MODAL -->
+  <div id="detail-modal" class="fixed inset-0 z-[4500] bg-black/60 backdrop-blur-sm flex items-end justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="window.HAppWorkflow.closeDetailModal()">
+    <div style="padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem);" class="w-full max-w-md max-h-[80dvh] bg-[#0c0c0e]/95 backdrop-blur-2xl rounded-t-[2.5rem] border-t border-white/10 px-6 pt-4 pb-0 overflow-hidden transform translate-y-full transition-transform duration-300 flex flex-col space-y-4" onclick="event.stopPropagation()">
+      <div onclick="window.HAppWorkflow.closeDetailModal(); event.stopPropagation();" class="py-2 px-6 cursor-pointer shrink-0 flex items-center justify-center">
+        <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+      </div>
+      <div id="detail-modal-content" class="space-y-6 overflow-y-auto hide-scrollbar flex-1 pr-1 pb-6 overscroll-y-contain"></div>
+    </div>
+  </div>
+
+  <!-- LEVEL 5: STANDARD CONFIRM MODAL -->
+  <div id="confirm-modal" class="fixed inset-0 z-[6000] bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none" onclick="if(typeof window.HAppWorkflow.closeConfirmModal === 'function') window.HAppWorkflow.closeConfirmModal()">
+    <div style="padding-bottom: env(safe-area-inset-bottom);" class="w-[90%] max-w-sm bg-[#1C1C1E] border border-white/10 rounded-[2rem] p-6 transform scale-95 transition-transform duration-300 flex flex-col space-y-6 shadow-2xl" onclick="event.stopPropagation()">
+      <div id="confirm-modal-content" class="w-full"></div>
+    </div>
+  </div>
+
+  <!-- Diagnostic HUD Overlay -->
+  <div id="liff-hud" class="fixed top-4 left-4 right-4 bg-black/90 backdrop-blur-md text-white rounded-2xl p-4 text-xs font-mono z-[100000] border border-white/20 shadow-2xl space-y-1 hidden">
+    <div class="font-bold text-blue-400 text-xs border-b border-white/20 pb-1 mb-2 flex justify-between">
+      <span>📱 REAL-TIME DIAGNOSTIC HUD</span>
+      <span id="hud-os" class="text-gray-400">OS: -</span>
+    </div>
+    <div>1. LIFF Init: <span id="hud-init" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>2. LoggedIn: <span id="hud-login" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>3. Profile: <span id="hud-profile" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>4. Register Staff: <span id="hud-register" class="font-bold text-yellow-400">WAITING</span></div>
+    <div>5. getAppData: <span id="hud-appdata" class="font-bold text-yellow-400">WAITING</span></div>
+    <div class="text-[9px] text-gray-400 pt-1 border-t border-white/10 mt-1 break-all" id="hud-url"></div>
+  </div>
+
+  <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm font-bold shadow-2xl hidden z-[11000] whitespace-nowrap border border-white/10 transition-all"></div>
+  <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
+
+  <!-- INLINE CORE CONTROLLER & LIFF BINDING -->
+  <script>
+    console.log("[FIELD OPERATIONS OS] Core Initializing...");
+
+    const API_URL = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api) 
+      ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl 
+      : 'https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec';
+    
+    const LIFF_ID = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.line && window.PMS_CLIENT_CONFIG.line.liffId)
+      ? window.PMS_CLIENT_CONFIG.line.liffId
+      : "2010374196-bHBYo37e";
+
+    let appData = {
+      areas: [
+        { id: "MIE03_ADDRESS_MASTER", name: "MIE03_ADDRESS_MASTER", progress: 15, count: 120, total: 800 }
+      ]
+    };
+    let currentUser = {
+      displayName: localStorage.getItem('posting_display_name') || '岩佐CEO',
+      name: localStorage.getItem('posting_display_name') || '岩佐CEO',
+      userId: 'U_IWASA_CEO_OFFICIAL',
+      id: 'U_IWASA_CEO_OFFICIAL',
+      last: '岩佐',
+      first: 'CEO'
+    };
+    let rankingData = [];
+    let currentNavTier = 1;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDebugMode = urlParams.get('debug') === 'true' || urlParams.get('hud') === 'true' || urlParams.get('hud') === '1';
+      const hud = document.getElementById('liff-hud');
+      if (hud && isDebugMode) hud.classList.remove('hidden');
+    });
+
+    function setHud(step, text, isOk, extra = '') {
+      const el = document.getElementById('hud-' + step);
+      if (!el) return;
+      el.textContent = (isOk === true ? 'OK ' : isOk === false ? 'NG ' : '') + text + (extra ? ` (${extra})` : '');
+      el.className = 'font-bold ' + (isOk === true ? 'text-green-400' : isOk === false ? 'text-red-400' : 'text-yellow-400');
+    }
+
+    async function initLiff() {
+      const hudUrl = document.getElementById('hud-url');
+      if (hudUrl) hudUrl.textContent = 'URL: ' + window.location.href;
+
+      if (typeof liff === 'undefined') {
+        console.warn('[LIFF] SDK not loaded.');
+        setHud('init', 'SDK NOT LOADED', false);
+        return false;
+      }
+      try {
+        await liff.init({ liffId: LIFF_ID });
+        console.log('[LIFF] Init success with ID:', LIFF_ID);
+        setHud('init', 'Init Success', true);
+
+        const os = liff.getOS();
+        const hudOs = document.getElementById('hud-os');
+        if (hudOs) hudOs.textContent = 'OS: ' + os;
+
+        const loggedIn = liff.isLoggedIn();
+        setHud('login', loggedIn ? 'LoggedIn' : 'Not LoggedIn (login())', loggedIn);
+
+        if (!loggedIn) {
+          if (os === 'web') {
+            setHud('login', 'Web PC Mode', true);
+            setHud('profile', 'PC Demo User', true, '岩佐CEO');
+            currentUser = {
+              userId: 'U_IWASA_CEO_OFFICIAL',
+              displayName: '岩佐CEO',
+              pictureUrl: '',
+              name: '岩佐CEO',
+              id: 'U_IWASA_CEO_OFFICIAL',
+              last: '岩佐',
+              first: 'CEO'
+            };
+            return true;
+          }
+          liff.login();
+          return false;
+        }
+
+        const liffProfile = await liff.getProfile();
+        setHud('profile', 'Profile Loaded', true, liffProfile ? liffProfile.displayName : '');
+
+        if (liffProfile) {
+          currentUser = {
+            userId: liffProfile.userId,
+            displayName: liffProfile.displayName,
+            pictureUrl: liffProfile.pictureUrl || '',
+            name: liffProfile.displayName,
+            id: liffProfile.userId,
+            last: liffProfile.displayName,
+            first: 'LINE'
+          };
+          localStorage.setItem('posting_display_name', liffProfile.displayName);
+          localStorage.setItem('user_info', JSON.stringify(currentUser));
+          
+          setHud('register', 'Sending...', null);
+          const regRes = await api('registerStaff', { 
+            lastName: liffProfile.displayName, 
+            firstName: 'LINE', 
+            lineUserId: liffProfile.userId 
+          }, 'POST');
+
+          if (regRes && regRes.success) {
+            setHud('register', 'Saved to GAS', true);
+          } else {
+            setHud('register', 'GAS Fail', false);
+          }
+        }
+        return true;
+      } catch (err) {
+        console.error('[LIFF] Init/Login Error:', err);
+        const errMsg = err.message || err.toString();
+        setHud('profile', 'Error', false, errMsg);
+      }
+      return false;
+    }
+
+    function getAuthToken() {
+      let token = null;
+      try {
+        if (typeof liff !== 'undefined' && liff.isLoggedIn && liff.isLoggedIn()) {
+          token = liff.getAccessToken() || liff.getIDToken();
+        }
+      } catch (e) {}
+      if (!token && typeof localStorage !== 'undefined') {
+        token = localStorage.getItem('liff_token') || localStorage.getItem('posting_token');
+      }
+      if (!token) token = 'valid-liff-token';
+      return token;
+    }
+
+    async function api(action, params = {}, method = 'GET') {
+      const url = new URL(API_URL);
+      url.searchParams.append('action', action);
+      const token = getAuthToken();
+      if (token) url.searchParams.append('liffToken', token);
+      Object.keys(params).forEach(k => {
+        if (typeof params[k] !== 'object' && params[k] !== undefined) {
+          url.searchParams.append(k, params[k]);
+        }
+      });
+      try {
+        const options = { method: method, redirect: 'follow' };
+        if (method === 'POST') {
+          const formData = new FormData();
+          formData.append('json', JSON.stringify({ action, liffToken: token, ...params }));
+          options.body = formData;
+        }
+        const response = await fetch(url.toString(), options);
+        const text = await response.text();
+        try { return JSON.parse(text); } catch (e) { return null; }
+      } catch (err) { return null; }
+    }
+
+    async function startApp() {
+      const gateway = document.getElementById('screen-gateway');
+      if (gateway) gateway.classList.add('hidden');
+
+      let ok = await initLiff();
+      if (!ok) {
+        currentUser = {
+          userId: 'U_IWASA_CEO_OFFICIAL',
+          displayName: '岩佐CEO',
+          name: '岩佐CEO',
+          id: 'U_IWASA_CEO_OFFICIAL',
+          last: '岩佐',
+          first: 'CEO'
+        };
+      }
+      
+      const rawRes = await api('getAppData');
+      const data = (rawRes && rawRes.data) ? rawRes.data : rawRes;
+      if (data && data.areas) {
+        appData = data;
+        const totalDone = appData.areas.reduce((sum, a) => sum + (a.count || 0), 0);
+        const totalTarget = appData.areas.reduce((sum, a) => sum + (a.total || 500), 0);
+        const pct = totalTarget > 0 ? Math.round((totalDone / totalTarget) * 100) : 0;
+        
+        const countEl = document.getElementById('header-count');
+        if (countEl) countEl.textContent = `(${String(totalDone).padStart(3, ' ')}/${totalTarget})`;
+        const pctEl = document.getElementById('header-pct');
+        if (pctEl) pctEl.textContent = `${pct}%`;
+      }
+      
+      switchPage('areas');
+    }
+
+    function forceStart() { startApp(); }
+
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      const targetPage = document.getElementById(pageId === 'areas' ? 'page-areas' : pageId === 'detail' ? 'page-detail' : pageId === 'settings' ? 'page-settings' : pageId === 'ranking' ? 'new-page-ranking' : pageId === 'storage-register' ? 'new-page-storage-register' : pageId === 'storage-list' ? 'new-page-storage-list' : `page-${pageId}`);
+      if (targetPage) targetPage.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-page') === pageId) {
+          btn.classList.remove('opacity-40');
+          btn.classList.add('opacity-100');
+        } else if (btn.getAttribute('data-page') !== 'next' && btn.getAttribute('data-page') !== 'back') {
+          btn.classList.remove('opacity-100');
+          btn.classList.add('opacity-40');
+        }
+      });
+
+      if (pageId === 'areas') {
+        if (window.HAppRender && window.HAppRender.renderAreas) {
+          window.HAppRender.renderAreas();
+        }
+      } else if (pageId === 'ranking') {
+        if (window.HAppRender && window.HAppRender.renderRanking) {
+          window.HAppRender.renderRanking();
+        }
+      } else if (pageId === 'settings') {
+        if (window.HAppRender && window.HAppRender.renderSettings) {
+          window.HAppRender.renderSettings();
+        }
+      } else if (pageId === 'storage-list') {
+        if (window.HAppRender && window.HAppRender.renderStorageList) {
+          window.HAppRender.renderStorageList();
+        }
+      }
+    }
+
+    function toggleNavTier(tier) {
+      currentNavTier = tier;
+      const tier1 = document.getElementById('nav-tier-1');
+      const tier2 = document.getElementById('nav-tier-2');
+      if (tier === 2) {
+        if (tier1) tier1.classList.add('hidden');
+        if (tier2) tier2.classList.remove('hidden');
+      } else {
+        if (tier2) tier2.classList.add('hidden');
+        if (tier1) tier1.classList.remove('hidden');
+      }
+    }
+
+    function backToTier1() { toggleNavTier(1); switchPage('areas'); }
+
+    function openIdInfoModal(type, event) {
+      if (event) event.stopPropagation();
+      const modal = document.getElementById('id-info-modal');
+      const title = document.getElementById('id-info-title');
+      const body = document.getElementById('id-info-body');
+      if (!modal || !title || !body) return;
+
+      if (type === 'terms') {
+        title.textContent = '利用規約 (TERMS OF SERVICE)';
+        body.textContent = '本アプリケーションはFIELD OPERATIONS OS公式配布員専用の業務管理システムです。登録された情報および端末データは業務管理と統計分析の目的でのみ使用されます。';
+      } else if (type === 'privacy') {
+        title.textContent = 'プライバシーポリシー (PRIVACY POLICY)';
+        body.textContent = '配布員の個人のプライバシー情報を厳重に管理し、法的要求がある場合を除き第三者へ開示・提供することはありません。位置情報は配布作業時のみ計測されます。';
+      } else {
+        title.textContent = 'ライセンス情報 (LICENSE)';
+        body.textContent = 'POSTING MAP FIELD OPERATIONS OS v4.31. Copyright (C) 2026 POSTING MAP SYSTEM. All rights reserved.';
+      }
+      modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+      const child = modal.querySelector('div');
+      if (child) child.classList.remove('translate-y-full');
+    }
+
+    function closeIdInfoModal() {
+      const modal = document.getElementById('id-info-modal');
+      if (!modal) return;
+      const child = modal.querySelector('div');
+      if (child) child.classList.add('translate-y-full');
+      setTimeout(() => modal.classList.add('hidden', 'opacity-0', 'pointer-events-none'), 200);
+    }
+
+    function showToast(msg, isErr=false) {
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg; 
+      t.className = `fixed bottom-28 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm font-bold shadow-2xl z-[11000] whitespace-nowrap border border-white/10 transition-all ${isErr ? 'bg-red-500' : 'bg-[#2563eb]'}`;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 3000);
+    }
+
+    function saveProfile() {
+      const last = document.getElementById('user-last')?.value;
+      const first = document.getElementById('user-first')?.value;
+      if (!last) return showToast('お名前を入力してください', true);
+      const info = { last: last, first: first || '', id: currentUser.id || 'STAFF ID U_001' };
+      localStorage.setItem('user_info', JSON.stringify(info));
+      currentUser.last = last;
+      currentUser.first = first;
+      showToast('プロファイルを保存しました');
+      switchPage('settings');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      startApp();
+    });
+  </script>
 </body>
 </html>
