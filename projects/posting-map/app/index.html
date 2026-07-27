@@ -141,33 +141,20 @@
       userId: 'U_IWASA_CEO_OFFICIAL'
     };
     let currentTab = 'settings';
-    let isAdminMode = localStorage.getItem('posting_admin_mode') === 'true';
 
-    // Apply HUD visibility on load
+    // HUDは開発者専用機能（URLパラメータ ?debug=true または ?hud=true 指定時のみ表示）
     document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDebugMode = urlParams.get('debug') === 'true' || urlParams.get('hud') === 'true' || urlParams.get('hud') === '1';
       const hud = document.getElementById('liff-hud');
       if (hud) {
-        if (isAdminMode) {
+        if (isDebugMode) {
           hud.classList.remove('hidden');
         } else {
           hud.classList.add('hidden');
         }
       }
     });
-
-    function toggleAdminMode() {
-      isAdminMode = !isAdminMode;
-      localStorage.setItem('posting_admin_mode', isAdminMode.toString());
-      const hud = document.getElementById('liff-hud');
-      if (hud) {
-        if (isAdminMode) {
-          hud.classList.remove('hidden');
-        } else {
-          hud.classList.add('hidden');
-        }
-      }
-      switchTab('settings'); // re-render to update button text
-    }
 
     function setHud(step, text, isOk, extra = '') {
       const el = document.getElementById('hud-' + step);
@@ -481,12 +468,7 @@
             ${avatar}
             <h3 class="text-3xl font-black text-navy mb-2 tracking-tighter">${currentUser.displayName || currentUser.name} 様</h3>
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-8 break-all">LINE User ID: ${currentUser.userId || currentUser.id}</p>
-            <button onclick="logout()" class="text-xs font-black text-red-400 uppercase tracking-widest border-b-2 border-red-50/50 hover:text-red-600 transition-colors mb-6 block w-full text-center">ログアウト</button>
-            <div class="border-t border-gray-100 pt-6 mt-6">
-              <button onclick="toggleAdminMode()" class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b-2 border-gray-50/50 hover:text-gray-600 transition-colors">
-                管理者モード (診断HUD ${isAdminMode ? 'ON' : 'OFF'})
-              </button>
-            </div>
+            <button onclick="logout()" class="text-xs font-black text-red-400 uppercase tracking-widest border-b-2 border-red-50/50 hover:text-red-600 transition-colors">ログアウト</button>
           </div>
         `;
       }
