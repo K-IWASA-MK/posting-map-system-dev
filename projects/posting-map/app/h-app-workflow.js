@@ -1,36 +1,37 @@
 /**
  * POSTING MAP H-app Workflow & State Machine Module
- * Connects openDetail -> points list -> point modal -> start -> GPS -> camera -> numpad -> commit
+ * Connects openDetail -> points list -> point modal -> start -> GPS -> camera -> numpad -> commit -> stock registration
  */
 (function(window) {
   let numpadContext = null;
+
+  function navigateToAreaTab() {
+    if (typeof window.switchPage === 'function') {
+      window.switchPage('areas');
+    }
+  }
 
   // 1. エリア詳細の読み込み & 住居ポイント一覧表示 (openDetail)
   async function openDetail(areaName) {
     console.log(`[H-app Workflow] Opening Area Detail for: ${areaName}`);
     window.currentAreaName = areaName;
 
-    // View 切り替え
-    const main = document.getElementById('main-view');
-    if (!main) return;
+    if (typeof window.switchPage === 'function') {
+      window.switchPage('detail');
+    }
 
-    main.innerHTML = `
-      <div class="space-y-4">
-        <div class="flex items-center gap-3">
-          <button onclick="window.HAppWorkflow.backToAreas()" class="w-10 h-10 bg-white rounded-2xl flex items-center justify-center font-bold shadow-sm border border-gray-100 text-navy">‹</button>
-          <div>
-            <h2 class="text-xl font-black text-navy tracking-tight">${areaName}</h2>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Address Points List</p>
-          </div>
+    const titleEl = document.getElementById('detail-area-title');
+    if (titleEl) titleEl.textContent = areaName;
+
+    const container = document.getElementById('detail-list');
+    if (container) {
+      container.innerHTML = `
+        <div class="premium-glass p-8 text-center">
+          <div class="w-8 h-8 border-4 border-[#2563eb] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p class="text-xs font-bold text-white">住居データを同期中...</p>
         </div>
-        <div id="detail-list" class="space-y-3">
-          <div class="bg-white rounded-3xl p-8 text-center shadow-sm">
-            <div class="w-8 h-8 border-4 border-navy border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-            <p class="text-xs font-bold text-navy">住居データを同期中...</p>
-          </div>
-        </div>
-      </div>
-    `;
+      `;
+    }
 
     let points = [];
     try {
@@ -54,18 +55,18 @@
       console.error("[H-app Workflow] getAreaDetails fetch error:", err);
     }
 
-    // Default Point List for MIE-03 address master if empty
+    // MIE-03 address master mock if empty
     if (!points || points.length === 0) {
       points = [
         { rowId: 101, areaName: areaName, address: '三重県四日市市富田 1丁目1-1 (住居ポイント#1)', status: 'NOT_STARTED', count: 0, memo: '配達注意: 門扉左ポスト' },
-        { rowId: 102, areaName: areaName, address: '三重県四日市市富田 1丁目1-2 (住居ポイント#2)', status: 'NOT_STARTED', count: 0, memo: '集合ポスト 101号室' },
-        { rowId: 103, areaName: areaName, address: '三重県四日市市富田 1丁目2-1 (住居ポイント#3)', status: 'NOT_STARTED', count: 0, memo: '宅配ボックス横' }
+        { rowId: 102, areaName: areaName, address: '三重県四日市市富田 1丁目1-2 (住居ポイント#2)', status: 'IN_PROGRESS', count: 2, memo: '集合ポスト 101号室' },
+        { rowId: 103, areaName: areaName, address: '三重県四日市市富田 1丁目2-1 (住居ポイント#3)', status: 'SYNCED', count: 1, completedAt: '2026-07-28 09:30', memo: '宅配ボックス横' }
       ];
     }
 
     window.allPoints = points.map(p => ({ ...p, areaName }));
     
-    // IndexedDB ドラフトとマージ
+    // Merge IndexedDB drafts
     if (window.HAppDB && typeof window.HAppDB.getAreaDrafts === 'function') {
       try {
         const drafts = await window.HAppDB.getAreaDrafts(areaName);
@@ -81,13 +82,13 @@
       } catch(e) {}
     }
 
-    window.renderDetailList(areaName, window.allPoints);
+    if (window.HAppRender && window.HAppRender.renderDetailList) {
+      window.HAppRender.renderDetailList(areaName, window.allPoints);
+    }
   }
 
   function backToAreas() {
-    if (typeof window.switchTab === 'function') {
-      window.switchTab('area');
-    }
+    navigateToAreaTab();
   }
 
   // 2. 住居ポイント詳細モーダルを開く
@@ -97,8 +98,8 @@
 
     window.currentPoint = p;
     const modalContent = document.getElementById('detail-modal-content');
-    if (modalContent) {
-      modalContent.innerHTML = window.renderDetailModalContent(p);
+    if (modalContent && window.HAppRender && window.HAppRender.renderDetailModalContent) {
+      modalContent.innerHTML = window.HAppRender.renderDetailModalContent(p);
     }
 
     const modal = document.getElementById('detail-modal');
@@ -122,7 +123,6 @@
     p.status = 'IN_PROGRESS';
     p.startedAt = Date.now();
 
-    // 自動でGPSを測定
     if (window.HAppGPS) {
       const gps = await window.HAppGPS.getGPSLocation();
       if (gps && gps.latitude) {
@@ -131,13 +131,14 @@
       }
     }
 
-    // ドラフト保存
     if (window.HAppDB) {
       window.HAppDB.saveDraft({ id: `${areaName}_${rowId}`, areaName, rowId, status: 'IN_PROGRESS', ...p });
     }
 
     openPointDetailModal(rowId);
-    if (window.currentAreaName) window.renderDetailList(window.currentAreaName, window.allPoints);
+    if (window.currentAreaName && window.HAppRender && window.HAppRender.renderDetailList) {
+      window.HAppRender.renderDetailList(window.currentAreaName, window.allPoints);
+    }
   }
 
   // 4. GPS 測定
@@ -196,7 +197,9 @@
         p.count = valNum;
         if (window.HAppDB) window.HAppDB.saveDraft({ id: `${numpadContext.areaName}_${numpadContext.rowId}`, ...p });
         openPointDetailModal(p.rowId);
-        if (window.currentAreaName) window.renderDetailList(window.currentAreaName, window.allPoints);
+        if (window.currentAreaName && window.HAppRender && window.HAppRender.renderDetailList) {
+          window.HAppRender.renderDetailList(window.currentAreaName, window.allPoints);
+        }
       }
       closeNumpad();
       return;
@@ -213,7 +216,9 @@
     const p = (window.allPoints || []).find(pt => pt.rowId === rowId);
     if (!p) return;
     closeDetailModal();
-    window.renderConfirmModal(areaName, p);
+    if (window.HAppRender && window.HAppRender.renderConfirmModal) {
+      window.HAppRender.renderConfirmModal(areaName, p);
+    }
   }
 
   function closeConfirmModal() {
@@ -251,10 +256,43 @@
     }
 
     if (typeof window.showToast === 'function') window.showToast('配布完了実績を送信しました');
-    if (window.currentAreaName) window.renderDetailList(window.currentAreaName, window.allPoints);
+    if (window.currentAreaName && window.HAppRender && window.HAppRender.renderDetailList) {
+      window.HAppRender.renderDetailList(window.currentAreaName, window.allPoints);
+    }
+  }
+
+  // 8. チラシ保管庫の在庫登録 (submitFlyerStock)
+  async function submitFlyerStock() {
+    const locEl = document.getElementById('storage-register-location');
+    const countEl = document.getElementById('storage-register-count');
+    const msgEl = document.getElementById('storage-register-message');
+
+    const location = locEl ? locEl.value : '津市';
+    const count = countEl ? (parseInt(countEl.value, 10) || 0) : 0;
+
+    if (count <= 0) {
+      if (typeof window.showToast === 'function') window.showToast('有効な枚数を入力してください', true);
+      return;
+    }
+
+    if (msgEl) {
+      msgEl.textContent = '登録中...';
+      msgEl.classList.remove('hidden');
+    }
+
+    if (typeof window.api === 'function') {
+      await window.api('submitStock', { location, count }, 'POST');
+    }
+
+    if (msgEl) {
+      msgEl.textContent = `${location}に ${count.toLocaleString()}枚 登録しました`;
+    }
+    if (typeof window.showToast === 'function') window.showToast(`在庫登録完了: ${count}枚`);
+    if (countEl) countEl.value = '';
   }
 
   window.HAppWorkflow = {
+    navigateToAreaTab,
     openDetail,
     backToAreas,
     openPointDetailModal,
@@ -267,6 +305,7 @@
     pressNum,
     commitDistribution,
     closeConfirmModal,
-    executeCommitDistribution
+    executeCommitDistribution,
+    submitFlyerStock
   };
 })(window);
