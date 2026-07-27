@@ -27,22 +27,24 @@
     const container = $('area-list') || $('new-area-list');
     if (!container) return;
 
-    const areas = (window.appData && window.appData.areas) ? window.appData.areas : [
-      { id: "MIE03_ADDRESS_MASTER", name: "MIE03_ADDRESS_MASTER", progress: 15, count: 120, total: 800 }
-    ];
+    const areas = (window.appData && Array.isArray(window.appData.areas)) ? window.appData.areas : [];
 
     if (!areas || areas.length === 0) {
       container.innerHTML = `
-        <div class="premium-glass p-8 text-center">
-          <p class="text-white/40 font-bold text-sm">エリアデータが見つかりません</p>
+        <div class="premium-glass p-8 text-center space-y-2">
+          <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-2">
+            <span class="text-sm">🗺️</span>
+          </div>
+          <p class="text-white/70 font-bold text-sm">エリアデータを読み込み中...</p>
+          <p class="text-[10px] text-white/40 font-mono uppercase tracking-widest">CONNECTING TO MIE-03 MASTER</p>
         </div>`;
       return;
     }
 
     const cardsHtml = areas.map((area) => {
-      const progress = area.progress || 0;
-      const count = area.count || 0;
-      const total = area.total || 500;
+      const progress = Number(area.progress || 0);
+      const count = Number(area.count || 0);
+      const total = Number(area.total || 500);
 
       let borderStyle = 'border: 1px solid rgba(255, 255, 255, 0.06);';
       let badgeBg = 'bg-white/5 text-white/50 border-white/10';
@@ -61,11 +63,11 @@
       }
 
       return `
-        <div style="${borderStyle}" onclick="window.HAppWorkflow.openDetail('${area.name}')" class="premium-glass p-6 space-y-4 clickable-card cursor-pointer">
+        <div style="${borderStyle}" onclick="window.HAppWorkflow.openDetail('${area.name || area.id}')" class="premium-glass p-6 space-y-4 clickable-card cursor-pointer">
           <div class="flex justify-between items-start">
             <div class="space-y-1">
               <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${badgeBg}">${badgeText}</span>
-              <h3 class="text-xl font-black text-white tracking-tight leading-tight pt-1">${area.name}</h3>
+              <h3 class="text-xl font-black text-white tracking-tight leading-tight pt-1">${area.name || area.id}</h3>
             </div>
             <div class="text-right">
               <div class="text-2xl font-black font-mono" style="color: ${progressColor}">${progress}<span class="text-xs ml-0.5">%</span></div>
@@ -93,16 +95,13 @@
     const container = $('detail-list');
     if (!container) return;
 
-    const list = (points && points.length > 0) ? points : (window.allPoints || [
-      { rowId: 1, name: "津市一身田町 101", status: "NOT_STARTED", memo: "戸建 / ポスト右側" },
-      { rowId: 2, name: "津市一身田町 102", status: "IN_PROGRESS", count: 2, memo: "集合住宅" },
-      { rowId: 3, name: "津市一身田町 103", status: "SYNCED", count: 1, completedAt: "2026-07-28 09:30" }
-    ]);
+    const list = (points && points.length > 0) ? points : (Array.isArray(window.allPoints) ? window.allPoints : []);
 
     if (!list || list.length === 0) {
       container.innerHTML = `
-        <div class="premium-glass p-8 text-center">
-          <p class="text-white/40 font-bold text-sm">該当エリアの住居データがありません</p>
+        <div class="premium-glass p-8 text-center space-y-2">
+          <p class="text-white/70 font-bold text-sm">該当エリアの住居データを読み込み中...</p>
+          <p class="text-[10px] text-white/40 font-mono uppercase tracking-widest">FETCHING MIE03_ADDRESS_MASTER</p>
         </div>`;
       return;
     }
@@ -149,28 +148,35 @@
     const container = $('settings-content');
     if (!container) return;
 
-    const userInfo = JSON.parse(localStorage.getItem('user_info')) || (window.currentUser ? {
-      last: window.currentUser.last || window.currentUser.displayName || '岩佐',
-      first: window.currentUser.first || 'CEO',
-      id: window.currentUser.id || 'STAFF ID U_001',
-      picture: window.currentUser.pictureUrl || ''
-    } : null);
+    let userInfo = null;
+    try {
+      userInfo = JSON.parse(localStorage.getItem('user_info'));
+    } catch(e) {}
+    if (!userInfo && window.currentUser && window.currentUser.id && window.currentUser.id !== 'U_IWASA_CEO_OFFICIAL') {
+      userInfo = {
+        last: window.currentUser.last || window.currentUser.displayName || '',
+        first: window.currentUser.first || '',
+        id: window.currentUser.id,
+        picture: window.currentUser.pictureUrl || ''
+      };
+    }
 
-    if (!userInfo) {
+    if (!userInfo || !userInfo.last) {
       container.innerHTML = `
         <div class="flex flex-col items-center justify-center pt-4 pb-12">
-          <div class="mb-6 text-center">
-            <p class="text-sm text-white/70 leading-relaxed font-bold">公式配布員のお名前を登録してください</p>
+          <div class="mb-6 text-center space-y-1">
+            <h3 class="text-lg font-black text-white">公式配布員プロファイル</h3>
+            <p class="text-xs text-white/50 font-medium">LINEアカウント情報を取得中、または名前を登録してください</p>
           </div>
           <div class="w-full premium-glass p-8 space-y-6 text-left">
             <div class="space-y-4">
               <div>
                 <label class="text-[11px] font-black uppercase tracking-[0.2em] mb-2 block text-white/70 text-center">苗字</label>
-                <input type="text" id="user-last" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-5 text-lg font-black text-white outline-none focus:border-[#2563eb] text-center" placeholder="例：鈴木">
+                <input type="text" id="user-last" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-5 text-lg font-black text-white outline-none focus:border-[#2563eb] text-center" placeholder="例：山田">
               </div>
               <div>
                 <label class="text-[11px] font-black uppercase tracking-[0.2em] mb-2 block text-white/70 text-center">名前</label>
-                <input type="text" id="user-first" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-5 text-lg font-black text-white outline-none focus:border-[#2563eb] text-center" placeholder="例：一郎">
+                <input type="text" id="user-first" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-5 text-lg font-black text-white outline-none focus:border-[#2563eb] text-center" placeholder="例：太郎">
               </div>
             </div>
             <button onclick="saveProfile()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-5 text-lg font-black shadow-xl">登録を完了する</button>
@@ -188,7 +194,7 @@
         </div>
       `;
 
-      const formattedId = userInfo.id ? String(userInfo.id).replace(/^[A-Za-z_]+/, 'STAFF ID ') : 'STAFF ID U_OFFICIAL';
+      const formattedId = userInfo.id ? String(userInfo.id).replace(/^[A-Za-z_]+/, 'STAFF ID ') : 'STAFF ID UNKNOWN';
       const rawBranch = localStorage.getItem('branch_name') || '三重第3区';
       const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : '';
 
@@ -210,8 +216,8 @@
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" class="flex flex-col items-center z-10 w-full max-w-[280px]">
               ${avatarHtml}
               <div style="font-size: 26px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center w-full">
-                <div class="truncate w-full">${userInfo.last || '岩佐'}</div>
-                <div class="text-xs text-white/40 font-medium mt-1 truncate w-full">${userInfo.first || 'CEO'}</div>
+                <div class="truncate w-full">${userInfo.last || ''}</div>
+                <div class="text-xs text-white/40 font-medium mt-1 truncate w-full">${userInfo.first || ''}</div>
               </div>
             </div>
             
@@ -242,38 +248,47 @@
         <div class="w-8 h-8 rounded-xl bg-[#2563eb]/10 border border-[#2563eb]/20 flex items-center justify-center shadow-lg shadow-[#2563eb]/10 mb-0.5">
           <span class="text-base">🏆</span>
         </div>
-        <div class="text-lg font-black text-white tracking-tight">配布ランキング</div>
+        <div class="text-lg font-black text-white tracking-tight">MIE-03 配布ランキング</div>
       </div>
     `;
 
-    const userInfo = JSON.parse(localStorage.getItem('user_info')) || (window.currentUser ? { last: '岩佐', first: 'CEO' } : null);
-    const myName = userInfo ? `${userInfo.last} ${userInfo.first || ''}`.trim() : "岩佐 CEO";
+    let userInfo = null;
+    try { userInfo = JSON.parse(localStorage.getItem('user_info')); } catch(e) {}
+    const myName = userInfo ? `${userInfo.last} ${userInfo.first || ''}`.trim() : (window.currentUser ? window.currentUser.displayName : '');
 
-    const displayRanking = (window.rankingData && window.rankingData.length > 0) ? window.rankingData : [
-      { name: "岩佐 CEO", count: 1250 },
-      { name: "田中 健一", count: 980 },
-      { name: "佐藤 美咲", count: 750 }
-    ];
+    const displayRanking = (Array.isArray(window.rankingData) && window.rankingData.length > 0) ? window.rankingData : (
+      (window.appData && Array.isArray(window.appData.ranking)) ? window.appData.ranking : []
+    );
 
-    let myCount = 1250;
+    if (!displayRanking || displayRanking.length === 0) {
+      container.innerHTML = headerCardHtml + `
+        <div class="premium-glass p-8 text-center space-y-2">
+          <p class="text-white/70 font-bold text-sm">ランキングデータを読み込み中...</p>
+          <p class="text-[10px] text-white/40 font-mono uppercase tracking-widest">FETCHING MIE-03 DISTRIBUTOR RANKING</p>
+        </div>
+      `;
+      return;
+    }
+
+    let myCount = 0;
     const idx = displayRanking.findIndex(r => r.name === myName);
-    if (idx !== -1) myCount = displayRanking[idx].count;
+    if (idx !== -1) myCount = displayRanking[idx].count || 0;
 
-    const myStatusCardHtml = `
+    const myStatusCardHtml = myName ? `
       <div style="border: 1px solid rgba(255, 255, 255, 0.08);" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">
         <div class="text-[9px] font-black text-[#22c55e] uppercase tracking-[0.2em]">My Performance</div>
         <div class="text-lg font-black text-white tracking-tight">${myName}</div>
         <div class="flex items-center justify-center mt-0.5">
           <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 24px; font-size: 11px; color: #22c55e;" class="inline-flex items-center justify-center px-3 font-black rounded-full font-mono">
-            現在までの配布数 : ${myCount.toLocaleString()} 枚
+            現在までの配布数 : ${Number(myCount).toLocaleString()} 枚
           </div>
         </div>
       </div>
-    `;
+    ` : '';
 
     const itemsHtml = displayRanking.map((r, index) => {
       const rank = index + 1;
-      const isMe = r.name === myName;
+      const isMe = myName && r.name === myName;
 
       let cardStyle = 'border: 1px solid rgba(255, 255, 255, 0.06);';
       let rankBadgeClass = 'bg-white/5 text-white/40 border border-white/10';
@@ -293,9 +308,9 @@
         <div style="${cardStyle}" class="premium-glass p-5 flex justify-between items-center ${isMe ? 'bg-white/5' : ''}">
           <div class="flex items-center gap-4">
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black font-mono ${rankBadgeClass}">${rank}</div>
-            <div class="text-base font-black text-white tracking-tight">${r.name}</div>
+            <div class="text-base font-black text-white tracking-tight">${r.name || 'スタッフ'}</div>
           </div>
-          <div class="text-lg font-black text-[#2563eb] font-mono">${r.count.toLocaleString()} <span class="text-xs text-white/40">枚</span></div>
+          <div class="text-lg font-black text-[#2563eb] font-mono">${Number(r.count || 0).toLocaleString()} <span class="text-xs text-white/40">枚</span></div>
         </div>
       `;
     }).join('');
@@ -308,20 +323,28 @@
     const container = $('new-storage-list-container') || $('storage-list-container');
     if (!container) return;
 
-    const list = stocks.length > 0 ? stocks : [
-      { location: "津市保管庫", count: 5000, updatedAt: "2026-07-28" },
-      { location: "四日市支部", count: 3200, updatedAt: "2026-07-27" }
-    ];
+    const list = (Array.isArray(stocks) && stocks.length > 0) ? stocks : (
+      (window.appData && Array.isArray(window.appData.flyerStocks)) ? window.appData.flyerStocks : []
+    );
+
+    if (!list || list.length === 0) {
+      container.innerHTML = `
+        <div class="premium-glass p-8 text-center space-y-2">
+          <p class="text-white/70 font-bold text-sm">チラシ保管庫データを読み込み中...</p>
+          <p class="text-[10px] text-white/40 font-mono uppercase tracking-widest">FETCHING MIE-03 FLYER STOCK INVENTORY</p>
+        </div>`;
+      return;
+    }
 
     const cardsHtml = list.map(s => `
       <div class="premium-glass p-6 flex justify-between items-center">
         <div class="space-y-1">
           <div class="text-xs font-bold text-white/40 uppercase tracking-wider">保管場所</div>
-          <div class="text-lg font-black text-white">${s.location}</div>
+          <div class="text-lg font-black text-white">${s.location || s.city || '支部保管庫'}</div>
         </div>
         <div class="text-right space-y-1">
           <div class="text-2xl font-black text-[#22c55e] font-mono">${Number(s.count || 0).toLocaleString()} <span class="text-xs text-white/40">枚</span></div>
-          <div class="text-[10px] text-white/30 font-mono">${s.updatedAt || ''}</div>
+          <div class="text-[10px] text-white/30 font-mono">${s.updatedAt || s.date || ''}</div>
         </div>
       </div>
     `).join('');
