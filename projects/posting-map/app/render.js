@@ -5,7 +5,8 @@
 (function(window) {
   function getCleanAddress(addr) {
     if (!addr) return '';
-    return addr.replace(/^〒\d{3}-\d{4}\s*/, '');
+    const str = String(addr);
+    return str.replace(/^〒\d{3}-\d{4}\s*/, '');
   }
 
   function formatCompletedAt(dateStr) {
