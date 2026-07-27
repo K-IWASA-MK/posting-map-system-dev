@@ -275,42 +275,17 @@
     async function api(action, params = {}, method = 'GET') {
       const url = new URL(API_URL);
       url.searchParams.append('action', action);
-
-      let token = null;
-      if (typeof liff !== 'undefined' && liff.isLoggedIn && liff.isLoggedIn()) {
-        token = liff.getAccessToken();
-      }
-      
-      // Fallback 1: LocalStorage token lookup
-      if (!token && typeof localStorage !== 'undefined') {
-        token = localStorage.getItem('posting_liff_token') || localStorage.getItem('liff_access_token');
-      }
-
-      // Fallback 2: Development / Stub token fallback
-      if (!token) {
-        token = 'valid-liff-token';
-      }
-
-      if (token) {
-        url.searchParams.append('liffToken', token);
-      }
-
       Object.keys(params).forEach(k => {
         if (typeof params[k] !== 'object' && params[k] !== undefined) {
           url.searchParams.append(k, params[k]);
         }
       });
-
       try {
-        const headers = {};
-        if (token) {
-          // headers['Authorization'] = 'Bearer ' + token;
-          console.log(`[API ${action}] Auth Token Injected (Fallback: Query liffToken only to prevent CORS preflight)`);
-        }
-        const options = { method: method, headers: headers, redirect: 'follow' };
+        const options = { method: method, redirect: 'follow' };
         if (method === 'POST') {
-          headers['Content-Type'] = 'text/plain';
-          options.body = JSON.stringify({ action, ...params });
+          const formData = new FormData();
+          formData.append('json', JSON.stringify({ action, ...params }));
+          options.body = formData;
         }
         const response = await fetch(url.toString(), options);
         console.log(`[API ${action}] HTTP Status:`, response.status);
@@ -344,22 +319,11 @@
         return;
       }
       if (currentUser) {
-        setHud('register', 'Sending...', null);
-        try {
-          const regRes = await api('registerStaff', {
-            lastName: currentUser.displayName || currentUser.name,
-            firstName: 'LINE',
-            lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
-          }, 'POST');
-          if (regRes && regRes.success) {
-            setHud('register', 'Saved to GAS', true);
-          } else {
-            setHud('register', 'GAS Fail', false);
-          }
-        } catch (err) {
-          console.error('[GAS Register Error]', err);
-          setHud('register', 'Error', false);
-        }
+        api('registerStaff', {
+          lastName: currentUser.displayName || currentUser.name,
+          firstName: 'LINE',
+          lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
+        }, 'POST').catch(err => console.error('[GAS Register Error]', err));
       }
       switchTab(currentUser ? 'area' : 'settings');
       showLoading('同期中...');
@@ -370,19 +334,16 @@
         if (!data) {
           hudData.className = 'font-bold text-red-400';
           hudData.textContent = 'NG (null)';
+        } else if (!data.areas) {
+          hudData.className = 'font-bold text-orange-400';
+          hudData.textContent = 'NG (areas: ' + (typeof data === 'object' ? JSON.stringify(data) : typeof data) + ')';
         } else {
-          const innerData = data.data || data;
-          if (!innerData || !innerData.areas) {
-            hudData.className = 'font-bold text-orange-400';
-            hudData.textContent = 'NG (areas: ' + (typeof data === 'object' ? JSON.stringify(data) : typeof data) + ')';
-          } else {
-            hudData.className = 'font-bold text-green-400';
-            hudData.textContent = 'OK (areas: ' + innerData.areas.length + ')';
-          }
+          hudData.className = 'font-bold text-green-400';
+          hudData.textContent = 'OK (areas: ' + data.areas.length + ')';
         }
       }
       if (data) {
-        appData = data.data || data;
+        appData = data;
         document.getElementById('sync-pct').textContent = currentUser ? '100%' : '0%';
         renderView();
       } else {
