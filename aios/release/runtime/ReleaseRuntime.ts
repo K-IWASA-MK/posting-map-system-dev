@@ -7,6 +7,8 @@ import { DeploymentAdapter } from "../adapters/DeploymentAdapter";
 import { ProductionVerifier } from "../verification/ProductionVerifier";
 import { DeploymentTargetVerificationGate } from "../gates/DeploymentTargetVerificationGate";
 import { DeploymentGateRequest } from "../gates/types/DeploymentTargetGateTypes";
+import { DeploymentFingerprintVerifier } from "../gates/verifiers/DeploymentFingerprintVerifier";
+import { DeploymentSmokeTest } from "../gates/smoke/DeploymentSmokeTest";
 import { ExecutionLedgerRegistry, ExecutionState } from "../../../sdk/ExecutionLedgerRegistry";
 import { CapabilityRegistry, CapabilityCategory, CapabilityStatus } from "../../../sdk/CapabilityRegistry";
 import { SkillPipelineRegistry, SkillPipelineStatus } from "../../../sdk/SkillPipelineRegistry";
@@ -366,6 +368,72 @@ export class ReleaseRuntime {
         deployedTargets,
         verified: false,
         error: verificationError
+      };
+    }
+
+    // 7.5 Gate-008 Post-Deployment Smoke Test (Post-Deployment Environment Audit)
+    const smokeTestEngine = new DeploymentSmokeTest(this.workspaceRoot);
+    const primaryTarget = deployedTargets[0]?.destination || request.artifacts[0]?.filePath;
+
+    const assetContent = fs.existsSync(primaryTarget) ? fs.readFileSync(primaryTarget, "utf-8") : "";
+    const primaryAssetHash = DeploymentFingerprintVerifier.hashContent(assetContent);
+
+    const smokeResult = await smokeTestEngine.execute({
+      releaseId: request.releaseId,
+      version: request.version,
+      publicUrl: primaryTarget,
+      expectedBackendEndpoint: request.expectedBackendEndpoint || "https://script.google.com/macros/s/AKfycbxy1/exec",
+      expectedVersion: request.version,
+      expectedFingerprintHash: primaryAssetHash
+    });
+
+    // Commit Gate-008 Assessment to ExecutionLedger
+    try {
+      this.ensureGateRegistrations();
+      const numericId = Date.now().toString() + Math.floor(Math.random() * 1000).toString();
+      ExecutionLedgerRegistry.register({
+        executionId: `ledger-${numericId}`,
+        ledgerVersion: "1.0.0",
+        description: `Gate-008 Post-Deployment Smoke Test for ${request.releaseId}`,
+        capabilityId: "cap-deployment-gate",
+        pipelineId: "pipe-release-verification",
+        skillIds: ["skill-deployment-target-verification"],
+        executionState: smokeResult.overallStatus === "FAIL"
+          ? ExecutionState.FAILED
+          : ExecutionState.COMPLETED,
+        timestamp: new Date().toISOString(),
+        version: "1.0.0",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        auditTrail: [
+          `Gate: Gate-008 (Deployment Smoke Test)`,
+          `ReleaseId: ${request.releaseId}`,
+          `OverallStatus: ${smokeResult.overallStatus}`,
+          `PublicEndpoint: ${primaryTarget}`,
+          `FingerprintHash: ${smokeResult.publicFingerprintHash || 'N/A'}`,
+          ...smokeResult.checks.map(c => `${c.checkId} (${c.name}): ${c.status} - ${c.detail}`)
+        ]
+      });
+    } catch (err) {
+      console.warn("[ReleaseRuntime] Gate-008 ExecutionLedger registration notice:", err);
+    }
+
+    if (smokeResult.overallStatus === "FAIL") {
+      const smokeErrorMsg = `Gate-008 Post-Deployment Smoke Test FAILED for release ${request.releaseId}. Details: ${smokeResult.checks.map(c => `${c.checkId}:${c.status}(${c.detail})`).join(" | ")}`;
+      this.emit({
+        type: "RELEASE_FAILED",
+        releaseId: request.releaseId,
+        version: request.version,
+        timestamp: Date.now(),
+        error: smokeErrorMsg
+      });
+      return {
+        status: "FAILED",
+        releaseId: request.releaseId,
+        version: request.version,
+        deployedTargets,
+        verified: false,
+        error: smokeErrorMsg
       };
     }
 
