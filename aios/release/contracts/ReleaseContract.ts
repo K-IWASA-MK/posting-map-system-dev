@@ -2,12 +2,21 @@ export interface ReleaseRequest {
   readonly releaseId: string;
   readonly sprintId: string;
   readonly version: string;
-  readonly targetEnvironment: "production";
+  readonly targetEnvironment: "production" | "staging" | "development" | string;
   readonly artifacts: {
     readonly filePath: string;
     readonly expectedHash?: string;
   }[];
   readonly schemaVersion: "v1";
+  readonly targetRepository?: string;
+  readonly targetBranch?: string;
+  readonly targetPublishRoot?: string;
+  readonly frontendConfigPath?: string;
+  readonly expectedBackendEndpoint?: string;
+  readonly expectedBackendVersion?: string;
+  readonly employeeId?: string;
+  readonly profileName?: string;
+  readonly fingerprint?: any;
 }
 
 export interface ReleaseResult {

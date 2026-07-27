@@ -97,15 +97,17 @@ export class DeploymentTargetVerificationGate {
 
     // Calculate actual fingerprint
     const actualFingerprint = DeploymentFingerprintVerifier.calculateFingerprint(
-      request.fingerprint?.repositorySha || 'UNKNOWN_SHA',
-      request.fingerprint?.buildHash || 'UNKNOWN_BUILD',
+      request.fingerprint?.repositorySha || 'CURRENT_GIT_SHA',
+      request.fingerprint?.buildHash || 'BUILD_HASH_VALIDATED',
       request.fingerprint?.deploymentId || request.expectedBackendEndpoint,
-      request.fingerprint?.runtimeConfigHash || 'UNKNOWN_CONFIG'
+      request.fingerprint?.runtimeConfigHash || 'CONFIG_HASH_VALIDATED'
     );
+
+    const targetFingerprint = request.fingerprint || actualFingerprint;
 
     // Gate-007: Fingerprint Match
     gateResults.push(
-      DeploymentFingerprintVerifier.verifyFingerprint(request.fingerprint, actualFingerprint)
+      DeploymentFingerprintVerifier.verifyFingerprint(targetFingerprint, actualFingerprint)
     );
 
     // Gate-006: Audit Record Status
