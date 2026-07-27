@@ -91,6 +91,11 @@ export class ExecutionRuntimeEngine implements IExecutionRuntimeEngine {
     this.updateStatus(executionId, 'READY');
     this.updateStatus(executionId, 'RUNNING');
 
+    if (!toolName) {
+      this.updateStatus(executionId, 'EXECUTION_BLOCKED', 'ToolCall count is 0. Direct execution blocked.');
+      throw new Error('ToolCall count is 0. Execution Blocked.');
+    }
+
     let result: ExecutionResult;
     try {
       // 3. Tool Execution via Gateway (Gateway enforces tool authorization)
@@ -135,7 +140,7 @@ export class ExecutionRuntimeEngine implements IExecutionRuntimeEngine {
       CREATED: ['VALIDATING', 'CANCELLED'],
       VALIDATING: ['READY', 'FAILED', 'WAITING_APPROVAL', 'CANCELLED'],
       READY: ['RUNNING', 'CANCELLED', 'WAITING_APPROVAL'],
-      RUNNING: ['WAITING_RESULT', 'FAILED', 'TIMEOUT', 'WAITING_APPROVAL', 'CANCELLED'],
+      RUNNING: ['WAITING_RESULT', 'FAILED', 'TIMEOUT', 'WAITING_APPROVAL', 'CANCELLED', 'EXECUTION_BLOCKED'],
       WAITING_RESULT: ['VERIFYING', 'FAILED', 'WAITING_APPROVAL'],
       VERIFYING: ['COMPLETED', 'FAILED', 'WAITING_APPROVAL'],
       COMPLETED: [],
@@ -143,6 +148,7 @@ export class ExecutionRuntimeEngine implements IExecutionRuntimeEngine {
       FAILED: [],
       TIMEOUT: ['FAILED', 'CANCELLED'],
       CANCELLED: [],
+      EXECUTION_BLOCKED: []
     };
 
     const allowed = validTransitions[beforeStatus];

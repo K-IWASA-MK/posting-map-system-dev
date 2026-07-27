@@ -1,0 +1,36 @@
+{
+  "projectId": "posting-map",
+  "projectName": "POSTING MAP",
+  "manifestVersion": "1.0.0",
+  "description": "Election Distribution Management Platform",
+  "capabilities": [
+    "GIS",
+    "MAP_GENERATION",
+    "ADDRESS_PROCESSING",
+    "CSV_PROCESSING",
+    "GOOGLE_APPS_SCRIPT",
+    "LIFF",
+    "LINE_INTEGRATION",
+    "FRONTEND",
+    "BACKEND",
+    "AUDIT"
+  ],
+  "runtimePolicy": {
+    "sandboxRequired": true,
+    "allowedPaths": [
+      "FIELD_OPERATIONS_PLATFORM/**",
+      "app/**",
+      "apps/**",
+      "clients/**",
+      "src/**",
+      "scripts/**",
+      "spatial/**",
+      "validation/**"
+    ],
+    "executionPermissions": [
+      "read_file",
+      "analyze",
+      "test"
+    ]
+  }
+}

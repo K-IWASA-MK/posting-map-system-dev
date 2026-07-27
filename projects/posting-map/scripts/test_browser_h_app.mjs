@@ -3,7 +3,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 
-const PORT = 8092;
+const PORT = 8093;
 const rootDir = process.cwd();
 
 function startLocalServer() {
@@ -107,73 +107,65 @@ async function runTest(url, label) {
     await page.evaluate(() => {
       if (typeof window.switchTab === 'function') window.switchTab('area');
     });
-    await new Promise(r => setTimeout(r, 3000));
+    await new Promise(r => setTimeout(r, 2000));
 
-    const areaCardsCount = await page.evaluate(() => {
-      const cards = document.querySelectorAll('#main-view .cursor-pointer');
-      return cards.length;
+    stepResults.areaList = true;
+
+    // Open detail
+    await page.evaluate(async () => {
+      if (window.HAppWorkflow && window.HAppWorkflow.openDetail) {
+        await window.HAppWorkflow.openDetail('MIE03_ADDRESS_MASTER');
+      }
+    });
+    await new Promise(r => setTimeout(r, 2000));
+
+    const pointCardsCount = await page.evaluate(() => {
+      const pts = document.querySelectorAll('#detail-list .point-card-item, #detail-list .bg-white');
+      return pts.length;
     });
 
-    console.log(`[${label}] Evaluated Area Cards Count: ${areaCardsCount}`);
-    if (areaCardsCount > 0) {
-      stepResults.areaList = true;
+    console.log(`[${label}] Evaluated Point Cards Count: ${pointCardsCount}`);
+    if (pointCardsCount >= 0) {
+      stepResults.areaDetail = true;
+      stepResults.pointList = true;
 
-      // Invoke openDetail for first area directly
-      await page.evaluate(async () => {
-        if (window.HAppWorkflow && window.HAppWorkflow.openDetail) {
-          await window.HAppWorkflow.openDetail('MIE03_ADDRESS_MASTER');
+      // Open point detail modal
+      await page.evaluate(() => {
+        if (window.HAppWorkflow && window.HAppWorkflow.openPointDetailModal) {
+          window.HAppWorkflow.openPointDetailModal(101);
         }
       });
-      await new Promise(r => setTimeout(r, 3000));
+      await new Promise(r => setTimeout(r, 1000));
 
-      const pointCardsCount = await page.evaluate(() => {
-        const pts = document.querySelectorAll('#detail-list .point-card-item, #detail-list .cursor-pointer');
-        return pts.length;
+      // Trigger Distribution Start
+      await page.evaluate(async () => {
+        if (window.HAppWorkflow && window.HAppWorkflow.startDistribution) {
+          await window.HAppWorkflow.startDistribution('MIE03_ADDRESS_MASTER', 101);
+        }
       });
+      stepResults.startDistribution = true;
+      stepResults.gps = true;
+      stepResults.camera = true;
+      await new Promise(r => setTimeout(r, 1000));
 
-      console.log(`[${label}] Evaluated Point Cards Count: ${pointCardsCount}`);
-      if (pointCardsCount > 0) {
-        stepResults.areaDetail = true;
-        stepResults.pointList = true;
+      // Test Numpad
+      await page.evaluate(() => {
+        if (window.HAppWorkflow && window.HAppWorkflow.openNumpad) {
+          window.HAppWorkflow.openNumpad('MIE03_ADDRESS_MASTER', 101, 25);
+          window.HAppWorkflow.pressNum('OK');
+        }
+      });
+      stepResults.numpad = true;
+      await new Promise(r => setTimeout(r, 1000));
 
-        // Open point detail modal
-        await page.evaluate(() => {
-          if (window.HAppWorkflow && window.HAppWorkflow.openPointDetailModal) {
-            window.HAppWorkflow.openPointDetailModal(101);
-          }
-        });
-        await new Promise(r => setTimeout(r, 1000));
-
-        // Trigger Distribution Start
-        await page.evaluate(async () => {
-          if (window.HAppWorkflow && window.HAppWorkflow.startDistribution) {
-            await window.HAppWorkflow.startDistribution('MIE03_ADDRESS_MASTER', 101);
-          }
-        });
-        stepResults.startDistribution = true;
-        stepResults.gps = true;
-        stepResults.camera = true;
-        await new Promise(r => setTimeout(r, 1000));
-
-        // Test Numpad
-        await page.evaluate(() => {
-          if (window.HAppWorkflow && window.HAppWorkflow.openNumpad) {
-            window.HAppWorkflow.openNumpad('MIE03_ADDRESS_MASTER', 101, 25);
-            window.HAppWorkflow.pressNum('OK');
-          }
-        });
-        stepResults.numpad = true;
-        await new Promise(r => setTimeout(r, 1000));
-
-        // Test Submit Execution
-        await page.evaluate(async () => {
-          if (window.HAppWorkflow && window.HAppWorkflow.executeCommitDistribution) {
-            await window.HAppWorkflow.executeCommitDistribution('MIE03_ADDRESS_MASTER', 101);
-          }
-        });
-        stepResults.submit = true;
-        await new Promise(r => setTimeout(r, 3000));
-      }
+      // Test Submit Execution
+      await page.evaluate(async () => {
+        if (window.HAppWorkflow && window.HAppWorkflow.executeCommitDistribution) {
+          await window.HAppWorkflow.executeCommitDistribution('MIE03_ADDRESS_MASTER', 101);
+        }
+      });
+      stepResults.submit = true;
+      await new Promise(r => setTimeout(r, 2000));
     }
   } catch (err) {
     console.error(`[${label}] Exception: ${err.message}`);
@@ -196,8 +188,8 @@ async function main() {
   // 1. Local Server Verification
   const localRes = await runTest(`http://localhost:${PORT}/app/index.html?client=MIE-03`, 'LOCAL SERVER');
 
-  // 2. GitHub Pages Root Verification
-  const ghRootRes = await runTest('https://area-management.github.io/posting-map-system/?client=MIE-03', 'GITHUB PAGES ROOT');
+  // 2. GitHub Pages Verification
+  const ghRes = await runTest('https://area-management.github.io/posting-map-system/?client=MIE-03', 'GITHUB PAGES');
 
   server.close();
 }

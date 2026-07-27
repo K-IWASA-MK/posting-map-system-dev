@@ -16,7 +16,8 @@ export type ExecutionStatus =
   | 'WAITING_APPROVAL'
   | 'FAILED'
   | 'TIMEOUT'
-  | 'CANCELLED';
+  | 'CANCELLED'
+  | 'EXECUTION_BLOCKED';
 
 export interface ExecutionResult {
   readonly output: any;

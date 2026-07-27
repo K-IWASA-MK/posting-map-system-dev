@@ -1,0 +1,21 @@
+/**
+ * POSTING MAP Client Configuration
+ * Client: MIE-05 (三重県第5区)
+ */
+if (typeof window !== 'undefined') {
+  window.PMS_CLIENT_CONFIG = {
+    districtId: "MIE-05",
+    districtName: "三重県第5区",
+    environment: "production",
+    api: {
+      gasWebAppUrl: "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec"
+    },
+    line: {
+      liffId: "2010177345-tXZIMAJK"
+    },
+    features: {
+      photoUpload: true,
+      gpsTracking: true
+    }
+  };
+}
