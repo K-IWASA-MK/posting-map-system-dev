@@ -231,8 +231,12 @@
       `;
 
       const formattedId = userInfo.id ? String(userInfo.id).replace(/^[A-Za-z_]+/, 'STAFF ID ') : 'STAFF ID OFFICIAL';
-      const rawBranch = localStorage.getItem('branch_name') || '三重第3区';
-      const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : '';
+      let rawBranch = localStorage.getItem('branch_name');
+      if (!rawBranch || rawBranch.includes('MIE-02') || rawBranch.includes('MIE02')) {
+        rawBranch = '三重第3区';
+        localStorage.setItem('branch_name', '三重第3区');
+      }
+      const displayBranch = rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`;
 
       container.innerHTML = `
         <div class="pt-2 pb-0 flex flex-col items-center">
