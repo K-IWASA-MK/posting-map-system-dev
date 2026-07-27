@@ -316,6 +316,8 @@
     };
     let rankingData = [];
     let currentNavTier = 1;
+    let _appDataPromise = null;
+    window.launchStartTime = performance.now();
 
     document.addEventListener("DOMContentLoaded", () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -371,6 +373,12 @@
           return false;
         }
 
+        // TASK-010 高速化 ①: liff.isLoggedIn() 確認後、getAppData通信を即時並列開始 (並列プリフェッチ)
+        if (!_appDataPromise) {
+          console.log('[TASK-010 PERF] Parallel prefetching getAppData...');
+          _appDataPromise = api('getAppData');
+        }
+
         const liffProfile = await liff.getProfile();
         setHud('profile', 'Profile Loaded', true, liffProfile ? liffProfile.displayName : '');
 
@@ -387,18 +395,22 @@
           localStorage.setItem('posting_display_name', liffProfile.displayName);
           localStorage.setItem('user_info', JSON.stringify(currentUser));
           
-          setHud('register', 'Sending...', null);
-          const regRes = await api('registerStaff', { 
+          setHud('register', 'Sending (Background)', true);
+          // TASK-010 高速化 ②: registerStaff処理を非ブロッキング化 (awaitなし、バックグラウンド処理)
+          api('registerStaff', { 
             lastName: liffProfile.displayName, 
             firstName: 'LINE', 
             lineUserId: liffProfile.userId 
-          }, 'POST');
-
-          if (regRes && regRes.success) {
-            setHud('register', 'Saved to GAS', true);
-          } else {
-            setHud('register', 'GAS Fail', false);
-          }
+          }, 'POST').then(regRes => {
+            if (regRes && regRes.success) {
+              setHud('register', 'Saved to GAS', true);
+            } else {
+              setHud('register', 'GAS Fail (Background)', false);
+            }
+          }).catch(err => {
+            console.warn('[TASK-010 PERF] Background registerStaff exception:', err);
+            setHud('register', 'GAS Fail (Background)', false);
+          });
         }
         return true;
       } catch (err) {
@@ -462,7 +474,11 @@
         };
       }
       
-      const rawRes = await api('getAppData');
+      // TASK-010 高速化 ③: loadDataで既存Promise (_appDataPromise) を再利用 (getAppData二重取得禁止)
+      if (!_appDataPromise) {
+        _appDataPromise = api('getAppData');
+      }
+      const rawRes = await _appDataPromise;
       const data = (rawRes && rawRes.data) ? rawRes.data : rawRes;
       if (data && data.areas) {
         appData = data;
@@ -477,6 +493,8 @@
       }
       
       switchPage('areas');
+      const elapsed = (performance.now() - window.launchStartTime).toFixed(1);
+      console.log(`[TASK-010 PERF] 🚀 App Fully Started in ${elapsed} ms! Target < 3000 ms.`);
     }
 
     function forceStart() { startApp(); }
