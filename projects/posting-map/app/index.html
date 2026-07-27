@@ -41,6 +41,11 @@
   </style>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script src="client-loader.js"></script>
+  <script src="h-app-gps.js"></script>
+  <script src="h-app-camera.js"></script>
+  <script src="h-app-sync.js"></script>
+  <script src="h-app-workflow.js"></script>
+  <script src="h-app-core.js"></script>
 </head>
 <body class="bg-apple text-[#1d1d1f] font-sans antialiased overflow-hidden select-none">
 
@@ -121,6 +126,39 @@
 
   <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white text-sm font-bold shadow-2xl hidden z-[11000] whitespace-nowrap border border-white/10 transition-all"></div>
 
+  <!-- Numpad Modal for Flyer Count Input -->
+  <div id="numpad-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[12000] flex items-end justify-center hidden opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 space-y-6 shadow-2xl safe-bottom">
+      <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+        <div>
+          <h3 class="text-lg font-black text-navy tracking-tight">配布枚数入力</h3>
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Enter Distributed Count</p>
+        </div>
+        <button onclick="window.HAppWorkflow.closeNumpad()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold">✕</button>
+      </div>
+
+      <div class="bg-apple rounded-2xl p-6 text-right">
+        <div id="numpad-display" class="text-4xl font-black text-navy tracking-tight font-mono">0</div>
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">flyers</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <button onclick="window.HAppWorkflow.pressNum(1)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">1</button>
+        <button onclick="window.HAppWorkflow.pressNum(2)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">2</button>
+        <button onclick="window.HAppWorkflow.pressNum(3)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">3</button>
+        <button onclick="window.HAppWorkflow.pressNum(4)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">4</button>
+        <button onclick="window.HAppWorkflow.pressNum(5)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">5</button>
+        <button onclick="window.HAppWorkflow.pressNum(6)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">6</button>
+        <button onclick="window.HAppWorkflow.pressNum(7)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">7</button>
+        <button onclick="window.HAppWorkflow.pressNum(8)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">8</button>
+        <button onclick="window.HAppWorkflow.pressNum(9)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">9</button>
+        <button onclick="window.HAppWorkflow.pressNum('C')" class="bg-red-50 hover:bg-red-100 active:scale-95 text-xl font-black text-red-500 py-4 rounded-2xl transition-all">C</button>
+        <button onclick="window.HAppWorkflow.pressNum(0)" class="bg-gray-50 hover:bg-gray-100 active:scale-95 text-2xl font-black text-navy py-4 rounded-2xl transition-all">0</button>
+        <button onclick="window.HAppWorkflow.pressNum('OK')" class="bg-navy hover:bg-navy-light active:scale-95 text-xl font-black text-white py-4 rounded-2xl shadow-xl shadow-navy/20 transition-all">OK</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     console.log("window.location.href =", window.location.href);
     console.log("window.location.origin =", window.location.origin);
@@ -128,7 +166,7 @@
 
     const API_URL = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api) 
       ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl 
-      : 'https://script.google.com/macros/s/AKfycbxyHvUbJ3yVwXX8sIdK_mWb6ML5ChmFX3mfv-nlEv1DDCv30hBQJlngM096_zLW04vQ/exec';
+      : 'https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec';
     
     const LIFF_ID = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.line && window.PMS_CLIENT_CONFIG.line.liffId)
       ? window.PMS_CLIENT_CONFIG.line.liffId
@@ -480,11 +518,11 @@
         return;
       }
       const list = appData.areas.map(a => `
-        <div class="bg-white rounded-3xl p-6 flex items-center shadow-sm border border-gray-50 active:scale-[0.98] transition-all ring-1 ring-black/[0.01]">
+        <div onclick='window.HAppCore.startAreaMission({ id: "${a.id || a.name}", name: "${a.name}" })' class="bg-white hover:bg-gray-50 rounded-3xl p-6 flex items-center shadow-sm border border-gray-50 active:scale-[0.98] transition-all ring-1 ring-black/[0.01] cursor-pointer">
           <div class="w-3 h-3 rounded-full mr-5 ${a.progress >= 100 ? 'bg-green-500 shadow-lg shadow-green-200' : a.progress > 0 ? 'bg-orange-400 shadow-lg shadow-orange-200' : 'bg-gray-200'}"></div>
           <div class="flex-1">
             <div class="text-lg font-black text-navy tracking-tight leading-tight">${a.name}</div>
-            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Target Area</div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Tap to Report Distribution ➔</div>
           </div>
           <div class="text-right">
             <div class="text-xl font-black text-navy leading-none">${a.progress}<span class="text-[10px] ml-0.5">%</span></div>
