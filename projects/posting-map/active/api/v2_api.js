@@ -23,6 +23,28 @@ function logTrace(event, data) {
   } catch (e) {}
 }
 
+function writeDebugLogToSheet(data) {
+  try {
+    const ss = getSS();
+    let sheet = ss.getSheetByName("TraceLog");
+    if (!sheet) {
+      sheet = ss.insertSheet("TraceLog");
+      sheet.appendRow(["Timestamp", "RequestId", "lineUserId", "identityId", "principalType", "edition", "requiredEdition"]);
+    }
+    sheet.appendRow([
+      new Date(),
+      data.requestId || "",
+      data.lineUserId || "",
+      data.identityId || "",
+      data.principalType || "",
+      data.edition || "",
+      data.requiredEdition || ""
+    ]);
+  } catch (e) {
+    // Ignore logging failures to prevent request crash
+  }
+}
+
 // =============================
 // ① 基本設定
 // =============================
@@ -500,7 +522,8 @@ function createJsonResponseFromApiResponse(apiResponse) {
       serverTimestamp: apiResponse.metadata.serverTimestamp,
       processingTime: apiResponse.metadata.processingTime,
       cacheStatus: cacheStatus,
-      version: apiResponse.metadata.version
+      version: apiResponse.metadata.version,
+      debugAuth: apiResponse.metadata.debugAuth || null
     }
   };
 
@@ -840,7 +863,7 @@ function registerStaff(lastName, firstName, lineUserId) {
 
   try {
     const ss = getSS();
-    const sheetName = CONFIG.get("SHEET_ROSTER");
+    const sheetName = CONFIG.get("SHEET_ROSTER") || '名簿';
     logTrace("registerStaff:sheetName", { sheetName, ssId: ss.getId() });
     const s = ss.getSheetByName(sheetName);
 
@@ -3248,6 +3271,43 @@ class ApiKeyIdentityProvider {
   }
 }
 
+class StaffIdentityResolver {
+  static resolve(lineUserId) {
+    if (!lineUserId) {
+      return { found: false };
+    }
+    try {
+      const sheetName = CONFIG.get("SHEET_ROSTER") || '名簿';
+      const ss = getSS();
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) {
+        logTrace("StaffIdentityResolver:error", { message: "Roster sheet not found" });
+        return { found: false };
+      }
+      const lastRow = sheet.getLastRow();
+      if (lastRow < 2) {
+        return { found: false };
+      }
+      const values = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+      for (let i = 0; i < values.length; i++) {
+        const row = values[i];
+        const rowLineUserId = String(row[3] || "").trim(); // D列 is LINE_USER_ID
+        if (rowLineUserId === lineUserId) {
+          return {
+            found: true,
+            staffId: String(row[0] || "").trim(),    // A列 is staffId
+            lastName: String(row[1] || "").trim(),   // B列 is lastName
+            firstName: String(row[2] || "").trim()   // C列 is firstName
+          };
+        }
+      }
+    } catch (e) {
+      logTrace("StaffIdentityResolver:error", { error: e.toString() });
+    }
+    return { found: false };
+  }
+}
+
 class LIFFIdentityProvider {
   authenticate(request) {
     const headerToken = request.headers && request.headers['authorization'];
@@ -3262,40 +3322,68 @@ class LIFFIdentityProvider {
     const cleanToken = token.indexOf('Bearer ') === 0 ? token.substring(7) : token;
     if (cleanToken) {
       if (cleanToken === 'valid-liff-token' || cleanToken.indexOf('stub-') === 0 || cleanToken === 'dev-token') {
+        const staffInfo = StaffIdentityResolver.resolve('U_IWASA_CEO_OFFICIAL');
         const context = new AuthenticationContext({
-          identityId: 'user-liff-stub-123',
+          identityId: staffInfo.found ? staffInfo.staffId : 'user-liff-stub-123',
           identityType: 'USER',
           authenticationMethod: 'LIFF',
           authenticated: true,
           issuedAt: Date.now(),
-          metadata: { provider: 'LIFFIdentityProvider', authSource: authSource, stub: true }
+          metadata: {
+            provider: 'LIFFIdentityProvider',
+            authSource: authSource,
+            stub: true,
+            principalType: staffInfo.found ? 'STAFF' : 'ANONYMOUS',
+            lineUserId: 'U_IWASA_CEO_OFFICIAL'
+          }
         });
         return AuthenticationResult.successResult(context);
       }
       try {
-        const response = UrlFetchApp.fetch(`https://api.line.me/oauth2/v2.1/verify?access_token=${cleanToken}`, { muteHttpExceptions: true });
+        const response = UrlFetchApp.fetch('https://api.line.me/v2/profile', {
+          headers: { 'Authorization': 'Bearer ' + cleanToken },
+          muteHttpExceptions: true
+        });
         if (response.getResponseCode() === 200) {
           const data = JSON.parse(response.getContentText());
+          const lineUserId = data.userId;
+          const staffInfo = StaffIdentityResolver.resolve(lineUserId);
           const context = new AuthenticationContext({
-            identityId: `line-user-${Date.now()}`,
+            identityId: staffInfo.found ? staffInfo.staffId : `line-user-${lineUserId}`,
             identityType: 'USER',
             authenticationMethod: 'LIFF',
             authenticated: true,
             issuedAt: Date.now(),
-            metadata: { provider: 'LIFFIdentityProvider', authSource: authSource, clientId: data.client_id, expiresIn: data.expires_in }
+            metadata: {
+              provider: 'LIFFIdentityProvider',
+              authSource: authSource,
+              clientId: lineUserId,
+              lineUserId: lineUserId,
+              principalType: staffInfo.found ? 'STAFF' : 'ANONYMOUS',
+              displayName: data.displayName,
+              pictureUrl: data.pictureUrl
+            }
           });
           return AuthenticationResult.successResult(context);
         }
       } catch (e) {
-        // Fall through to fallback auth for robust production resilience
+        // Fall through to fallback auth
       }
+      const lineUserId = `fallback-${cleanToken.substring(0, 8)}`;
+      const staffInfo = StaffIdentityResolver.resolve(lineUserId);
       const fallbackContext = new AuthenticationContext({
-        identityId: `user-liff-fallback-${cleanToken.substring(0, 8)}`,
+        identityId: staffInfo.found ? staffInfo.staffId : `user-liff-fallback-${cleanToken.substring(0, 8)}`,
         identityType: 'USER',
         authenticationMethod: 'LIFF',
         authenticated: true,
         issuedAt: Date.now(),
-        metadata: { provider: 'LIFFIdentityProvider', authSource: authSource, fallback: true }
+        metadata: {
+          provider: 'LIFFIdentityProvider',
+          authSource: authSource,
+          fallback: true,
+          lineUserId: lineUserId,
+          principalType: staffInfo.found ? 'STAFF' : 'ANONYMOUS'
+        }
       });
       return AuthenticationResult.successResult(fallbackContext);
     }
@@ -3484,7 +3572,7 @@ class AuthorizationPolicy {
     this.requiredScopes = params.requiredScopes || [];
   }
   static resolve(request) {
-    if (request.path === '/health' || request.path === '/getEvidence') {
+    if (request.path === '/health' || request.path === '/getEvidence' || request.path === '/registerStaff') {
       return new AuthorizationPolicy({});
     }
     if (request.path === '/admin' || (request.query && request.query.action === 'resetAllSheets')) {
@@ -3763,6 +3851,12 @@ class EditionResolver {
       return 'PROFESSIONAL';
     }
     if (id === 'user-liff-stub-123') {
+      return 'STANDARD';
+    }
+    if (authContext.metadata && authContext.metadata.principalType === 'STAFF') {
+      return 'STANDARD';
+    }
+    if (id && id.indexOf('S') === 0 && id.length >= 4) {
       return 'STANDARD';
     }
     return 'COMMUNITY';
@@ -4748,6 +4842,21 @@ class PlatformIntegrationPipeline {
       });
 
       apiResponse = ExceptionHandler.handle(err, req, apiContext);
+    }
+
+    if (apiResponse && apiResponse.metadata) {
+      const activeReq = apiRequest || req;
+      apiResponse.metadata.debugAuth = {
+        lineUserId: apiContext.getAuthenticationContext() ? (apiContext.getAuthenticationContext().metadata ? apiContext.getAuthenticationContext().metadata.lineUserId : "none") : "none",
+        identityId: apiContext.getAuthenticationContext() ? apiContext.getAuthenticationContext().identityId : "none",
+        principalType: apiContext.getAuthenticationContext() ? (apiContext.getAuthenticationContext().metadata ? apiContext.getAuthenticationContext().metadata.principalType : "none") : "none",
+        edition: apiContext.getLicenseContext() ? apiContext.getLicenseContext().edition : "none",
+        requiredEdition: (activeReq && LicensePolicy.resolve(activeReq)) ? LicensePolicy.resolve(activeReq).requiredEdition : "none"
+      };
+      writeDebugLogToSheet({
+        requestId: apiResponse.metadata.requestId,
+        ...apiResponse.metadata.debugAuth
+      });
     }
 
     return createJsonResponseFromApiResponse(apiResponse);

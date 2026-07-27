@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta name="build-id" content="20260724-1534-ab300e1">
+  <meta name="git-commit" content="ab300e1">
+  <meta name="build-source" content="main">
+  <meta name="publish-target" content="GitHub Pages">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP</title>
@@ -272,25 +276,40 @@
       }
     }
 
+    function getAuthToken() {
+      let token = null;
+      try {
+        if (typeof liff !== 'undefined' && liff.isLoggedIn && liff.isLoggedIn()) {
+          token = liff.getAccessToken() || liff.getIDToken();
+        }
+      } catch (e) {
+        console.warn('[API Auth] Failed to read token from LIFF SDK:', e);
+      }
+
+      if (!token && typeof localStorage !== 'undefined') {
+        token = localStorage.getItem('liff_token') || localStorage.getItem('posting_token') || localStorage.getItem('posting_liff_token') || localStorage.getItem('liff_access_token');
+      }
+
+      if (!token) {
+        const os = (typeof liff !== 'undefined' && liff.getOS) ? liff.getOS() : 'web';
+        if (os === 'web' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          token = 'valid-liff-token';
+        }
+      }
+
+      if (token && typeof localStorage !== 'undefined') {
+        localStorage.setItem('liff_token', token);
+        localStorage.setItem('posting_token', token);
+      }
+
+      return token;
+    }
+
     async function api(action, params = {}, method = 'GET') {
       const url = new URL(API_URL);
       url.searchParams.append('action', action);
-
-      let token = null;
-      if (typeof liff !== 'undefined' && liff.isLoggedIn && liff.isLoggedIn()) {
-        token = liff.getAccessToken();
-      }
       
-      // Fallback 1: LocalStorage token lookup
-      if (!token && typeof localStorage !== 'undefined') {
-        token = localStorage.getItem('posting_liff_token') || localStorage.getItem('liff_access_token');
-      }
-
-      // Fallback 2: Development / Stub token fallback
-      if (!token) {
-        token = 'valid-liff-token';
-      }
-
+      const token = getAuthToken();
       if (token) {
         url.searchParams.append('liffToken', token);
       }
@@ -300,18 +319,15 @@
           url.searchParams.append(k, params[k]);
         }
       });
-
       try {
-        const headers = {};
-        if (token) {
-          // headers['Authorization'] = 'Bearer ' + token;
-          console.log(`[API ${action}] Auth Token Injected (Fallback: Query liffToken only to prevent CORS preflight)`);
-        }
-        const options = { method: method, headers: headers, redirect: 'follow' };
+        const options = { method: method, redirect: 'follow' };
         if (method === 'POST') {
-          headers['Content-Type'] = 'text/plain';
-          options.body = JSON.stringify({ action, ...params });
+          const formData = new FormData();
+          formData.append('json', JSON.stringify({ action, liffToken: token, ...params }));
+          options.body = formData;
         }
+
+        console.log(`[API ${action}] Sending request (Token Injected: ${!!token})...`);
         const response = await fetch(url.toString(), options);
         console.log(`[API ${action}] HTTP Status:`, response.status);
         const text = await response.text();
@@ -345,44 +361,46 @@
       }
       if (currentUser) {
         setHud('register', 'Sending...', null);
-        try {
-          const regRes = await api('registerStaff', {
-            lastName: currentUser.displayName || currentUser.name,
-            firstName: 'LINE',
-            lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
-          }, 'POST');
-          if (regRes && regRes.success) {
+        api('registerStaff', {
+          lastName: currentUser.displayName || currentUser.name,
+          firstName: 'LINE',
+          lineUserId: currentUser.userId || 'U_IWASA_CEO_OFFICIAL'
+        }, 'POST').then(regRes => {
+          const rawReg = (regRes && regRes.data) ? regRes.data : regRes;
+          if (rawReg && rawReg.success !== false) {
             setHud('register', 'Saved to GAS', true);
           } else {
             setHud('register', 'GAS Fail', false);
           }
-        } catch (err) {
+        }).catch(err => {
           console.error('[GAS Register Error]', err);
           setHud('register', 'Error', false);
-        }
+        });
       }
       switchTab(currentUser ? 'area' : 'settings');
       showLoading('同期中...');
-      const data = await api('getAppData');
+      const rawRes = await api('getAppData');
+      const data = (rawRes && rawRes.data) ? rawRes.data : rawRes;
       hideLoading();
       const hudData = document.getElementById('hud-appdata');
       if (hudData) {
         if (!data) {
           hudData.className = 'font-bold text-red-400';
           hudData.textContent = 'NG (null)';
+        } else if (data.success === false || (rawRes && rawRes.success === false)) {
+          const errObj = (rawRes && rawRes.error) || (data && data.error);
+          hudData.className = 'font-bold text-red-400';
+          hudData.textContent = 'NG (' + (errObj ? errObj.code : 'Fail') + ')';
+        } else if (!data.areas) {
+          hudData.className = 'font-bold text-orange-400';
+          hudData.textContent = 'NG (areas missing)';
         } else {
-          const innerData = data.data || data;
-          if (!innerData || !innerData.areas) {
-            hudData.className = 'font-bold text-orange-400';
-            hudData.textContent = 'NG (areas: ' + (typeof data === 'object' ? JSON.stringify(data) : typeof data) + ')';
-          } else {
-            hudData.className = 'font-bold text-green-400';
-            hudData.textContent = 'OK (areas: ' + innerData.areas.length + ')';
-          }
+          hudData.className = 'font-bold text-green-400';
+          hudData.textContent = 'OK (areas: ' + data.areas.length + ')';
         }
       }
       if (data) {
-        appData = data.data || data;
+        appData = data;
         document.getElementById('sync-pct').textContent = currentUser ? '100%' : '0%';
         renderView();
       } else {
