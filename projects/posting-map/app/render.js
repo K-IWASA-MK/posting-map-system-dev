@@ -187,7 +187,7 @@
     try {
       userInfo = JSON.parse(localStorage.getItem('user_info'));
     } catch(e) {}
-    if (!userInfo && window.currentUser && window.currentUser.id && window.currentUser.id !== 'U_IWASA_CEO_OFFICIAL') {
+    if (!userInfo && window.currentUser && window.currentUser.id) {
       userInfo = {
         last: window.currentUser.last || window.currentUser.displayName || '',
         first: window.currentUser.first || '',
@@ -201,7 +201,7 @@
         <div class="flex flex-col items-center justify-center pt-4 pb-12">
           <div class="mb-6 text-center space-y-1">
             <h3 class="text-lg font-black text-white">公式配布員プロファイル</h3>
-            <p class="text-xs text-white/50 font-medium">LINEアカウント情報を取得中、または名前を登録してください</p>
+            <p class="text-xs text-white/50 font-medium">LINEログイン情報を確認中、またはお名前を登録してください</p>
           </div>
           <div class="w-full premium-glass p-8 space-y-6 text-left">
             <div class="space-y-4">
@@ -229,7 +229,7 @@
         </div>
       `;
 
-      const formattedId = userInfo.id ? String(userInfo.id).replace(/^[A-Za-z_]+/, 'STAFF ID ') : 'STAFF ID UNKNOWN';
+      const formattedId = userInfo.id ? String(userInfo.id).replace(/^[A-Za-z_]+/, 'STAFF ID ') : 'STAFF ID OFFICIAL';
       const rawBranch = localStorage.getItem('branch_name') || '三重第3区';
       const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : '';
 

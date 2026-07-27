@@ -154,13 +154,16 @@
               <div class="premium-glass p-6 space-y-6">
                 <span class="text-[10px] font-black uppercase tracking-widest text-[#22c55e] font-mono block text-center">保管情報の登録</span>
                 <div class="space-y-2">
-                  <label class="text-[10px] font-bold text-white/40 tracking-wider">保管場所（市名）</label>
+                  <label class="text-[10px] font-bold text-white/40 tracking-wider">保管場所（市区町村）</label>
                   <select id="storage-register-location" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-4 text-sm font-bold text-white focus:outline-none focus:border-[#2563eb] transition-colors">
-                    <option value="津市">津市</option>
-                    <option value="四日市市">四日市市</option>
-                    <option value="鈴鹿市">鈴鹿市</option>
-                    <option value="松阪市">松阪市</option>
-                    <option value="伊勢市">伊勢市</option>
+                    <option value="四日市市">四日市市 支部</option>
+                    <option value="桑名市">桑名市 支部</option>
+                    <option value="いなべ市">いなべ市 支部</option>
+                    <option value="木曽岬町">桑名郡木曽岬町 支部</option>
+                    <option value="東員町">員弁郡東員町 支部</option>
+                    <option value="菰野町">三重郡菰野町 支部</option>
+                    <option value="朝日町">三重郡朝日町 支部</option>
+                    <option value="川越町">三重郡川越町 支部</option>
                   </select>
                 </div>
                 <div class="space-y-2">
@@ -473,7 +476,8 @@
       const gateway = document.getElementById('screen-gateway');
       if (gateway) gateway.classList.add('hidden');
 
-      // TASK-010-B 1 & 3: キャッシュファースト (localStorage から 0.1秒で即時即効描画)
+      // TASK-012-SPEC: 初回アクセス時（キャッシュ無）は最初に Gyro ID Card (settings) を0.1秒で即時表示！
+      // ユーザーが ID カードを確認している裏で GAS からエリアデータを並列非同期取得！
       let renderedFromCache = false;
       const cachedRaw = localStorage.getItem('cached_app_data');
       if (cachedRaw) {
@@ -482,26 +486,22 @@
           if (cached && Array.isArray(cached.areas) && cached.areas.length > 0) {
             appData = cached;
             updateHeaderProgress(appData);
-            switchPage('areas'); // 通信完了を一切待たずに即時HOME画面表示！
+            switchPage('areas');
             renderedFromCache = true;
-            console.log('[TASK-010-B] ⚡ INSTANT LAUNCH: Rendered HOME from localStorage Cache!');
+            console.log('[TASK-012-SPEC] ⚡ INSTANT LAUNCH: Rendered HOME from Cache!');
           }
         } catch(e) {}
       }
 
-      // TASK-010-B 4 & 5: バックグラウンド並列同期と差分レンダリング
+      if (!renderedFromCache) {
+        // キャッシュがない初回来訪時は、空のローディングで待たせずに即座に ID Card (Settings) を表示！
+        switchPage('settings');
+        console.log('[TASK-012-SPEC] 🪪 FIRST LAUNCH: Showing Gyro ID Card while prefetching GAS data...');
+      }
+
+      // バックグラウンド非同期同期（IDカード表示中に裏でGASから通信取得）
       const syncTask = async () => {
         let ok = await initLiff();
-        if (!ok) {
-          currentUser = {
-            userId: 'U_IWASA_CEO_OFFICIAL',
-            displayName: '岩佐CEO',
-            name: '岩佐CEO',
-            id: 'U_IWASA_CEO_OFFICIAL',
-            last: '岩佐',
-            first: 'CEO'
-          };
-        }
 
         if (!_appDataPromise) {
           _appDataPromise = api('getAppData');
@@ -513,18 +513,17 @@
           localStorage.setItem('cached_app_data', JSON.stringify(appData));
           updateHeaderProgress(appData);
           if (window.HAppRender && window.HAppRender.renderAreas) {
-            window.HAppRender.renderAreas(); // 受信後、画面を静かに差分更新
+            window.HAppRender.renderAreas();
           }
-          if (!renderedFromCache) {
+          // IDカード表示から HOME (Areas) へスムーズ自動移行（未閲覧時）
+          const currentVisiblePage = document.querySelector('.page:not(.hidden)')?.id;
+          if (currentVisiblePage === 'page-settings' || !renderedFromCache) {
             switchPage('areas');
           }
-          console.log('[TASK-010-B] 🔄 SILENT SYNC: Updated appData live from GAS.');
-        } else if (!renderedFromCache) {
-          switchPage('areas');
+          console.log('[TASK-012-SPEC] 🔄 BACKGROUND SYNC COMPLETE: Transitioned to Areas.');
         }
       };
 
-      // バックグラウンド同期を発火
       syncTask();
     }
 
