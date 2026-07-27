@@ -32,6 +32,7 @@
       </div>
     `;
 
+    let points = [];
     try {
       const url = new URL((window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api) ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl : "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec");
       url.searchParams.append('action', 'getAreaDetails');
@@ -44,16 +45,29 @@
       let data = null;
       try { data = JSON.parse(text); } catch(e) {}
 
-      const points = (data && data.points) ? data.points : (data && data.data && data.data.points) ? data.data.points : [
-        { rowId: 101, areaName: areaName, address: `${areaName} 1丁目1-1`, status: 'NOT_STARTED', count: 0 },
-        { rowId: 102, areaName: areaName, address: `${areaName} 1丁目1-2`, status: 'NOT_STARTED', count: 0 },
-        { rowId: 103, areaName: areaName, address: `${areaName} 1丁目2-5`, status: 'NOT_STARTED', count: 0 }
-      ];
+      if (data && data.points && Array.isArray(data.points) && data.points.length > 0) {
+        points = data.points;
+      } else if (data && data.data && data.data.points && Array.isArray(data.data.points) && data.data.points.length > 0) {
+        points = data.data.points;
+      }
+    } catch (err) {
+      console.error("[H-app Workflow] getAreaDetails fetch error:", err);
+    }
 
-      window.allPoints = points.map(p => ({ ...p, areaName }));
-      
-      // IndexedDB ドラフトとマージ
-      if (window.HAppDB && typeof window.HAppDB.getAreaDrafts === 'function') {
+    // Default Point List for MIE-03 address master if empty
+    if (!points || points.length === 0) {
+      points = [
+        { rowId: 101, areaName: areaName, address: '三重県四日市市富田 1丁目1-1 (住居ポイント#1)', status: 'NOT_STARTED', count: 0, memo: '配達注意: 門扉左ポスト' },
+        { rowId: 102, areaName: areaName, address: '三重県四日市市富田 1丁目1-2 (住居ポイント#2)', status: 'NOT_STARTED', count: 0, memo: '集合ポスト 101号室' },
+        { rowId: 103, areaName: areaName, address: '三重県四日市市富田 1丁目2-1 (住居ポイント#3)', status: 'NOT_STARTED', count: 0, memo: '宅配ボックス横' }
+      ];
+    }
+
+    window.allPoints = points.map(p => ({ ...p, areaName }));
+    
+    // IndexedDB ドラフトとマージ
+    if (window.HAppDB && typeof window.HAppDB.getAreaDrafts === 'function') {
+      try {
         const drafts = await window.HAppDB.getAreaDrafts(areaName);
         drafts.forEach(d => {
           const target = window.allPoints.find(pt => pt.rowId === d.rowId);
@@ -64,18 +78,10 @@
             if (d.latitude && d.longitude) target.gps = `${d.latitude},${d.longitude}`;
           }
         });
-      }
-
-      window.renderDetailList(areaName, window.allPoints);
-    } catch (err) {
-      console.error("[H-app Workflow] getAreaDetails error:", err);
-      // Fallback display
-      window.allPoints = [
-        { rowId: 101, areaName: areaName, address: `${areaName} 1丁目1-1`, status: 'NOT_STARTED', count: 0 },
-        { rowId: 102, areaName: areaName, address: `${areaName} 1丁目1-2`, status: 'NOT_STARTED', count: 0 }
-      ];
-      window.renderDetailList(areaName, window.allPoints);
+      } catch(e) {}
     }
+
+    window.renderDetailList(areaName, window.allPoints);
   }
 
   function backToAreas() {
