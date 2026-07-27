@@ -26,8 +26,7 @@
     client = "MIE-03";
   }
   
-  console.log(`[PMS Loader] Resolving environment config for client: ${client}`);
-  
-  // 4. Inject script synchronously to ensure PMS_CLIENT_CONFIG is initialized before downstream script executions
-  document.write(`<script src="clients/${client}/config.js"><\/script>`);
+  const basePath = (window.location.pathname.includes('/app/') || window.location.pathname.endsWith('/app')) ? '../clients/' : 'clients/';
+  console.log(`[PMS Loader] Resolving environment config from basePath: ${basePath} for client: ${client}`);
+  document.write(`<script src="${basePath}${client}/config.js"><\/script>`);
 })();
