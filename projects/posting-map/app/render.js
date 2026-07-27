@@ -22,12 +22,46 @@
     return `${MM}/${dd} ${HH}:${mm}`;
   }
 
+  // TASK-012: 内部マスター情報と現場表示情報を分離する DTO 変換関数
+  function normalizeAreasForDisplay(rawAreas) {
+    if (!Array.isArray(rawAreas)) return [];
+    
+    // 1. 内部マスター識別子 (MIE03_ADDRESS_MASTER 等) を完全フィルタアウト
+    const filtered = rawAreas.filter(a => {
+      if (!a) return false;
+      const name = String(a.name || a.id || '').trim();
+      if (name.includes('MASTER') || name.includes('ADDRESS_MASTER') || name.startsWith('MIE03_')) {
+        return false;
+      }
+      return true;
+    });
+
+    // 2. 現場配布員向けエリア名の正規化 (カッコ数字 -> 第Nエリア)
+    return filtered.map(a => {
+      let displayName = a.name || a.id || '現場エリア';
+      displayName = displayName.replace(/\((\d+)\)/, ' 第$1エリア');
+
+      return {
+        id: a.id || a.name,
+        name: displayName,
+        rawName: a.name || a.id,
+        progress: Number(a.progress || 0),
+        count: Number(a.count || a.done || 0),
+        total: Number(a.total || 500),
+        repAddress: a.repAddress || ''
+      };
+    });
+  }
+
   // 1. エリア一覧のレンダリング (HOME Dashboard - Dark Glass UI)
   function renderAreas() {
     const container = $('area-list') || $('new-area-list');
     if (!container) return;
 
-    const areas = (window.appData && Array.isArray(window.appData.areas)) ? window.appData.areas : [];
+    const rawAreas = (window.appData && Array.isArray(window.appData.areas)) ? window.appData.areas : [];
+    
+    // TASK-012: DTO 変換（内部マスター排除 ＆ 現場表示名正規化）
+    const areas = normalizeAreasForDisplay(rawAreas);
 
     if (!areas || areas.length === 0) {
       container.innerHTML = `
@@ -35,16 +69,16 @@
           <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-2">
             <span class="text-sm">🗺️</span>
           </div>
-          <p class="text-white/70 font-bold text-sm">エリアデータを読み込み中...</p>
-          <p class="text-[10px] text-white/40 font-mono uppercase tracking-widest">CONNECTING TO MIE-03 MASTER</p>
+          <p class="text-white/70 font-bold text-sm">配属エリアデータを準備中...</p>
+          <p class="text-[10px] text-white/40 font-mono uppercase tracking-widest">FIELD OPERATIONS OS</p>
         </div>`;
       return;
     }
 
     const cardsHtml = areas.map((area) => {
-      const progress = Number(area.progress || 0);
-      const count = Number(area.count || 0);
-      const total = Number(area.total || 500);
+      const progress = area.progress;
+      const count = area.count;
+      const total = area.total;
 
       let borderStyle = 'border: 1px solid rgba(255, 255, 255, 0.06);';
       let badgeBg = 'bg-white/5 text-white/50 border-white/10';
@@ -63,11 +97,12 @@
       }
 
       return `
-        <div style="${borderStyle}" onclick="window.HAppWorkflow.openDetail('${area.name || area.id}')" class="premium-glass p-6 space-y-4 clickable-card cursor-pointer">
+        <div style="${borderStyle}" onclick="window.HAppWorkflow.openDetail('${area.rawName}')" class="premium-glass p-6 space-y-4 clickable-card cursor-pointer">
           <div class="flex justify-between items-start">
             <div class="space-y-1">
               <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${badgeBg}">${badgeText}</span>
-              <h3 class="text-xl font-black text-white tracking-tight leading-tight pt-1">${area.name || area.id}</h3>
+              <h3 class="text-xl font-black text-white tracking-tight leading-tight pt-1">${area.name}</h3>
+              ${area.repAddress ? `<p class="text-xs text-white/40 font-medium font-mono">${area.repAddress.replace(/^〒\d{3}-\d{4}\s*/, '')}</p>` : ''}
             </div>
             <div class="text-right">
               <div class="text-2xl font-black font-mono" style="color: ${progressColor}">${progress}<span class="text-xs ml-0.5">%</span></div>
@@ -474,6 +509,7 @@
     renderStorageList,
     renderDetailModalContent,
     renderConfirmModal,
-    getCleanAddress
+    getCleanAddress,
+    normalizeAreasForDisplay
   };
 })(window);
