@@ -22,7 +22,7 @@
     return `${MM}/${dd} ${HH}:${mm}`;
   }
 
-  // TASK-012: 内部マスター情報と現場表示情報を分離する DTO 変換関数
+  // TASK-014: 内部マスター情報と現場表示情報を分離する DTO 変換関数 (SSOT 適合移植)
   function normalizeAreasForDisplay(rawAreas) {
     if (!Array.isArray(rawAreas)) return [];
     
@@ -36,7 +36,7 @@
       return true;
     });
 
-    // 2. 現場配布員向けエリア名の正規化 (カッコ数字 -> 第Nエリア)
+    // 2. 現場配布員向けエリア DTO 正規化 (カッコ数字 -> 第Nエリア)
     return filtered.map(a => {
       let displayName = a.name || a.id || '現場エリア';
       displayName = displayName.replace(/\((\d+)\)/, ' 第$1エリア');
@@ -45,10 +45,10 @@
         id: a.id || a.name,
         name: displayName,
         rawName: a.name || a.id,
-        progress: Number(a.progress || 0),
+        progress: Number(a.progress || a.pct || 0),
         count: Number(a.count || a.done || 0),
         total: Number(a.total || 500),
-        repAddress: a.repAddress || ''
+        repAddress: a.repAddress || a.address || ''
       };
     });
   }
@@ -178,7 +178,7 @@
     container.innerHTML = cardsHtml;
   }
 
-  // 3. Gyro ID Card & Settings のレンダリング
+  // 3. Gyro ID Card & Settings のレンダリング (SSOT 適合移植)
   function renderSettings() {
     const container = $('settings-content');
     if (!container) return;
@@ -187,9 +187,10 @@
     try {
       userInfo = JSON.parse(localStorage.getItem('user_info'));
     } catch(e) {}
-    if (!userInfo && window.currentUser && window.currentUser.id) {
+
+    if (!userInfo && window.currentUser && window.currentUser.id && window.currentUser.displayName) {
       userInfo = {
-        last: window.currentUser.last || window.currentUser.displayName || '',
+        last: window.currentUser.last || window.currentUser.displayName,
         first: window.currentUser.first || '',
         id: window.currentUser.id,
         picture: window.currentUser.pictureUrl || ''
@@ -201,17 +202,17 @@
         <div class="flex flex-col items-center justify-center pt-4 pb-12">
           <div class="mb-6 text-center space-y-1">
             <h3 class="text-lg font-black text-white">公式配布員プロファイル</h3>
-            <p class="text-xs text-white/50 font-medium">LINEログイン情報を確認中、またはお名前を登録してください</p>
+            <p class="text-xs text-white/50 font-medium">お名前を登録して公式IDカードを発行してください</p>
           </div>
           <div class="w-full premium-glass p-8 space-y-6 text-left">
             <div class="space-y-4">
               <div>
                 <label class="text-[11px] font-black uppercase tracking-[0.2em] mb-2 block text-white/70 text-center">苗字</label>
-                <input type="text" id="user-last" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-5 text-lg font-black text-white outline-none focus:border-[#2563eb] text-center" placeholder="例：山田">
+                <input type="text" id="user-last" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-5 text-lg font-black text-white outline-none focus:border-[#2563eb] text-center" placeholder="例：鈴木">
               </div>
               <div>
                 <label class="text-[11px] font-black uppercase tracking-[0.2em] mb-2 block text-white/70 text-center">名前</label>
-                <input type="text" id="user-first" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-5 text-lg font-black text-white outline-none focus:border-[#2563eb] text-center" placeholder="例：太郎">
+                <input type="text" id="user-first" class="w-full h-14 bg-[#1C1C1E] border border-white/10 rounded-2xl px-5 text-lg font-black text-white outline-none focus:border-[#2563eb] text-center" placeholder="例：一郎">
               </div>
             </div>
             <button onclick="saveProfile()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-5 text-lg font-black shadow-xl">登録を完了する</button>

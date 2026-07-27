@@ -235,6 +235,11 @@
     p.isDone = true;
     p.completedAt = new Date().toISOString();
 
+    let userInfo = null;
+    try { userInfo = JSON.parse(localStorage.getItem('user_info')); } catch(e) {}
+    const sName = userInfo ? `${userInfo.last}${userInfo.first || ''}` : ((window.currentUser && window.currentUser.displayName) || '公式配布員');
+    const sId = userInfo ? userInfo.id : ((window.currentUser && window.currentUser.id) || 'STAFF_OFFICIAL');
+
     const payload = {
       action: 'submitDistribution',
       areaName,
@@ -243,8 +248,8 @@
       photoBase64: p.photoBase64 || '',
       latitude: p.gps ? p.gps.split(',')[0] : '',
       longitude: p.gps ? p.gps.split(',')[1] : '',
-      staffName: (window.currentUser && window.currentUser.name) || '岩佐CEO',
-      staffId: (window.currentUser && window.currentUser.userId) || 'U_IWASA_CEO_OFFICIAL'
+      staffName: sName,
+      staffId: sId
     };
 
     if (window.HAppDB) {
