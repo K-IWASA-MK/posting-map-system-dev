@@ -6,6 +6,7 @@
  * 事前リスクスコア（0〜100）および RiskLevel を自律推論する。
  */
 
+import * as path from 'path';
 import { DeploymentGateRequest } from '../gates/types/DeploymentTargetGateTypes';
 import { DeploymentKnowledgeRegistry } from '../feedback/DeploymentKnowledgeRegistry';
 import { RiskPrediction, RiskLevel } from './DeploymentImprovementTypes';
@@ -30,7 +31,9 @@ export class DeploymentRiskPredictor {
 
     // 2. Publish Root Risk Check
     if (request.frontendConfigPath && request.targetPublishRoot) {
-      if (!request.frontendConfigPath.startsWith(request.targetPublishRoot) && !request.targetPublishRoot.startsWith(request.frontendConfigPath)) {
+      const absConfig = path.resolve(request.frontendConfigPath);
+      const absRoot = path.resolve(request.targetPublishRoot);
+      if (!absConfig.startsWith(absRoot) && !absRoot.startsWith(absConfig)) {
         score += 30;
         predictedFailures.push('Gate-003 (Publish Root Match)');
         reasons.push('Source asset path lies outside the designated publish root.');
