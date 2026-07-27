@@ -55,7 +55,7 @@
       const isCompleted = (currentStatus === 'READY_TO_SYNC' || currentStatus === 'SYNCED');
 
       return `
-        <div onclick="window.HAppWorkflow.openPointDetailModal(${p.rowId})" class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 active:scale-[0.98] transition-all cursor-pointer flex justify-between items-center">
+        <div onclick="window.HAppWorkflow.openPointDetailModal(${p.rowId})" class="point-card-item bg-white rounded-2xl p-5 shadow-sm border border-gray-100 active:scale-[0.98] transition-all cursor-pointer flex justify-between items-center">
           <div class="space-y-1">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black ${statusBadge}">
               <span class="w-2 h-2 rounded-full ${statusDot}"></span>
