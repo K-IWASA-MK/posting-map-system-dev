@@ -2,21 +2,14 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>DEPRECATED: Use Root index.html</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f87171; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-    .box { background: rgba(0,0,0,0.2); padding: 3rem; border-radius: 1rem; max-width: 600px; }
-    h1 { margin-top: 0; }
-    a { color: #fff; text-decoration: underline; font-weight: bold; }
-  </style>
+  <title>POSTING MAP - H-app Entry</title>
+  <script>
+    // Redirect root access to app/index.html preserving query parameters
+    const search = window.location.search;
+    window.location.replace('./app/index.html' + search);
+  </script>
 </head>
 <body>
-  <div class="box">
-    <h1>⚠️ DEPRECATED</h1>
-    <p>このファイル (<code>projects/posting-map/index.html</code>) は廃止予定です。</p>
-    <p>唯一の公式な SSOT（Single Source of Truth）は、リポジトリルートの <code>/index.html</code> に統合されました。</p>
-    <p>開発・検証・公開のすべてにおいて、今後はルートの <code>/index.html</code> を参照してください。</p>
-    <p>※ 次のスプリントでこのファイルは完全に削除されます。</p>
-  </div>
+  <p>Redirecting to POSTING MAP H-app...</p>
 </body>
 </html>
