@@ -12,3 +12,5 @@ export * from './ExecutionPlanModel';
 export * from './ExecutionPlanValidator';
 export * from './ExecutionPlanFactory';
 export * from './ExecutionPlanRegistry';
+export * from './ExecutionStepHandlerRegistry';
+export * from './AIEmployeeExecutionRuntime';
