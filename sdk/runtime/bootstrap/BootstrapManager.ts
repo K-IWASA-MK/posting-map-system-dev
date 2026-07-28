@@ -1,11 +1,12 @@
 /**
  * BootstrapManager.ts
  * 
- * Unified Bootstrap Manager orchestrating OrganizationBootstrap and AutonomousRuntimeBootstrap
+ * Unified Bootstrap Manager orchestrating OrganizationBootstrap, WorkflowBootstrap, ProjectBootstrap, and AutonomousRuntimeBootstrap
  */
 
 import { OrganizationBootstrap } from '../../employee/organization/bootstrap/OrganizationBootstrap';
 import { WorkflowBootstrap } from '../../employee/workflow/bootstrap/WorkflowBootstrap';
+import { ProjectBootstrap } from '../../project/bootstrap/ProjectBootstrap';
 import { AutonomousRuntimeBootstrap, AutonomousRuntimeState } from '../../runtime/bootstrap/AutonomousRuntimeBootstrap';
 import { AIEmployeeRegistry } from '../../employee/manager/registry/AIEmployeeRegistry';
 
@@ -24,7 +25,10 @@ export class BootstrapManager {
     // 2. Bootstrap Workflows & Blueprints into registries
     WorkflowBootstrap.bootstrap();
 
-    // 3. Start Autonomous Runtime Bootstrap with sharedRegistry
+    // 3. Bootstrap Projects & Standard Project Catalog into ProjectRegistry
+    ProjectBootstrap.bootstrap();
+
+    // 4. Start Autonomous Runtime Bootstrap with sharedRegistry
     const state = AutonomousRuntimeBootstrap.start(this.sharedRegistry);
 
     this.initialized = true;
@@ -37,6 +41,7 @@ export class BootstrapManager {
 
   public static clear(): void {
     AutonomousRuntimeBootstrap.clear();
+    ProjectBootstrap.clear();
     this.sharedRegistry = new AIEmployeeRegistry();
     this.initialized = false;
   }

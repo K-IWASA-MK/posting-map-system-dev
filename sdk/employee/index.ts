@@ -107,3 +107,5 @@ export * from './workflow/routing/WorkflowCoordinator';
 
 export * from './workflow/catalog/StandardWorkflowCatalog';
 export * from './workflow/bootstrap/WorkflowBootstrap';
+
+export * from '../project';
