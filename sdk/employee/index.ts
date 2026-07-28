@@ -70,3 +70,40 @@ export * from './profession/routing/ProfessionRoutingPolicy';
 export * from './profession/routing/ProfessionSelector';
 
 export * from './profession/catalog/StandardProfessionCatalog';
+
+export * from './workflow/types/WorkflowId';
+export * from './workflow/types/WorkflowInstanceId';
+export * from './workflow/types/WorkflowCategory';
+export * from './workflow/types/EmployeeWorkflow';
+export * from './workflow/types/WorkflowInstance';
+export * from './workflow/registry/WorkflowRegistry';
+export * from './workflow/registry/WorkflowInstanceRegistry';
+
+export * from './workflow/stage/types/StageId';
+export * from './workflow/stage/types/StageState';
+export * from './workflow/stage/types/WorkflowStage';
+
+export * from './workflow/blueprint/types/WorkflowBlueprint';
+export * from './workflow/blueprint/registry/WorkflowBlueprintRegistry';
+export * from './workflow/blueprint/WorkflowFactory';
+
+export * from './workflow/assignment/types/StageAssignment';
+export * from './workflow/assignment/types/WorkflowAssignment';
+export * from './workflow/assignment/AssignmentResolver';
+
+export * from './workflow/progress/types/WorkflowProgress';
+export * from './workflow/progress/WorkflowProgressTracker';
+
+export * from './workflow/event/types/WorkflowEventType';
+export * from './workflow/event/types/WorkflowEvent';
+export * from './workflow/event/WorkflowEventPublisher';
+
+export * from './workflow/routing/interfaces/IStageExecutionCoordinator';
+export * from './workflow/routing/interfaces/IAssignmentCoordinator';
+export * from './workflow/routing/interfaces/ITransitionCoordinator';
+export * from './workflow/routing/StageTransitionResolver';
+export * from './workflow/routing/WorkflowRouter';
+export * from './workflow/routing/WorkflowCoordinator';
+
+export * from './workflow/catalog/StandardWorkflowCatalog';
+export * from './workflow/bootstrap/WorkflowBootstrap';

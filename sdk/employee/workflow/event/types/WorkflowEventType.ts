@@ -1,0 +1,14 @@
+/**
+ * WorkflowEventType.ts
+ * 
+ * Event Types for Workflow Events
+ */
+
+export enum WorkflowEventType {
+  WORKFLOW_CREATED = 'WORKFLOW_CREATED',
+  STAGE_STARTED = 'STAGE_STARTED',
+  STAGE_COMPLETED = 'STAGE_COMPLETED',
+  STAGE_FAILED = 'STAGE_FAILED',
+  WORKFLOW_COMPLETED = 'WORKFLOW_COMPLETED',
+  WORKFLOW_CANCELLED = 'WORKFLOW_CANCELLED'
+}

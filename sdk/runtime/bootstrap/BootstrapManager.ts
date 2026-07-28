@@ -5,6 +5,7 @@
  */
 
 import { OrganizationBootstrap } from '../../employee/organization/bootstrap/OrganizationBootstrap';
+import { WorkflowBootstrap } from '../../employee/workflow/bootstrap/WorkflowBootstrap';
 import { AutonomousRuntimeBootstrap, AutonomousRuntimeState } from '../../runtime/bootstrap/AutonomousRuntimeBootstrap';
 import { AIEmployeeRegistry } from '../../employee/manager/registry/AIEmployeeRegistry';
 
@@ -20,7 +21,10 @@ export class BootstrapManager {
     // 1. Bootstrap Organization & AI Employees into sharedRegistry
     OrganizationBootstrap.bootstrap(this.sharedRegistry);
 
-    // 2. Start Autonomous Runtime Bootstrap with sharedRegistry
+    // 2. Bootstrap Workflows & Blueprints into registries
+    WorkflowBootstrap.bootstrap();
+
+    // 3. Start Autonomous Runtime Bootstrap with sharedRegistry
     const state = AutonomousRuntimeBootstrap.start(this.sharedRegistry);
 
     this.initialized = true;

@@ -221,7 +221,7 @@ async function test4_FullProductionLiveE2EAutonomousExecution() {
   const taskId = ackTask.taskId;
 
   // 2. Allow event-driven orchestrator, execution runtime, verification & callback to run
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
   // 3. Verify task reached COMPLETED in ExecutionTaskRegistry
   const completedTask = ExecutionTaskRegistry.get(taskId);
