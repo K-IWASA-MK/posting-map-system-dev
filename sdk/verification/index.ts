@@ -25,3 +25,10 @@ export * from './deployment/DeploymentVerificationRuntime';
 
 export * from './evidence/VerificationEvidencePackage';
 export * from './AIEmployeeVerificationOrchestrator';
+
+// Phase 5 Extensions
+export * from './evidence/EvidenceIntegrityManager';
+export * from './evidence/EvidenceStorageManager';
+export * from './deployment/ProductionAssetExtractor';
+export * from './deployment/GitHubActionsRealVerificationProvider';
+export * from './governance/VerificationGovernanceGateBridge';
