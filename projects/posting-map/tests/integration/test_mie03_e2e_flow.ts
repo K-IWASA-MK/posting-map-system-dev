@@ -112,8 +112,8 @@ async function runMie03E2eEvidenceTest() {
 
   // 4. ブラウザ画面への地域一覧レンダリングデータ構造検証 (Simulating UI Store & Renderer Input)
   const areaSummaryList = Array.isArray(dashResponse?.summary) ? dashResponse.summary : (Array.isArray(dashResponse) ? dashResponse : []);
-  console.log(`\nFound ${areaSummaryList.length} area items in MIE-03 response.`);
-  assertTrue("Criterion 4: Renderable area items count > 0", areaSummaryList.length >= 0, `Items: ${areaSummaryList.length}`);
+  console.log(`\nFound ${areaSummaryList.length} distribution areas (partitioned from 858 address master records) in MIE-03 response.`);
+  assertTrue("Criterion 4: Renderable distribution areas count = 91", areaSummaryList.length === 91, `Areas: ${areaSummaryList.length}`);
 
   // 5. 配布登録 (submitDistribution) の実地送信動作検証
   console.log("\nTesting submitDistribution for MIE-03...");
