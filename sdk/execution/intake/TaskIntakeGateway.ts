@@ -8,6 +8,7 @@
  */
 
 import { ExecutionTask, ExecutionTaskRegistry } from '../index';
+import { TaskCreatedEventPublisher } from '../../runtime';
 import { TaskIntakeAuditManager } from './TaskIntakeAudit';
 import { TaskIntakeRequest } from './TaskIntakeRequestModel';
 import { TaskIntakeRequestValidator } from './TaskIntakeRequestValidator';
@@ -46,6 +47,11 @@ export class TaskIntakeGateway {
       sourceApplication: request.sourceApplication,
       receivedAt,
       status: 'ACCEPTED'
+    });
+
+    // 5. Auto-publish TASK_CREATED event to AutonomousRuntimeEventBus
+    TaskCreatedEventPublisher.publish(task).catch((err) => {
+      console.error(`[TaskIntakeGateway] Failed to publish TASK_CREATED event for task ${task.taskId}:`, err);
     });
 
     return task;

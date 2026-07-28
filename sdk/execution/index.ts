@@ -25,5 +25,7 @@ export * from './intake/TaskIntakeGateway';
 // Autonomous Orchestration Component Exports
 export * from './orchestration/ExecutionCoordinator';
 export * from './orchestration/AIEmployeeTaskOrchestrator';
+export * from './orchestration/TaskOrchestrationListener';
 export * from '../integration/employee/CapabilityMappingRegistry';
 export * from '../integration/employee/AIEmployeeCapabilityAdapter';
+

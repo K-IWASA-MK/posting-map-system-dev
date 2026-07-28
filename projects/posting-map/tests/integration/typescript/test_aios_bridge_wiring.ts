@@ -115,6 +115,29 @@ async function runTests() {
   assert(liveAuditRecord?.taskId === taskId, 'Audit record taskId must match registered taskId');
   console.log(' -> LIVE Mode Test PASSED.');
 
+  // 4. Test ORDER_CREATED Event Transmission via Pipeline (FLAG_BRIDGE_MODE=LIVE)
+  console.log('\n[Test 4] Pipeline ORDER_CREATED Real Event Transmission Test (FLAG_BRIDGE_MODE=LIVE)...');
+  const pipelineProvider = new AIOSBridgeProvider(AIOSBridgeMode.LIVE);
+  const orderEventMsg = new BridgeMessage({
+    messageId: 'msg-order-live-999',
+    messageType: 'ORDER_CREATED',
+    timestamp: Date.now(),
+    source: 'POSTING_MAP',
+    destination: 'AIOS',
+    payload: { title: 'Election Poster Dispatch Order Mie District 3', districtId: 'mie-03' }
+  });
+
+  const orderResult = pipelineProvider.send(orderEventMsg);
+  assert(orderResult.success === true, 'ORDER_CREATED delivery must return success');
+  const orderTaskId = orderResult.response?.payload?.taskId;
+  assert(typeof orderTaskId === 'string' && orderTaskId.length > 0, 'Response must contain valid taskId');
+
+  const orderRegisteredTask = ExecutionTaskRegistry.get(orderTaskId);
+  assert(orderRegisteredTask !== undefined, 'ORDER_CREATED task must be registered in ExecutionTaskRegistry');
+  assert(orderRegisteredTask?.priority === ExecutionTaskPriority.HIGH, 'ORDER_CREATED task priority must be HIGH');
+  assert(Boolean(orderRegisteredTask?.requiredCapabilities.includes(VerificationCapabilityType.API_ACCESS)), 'Task must include API_ACCESS capability');
+  console.log(' -> Pipeline ORDER_CREATED Test PASSED.');
+
   console.log('\n========================================================');
   console.log('ALL AIOS Bridge Wiring Integration Tests PASSED!');
   console.log('========================================================');

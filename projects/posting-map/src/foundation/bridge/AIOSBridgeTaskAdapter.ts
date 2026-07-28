@@ -9,6 +9,8 @@ export class AIOSBridgeTaskAdapter {
     const title = message.payload?.title || `[${message.messageType}] Business Event Task`;
     const description = message.payload?.description || JSON.stringify(message.payload || {});
 
+    const metaPayload = message.payload?.metadata || {};
+
     return {
       requestId: message.messageId,
       sourceApplication: message.source || 'POSTING_MAP',
@@ -19,6 +21,7 @@ export class AIOSBridgeTaskAdapter {
       metadata: {
         messageType: message.messageType,
         correlationId: message.correlationId,
+        ...metaPayload,
         payload: message.payload
       },
       requestedAt: new Date(message.timestamp || Date.now()).toISOString()

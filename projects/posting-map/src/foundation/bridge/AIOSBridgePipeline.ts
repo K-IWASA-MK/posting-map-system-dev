@@ -33,6 +33,11 @@ export class AIOSBridgePipeline {
     const config = GasConfigurationProvider.getInstance();
     const flags = config.getFeatureFlags();
 
+    // Dynamically sync provider mode from configuration (FLAG_BRIDGE_MODE)
+    if (flags.bridgeMode) {
+      this.provider.setMode(flags.bridgeMode);
+    }
+
     // 1. Resolve policy
     const policy = new BridgePolicy({
       bridgeEnabled: flags.bridgeEnabled !== false,

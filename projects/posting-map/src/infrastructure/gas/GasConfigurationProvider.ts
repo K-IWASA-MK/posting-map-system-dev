@@ -126,6 +126,7 @@ export class GasConfigurationProvider {
           bridgeHeartbeat: props.getProperty('FLAG_BRIDGE_HEARTBEAT') !== 'false',
           bridgeTimeout: timeoutStr ? parseInt(timeoutStr, 10) : 5000,
           bridgeProvider: props.getProperty('FLAG_BRIDGE_PROVIDER') || 'AIOSBridgeProvider',
+          bridgeMode: props.getProperty('FLAG_BRIDGE_MODE') || 'STUB',
           platformIntegrationEnabled: props.getProperty('FLAG_PLATFORM_INTEGRATION_ENABLED') !== 'false',
           pipelineMode: props.getProperty('FLAG_PIPELINE_MODE') || 'DETERMINISTIC',
           debugExecutionTrace: props.getProperty('FLAG_DEBUG_EXECUTION_TRACE') !== 'false'
@@ -159,6 +160,7 @@ export class GasConfigurationProvider {
       bridgeHeartbeat: true,
       bridgeTimeout: 5000,
       bridgeProvider: 'AIOSBridgeProvider',
+      bridgeMode: 'STUB',
       platformIntegrationEnabled: true,
       pipelineMode: 'DETERMINISTIC',
       debugExecutionTrace: true

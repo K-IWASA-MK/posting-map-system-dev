@@ -1473,6 +1473,7 @@ class GasConfigurationProvider {
         bridgeHeartbeat: props.getProperty('FLAG_BRIDGE_HEARTBEAT') !== 'false',
         bridgeTimeout: timeoutStr ? parseInt(timeoutStr, 10) : 5000,
         bridgeProvider: props.getProperty('FLAG_BRIDGE_PROVIDER') || 'AIOSBridgeProvider',
+        bridgeMode: props.getProperty('FLAG_BRIDGE_MODE') || 'STUB',
         platformIntegrationEnabled: props.getProperty('FLAG_PLATFORM_INTEGRATION_ENABLED') !== 'false',
         pipelineMode: props.getProperty('FLAG_PIPELINE_MODE') || 'DETERMINISTIC',
         debugExecutionTrace: props.getProperty('FLAG_DEBUG_EXECUTION_TRACE') !== 'false'
@@ -1503,6 +1504,7 @@ class GasConfigurationProvider {
       bridgeHeartbeat: true,
       bridgeTimeout: 5000,
       bridgeProvider: 'AIOSBridgeProvider',
+      bridgeMode: 'STUB',
       platformIntegrationEnabled: true,
       pipelineMode: 'DETERMINISTIC',
       debugExecutionTrace: true
@@ -4328,28 +4330,177 @@ class BridgeException extends ApiException {
   }
 }
 
-class AIOSBridgeProvider {
-  constructor() {
-    this.lastReceivedMessage = null;
-    this.currentStatus = 'CONNECTED';
+const AIOSBridgeMode = {
+  STUB: 'STUB',
+  LIVE: 'LIVE'
+};
+
+function resolveBridgeMode(modeString) {
+  if (!modeString) return AIOSBridgeMode.STUB;
+  const normalized = String(modeString).trim().toUpperCase();
+  if (normalized === 'LIVE') return AIOSBridgeMode.LIVE;
+  return AIOSBridgeMode.STUB;
+}
+
+class CapabilityMappingRegistry {
+  static getMapping(eventType) {
+    const mappings = {
+      'ORDER_CREATED': { priority: 'HIGH', capabilities: ['API_ACCESS', 'FILE_ACCESS'] },
+      'ORDER_PROCESSING_REQUEST': { priority: 'HIGH', capabilities: ['API_ACCESS', 'FILE_ACCESS'] },
+      'DISTRIBUTION_ACTIVITY_COMPLETED': { priority: 'NORMAL', capabilities: ['API_ACCESS', 'FILE_ACCESS'] },
+      'GPS_EVIDENCE_REJECTED': { priority: 'HIGH', capabilities: ['BROWSER_AUTOMATION', 'SCREENSHOT', 'DOM_INSPECTION'] },
+      'PHOTO_EVIDENCE_REJECTED': { priority: 'HIGH', capabilities: ['BROWSER_AUTOMATION', 'SCREENSHOT'] },
+      'FLYER_SHORTAGE_WARNING': { priority: 'NORMAL', capabilities: ['API_ACCESS'] },
+      'FLYER_OUT_OF_STOCK': { priority: 'HIGH', capabilities: ['API_ACCESS'] },
+      'API_EXECUTION_REQUEST': { priority: 'NORMAL', capabilities: ['API_ACCESS'] }
+    };
+    if (eventType && mappings[eventType.trim()]) {
+      return mappings[eventType.trim()];
+    }
+    return { priority: 'NORMAL', capabilities: ['API_ACCESS'] };
   }
-  send(message) {
-    const reply = new BridgeMessage({
-      messageId: 'rep-' + message.messageId,
-      messageType: message.messageType + '.reply',
+}
+
+class CapabilityResolver {
+  static resolve(message) {
+    if (message.payload) {
+      const customPriority = message.payload.priority;
+      const customCapabilities = message.payload.requiredCapabilities;
+      if (customPriority && customCapabilities && Array.isArray(customCapabilities)) {
+        return {
+          priority: customPriority,
+          capabilities: customCapabilities
+        };
+      }
+    }
+    return CapabilityMappingRegistry.getMapping(message.messageType);
+  }
+}
+
+class AIOSBridgeTaskAdapter {
+  static toTaskIntakeRequest(message) {
+    const resolved = CapabilityResolver.resolve(message);
+    const title = (message.payload && message.payload.title) || ('[' + message.messageType + '] Business Event Task');
+    const description = (message.payload && message.payload.description) || JSON.stringify(message.payload || {});
+
+    return {
+      requestId: message.messageId,
+      sourceApplication: message.source || 'POSTING_MAP',
+      title: title,
+      description: description,
+      priority: resolved.priority,
+      requiredCapabilities: resolved.capabilities,
+      metadata: {
+        messageType: message.messageType,
+        correlationId: message.correlationId,
+        payload: message.payload
+      },
+      requestedAt: new Date(message.timestamp || Date.now()).toISOString()
+    };
+  }
+
+  static fromExecutionTask(task, original) {
+    return new BridgeMessage({
+      messageId: 'rep-' + original.messageId,
+      messageType: original.messageType + '.reply',
       timestamp: Date.now(),
       source: 'AIOS',
-      destination: 'POSTING_MAP',
+      destination: original.source || 'POSTING_MAP',
       payload: {
-        echo: message.payload,
-        status: 'PROPOSAL_RECEIVED',
-        details: 'Stub acknowledgment successfully generated'
+        taskId: task.taskId,
+        status: task.status,
+        assignedEmployeeId: task.assignedEmployeeId,
+        title: task.title,
+        priority: task.priority,
+        details: 'Task successfully accepted by AIOS TaskIntakeGateway'
       },
-      protocolVersion: message.protocolVersion,
-      correlationId: message.correlationId
+      protocolVersion: original.protocolVersion,
+      correlationId: original.correlationId
     });
-    this.lastReceivedMessage = reply;
-    return BridgeResult.successResult(reply);
+  }
+
+  static fromMockResult(mockResult, original) {
+    return new BridgeMessage({
+      messageId: 'rep-' + original.messageId,
+      messageType: original.messageType + '.reply',
+      timestamp: Date.now(),
+      source: 'AIOS',
+      destination: original.source || 'POSTING_MAP',
+      payload: mockResult,
+      protocolVersion: original.protocolVersion,
+      correlationId: original.correlationId
+    });
+  }
+}
+
+class MockAIOSClient {
+  submit(request) {
+    return {
+      echo: (request.metadata && request.metadata.payload) || { requestId: request.requestId, title: request.title },
+      status: 'PROPOSAL_RECEIVED',
+      details: 'Stub acknowledgment successfully generated (MockAIOSClient)'
+    };
+  }
+}
+
+class LiveAIOSClient {
+  submit(request) {
+    let gateway = typeof TaskIntakeGateway !== 'undefined' ? TaskIntakeGateway : null;
+    if (!gateway && typeof require === 'function') {
+      try {
+        const mod = require('../../../../../sdk/execution/intake/TaskIntakeGateway');
+        gateway = mod.TaskIntakeGateway || mod;
+      } catch (e) {}
+    }
+    if (!gateway && typeof globalThis !== 'undefined' && globalThis.TaskIntakeGateway) {
+      gateway = globalThis.TaskIntakeGateway;
+    }
+    if (!gateway) {
+      throw new Error('[LiveAIOSClient] TaskIntakeGateway is not available in current execution environment');
+    }
+    return gateway.submitTask(request);
+  }
+}
+
+class AIOSClientFactory {
+  static createClient(mode) {
+    if (mode === AIOSBridgeMode.LIVE) {
+      return new LiveAIOSClient();
+    }
+    return new MockAIOSClient();
+  }
+}
+
+class AIOSBridgeProvider {
+  constructor(mode = AIOSBridgeMode.STUB) {
+    this.lastReceivedMessage = null;
+    this.currentStatus = 'CONNECTED';
+    this.mode = resolveBridgeMode(mode);
+  }
+  setMode(mode) {
+    this.mode = resolveBridgeMode(mode);
+  }
+  getMode() {
+    return this.mode;
+  }
+  send(message) {
+    try {
+      const request = AIOSBridgeTaskAdapter.toTaskIntakeRequest(message);
+      const client = AIOSClientFactory.createClient(this.mode);
+      const rawResult = client.submit(request);
+
+      let reply;
+      if (this.mode === AIOSBridgeMode.LIVE) {
+        reply = AIOSBridgeTaskAdapter.fromExecutionTask(rawResult, message);
+      } else {
+        reply = AIOSBridgeTaskAdapter.fromMockResult(rawResult, message);
+      }
+
+      this.lastReceivedMessage = reply;
+      return BridgeResult.successResult(reply);
+    } catch (error) {
+      return BridgeResult.failureResult(error.message || 'AIOS bridge transmission failed');
+    }
   }
   receive() {
     const msg = this.lastReceivedMessage;
@@ -4383,6 +4534,10 @@ class AIOSBridgePipeline {
   execute(request, context) {
     const config = GasConfigurationProvider.getInstance();
     const flags = config.getFeatureFlags();
+
+    if (flags.bridgeMode) {
+      this.provider.setMode(flags.bridgeMode);
+    }
 
     const policy = new BridgePolicy({
       bridgeEnabled: flags.bridgeEnabled !== false,

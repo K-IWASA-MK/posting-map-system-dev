@@ -7,6 +7,7 @@ import { AIOSBridgeTaskAdapter } from './AIOSBridgeTaskAdapter';
 import { IAIOSClient } from './AIOSClientBoundary';
 import { AIOSClientFactory } from './AIOSClientFactory';
 import { ExecutionTask } from '../../../../../sdk/execution/ExecutionTaskModel';
+import { AIOSRuntimeInitializer } from '../runtime/AIOSRuntimeInitializer';
 
 export class AIOSBridgeProvider implements BridgeProvider {
   private lastReceivedMessage: BridgeMessage | null = null;
@@ -15,10 +16,16 @@ export class AIOSBridgeProvider implements BridgeProvider {
 
   constructor(mode: AIOSBridgeMode = AIOSBridgeMode.STUB) {
     this.mode = mode;
+    if (this.mode === AIOSBridgeMode.LIVE) {
+      AIOSRuntimeInitializer.initialize();
+    }
   }
 
   public setMode(mode: AIOSBridgeMode | string): void {
     this.mode = resolveBridgeMode(typeof mode === 'string' ? mode : mode);
+    if (this.mode === AIOSBridgeMode.LIVE) {
+      AIOSRuntimeInitializer.initialize();
+    }
   }
 
   public getMode(): AIOSBridgeMode {
@@ -27,6 +34,10 @@ export class AIOSBridgeProvider implements BridgeProvider {
 
   public send(message: BridgeMessage): BridgeResult {
     try {
+      if (this.mode === AIOSBridgeMode.LIVE) {
+        AIOSRuntimeInitializer.initialize();
+      }
+
       const request = AIOSBridgeTaskAdapter.toTaskIntakeRequest(message);
       const client: IAIOSClient = AIOSClientFactory.createClient(this.mode);
       const rawResult = client.submit(request);
