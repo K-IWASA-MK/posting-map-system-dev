@@ -4,7 +4,8 @@ import { BridgeResult } from './BridgeResult';
 import { BridgeStatus } from './BridgeStatus';
 import { AIOSBridgeMode, resolveBridgeMode } from './AIOSBridgeMode';
 import { AIOSBridgeTaskAdapter } from './AIOSBridgeTaskAdapter';
-import { AIOSClientFactory, IAIOSClient } from './AIOSClientBoundary';
+import { IAIOSClient } from './AIOSClientBoundary';
+import { AIOSClientFactory } from './AIOSClientFactory';
 import { ExecutionTask } from '../../../../../sdk/execution/ExecutionTaskModel';
 
 export class AIOSBridgeProvider implements BridgeProvider {
