@@ -24,11 +24,19 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 1. マウント先ルート要素の取得
   const root = document.getElementById('app') || document.body;
 
-  // 2. CONFIG情報の取得
+  // 2. CONFIG情報の取得 (window.CONFIG および 旧 window.PMS_CLIENT_CONFIG の両方をサポート)
+  const pmsConfig = (window as any).PMS_CLIENT_CONFIG || {};
   const config = window.CONFIG || {};
-  const apiUrl = config.API_BASE || 'https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec';
-  const tenantId = config.DEFAULT_TENANT_ID || 'MIE-03';
-  const branchId = config.DEFAULT_BRANCH_ID || 'MIE-03';
+  const apiUrl = config.API_BASE || pmsConfig.api?.gasWebAppUrl;
+  const tenantId = config.DEFAULT_TENANT_ID || pmsConfig.districtId || 'MIE-03';
+  const branchId = config.DEFAULT_BRANCH_ID || pmsConfig.districtId || 'MIE-03';
+
+  if (!apiUrl) {
+    const errorMsg = 'CRITICAL: window.CONFIG.API_BASE is not defined. Application cannot start.';
+    console.error(`[DashboardBootstrap] ${errorMsg}`);
+    showErrorOverlay(root as HTMLElement, [errorMsg, 'Please ensure the application configuration is properly injected.']);
+    return;
+  }
 
   // 3. Runtime Verification (Configuration -> Feature Toggle -> Runtime Validator)
   const validation = ProductRuntimeValidator.validate(apiUrl, tenantId, branchId, 'app');
