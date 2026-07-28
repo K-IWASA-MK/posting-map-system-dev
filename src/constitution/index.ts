@@ -12,4 +12,5 @@ export * from './DispatchPolicy';
 export * from './KnowledgeSanitizationPolicy';
 export * from './AIOSConstitution';
 export * from './enforcement';
+export * from './audit';
 
