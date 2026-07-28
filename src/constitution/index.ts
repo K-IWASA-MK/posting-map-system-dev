@@ -11,3 +11,5 @@ export * from './ArtifactOwnership';
 export * from './DispatchPolicy';
 export * from './KnowledgeSanitizationPolicy';
 export * from './AIOSConstitution';
+export * from './enforcement';
+
