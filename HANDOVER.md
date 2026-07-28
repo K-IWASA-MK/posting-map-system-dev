@@ -19,14 +19,86 @@
   - `Sprint G10-2: AIOS Constitution Enforcement Foundation` (Skill-Only AIOS Retention Enforcement, Everything Else REJECT & Mandatory Project Return, Validation Matrix Engine)
   - `Sprint G10-3: Constitution Runtime Integration` (ConstitutionRuntimeGate Wiring at Project Boundary, 3-Tier Separation of Concerns, Skill-Only AIOS Retention Guaranteed)
   - `Sprint G10-4: Governance Audit Trigger Foundation` (Governance Audit Trigger Engine, Deterministic Reaudit Decision Matrix, Multiple Governance Changes Support)
-- **Milestone**: `Governance Audit Trigger Foundation Completed (G10 Governance Foundation Series Fully Completed)`
-- **Verification Status**: `PASS (All Unit, Integration & Regression Test Suites PASS)`
-- **Current Phase**: `Sprint G10-4 COMPLETED (G10 Series Completed)`
-- **Baseline**: `AIOS Governance Foundation v1.0`
-- **Status**: `FROZEN`
-- **Modification Policy**: `Any modification requires Governance Reaudit (Sprint G10-4 Engine Evaluation)`
-- **Next Action**: `POSTING MAP Development / District Initialization / Field Operations`
+  - `Sprint G10-1: Task Gateway Foundation` (CEO Decision Intake, 8-Intent Classification, Workflow Stages Pipeline, Output Policy, Immutable TaskContract, Single Intake Rule)
+  - `Sprint G10-1 v1.1: Task Gateway Workflow Profile Extension` (WorkflowProfile in TaskContract, What+How Contract Integration, OutputPolicy & CompletionPolicy Contract)
+  - `Sprint G10-2: Task Dispatcher Foundation` (Model-Agnostic AgentRegistry, CapabilityMatch Scoring, RoleResolver, AssignmentContract, ReasonCodes)
+  - `Sprint G10-3: Task Lifecycle Foundation` (TaskState & TaskOutcome Dual Matrix, Abstract ReasonCodes, Deterministic lifecycleId, Immutable LifecycleRecord)
+  - `Sprint G10-4: Knowledge Capture Foundation` (Facts vs Inferences Separation, Auditable ConfidenceFactors, Evidence ID References, Two-Stage KnowledgeCandidate Model)
+  - `Sprint G10-5: Skill Learning Foundation` (Three-Tier Evidence/Candidate Separation, ProficiencyMapper, Auditable LearningFactors, Immutable SkillCandidate)
+- **Milestone**: `Generation 10 Completed with v1.1 Workflow Profile Extension (AI Employee Organization Foundation Fully Finalized)`
+- **Verification Status**: `PASS (All Gateway v1.1, Dispatcher, Lifecycle, Knowledge & Learning Unit Tests & Build PASS)`
+- **Current Phase**: `Generation 10 COMPLETED (Ready for Generation 11: Governance, Certification & Skill Advancement)`
+- **Baseline**: `AIOS Generation 10 Workforce Architecture v1.1.0 / AI Workforce Constitution v1.5.0`
+- **Status**: `ACTIVE`
+- **Modification Policy**: `All Gen 10 Foundations are Stateless, Immutable, Deterministic, and Side-Effect Free`
+- **Next Action**: `Generation 11 Planning & Architecture Alignment`
 - **Branch**: `main`
+
+---
+
+## 📌 AIOS Workforce Architecture 7層組織構造
+
+```
+CEO (意思決定: ユーザー + GPT)
+    │
+    ▼
+Task Gateway (AIOS唯一の公式受付)
+    │
+    ▼
+Task Contract (不変の受託契約書)
+    │
+    ▼
+Task Dispatcher (能力・スコアに基づく配属・割り当て)
+    │
+    ▼
+Role (永続的な組織上の役割: e.g. IMPLEMENTATION_ENGINEER)
+    │
+    ▼
+Agent (交換可能な実行主体: e.g. Flash, Claude, GPT, Local AI)
+    │
+    ▼
+Runtime (実行基盤)
+```
+
+---
+
+## 📌 G10-2 Task Dispatcher Foundation への引き継ぎ重要事項 (Handover to G10-2)
+
+### 1. Role (役割) と Agent (実行主体) の分離 & Capability Match 配属設計
+G10-1 の Task Gateway では、受託指示から `TaskContract`（Intent, WorkflowProfile, workflowStages, OutputPolicy 等）を決定論的に生成しました。
+後続の **G10-2 Task Dispatcher Foundation** では、以下の二段階分離 & Capability Match 構造を採用します：
+- **`requiredRoles` (役割)**: 「どんな仕事・専門性が必要か」（例: `IMPLEMENTATION_ENGINEER`, `REVIEW_ENGINEER`）
+- **`requiredCapabilities` (能力)**: 「どんな能力が必要か」（例: `typescript`, `testing`, `architecture`, `git`）
+- **`assignedAgent` (実行主体)**: 「誰がその役割を担当するか」（例: `Flash`, `Claude`, `GPT` 等）
+
+Dispatcher はモデル名ではなく **Capability Match スコア（適合率）** に基づいて動的に最適 Agent を選定します（例: `Claude` 95% vs `Flash` 80% ➔ `Claude` へ自動アサイン）。
+
+### 2. Generation 9 から Generation 10 への構造進化 (Generation Paradigm Shift)
+今回の Task Gateway Foundation の完成により、AIOS は「単なるAI補助ツール」から「自律型AI組織の運営基盤」へと根本的な進化を遂げました。
+
+- **Generation 9 まで (補助ツール時代)**:
+  `CEO ➔ 生成AI ➔ 成果物`
+- **Generation 10 から (自律組織運営基盤時代)**:
+  `CEO ➔ AIOS ➔ Task Gateway ➔ Task Contract ➔ AI社員 ➔ 成果物`
+
+Antigravity IDE上のすべての指示が Task Gateway という受付を通過し、正式な Task Contract に基づき AIOS 内で高い規律・透明性・拡張性をもって業務が遂行されます。
+
+---
+
+## 📌 Generation 10 完遂と Generation 11 への引き継ぎ方針 (Generation 10 Completion & Handover to Gen 11)
+
+Generation 10: AI Employee Organization & Workforce Foundation の全5大基礎スプリント（G10-1 〜 G10-5）がすべて完遂されました：
+
+### Generation 10 全5大基礎層の完成成果
+1. **G10-1 (Task Gateway)**: 総合受付（CEO意思決定受託・8大Intent判定・`TaskContract` 生成）
+2. **G10-2 (Task Dispatcher)**: 人事部・配属決裁（モデル非依存AgentRegistry・`CapabilityType` Match・`AssignmentContract` 生成）
+3. **G10-3 (Task Lifecycle)**: 業務管理・進行制御（`TaskState` と `TaskOutcome` の二軸分離・`lifecycleId` 付与・`LifecycleRecord` 管理）
+4. **G10-4 (Knowledge Capture)**: 組織知抽出・経験資産化（成功体験からの `facts` / `inferences` 分離・`KnowledgeCandidate` 抽出）
+5. **G10-5 (Skill Learning)**: 教育部・人材育成（能力証跡 `SkillEvidence` と能力成長候補 `SkillCandidate` の二段構築・`ProficiencyMapper` 算出）
+
+### Generation 11 へのバトンタッチ
+Generation 10 によって「単なるAI呼び出しシステム」から「AI社員を運営・育成する組織基盤」へと根本的な進化を遂げました。
+Generation 11 では、G10-5 が生成した不変な `SkillCandidate` を受託し、**「能力審査・スキル認定 (Skill Certification)」「Agent Capability の動的更新・昇格」「組織ナレッジベース (Knowledge Base) への永続登録」** を担う高次元ガバナンス＆成長層の構築に進みます。
 
 
 

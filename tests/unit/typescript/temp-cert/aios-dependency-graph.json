@@ -1,0 +1,26 @@
+{
+  "execution": [
+    "orchestration"
+  ],
+  "validation": [],
+  "audit": [],
+  "learning": [
+    "execution"
+  ],
+  "completion": [
+    "validation"
+  ],
+  "orchestration": [],
+  "observability": [],
+  "release": [
+    "validation"
+  ],
+  "autonomous": [
+    "orchestration"
+  ],
+  "certification": [
+    "orchestration",
+    "audit",
+    "release"
+  ]
+}

@@ -1,5 +1,6 @@
 import { ReviewRule, ReviewContext } from '../ReviewRule';
 import { ReviewViolation } from '../ReviewResult';
+import { WorkspacePathAuditLogger } from '../../../projects/posting-map/src/shared/audit/WorkspacePathAuditLogger';
 import * as path from 'path';
 
 export class OwnershipRule implements ReviewRule {
@@ -31,8 +32,6 @@ export class OwnershipRule implements ReviewRule {
       } else if (relativePath.startsWith('projects/hokusei-ch/')) {
         fileOwner = 'Hokusei CH';
       } else if (relativePath.startsWith('FIELD_OPERATIONS_PLATFORM/')) {
-        // The root FIELD_OPERATIONS_PLATFORM is owned by AIOS, but contains app data.
-        // It has a mismatch since it resides outside projects/posting-map.
         fileOwner = 'AIOS';
       }
 
@@ -45,6 +44,41 @@ export class OwnershipRule implements ReviewRule {
           targetFile: file,
           remediation: `Ensure you only modify files that correspond to the task's owner context. If you are developing for ${taskOwner}, keep changes within its designated projects namespace.`
         });
+      }
+
+      // Enforcement: POSTING MAP Path Resolution Responsibility Ownership
+      if (
+        relativePath.startsWith('projects/posting-map/src/platform/') ||
+        relativePath.startsWith('projects/posting-map/tests/integration/')
+      ) {
+        try {
+          const fs = require('fs');
+          if (fs.existsSync(file)) {
+            const content = fs.readFileSync(file, 'utf-8');
+            if (
+              (content.includes('FIELD_OPERATIONS_PLATFORM') || content.includes('03_BRANCH')) &&
+              !content.includes('PostingMapPathResolver') &&
+              !file.endsWith('PostingMapPathResolver.ts')
+            ) {
+              violations.push({
+                ruleId: this.id,
+                severity: 'ERROR',
+                message: `Path Resolution Ownership Violation in "${relativePath}": Platform Runtimes and Integration Tests must delegate workspace path resolution to PostingMapPathResolver.`,
+                targetFile: file,
+                remediation: 'Import and use PostingMapPathResolver to resolve platform workspace paths.'
+              });
+
+              WorkspacePathAuditLogger.getInstance().logEvent({
+                componentName: this.id,
+                eventType: 'RULE_VIOLATION_DETECTED',
+                targetPath: relativePath,
+                violatedRuleId: this.id
+              });
+            }
+          }
+        } catch {
+          // Ignore read errors
+        }
       }
     }
 

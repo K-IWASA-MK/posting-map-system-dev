@@ -5,18 +5,20 @@ import { ArchitectureValidator } from './ArchitectureValidator';
 import { SDKBoundaryValidator } from './SDKBoundaryValidator';
 import { DomainIsolationValidator } from './DomainIsolationValidator';
 import { NamingValidator } from './NamingValidator';
+import { WorkspacePathValidator } from './WorkspacePathValidator';
 
 export class ValidationPipeline {
   private readonly validators: IValidator[] = [];
 
   constructor() {
-    // Sequence requirements: Dependency -> Import -> Architecture -> SDK -> Domain -> Naming
+    // Sequence requirements: Dependency -> Import -> Architecture -> SDK -> Domain -> Naming -> WorkspacePath
     this.validators.push(new DependencyScanner());
     this.validators.push(new ImportRuleChecker());
     this.validators.push(new ArchitectureValidator());
     this.validators.push(new SDKBoundaryValidator());
     this.validators.push(new DomainIsolationValidator());
     this.validators.push(new NamingValidator());
+    this.validators.push(new WorkspacePathValidator());
   }
 
   public async run(): Promise<ValidationReport> {
