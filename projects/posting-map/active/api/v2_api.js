@@ -390,6 +390,9 @@ function processGetActionLegacy(action, e) {
  * POSTリクエスト：データの登録・更新
  */
 function doPost(e) {
+  // AIOS Task Gateway Bridge 経由化 (すべてのPOSTリクエストを受理)
+  const gatewayInput = AiosTaskGatewayBridge.acceptRequest(e);
+
   try {
     let params = (e && e.parameter) ? Object.assign({}, e.parameter) : {};
     let postData = null;
