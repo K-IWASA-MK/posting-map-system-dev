@@ -3,8 +3,8 @@
  * 
  * AIOS Verification Runtime Foundation - Capability Model Definitions
  * 
- * AI社員が実行環境（Browser, CDP, Git, Filesystem, API等）の自己診断を行い、
- * 検証能力を正確に認識・管理するためのモデル定義。
+ * AI社員が実行環境（Browser, CDP, Git, Filesystem, API, GitHub Actions, Deployment, Asset Version等）の
+ * 自己診断を行い、検証能力を正確に認識・管理するためのモデル定義。
  */
 
 export enum VerificationCapabilityType {
@@ -16,7 +16,11 @@ export enum VerificationCapabilityType {
   NETWORK_CAPTURE = 'NETWORK_CAPTURE',
   GIT_ACCESS = 'GIT_ACCESS',
   FILE_ACCESS = 'FILE_ACCESS',
-  API_ACCESS = 'API_ACCESS'
+  API_ACCESS = 'API_ACCESS',
+  GITHUB_ACTION_STATUS = 'GITHUB_ACTION_STATUS',
+  DEPLOYMENT_STATUS = 'DEPLOYMENT_STATUS',
+  PRODUCTION_URL_ACCESS = 'PRODUCTION_URL_ACCESS',
+  ASSET_VERSION_VERIFY = 'ASSET_VERSION_VERIFY'
 }
 
 export enum VerificationCapabilityStatus {
