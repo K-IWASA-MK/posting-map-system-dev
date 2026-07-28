@@ -58,7 +58,7 @@
     const container = $('area-list') || $('new-area-list');
     if (!container) return;
 
-    const rawAreas = (window.appData && Array.isArray(window.appData.areas)) ? window.appData.areas : [];
+    const rawAreas = (window.appData && Array.isArray(window.appData.areas)) ? window.appData.areas : (window.appData && Array.isArray(window.appData.summary)) ? window.appData.summary : [];
     
     // TASK-012: DTO 変換（内部マスター排除 ＆ 現場表示名正規化）
     const areas = normalizeAreasForDisplay(rawAreas);

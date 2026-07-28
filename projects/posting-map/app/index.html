@@ -507,8 +507,11 @@
         }
         const rawRes = await _appDataPromise;
         const data = (rawRes && rawRes.data) ? rawRes.data : rawRes;
-        if (data && data.areas) {
+        const areasList = (data && Array.isArray(data.areas)) ? data.areas : (data && Array.isArray(data.summary)) ? data.summary : [];
+        if (data && areasList.length > 0) {
+          data.areas = areasList;
           appData = data;
+          window.appData = appData;
           localStorage.setItem('cached_app_data', JSON.stringify(appData));
           updateHeaderProgress(appData);
           if (window.HAppRender && window.HAppRender.renderAreas) {
@@ -519,7 +522,7 @@
           if (currentVisiblePage === 'page-settings' || !renderedFromCache) {
             switchPage('areas');
           }
-          console.log('[TASK-012-SPEC] 🔄 BACKGROUND SYNC COMPLETE: Transitioned to Areas.');
+          console.log('[TASK-012-SPEC] 🔄 BACKGROUND SYNC COMPLETE: Transitioned to Areas with', areasList.length, 'areas.');
         }
       };
 
