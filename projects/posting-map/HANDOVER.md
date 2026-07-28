@@ -254,6 +254,13 @@ graph TD
 * **`ReleaseRuntime` (リリースランタイムオーケストレーター)**:
   - 各種検証、リプレイ防止（Version Lock）、複数アダプターに対する順次デプロイ処理、本番検証およびリリースイベント（Requested, Completed, Failed, Blocked）発行の全体統合ライフサイクル。障害時ロールバックを実行しない防御設計（No Auto Rollback）を適用。
 
+### TASK-POSTING-MAP-002: AIOS Bridge Runtime Wiring
+- **`AIOSBridgeMode.ts`**: STUB / LIVE モード定義および動的フラグ解決。
+- **`CapabilityMappingRegistry.ts` & `CapabilityResolver.ts`**: 業務イベント種別（`ORDER_CREATED`, `GPS_EVIDENCE_REJECTED` 等）に対する要求機能（Capability）および優先度（Priority）の宣言的マッピングレジストリ。
+- **`AIOSClientBoundary.ts`, `MockAIOSClient.ts`, `LiveAIOSClient.ts`, `AIOSClientFactory.ts`**: POSTING MAP と AIOS Core の直接依存を防ぐクライアント境界設計。
+- **`AIOSBridgeTaskAdapter.ts`**: `BridgeMessage` ⇔ `TaskIntakeRequest` / `ExecutionTask` ⇔ `BridgeMessage` の双方向変換。
+- **`AIOSBridgeProvider.ts`**: STUB (Echo) / LIVE (AIOS TaskIntakeGateway 接続) の安全な切り替え配信プロバイダー。
+
 ---
 
 ## 7. 追加テスト合格実績
@@ -274,8 +281,10 @@ graph TD
 | `test_runtime_orchestration.ts` | Runtime Orchestration | ✅ 5/5 PASS |
 | `test_runtime_observability.ts` | Runtime Observability | ✅ 7/7 PASS |
 | `test_runtime_release.ts` | Production Cloud Release | ✅ 8/8 PASS |
+| `test_aios_bridge_wiring.ts` | AIOS Bridge Runtime Wiring (STUB/LIVE) | ✅ 3/3 PASS |
 
-※プロジェクト全体の TypeScript 統合テストを含む **177 個のテストすべてがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+※プロジェクト全体の TypeScript 統合テストを含む **すべてのテストがノーエラー（0 failures）でグリーンパス（PASS）**しています。
+
 
 
 
