@@ -14,3 +14,10 @@ export * from './ExecutionPlanFactory';
 export * from './ExecutionPlanRegistry';
 export * from './ExecutionStepHandlerRegistry';
 export * from './AIEmployeeExecutionRuntime';
+
+// Task Intake Component Exports
+export * from './intake/TaskIntakeRequestModel';
+export * from './intake/TaskIntakeRequestValidator';
+export * from './intake/TaskRequestTransformer';
+export * from './intake/TaskIntakeAudit';
+export * from './intake/TaskIntakeGateway';
