@@ -15,6 +15,7 @@ import { ResultBuilder } from '../result/ResultBuilder';
 import { WorkflowProgressTracker } from '../../employee/workflow/progress/WorkflowProgressTracker';
 import { ProjectEventPublisher } from '../event/ProjectEventPublisher';
 import { ProjectEventType } from '../event/types/ProjectEventType';
+import { ConstitutionRuntimeGate } from '../../../src/runtime/constitution/ConstitutionRuntimeGate';
 
 export class ProjectBridgeRuntime implements ProjectBridge {
   private static callbacks: Map<string, ProjectCallback> = new Map();
@@ -82,11 +83,23 @@ export class ProjectBridgeRuntime implements ProjectBridge {
     const progress = WorkflowProgressTracker.getProgress(currentInstance.instanceId.getValue());
     const projectResult = ResultBuilder.buildResult(request.requestId, request.projectId, currentInstance, progress);
 
+    // 3b. Constitution Runtime Gate Evaluation (Enforce Skill-Only AIOS Retention & Mandatory Project Return)
+    const constitutionDecision = ConstitutionRuntimeGate.evaluateResultArtifacts(
+      request.projectId,
+      response.taskId,
+      projectResult.producedArtifacts.map(art => ({ artifactId: art.artifactId, artifactType: art.artifactType }))
+    );
+
     ProjectEventPublisher.publish(
       ProjectEventType.WORKFLOW_COMPLETED,
       request.projectId,
       response.taskId,
-      { status: projectResult.status, producedArtifactsCount: projectResult.producedArtifacts.length }
+      { 
+        status: projectResult.status, 
+        producedArtifactsCount: projectResult.producedArtifacts.length,
+        mandatoryProjectReturnEnforced: constitutionDecision.mandatoryProjectReturnEnforced,
+        aiosRetentionAllowed: constitutionDecision.aiosRetentionAllowed
+      }
     );
 
     // 4. Dispatch Callback if registered

@@ -17,9 +17,10 @@
   - `TASK-AIOS-016: Post-Implementation Production Audit & Release Tag Review` (`v1.0.0-rc.1`)
   - `Sprint G10-1: AIOS Constitution Foundation` (AIOS Supreme Governance Rules, Principles 001-006, Version 1.0)
   - `Sprint G10-2: AIOS Constitution Enforcement Foundation` (Skill-Only AIOS Retention Enforcement, Everything Else REJECT & Mandatory Project Return, Validation Matrix Engine)
-- **Milestone**: `AIOS Constitution Enforcement Foundation Completed (Skill-Only Retention Enforcement Engine)`
-- **Verification Status**: `PASS (All Unit & Regression Test Suites PASS)`
-- **Current Phase**: `Sprint G10-2 COMPLETED`
+  - `Sprint G10-3: Constitution Runtime Integration` (ConstitutionRuntimeGate Wiring at Project Boundary, 3-Tier Separation of Concerns, Skill-Only AIOS Retention Guaranteed)
+- **Milestone**: `Constitution Runtime Integration Completed (All AI Employees & Tasks Governed by Constitution Gate)`
+- **Verification Status**: `PASS (All Unit, Integration & Regression Test Suites PASS)`
+- **Current Phase**: `Sprint G10-3 COMPLETED`
 - **Next Action**: `READY FOR NEXT SPRINT`
 - **Branch**: `main`
 
