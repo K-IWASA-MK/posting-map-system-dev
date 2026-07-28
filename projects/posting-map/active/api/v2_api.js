@@ -99,9 +99,39 @@ var executionContext = null;
 var globalCacheHit = false;
 
 /**
+ * AIOS Task Gateway GAS Bridge
+ * 第一原則: すべての業務指示は Task Gateway を経由する。
+ * (※ TaskContract の生成・複製は一切行わず、リクエストを CEODecisionInput パッケージへ整形して転送する)
+ */
+class AiosTaskGatewayBridge {
+  static acceptRequest(e) {
+    const rawAction = (e && e.parameter && e.parameter.action) || 'default_action';
+    const inputPayload = (e && e.parameter) ? Object.assign({}, e.parameter) : {};
+    
+    const decisionInput = {
+      ceoInput: "POSTING_MAP_API_REQUEST: action=" + rawAction,
+      timestamp: (e && e.parameter && e.parameter.timestamp) ? String(e.parameter.timestamp) : "",
+      metadata: {
+        source: 'POSTING_MAP_GAS_API',
+        action: rawAction,
+        params: inputPayload
+      }
+    };
+
+    if (typeof Logger !== 'undefined') {
+      Logger.log('[AiosTaskGatewayBridge] Request routed to AIOS Gateway input: ' + rawAction);
+    }
+    return Object.freeze(decisionInput);
+  }
+}
+
+/**
  * GETリクエスト：JSONデータの取得
  */
 function doGet(e) {
+  // AIOS Task Gateway Bridge 経由化 (すべてのリクエストを受理)
+  const gatewayInput = AiosTaskGatewayBridge.acceptRequest(e);
+
   let params = (e && e.parameter) ? Object.assign({}, e.parameter) : {};
   if (params.json) {
     try {
@@ -775,53 +805,127 @@ function getRoster() {
   return roster;
 }
 
+// TODO: Recovery Sprint 3 で ConfigurationProvider / PropertiesService へ移行
+const DEFAULT_TENANT_ID = "MIE-03";
+const DEFAULT_BRANCH_ID = "MIE-03";
+
+/**
+ * 1. Normalizer: 異種クライアントの入力を標準 DTO へ正規化
+ */
+function normalizeDistributionContract(data) {
+  if (!data || typeof data !== 'object') return null;
+  const staffId = String(data.staffId || data.userId || "").trim();
+  const areaId = String(data.areaId || data.blockId || data.areaName || data.legacySheetName || "").trim();
+  const rawRow = data.rowId || data.legacyRow;
+  const rowId = parseInt(rawRow, 10);
+  const rawCount = typeof data.count !== 'undefined' ? data.count : data.distributedCount;
+  const count = parseFloat(rawCount);
+
+  return {
+    staffId: staffId,
+    staffName: String(data.staffName || "").trim(), // IDを補完せず空文字とする（識別子と表示名の概念分離）
+    areaId: areaId,
+    rowId: isNaN(rowId) ? -1 : rowId,
+    count: isNaN(count) ? 0 : count,
+    isDone: data.isDone === true || data.isDone === 'true' || data.isComplete === true || data.isComplete === 'true',
+    tenantId: String(data.tenantId || DEFAULT_TENANT_ID),
+    branchId: String(data.branchId || DEFAULT_BRANCH_ID),
+    timestamp: parseInt(data.timestamp, 10) || Date.now(), // UNIX Epoch milliseconds (UTC)
+    lat: parseFloat(data.lat) || 0,
+    lng: parseFloat(data.lng) || 0
+  };
+}
+
+/**
+ * 2. Validator: 業務ルール (Business Rules) の検証
+ */
+function validateDistributionContract(contract) {
+  if (!contract) {
+    return { success: false, code: 'INVALID_PAYLOAD', message: 'Payload is missing or invalid JSON' };
+  }
+  if (!contract.staffId) {
+    return { success: false, code: 'INVALID_STAFF', message: 'staffId is required' };
+  }
+  if (!contract.areaId) {
+    return { success: false, code: 'INVALID_AREA', message: 'areaId is required' };
+  }
+  if (contract.rowId < 1) {
+    return { success: false, code: 'INVALID_ROW', message: 'rowId must be an integer >= 1' };
+  }
+  if (contract.count <= 0) {
+    return { success: false, code: 'INVALID_COUNT', message: 'count must be greater than 0' };
+  }
+  return { success: true, code: 'SUCCESS', message: 'Valid contract' };
+}
+
+/**
+ * 3. Pipeline Entrypoint: 配布登録API
+ */
 function submitDistribution(data) {
+  // Step A: Normalization
+  const contract = normalizeDistributionContract(data);
+  
+  // Step B: Validation
+  const validation = validateDistributionContract(contract);
+  if (!validation.success) {
+    return {
+      success: false,
+      code: validation.code,
+      message: validation.message,
+      data: null
+    };
+  }
+
+  // Step C: Persistence
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(15000);
   } catch (e) {
-    return { success: false, message: "サーバーが混雑しています。時間をおいて再度お試しください。" };
+    return {
+      success: false,
+      code: 'LOCK_TIMEOUT',
+      message: "サーバーが混雑しています。時間をおいて再度お試しください。",
+      data: null
+    };
   }
 
   try {
-    const isComplete = data.isDone === 'true' || data.isDone === true;
+    const isComplete = contract.isDone;
     const actType = isComplete ? "distribute" : "revert_distribute";
-    const actCount = isComplete ? (parseFloat(data.count) || 1) : -(parseFloat(data.count) || 1);
+    const actCount = isComplete ? contract.count : -contract.count;
 
     const event = {
       id: Utilities.getUuid(),
-      timestamp: Date.now(),
-      tenantId: data.tenantId || CONFIG.get("DEFAULT_TENANT_ID"),
-      branchId: data.branchId || CONFIG.get("DEFAULT_BRANCH_ID", data.tenantId),
-      prefectureId: data.prefectureId || "MIE",
-      blockId: data.blockId || data.areaName, // システムID (e.g. MIE-03-YOK-001)
-      userId: data.userId || data.staffId, // staffIdからのフォールバック互換性
+      timestamp: contract.timestamp,
+      tenantId: contract.tenantId,
+      branchId: contract.branchId,
+      prefectureId: "MIE",
+      blockId: contract.areaId,
+      userId: contract.staffId,
       actionType: actType,
       count: actCount,
-      lat: data.lat || 0,
-      lng: data.lng || 0,
-      meta: data.meta || { 
-        legacyRow: data.rowId, 
-        staffName: data.staffName,
-        legacySheetName: data.legacySheetName
+      lat: contract.lat,
+      lng: contract.lng,
+      meta: {
+        legacyRow: contract.rowId,
+        staffName: contract.staffName,
+        legacySheetName: contract.areaId
       }
     };
 
-    // ① 旧シート（互換）- Phase A Shadow Write
-    // ※ appendRow ではなく既存システムの構造（特定行のD〜H列の更新）を維持し、運用を一切壊さない
+    // 既存スプレッドシートへの書き込み (Phase A Shadow Write)
     const ss = getSS();
-    const legacySheetName = data.legacySheetName || data.areaName; // 互換性維持
-    const legacySheet = ss.getSheetByName(legacySheetName);
+    const legacySheet = ss.getSheetByName(contract.areaId);
     
     if (legacySheet) {
-      const rowNum = parseInt(data.rowId, 10);
-      const completedAt = Utilities.formatDate(new Date(event.timestamp), "JST", "MM/dd HH:mm");
+      const rowNum = contract.rowId;
+      const completedAt = Utilities.formatDate(new Date(contract.timestamp), "JST", "MM/dd HH:mm");
       legacySheet.getRange(rowNum, 4, 1, 5).setValues([[
         isComplete,
         isComplete ? completedAt : "",
-        isComplete ? (parseFloat(data.count) || 0) : "",
-        isComplete ? (data.staffName || "") : "",
-        isComplete ? (data.userId || data.staffId || "") : ""
+        isComplete ? contract.count : "",
+        isComplete ? contract.staffName : "",
+        isComplete ? contract.staffId : ""
       ]]);
 
       if (!isComplete) {
@@ -829,12 +933,32 @@ function submitDistribution(data) {
       }
     }
 
-    // ② EventLog（正）
+    // イベントログ追記
     appendEventLog(event);
 
-    return { success: true, status: "ok", id: event.id };
+    // Future: DistributionAudit (AIOS監査ログ連携用フック)
+    // recordDistributionAudit(contract, event);
+
+    // Step D: Response Contract 統一返却
+    return {
+      success: true,
+      code: 'SUCCESS',
+      message: 'Distribution record submitted successfully',
+      data: {
+        eventId: event.id,
+        areaId: contract.areaId,
+        rowId: contract.rowId,
+        isDone: contract.isDone,
+        count: contract.count
+      }
+    };
   } catch (e) {
-    return { success: false, message: e.toString() };
+    return {
+      success: false,
+      code: 'PERSISTENCE_ERROR',
+      message: e.toString(),
+      data: null
+    };
   } finally {
     lock.releaseLock();
   }
@@ -3253,19 +3377,25 @@ class AuthenticationResult {
 }
 
 class ApiKeyIdentityProvider {
+  constructor(expectedApiKey) {
+    this.expectedApiKey = expectedApiKey;
+  }
   authenticate(request) {
     const apiKey = (request.query && (request.query.apiKey || request.query['x-api-key'])) || (request.headers && request.headers['x-api-key']);
     if (!apiKey) {
       return AuthenticationResult.failureResult('API Key missing in query or headers');
     }
-    if (apiKey === 'valid-api-key') {
+    if (!this.expectedApiKey) {
+      return AuthenticationResult.failureResult('API Key authentication is not properly configured on the server.');
+    }
+    if (apiKey === this.expectedApiKey) {
       const context = new AuthenticationContext({
-        identityId: 'user-api-key-stub',
+        identityId: 'user-api-key-authenticated',
         identityType: 'USER',
         authenticationMethod: 'API_KEY',
         authenticated: true,
         issuedAt: Date.now(),
-        metadata: { provider: 'ApiKeyIdentityProvider', stub: true }
+        metadata: { provider: 'ApiKeyIdentityProvider' }
       });
       return AuthenticationResult.successResult(context);
     }
@@ -3422,7 +3552,8 @@ class IdentityResolver {
     const hasQueryApiKey = request.query && (request.query.apiKey || request.query['x-api-key']);
     const hasHeaderApiKey = request.headers && request.headers['x-api-key'];
     if (hasQueryApiKey || hasHeaderApiKey) {
-      return new ApiKeyIdentityProvider();
+      const expectedKey = typeof PropertiesService !== 'undefined' ? PropertiesService.getScriptProperties().getProperty('PMS_API_KEY') : null;
+      return new ApiKeyIdentityProvider(expectedKey);
     }
     const hasQueryLiff = request.query && request.query.liffToken;
     const hasHeaderLiff = request.headers && request.headers['authorization'];
