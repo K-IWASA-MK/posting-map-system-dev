@@ -1,12 +1,13 @@
 import { IAIOSClient } from './AIOSClientBoundary';
-import { TaskIntakeRequest } from '../../../../../sdk/execution/intake/TaskIntakeRequestModel';
+import { ProjectTaskRequest } from '../../../../../sdk/project/intake/types/ProjectTaskRequest';
 
 export class MockAIOSClient implements IAIOSClient {
-  public submit(request: TaskIntakeRequest): { echo: Record<string, any>; status: string; details: string } {
+  public submit(request: ProjectTaskRequest): { echo: Record<string, any>; status: string; details: string } {
     return {
-      echo: request.metadata?.payload || { requestId: request.requestId, title: request.title },
+      echo: request.parameters || { requestId: request.requestId, taskType: request.taskType },
       status: 'PROPOSAL_RECEIVED',
       details: 'Stub acknowledgment successfully generated (MockAIOSClient)'
     };
   }
 }
+

@@ -2,8 +2,6 @@ import { AIOSBridgeProvider } from '../../../src/foundation/bridge/AIOSBridgePro
 import { AIOSBridgeMode } from '../../../src/foundation/bridge/AIOSBridgeMode';
 import { BridgeMessage } from '../../../src/foundation/bridge/BridgeMessage';
 import { CapabilityResolver } from '../../../src/foundation/bridge/CapabilityResolver';
-import { ExecutionTaskRegistry } from '../../../../../sdk/execution/ExecutionTaskRegistry';
-import { TaskIntakeAuditManager } from '../../../../../sdk/execution/intake/TaskIntakeAudit';
 import { VerificationCapabilityType } from '../../../../../sdk/verification/VerificationCapabilityModel';
 import { ExecutionTaskPriority } from '../../../../../sdk/execution/ExecutionTaskModel';
 
@@ -68,16 +66,10 @@ async function runTests() {
     Boolean(stubResult.response?.payload?.details?.includes('MockAIOSClient')),
     'Stub response must be handled by MockAIOSClient'
   );
-
-  const registeredStubTask = ExecutionTaskRegistry.get('msg-stub-100');
-  assert(registeredStubTask === undefined, 'STUB mode must NOT register task into ExecutionTaskRegistry');
-
-  const stubAuditRecord = TaskIntakeAuditManager.getByRequestId('msg-stub-100');
-  assert(stubAuditRecord === undefined, 'STUB mode must NOT create TaskIntakeAudit record');
   console.log(' -> STUB Mode Test PASSED.');
 
-  // 3. Test LIVE Mode (BRIDGE_MODE=LIVE)
-  console.log('\n[Test 3] BRIDGE_MODE=LIVE Verification Test...');
+  // 3. Test LIVE Mode (BRIDGE_MODE=LIVE via ProjectBridgeRuntime)
+  console.log('\n[Test 3] BRIDGE_MODE=LIVE Verification Test (ProjectBridgeRuntime)...');
   const liveProvider = new AIOSBridgeProvider(AIOSBridgeMode.LIVE);
   const liveMessage = new BridgeMessage({
     messageId: 'msg-live-200',
@@ -94,25 +86,15 @@ async function runTests() {
   assert(liveResult.response?.messageType === 'GPS_EVIDENCE_REJECTED.reply', 'Reply messageType must match .reply');
 
   const taskId = liveResult.response?.payload?.taskId;
-  assert(typeof taskId === 'string' && taskId.length > 0, 'LIVE response must contain valid taskId from AIOS');
+  assert(typeof taskId === 'string' && taskId.length > 0, 'LIVE response must contain valid taskId from AIOS ProjectBridge');
   assert(
-    liveResult.response?.payload?.details === 'Task successfully accepted by AIOS TaskIntakeGateway',
-    'LIVE response must acknowledge TaskIntakeGateway acceptance'
+    liveResult.response?.payload?.completed === true,
+    'LIVE response must acknowledge ProjectBridgeRuntime completion'
   );
-
-  const registeredLiveTask = ExecutionTaskRegistry.get(taskId);
-  assert(registeredLiveTask !== undefined, 'ExecutionTask must be registered in AIOS ExecutionTaskRegistry');
-  assert(registeredLiveTask?.title === 'GPS Rejection Investigation', 'Task title must match mapped title');
-  assert(registeredLiveTask?.priority === ExecutionTaskPriority.HIGH, 'Task priority must match mapped priority');
   assert(
-    Boolean(registeredLiveTask?.requiredCapabilities.includes(VerificationCapabilityType.BROWSER_AUTOMATION)),
-    'Task capabilities must match CapabilityResolver capabilities'
+    Array.isArray(liveResult.response?.payload?.producedArtifacts),
+    'LIVE response must return producedArtifacts array from Workflow execution'
   );
-
-  const liveAuditRecord = TaskIntakeAuditManager.getByRequestId('msg-live-200');
-  assert(liveAuditRecord !== undefined, 'Audit record must exist in TaskIntakeAuditManager');
-  assert(liveAuditRecord?.status === 'ACCEPTED', 'Audit status must be ACCEPTED');
-  assert(liveAuditRecord?.taskId === taskId, 'Audit record taskId must match registered taskId');
   console.log(' -> LIVE Mode Test PASSED.');
 
   // 4. Test ORDER_CREATED Event Transmission via Pipeline (FLAG_BRIDGE_MODE=LIVE)
@@ -131,17 +113,14 @@ async function runTests() {
   assert(orderResult.success === true, 'ORDER_CREATED delivery must return success');
   const orderTaskId = orderResult.response?.payload?.taskId;
   assert(typeof orderTaskId === 'string' && orderTaskId.length > 0, 'Response must contain valid taskId');
-
-  const orderRegisteredTask = ExecutionTaskRegistry.get(orderTaskId);
-  assert(orderRegisteredTask !== undefined, 'ORDER_CREATED task must be registered in ExecutionTaskRegistry');
-  assert(orderRegisteredTask?.priority === ExecutionTaskPriority.HIGH, 'ORDER_CREATED task priority must be HIGH');
-  assert(Boolean(orderRegisteredTask?.requiredCapabilities.includes(VerificationCapabilityType.API_ACCESS)), 'Task must include API_ACCESS capability');
+  assert(orderResult.response?.payload?.completed === true, 'ORDER_CREATED task must complete via AIOS Supervisor');
   console.log(' -> Pipeline ORDER_CREATED Test PASSED.');
 
   console.log('\n========================================================');
   console.log('ALL AIOS Bridge Wiring Integration Tests PASSED!');
   console.log('========================================================');
 }
+
 
 runTests().catch((err) => {
   console.error('\n[Test Failure]', err);

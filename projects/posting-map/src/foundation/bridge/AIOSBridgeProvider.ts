@@ -6,7 +6,8 @@ import { AIOSBridgeMode, resolveBridgeMode } from './AIOSBridgeMode';
 import { AIOSBridgeTaskAdapter } from './AIOSBridgeTaskAdapter';
 import { IAIOSClient } from './AIOSClientBoundary';
 import { AIOSClientFactory } from './AIOSClientFactory';
-import { ExecutionTask } from '../../../../../sdk/execution/ExecutionTaskModel';
+import { ProjectTaskResponse } from '../../../../../sdk/project/intake/types/ProjectTaskResponse';
+import { ProjectResult } from '../../../../../sdk/project/result/types/ProjectResult';
 import { AIOSRuntimeInitializer } from '../runtime/AIOSRuntimeInitializer';
 
 export class AIOSBridgeProvider implements BridgeProvider {
@@ -38,13 +39,16 @@ export class AIOSBridgeProvider implements BridgeProvider {
         AIOSRuntimeInitializer.initialize();
       }
 
-      const request = AIOSBridgeTaskAdapter.toTaskIntakeRequest(message);
+      const request = AIOSBridgeTaskAdapter.toProjectTaskRequest(message);
       const client: IAIOSClient = AIOSClientFactory.createClient(this.mode);
       const rawResult = client.submit(request);
 
       let reply: BridgeMessage;
       if (this.mode === AIOSBridgeMode.LIVE) {
-        reply = AIOSBridgeTaskAdapter.fromExecutionTask(rawResult as ExecutionTask, message);
+        reply = AIOSBridgeTaskAdapter.fromProjectResult(
+          rawResult as { response: ProjectTaskResponse; result?: ProjectResult },
+          message
+        );
       } else {
         reply = AIOSBridgeTaskAdapter.fromMockResult(
           rawResult as { echo: Record<string, any>; status: string; details: string },
@@ -77,3 +81,4 @@ export class AIOSBridgeProvider implements BridgeProvider {
     this.currentStatus = status;
   }
 }
+

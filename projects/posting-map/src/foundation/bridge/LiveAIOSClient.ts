@@ -1,10 +1,14 @@
 import { IAIOSClient } from './AIOSClientBoundary';
-import { TaskIntakeRequest } from '../../../../../sdk/execution/intake/TaskIntakeRequestModel';
-import { ExecutionTask } from '../../../../../sdk/execution/ExecutionTaskModel';
-import { TaskIntakeGateway } from '../../../../../sdk/execution/intake/TaskIntakeGateway';
+import { ProjectTaskRequest } from '../../../../../sdk/project/intake/types/ProjectTaskRequest';
+import { ProjectTaskResponse } from '../../../../../sdk/project/intake/types/ProjectTaskResponse';
+import { ProjectResult } from '../../../../../sdk/project/result/types/ProjectResult';
+import { ProjectBridgeRuntime } from '../../../../../sdk/project/bridge/ProjectBridgeRuntime';
 
 export class LiveAIOSClient implements IAIOSClient {
-  public submit(request: TaskIntakeRequest): ExecutionTask {
-    return TaskIntakeGateway.submitTask(request);
+  private bridgeRuntime: ProjectBridgeRuntime = new ProjectBridgeRuntime();
+
+  public submit(request: ProjectTaskRequest): { response: ProjectTaskResponse; result?: ProjectResult } {
+    return this.bridgeRuntime.submitTask(request);
   }
 }
+

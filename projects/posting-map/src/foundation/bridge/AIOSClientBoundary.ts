@@ -1,6 +1,8 @@
-import { TaskIntakeRequest } from '../../../../../sdk/execution/intake/TaskIntakeRequestModel';
-import { ExecutionTask } from '../../../../../sdk/execution/ExecutionTaskModel';
+import { ProjectTaskRequest } from '../../../../../sdk/project/intake/types/ProjectTaskRequest';
+import { ProjectTaskResponse } from '../../../../../sdk/project/intake/types/ProjectTaskResponse';
+import { ProjectResult } from '../../../../../sdk/project/result/types/ProjectResult';
 
 export interface IAIOSClient {
-  submit(request: TaskIntakeRequest): ExecutionTask | { echo: Record<string, any>; status: string; details: string };
+  submit(request: ProjectTaskRequest): { response: ProjectTaskResponse; result?: ProjectResult } | { echo: Record<string, any>; status: string; details: string };
 }
+
