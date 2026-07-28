@@ -8,3 +8,7 @@ export * from './ExecutionTaskFactory';
 export * from './ExecutionTaskRegistry';
 export * from './ExecutionPermissionGate';
 export * from './AIEmployeeAssignmentRuntime';
+export * from './ExecutionPlanModel';
+export * from './ExecutionPlanValidator';
+export * from './ExecutionPlanFactory';
+export * from './ExecutionPlanRegistry';
