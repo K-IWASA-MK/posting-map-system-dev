@@ -1379,15 +1379,6 @@ async function safeInitApp() {
         logDebug("LOGIN OK");
         sessionStorage.removeItem('liff_initializing'); // ✅ ログイン確認後にフラグを削除（ここが正しいタイミング）
         
-        // ログイン成功したこのタイミングで URL の OAuth パラメータ (?code= 等) を完全に消去し、以後のリロード時の誤検知を防ぐ
-        try {
-          const cleanUrl = window.location.origin + window.location.pathname + window.location.search.replace(/[\?&](code|liff\.state)=[^&]*/g, '');
-          window.history.replaceState({}, document.title, cleanUrl);
-          logDebug("OAuth query parameters cleaned from address bar via history.replaceState");
-        } catch (e) {
-          console.warn("Failed to clean OAuth query parameters:", e);
-        }
-        
         let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
         
         // ⑤ getAppDataを並列プリフェッチ開始（profile取得・登録処理と並行）
@@ -1400,6 +1391,16 @@ async function safeInitApp() {
           logDebug("PROFILE START"); // ⑤ profile取得開始
           const profile = await liff.getProfile();
           logDebug("PROFILE OK"); // ⑥ profile取得成功
+          
+          // トークン確立が完了したこのタイミングで URL の OAuth パラメータ (?code= 等) を安全に消去する
+          try {
+            const cleanUrl = window.location.origin + window.location.pathname + window.location.search.replace(/[\?&](code|liff\.state)=[^&]*/g, '');
+            window.history.replaceState({}, document.title, cleanUrl);
+            logDebug("OAuth query parameters cleaned from address bar via history.replaceState (Safe Delay)");
+          } catch (e) {
+            console.warn("Failed to clean OAuth query parameters:", e);
+          }
+
           setLoadingProgress(65, 'PROFILE LOADED');
           console.log(profile);
 
@@ -1454,27 +1455,9 @@ async function safeInitApp() {
           return;
         }
 
-        logDebug("Not logged in.");
-        if (liff.isInClient()) {
-          logDebug("In LINE client. Redirecting to LINE Login automatically...");
-          sessionStorage.setItem('liff_initializing', 'true');
-          liff.login();
-        } else {
-          logDebug("In external browser. Showing manual login button.");
-          if (btn) {
-            btn.textContent = "LINEでログイン";
-            btn.onclick = () => {
-              logDebug("Manual login button clicked. Redirecting...");
-              sessionStorage.setItem('liff_initializing', 'true');
-              liff.login();
-            };
-            btn.classList.remove('hidden');
-          }
-          if (spinner) spinner.classList.add('hidden');
-          if (subtitle) subtitle.textContent = "ブラウザ環境です。「LINEでログイン」ボタンを押してください。";
-          $('screen-gateway').classList.remove('hidden');
-          $('loading').classList.add('hidden');
-        }
+        logDebug("Not logged in. Redirecting to LINE Login automatically...");
+        sessionStorage.setItem('liff_initializing', 'true');
+        liff.login();
       }
     } catch (err) {
       console.error("LIFF Init Error:", err);
