@@ -237,9 +237,20 @@ async function callApiPost(action, payload = {}) {
 }
 
 function startApp(profile = null) {
+  // 直ちにID画面（settings）に切り替える（スプラッシュ待ち時間 0秒）
+  switchPage('settings');
   $('screen-gateway').classList.add('hidden');
-  $('loading').classList.remove('hidden');
-  loadData();
+  $('app').classList.remove('hidden');
+  
+  // loading をスムーズに隠す
+  const loadingEl = $('loading');
+  if (loadingEl) {
+    loadingEl.classList.add('opacity-0');
+    setTimeout(() => loadingEl.classList.add('hidden'), 400);
+  }
+  
+  // データ同期およびロード処理は完全にバックグラウンドで非同期実行
+  loadData(false);
 }
 
 function setSyncStatus(state) {
@@ -379,62 +390,41 @@ async function syncOfflineQueue() {
 }
 
 async function loadData(skipSync = false) {
-  logDebug("[loadData] START");
+  logDebug("[loadData] START (Background)");
 
   try {
     if (!skipSync && navigator.onLine) {
-      logDebug("[loadData] Syncing offline queue...");
+      logDebug("[loadData] Syncing offline queue in background...");
       await syncOfflineQueue();
     } else if (!navigator.onLine) {
       logDebug("[loadData] Offline. Setting status...");
       setSyncStatus('offline');
     }
-    logDebug("[loadData] Fetching getAppData...");
-    setLoadingProgress(82, 'SYNCING DATA...');
+    
+    logDebug("[loadData] Fetching getAppData in background...");
     const data = await (_appDataPromise || callApi('getAppData')); // ⑤ プリフェッチがあれば再利用
     logDebug("[loadData] getAppData fetched successfully.");
-    setLoadingProgress(96, 'READY');
     _appDataPromise = null;
+    
     if (data && data.success) {
       logDebug("[loadData] data keys: " + Object.keys(data).join(", "));
       areaSummary = data.areas || [];
-      // ranking は switchPage('ranking') 初回タップ時に遅延取得
       if (data.branchName) localStorage.setItem('branch_name', data.branchName);
       
-      logDebug("[loadData] Rendering areas...");
+      logDebug("[loadData] Rendering areas in background...");
       renderAreas();
       logDebug("[loadData] Rendering areas OK. Updating stats...");
       updateStats();
 
       // バックグラウンドでランキングデータを先読み/更新
       prefetchRanking();
-      
-      if (!skipSync) {
-        logDebug("[loadData] Initial load. Switching page to settings and animating app entry...");
-        switchPage('settings');
-        logDebug("[loadData] Showing main app div...");
-        $('screen-gateway').classList.add('hidden');
-        $('app').classList.remove('hidden');
-        setTimeout(() => {
-          setLoadingProgress(100, 'READY');
-          $('app').classList.remove('opacity-0');
-          $('loading').classList.add('opacity-0');
-          setTimeout(() => $('loading').classList.add('hidden'), 400);
-        }, 50);
-      }
     } else {
       throw new Error(data ? data.message : "データが空です");
     }
   } catch (err) {
-    console.error("Startup Error:", err);
-    logDebug(`[loadData] ERROR: ${err.message}`);
-    $('loading').classList.add('hidden');
-    // 🔍 診断: エラー内容を画面に表示して実機でも原因がわかるようにする
-    const titleEl = $('gateway-title');
-    const subtitleEl = $('gateway-subtitle');
-    if (titleEl) titleEl.textContent = '起動エラー';
-    if (subtitleEl) subtitleEl.textContent = String(err.message || err).slice(0, 120);
-    $('screen-gateway').classList.remove('hidden');
+    console.error("Background Load Error:", err);
+    logDebug(`[loadData] Background ERROR: ${err.message}`);
+    // バックグラウンドロードの失敗は画面をブロッキングしてフリーズさせず、ログ出力のみに留めます。
   }
 }
 
