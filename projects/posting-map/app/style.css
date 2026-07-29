@@ -1,8 +1,7 @@
-/* FIELD OPERATIONS OS - Dark Glass UI Design System */
 * {
   box-sizing: border-box;
 }
-
+/* button要素のブラウザデフォルトスタイルを完全にリセット */
 button {
   background: transparent;
   border: none;
@@ -15,28 +14,22 @@ button {
   -webkit-appearance: none;
   appearance: none;
 }
-
 p {
   margin: 0;
 }
-
 .hidden {
   display: none !important;
 }
-
 body {
   -webkit-tap-highlight-color: transparent;
   overflow: hidden !important;
   background-color: #000000 !important;
-  color: #ffffff !important;
   margin: 0 !important;
   padding: 0 !important;
 }
-
 .safe-top { padding-top: calc(env(safe-area-inset-top) + 2.2rem) !important; }
 .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem) !important; }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
-
 .page {
   display: block;
   opacity: 1;
@@ -49,7 +42,7 @@ body {
   transform: translateY(12px);
 }
 
-/* Standard CSS conversions */
+/* Standard CSS conversions to avoid CDN Tailwind @apply errors */
 .neu-flat { 
   background-color: #ffffff;
   box-shadow: 8px 8px 20px rgba(0,0,0,0.05);
@@ -82,7 +75,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Gyro Hologram Glow Card Style */
+/* Gyro Hologram Glow Card Style (ID Card Edge & Shadow Glow) */
 .gyro-card {
   position: relative;
   border-radius: 28px;
@@ -131,23 +124,26 @@ body {
   animation: soft-pulse 1.5s infinite ease-in-out;
 }
 
-/* プレミアム・インタラクション・ヒエラルキー */
+/* プレミアム・インタラクション・ヒエラルキー (0.14s ease) */
 button, .btn-neu, .nav-btn, .clickable-card {
   transition: all 0.14s ease !important;
 }
 
+/* PRIMARY (主操作: 起動・登録ボタン等) */
 .btn-neu:active, .pressed-primary {
   transform: scale(0.96);
   filter: brightness(1.08);
   box-shadow: none !important;
 }
 
+/* SECONDARY (補助操作: エリアカード等) */
 .clickable-card:active, .pressed-secondary {
   transform: scale(0.985);
   opacity: 0.96;
   box-shadow: none !important;
 }
 
+/* NAV BUTTON (ナビ操作: 背景変化のみ) */
 .nav-btn:active, .pressed-nav {
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 1.5rem;
@@ -156,7 +152,7 @@ button, .btn-neu, .nav-btn, .clickable-card {
 .description { line-height: 160%; }
 input::placeholder { text-align: center; }
 
-/* Gateway/Splash Screen instant layout */
+/* Gateway/Splash Screen instant layout to prevent CDN load shift */
 #screen-gateway {
   position: fixed !important;
   inset: 0 !important;
@@ -164,7 +160,7 @@ input::placeholder { text-align: center; }
   height: 100dvh !important;
   z-index: 1000 !important;
   background-color: #000000 !important;
-  display: flex;
+  display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
@@ -172,6 +168,7 @@ input::placeholder { text-align: center; }
   text-align: center !important;
   box-sizing: border-box !important;
   font-family: 'Inter', -apple-system, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', sans-serif !important;
+  /* スマホブラウザでのバウンススクロールやタッチでの挙動ブレを完全防止 */
   overscroll-behavior: none !important;
   touch-action: none !important;
 }
@@ -308,12 +305,18 @@ input::placeholder { text-align: center; }
   box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Page bottom padding */
-#page-areas, #page-detail, #page-settings, #new-page-ranking, #new-page-storage-register, #new-page-storage-list {
+/* 各ページ専用の下部パディング（フローティング下部ナビゲーションとの重なりを回避） */
+#page-areas {
+  padding-bottom: 160px;
+}
+#page-detail {
+  padding-bottom: 160px;
+}
+#page-settings {
   padding-bottom: 160px;
 }
 
-/* iOS Reset for inputs */
+/* iOSにおけるinput・selectのデフォルト白背景・崩れ防止リセット */
 input[type="text"],
 input[type="number"],
 select {
@@ -323,6 +326,7 @@ select {
   color: #ffffff !important;
 }
 
+/* select要素用のカスタム下向き矢印 */
 select {
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -331,6 +335,7 @@ select {
   padding-right: 2.5rem;
 }
 
+/* iOSブラウザの自動入力(Autofill)時の白・黄色背景化を防止 */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -340,19 +345,4 @@ select:-webkit-autofill:focus {
   -webkit-text-fill-color: #ffffff !important;
   -webkit-box-shadow: 0 0 0px 1000px #1C1C1E inset !important;
   transition: background-color 5000s ease-in-out 0s;
-}
-
-.new-premium-glass {
-  border-radius: 28px;
-  background: #1C1C1E;
-  box-shadow: 0 0 30px rgba(37, 99, 235, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
-}
-
-.new-premium-glass:active {
-  transform: scale(0.98);
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.02);
 }
