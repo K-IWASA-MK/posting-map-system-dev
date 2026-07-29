@@ -160,7 +160,7 @@ input::placeholder { text-align: center; }
   height: 100dvh !important;
   z-index: 1000 !important;
   background-color: #000000 !important;
-  display: flex !important;
+  display: flex; /* Visibility Contract: JS制御要素のため !important を排除 */
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
@@ -171,6 +171,11 @@ input::placeholder { text-align: center; }
   /* スマホブラウザでのバウンススクロールやタッチでの挙動ブレを完全防止 */
   overscroll-behavior: none !important;
   touch-action: none !important;
+}
+
+/* ID詳細度とクラス詳細度の競合を防ぎ、JSからの .hidden 付与による非表示化を100%保証 */
+#screen-gateway.hidden {
+  display: none !important;
 }
 
 #screen-gateway .gateway-header-wrap {
