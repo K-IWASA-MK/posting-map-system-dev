@@ -1299,12 +1299,8 @@ async function safeInitApp() {
         
         let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
         
-        // ⑤ 登録済みの場合のみ getAppDataを並列プリフェッチ開始（未登録でのPM-LIC-003競合を回避）
-        if (userInfo.id) {
-          _appDataPromise = callApi('getAppData');
-        } else {
-          _appDataPromise = null;
-        }
+        // ⑤ getAppDataを並列プリフェッチ開始（profile取得・登録処理と並行）
+        _appDataPromise = callApi('getAppData');
 
         try {
           // ② LINE内部トークン処理安定ディレイ（最適化済み）
