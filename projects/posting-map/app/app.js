@@ -74,6 +74,11 @@ async function callApi(action, params = {}) {
   const MAX_RETRIES = 3;
   let delay = 1000;
   
+  // LIFFがログイン済みならトークンを自動的に付与
+  if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
+    params.liffToken = liff.getAccessToken();
+  }
+  
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     const queryParams = new URLSearchParams({
       action: action,
@@ -150,6 +155,11 @@ async function callApi(action, params = {}) {
 async function callApiPost(action, payload = {}) {
   const MAX_RETRIES = 3;
   let delay = 1000;
+
+  // LIFFがログイン済みならトークンを自動的に付与
+  if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
+    payload.liffToken = liff.getAccessToken();
+  }
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     const url = `${API_URL}?_t=${Date.now()}`; // actionはbodyに含める
