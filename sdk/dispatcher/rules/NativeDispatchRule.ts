@@ -22,7 +22,7 @@ export class NativeDispatchRule implements DispatchRule {
     }
 
     return Object.freeze({
-      dispatchTarget: 'NATIVE_RUNTIME',
+      runtimeType: 'NATIVE_RUNTIME',
       adapterType: 'NATIVE_ADAPTER',
       executionType: 'ASYNC_AI_EXECUTION',
       priority: context.priority,

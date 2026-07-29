@@ -22,7 +22,7 @@ export class IntentDispatchRule implements DispatchRule {
     }
 
     return Object.freeze({
-      dispatchTarget: 'NATIVE_RUNTIME',
+      runtimeType: 'NATIVE_RUNTIME',
       adapterType: 'NONE',
       executionType: 'AI_INTERNAL_PROCESSING',
       priority: context.priority,

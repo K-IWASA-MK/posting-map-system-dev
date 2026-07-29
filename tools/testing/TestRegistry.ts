@@ -49,6 +49,17 @@ export const REGISTERED_TESTS: TestAsset[] = [
     enabled: true
   },
   {
+    id: 'execution-runtime-foundation',
+    version: 1,
+    name: 'Execution Runtime Foundation Unit Tests',
+    module: 'tests/unit/typescript/test_execution_runtime_foundation.ts',
+    category: 'foundation',
+    tags: ['runtime', 'registry', 'executor', 'legacy'],
+    capabilities: [],
+    timeout: 30000,
+    enabled: true
+  },
+  {
     id: 'task-lifecycle-foundation',
     version: 1,
     name: 'Task Lifecycle Foundation Unit Tests',

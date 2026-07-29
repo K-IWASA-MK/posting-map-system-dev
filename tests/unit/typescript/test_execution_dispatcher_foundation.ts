@@ -56,7 +56,7 @@ async function testLegacyRouting() {
 
   const result = ExecutionDispatcher.dispatch(contract);
 
-  assert(result.decision.dispatchTarget === 'LEGACY_RUNTIME', 'Should route to LEGACY_RUNTIME');
+  assert(result.decision.runtimeType === 'LEGACY_RUNTIME', 'Should route to LEGACY_RUNTIME');
   assert(result.decision.adapterType === 'LEGACY_CONTRACT_ADAPTER', 'Should use LEGACY_CONTRACT_ADAPTER');
   assert(result.matchedRule === 'LEGACY_DISPATCH_RULE', 'Should match LEGACY_DISPATCH_RULE');
   assert(Object.isFrozen(result), 'Result must be immutable');
@@ -74,7 +74,7 @@ async function testNativeRouting() {
 
   const result = ExecutionDispatcher.dispatch(contract);
 
-  assert(result.decision.dispatchTarget === 'NATIVE_RUNTIME', 'Should route to NATIVE_RUNTIME');
+  assert(result.decision.runtimeType === 'NATIVE_RUNTIME', 'Should route to NATIVE_RUNTIME');
   assert(result.decision.adapterType === 'NATIVE_ADAPTER', 'Should use NATIVE_ADAPTER');
   assert(result.matchedRule === 'NATIVE_DISPATCH_RULE', 'Should match NATIVE_DISPATCH_RULE');
 
@@ -88,7 +88,7 @@ async function testIntentRouting() {
 
   const result = ExecutionDispatcher.dispatch(contract);
 
-  assert(result.decision.dispatchTarget === 'NATIVE_RUNTIME', 'Should fallback to NATIVE_RUNTIME');
+  assert(result.decision.runtimeType === 'NATIVE_RUNTIME', 'Should fallback to NATIVE_RUNTIME');
   assert(result.decision.adapterType === 'NONE', 'Should use NONE adapter type');
   assert(result.matchedRule === 'INTENT_DISPATCH_RULE', 'Should match INTENT_DISPATCH_RULE');
 

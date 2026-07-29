@@ -21,7 +21,7 @@ export class LegacyDispatchRule implements DispatchRule {
     }
 
     return Object.freeze({
-      dispatchTarget: 'LEGACY_RUNTIME',
+      runtimeType: 'LEGACY_RUNTIME',
       adapterType: 'LEGACY_CONTRACT_ADAPTER',
       executionType: 'SYNCHRONOUS_API_CALL',
       priority: context.priority,
