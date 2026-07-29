@@ -242,6 +242,9 @@ function startApp(profile = null) {
   $('screen-gateway').classList.add('hidden');
   $('app').classList.remove('hidden');
   
+  // 不透明度 0% を解除し、IDカード画面を前面へ可視化する (バグ修正)
+  $('app').classList.remove('opacity-0');
+  
   // loading をスムーズに隠す
   const loadingEl = $('loading');
   if (loadingEl) {
