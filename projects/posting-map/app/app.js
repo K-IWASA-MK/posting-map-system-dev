@@ -137,6 +137,16 @@ async function callApi(action, params = {}) {
         throw new Error("JSON形式ではない応答を受け取りました: " + parseErr.message);
       }
       
+      // GAS v2 形式のレスポンス（data.data ペイロードが存在する）の場合はアンラップ
+      if (data && typeof data === 'object' && 'data' in data && data.data !== null) {
+        const innerSuccess = data.data.success !== undefined ? data.data.success : data.success;
+        if (innerSuccess === false) {
+          logDebug(`[callApi] API returned inner success=false. msg=${data.data.message || data.message}`);
+          throw new Error(data.data.message || data.message || "API Error");
+        }
+        return data.data;
+      }
+      
       if (data.success === false) {
         logDebug(`[callApi] API returned success=false. msg=${data.message}`);
         throw new Error(data.message || "API Error");
@@ -203,6 +213,13 @@ async function callApiPost(action, payload = {}) {
         data = JSON.parse(text);
       } catch (parseErr) {
         throw new Error("JSON形式ではない応答を受け取りました: " + parseErr.message);
+      }
+
+      // GAS v2 形式のレスポンス（data.data ペイロードが存在する）の場合はアンラップ
+      if (data && typeof data === 'object' && 'data' in data && data.data !== null) {
+        const innerSuccess = data.data.success !== undefined ? data.data.success : data.success;
+        if (innerSuccess === false) throw new Error(data.data.message || data.message || "API Error");
+        return data.data;
       }
 
       if (data.success === false) throw new Error(data.message || "API Error");
@@ -318,7 +335,8 @@ async function loadData(skipSync = false) {
     setLoadingProgress(96, 'READY');
     _appDataPromise = null;
     if (data && data.success) {
-      areaSummary = data.areas;
+      logDebug("[loadData] data keys: " + Object.keys(data).join(", "));
+      areaSummary = data.areas || [];
       // ranking は switchPage('ranking') 初回タップ時に遅延取得
       if (data.branchName) localStorage.setItem('branch_name', data.branchName);
       
@@ -1132,6 +1150,10 @@ function backToCityList() {
 function updateStats() {
   let totalDone = 0;
   let totalPoints = 0;
+  if (!areaSummary || !Array.isArray(areaSummary)) {
+    logDebug("[updateStats] areaSummary is missing or not an array!");
+    return;
+  }
   areaSummary.forEach(area => {
     totalDone += area.done || 0;
     totalPoints += area.total || 0;
@@ -1274,8 +1296,16 @@ async function safeInitApp() {
       if (liff.isLoggedIn()) {
         logDebug("LOGIN OK");
         sessionStorage.removeItem('liff_initializing'); // ✅ ログイン確認後にフラグを削除（ここが正しいタイミング）
-        // ⑤ getAppDataを並列プリフェッチ開始（profile取得・登録処理と並行）
-        _appDataPromise = callApi('getAppData');
+        
+        let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+        
+        // ⑤ 登録済みの場合のみ getAppDataを並列プリフェッチ開始（未登録でのPM-LIC-003競合を回避）
+        if (userInfo.id) {
+          _appDataPromise = callApi('getAppData');
+        } else {
+          _appDataPromise = null;
+        }
+
         try {
           // ② LINE内部トークン処理安定ディレイ（最適化済み）
           await new Promise(r => setTimeout(r, 100));
@@ -1286,8 +1316,6 @@ async function safeInitApp() {
           setLoadingProgress(65, 'PROFILE LOADED');
           console.log(profile);
 
-          let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-          
           // ④ 初回・再登録ともにPOSTでlineUserIdをGASに送信
           if (!userInfo.id) {
             // 初回登録
