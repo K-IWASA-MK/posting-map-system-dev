@@ -65,8 +65,10 @@ function removePressed() {
 
 
 
-// GAS API CONFIG (JSON ONLY)
-const API_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
+// GAS API CONFIG (DYNAMICS LOADED WITH FALLBACK)
+const API_URL = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api && window.PMS_CLIENT_CONFIG.api.gasWebAppUrl)
+  ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl
+  : "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
 
 async function callApi(action, params = {}) {
   const MAX_RETRIES = 3;
@@ -1225,12 +1227,10 @@ async function safeInitApp() {
   }
   // ※ フラグはここでは削除しない。ログイン確認成功後（isLoggedIn()=true）に削除する。
   
-  // デプロイ先（ホスト名）に応じてLIFF IDを自動切り替え
-  // area-management.github.io → モニター用LIFF（h9Fjv1iU）
-  // k-iwasa-mk.github.io → スマホ用LIFF（tXZIMAJK）
-  const liffId = window.location.hostname === 'area-management.github.io'
-    ? "2010374196-gIYb6PDH"
-    : "2010374196-gIYb6PDH";
+  // クライアント設定(PMS_CLIENT_CONFIG)からLIFF IDを取得、なければホスト名からフォールバック
+  const liffId = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.line && window.PMS_CLIENT_CONFIG.line.liffId)
+    ? window.PMS_CLIENT_CONFIG.line.liffId
+    : (window.location.hostname === 'area-management.github.io' ? "2010374196-gIYb6PDH" : "2010374196-gIYb6PDH");
   const btn = $('btn-login-manual');
   const spinner = $('login-spinner');
   const subtitle = $('gateway-subtitle');
