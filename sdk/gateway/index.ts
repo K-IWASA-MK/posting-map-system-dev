@@ -14,3 +14,8 @@ export * from './domain/WorkflowSelector';
 export * from './domain/OutputPolicyResolver';
 export * from './domain/TaskContractFactory';
 export * from './TaskGateway';
+export * from './dto/LegacyDistributionRequest';
+export * from './dto/LegacyAreaDetailsRequest';
+export * from './dto/LegacyDashboardRequest';
+export * from './adapters/ContractAdapter';
+export * from './adapters/LegacyContractAdapter';

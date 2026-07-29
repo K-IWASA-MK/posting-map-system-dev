@@ -80,5 +80,16 @@ export const REGISTERED_TESTS: TestAsset[] = [
     capabilities: [],
     timeout: 30000,
     enabled: true
+  },
+  {
+    id: 'legacy-contract-adapter-foundation',
+    version: 1,
+    name: 'Legacy Contract Adapter Foundation Unit Tests',
+    module: 'tests/unit/typescript/test_legacy_contract_adapter.ts',
+    category: 'foundation',
+    tags: ['adapter', 'legacy', 'dto', 'validation', 'gateway'],
+    capabilities: [],
+    timeout: 30000,
+    enabled: true
   }
 ];
