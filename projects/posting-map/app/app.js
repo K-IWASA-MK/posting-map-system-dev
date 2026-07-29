@@ -1312,29 +1312,32 @@ async function safeInitApp() {
           setLoadingProgress(65, 'PROFILE LOADED');
           console.log(profile);
 
-          // ④ 初回・再登録ともにPOSTでlineUserIdをGASに送信
+          // ④ 初回登録をバックグラウンド(非同期)で実行。通信待ちを排除し1.5秒起動を実現。
           if (!userInfo.id) {
-            // 初回登録
-            logDebug("API START (初回登録)");
-            const res = await callApiPost('registerStaff', { 
+            logDebug("API START (初回登録・非同期)");
+            callApiPost('registerStaff', { 
               lastName: profile.displayName, 
               firstName: "(LINE)",
               lineUserId: profile.userId
+            }).then(res => {
+              logDebug("API OK (初回登録完了)");
+              if (res && res.success) {
+                const registeredInfo = {
+                  last: profile.displayName,
+                  first: "",
+                  id: res.id,
+                  lineUserId: profile.userId,
+                  picture: profile.pictureUrl
+                };
+                localStorage.setItem('user_info', JSON.stringify(registeredInfo));
+                logDebug("Registered! Staff ID: " + res.id);
+                // ID表示部分をバックグラウンドで動的に更新
+                const idEl = $('storage-register-staff-id');
+                if (idEl) idEl.textContent = 'ID: ' + (res.id || '---');
+              }
+            }).catch(err => {
+              logDebug("Background registration failed: " + err.message);
             });
-            logDebug("API OK");
-            if (res && res.success) {
-              userInfo = {
-                last: profile.displayName,
-                first: "",
-                id: res.id,
-                lineUserId: profile.userId,
-                picture: profile.pictureUrl
-              };
-              localStorage.setItem('user_info', JSON.stringify(userInfo));
-              logDebug("Registered! Staff ID: " + res.id);
-            } else {
-              throw new Error("GAS registration failed");
-            }
           } else {
             // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
             userInfo.lineUserId = profile.userId;
