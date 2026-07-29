@@ -3,7 +3,7 @@
  * Pre-Execution Validator for Task Contract Lock & Input Spec
  */
 
-import { TaskRecord } from '../../task-assignment/models/TaskAssignmentModels';
+import { TaskRecord } from '../task-assignment/models/TaskAssignmentModels';
 import { IExecutionValidator } from './contract/IExecutor';
 
 export class ExecutionValidator implements IExecutionValidator {

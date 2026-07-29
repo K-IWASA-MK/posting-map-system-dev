@@ -39,7 +39,7 @@ export class DecisionRuleEngine implements IDecisionRuleEngine {
 
     // 2. Input Lock Mismatch -> DENIED
     if (
-      context.actualSource !== task.inputSpec.inputSource ||
+      context.actualInputSource !== task.inputSpec.inputSource ||
       context.actualRecordCount !== task.inputSpec.expectedRecordCount
     ) {
       return Object.freeze({

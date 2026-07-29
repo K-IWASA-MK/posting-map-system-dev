@@ -188,7 +188,12 @@ function createSystemCacheSheet() {
     "__TEMP_ADDRESSES__" // バッチ一時シート（完了前に残った場合も除外）
   ];
 
-  const areaSheets = ss.getSheets().filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden());
+  const areaSheets = ss.getSheets().filter(s => 
+    !exclude.includes(s.getName()) && 
+    !s.isSheetHidden() && 
+    !s.getName().includes("MASTER") && 
+    !s.getName().includes("DATABASE")
+  );
   
   if (areaSheets.length === 0) {
     SpreadsheetApp.flush();

@@ -25,6 +25,7 @@ export interface FeatureFlags {
   bridgeProvider: string;
   platformIntegrationEnabled: boolean;
   pipelineMode: string;
+  bridgeMode?: string;
   debugExecutionTrace: boolean;
 }
 

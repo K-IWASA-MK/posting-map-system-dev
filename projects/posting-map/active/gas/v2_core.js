@@ -16,7 +16,7 @@ function getEventLogSheet() {
  */
 function getAllEventLogs() {
   const cache = CacheService.getScriptCache();
-  const CACHE_KEY = "EVENT_LOGS_V2";
+  const CACHE_KEY = "EVENT_LOGS_V2_MIN";
   
   const cached = cache.get(CACHE_KEY);
   if (cached) {
@@ -30,26 +30,28 @@ function getAllEventLogs() {
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return [];
   
-  // 12カラム: id, timestamp, tenantId, branchId, prefectureId, blockId, userId, actionType, count, lat, lng, meta
+  // 必要な集計用データ（id, timestamp, blockId, userId, actionType, count）だけを抽出しサイズを極小化
   const data = sheet.getRange(2, 1, lastRow - 1, 12).getValues();
-  const logs = data.map(row => ({
-    id: String(row[0]),
-    timestamp: Number(row[1]),
-    tenantId: String(row[2]),
-    branchId: String(row[3]),
-    prefectureId: String(row[4]),
-    blockId: String(row[5]),
-    userId: String(row[6]),
-    actionType: String(row[7]),
-    count: Number(row[8]),
-    lat: Number(row[9]),
-    lng: Number(row[10]),
-    meta: row[11] ? JSON.parse(String(row[11])) : {}
-  }));
+  const logs = [];
+  for (let i = 0; i < data.length; i++) {
+    const row = data[i];
+    if (!row[0]) continue;
+    logs.push({
+      id: String(row[0]),
+      timestamp: Number(row[1]),
+      blockId: String(row[5]),
+      userId: String(row[6]),
+      actionType: String(row[7]),
+      count: Number(row[8])
+    });
+  }
   
   try {
-    cache.put(CACHE_KEY, JSON.stringify(logs), 15);
-  } catch(e) {}
+    // キャッシュを300秒(5分)維持してシート読み込み遅延を劇的に排除
+    cache.put(CACHE_KEY, JSON.stringify(logs), 300);
+  } catch(e) {
+    Logger.log("Failed to cache event logs: " + e.toString());
+  }
   
   return logs;
 }

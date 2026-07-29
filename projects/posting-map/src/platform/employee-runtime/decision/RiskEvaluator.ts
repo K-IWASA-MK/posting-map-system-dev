@@ -17,7 +17,7 @@ export class RiskEvaluator implements IRiskEvaluator {
 
     // 2. Input Lock Mismatch -> HIGH
     if (
-      context.actualSource !== task.inputSpec.inputSource ||
+      context.actualInputSource !== task.inputSpec.inputSource ||
       context.actualRecordCount !== task.inputSpec.expectedRecordCount
     ) {
       return 'HIGH';

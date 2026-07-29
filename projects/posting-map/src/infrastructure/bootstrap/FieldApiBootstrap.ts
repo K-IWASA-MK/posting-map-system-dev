@@ -27,8 +27,17 @@ import { ApplicationEventPublisher } from '@application/events/ApplicationEventP
 import { FIELD_ENDPOINTS } from '@api/registry/FieldEndpoints';
 import { DASHBOARD_ENDPOINTS } from '@api/registry/DashboardEndpoints';
 import { OPERATIONS_ENDPOINTS } from '@api/registry/OperationsEndpoints';
+import { AIOSCallbackHandler, AIOSCallbackReceiver, CallbackValidator, SharedSecretAuthenticator, CallbackEvent } from '../../integration/aios/callback';
+import { TaskResultHandler } from '../../application/callback/TaskResultHandler';
 
 let initialized = false;
+
+// Mock publisher for the EventBus during initialization
+class DefaultCallbackEventPublisher {
+  publish(event: CallbackEvent): void {
+    console.log(`[AIOS Callback Event] ${event.type}:`, event);
+  }
+}
 
 export function bootstrapFieldApis(): void {
   if (initialized) return;
@@ -53,6 +62,14 @@ export function bootstrapFieldApis(): void {
   const operationsDashboardAppService = new OperationsDashboardApplicationService(workspaceRepo, subscriptionRepo);
   const workspaceService = new WorkspaceApplicationService(workspaceRepo, subscriptionRepo);
 
+  // Setup Callback Integration Foundation
+  const aiosCallbackAuthenticator = new SharedSecretAuthenticator();
+  const aiosCallbackValidator = new CallbackValidator(aiosCallbackAuthenticator);
+  const aiosTaskResultHandler = new TaskResultHandler(eventPublisher);
+  const aiosCallbackEventPublisher = new DefaultCallbackEventPublisher();
+  const aiosCallbackReceiver = new AIOSCallbackReceiver(aiosCallbackValidator, aiosTaskResultHandler, aiosCallbackEventPublisher);
+  const aiosCallbackHandler = new AIOSCallbackHandler(aiosCallbackReceiver);
+
   const handlers: Record<string, any> = {
     FieldStockHandler: new FieldStockHandler(holdingAppService),
     HoldingHandler: new HoldingHandler(holdingAppService),
@@ -63,7 +80,8 @@ export function bootstrapFieldApis(): void {
     DashboardFactHandler: new DashboardFactHandler(new DashboardFactService(activityRepo, holdingRepo)),
     SubscriptionHandler: new SubscriptionHandler(subscriptionAppService),
     OperationsDashboardHandler: new OperationsDashboardHandler(operationsDashboardAppService),
-    WorkspaceHandler: new WorkspaceHandler(workspaceService)
+    WorkspaceHandler: new WorkspaceHandler(workspaceService),
+    AIOSCallbackHandler: aiosCallbackHandler
   };
 
   // Register Field API Endpoints
@@ -93,5 +111,9 @@ export function bootstrapFieldApis(): void {
     registry.register(config.method, config.version, config.path, handlerInstance);
   }
 
+  // Register AIOS Callback Route explicitly
+  registry.register('POST', 'v2', '/aios/callback', aiosCallbackHandler);
+
   initialized = true;
 }
+

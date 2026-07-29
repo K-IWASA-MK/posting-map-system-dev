@@ -3,7 +3,7 @@
  * Gateway for Tool Authorization and Execution Routing
  */
 
-import { TaskRecord } from '../../task-assignment/models/TaskAssignmentModels';
+import { TaskRecord } from '../task-assignment/models/TaskAssignmentModels';
 import { IExecutor, IToolExecutionGateway } from './contract/IExecutor';
 import { ExecutionResult } from './models/ExecutionRuntimeModels';
 

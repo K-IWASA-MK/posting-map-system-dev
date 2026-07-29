@@ -44,7 +44,9 @@ function appendEventLog(event) {
     sheet.appendRow(row);
     
     // キャッシュをフラッシュ
-    CacheService.getScriptCache().remove("EVENT_LOGS_V2");
+    const scriptCache = CacheService.getScriptCache();
+    scriptCache.remove("EVENT_LOGS_V2");
+    scriptCache.remove("EVENT_LOGS_V2_MIN");
     
     // Phase 16: リアルタイム戦略OSキャッシュ無効化
     if (typeof onNewEventLogEntry === "function") {

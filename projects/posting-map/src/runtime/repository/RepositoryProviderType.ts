@@ -1,0 +1,7 @@
+export enum RepositoryProviderType {
+  SPREADSHEET = 'SPREADSHEET',
+  DATABASE = 'DATABASE',
+  FIRESTORE = 'FIRESTORE',
+  POSTGRES = 'POSTGRES',
+  BIGQUERY = 'BIGQUERY'
+}

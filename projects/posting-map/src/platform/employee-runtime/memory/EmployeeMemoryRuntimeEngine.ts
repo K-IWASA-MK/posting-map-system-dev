@@ -24,9 +24,7 @@ export class EmployeeMemoryRuntimeEngine implements IEmployeeMemoryRuntimeEngine
     sourceId: string,
     data: any
   ): MemoryRecord {
-    const record = this.registry.registerFact ? 
-      this.registry.registerMemory(employeeId, sourceType, sourceId, data) : 
-      this.registry.registerMemory(employeeId, sourceType, sourceId, data);
+    const record = this.registry.registerMemory(employeeId, sourceType, sourceId, data);
 
     this.recordAudit(
       record.memoryId,

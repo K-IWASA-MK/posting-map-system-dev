@@ -4,8 +4,9 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZh
 const urlParams = new URLSearchParams(window.location.search);
 const workspaceId = urlParams.get('workspaceId') || 'WS-MIE-03';
 const yearMonth = urlParams.get('yearMonth') || '';
+const isDev = urlParams.get('dev') === 'true' || urlParams.get('mock') === 'true';
 
-let googleUser = JSON.parse(localStorage.getItem('google_user')) || null;
+let googleUser = JSON.parse(localStorage.getItem('google_user')) || (isDev ? { email: 'dev@postingmap.jp', name: '三重第3区 担当者' } : null);
 let activeTab = 'home';
 let dashboardData = null;
 
@@ -53,6 +54,42 @@ async function checkAuth() {
 }
 
 async function fetchDashboardData(email) {
+  if (isDev) {
+    // Return mock MIE-03 dashboard dataset for local mobile verification
+    return {
+      success: true,
+      data: {
+        workspaceId: workspaceId,
+        workspaceName: '三重第3区 支部',
+        displayName: '三重第3区 統括',
+        memberCount: 42,
+        newMemberCount: 5,
+        activeMemberCount: 38,
+        totalHoldingQuantity: 125000,
+        monthlyDistributionQuantity: 48500,
+        previousMonthDistributionQuantity: 42000,
+        growthRate: 15.5,
+        distributionGoal: 50000,
+        achievementRate: 97.0,
+        cityActivities: [
+          { cityName: '四日市市', quantity: 22000, goal: 23000 },
+          { cityName: '桑名市', quantity: 12000, goal: 12500 },
+          { cityName: '鈴鹿市', quantity: 8500, goal: 9000 },
+          { cityName: 'いなべ市', quantity: 6000, goal: 5500 }
+        ],
+        members: [
+          { name: '佐藤 健太', role: 'リーダー', monthlyQuantity: 5200 },
+          { name: '田中 美咲', role: '配布員', monthlyQuantity: 4100 }
+        ],
+        monthlyTrend: [
+          { month: '4月', quantity: 38000 },
+          { month: '5月', quantity: 42000 },
+          { month: '6月', quantity: 48500 }
+        ]
+      }
+    };
+  }
+
   let url = `${API_URL}?action=getWorkspaceDashboard&workspaceId=${workspaceId}&googleEmail=${encodeURIComponent(email)}`;
   if (yearMonth) {
     url += `&yearMonth=${yearMonth}`;
