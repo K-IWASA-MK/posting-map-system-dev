@@ -49,7 +49,7 @@ export class CompletionRuntime {
    */
   public async processRequest(request: CompletionRequest, gitCwd?: string): Promise<CompletionResult> {
     const cwd = gitCwd || this.workspaceRoot;
-    const handoverPath = request.handoverFilePath || path.join(this.workspaceRoot, "projects", "posting-map", "HANDOVER.md");
+    const handoverPath = request.handoverFilePath || path.join(this.workspaceRoot, "HANDOVER.md");
 
     // 1. Replay Safety check: check if already committed
     let isAlreadyCommitted = false;

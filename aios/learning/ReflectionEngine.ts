@@ -57,11 +57,11 @@ export class ReflectionEngine {
       futureRule = "Require pre-validation of permissions and environment prior to execution.";
       category = "FAILURE_RECOVERY";
       confidence = 0.80;
-    } else if (result.projectId === "posting-map") {
-      observation = "LIFF and GAS authentication check completed on posting-map.";
-      cause = "LIFF authentication endpoint URL and GAS quota verified successfully.";
-      pattern = "LIFF + GAS integration pattern on posting-map domain.";
-      futureRule = "Pre-verify AppScript execution quotas when conducting LIFF authentication checks.";
+    } else if (result.projectId) {
+      observation = `Verification check completed on ${result.projectId}.`;
+      cause = "Execution environment verified successfully.";
+      pattern = `Integration pattern on ${result.projectId} domain.`;
+      futureRule = "Maintain consistency with project-specific integration standards.";
       category = "SUCCESS_PATTERN";
       confidence = 0.92;
     }

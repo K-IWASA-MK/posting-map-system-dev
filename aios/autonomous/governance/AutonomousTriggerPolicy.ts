@@ -12,7 +12,7 @@ export class AutonomousTriggerPolicy {
   ]);
 
   private static readonly ALLOWED_PATH_PREFIXES = [
-    "projects/posting-map/",
+    "app/",
     "tests/",
     "docs/"
   ];

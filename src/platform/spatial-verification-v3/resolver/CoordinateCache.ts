@@ -13,8 +13,9 @@ export class CoordinateCache {
   private cache: Record<string, CachedCoordinate>;
 
   constructor(filePath?: string) {
-    // Default to the data directory or wherever makes sense, e.g., root directory
-    this.cacheFilePath = filePath || path.join(process.cwd(), 'coordinate_cache.json');
+    const defaultPath = path.join(process.cwd(), 'spatial/coordinate_cache.json');
+    const fallbackPath = path.join(process.cwd(), 'coordinate_cache.json');
+    this.cacheFilePath = filePath || (fs.existsSync(defaultPath) ? defaultPath : fallbackPath);
     this.cache = this.loadCache();
   }
 

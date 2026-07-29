@@ -1,71 +1,44 @@
 # Workflow: District Initialization AI
 
-## シーケンス概略
+## ■ SOP v1: 支部作成自律実行フロー (Master Governance 準拠)
+
+本 Agent はユーザーから「〇〇支部を作成して」（例: `NARA-07支部を作成して`）と指示を受けた際、以下の SOP v1 手順で自律的にプロビジョニングを実行する。
+
 ```text
-  [入力: 選挙区名]
+  [ユーザー指示: 例 NARA-07 支部を作成して]
         │
         ▼
-  Step 1: 総務省（衆議院小選挙区情報）確認
+  STEP 1: 原本コピー (POSTING MAP MASTER)
         │
         ▼
-  Step 2: 都道府県選管（例: 三重県選管）確認
+  STEP 2: スプレッドシート名変更
+        │   ファイル名 (画面左上): {branchId} v{masterVersionMajor} (例: NARA-07 v1)
         │
         ▼
-  Step 3: 情報一致検証（クロスバリデーション）
+  STEP 3: 内部シート（タブ）の保護
+        │   原本構造を 100% 完全保持 (タブ名は一切変更しない)
         │
-        ├─【不一致 / 不存在】──► FAILED 停止（CSV未生成）
+        ▼
+  STEP 4: 表示名設定
+        │   displayName: 奈良第7支部
         │
-        └─【完全一致】
-              │
-              ▼
-  Step 4: WORKSPACE ディレクトリ構造の自動作成
-        │   `03_BRANCH/【都道府県】/【選挙区】/`
-        │   ├── source/
-        │   ├── master/
-        │   ├── output/
-        │   └── logs/
-              │
-              ▼
-  Step 5: 成果物 CSV 納品
-        │   `source/district_municipalities.csv` (1自治体1行形式)
-              │
-              ▼
-  Step 6: 監査ログ JSON 納品
-        │   `logs/verification.json` (URL/取得日時含む)
-              │
-              ▼
-  Step 7: ステータス `SUCCESS` 発行 (次フェーズへバトン渡す)
+        ▼
+  STEP 5: deployment.json マニフェスト生成
+        │   branchId, masterVersion, createdFrom, spreadsheetId, spreadsheetTitle 等の不変記録
+        │
+        ▼
+  STEP 6: Google Drive (1FfcVEQjod--rZSucOPFJD2DJ58hV650_) へ完全同期保存
+        │   03_BRANCH/NARA-07/ 内へ実体配置
+        │
+        ▼
+  STEP 7: 地区データ投入待ち状態 (BRANCH_CREATED_READY_FOR_DATA) へ遷移し完了報告
 ```
 
 ---
 
-## 各ステップの詳細手順
-
-### Step 1 & Step 2: 公的情報の取得
-- **総務省情報源**: 衆議院小選挙区区割り最新告示データ
-- **選管情報源**: 対象都道府県選挙管理委員会が公表する最新区割り一覧
-- **記録要件**: 参照した正確なWeb URLおよび取得タイムスタンプ（ISO 8601形式）を取得。
-
-### Step 3: クロスバリデーション (Fact-Check Gate)
-- 総務省の構成自治体リストと、都道府県選管の構成自治体リストを完全一致比較する。
-- 1文字でも異体字や曖昧さがある場合は照合失敗（`FAILED`）とする。
-
-### Step 4: WORKSPACE ディレクトリ構築
-- 定数 `WORKSPACE.FOLDERS.BRANCH` (`03_BRANCH/`) を起点とし、以下の構造を自動生成する。
-  ```
-  FIELD_OPERATIONS_PLATFORM/03_BRANCH/三重県/三重第3区/
-  ├── source/
-  ├── master/
-  ├── output/
-  └── logs/
-  ```
-
-### Step 5 & Step 6: 納品物の出力
-- `source/district_municipalities.csv` を生成。
-- `logs/verification.json` を生成。
-
-### Step 7: 結果判定 (RESULT)
-- 処理完了時に以下のいずれかのステータスを発行する：
-  - **`SUCCESS`**: 完全照合成功・全ファイル正常納品
-  - **`FAILED`**: 照合失敗・不整合・安全停止
-  - **`PARTIAL`**: 一部完了（本Agent v1.0では非使用、将来拡張用）
+## 監査・検証ゲート (Governance Rule-001 〜 Rule-005)
+- **Rule-001**: 必ず最新の MASTER から作成
+- **Rule-002**: 承認済みの原本のみ使用
+- **Rule-003**: 世代 (`masterVersion`) と系譜 (`createdFrom`) のリネージ記録
+- **Rule-004**: ファイル名 `{branchId} v{masterVersionMajor}`、内部シート名は原本保持
+- **Rule-005**: 既存支部ファイルは永久上書き不可 (Immutability)

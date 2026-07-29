@@ -28,8 +28,7 @@ export class RawDataIngestor {
 
     // STEP 1-1: Postal Raw Ingestion (KEN_ALL.CSV)
     const postalPath = path.join(postalDir, 'KEN_ALL.CSV');
-    let postalContent = '';
-    const existingPostalRef = path.join(__dirname, '../../../../../FIELD_OPERATIONS_PLATFORM/01_MASTER/MIE_POSTAL.CSV');
+    const existingPostalRef = path.join(rawDir, 'postal/source_postal.csv');
 
     if (fs.existsSync(existingPostalRef)) {
       postalContent = fs.readFileSync(existingPostalRef, 'utf8');

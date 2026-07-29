@@ -181,7 +181,7 @@ export class ReleaseRuntime {
       releaseId: request.releaseId,
       version: request.version,
       environment: envPolicy as any,
-      requestedRepository: request.targetRepository || "posting-map-system",
+      requestedRepository: request.targetRepository || "aios-core",
       requestedBranch: request.targetBranch || "main",
       targetPublishRoot: request.targetPublishRoot || defaultArtifactPath,
       frontendConfigPath: request.frontendConfigPath || defaultArtifactPath,

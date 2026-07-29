@@ -29,7 +29,7 @@ export class IntentResolver {
     descriptors.forEach(descriptor => {
       const pId = descriptor.manifest.projectId.toLowerCase();
       const pName = descriptor.manifest.projectName.toLowerCase();
-      if (lowerInput.includes(pId) || lowerInput.includes(pName) || (pId === 'posting-map' && (lowerInput.includes('ポスティング') || lowerInput.includes('posting')))) {
+      if (lowerInput.includes(pId) || lowerInput.includes(pName)) {
         explicitProjectId = descriptor.manifest.projectId;
         reasoning.push({
           factor: "EXPLICIT_MENTION",

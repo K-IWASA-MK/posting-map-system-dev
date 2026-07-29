@@ -120,7 +120,7 @@ export class AgentScoreEngine {
     } else {
       // Medium Risk: Balance First (Round Robin / lowest domain count)
       return topCandidates.reduce((best, current) => 
-        (current.domainExperiences["posting-map"] || 0) < (best.domainExperiences["posting-map"] || 0) ? current : best
+        current.totalTasksCompleted < best.totalTasksCompleted ? current : best
       );
     }
   }

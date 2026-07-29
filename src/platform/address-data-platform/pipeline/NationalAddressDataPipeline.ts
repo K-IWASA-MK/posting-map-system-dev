@@ -49,10 +49,11 @@ export class NationalAddressDataPipeline {
 
     const rawRecords: AddressMasterRecord[] = lines.map(l => {
       const parts = l.split(',').map(p => p.replace(/"/g, '').trim());
-      const postalCode = parts[1] || '5100000';
-      const prefecture = parts[2] || '三重県';
-      const municipality = parts[3] || '桑名市';
-      const rawAddr = parts[4] || '';
+      // KEN_ALL format: [0]code, [1]zip5, [2]zip7, [3]pref_kana, [4]city_kana, [5]town_kana, [6]pref, [7]city, [8]town
+      const postalCode = parts[2] && parts[2].length === 7 ? parts[2] : (parts[1] || '5100000');
+      const prefecture = parts[6] || parts[2] || '三重県';
+      const municipality = parts[7] || parts[3] || '桑名市';
+      const rawAddr = parts[8] || parts[4] || '';
 
       return NationalAddressHierarchyParser.parseAddressRow(prefecture, municipality, rawAddr, postalCode);
     });

@@ -13,7 +13,7 @@ export interface ProjectManifest {
   readonly manifestVersion: string;
 
   /**
-   * Unique identifier for the project (e.g., 'posting-map').
+   * Unique identifier for the project (e.g., 'core-app').
    */
   readonly projectId: string;
 
