@@ -273,6 +273,67 @@ function setSyncStatus(state) {
   }
 }
 
+let isRegistering = false;
+let registrationError = false;
+function triggerBackgroundRegistration(profile) {
+  if (isRegistering) return;
+  isRegistering = true;
+  registrationError = false;
+  
+  const idEl = $('storage-register-staff-id');
+  if (idEl) {
+    idEl.textContent = 'ID: 登録中...';
+    idEl.style.color = 'inherit';
+    idEl.style.cursor = 'default';
+    idEl.onclick = null;
+  }
+  
+  logDebug("API START (初回登録・非同期)");
+  callApiPost('registerStaff', { 
+    lastName: profile.displayName, 
+    firstName: "(LINE)",
+    lineUserId: profile.userId
+  }).then(res => {
+    isRegistering = false;
+    logDebug("API OK (初回登録完了)");
+    if (res && res.success) {
+      const registeredInfo = {
+        last: profile.displayName,
+        first: "",
+        id: res.id,
+        lineUserId: profile.userId,
+        picture: profile.pictureUrl
+      };
+      localStorage.setItem('user_info', JSON.stringify(registeredInfo));
+      logDebug("Registered! Staff ID: " + res.id);
+      
+      const updatedIdEl = $('storage-register-staff-id');
+      if (updatedIdEl) {
+        updatedIdEl.textContent = 'ID: ' + (res.id || '---');
+        updatedIdEl.style.color = 'inherit';
+        updatedIdEl.style.cursor = 'default';
+        updatedIdEl.onclick = null;
+      }
+    } else {
+      throw new Error("GAS registration returned success=false");
+    }
+  }).catch(err => {
+    isRegistering = false;
+    registrationError = true;
+    logDebug("Background registration failed: " + err.message);
+    
+    const updatedIdEl = $('storage-register-staff-id');
+    if (updatedIdEl) {
+      updatedIdEl.textContent = 'ID: 登録失敗 (タップして再試行)';
+      updatedIdEl.style.color = '#ef4444';
+      updatedIdEl.style.cursor = 'pointer';
+      updatedIdEl.onclick = () => {
+        triggerBackgroundRegistration(profile);
+      };
+    }
+  });
+}
+
 let isSyncing = false;
 async function syncOfflineQueue() {
   if (isSyncing) return;
@@ -891,7 +952,40 @@ async function switchPage(id, force = false) {
     const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
     const idEl = $('storage-register-staff-id');
     const nameEl = $('storage-register-staff-name');
-    if (idEl) idEl.textContent = 'ID: ' + (staffId || '---');
+    
+    if (idEl) {
+      if (staffId) {
+        idEl.textContent = 'ID: ' + staffId;
+        idEl.style.color = 'inherit';
+        idEl.style.cursor = 'default';
+        idEl.onclick = null;
+      } else if (isRegistering) {
+        idEl.textContent = 'ID: 登録中...';
+        idEl.style.color = 'inherit';
+        idEl.style.cursor = 'default';
+        idEl.onclick = null;
+      } else if (registrationError) {
+        idEl.textContent = 'ID: 登録失敗 (タップして再試行)';
+        idEl.style.color = '#ef4444';
+        idEl.style.cursor = 'pointer';
+        idEl.onclick = async () => {
+          try {
+            idEl.textContent = 'ID: 再登録中...';
+            idEl.style.color = 'inherit';
+            const profile = await liff.getProfile();
+            triggerBackgroundRegistration(profile);
+          } catch(e) {
+            idEl.textContent = 'ID: 登録失敗 (タップして再試行)';
+            idEl.style.color = '#ef4444';
+          }
+        };
+      } else {
+        idEl.textContent = 'ID: ---';
+        idEl.style.color = 'inherit';
+        idEl.style.cursor = 'default';
+        idEl.onclick = null;
+      }
+    }
     if (nameEl) nameEl.textContent = staffName || '---';
 
     // Clear input and feedback message on entry
@@ -1314,30 +1408,7 @@ async function safeInitApp() {
 
           // ④ 初回登録をバックグラウンド(非同期)で実行。通信待ちを排除し1.5秒起動を実現。
           if (!userInfo.id) {
-            logDebug("API START (初回登録・非同期)");
-            callApiPost('registerStaff', { 
-              lastName: profile.displayName, 
-              firstName: "(LINE)",
-              lineUserId: profile.userId
-            }).then(res => {
-              logDebug("API OK (初回登録完了)");
-              if (res && res.success) {
-                const registeredInfo = {
-                  last: profile.displayName,
-                  first: "",
-                  id: res.id,
-                  lineUserId: profile.userId,
-                  picture: profile.pictureUrl
-                };
-                localStorage.setItem('user_info', JSON.stringify(registeredInfo));
-                logDebug("Registered! Staff ID: " + res.id);
-                // ID表示部分をバックグラウンドで動的に更新
-                const idEl = $('storage-register-staff-id');
-                if (idEl) idEl.textContent = 'ID: ' + (res.id || '---');
-              }
-            }).catch(err => {
-              logDebug("Background registration failed: " + err.message);
-            });
+            triggerBackgroundRegistration(profile);
           } else {
             // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
             userInfo.lineUserId = profile.userId;
