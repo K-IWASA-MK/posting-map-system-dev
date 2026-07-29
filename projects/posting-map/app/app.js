@@ -1387,53 +1387,68 @@ async function safeInitApp() {
         
         let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
         
-        // ⑤ getAppDataを並列プリフェッチ開始（profile取得・登録処理と並行）
+        // ⑤ getAppDataを並列プリフェッチ開始
         _appDataPromise = callApi('getAppData');
 
-        try {
-          // ② LINE内部トークン処理安定ディレイ（最適化済み）
-          await new Promise(r => setTimeout(r, 100));
-
-          logDebug("PROFILE START"); // ⑤ profile取得開始
-          const profile = await liff.getProfile();
-          logDebug("PROFILE OK"); // ⑥ profile取得成功
+        // 【通常起動】既にユーザー登録・LINE連携キャッシュがある場合は、同期通信を待たずに即時起動
+        if (userInfo.id && userInfo.lineUserId) {
+          logDebug("Fast startup using cached user info.");
+          const cachedProfile = {
+            displayName: userInfo.last,
+            userId: userInfo.lineUserId,
+            pictureUrl: userInfo.picture || ''
+          };
           
-          // トークン確立が完了したこのタイミングで URL の OAuth パラメータ (?code= 等) を安全に消去する
-          try {
-            const cleanUrl = window.location.origin + window.location.pathname + window.location.search.replace(/[\?&](code|liff\.state)=[^&]*/g, '');
-            window.history.replaceState({}, document.title, cleanUrl);
-            logDebug("OAuth query parameters cleaned from address bar via history.replaceState (Safe Delay)");
-          } catch (e) {
-            console.warn("Failed to clean OAuth query parameters:", e);
-          }
+          // 0.1秒で即時にID表示・メイン画面可視化
+          startApp(cachedProfile);
 
-          setLoadingProgress(65, 'PROFILE LOADED');
-          console.log(profile);
-
-          // ④ 初回登録をバックグラウンド(非同期)で実行。通信待ちを排除し1.5秒起動を実現。
-          if (!userInfo.id) {
-            triggerBackgroundRegistration(profile);
-          } else {
-            // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
+          // バックグラウンドで静かにgetProfileを走らせ、LINE公式の最新データに追従
+          liff.getProfile().then(profile => {
+            logDebug("Background profile refresh OK");
             userInfo.lineUserId = profile.userId;
             userInfo.picture = profile.pictureUrl;
             localStorage.setItem('user_info', JSON.stringify(userInfo));
-            // D列にLINE_USER_IDが未設定の可能性があるためバックグラウンドで更新
-            callApiPost('registerStaff', {
-              lastName: userInfo.last,
-              firstName: userInfo.first || '(LINE)',
-              lineUserId: profile.userId
-            }).catch(() => {});
+            
+            // 最新の名前・アバター写真をIDカードにリアルタイム反映（再描画）
+            if (typeof renderSettings === 'function') {
+              renderSettings();
+            }
+          }).catch(err => {
+            console.warn("Background profile refresh failed:", err);
+          });
+
+        } else {
+          // 【初回ログイン/キャッシュ未確立時】同期的にgetProfileを取得して登録へ進む
+          try {
+            // LINE内部トークン処理完了のための安全ウェイト（300ms）
+            await new Promise(r => setTimeout(r, 300));
+
+            logDebug("PROFILE START");
+            const profile = await liff.getProfile();
+            logDebug("PROFILE OK");
+            
+            // トークン確立後に OAuth パラメータを安全に消去
+            try {
+              const cleanUrl = window.location.origin + window.location.pathname + window.location.search.replace(/[\?&](code|liff\.state)=[^&]*/g, '');
+              window.history.replaceState({}, document.title, cleanUrl);
+              logDebug("OAuth query parameters cleaned from address bar via history.replaceState (Safe Delay)");
+            } catch (e) {
+              console.warn("Failed to clean OAuth query parameters:", e);
+            }
+
+            setLoadingProgress(65, 'PROFILE LOADED');
+            console.log(profile);
+
+            // 初回登録をバックグラウンド(非同期)で実行
+            triggerBackgroundRegistration(profile);
+
+            logDebug("START APP");
+            startApp(profile);
+          } catch (err) {
+            console.error("LIFF PROFILE ERROR", err);
+            logDebug("LIFF PROFILE ERROR: " + err.message);
+            $('loading-status').textContent = "起動エラー: " + err.message;
           }
-
-
-          // ③ 800msディレイ削除
-          logDebug("START APP");
-          startApp(profile);
-        } catch (err) {
-          console.error("LIFF PROFILE ERROR", err);
-          logDebug("LIFF PROFILE ERROR: " + err.message);
-          $('loading-status').textContent = "起動エラー: " + err.message;
         }
       } else {
         // LINEログイン処理中（OAuthコールバックのパラメータがある）なら、手動ログイン画面を出さずに少し待機して再チェックする
