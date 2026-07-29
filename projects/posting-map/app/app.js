@@ -75,8 +75,17 @@ async function callApi(action, params = {}) {
   let delay = 1000;
   
   // LIFFがログイン済みならトークンを自動的に付与
-  if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
-    params.liffToken = liff.getAccessToken();
+  logDebug(`[callApi] Checking LIFF status. typeof liff=${typeof liff}`);
+  if (typeof liff !== 'undefined') {
+    const isLoggedIn = liff.isLoggedIn();
+    const token = liff.getAccessToken();
+    logDebug(`[callApi] isLoggedIn=${isLoggedIn}, tokenLength=${token ? token.length : '0'}`);
+    if (isLoggedIn && token) {
+      params.liffToken = token;
+      logDebug(`[callApi] Token injected: ${token.substring(0, 10)}...`);
+    } else {
+      logDebug(`[callApi] Token injection skipped. isLoggedIn=${isLoggedIn}, hasToken=${!!token}`);
+    }
   }
   
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
