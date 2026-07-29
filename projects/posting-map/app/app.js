@@ -1427,11 +1427,23 @@ async function safeInitApp() {
           $('loading').classList.add('hidden');
         }
       } else {
-        // LINEログイン処理中（OAuthコールバックのパラメータがある）なら、手動ログイン画面を出さずに待機する
+        // LINEログイン処理中（OAuthコールバックのパラメータがある）なら、手動ログイン画面を出さずに少し待機して再チェックする
         const urlParams = new URLSearchParams(window.location.search);
         const isProcessing = urlParams.has('code') || urlParams.has('liff.state');
         if (isProcessing) {
-          logDebug("LINE login is processing in background, skip showing manual gateway.");
+          logDebug("LINE login is processing in background. Retrying login check in 1.5s...");
+          setTimeout(() => {
+            if (liff.isLoggedIn()) {
+              logDebug("Retried Login: OK");
+              safeInitApp(); // 再起動してメインフローへ入る
+            } else {
+              logDebug("Retried Login: FAIL. Showing manual login button as fallback.");
+              if (btn) btn.classList.remove('hidden');
+              if (spinner) spinner.classList.add('hidden');
+              $('gateway-title').textContent = "ログインの確認ができませんでした";
+              if (subtitle) subtitle.textContent = "ボタンを押して手動でログインしてください。";
+            }
+          }, 1500);
           return;
         }
 
