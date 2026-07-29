@@ -239,7 +239,6 @@ async function callApiPost(action, payload = {}) {
 function startApp(profile = null) {
   // 直ちにID画面（settings）に切り替える（スプラッシュ待ち時間 0秒）
   switchPage('settings');
-  $('screen-gateway').classList.add('hidden');
   $('app').classList.remove('hidden');
   
   // 不透明度 0% を解除し、IDカード画面を前面へ可視化する (バグ修正)
