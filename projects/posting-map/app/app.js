@@ -1345,9 +1345,8 @@ async function safeInitApp() {
   // 孤立した ?code=（フラグなし）→ クリーンURLでやり直し（スタック防止）
   if (hasOAuthParams && !isReturningFromLogin) {
       sessionStorage.setItem('liff_initializing', 'true');
-      // リロードを回避し、セッションを維持したまま URL をクリーンアップ
-      const cleanUrl = window.location.origin + window.location.pathname + window.location.search.replace(/[\?&](code|liff\.state)=[^&]*/g, '');
-      window.history.replaceState({}, document.title, cleanUrl);
+      window.location.href = window.location.origin + window.location.pathname;
+      return;
   }
   // ※ フラグはここでは削除しない。ログイン確認成功後（isLoggedIn()=true）に削除する。
   
@@ -1379,6 +1378,15 @@ async function safeInitApp() {
       if (liff.isLoggedIn()) {
         logDebug("LOGIN OK");
         sessionStorage.removeItem('liff_initializing'); // ✅ ログイン確認後にフラグを削除（ここが正しいタイミング）
+        
+        // ログイン成功したこのタイミングで URL の OAuth パラメータ (?code= 等) を完全に消去し、以後のリロード時の誤検知を防ぐ
+        try {
+          const cleanUrl = window.location.origin + window.location.pathname + window.location.search.replace(/[\?&](code|liff\.state)=[^&]*/g, '');
+          window.history.replaceState({}, document.title, cleanUrl);
+          logDebug("OAuth query parameters cleaned from address bar via history.replaceState");
+        } catch (e) {
+          console.warn("Failed to clean OAuth query parameters:", e);
+        }
         
         let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
         
