@@ -381,8 +381,6 @@ async function syncOfflineQueue() {
   if (failedItems.length === 0) {
     console.log('Offline sync completed successfully.');
     setSyncStatus('online');
-    // Refresh main data after sync completes
-    await loadData(true);
   } else {
     console.warn(`${failedItems.length} items failed to sync. Will retry.`);
     setSyncStatus('offline');
@@ -1347,8 +1345,9 @@ async function safeInitApp() {
   // 孤立した ?code=（フラグなし）→ クリーンURLでやり直し（スタック防止）
   if (hasOAuthParams && !isReturningFromLogin) {
       sessionStorage.setItem('liff_initializing', 'true');
-      window.location.href = window.location.origin + window.location.pathname;
-      return;
+      // リロードを回避し、セッションを維持したまま URL をクリーンアップ
+      const cleanUrl = window.location.origin + window.location.pathname + window.location.search.replace(/[\?&](code|liff\.state)=[^&]*/g, '');
+      window.history.replaceState({}, document.title, cleanUrl);
   }
   // ※ フラグはここでは削除しない。ログイン確認成功後（isLoggedIn()=true）に削除する。
   
