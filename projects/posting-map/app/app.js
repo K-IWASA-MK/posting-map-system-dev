@@ -1437,18 +1437,37 @@ async function safeInitApp() {
               logDebug("Retried Login: OK");
               safeInitApp(); // 再起動してメインフローへ入る
             } else {
-              logDebug("Retried Login: FAIL. Redirecting to LINE Login automatically...");
-              sessionStorage.setItem('liff_initializing', 'true');
-              liff.login();
+              logDebug("Retried Login: FAIL. Showing manual login button as fallback.");
+              if (btn) btn.classList.remove('hidden');
+              if (spinner) spinner.classList.add('hidden');
+              $('gateway-title').textContent = "ログインの確認ができませんでした";
+              if (subtitle) subtitle.textContent = "ボタンを押して手動でログインしてください。";
             }
           }, 1500);
           return;
         }
 
-        logDebug("Not logged in. Redirecting to LINE Login automatically...");
-        sessionStorage.setItem('liff_initializing', 'true');
-        liff.login();
-      }
+        logDebug("Not logged in.");
+        if (liff.isInClient()) {
+          logDebug("In LINE client. Redirecting to LINE Login automatically...");
+          sessionStorage.setItem('liff_initializing', 'true');
+          liff.login();
+        } else {
+          logDebug("In external browser. Showing manual login button.");
+          if (btn) {
+            btn.textContent = "LINEでログイン";
+            btn.onclick = () => {
+              logDebug("Manual login button clicked. Redirecting...");
+              sessionStorage.setItem('liff_initializing', 'true');
+              liff.login();
+            };
+            btn.classList.remove('hidden');
+          }
+          if (spinner) spinner.classList.add('hidden');
+          if (subtitle) subtitle.textContent = "ブラウザ環境です。「LINEでログイン」ボタンを押してください。";
+          $('screen-gateway').classList.remove('hidden');
+          $('loading').classList.add('hidden');
+        }
       }
     } catch (err) {
       console.error("LIFF Init Error:", err);
