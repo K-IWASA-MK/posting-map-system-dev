@@ -1,7 +1,7 @@
 /**
- * TaskDispatcher.ts
+ * AgentDispatcher.ts
  * 
- * AIOS Task Dispatcher Foundation
+ * AIOS Agent Dispatcher Foundation
  * 
  * Single official entry point for deterministically assigning optimal AI Employees (Agents)
  * based on TaskContract Role and Capabilities.
@@ -18,7 +18,7 @@ import { AgentRegistry } from './domain/AgentRegistry';
 import { AssignmentResolver } from './domain/AssignmentResolver';
 import { AssignmentContract } from './models/AssignmentModels';
 
-export class TaskDispatcher {
+export class AgentDispatcher {
   /**
    * Deterministically dispatches a TaskContract to the optimal Agent.
    * Pure function, Stateless, Deterministic, Side Effect Free.
@@ -29,7 +29,7 @@ export class TaskDispatcher {
     registry?: AgentRegistry
   ): AssignmentContract {
     if (!contract || !contract.taskId) {
-      throw new Error('[TaskDispatcher] Request rejected: TaskContract must be a valid contract object.');
+      throw new Error('[AgentDispatcher] Request rejected: TaskContract must be a valid contract object.');
     }
 
     const effectiveRegistry = registry || AgentRegistry.createDefaultRegistry();

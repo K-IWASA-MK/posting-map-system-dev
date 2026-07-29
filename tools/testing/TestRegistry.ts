@@ -27,12 +27,23 @@ export const REGISTERED_TESTS: TestAsset[] = [
     enabled: true
   },
   {
-    id: 'task-dispatcher-foundation',
+    id: 'agent-dispatcher-foundation',
     version: 1,
-    name: 'Task Dispatcher Foundation Unit Tests',
-    module: 'tests/unit/typescript/test_task_dispatcher_foundation.ts',
+    name: 'Agent Dispatcher Foundation Unit Tests',
+    module: 'tests/unit/typescript/test_agent_dispatcher_foundation.ts',
     category: 'foundation',
     tags: ['dispatcher', 'assignment-contract', 'capability-match', 'role-resolver'],
+    capabilities: [],
+    timeout: 30000,
+    enabled: true
+  },
+  {
+    id: 'execution-dispatcher-foundation',
+    version: 1,
+    name: 'Execution Dispatcher Foundation Unit Tests',
+    module: 'tests/unit/typescript/test_execution_dispatcher_foundation.ts',
+    category: 'foundation',
+    tags: ['dispatcher', 'routing', 'dispatch-rule', 'dispatch-decision'],
     capabilities: [],
     timeout: 30000,
     enabled: true

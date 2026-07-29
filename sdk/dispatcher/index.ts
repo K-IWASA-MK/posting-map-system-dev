@@ -1,14 +1,15 @@
 /**
  * sdk/dispatcher/index.ts
  * 
- * AIOS Task Dispatcher Foundation Public Exports
+ * AIOS Execution Dispatcher Foundation Public Exports
  */
 
-export * from './models/AgentModels';
-export * from './models/AssignmentModels';
-export * from './domain/AgentRegistry';
-export * from './domain/CapabilityMatcher';
-export * from './domain/RoleResolver';
-export * from './domain/AssignmentFactory';
-export * from './domain/AssignmentResolver';
-export * from './TaskDispatcher';
+export * from './DispatchContext';
+export * from './DispatchDecision';
+export * from './DispatchResult';
+export * from './DispatchRule';
+export * from './ExecutionDispatcher';
+export * from './rules/IntentDispatchRule';
+export * from './rules/LegacyDispatchRule';
+export * from './rules/NativeDispatchRule';
+export * from '../assignment';

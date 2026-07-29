@@ -7,14 +7,11 @@
  */
 
 import { TaskGateway, CEODecisionInput } from '../../../sdk/gateway';
-import {
-  TaskDispatcher,
-  AgentRegistry,
-  AgentProfile,
-  CapabilityType,
-  CapabilityMatcher,
-  RoleResolver
-} from '../../../sdk/dispatcher';
+import { AgentDispatcher } from '../../../sdk/assignment/AgentDispatcher';
+import { AgentRegistry } from '../../../sdk/assignment/domain/AgentRegistry';
+import { AgentProfile, CapabilityType } from '../../../sdk/assignment/models/AgentModels';
+import { CapabilityMatcher } from '../../../sdk/assignment/domain/CapabilityMatcher';
+import { RoleResolver } from '../../../sdk/assignment/domain/RoleResolver';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -76,7 +73,7 @@ async function testMultiAgentComparisonAndOptimalSelection() {
   }).contract;
 
   const defaultRegistry = AgentRegistry.createDefaultRegistry();
-  const assignment = TaskDispatcher.dispatch(taskContract, timestamp, defaultRegistry);
+  const assignment = AgentDispatcher.dispatch(taskContract, timestamp, defaultRegistry);
 
   assert(assignment.taskId === taskContract.taskId, 'Assignment taskId must match contract');
   assert(assignment.selectedAgent !== undefined, 'Selected agent must be populated');
@@ -106,7 +103,7 @@ async function testCustomAgentRegistryInjectionModelAgnostic() {
   });
 
   const customRegistry = new AgentRegistry([customAgent]);
-  const assignment = TaskDispatcher.dispatch(taskContract, timestamp, customRegistry);
+  const assignment = AgentDispatcher.dispatch(taskContract, timestamp, customRegistry);
 
   assert(assignment.selectedAgent.agentId === 'AGENT-CUSTOM-NEXTGEN', 'Dispatcher must select custom injected agent');
   assert(assignment.selectedAgent.provider === 'LocalAI Consortium', 'Provider must match custom injected agent');
@@ -124,7 +121,7 @@ async function testAssignmentContractImmutability() {
     timestamp
   }).contract;
 
-  const assignment = TaskDispatcher.dispatch(taskContract, timestamp);
+  const assignment = AgentDispatcher.dispatch(taskContract, timestamp);
 
   assert(Object.isFrozen(assignment), 'AssignmentContract must be frozen');
   assert(Object.isFrozen(assignment.selectedAgent), 'selectedAgent must be frozen');
@@ -153,8 +150,8 @@ async function testStrictDeterminismAndSideEffectFree() {
 
   const registry = AgentRegistry.createDefaultRegistry();
 
-  const dispatchA = TaskDispatcher.dispatch(taskContract, timestamp, registry);
-  const dispatchB = TaskDispatcher.dispatch(taskContract, timestamp, registry);
+  const dispatchA = AgentDispatcher.dispatch(taskContract, timestamp, registry);
+  const dispatchB = AgentDispatcher.dispatch(taskContract, timestamp, registry);
 
   assert(dispatchA.assignmentId === dispatchB.assignmentId, 'Assignment ID must be identical across calls');
   assert(dispatchA.selectedAgent.agentId === dispatchB.selectedAgent.agentId, 'Selected Agent ID must be identical');
