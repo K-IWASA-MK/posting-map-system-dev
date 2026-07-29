@@ -1336,6 +1336,12 @@ async function saveProfile() {
 }
 
 async function safeInitApp() {
+  // LIFF SDK が内部でトークン交換用に生成する非表示 iframe 内での二重実行（アクセストークン失効）を完全に防止するガード
+  if (window !== window.top) {
+    console.log("[DEBUG] Running inside iframe, skipping safeInitApp.");
+    return;
+  }
+
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
   
@@ -1357,9 +1363,6 @@ async function safeInitApp() {
   const liffId = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.line && window.PMS_CLIENT_CONFIG.line.liffId)
     ? window.PMS_CLIENT_CONFIG.line.liffId
     : (window.location.hostname === 'area-management.github.io' ? "2010374196-gIYb6PDH" : "2010374196-gIYb6PDH");
-  const btn = $('btn-login-manual');
-  const spinner = $('login-spinner');
-  const subtitle = $('gateway-subtitle');
   
   if (typeof liff !== 'undefined') {
     try {
@@ -1430,12 +1433,7 @@ async function safeInitApp() {
         } catch (err) {
           console.error("LIFF PROFILE ERROR", err);
           logDebug("LIFF PROFILE ERROR: " + err.message);
-          if (btn) btn.classList.remove('hidden');
-          if (spinner) spinner.classList.add('hidden');
-          $('gateway-title').textContent = "自動ログインに失敗しました";
-          if (subtitle) subtitle.textContent = "手動で起動してください。";
-          $('screen-gateway').classList.remove('hidden');
-          $('loading').classList.add('hidden');
+          $('loading-status').textContent = "起動エラー: " + err.message;
         }
       } else {
         // LINEログイン処理中（OAuthコールバックのパラメータがある）なら、手動ログイン画面を出さずに少し待機して再チェックする
@@ -1448,11 +1446,9 @@ async function safeInitApp() {
               logDebug("Retried Login: OK");
               safeInitApp(); // 再起動してメインフローへ入る
             } else {
-              logDebug("Retried Login: FAIL. Showing manual login button as fallback.");
-              if (btn) btn.classList.remove('hidden');
-              if (spinner) spinner.classList.add('hidden');
-              $('gateway-title').textContent = "ログインの確認ができませんでした";
-              if (subtitle) subtitle.textContent = "ボタンを押して手動でログインしてください。";
+              logDebug("Retried Login: FAIL. Redirecting to LINE Login automatically...");
+              sessionStorage.setItem('liff_initializing', 'true');
+              liff.login();
             }
           }, 1500);
           return;
@@ -1465,21 +1461,11 @@ async function safeInitApp() {
     } catch (err) {
       console.error("LIFF Init Error:", err);
       logDebug("LIFF Error: " + err.message);
-      if (btn) btn.classList.remove('hidden');
-      if (spinner) spinner.classList.add('hidden');
-      $('gateway-title').textContent = "自動ログインに失敗しました";
-      if (subtitle) subtitle.textContent = "手動で起動してください。";
-      $('screen-gateway').classList.remove('hidden');
-      $('loading').classList.add('hidden');
+      $('loading-status').textContent = "起動エラー: " + err.message;
     }
   } else {
-    logDebug("Running in standalone web browser. Showing manual launch button.");
-    if (btn) btn.classList.remove('hidden');
-    if (spinner) spinner.classList.add('hidden');
-    $('gateway-title').textContent = "ブラウザ起動";
-    if (subtitle) subtitle.textContent = "手動で起動します。";
-    $('screen-gateway').classList.remove('hidden');
-    $('loading').classList.add('hidden');
+    logDebug("Running in standalone web browser. Blocked.");
+    $('loading-status').textContent = "エラー: LINEアプリ内から起動してください。";
   }
 }
 

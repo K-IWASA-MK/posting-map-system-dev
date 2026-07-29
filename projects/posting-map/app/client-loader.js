@@ -8,6 +8,11 @@
     return;
   }
 
+  // iframe内での二重ロードを完全に防止
+  if (window !== window.top) {
+    return;
+  }
+
   // 1. Resolve client from Query Parameter
   const urlParams = new URLSearchParams(window.location.search);
   let client = urlParams.get('client');
