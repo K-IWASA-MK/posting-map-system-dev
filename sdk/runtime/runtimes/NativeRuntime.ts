@@ -29,6 +29,7 @@ export class NativeRuntime implements RuntimeExecutor {
 
       const completedAt = new Date().toISOString();
       return Object.freeze({
+        taskId: context.taskId,
         executionId: context.executionId,
         status: 'SUCCESS',
         startedAt,
@@ -39,6 +40,7 @@ export class NativeRuntime implements RuntimeExecutor {
     } catch (err: any) {
       const completedAt = new Date().toISOString();
       return Object.freeze({
+        taskId: context.taskId,
         executionId: context.executionId,
         status: 'FAILURE',
         startedAt,

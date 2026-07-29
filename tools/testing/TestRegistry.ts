@@ -60,6 +60,17 @@ export const REGISTERED_TESTS: TestAsset[] = [
     enabled: true
   },
   {
+    id: 'execution-result-adapter-foundation',
+    version: 1,
+    name: 'Execution Result Adapter Foundation Unit Tests',
+    module: 'tests/unit/typescript/test_execution_result_adapter_foundation.ts',
+    category: 'foundation',
+    tags: ['adapter', 'result', 'normalization', 'contract'],
+    capabilities: [],
+    timeout: 30000,
+    enabled: true
+  },
+  {
     id: 'task-lifecycle-foundation',
     version: 1,
     name: 'Task Lifecycle Foundation Unit Tests',

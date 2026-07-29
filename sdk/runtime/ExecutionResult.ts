@@ -5,6 +5,7 @@
  * All Runtimes must return this exact shape wrapped in a Promise.
  */
 export interface ExecutionResult {
+  readonly taskId: string;
   readonly executionId: string;
   readonly status: 'SUCCESS' | 'FAILURE' | 'PENDING';
   readonly startedAt: string;

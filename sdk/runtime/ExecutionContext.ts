@@ -8,6 +8,7 @@ import { TaskContract } from '../gateway/models/TaskContractModels';
  * Contains only the information necessary for a Runtime to execute.
  */
 export interface ExecutionContext {
+  readonly taskId: string;
   readonly executionId: string;
   readonly correlationId: string;
   readonly decision: DispatchDecision;
@@ -23,8 +24,9 @@ export class ExecutionContextFactory {
     metadata: Record<string, any> = {}
   ): ExecutionContext {
     return Object.freeze({
+      taskId: contract.taskId,
       executionId: `EXEC-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-      correlationId: contract.taskId,
+      correlationId: `CORR-${contract.taskId}-${Date.now()}`,
       decision: Object.freeze({ ...decision }),
       contract: Object.freeze({ ...contract }),
       metadata: Object.freeze({ ...metadata }),
