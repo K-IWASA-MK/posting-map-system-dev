@@ -1,0 +1,29 @@
+{
+  "color": {
+    "primary": "#00B7FF",
+    "success": "#22C55E",
+    "warning": "#F59E0B",
+    "danger": "#EF4444",
+    "text": {
+      "main": "#FFFFFF",
+      "muted": "rgba(255, 255, 255, 0.4)"
+    },
+    "backdrop": "rgba(28, 28, 30, 0.8)"
+  },
+  "spacing": {
+    "space-4": "4px",
+    "space-8": "8px",
+    "space-16": "16px",
+    "space-24": "24px",
+    "space-32": "32px"
+  },
+  "radius": {
+    "card": "24px",
+    "btn": "16px"
+  },
+  "elevation": {
+    "blur": "20px",
+    "border": "1px solid rgba(255, 255, 255, 0.08)",
+    "shadow": "0 8px 32px 0 rgba(0, 0, 0, 0.37)"
+  }
+}

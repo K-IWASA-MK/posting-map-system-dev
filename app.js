@@ -1113,27 +1113,10 @@ async function switchPage(id, force = false) {
   
 
   // 下ナビのタブのアクティブ状態の不透明度とカラーを調整
-  document.querySelectorAll('.nav-btn').forEach((b) => { 
-    const pageAttr = b.getAttribute('data-page');
-    let isActive = false;
-    if (pageAttr === 'areas' && (id === 'areas' || id === 'detail')) isActive = true;
-    else if (pageAttr === id) isActive = true;
-
-    b.style.opacity = '';
-    if (isActive) {
-      b.classList.remove('opacity-40');
-    } else {
-      b.classList.add('opacity-40');
-    }
-    const label = b.querySelector('span');
-    if (label) {
-      if (isActive) {
-        label.className = 'text-[10px] font-black uppercase tracking-widest text-white';
-      } else {
-        label.className = 'text-[10px] font-black uppercase tracking-widest text-white/40';
-      }
-    }
-  });
+  const navContainer = $('bottom-nav');
+  if (navContainer && typeof renderBottomNavigation === 'function') {
+    navContainer.innerHTML = renderBottomNavigation(id);
+  }
 
   // スクロール位置の復元
   if (id === 'areas' && window.currentCityDetailAreaName) {
@@ -1160,17 +1143,11 @@ window.toggleNavTier = function(tier) {
     if (activePage) {
       _prevPageBeforeTier2 = pageIdMap[activePage.id] || 'areas';
     }
-    $('nav-tier-1').classList.add('hidden');
-    $('nav-tier-2').classList.remove('hidden');
     switchPage('storage-list');
-  } else {
-    $('nav-tier-2').classList.add('hidden');
-    $('nav-tier-1').classList.remove('hidden');
   }
 };
 
 window.backToTier1 = function() {
-  toggleNavTier(1);
   // 次へを押す前にいたページへ戻る
   if (_prevPageBeforeTier2 === 'ranking') {
     switchPage('ranking');
@@ -1344,7 +1321,11 @@ async function saveProfile() {
     logDebug(`saveProfile: API result: ${JSON.stringify(res)}`);
     if (res && res.success) {
       logDebug("saveProfile: success! storing user_info to localStorage");
-      localStorage.setItem('user_info', JSON.stringify({last, first, id: res.id}));
+      const existing = JSON.parse(localStorage.getItem('user_info')) || {};
+      const updated = Object.assign({}, existing, { last, first });
+      if (res.id) updated.id = res.id;
+      localStorage.setItem('user_info', JSON.stringify(updated));
+      window.isEditingProfile = false;
       logDebug("saveProfile: switching to settings page");
       switchPage('settings', true);
       $('loading').classList.add('opacity-0');

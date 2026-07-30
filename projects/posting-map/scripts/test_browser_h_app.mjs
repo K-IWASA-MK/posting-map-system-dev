@@ -50,6 +50,30 @@ async function runTest(url, label) {
   });
 
   const page = await browser.newPage();
+
+  // Mock window.liff and set mock user_info in localStorage to bypass login
+  await page.evaluateOnNewDocument(() => {
+    window.liff = {
+      init: () => Promise.resolve(),
+      isLoggedIn: () => true,
+      getAccessToken: () => 'stub-access-token',
+      getIDToken: () => 'stub-id-token',
+      getOS: () => 'web',
+      getProfile: () => Promise.resolve({
+        userId: 'U_IWASA_CEO_OFFICIAL',
+        displayName: 'テスト配布員',
+        pictureUrl: ''
+      })
+    };
+    localStorage.setItem('user_info', JSON.stringify({
+      id: 'STAFF123',
+      last: 'テスト',
+      first: '配布員',
+      picture: '',
+      registrationDate: '2025/07/01'
+    }));
+  });
+
   const consoleErrors = [];
   const failedRequests = [];
   const networkCalls = [];
@@ -100,7 +124,7 @@ async function runTest(url, label) {
     stepResults.lineLogin = true;
 
     // Wait for App shell
-    await page.waitForSelector('#app-shell', { timeout: 10000 });
+    await page.waitForSelector('#app', { timeout: 10000 });
     await new Promise(r => setTimeout(r, 2000));
 
     // Switch to Area Tab

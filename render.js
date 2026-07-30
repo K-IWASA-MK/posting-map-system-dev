@@ -70,40 +70,7 @@ function renderAreas() {
       </div>
     `;
 
-    const cityCardsHtml = cities.map(c => {
-      const pctColorClass = 'text-[#2563eb]';
-      const isCompleted = c.done === c.total && c.total > 0;
-      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 12px;" class="select-none text-[9px] font-sans">🔒 VERIFIED</span>' : '';
-      const rightLabel = isCompleted ? '<span style="margin-left: 12px;" class="font-sans text-[9px] opacity-90">🔒 VERIFIED</span>' : '';
-
-      // 市名の文字数に応じてフォントサイズを自動調整（折り返し・はみ出し防止）
-      let fontSizeClass = 'text-lg';
-      if (c.name.length > 12) {
-        fontSizeClass = 'text-xs';
-      } else if (c.name.length > 8) {
-        fontSizeClass = 'text-sm';
-      } else if (c.name.length > 5) {
-        fontSizeClass = 'text-base';
-      }
-
-      return `
-      <div class="clickable-card premium-glass py-5 px-6 flex flex-col items-center text-center gap-1.5" onclick="selectCity('${c.name}')">
-        <div class="w-full flex justify-center mb-1">
-          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);" class="inline-flex items-center justify-center h-7 px-3 ${fontSizeClass} font-black text-white rounded-full tracking-tight">
-            <span class="text-xs mr-1 select-none">🏢</span>
-            <span>${c.name}</span>
-          </div>
-        </div>
-        <div class="text-sm ${pctColorClass}">${c.progress}%</div>
-        <div class="flex items-center justify-center w-full">
-          ${leftDummy}
-          <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
-            ${c.done}/ ${c.total}
-          </div>
-          ${rightLabel}
-        </div>
-      </div>`;
-    }).join('');
+    const cityCardsHtml = cities.map(c => renderCityListItem(c)).join('');
 
     // 1層目の最下部にスムーズスクロールで上部に戻る「↑ トップに戻る」ボタンを追加
     const bottomTopButtonHtml = `
@@ -123,98 +90,7 @@ function renderAreas() {
       </div>
     `;
 
-    const areaCardsHtml = filteredAreas.map(s => {
-      const pctColorClass = 'text-[#2563eb]';
-      const isCompleted = s.done === s.total && s.total > 0;
-      const leftDummy = isCompleted ? '<span style="visibility: hidden; margin-right: 8px; white-space: nowrap;" class="select-none text-xs font-sans">🔒</span>' : '';
-      const rightLabel = isCompleted ? '<span style="margin-left: 8px; white-space: nowrap;" class="font-sans text-xs opacity-90">🔒</span>' : '';
-      
-      // A2の代表住所を郵便番号と住所に分離して解析
-      let zipCode = '';
-      let cleanAddress = s.name;
-      
-      if (s.repAddress) {
-        const match = s.repAddress.match(/^〒(\d{3}-\d{4})\s*([\s\S]*)$/);
-        if (match) {
-          zipCode = match[1];
-          cleanAddress = match[2].trim().replace(/\r?\n/g, ' ');
-        } else {
-          cleanAddress = s.repAddress.replace(/\r?\n/g, ' ');
-        }
-      }
-
-      // 郵便番号バッジHTML（郵便番号が存在する場合のみ生成）
-      const zipBadgeHtml = zipCode 
-        ? `<div style="text-indent: 0.12em; letter-spacing: 0.12em; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2);" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono rounded-full mb-1">📮 〒${zipCode}</div>`
-        : '';
-
-      // 住所の文字数に応じてフォントサイズを自動調整（折り返し・はみ出し防止）
-      let fontSizeClass = 'text-base';
-      if (cleanAddress.length > 12) {
-        fontSizeClass = 'text-xs'; // 12文字超は小さめ (12px)
-      } else if (cleanAddress.length > 8) {
-        fontSizeClass = 'text-sm';  // 8〜12文字は中くらい (14px)
-      }
-
-      const mapUrl = zipCode
-        ? `https://www.google.com/maps/search/?api=1&query=${zipCode}`
-        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanAddress + ' 日本')}`;
-
-      const googleMapsButtonHtml = isCompleted
-        ? `
-          <a style="background: rgba(37,99,235,0.02); border: 1px solid rgba(37,99,235,0.1); color: rgba(37,99,235,0.3); pointer-events: none; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;"
-            class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none opacity-40">
-            📮 〒${zipCode || '---'} → 🗺
-          </a>
-        `
-        : `
-          <a href="${mapUrl}" target="_blank"
-            style="background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.25); color: rgba(37,99,235,0.88); transition: transform 75ms ease-out; white-space: nowrap; font-family: monospace; display: inline-flex; align-items: center; justify-content: center;"
-            onpointerdown="this.style.transform='scale(0.94)'"
-            onpointerup="this.style.transform=''"
-            onpointerleave="this.style.transform=''"
-            class="h-7 px-4 rounded-full text-[10px] font-black tracking-widest select-none">
-            📮 〒${zipCode || '---'} → 🗺
-          </a>
-        `;
-
-      const actionButtonHtml = isCompleted
-        ? `
-          <button style="background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.15); color: rgba(255,255,255,0.3); pointer-events: none;"
-            class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none opacity-40">
-            配布詳細へ →
-          </button>
-        `
-        : `
-          <button ontouchstart="" onclick="openDetail('${s.name}')"
-            style="background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); color: #fff; transition: transform 75ms ease-out; white-space: nowrap;"
-            onpointerdown="this.style.transform='scale(0.96)'"
-            onpointerup="this.style.transform=''"
-            onpointerleave="this.style.transform=''"
-            class="h-9 px-5 rounded-xl text-xs font-black tracking-wide select-none">
-            配布詳細へ →
-          </button>
-        `;
-
-      return `
-      <div id="area-card-${s.name}" class="premium-glass py-5 px-6 flex items-center justify-center">
-        <div style="display: inline-flex; flex-direction: column; align-items: stretch; gap: 8px; text-align: center;">
-          ${googleMapsButtonHtml}
-          <div class="${fontSizeClass} font-black text-white tracking-tight leading-snug" style="text-wrap: balance; padding: 4px 0;">
-            ${cleanAddress}
-          </div>
-          <div class="text-sm ${pctColorClass}">${s.progress}%</div>
-          <div class="flex items-center justify-center">
-            ${leftDummy}
-            <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e; white-space: nowrap; flex-shrink: 0;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wider font-mono">
-              ${s.done || 0}/ ${s.total || 0}
-            </div>
-            ${rightLabel}
-          </div>
-          ${actionButtonHtml}
-        </div>
-      </div>`;
-    }).join('');
+    const areaCardsHtml = filteredAreas.map(s => renderAreaListItem(s)).join('');
 
     // 2層目の最下部ナビゲーション（戻る ‹ / ↑ トップに戻る）
     const bottomNavHtml = filteredAreas.length > 3 ? `
@@ -479,51 +355,7 @@ function renderDetailModalContent(p) {
 // Render the entire details list using global allPoints (1-line simple card)
 function renderDetailList(areaName) {
   const cardsHtml = allPoints.map((p, i) => {
-    const statusDot   = p.isDone 
-      ? 'background-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.6);' 
-      : 'background-color: rgba(255, 255, 255, 0.2);';
-    const statusText  = p.isDone ? '🔒 完了' : '未完了';
-    const statusColor = p.isDone ? 'color: #2563eb;' : 'color: rgba(255, 255, 255, 0.4);';
-
-    // 同期バッジ (要件8: PENDING↓SYNCING↓COMPLETE / RETRYING...)
-    const _s = p.syncStatus;
-    const syncBadge = (() => {
-      if (!_s) return '';
-      if (_s === 'SYNCING'  || _s === 'sending') return ` <span style="color:#2563eb;font-size:7px;font-weight:900;letter-spacing:0.1em">●</span>`;
-      if (_s === 'RETRY'    || _s === 'failed')  return ` <span style="color:#ef4444;font-size:7px;font-weight:900;letter-spacing:0.08em">RETRY</span>`;
-      if (_s === 'PENDING'  || _s === 'pending') return ` <span style="color:#f59e0b;font-size:7px;font-weight:900;letter-spacing:0.08em">⋯</span>`;
-      return '';
-    })();
-
-    // 3行目：配布員名（グリーンのバッジ枠で囲み、自然に中央揃えに）
-    const nameLineHtml = p.isDone && p.staffName
-      ? `
-        <div class="w-full flex justify-center mt-0.5">
-          <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); height: 22px; font-size: 10px; color: #10b981;" class="inline-flex items-center justify-center h-[22px] px-2.5 text-[10px] font-bold text-[#10b981] rounded-full tracking-wider">
-            ${p.staffName}
-          </div>
-        </div>`
-      : '';
-
-    // 完了済みカードはタップ無効（ロック状態）
-    const onclickAttr = p.isDone ? '' : `onclick="openPointDetailModal(${p.rowId})"`;
-    const cardClass = p.isDone
-      ? "premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center"
-      : "clickable-card premium-glass p-5 flex flex-col items-center justify-center gap-2 text-center";
-
-    return `
-      <div class="${cardClass}" ${onclickAttr}>
-        <div class="w-full flex justify-center">
-          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); height: 26px; font-size: 12px; color: rgba(255, 255, 255, 0.9);" class="inline-flex items-center justify-center px-3 font-bold rounded-full tracking-wide truncate max-w-full">
-            🏠 ${getCleanAddress(p.address)}
-          </div>
-        </div>
-        <div style="${statusColor}" class="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 w-full">
-          <span style="${statusDot}" class="w-1.5 h-1.5 rounded-full inline-block"></span>
-          <span>${statusText} ${p.isDone && p.count ? `· ${p.count}枚` : ''}${syncBadge}</span>
-        </div>
-        ${nameLineHtml}
-      </div>`;
+    return renderPointCard(p);
   }).join('');
 
   // 同一市区町村内の隣接エリアへの切り替えナビゲーションを追加
@@ -562,6 +394,9 @@ function navigateToSiblingArea(direction) {
 }
 
 async function openDetail(name) {
+  // openDetail() で開かれたエリアを localStorage の assigned_area に自動記録
+  localStorage.setItem('assigned_area', name);
+
   // 1. 同一エリアへの再タップ: メモリキャッシュを使って即時描画
   if (window.currentCityDetailAreaName === name && allPoints && allPoints.length > 0) {
     if (typeof scrollPositions !== 'undefined') scrollPositions['detail'] = 0;
@@ -687,10 +522,6 @@ function renderSettings() {
   const container = $('settings-content');
   
   if (!userInfo) {
-    // LINE認証移行に伴う表示制御 (手動登録画面のバイパス ＆ 状態監視)
-    // [CANDIDATE FOR REMOVAL]
-    // Legacy manual registration.
-    // Not executed in normal LINE authentication flow.
     if (window.registrationError) {
       container.innerHTML = `
         <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
@@ -711,7 +542,6 @@ function renderSettings() {
       return;
     }
 
-    // デフォルト、または登録処理中はローディングスピナーを表示
     container.innerHTML = `
       <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
         <div class="mb-8 text-center">
@@ -726,92 +556,99 @@ function renderSettings() {
       </div>
     `;
     return;
+  }
 
-    // Card 1: Registration (Absolute alignment with Splash Model)
+  // If editing mode is active
+  if (window.isEditingProfile) {
     container.innerHTML = `
       <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
         <div class="mb-8 text-center">
-          <p class="text-sm text-white/70 leading-relaxed">
-            <span class="font-black">お名前を登録して</span><br>
-            <span class="font-medium">ください</span>
+          <p class="text-sm text-white/70 leading-relaxed font-bold">
+            名前を編集してください
           </p>
         </div>
         <div class="w-full premium-glass p-8 space-y-8 text-left">
           <div class="space-y-4">
             <div>
-              <label style="color: rgba(255,255,255,0.72);" class="text-[11px] font-black uppercase tracking-[0.2em] mb-2 block text-center">名前</label>
-              <input type="text" id="user-last" style="background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.15); color: #000000;" class="w-full rounded-2xl py-6 px-7 text-lg font-black text-left outline-none focus:border-[#2563eb] transition-all shadow-xl placeholder-gray-400" placeholder="例：鈴木一郎">
+              <label style="color: rgba(255,255,255,0.72);" class="text-[11px] font-black uppercase tracking-[0.2em] mb-2 block text-center">苗字</label>
+              <input type="text" id="user-last" value="${userInfo.last || ''}" style="background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.15); color: #000000;" class="w-full rounded-2xl py-6 px-7 text-lg font-black text-left outline-none focus:border-[#2563eb] transition-all shadow-xl placeholder-gray-400" placeholder="例：鈴木">
             </div>
             <div>
-              <label style="color: rgba(255,255,255,0.72);" class="text-[11px] font-black uppercase tracking-[0.2em] mb-2 block text-center">アプリ名</label>
-              <input type="text" id="user-first" style="background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.15); color: #000000;" class="w-full rounded-2xl py-6 px-7 text-lg font-black text-left outline-none focus:border-[#2563eb] transition-all shadow-xl placeholder-gray-400" placeholder="例：すずき（LINE）">
+              <label style="color: rgba(255,255,255,0.72);" class="text-[11px] font-black uppercase tracking-[0.2em] mb-2 block text-center">名前</label>
+              <input type="text" id="user-first" value="${userInfo.first || ''}" style="background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.15); color: #000000;" class="w-full rounded-2xl py-6 px-7 text-lg font-black text-left outline-none focus:border-[#2563eb] transition-all shadow-xl placeholder-gray-400" placeholder="例：一郎">
             </div>
           </div>
           
-          <div class="pt-2">
-            <button onclick="saveProfile()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl transition-all">登録を完了する</button>
+          <div class="pt-2 flex gap-4">
+            <button onclick="window.cancelEditingProfile()" class="w-1/2 bg-white/5 border border-white/10 text-white rounded-2xl py-4 text-base font-bold shadow-xl transition-all">キャンセル</button>
+            <button onclick="saveProfile()" class="w-1/2 bg-[#00B7FF] text-white rounded-2xl py-4 text-base font-black shadow-xl transition-all">保存する</button>
           </div>
         </div>
       </div>
     `;
-  } else {
-    // Card 2: Distributor ID Card (Standardized to Splash Model)
-    const avatarHtml = userInfo.picture ? `
-      <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl mb-4 relative z-10">
-        <img src="${userInfo.picture}" class="w-full h-full object-cover">
-      </div>
-    ` : `
-      <div class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4 relative z-10">
-        <span class="text-3xl text-white/40">👤</span>
-      </div>
-    `;
-
-    const formattedId = userInfo.id ? userInfo.id.replace(/^[A-Za-z]+/, 'STAFF ID ') : '';
-    const rawBranch = localStorage.getItem('branch_name') || '';
-    const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : '';
-
-    container.innerHTML = `
-      <div class="pt-2 pb-0 px-4 flex flex-col items-center">
-        <div class="mb-6 flex items-center justify-center gap-3">
-          <span class="text-xs font-bold text-white/50 tracking-wider">公式配布員</span>
-          ${formattedId ? `<span style="letter-spacing: 0.15em; text-indent: 0.15em; background: linear-gradient(180deg, rgba(37,99,235,0.16), rgba(37,99,235,0.06)); border: 1px solid rgba(37,99,235,0.3); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 0 6px rgba(37,99,235,0.35), 0 0 12px rgba(37,99,235,0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);" class="inline-flex items-center justify-center h-6 px-3 text-[10px] font-black text-[#2563eb] font-mono rounded-full">${formattedId}</span>` : ''}
-        </div>
-        
-        <div id="id-gyro-card" style="height: 300px; --glow-x: 0px; --glow-y: 0px; --glow-opacity: 0.08; --edge-opacity: 0.08; --edge-angle: 180deg;" class="w-full max-w-sm gyro-card flex flex-col items-center p-6 relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-white/0 pointer-events-none rounded-[28px]"></div>
-          
-          <!-- 1. 最上部 (🟢AUTHを本当に少しだけ下へ微調整) -->
-          <div style="margin-top: 18px;" class="inline-flex items-center gap-2 z-10">
-            <span class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]"></span>
-            <span class="text-[8px] font-black text-[#22c55e] uppercase tracking-[0.3em]">Authorized Staff</span>
-          </div>
-          
-          <!-- 2. 中央アバターと名前 (絶対配置で縦横完全センター化、元のサイズをキープ) -->
-          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" class="flex flex-col items-center z-10 w-full max-w-[280px]">
-            ${avatarHtml}
-            <div style="font-size: 28px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.1;" class="flex flex-col items-center w-full">
-              <div class="truncate w-full">${userInfo.last}</div>
-              <div class="text-xs text-white/40 font-medium mt-1 truncate w-full">${userInfo.first || ''}</div>
-            </div>
-          </div>
-          
-          <!-- 3. 最下部 (底面から12px固定、上の2行をさらに1行分上にシフトしてバランス調整) -->
-          <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); width: 100%;" class="flex flex-col items-center gap-0.5 z-10">
-            ${displayBranch ? `<p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">${displayBranch}</p>` : ''}
-            <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">Field Operations</p>
-            <p style="margin-top: 12px;" class="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] select-none">
-              <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('terms', event)">Terms</span>
-              &nbsp;&nbsp;
-              <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('privacy', event)">Privacy</span>
-              &nbsp;&nbsp;
-              <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('license', event)">License</span>
-            </p>
-          </div>
-        </div>
-      </div>
-    `;
+    return;
   }
+
+  // Normal view mode: Show ID card + assigned area shortcut + edit name button
+  const rawBranch = localStorage.getItem('branch_name') || '';
+  const displayBranch = rawBranch ? (rawBranch.includes('支部') ? rawBranch : `${rawBranch} 支部`) : 'MIE-03 支部';
+  
+  // Format sync time
+  const lastSyncTime = localStorage.getItem('__last_sync_time__') || '--:--';
+  const regDate = userInfo.registrationDate || '2025/07/01';
+
+  // Find assigned area info
+  let assignedAreaData = null;
+  const assignedAreaName = localStorage.getItem('assigned_area');
+  if (assignedAreaName && areaSummary) {
+    assignedAreaData = areaSummary.find(s => s.name === assignedAreaName);
+  }
+
+  const staffCardHtml = renderStaffCard(userInfo, {
+    branchName: displayBranch,
+    lastSyncTime: lastSyncTime,
+    registrationDate: regDate
+  });
+
+  const areaCardHtml = assignedAreaData ? renderAreaCard(assignedAreaData) : '';
+
+  container.innerHTML = `
+    <div class="space-y-6 flex flex-col items-center">
+      <div class="w-full">${staffCardHtml}</div>
+      ${areaCardHtml ? `<div class="w-full flex justify-center">${areaCardHtml}</div>` : ''}
+      
+      <div class="w-full max-w-sm px-4 pt-4 space-y-4">
+        <button onclick="window.startEditingProfile()" class="w-full h-12 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-bold hover:bg-white/10 transition-colors">
+          👤 プロフィール名前編集
+        </button>
+        <p class="text-center text-[10px] text-white/30 uppercase tracking-widest leading-none select-none">
+          <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('terms', event)">Terms</span>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('privacy', event)">Privacy</span>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('license', event)">License</span>
+        </p>
+      </div>
+    </div>
+  `;
 }
+
+// Publish helper functions to window
+window.startEditingProfile = function() {
+  window.isEditingProfile = true;
+  renderSettings();
+};
+window.cancelEditingProfile = function() {
+  window.isEditingProfile = false;
+  renderSettings();
+};
+
+window.switchToAssignedArea = function() {
+  const assignedAreaName = localStorage.getItem('assigned_area');
+  if (assignedAreaName) {
+    openDetail(assignedAreaName);
+  }
+};
 
 function renderRanking() {
   const container = $('ranking-list');
@@ -834,35 +671,8 @@ function renderRanking() {
   // APIから取得した実データを優先的に使用
   const displayRanking = (typeof rankingData !== 'undefined' && rankingData) ? rankingData : [];
 
-  let myRank = -1;
-  let myCount = 0;
-  if (myName) {
-    const idx = displayRanking.findIndex(r => r.name === myName);
-    if (idx !== -1) {
-      myRank = idx + 1;
-      myCount = displayRanking[idx].count;
-    } else {
-      myRank = "圏外";
-      myCount = 0;
-    }
-  }
-
-  // 1. 本人のステータスカード（ID登録されている場合のみ表示）
-  const myStatusCardHtml = myName ? `
-    <div class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 mb-6">
-      <div class="text-[9px] font-black text-[#22c55e] uppercase tracking-[0.2em]">My Performance</div>
-      <div class="text-lg font-black text-white tracking-tight">${myName}</div>
-      <div class="flex items-center justify-center mt-0.5">
-        <div style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); height: 22px; font-size: 10px; color: #22c55e;" class="inline-flex items-center justify-center px-2.5 font-bold rounded-full tracking-wide">
-          現在までの配布数 : ${myCount.toLocaleString()}枚
-        </div>
-      </div>
-    </div>
-  ` : '';
-
-  // 2. ランキングリストが空の場合の美麗プレースホルダー
   if (displayRanking.length === 0) {
-    container.innerHTML = headerCardHtml + myStatusCardHtml + `
+    container.innerHTML = headerCardHtml + `
       <div style="border: 1px solid rgba(255, 255, 255, 0.04);" class="premium-glass p-8 flex flex-col items-center justify-center text-center gap-3">
         <span class="text-3xl">🏆</span>
         <div class="text-sm font-black text-white/80">まだ配布ランキングがありません</div>
@@ -875,63 +685,8 @@ function renderRanking() {
     return;
   }
 
-  // 3. ランキング項目のレンダリング
-  const itemsHtml = displayRanking.map((r, index) => {
-    const rank = index + 1;
-    const isMe = myName && r.name === myName;
-    
-    let cardStyle = '';
-    let rankBadgeClass = '';
-    let glowDotHtml = '';
-
-    if (rank === 1) {
-      cardStyle = 'border: 1px solid rgba(250, 204, 21, 0.35); box-shadow: inset 0 0 15px rgba(250, 204, 21, 0.08), 0 0 25px rgba(250, 204, 21, 0.12);';
-      rankBadgeClass = 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20';
-      glowDotHtml = '<span style="position:absolute;left:10px;" class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse shadow-[0_0_8px_#eab308]"></span>';
-    } else if (rank === 2) {
-      cardStyle = 'border: 1px solid rgba(226, 232, 240, 0.3); box-shadow: inset 0 0 12px rgba(226, 232, 240, 0.06), 0 0 20px rgba(226, 232, 240, 0.08);';
-      rankBadgeClass = 'bg-slate-300/10 text-slate-300 border border-slate-300/20';
-      glowDotHtml = '<span style="position:absolute;left:10px;" class="w-1.5 h-1.5 rounded-full bg-slate-300 shadow-[0_0_6px_#cbd5e1]"></span>';
-    } else if (rank === 3) {
-      cardStyle = 'border: 1px solid rgba(217, 119, 6, 0.3); box-shadow: inset 0 0 12px rgba(217, 119, 6, 0.06), 0 0 20px rgba(217, 119, 6, 0.08);';
-      rankBadgeClass = 'bg-amber-600/10 text-amber-500 border border-amber-600/20';
-      glowDotHtml = '<span style="position:absolute;left:10px;" class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_6px_#f59e0b]"></span>';
-    } else {
-      cardStyle = isMe 
-        ? 'border: 1px solid rgba(37, 99, 235, 0.4); box-shadow: inset 0 0 12px rgba(37, 99, 235, 0.1), 0 0 20px rgba(37, 99, 235, 0.15);' 
-        : 'border: 1px solid rgba(255, 255, 255, 0.04);';
-      rankBadgeClass = isMe 
-        ? 'bg-[#2563eb]/20 text-[#2563eb] border border-[#2563eb]/30' 
-        : 'bg-white/5 text-white/50 border border-white/5';
-      glowDotHtml = isMe 
-        ? '<span style="position:absolute;left:10px;" class="w-1.5 h-1.5 rounded-full bg-[#2563eb] animate-pulse shadow-[0_0_8px_#2563eb]"></span>' 
-        : '';
-    }
-
-    return `
-      <div style="${cardStyle}" class="premium-glass py-5 px-6 flex flex-col items-center justify-center text-center gap-2 transition-all">
-        <!-- 1行目: 順位バッジ -->
-        <div class="flex items-center justify-center">
-          <div style="min-width: 76px; position: relative;" class="h-7 px-3.5 rounded-full flex items-center justify-center font-mono font-black text-[11px] ${rankBadgeClass}">
-            ${glowDotHtml}
-            <span>${rank}位</span>
-          </div>
-        </div>
-        
-        <!-- 2行目: 配布員名 -->
-        <div class="text-sm font-black text-white tracking-tight">
-          ${r.name}
-        </div>
-        
-        <!-- 3行目: 配布枚数 -->
-        <div class="text-lg font-black text-white tracking-tight">
-          ${r.count.toLocaleString()}<span class="text-[10px] font-bold text-white/40 ml-1">枚</span>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  container.innerHTML = headerCardHtml + myStatusCardHtml + `<div class="space-y-4">${itemsHtml}</div>`;
+  const rankingContentHtml = renderRankingCard(displayRanking, myName);
+  container.innerHTML = headerCardHtml + rankingContentHtml;
 }
 
 // チラシ保管状況の描画処理
