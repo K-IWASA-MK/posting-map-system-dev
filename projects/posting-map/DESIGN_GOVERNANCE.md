@@ -57,12 +57,33 @@ Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition 
 
 ---
 
+## 🛑 DS-01 Freeze Gate (品質ゲート定義)
+
+DS-01スプリントのフリーズ（完結判定）は、以下の5条件をすべてクリアした場合にのみ許可される：
+
+* [ ] **Design Structure** = 🟢 (Foundationページ, Variables, Component Set, Auto Layout, Layer命名規則, Governance遵守)
+* [ ] **Dev Mode Validation** = 🟢 (ButtonおよびCardの2セットの実証連動エビデンス)
+* [ ] **CEO Review** = PASS (プロダクトオーナーによる最終承認)
+* [ ] **Git Tag Created** = `v5.1-ds01-complete` (バージョンタグの発行)
+* [ ] **No Open Critical Issues** = 未解決のクリティカルな不具合・懸念がゼロであること
+
+---
+
 ## 🚦 DS-02 Transition Workflow (DS-02進行条件)
 
-DS-01からDS-02（Variables Sync Foundation）へ進むための移行プロセスを以下の通り厳密に規定する：
+DS-01からDS-02（Variables Sync Foundation）へ進むための段階的ロードマップを以下の通り規定する：
 
 ```
-DS-01 Execution ➔ Design Structure 🟢 ➔ Dev Mode 🟢 ➔ CEO Review ➔ Freeze ➔ Git Tag (v5.1-ds01-complete) ➔ DS-02 Start
+DS-01: Foundation
+        │
+        ▼
+DS-02: Variables REST API Sync
+        │
+        ▼
+DS-03: Plugin Bridge
+        │
+        ▼
+DS-04: AI Design Automation
 ```
 
 本プロジェクトにおいて「Design SSOTが正式に確立された」と認定するためには、以下の4要件がすべて満たされていることを条件とする：
