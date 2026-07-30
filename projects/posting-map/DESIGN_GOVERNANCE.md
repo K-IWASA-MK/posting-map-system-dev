@@ -48,7 +48,14 @@ Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition 
 
 ---
 
-## 📋 Design Review Checklist (デザイン審査・承認基準)
+## 🏆 Design SSOT Certification Standard (認定4要件)
+
+本プロジェクトにおいて「Design SSOTが正式に確立された」と認定するためには、以下の4要件がすべて満たされていることを条件とする：
+
+1. **Design File (URL固定)**: Figmaファイルが正式に存在し、閲覧用URLが固定されていること。
+2. **Design Structure (構造化)**: Pages、Layers、Components、Variablesがキャンバス上で整理整頓されていること。
+3. **Dev Mode (情報取得性)**: ButtonやCardなどの主要コンポーネントの設計情報がDev Modeで正確に取得できること。
+4. **Implementation (実装連動性)**: Dev Modeの情報を基に、`design-tokens.json` ➔ `style.css` ➔ H-App 表示へ矛盾なく反映できること。
 
 すべての設計レビュー（Figma上の各要素フェーズ）および将来の実装レビューにおいて、以下のチェックリストをすべてパスすることを必須の統治基準と定義する：
 
