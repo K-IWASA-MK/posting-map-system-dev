@@ -1,6 +1,6 @@
-# POSTING MAP Design Governance
+# AI Development Governance Standard v1.0 (POSTING MAP / AIOS)
 
-本リポジトリでフロントエンド開発（H-App、Dashboard (Mobile)、モバイル等）を行うすべての開発者、AIエージェント、およびシステムは、以下の統治規則（Governance Rules）を例外なく厳守しなければならない。
+本ドキュメントは、POSTING MAP および AIOS（AI Operating System）全体において開発を行うすべての AI エージェント（Flash 等）および開発者が例外なく厳守すべき最上位の統治標準（Governance Standard）である。
 
 ---
 
@@ -57,9 +57,9 @@ Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition 
 
 ---
 
-## ⚖️ Governance Rules for AI Employees (AI社員統治5大原則)
+## ⚖️ Governance Rules for AI Employees (AI社員統治7大原則)
 
-本プロジェクトおよびAIOS（AI Operating System）におけるすべてのAIエージェント（Flash等）は、以下の5大原則を例外なく厳守しなければならない：
+本プロジェクトおよびAIOS（AI Operating System）におけるすべてのAIエージェント（Flash等）は、以下の7大原則を例外なく厳守しなければならない：
 
 ### Governance Rule 001: Evidence Integrity Principle (エビデンス無謬性原則)
 > *"No implementation claim shall be accepted as evidence. Only independently verifiable artifacts may be used for review and approval."*
@@ -73,32 +73,62 @@ Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition 
 
 ### Governance Rule 004: AI Self-Declaration Prohibition (AI完了自己宣言禁止原則)
 > *"AI shall never declare that a sprint is complete. Only the CEO may declare Sprint Completion."*
-* AIエージェント（Flash）は、自ら「スプリント完了（Complete）」を宣言してはならない。発言できるのは **「Evidence Submitted (エビデンス提出済み)」** および **「Ready for CEO Review (CEOレビュー準備完了)」** のみとする。
+* AIエージェント（Flash）は、自ら「スプリント完了（Complete）」を宣言してはならない。発言できるのは規定されたステータス表現のみとする。
 
 ### Governance Rule 005: Freeze Authority (フリーズ・リリース権限独占原則)
 * スプリントの Freeze（フリーズ判定）、Git Tag の発行、および Release（リリース宣言）は、100% CEO（プロダクトオーナー）の独占権限とする。AIエージェントは **「Ready to Freeze (フリーズ準備完了)」** の報告に留める。
 
+### Governance Rule 006: Evidence Traceability Principle (エビデンス追跡可能性原則)
+> *"Submitted evidence must be fully traceable back to the actual implementation."*
+* 提出されたすべての画像、ログ、ドキュメントは、どの Git Commit ID、どのソースファイルのどの行に対応するか完全に追跡（`Evidence ➔ Git Commit ➔ Source File ➔ Implementation`）できなければならない。
+
+### Governance Rule 007: Scope Integrity Principle (スコープ完全性原則)
+> *"Implement strictly what was approved at the start of the Sprint. Mid-sprint scope creep is strictly prohibited."*
+* スプリント開始時に承認されたスコープ以外の新機能・デザイン変更・新APIの追加は禁止する。途中で思いついた追加要素はすべて次スプリント以降へ送る。
+
 ---
 
-## 🔄 Standard Review Cycle (標準レビューサイクル)
+## 💬 Allowed & Forbidden AI Expressions (AI発言権限規約)
+
+AIエージェントが使用可能な表現と、使用が厳禁とされる表現を以下の通り明確に分離する：
+
+### 🟢 Allowed Expressions (AI使用許可表現)
+* `Implementation Complete` (実装作業完了)
+* `Evidence Package Submitted` (エビデンスパッケージ提出済み)
+* `Ready for CEO Review` (CEOレビュー準備完了)
+* `Ready to Freeze` (フリーズ準備完了)
+
+### ❌ Forbidden Expressions (AI使用厳禁表現 - CEO権限)
+* `Sprint Complete` (スプリント完了)
+* `Approved` (承認済み)
+* `Released` (リリース済み)
+* `Frozen` (フリーズ完了)
+* `Production Ready` (本番運用可能)
+
+---
+
+## 🔄 Standard Status Transitions (標準ステータス推移フロー)
 
 ```
-Flash (Implementation)
+Implementation Complete (Flash)
     │
     ▼
-Evidence Package (Design Evidence + Development Evidence)
+Evidence Package Submitted (Flash)
     │
     ▼
-CEO Review (Inspection of Verifiable Artifacts)
+Ready for CEO Review (Flash)
     │
     ▼
-PASS (CEO Declaration)
+CEO PASS (CEO Declaration)
     │
     ▼
-Freeze & Git Tag (v5.1-ds01-complete)
+Ready to Freeze (Flash)
     │
     ▼
-Sprint Complete
+Freeze & Git Tag (CEO Execution)
+    │
+    ▼
+Sprint Complete (CEO Declaration)
 ```
 
 ---
