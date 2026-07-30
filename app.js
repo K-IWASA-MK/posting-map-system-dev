@@ -65,12 +65,28 @@ function removePressed() {
 
 
 
-// GAS API CONFIG (JSON ONLY)
-const API_URL = "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
+// GAS API CONFIG (DYNAMICS LOADED WITH FALLBACK)
+const API_URL = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.api && window.PMS_CLIENT_CONFIG.api.gasWebAppUrl)
+  ? window.PMS_CLIENT_CONFIG.api.gasWebAppUrl
+  : "https://script.google.com/macros/s/AKfycbwgiOFU5iudUS6UscNU-MZhnxZJaqJHywVA9ivA-GE0uLe02fi7mmBU474lWa1TD7-R/exec";
 
 async function callApi(action, params = {}) {
   const MAX_RETRIES = 3;
   let delay = 1000;
+  
+  // LIFFがログイン済みならトークンを自動的に付与
+  logDebug(`[callApi] Checking LIFF status. typeof liff=${typeof liff}`);
+  if (typeof liff !== 'undefined') {
+    const isLoggedIn = liff.isLoggedIn();
+    const token = liff.getAccessToken();
+    logDebug(`[callApi] isLoggedIn=${isLoggedIn}, tokenLength=${token ? token.length : '0'}`);
+    if (isLoggedIn && token) {
+      params.liffToken = token;
+      logDebug(`[callApi] Token injected: ${token.substring(0, 10)}...`);
+    } else {
+      logDebug(`[callApi] Token injection skipped. isLoggedIn=${isLoggedIn}, hasToken=${!!token}`);
+    }
+  }
   
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     const queryParams = new URLSearchParams({
@@ -121,6 +137,16 @@ async function callApi(action, params = {}) {
         throw new Error("JSON形式ではない応答を受け取りました: " + parseErr.message);
       }
       
+      // GAS v2 形式のレスポンス（data.data ペイロードが存在する）の場合はアンラップ
+      if (data && typeof data === 'object' && 'data' in data && data.data !== null) {
+        const innerSuccess = data.data.success !== undefined ? data.data.success : data.success;
+        if (innerSuccess === false) {
+          logDebug(`[callApi] API returned inner success=false. msg=${data.data.message || data.message}`);
+          throw new Error(data.data.message || data.message || "API Error");
+        }
+        return data.data;
+      }
+      
       if (data.success === false) {
         logDebug(`[callApi] API returned success=false. msg=${data.message}`);
         throw new Error(data.message || "API Error");
@@ -148,6 +174,11 @@ async function callApi(action, params = {}) {
 async function callApiPost(action, payload = {}) {
   const MAX_RETRIES = 3;
   let delay = 1000;
+
+  // LIFFがログイン済みならトークンを自動的に付与
+  if (typeof liff !== 'undefined' && liff.isLoggedIn()) {
+    payload.liffToken = liff.getAccessToken();
+  }
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     const url = `${API_URL}?_t=${Date.now()}`; // actionはbodyに含める
@@ -184,6 +215,13 @@ async function callApiPost(action, payload = {}) {
         throw new Error("JSON形式ではない応答を受け取りました: " + parseErr.message);
       }
 
+      // GAS v2 形式のレスポンス（data.data ペイロードが存在する）の場合はアンラップ
+      if (data && typeof data === 'object' && 'data' in data && data.data !== null) {
+        const innerSuccess = data.data.success !== undefined ? data.data.success : data.success;
+        if (innerSuccess === false) throw new Error(data.data.message || data.message || "API Error");
+        return data.data;
+      }
+
       if (data.success === false) throw new Error(data.message || "API Error");
       return data;
     } catch (err) {
@@ -199,9 +237,22 @@ async function callApiPost(action, payload = {}) {
 }
 
 function startApp(profile = null) {
-  $('screen-gateway').classList.add('hidden');
-  $('loading').classList.remove('hidden');
-  loadData();
+  // 直ちにID画面（settings）に切り替える（スプラッシュ待ち時間 0秒）
+  switchPage('settings');
+  $('app').classList.remove('hidden');
+  
+  // 不透明度 0% を解除し、IDカード画面を前面へ可視化する (バグ修正)
+  $('app').classList.remove('opacity-0');
+  
+  // loading をスムーズに隠す
+  const loadingEl = $('loading');
+  if (loadingEl) {
+    loadingEl.classList.add('opacity-0');
+    setTimeout(() => loadingEl.classList.add('hidden'), 400);
+  }
+  
+  // データ同期およびロード処理は完全にバックグラウンドで非同期実行
+  loadData(false);
 }
 
 function setSyncStatus(state) {
@@ -233,6 +284,67 @@ function setSyncStatus(state) {
       textEl.classList.add('text-[#2563eb]', 'animate-pulse');
     }
   }
+}
+
+let isRegistering = false;
+let registrationError = false;
+function triggerBackgroundRegistration(profile) {
+  if (isRegistering) return;
+  isRegistering = true;
+  registrationError = false;
+  
+  const idEl = $('storage-register-staff-id');
+  if (idEl) {
+    idEl.textContent = 'ID: 登録中...';
+    idEl.style.color = 'inherit';
+    idEl.style.cursor = 'default';
+    idEl.onclick = null;
+  }
+  
+  logDebug("API START (初回登録・非同期)");
+  callApiPost('registerStaff', { 
+    lastName: profile.displayName, 
+    firstName: "(LINE)",
+    lineUserId: profile.userId
+  }).then(res => {
+    isRegistering = false;
+    logDebug("API OK (初回登録完了)");
+    if (res && res.success) {
+      const registeredInfo = {
+        last: profile.displayName,
+        first: "",
+        id: res.id,
+        lineUserId: profile.userId,
+        picture: profile.pictureUrl
+      };
+      localStorage.setItem('user_info', JSON.stringify(registeredInfo));
+      logDebug("Registered! Staff ID: " + res.id);
+      
+      const updatedIdEl = $('storage-register-staff-id');
+      if (updatedIdEl) {
+        updatedIdEl.textContent = 'ID: ' + (res.id || '---');
+        updatedIdEl.style.color = 'inherit';
+        updatedIdEl.style.cursor = 'default';
+        updatedIdEl.onclick = null;
+      }
+    } else {
+      throw new Error("GAS registration returned success=false");
+    }
+  }).catch(err => {
+    isRegistering = false;
+    registrationError = true;
+    logDebug("Background registration failed: " + err.message);
+    
+    const updatedIdEl = $('storage-register-staff-id');
+    if (updatedIdEl) {
+      updatedIdEl.textContent = 'ID: 登録失敗 (タップして再試行)';
+      updatedIdEl.style.color = '#ef4444';
+      updatedIdEl.style.cursor = 'pointer';
+      updatedIdEl.onclick = () => {
+        triggerBackgroundRegistration(profile);
+      };
+    }
+  });
 }
 
 let isSyncing = false;
@@ -271,8 +383,6 @@ async function syncOfflineQueue() {
   if (failedItems.length === 0) {
     console.log('Offline sync completed successfully.');
     setSyncStatus('online');
-    // Refresh main data after sync completes
-    await loadData(true);
   } else {
     console.warn(`${failedItems.length} items failed to sync. Will retry.`);
     setSyncStatus('offline');
@@ -280,61 +390,41 @@ async function syncOfflineQueue() {
 }
 
 async function loadData(skipSync = false) {
-  logDebug("[loadData] START");
+  logDebug("[loadData] START (Background)");
 
   try {
     if (!skipSync && navigator.onLine) {
-      logDebug("[loadData] Syncing offline queue...");
+      logDebug("[loadData] Syncing offline queue in background...");
       await syncOfflineQueue();
     } else if (!navigator.onLine) {
       logDebug("[loadData] Offline. Setting status...");
       setSyncStatus('offline');
     }
-    logDebug("[loadData] Fetching getAppData...");
-    setLoadingProgress(82, 'SYNCING DATA...');
+    
+    logDebug("[loadData] Fetching getAppData in background...");
     const data = await (_appDataPromise || callApi('getAppData')); // ⑤ プリフェッチがあれば再利用
     logDebug("[loadData] getAppData fetched successfully.");
-    setLoadingProgress(96, 'READY');
     _appDataPromise = null;
+    
     if (data && data.success) {
-      areaSummary = data.areas;
-      // ranking は switchPage('ranking') 初回タップ時に遅延取得
+      logDebug("[loadData] data keys: " + Object.keys(data).join(", "));
+      areaSummary = data.areas || [];
       if (data.branchName) localStorage.setItem('branch_name', data.branchName);
       
-      logDebug("[loadData] Rendering areas...");
+      logDebug("[loadData] Rendering areas in background...");
       renderAreas();
       logDebug("[loadData] Rendering areas OK. Updating stats...");
       updateStats();
 
       // バックグラウンドでランキングデータを先読み/更新
       prefetchRanking();
-      
-      if (!skipSync) {
-        logDebug("[loadData] Initial load. Switching page to settings and animating app entry...");
-        switchPage('settings');
-        logDebug("[loadData] Showing main app div...");
-        $('screen-gateway').classList.add('hidden');
-        $('app').classList.remove('hidden');
-        setTimeout(() => {
-          setLoadingProgress(100, 'READY');
-          $('app').classList.remove('opacity-0');
-          $('loading').classList.add('opacity-0');
-          setTimeout(() => $('loading').classList.add('hidden'), 400);
-        }, 50);
-      }
     } else {
       throw new Error(data ? data.message : "データが空です");
     }
   } catch (err) {
-    console.error("Startup Error:", err);
-    logDebug(`[loadData] ERROR: ${err.message}`);
-    $('loading').classList.add('hidden');
-    // 🔍 診断: エラー内容を画面に表示して実機でも原因がわかるようにする
-    const titleEl = $('gateway-title');
-    const subtitleEl = $('gateway-subtitle');
-    if (titleEl) titleEl.textContent = '起動エラー';
-    if (subtitleEl) subtitleEl.textContent = String(err.message || err).slice(0, 120);
-    $('screen-gateway').classList.remove('hidden');
+    console.error("Background Load Error:", err);
+    logDebug(`[loadData] Background ERROR: ${err.message}`);
+    // バックグラウンドロードの失敗は画面をブロッキングしてフリーズさせず、ログ出力のみに留めます。
   }
 }
 
@@ -852,7 +942,40 @@ async function switchPage(id, force = false) {
     const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
     const idEl = $('storage-register-staff-id');
     const nameEl = $('storage-register-staff-name');
-    if (idEl) idEl.textContent = 'ID: ' + (staffId || '---');
+    
+    if (idEl) {
+      if (staffId) {
+        idEl.textContent = 'ID: ' + staffId;
+        idEl.style.color = 'inherit';
+        idEl.style.cursor = 'default';
+        idEl.onclick = null;
+      } else if (isRegistering) {
+        idEl.textContent = 'ID: 登録中...';
+        idEl.style.color = 'inherit';
+        idEl.style.cursor = 'default';
+        idEl.onclick = null;
+      } else if (registrationError) {
+        idEl.textContent = 'ID: 登録失敗 (タップして再試行)';
+        idEl.style.color = '#ef4444';
+        idEl.style.cursor = 'pointer';
+        idEl.onclick = async () => {
+          try {
+            idEl.textContent = 'ID: 再登録中...';
+            idEl.style.color = 'inherit';
+            const profile = await liff.getProfile();
+            triggerBackgroundRegistration(profile);
+          } catch(e) {
+            idEl.textContent = 'ID: 登録失敗 (タップして再試行)';
+            idEl.style.color = '#ef4444';
+          }
+        };
+      } else {
+        idEl.textContent = 'ID: ---';
+        idEl.style.color = 'inherit';
+        idEl.style.cursor = 'default';
+        idEl.onclick = null;
+      }
+    }
     if (nameEl) nameEl.textContent = staffName || '---';
 
     // Clear input and feedback message on entry
@@ -1111,6 +1234,10 @@ function backToCityList() {
 function updateStats() {
   let totalDone = 0;
   let totalPoints = 0;
+  if (!areaSummary || !Array.isArray(areaSummary)) {
+    logDebug("[updateStats] areaSummary is missing or not an array!");
+    return;
+  }
   areaSummary.forEach(area => {
     totalDone += area.done || 0;
     totalPoints += area.total || 0;
@@ -1165,6 +1292,9 @@ function cleanNameInput(str) {
   return s;
 }
 
+// [CANDIDATE FOR REMOVAL]
+// Legacy manual registration.
+// Not executed in normal LINE authentication flow.
 async function saveProfile() {
   logDebug("saveProfile: click triggered");
   const rawLast = $('user-last').value, rawFirst = $('user-first').value;
@@ -1208,6 +1338,12 @@ async function saveProfile() {
 }
 
 async function safeInitApp() {
+  // LIFF SDK が内部でトークン交換用に生成する非表示 iframe 内での二重実行（アクセストークン失効）を完全に防止するガード
+  if (window !== window.top) {
+    console.log("[DEBUG] Running inside iframe, skipping safeInitApp.");
+    return;
+  }
+
   logDebug("safeInitApp invoked.");
   console.log("POSTING MAP PRO safeInitApp started.");
   
@@ -1225,15 +1361,10 @@ async function safeInitApp() {
   }
   // ※ フラグはここでは削除しない。ログイン確認成功後（isLoggedIn()=true）に削除する。
   
-  // デプロイ先（ホスト名）に応じてLIFF IDを自動切り替え
-  // area-management.github.io → モニター用LIFF（h9Fjv1iU）
-  // k-iwasa-mk.github.io → スマホ用LIFF（tXZIMAJK）
-  const liffId = window.location.hostname === 'area-management.github.io'
-    ? "2010374196-gIYb6PDH"
-    : "2010374196-gIYb6PDH";
-  const btn = $('btn-login-manual');
-  const spinner = $('login-spinner');
-  const subtitle = $('gateway-subtitle');
+  // クライアント設定(PMS_CLIENT_CONFIG)からLIFF IDを取得、なければホスト名からフォールバック
+  const liffId = (window.PMS_CLIENT_CONFIG && window.PMS_CLIENT_CONFIG.line && window.PMS_CLIENT_CONFIG.line.liffId)
+    ? window.PMS_CLIENT_CONFIG.line.liffId
+    : (window.location.hostname === 'area-management.github.io' ? "2010374196-gIYb6PDH" : "2010374196-gIYb6PDH");
   
   if (typeof liff !== 'undefined') {
     try {
@@ -1255,119 +1386,103 @@ async function safeInitApp() {
       if (liff.isLoggedIn()) {
         logDebug("LOGIN OK");
         sessionStorage.removeItem('liff_initializing'); // ✅ ログイン確認後にフラグを削除（ここが正しいタイミング）
-        // ⑤ getAppDataを並列プリフェッチ開始（profile取得・登録処理と並行）
+        
+        let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+        
+        // ⑤ getAppDataを並列プリフェッチ開始
         _appDataPromise = callApi('getAppData');
-        try {
-          // ② LINE内部トークン処理安定ディレイ（最適化済み）
-          await new Promise(r => setTimeout(r, 100));
 
-          logDebug("PROFILE START"); // ⑤ profile取得開始
-          const profile = await liff.getProfile();
-          logDebug("PROFILE OK"); // ⑥ profile取得成功
-          setLoadingProgress(65, 'PROFILE LOADED');
-          console.log(profile);
-
-          let userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+        // 【通常起動】既にユーザー登録・LINE連携キャッシュがある場合は、同期通信を待たずに即時起動
+        if (userInfo.id && userInfo.lineUserId) {
+          logDebug("Fast startup using cached user info.");
+          const cachedProfile = {
+            displayName: userInfo.last,
+            userId: userInfo.lineUserId,
+            pictureUrl: userInfo.picture || ''
+          };
           
-          // ④ 初回・再登録ともにPOSTでlineUserIdをGASに送信
-          if (!userInfo.id) {
-            // 初回登録
-            logDebug("API START (初回登録)");
-            const res = await callApiPost('registerStaff', { 
-              lastName: profile.displayName, 
-              firstName: "(LINE)",
-              lineUserId: profile.userId
-            });
-            logDebug("API OK");
-            if (res && res.success) {
-              userInfo = {
-                last: profile.displayName,
-                first: "",
-                id: res.id,
-                lineUserId: profile.userId,
-                picture: profile.pictureUrl
-              };
-              localStorage.setItem('user_info', JSON.stringify(userInfo));
-              logDebug("Registered! Staff ID: " + res.id);
-            } else {
-              throw new Error("GAS registration failed");
-            }
-          } else {
-            // 登録済み：ローカルキャッシュ更新 + GASのD列を更新（バックグラウンド）
+          // 0.1秒で即時にID表示・メイン画面可視化
+          startApp(cachedProfile);
+
+          // バックグラウンドで静かにgetProfileを走らせ、LINE公式の最新データに追従
+          liff.getProfile().then(profile => {
+            logDebug("Background profile refresh OK");
             userInfo.lineUserId = profile.userId;
             userInfo.picture = profile.pictureUrl;
             localStorage.setItem('user_info', JSON.stringify(userInfo));
-            // D列にLINE_USER_IDが未設定の可能性があるためバックグラウンドで更新
-            callApiPost('registerStaff', {
-              lastName: userInfo.last,
-              firstName: userInfo.first || '(LINE)',
-              lineUserId: profile.userId
-            }).catch(() => {});
+            
+            // 最新の名前・アバター写真をIDカードにリアルタイム反映（再描画）
+            if (typeof renderSettings === 'function') {
+              renderSettings();
+            }
+          }).catch(err => {
+            console.warn("Background profile refresh failed:", err);
+          });
+
+        } else {
+          // 【初回ログイン/キャッシュ未確立時】同期的にgetProfileを取得して登録へ進む
+          try {
+            // LINE内部トークン処理完了のための安全ウェイト（300ms）
+            await new Promise(r => setTimeout(r, 300));
+
+            logDebug("PROFILE START");
+            const profile = await liff.getProfile();
+            logDebug("PROFILE OK");
+            
+            // トークン確立後に OAuth パラメータを安全に消去
+            try {
+              const cleanUrl = window.location.origin + window.location.pathname + window.location.search.replace(/[\?&](code|liff\.state)=[^&]*/g, '');
+              window.history.replaceState({}, document.title, cleanUrl);
+              logDebug("OAuth query parameters cleaned from address bar via history.replaceState (Safe Delay)");
+            } catch (e) {
+              console.warn("Failed to clean OAuth query parameters:", e);
+            }
+
+            setLoadingProgress(65, 'PROFILE LOADED');
+            console.log(profile);
+
+            // 初回登録をバックグラウンド(非同期)で実行
+            triggerBackgroundRegistration(profile);
+
+            logDebug("START APP");
+            startApp(profile);
+          } catch (err) {
+            console.error("LIFF PROFILE ERROR", err);
+            logDebug("LIFF PROFILE ERROR: " + err.message);
+            $('loading-status').textContent = "起動エラー: " + err.message;
           }
-
-
-          // ③ 800msディレイ削除
-          logDebug("START APP");
-          startApp(profile);
-        } catch (err) {
-          console.error("LIFF PROFILE ERROR", err);
-          logDebug("LIFF PROFILE ERROR: " + err.message);
-          if (btn) btn.classList.remove('hidden');
-          if (spinner) spinner.classList.add('hidden');
-          $('gateway-title').textContent = "自動ログインに失敗しました";
-          if (subtitle) subtitle.textContent = "手動で起動してください。";
-          $('screen-gateway').classList.remove('hidden');
-          $('loading').classList.add('hidden');
         }
       } else {
-        // LINEログイン処理中（OAuthコールバックのパラメータがある）なら、手動ログイン画面を出さずに待機する
+        // LINEログイン処理中（OAuthコールバックのパラメータがある）なら、手動ログイン画面を出さずに少し待機して再チェックする
         const urlParams = new URLSearchParams(window.location.search);
         const isProcessing = urlParams.has('code') || urlParams.has('liff.state');
         if (isProcessing) {
-          logDebug("LINE login is processing in background, skip showing manual gateway.");
+          logDebug("LINE login is processing in background. Retrying login check in 1.5s...");
+          setTimeout(() => {
+            if (liff.isLoggedIn()) {
+              logDebug("Retried Login: OK");
+              safeInitApp(); // 再起動してメインフローへ入る
+            } else {
+              logDebug("Retried Login: FAIL. Redirecting to LINE Login automatically...");
+              sessionStorage.setItem('liff_initializing', 'true');
+              liff.login();
+            }
+          }, 1500);
           return;
         }
 
-        logDebug("Not logged in.");
-        if (liff.isInClient()) {
-          logDebug("In LINE client. Redirecting to LINE Login automatically...");
-          sessionStorage.setItem('liff_initializing', 'true');
-          liff.login();
-        } else {
-          logDebug("In external browser. Showing manual login button.");
-          if (btn) {
-            btn.textContent = "LINEでログイン";
-            btn.onclick = () => {
-              logDebug("Manual login button clicked. Redirecting...");
-              sessionStorage.setItem('liff_initializing', 'true');
-              liff.login();
-            };
-            btn.classList.remove('hidden');
-          }
-          if (spinner) spinner.classList.add('hidden');
-          if (subtitle) subtitle.textContent = "ブラウザ環境です。「LINEでログイン」ボタンを押してください。";
-          $('screen-gateway').classList.remove('hidden');
-          $('loading').classList.add('hidden');
-        }
+        logDebug("Not logged in. Redirecting to LINE Login automatically...");
+        sessionStorage.setItem('liff_initializing', 'true');
+        liff.login();
       }
     } catch (err) {
       console.error("LIFF Init Error:", err);
       logDebug("LIFF Error: " + err.message);
-      if (btn) btn.classList.remove('hidden');
-      if (spinner) spinner.classList.add('hidden');
-      $('gateway-title').textContent = "自動ログインに失敗しました";
-      if (subtitle) subtitle.textContent = "手動で起動してください。";
-      $('screen-gateway').classList.remove('hidden');
-      $('loading').classList.add('hidden');
+      $('loading-status').textContent = "起動エラー: " + err.message;
     }
   } else {
-    logDebug("Running in standalone web browser. Showing manual launch button.");
-    if (btn) btn.classList.remove('hidden');
-    if (spinner) spinner.classList.add('hidden');
-    $('gateway-title').textContent = "ブラウザ起動";
-    if (subtitle) subtitle.textContent = "手動で起動します。";
-    $('screen-gateway').classList.remove('hidden');
-    $('loading').classList.add('hidden');
+    logDebug("Running in standalone web browser. Blocked.");
+    $('loading-status').textContent = "エラー: LINEアプリ内から起動してください。";
   }
 }
 
