@@ -390,6 +390,7 @@ function deleteAllAreaSheets() {
     CONFIG.get("SHEET_POSTAL"),
     CONFIG.get("SHEET_DISTRICT"),
     CONFIG.get("SHEET_STORAGE"),
+    CONFIG.get("SHEET_SYSTEM_CACHE"),
   ];
   ss.getSheets().forEach((s) => {
     if (!exclude.includes(s.getName())) ss.deleteSheet(s);
