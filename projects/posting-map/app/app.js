@@ -1292,6 +1292,9 @@ function cleanNameInput(str) {
   return s;
 }
 
+// [CANDIDATE FOR REMOVAL]
+// Legacy manual registration.
+// Not executed in normal LINE authentication flow.
 async function saveProfile() {
   logDebug("saveProfile: click triggered");
   const rawLast = $('user-last').value, rawFirst = $('user-first').value;

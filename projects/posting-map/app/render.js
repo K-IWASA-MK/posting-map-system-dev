@@ -34,7 +34,11 @@ function getCityName(areaName) {
 
 function renderAreas() {
   if (!areaSummary || areaSummary.length === 0) {
-    $('area-list').innerHTML = '<p class="text-center text-white/40 py-20 font-bold">データがありません。<br>一括作成を実行してください。</p>';
+    $('area-list').innerHTML = `
+      <div class="premium-glass p-8 text-center space-y-4 mx-4 my-10 border border-white/10 rounded-3xl bg-white/5 backdrop-blur-2xl">
+        <p class="text-base font-black text-white">エリアデータが設定されていません</p>
+        <p class="text-xs text-white/50 leading-relaxed">管理者のセットアップをお待ちください。</p>
+      </div>`;
     return;
   }
 
@@ -683,6 +687,28 @@ function renderSettings() {
   const container = $('settings-content');
   
   if (!userInfo) {
+    // LINE認証移行に伴う表示制御 (手動登録画面のバイパス)
+    // [CANDIDATE FOR REMOVAL]
+    // Legacy manual registration.
+    // Not executed in normal LINE authentication flow.
+    const isLiffLoading = true;
+    if (isLiffLoading) {
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
+          <div class="mb-8 text-center">
+            <div class="inline-flex w-12 h-12 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin mb-4"></div>
+            <p class="text-sm text-white/70 leading-relaxed font-bold">
+              LINE認証を初期化中...
+            </p>
+            <p class="text-[10px] text-white/40 mt-2 uppercase tracking-widest font-mono">
+              Initializing LINE Authentication
+            </p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
     // Card 1: Registration (Absolute alignment with Splash Model)
     container.innerHTML = `
       <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">

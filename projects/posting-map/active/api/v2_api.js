@@ -45,18 +45,22 @@ function writeDebugLogToSheet(data) {
   }
 }
 
+var isWebAppCall = false;
+
 // =============================
 // ① 基本設定
 // =============================
 function getSS() {
   // 1. まずアクティブなスプレッドシート（UIコンテキスト）の取得を試みる
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    if (ss && ss.getId()) {
-      return ss;
+  if (!isWebAppCall) {
+    try {
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      if (ss && ss.getId()) {
+        return ss;
+      }
+    } catch (e) {
+      // UIコンテキスト外は無視してプロパティ参照へ
     }
-  } catch (e) {
-    // UIコンテキスト外（Web App実行時など）は無視してプロパティ参照へ
   }
 
   // 2. プロパティサービスからIDを取得して開く（Web Appフォールバック用）
@@ -100,6 +104,7 @@ var globalCacheHit = false;
  * GETリクエスト：JSONデータの取得
  */
 function doGet(e) {
+  isWebAppCall = true;
   let params = (e && e.parameter) ? Object.assign({}, e.parameter) : {};
   if (params.json) {
     try {
@@ -119,10 +124,17 @@ function doGet(e) {
   }
   if (action === "debugProperties") {
     const props = PropertiesService.getScriptProperties().getProperties();
+    let ssName = "Unknown";
+    try {
+      ssName = getSS().getName();
+    } catch (e) {
+      ssName = "Error: " + e.toString();
+    }
     return ContentService.createTextOutput(JSON.stringify({
       success: true,
       properties: props,
-      spreadsheetId: props["SPREADSHEET_ID"] || null
+      spreadsheetId: props["SPREADSHEET_ID"] || null,
+      spreadsheetName: ssName
     })).setMimeType(ContentService.MimeType.JSON);
   }
   if (action === "debugCount") {
@@ -379,6 +391,7 @@ function processGetActionLegacy(action, e) {
  * POSTリクエスト：データの登録・更新
  */
 function doPost(e) {
+  isWebAppCall = true;
   try {
     let params = (e && e.parameter) ? Object.assign({}, e.parameter) : {};
     let postData = null;
@@ -427,6 +440,8 @@ function doPost(e) {
     if (action === "debugCount") {
       try {
         const ss = getSS();
+        const meiboSheet = ss.getSheetByName("名簿");
+        const meiboValues = meiboSheet ? meiboSheet.getDataRange().getValues() : [];
         const sheets = ss.getSheets();
         const sheetInfo = sheets.map(s => {
           return {
@@ -436,7 +451,8 @@ function doPost(e) {
         });
         return ContentService.createTextOutput(JSON.stringify({
           success: true,
-          sheets: sheetInfo
+          sheets: sheetInfo,
+          meiboValues: meiboValues
         })).setMimeType(ContentService.MimeType.JSON);
       } catch (err) {
         return ContentService.createTextOutput(JSON.stringify({
@@ -964,8 +980,33 @@ function normalizeName(str) {
   return s.replace(/[\s\u3000\u200b\u200c\u200d\uFEFF]/g, "");
 }
 
-function registerStaff(lastName, firstName, lineUserId) {
-  logTrace("registerStaff:entry", { lastName, firstName, lineUserId });
+function registerStaff(arg1, arg2, arg3) {
+  let lineUserId = "";
+  let displayName = "";
+  let pictureUrl = "";
+
+  const isUserId = (val) => typeof val === "string" && val.startsWith("U") && val.length > 25;
+
+  if (isUserId(arg1)) {
+    // New signature: registerStaff(lineUserId, displayName, pictureUrl)
+    lineUserId = arg1;
+    displayName = arg2 || "";
+    pictureUrl = arg3 || "";
+  } else if (isUserId(arg3)) {
+    // Old signature: registerStaff(lastName, firstName, lineUserId)
+    lineUserId = arg3;
+    displayName = arg1 || "";
+    pictureUrl = "";
+  } else {
+    if (arg1 && !arg3) {
+      displayName = arg1;
+    } else {
+      displayName = arg1 || "";
+      lineUserId = arg3 || "";
+    }
+  }
+
+  logTrace("registerStaff:entry", { displayName, lineUserId, pictureUrl });
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(15000);
@@ -995,34 +1036,34 @@ function registerStaff(lastName, firstName, lineUserId) {
       return { success: false, message: "Roster sheet not found" };
     }
 
-    const cleanName = String(lastName || "").trim();
-    const cleanAppName = String(firstName || "LINE").trim();
-    const normName = normalizeName(lastName);
-    const normAppName = normalizeName(firstName);
+    const cleanName = String(displayName || "").trim();
+    const cleanLineUserId = String(lineUserId || "").trim();
+    const cleanAppName = "LINE";
+    const normName = normalizeName(cleanName);
+    const normAppName = normalizeName(cleanAppName);
     
-    if (!cleanName || !cleanAppName) {
-      return { success: false, message: "名前とアプリ名を入力してください。" };
+    if (!cleanLineUserId) {
+      return { success: false, message: "LINE User ID が必要です。" };
+    }
+    if (!cleanName) {
+      return { success: false, message: "お名前 (displayName) が必要です。" };
     }
 
     const fullName = cleanName;
 
-    // A列からC列のデータをすべて取得してチェック
+    // A列からD列のデータをすべて取得してチェック
     const lastRow = s.getLastRow();
     let values = [];
     if (lastRow >= 1) {
-      // D列(4)まで取得する（A:ID, B:名前, C:アプリ名, D:LINE_USER_ID）
       values = s.getRange(1, 1, lastRow, 4).getValues();
     }
 
-    // 1. D列(LINE_USER_ID)での完全一致重複チェック（最優先 - 重複登録および名簿重複を完全に防止）
-    if (lineUserId) {
-      const cleanLineUserId = String(lineUserId).trim();
-      for (let i = 1; i < values.length; i++) {
-        const rowLineUserId = String(values[i][3] || "").trim();
-        if (rowLineUserId === cleanLineUserId) {
-          logTrace("registerStaff:duplicate_line_id", { lineUserId: cleanLineUserId, staffId: values[i][0] });
-          return { success: true, id: values[i][0], name: values[i][1], message: "existing" };
-        }
+    // 1. D列(LINE_USER_ID)での完全一致重複チェック
+    for (let i = 1; i < values.length; i++) {
+      const rowLineUserId = String(values[i][3] || "").trim();
+      if (rowLineUserId === cleanLineUserId) {
+        logTrace("registerStaff:duplicate_line_id", { lineUserId: cleanLineUserId, staffId: values[i][0] });
+        return { success: true, id: values[i][0], name: values[i][1], message: "existing" };
       }
     }
 
@@ -1033,18 +1074,18 @@ function registerStaff(lastName, firstName, lineUserId) {
       const rowAppName = normalizeName(values[i][2]);
 
       if (rowName === normName && rowAppName === normAppName && rowId !== "") {
-        // 既存ユーザー：LINE_USER_IDが未設定でlineUserIdが渡された場合はD列を更新
-        if (lineUserId && !values[i][3]) {
-          s.getRange(i + 1, 4).setValue(lineUserId);
+        // 既存ユーザー：LINE_USER_IDが未設定の場合はD列を更新
+        if (!values[i][3]) {
+          s.getRange(i + 1, 4).setValue(cleanLineUserId);
         }
         return { success: true, id: rowId, name: values[i][1], message: "existing" };
       }
     }
 
-    // 2. 新規採番 (A列の最大値 + 1) と書き込み先の決定
+    // 3. 新規採番 (A列の最大値 + 1) と書き込み先の決定
     let maxIdNum = 0;
-    let prefix = "S"; // デフォルトプレフィックス
-    let paddingWidth = 3; // デフォルトパディング幅 (S001 -> 3桁)
+    let prefix = "S";
+    let paddingWidth = 3;
     let targetRow = 0;
     let foundEmptyRow = false;
 
@@ -1054,7 +1095,6 @@ function registerStaff(lastName, firstName, lineUserId) {
       const valAppName = normalizeName(values[i][2]);
 
       if (valId !== "") {
-        // 例: "S001" -> prefix: "S", numPart: "001"
         const match = valId.match(/^([A-Za-z]*)(0*)(\d+)$/);
         if (match) {
           const currentPrefix = match[1];
@@ -1077,7 +1117,6 @@ function registerStaff(lastName, firstName, lineUserId) {
         }
       }
 
-      // データ書き込み先として、ヘッダーより下で「ID、名前、アプリ名がすべて実質空白」の最初の行を再利用する
       if (!foundEmptyRow && valId === "" && valName === "" && valAppName === "") {
         targetRow = i + 1;
         foundEmptyRow = true;
@@ -1097,7 +1136,7 @@ function registerStaff(lastName, firstName, lineUserId) {
     }
 
     // 指定の行に書き込む (A: ID, B: 名前, C: アプリ名, D: LINE_USER_ID)
-    s.getRange(targetRow, 1, 1, 4).setValues([[newId, cleanName, cleanAppName, lineUserId || ""]]);
+    s.getRange(targetRow, 1, 1, 4).setValues([[newId, cleanName, cleanAppName, cleanLineUserId]]);
 
     // DIAGNOSTIC START - Write & Flush Readback Verification
     SpreadsheetApp.flush();

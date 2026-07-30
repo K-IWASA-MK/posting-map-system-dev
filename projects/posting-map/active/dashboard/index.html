@@ -509,7 +509,7 @@
         const rawRes = await _appDataPromise;
         const data = (rawRes && rawRes.data) ? rawRes.data : rawRes;
         const dataAreas = (data && Array.isArray(data.areas)) ? data.areas : (data && Array.isArray(data.summary)) ? data.summary : [];
-        if (data && dataAreas.length > 0) {
+        if (data) {
           data.areas = dataAreas;
           appData = data;
           localStorage.setItem('cached_app_data', JSON.stringify(appData));
@@ -619,6 +619,9 @@
       setTimeout(() => t.classList.add('hidden'), 3000);
     }
 
+    // [CANDIDATE FOR REMOVAL]
+    // Legacy manual registration.
+    // Not executed in normal LINE authentication flow.
     function saveProfile() {
       const last = document.getElementById('user-last')?.value;
       const first = document.getElementById('user-first')?.value;
