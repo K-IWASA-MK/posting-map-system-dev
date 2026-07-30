@@ -1,6 +1,6 @@
 # POSTING MAP Design System v2.0
 
-* **Figma Design SSOT URL**: [https://www.figma.com/design/cmjPPVIC7d373Vv5YYf0Xo/無題](https://www.figma.com/design/cmjPPVIC7d373Vv5YYf0Xo/無題)
+* **Figma Design SSOT URL**: [https://www.figma.com/design/cmjPPVlC7d373Vv5YYf0Xo/%E7%84%A1%E9%A1%8C?node-id=0-1&t=4nxLb6FmkkA7sjd4-1](https://www.figma.com/design/cmjPPVlC7d373Vv5YYf0Xo/%E7%84%A1%E9%A1%8C?node-id=0-1&t=4nxLb6FmkkA7sjd4-1)
 
 本ドキュメントは、Figma 上で手作業で定義される共通コンポーネント・デザイントークンを、実装（HTML / CSS / JavaScript）へ正確にマッピングするための設計ガイドラインです。
 
