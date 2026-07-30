@@ -687,27 +687,45 @@ function renderSettings() {
   const container = $('settings-content');
   
   if (!userInfo) {
-    // LINE認証移行に伴う表示制御 (手動登録画面のバイパス)
+    // LINE認証移行に伴う表示制御 (手動登録画面のバイパス ＆ 状態監視)
     // [CANDIDATE FOR REMOVAL]
     // Legacy manual registration.
     // Not executed in normal LINE authentication flow.
-    const isLiffLoading = true;
-    if (isLiffLoading) {
+    if (window.registrationError) {
       container.innerHTML = `
         <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
-          <div class="mb-8 text-center">
-            <div class="inline-flex w-12 h-12 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin mb-4"></div>
-            <p class="text-sm text-white/70 leading-relaxed font-bold">
-              LINE認証を初期化中...
+          <div class="mb-8 text-center text-red-500">
+            <div class="text-4xl mb-4">⚠️</div>
+            <p class="text-sm leading-relaxed font-bold">
+              LINE認証の自動登録に失敗しました
             </p>
-            <p class="text-[10px] text-white/40 mt-2 uppercase tracking-widest font-mono">
-              Initializing LINE Authentication
+            <p class="text-[10px] text-red-400/65 mt-2 font-mono">
+              Registration API error. Please try again.
             </p>
           </div>
+          <button onclick="window.retryRegistration()" class="w-full max-w-xs bg-red-600 hover:bg-red-500 text-white rounded-2xl py-4 text-base font-bold shadow-lg transition-all">
+            再試行する
+          </button>
         </div>
       `;
       return;
     }
+
+    // デフォルト、または登録処理中はローディングスピナーを表示
+    container.innerHTML = `
+      <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
+        <div class="mb-8 text-center">
+          <div class="inline-flex w-12 h-12 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin mb-4"></div>
+          <p class="text-sm text-white/70 leading-relaxed font-bold">
+            LINE認証を初期化中...
+          </p>
+          <p class="text-[10px] text-white/40 mt-2 uppercase tracking-widest font-mono">
+            Initializing LINE Authentication
+          </p>
+        </div>
+      </div>
+    `;
+    return;
 
     // Card 1: Registration (Absolute alignment with Splash Model)
     container.innerHTML = `

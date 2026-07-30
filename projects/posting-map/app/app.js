@@ -289,9 +289,12 @@ function setSyncStatus(state) {
 let isRegistering = false;
 let registrationError = false;
 function triggerBackgroundRegistration(profile) {
+  window.liffProfile = profile;
   if (isRegistering) return;
   isRegistering = true;
+  window.isRegistering = true;
   registrationError = false;
+  window.registrationError = false;
   
   const idEl = $('storage-register-staff-id');
   if (idEl) {
@@ -308,6 +311,7 @@ function triggerBackgroundRegistration(profile) {
     lineUserId: profile.userId
   }).then(res => {
     isRegistering = false;
+    window.isRegistering = false;
     logDebug("API OK (初回登録完了)");
     if (res && res.success) {
       const registeredInfo = {
@@ -327,12 +331,19 @@ function triggerBackgroundRegistration(profile) {
         updatedIdEl.style.cursor = 'default';
         updatedIdEl.onclick = null;
       }
+      
+      // 非同期登録成功に伴い、設定画面（IDカード）を即座に再描画してローダーから移行
+      if (typeof renderSettings === 'function') {
+        renderSettings();
+      }
     } else {
       throw new Error("GAS registration returned success=false");
     }
   }).catch(err => {
     isRegistering = false;
+    window.isRegistering = false;
     registrationError = true;
+    window.registrationError = true;
     logDebug("Background registration failed: " + err.message);
     
     const updatedIdEl = $('storage-register-staff-id');
@@ -344,8 +355,20 @@ function triggerBackgroundRegistration(profile) {
         triggerBackgroundRegistration(profile);
       };
     }
+    
+    // エラー状態を描画するために再表示
+    if (typeof renderSettings === 'function') {
+      renderSettings();
+    }
   });
 }
+
+// 登録再試行用のグローバルハンドラーを公開
+window.retryRegistration = () => {
+  if (window.liffProfile) {
+    triggerBackgroundRegistration(window.liffProfile);
+  }
+};
 
 let isSyncing = false;
 async function syncOfflineQueue() {
