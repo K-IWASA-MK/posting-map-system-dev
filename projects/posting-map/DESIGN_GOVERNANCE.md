@@ -57,13 +57,24 @@ Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition 
 
 ---
 
-## 🛑 DS-01 Freeze Gate (品質ゲート定義)
+## 📸 Evidence First Principle (エビデンス第一原則)
 
-DS-01スプリントのフリーズ（完結判定）は、以下の5条件をすべてクリアした場合にのみ許可される：
+* **No Completion without Evidence**: 単なる実装完了報告やテキスト宣言のみに基づいてスプリントの完了を認めることは一切禁止する。
+* **Mandatory Evidence Package**: すべての完了申請は、第三者が独立して検証可能な「エビデンスパッケージ」の提出を必須とする。
+* **Evidence-Based CEO Approval**: CEOによる承認判断は、主張ではなく客観的に検証可能なエビデンスに基づいて行われる。
+
+> *"No sprint shall be considered complete based solely on an implementation report. Every completion claim must include an evidence package sufficient for independent review. CEO approval shall be based on verifiable evidence, not implementation claims."*
+
+---
+
+## 🛑 DS-01 Freeze Gate (品質ゲート6条件)
+
+DS-01スプリントのフリーズ（完結判定）は、以下の6条件をすべてクリアした場合にのみ許可される：
 
 * [ ] **Design Structure** = 🟢 (Foundationページ, Variables, Component Set, Auto Layout, Layer命名規則, Governance遵守)
 * [ ] **Dev Mode Validation** = 🟢 (ButtonおよびCardの2セットの実証連動エビデンス)
-* [ ] **CEO Review** = PASS (プロダクトオーナーによる最終承認)
+* [ ] **Evidence Package Submitted** (Figmaファイル, Dev Mode画面, コード差分, H-App表示, E2E結果の5点)
+* [ ] **CEO Review** = PASS (プロダクトオーナーによる最終検証承認)
 * [ ] **Git Tag Created** = `v5.1-ds01-complete` (バージョンタグの発行)
 * [ ] **No Open Critical Issues** = 未解決のクリティカルな不具合・懸念がゼロであること
 
