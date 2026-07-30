@@ -48,7 +48,22 @@ Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition 
 
 ---
 
-## 🏆 Design SSOT Certification Standard (認定4要件)
+## 🔒 Sprint Scope Lock Rule (スコープ増加禁止原則)
+
+* **No Scope Creep**: いかなるスプリントの進行中においても、未承認の新機能や追加要求によるスコープ拡張（Scope Creep）は一切禁止する。
+* **DS-01 Lock**: DS-01においてはスコープを完全に凍結（Lock）し、以下の残り2つの認定項目のみを完遂対象とする：
+  1. **Design Structure** (Foundationページ, Variables, Component Set, Auto Layout, Layer命名規則, Governance遵守)
+  2. **Dev Mode Validation** (ButtonおよびCardの Dev Mode ➔ Code ➔ H-App 実機連動エビデンス)
+
+---
+
+## 🚦 DS-02 Transition Workflow (DS-02進行条件)
+
+DS-01からDS-02（Variables Sync Foundation）へ進むための移行プロセスを以下の通り厳密に規定する：
+
+```
+DS-01 Execution ➔ Design Structure 🟢 ➔ Dev Mode 🟢 ➔ CEO Review ➔ Freeze ➔ Git Tag (v5.1-ds01-complete) ➔ DS-02 Start
+```
 
 本プロジェクトにおいて「Design SSOTが正式に確立された」と認定するためには、以下の4要件がすべて満たされていることを条件とする：
 
