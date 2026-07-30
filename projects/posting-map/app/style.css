@@ -1,12 +1,15 @@
 :root {
   /* Colors */
-  --color-primary: #00B7FF;
+  --color-primary: #f4700f;
+  --color-info: #00B7FF;
   --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
   --color-text-main: #FFFFFF;
   --color-text-muted: rgba(255, 255, 255, 0.4);
-  --color-bg-card: rgba(28, 28, 30, 0.8);
+  --color-bg-base: #000000;
+  --color-bg-surface: #111315;
+  --color-bg-card: rgba(28, 28, 30, 0.65);
 
   /* Spacing */
   --space-4: 4px;

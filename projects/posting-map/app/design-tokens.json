@@ -1,14 +1,18 @@
 {
   "color": {
-    "primary": "#00B7FF",
+    "primary": "#f4700f",
+    "info": "#00B7FF",
     "success": "#22C55E",
     "warning": "#F59E0B",
     "danger": "#EF4444",
+    "bgBase": "#000000",
+    "bgSurface": "#111315",
+    "bgCard": "rgba(28, 28, 30, 0.65)",
     "text": {
       "main": "#FFFFFF",
       "muted": "rgba(255, 255, 255, 0.4)"
     },
-    "backdrop": "rgba(28, 28, 30, 0.8)"
+    "backdrop": "rgba(28, 28, 30, 0.65)"
   },
   "spacing": {
     "space-4": "4px",
