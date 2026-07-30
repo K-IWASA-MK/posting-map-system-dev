@@ -45,3 +45,26 @@
 ```
 Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition / render.js)
 ```
+
+---
+
+## 📋 Design Review Checklist (デザイン審査・承認基準)
+
+すべての設計レビュー（Figma上の各要素フェーズ）および将来の実装レビューにおいて、以下のチェックリストをすべてパスすることを必須の統治基準と定義する：
+
+* **Rule 7: Brand Core Color Alignment**
+  - ブランドコアカラー `#f4700f` が適切に使われているか。
+* **Rule 8: Outdoor Readability Compliance**
+  - 晴天下、直射日光の下でも十分に文字や情報が視認できるか。
+* **Rule 9: 8px Grid Layout Conformity**
+  - すべての余白・マージン・パディングが 8px Grid システム（4px, 8px, 12px, 16px, 24px 等）に従っているか。
+* **Rule 10: Unified Iconography Rules**
+  - アイコンセットが一つに統一され、サイズや線幅が規定通りか。
+* **Rule 11: Accessible Touch Target Sizes**
+  - ボタンやタップ可能領域が手袋をはめた手でも押しやすいサイズ（44px〜48px以上）か。
+* **Rule 12: SSOT Component Reusability**
+  - 個別のベタ書きレイアウトを排除し、定義された共通コンポーネントのみで組み立てられているか。
+* **Rule 13: Non-Color Dependent States**
+  - 赤や緑などの「色だけ」で成功・警告・エラーなどの状態を表現せず、アイコンやテキストを併用しているか。
+* **Rule 14: Token Reference Lock**
+  - 独自の色やフォントを一切ハードコードせず、定義した Design Token (変数) のみを参照しているか。
