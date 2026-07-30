@@ -57,13 +57,42 @@ Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition 
 
 ---
 
-## 📸 Evidence First Principle (エビデンス第一原則)
+## 🔒 Evidence Integrity Principle (エビデンス無謬性原則)
 
-* **No Completion without Evidence**: 単なる実装完了報告やテキスト宣言のみに基づいてスプリントの完了を認めることは一切禁止する。
-* **Mandatory Evidence Package**: すべての完了申請は、第三者が独立して検証可能な「エビデンスパッケージ」の提出を必須とする。
-* **Evidence-Based CEO Approval**: CEOによる承認判断は、主張ではなく客観的に検証可能なエビデンスに基づいて行われる。
+* **No Claims without Verifiable Artifacts**: AIエージェントによる「対応しました」「コミットしました」というテキスト文章やサマリー報告自体は、一切証拠とみなさない。
+* **Original Verification Artifacts Only**: 第三者が直接、閲覧・実行・差分比較できる独立した実物成果物（Figmaファイル、Dev Mode画面、Git Diff、E2Eログ）のみを唯一のエビデンスとして認める。
 
-> *"No sprint shall be considered complete based solely on an implementation report. Every completion claim must include an evidence package sufficient for independent review. CEO approval shall be based on verifiable evidence, not implementation claims."*
+> *"Evidence must originate from the actual implementation. Generated summaries, status reports, or AI claims are not considered evidence by themselves. Only independently verifiable artifacts may be used for CEO approval."*
+
+---
+
+## 📦 Two-Layer Evidence Package Structure (2層エビデンス構造)
+
+すべてのスプリント完了申請は、以下の2層に分類されたエビデンスパッケージを提出しなければならない：
+
+### 1. Design Evidence (デザインエビデンス)
+* **Figma File**: 公式 Design SSOT URL
+* **Dev Mode Inspector**: 構造化ノード、Inspect CSS
+* **Components & Variables**: 定義されたコンポーネントセットおよびVariables
+* **H-App Rendering**: 実機環境（Viewport）でのレンダリング画面
+
+### 2. Development Evidence (開発・ガバナンスエビデンス)
+* **Git Commit**: フルコミットハッシュ（例: `70204041`）
+* **Git Diff**: 実際のコードおよび仕様書の差分出力 (`git show <hash> --stat`)
+* **E2E Execution Log**: `node scripts/test_browser_h_app.mjs` の実行ログ
+* **Task & Governance Diffs**: `task.md` および `DESIGN_GOVERNANCE.md` の更新差分
+* **Release Tag**: バージョンタグ（例: `v5.1-ds01-complete`）
+
+---
+
+## 📋 CEO Review Checklist (CEO標準審査基準)
+
+すべてのスプリント審査において、プロダクトオーナー（CEO）は以下の共通チェックリストを用いて判定を行う：
+
+* **Design Evidence**: `[ ] PASS / [ ] FAIL`
+* **Development Evidence**: `[ ] PASS / [ ] FAIL`
+* **Critical Issues**: `[ ] NONE`
+* **Decision**: `Proceed (承認・継続)` / `Revise (修正指示)` / `Reject (却下)`
 
 ---
 
@@ -73,8 +102,8 @@ DS-01スプリントのフリーズ（完結判定）は、以下の6条件を�
 
 * [ ] **Design Structure** = 🟢 (Foundationページ, Variables, Component Set, Auto Layout, Layer命名規則, Governance遵守)
 * [ ] **Dev Mode Validation** = 🟢 (ButtonおよびCardの2セットの実証連動エビデンス)
-* [ ] **Evidence Package Submitted** (Figmaファイル, Dev Mode画面, コード差分, H-App表示, E2E結果の5点)
-* [ ] **CEO Review** = PASS (プロダクトオーナーによる最終検証承認)
+* [ ] **Two-Layer Evidence Package Submitted** (Design Evidence 4点 ＋ Development Evidence 5点)
+* [ ] **CEO Review** = PASS (上記CEO Review Checklistを満たした検証承認)
 * [ ] **Git Tag Created** = `v5.1-ds01-complete` (バージョンタグの発行)
 * [ ] **No Open Critical Issues** = 未解決のクリティカルな不具合・懸念がゼロであること
 
