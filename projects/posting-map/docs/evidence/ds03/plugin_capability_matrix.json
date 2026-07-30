@@ -1,0 +1,65 @@
+[
+  {
+    "abstractCapability": "Create Frame Capability",
+    "figmaAdapterMapping": "figma.createFrame()",
+    "status": "PASS (Plugin API Supported)",
+    "category": "Node Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  },
+  {
+    "abstractCapability": "Create Rectangle Capability",
+    "figmaAdapterMapping": "figma.createRectangle()",
+    "status": "PASS (Plugin API Supported)",
+    "category": "Node Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  },
+  {
+    "abstractCapability": "Create Text Capability",
+    "figmaAdapterMapping": "figma.createText() + figma.loadFontAsync()",
+    "status": "PASS (Plugin API Supported)",
+    "category": "Node Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  },
+  {
+    "abstractCapability": "Create Component Capability",
+    "figmaAdapterMapping": "figma.createComponent()",
+    "status": "PASS (Plugin API Supported)",
+    "category": "Node Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  },
+  {
+    "abstractCapability": "Update Node Properties Capability",
+    "figmaAdapterMapping": "node.resize(), node.fills, node.name",
+    "status": "PASS (Plugin API Supported)",
+    "category": "Node Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  },
+  {
+    "abstractCapability": "Delete Node Capability",
+    "figmaAdapterMapping": "node.remove()",
+    "status": "PASS (Plugin API Supported)",
+    "category": "Node Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  },
+  {
+    "abstractCapability": "Auto Layout Edit Capability",
+    "figmaAdapterMapping": "frame.layoutMode, frame.paddingLeft, frame.itemSpacing",
+    "status": "PASS (Plugin API Supported)",
+    "category": "Layout Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  },
+  {
+    "abstractCapability": "Constraints Edit Capability",
+    "figmaAdapterMapping": "node.constraints",
+    "status": "PASS (Plugin API Supported)",
+    "category": "Layout Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  },
+  {
+    "abstractCapability": "Write Variables Capability",
+    "figmaAdapterMapping": "figma.variables.createVariable()",
+    "status": "PASS (Plugin API Supported in Figma Desktop/Web Runtime)",
+    "category": "Variables Operations",
+    "evidenceLog": "audit_plugin_api.log"
+  }
+]
