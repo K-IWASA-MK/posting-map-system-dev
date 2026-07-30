@@ -57,12 +57,49 @@ Design Tokens (JSON / CSS) ➔ Components (JS Functions) ➔ Pages (Composition 
 
 ---
 
-## 🔒 Evidence Integrity Principle (エビデンス無謬性原則)
+## ⚖️ Governance Rules for AI Employees (AI社員統治5大原則)
 
-* **No Claims without Verifiable Artifacts**: AIエージェントによる「対応しました」「コミットしました」というテキスト文章やサマリー報告自体は、一切証拠とみなさない。
-* **Original Verification Artifacts Only**: 第三者が直接、閲覧・実行・差分比較できる独立した実物成果物（Figmaファイル、Dev Mode画面、Git Diff、E2Eログ）のみを唯一のエビデンスとして認める。
+本プロジェクトおよびAIOS（AI Operating System）におけるすべてのAIエージェント（Flash等）は、以下の5大原則を例外なく厳守しなければならない：
 
-> *"Evidence must originate from the actual implementation. Generated summaries, status reports, or AI claims are not considered evidence by themselves. Only independently verifiable artifacts may be used for CEO approval."*
+### Governance Rule 001: Evidence Integrity Principle (エビデンス無謬性原則)
+> *"No implementation claim shall be accepted as evidence. Only independently verifiable artifacts may be used for review and approval."*
+* AIエージェントによるテキスト文や自己主張は一切証拠と認めない。第三者が独立して検証可能な実物成果物（Figma URL, Dev Mode画面, Git Diff, E2Eログ）のみを承認根拠とする。
+
+### Governance Rule 002: Two-Layer Evidence Principle (2層エビデンス原則)
+* すべてのスプリントは、**Design Evidence (デザイン証拠)** ＋ **Development Evidence (開発証拠)** の両方の提出が必須。片方のみでの完了申請は不可。
+
+### Governance Rule 003: CEO Review Principle (CEO直接検証原則)
+* CEOは「AIの実装報告文」ではなく、「提出されたエビデンス」のみを審査する。 (`Flash ➔ Evidence Submitted ➔ CEO Review ➔ PASS`)
+
+### Governance Rule 004: AI Self-Declaration Prohibition (AI完了自己宣言禁止原則)
+> *"AI shall never declare that a sprint is complete. Only the CEO may declare Sprint Completion."*
+* AIエージェント（Flash）は、自ら「スプリント完了（Complete）」を宣言してはならない。発言できるのは **「Evidence Submitted (エビデンス提出済み)」** および **「Ready for CEO Review (CEOレビュー準備完了)」** のみとする。
+
+### Governance Rule 005: Freeze Authority (フリーズ・リリース権限独占原則)
+* スプリントの Freeze（フリーズ判定）、Git Tag の発行、および Release（リリース宣言）は、100% CEO（プロダクトオーナー）の独占権限とする。AIエージェントは **「Ready to Freeze (フリーズ準備完了)」** の報告に留める。
+
+---
+
+## 🔄 Standard Review Cycle (標準レビューサイクル)
+
+```
+Flash (Implementation)
+    │
+    ▼
+Evidence Package (Design Evidence + Development Evidence)
+    │
+    ▼
+CEO Review (Inspection of Verifiable Artifacts)
+    │
+    ▼
+PASS (CEO Declaration)
+    │
+    ▼
+Freeze & Git Tag (v5.1-ds01-complete)
+    │
+    ▼
+Sprint Complete
+```
 
 ---
 
