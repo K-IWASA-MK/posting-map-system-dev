@@ -383,6 +383,7 @@ function deleteAllAreaSheets() {
   props.deleteProperty("BATCH_INDEX");
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+  props.setProperty("SPREADSHEET_ID", ss.getId());
   const exclude = [
     CONFIG.get("SHEET_GUIDE"),
     CONFIG.get("SHEET_ROSTER"),

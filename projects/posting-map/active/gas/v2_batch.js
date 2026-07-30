@@ -14,6 +14,7 @@ function forceStartBatch() {
   props.setProperty("BATCH_INDEX", "0");
   
   const ss = getSS(); // Web APIでも安全に取得できるよう getSS() を使用
+  props.setProperty("SPREADSHEET_ID", ss.getId()); // アクティブなスプレッドシートIDをプロパティサービスに同期
   
   // 0. 古いエリアシートを徹底的に全削除して完全クリーン化（フェイルセーフ保護）
   const baseSheet = ss.getSheetByName(CONFIG.get("SHEET_TEMPLATE"));

@@ -49,24 +49,22 @@ function writeDebugLogToSheet(data) {
 // ① 基本設定
 // =============================
 function getSS() {
+  // 1. まずアクティブなスプレッドシート（UIコンテキスト）の取得を試みる
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss && ss.getId()) {
+      return ss;
+    }
+  } catch (e) {
+    // UIコンテキスト外（Web App実行時など）は無視してプロパティ参照へ
+  }
+
+  // 2. プロパティサービスからIDを取得して開く（Web Appフォールバック用）
   const props = PropertiesService.getScriptProperties();
   let id = props.getProperty("SPREADSHEET_ID");
   
   if (!id) {
-    try {
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
-      if (ss && ss.getId()) {
-        id = ss.getId();
-        props.setProperty("SPREADSHEET_ID", id); // 次回以降はキャッシュから取得
-      }
-    } catch (e) {
-      // Webアプリ実行時はgetActiveSpreadsheet()はnullのため無視して次のフォールバックへ
-    }
-  }
-  
-  if (!id) {
-    // 緊急フォールバック: PropertiesServiceに SPREADSHEET_ID を設定してください。
-    // 設定方法: GASエディタ → [Project Settings] → [Script Properties] → SPREADSHEET_IDを追加。
+    // 緊急フォールバック
     console.error('[getSS] SPREADSHEET_ID が未設定です。PropertiesServiceに設定してください。');
     throw new Error('SPREADSHEET_ID is not configured. Please set it in Script Properties.');
   }
