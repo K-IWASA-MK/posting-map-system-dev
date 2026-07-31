@@ -1,6 +1,15 @@
 # POSTING MAP Deployment Registry
-Version: 1.0
+Version: 1.1
 Status: SSOT
+
+## Fundamental Rule
+
+**Production の Web App URL はシステム資産である。**
+
+更新対象は URL ではなく、Deployment のコードのみとする。
+AI社員は URL を変更してはならない。
+
+---
 
 ## Purpose
 
@@ -19,51 +28,70 @@ AI社員は本ファイルを唯一の正しい情報源（SSOT）として参�
 
 ---
 
-## Deployment Rules
+## Standard Deployment Procedure (SOP)
 
-### Production
+AI社員は「知っている」ではなく「手順通り実行する」こと。
 
-必ず既存デプロイメントを更新する。
-
-```bash
-clasp deploy -i <Deployment ID>
-```
-
-### Prohibited
-
-以下は禁止。
-
-```bash
-clasp deploy
-```
-
-（新しい本番Deployment IDを作成してはいけない）
+1. Script ID を確認
+2. `clasp login` 状態を確認
+3. `clasp status`
+4. `clasp push`
+5. `clasp deploy -i <Deployment ID>`
+6. Web App の動作確認
+7. TraceLog / API の動作確認
+8. 完了報告（指定テンプレートを使用）
 
 ---
 
-## Client Rules
+## Emergency Prohibitions
 
-`config.js` の
+AI社員は以下を禁止する。
 
-```javascript
-gasWebAppUrl
-```
-
-は本番運用中は変更しない。
-
-変更が必要な場合は CEO 承認を必須とする。
+- Deployment ID を新規作成しない（`clasp deploy` のみの実行禁止）
+- Web App URL を変更しない
+- `config.js` を変更しない
+- Script ID を変更しない
+- CEO承認なしに Production を変更しない
 
 ---
 
-## AI Employee Checklist
+## Deployment Report Template
 
-**デプロイ前**
-- [ ] Script ID を確認
-- [ ] Deployment ID を確認
-- [ ] Environment を確認
+デプロイ完了後、AI社員は必ず以下のフォーマットを用いて完了報告を行うこと。
 
-**デプロイ後**
-- [ ] `clasp deploy -i` を使用したか確認
-- [ ] Web App URL が変更されていないことを確認
-- [ ] `config.js` に変更がないことを確認
-- [ ] 動作確認
+```text
+## Deployment Report
+
+Environment:
+[環境名]
+
+Script ID:
+[確認済み]
+
+Deployment ID:
+[確認済み]
+
+Push:
+✅
+
+Deploy:
+✅
+
+URL変更:
+なし
+
+config.js変更:
+なし
+
+実機確認:
+☐ 未実施
+☑ 実施
+
+TraceLog:
+☐ 未確認
+☑ 停止確認
+
+CEO確認:
+☐ 未
+☑ 完了
+```
