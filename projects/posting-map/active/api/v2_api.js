@@ -24,6 +24,7 @@ function logTrace(event, data) {
 }
 
 function writeDebugLogToSheet(data) {
+  return; // --- 無効化（高速化のためTraceLogへの書き込みを停止） ---
   try {
     const ss = getSS();
     let sheet = ss.getSheetByName("TraceLog");
