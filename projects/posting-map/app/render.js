@@ -20,6 +20,8 @@ function formatCompletedAt(dateStr) {
   return `${MM}/${dd} ${HH}:${mm}`;
 }
 
+const CITY_ORDER = { '桑名市': 1, 'いなべ市': 2, '桑名郡': 3, '員弁郡': 4, '三重郡': 5, '四日市市': 6 };
+
 function getCityName(areaName) {
   if (!areaName) return 'その他';
   // 注意: 以下のハードコードは「四日市(市)」のようにエリア名に「市」が含まれる特殊ケースへの対処。
@@ -27,7 +29,7 @@ function getCityName(areaName) {
   if (areaName.startsWith('四日市')) return '四日市市';
   if (areaName.startsWith('鈴鹿')) return '鈴鹿市';
   if (areaName.startsWith('亀山')) return '亀山市';
-  const match = areaName.match(/^[^市町\(\d]+(?:市|町)/);
+  const match = areaName.match(/^[^市町郡区\(\d]+(?:市|町|郡|区)/);
   if (match) return match[0];
   return areaName + '市';
 }
@@ -57,6 +59,13 @@ function renderAreas() {
     const cities = Object.values(cityMap).map(c => {
       c.progress = c.total > 0 ? Math.round((c.done / c.total) * 100) : 0;
       return c;
+    });
+
+    cities.sort((a, b) => {
+      const orderA = CITY_ORDER[a.name] || 99;
+      const orderB = CITY_ORDER[b.name] || 99;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.name.localeCompare(b.name);
     });
 
     const headerCardHtml = `
@@ -682,7 +691,6 @@ function renderStorageList(stocks) {
     groups[loc].push(s);
   });
 
-  const CITY_ORDER = { '伊賀市': 1, '亀山市': 2, '鈴鹿市': 3, '名張市': 4, '四日市市': 5 };
   const sortedLocations = Object.keys(groups).sort((a, b) => {
     const orderA = CITY_ORDER[a] || 99;
     const orderB = CITY_ORDER[b] || 99;
