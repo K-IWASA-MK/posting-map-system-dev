@@ -522,39 +522,8 @@ function renderSettings() {
   const container = $('settings-content');
   
   if (!userInfo) {
-    if (window.registrationError) {
-      container.innerHTML = `
-        <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
-          <div class="mb-8 text-center text-red-500">
-            <div class="text-4xl mb-4">⚠️</div>
-            <p class="text-sm leading-relaxed font-bold">
-              LINE認証の自動登録に失敗しました
-            </p>
-            <p class="text-[10px] text-red-400/65 mt-2 font-mono">
-              Registration API error. Please try again.
-            </p>
-          </div>
-          <button onclick="window.retryRegistration()" class="w-full max-w-xs bg-red-600 hover:bg-red-500 text-white rounded-2xl py-4 text-base font-bold shadow-lg transition-all">
-            再試行する
-          </button>
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = `
-      <div class="flex flex-col items-center justify-center -mt-10 pb-12 px-4">
-        <div class="mb-8 text-center">
-          <div class="inline-flex w-12 h-12 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin mb-4"></div>
-          <p class="text-sm text-white/70 leading-relaxed font-bold">
-            LINE認証を初期化中...
-          </p>
-          <p class="text-[10px] text-white/40 mt-2 uppercase tracking-widest font-mono">
-            Initializing LINE Authentication
-          </p>
-        </div>
-      </div>
-    `;
+    // サーチ画面から1.5秒で確実にID画面へ移行する仕様のため、中途半端なスピナーや登録画面等の中間表示は一切行わない
+    container.innerHTML = '';
     return;
   }
 
