@@ -13,10 +13,15 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:figma": "tsc -p plugin/tsconfig.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.132.0",
+    "typescript": "^5.9.3"
+  }
 }

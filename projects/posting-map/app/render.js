@@ -590,13 +590,6 @@ function renderSettings() {
         <button onclick="window.startEditingProfile()" class="w-full h-12 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-bold hover:bg-white/10 transition-colors">
           👤 プロフィール名前編集
         </button>
-        <p class="text-center text-[10px] text-white/30 uppercase tracking-widest leading-none select-none">
-          <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('terms', event)">Terms</span>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('privacy', event)">Privacy</span>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <span class="cursor-pointer hover:text-white transition-colors" onclick="openIdInfoModal('license', event)">License</span>
-        </p>
       </div>
     </div>
   `;
