@@ -1,8 +1,0 @@
-export enum EvolutionStatus {
-  IDLE = "IDLE",
-  ANALYZING = "ANALYZING",
-  PLANNING = "PLANNING",
-  SIMULATED = "SIMULATED",
-  VALIDATED = "VALIDATED",
-  REJECTED = "REJECTED"
-}

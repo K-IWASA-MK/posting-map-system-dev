@@ -1,7 +1,0 @@
-export enum ResourceHealth {
-  NORMAL = "NORMAL",
-  WARNING = "WARNING",
-  SATURATED = "SATURATED",
-  FAILED = "FAILED",
-  RECOVERING = "RECOVERING"
-}
