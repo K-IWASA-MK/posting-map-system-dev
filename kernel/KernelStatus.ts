@@ -1,8 +1,0 @@
-export enum KernelStatus {
-  IDLE = "IDLE",
-  RECEIVING = "RECEIVING",
-  EVALUATING = "EVALUATING",
-  ROUTING = "ROUTING",
-  RESOLVED = "RESOLVED",
-  BLOCKED = "BLOCKED"
-}
