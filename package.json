@@ -1,24 +1,17 @@
 {
-  "name": "aios-workspace",
-  "version": "5.0.0-alpha.0",
-  "private": true,
-  "workspaces": [
-    "sdk",
-    "projects/*",
-    "shared"
-  ],
-  "description": "AIOS Platform and Products Workspace",
-  "main": "src/index.ts",
-  "scripts": {
-    "build": "tsc --noEmit",
-    "build:gas": "python3 tools/build_gas.py",
-    "test": "npx ts-node -r tsconfig-paths/register tools/testing/TestRunner.ts",
-    "architecture:test": "npx ts-node -r tsconfig-paths/register tools/architecture-check.ts",
-    "quality:check": "npm run build && npx ts-node -r tsconfig-paths/register tools/testing/TestRunner.ts && npx ts-node -r tsconfig-paths/register tools/runtime/ValidationRuntime.ts"
+  "name": "@kiwasa/posting-map",
+  "version": "1.0.0",
+  "description": "POSTING MAP Product",
+  "main": "client-loader.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
   },
-  "devDependencies": {
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.4.5"
-  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
 }

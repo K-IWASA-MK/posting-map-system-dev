@@ -1,58 +1,12 @@
-# OS files
-.DS_Store
-Thumbs.db
-
-# GAS / clasp
-.clasp.json
-.clasprc.json
-appsscript.json
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.venv/
-env/
-build/
-dist/
-
-# Project Data
-*.csv
-*.zip
-*.pdf
-
-# Backups & Archives
-*.bak
-*.old
-*_backup*
-backup_*/
-backups/
-gas_v2_backup.gs.txt
-
-# Test / Debug files (do not commit to production)
-test_backend.*
-process_postal.py
-implementation_plan.html
-
-# IDE/Local settings
-.vscode/
-.idea/
-# .claude/  # 通常は含めるが、プロジェクト設定として共有する場合はコメントアウト
-
-# Local credentials
-.clasprc.json.local.bak
-.clasp.json.bak
-.env
-tools/.kernel_secret
-
-# Dependencies
+# Dependencies & Cache
 node_modules/
-
-# AIOS generated artifacts & temporary files
+.vite/
 *.log
-coordinate_cache.json
-scratch/
-test_out/
-run_poc-output/
-*_runtime.json
-review_history_db.json
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+
+# Local Credentials / Secret Backups
+.clasprc.json.local*
